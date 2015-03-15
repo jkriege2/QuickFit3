@@ -11,8 +11,10 @@ QFRDRTableSetCellsDialog::QFRDRTableSetCellsDialog(const QVariant &init, QWidget
     ui->chkBoolean->setChecked(init.toBool());
     ui->edtDateTime->setDateTime(init.toDateTime());
     switch(init.type()) {
-        case QVariant::String: ui->cmbType->setCurrentIndex(0); break;
-        case QVariant::Double: ui->cmbType->setCurrentIndex(1); break;
+        case QVariant::String:
+            ui->cmbType->setCurrentIndex(0); break;
+        case QVariant::Double:
+            ui->cmbType->setCurrentIndex(1); break;
         case QVariant::LongLong:
         case QVariant::Int:
         case QVariant::ULongLong:

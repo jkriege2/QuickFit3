@@ -26,6 +26,7 @@
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include "qfsimpletreemodel.h"
+#include "qfpseudotreemodel.h"
 
 namespace Ui {
     class QFFitFunctionSelectDialog;
@@ -40,16 +41,22 @@ class QFWIDLIB_EXPORT QFFitFunctionSelectDialog : public QDialog
         ~QFFitFunctionSelectDialog();
 
         QString getSelected() const;
+        QString getCurrentItem() const;
         void init(const QString& filter, const QString& current);
         void init(const QStringList& availableFF, const QString& current);
 
     protected slots:
-        void currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+        void currentRowChanged(const QModelIndex &current, const QModelIndex &previous=QModelIndex());
+        void currentRowAccepted(const QModelIndex &current, const QModelIndex &previous=QModelIndex());
         void on_edtFilter_textChanged( const QString & text );
     private:
         Ui::QFFitFunctionSelectDialog *ui;
+        //QFPseudoTreeModel* model;
         QFSimpleTreeModel* model;
         QFSimpleTreeModelSortFilterProxyModel filterModel;
+        //QFPseudoTreeModelSortFilterProxyModel filterModel;
+
+        QString currentFunction;
 };
 
 #endif // QFFITFUNCTIONSELECTDIALOG_H

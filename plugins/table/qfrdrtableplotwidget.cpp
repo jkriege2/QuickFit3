@@ -374,6 +374,14 @@ void QFRDRTablePlotWidget::setAxisProps(JKQTPcoordinateAxis* axis, const QFRDRTa
     axis->set_labelFontSize(p.axisLabelFontSize);
     axis->set_tickLabelFont(p.fontName);
     axis->set_tickLabelFontSize(p.axisFontSize);
+    axis->set_minorTickLabelFontSize(p.axisMinorFontSize);
+    axis->set_minorTickLabelFullNumber(!axisData.minorTickLabelsOnlyDigit);
+    if (axisData.LinTicksForLogAxis && axisData.log) {
+        axis->set_tickMode(JKQTPLTMLin);
+    } else{
+        axis->set_tickMode(JKQTPLTMLinOrPower);
+    }
+    axis->set_minorTickLabelsEnabled(axisData.minorTickLabels);
     axis->set_drawGrid(p.grid&&majorGrid);
     axis->set_gridWidth(p.gridWidth);
     axis->set_gridStyle(p.gridStyle);
@@ -396,6 +404,7 @@ void QFRDRTablePlotWidget::setAxisProps(JKQTPcoordinateAxis* axis, const QFRDRTa
 
 
     axis->set_userTickSpacing(axisData.TickSpacing);
+    axis->set_userLogTickSpacing(axisData.TickSpacingLog);
     axis->set_autoAxisSpacing(axisData.AutoTicks);
     axis->set_tickSpacing(axisData.TickSpacing);
     axis->set_userTickSpacing(axisData.TickSpacing);

@@ -38,12 +38,18 @@ class QFLIB_EXPORT QFEnhancedComboBox : public QComboBox
         explicit QFEnhancedComboBox(QWidget *parent = 0);
         QVariant currentData(int role=Qt::UserRole) const;
 
+        virtual QVariant getCurrentIndexData(int role) const;
+        virtual void setCurrentFromModelData(const QVariant& data, int role=Qt::UserRole) ;
+
     public slots:
+        virtual void selectIndex(const QModelIndex&index);
         void setCurrentData(const QVariant& data, int role=Qt::UserRole);
     signals:
 
-    public slots:
-
+    protected:
+        virtual void wheelEvent(QWheelEvent *e);
+        virtual void keyPressEvent(QKeyEvent *e);
+        virtual void correctCurrentItem();
 };
 
 #endif // QFENHANCEDCOMBOBOX_H

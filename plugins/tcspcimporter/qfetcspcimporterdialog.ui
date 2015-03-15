@@ -740,6 +740,9 @@ p, li { white-space: pre-wrap; }
                   <height>0</height>
                  </size>
                 </property>
+                <property name="currentIndex">
+                 <number>2</number>
+                </property>
                 <property name="sizeAdjustPolicy">
                  <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
                 </property>
@@ -751,6 +754,11 @@ p, li { white-space: pre-wrap; }
                 <item>
                  <property name="text">
                   <string>bin and correlate: Multi-Tau 2 (one monitor for all lags)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>photon arrival times correlator (Multi-Tau)</string>
                  </property>
                 </item>
                </widget>
@@ -1227,9 +1235,9 @@ p, li { white-space: pre-wrap; }
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfetcspcimporter.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

@@ -75,6 +75,7 @@ class QFRDRTableAxisSettingsWidget : public QWidget
         void on_btnAutoscaleX_clicked();
         void plotDataChanged();
         void updateComboboxes();
+        void on_chkXAutoTicks_toggled(bool enabled);
 
     protected:
 

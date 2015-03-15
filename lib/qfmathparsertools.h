@@ -221,7 +221,7 @@ struct QFLIB_EXPORT qfmpResult {
          *
          * \return \c true on success
          */
-        QFLIB_EXPORT bool setVariant(const QVariant& data);
+        QFLIB_EXPORT bool setVariant(const QVariant& data, bool convertLists=true);
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
         QFLIB_EXPORT QStringList asStrVector() const;
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */

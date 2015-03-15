@@ -61,9 +61,9 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
         /** \copydoc QFExtension::getDescription() */
         virtual QString getDescription() const  { return tr("TCSPC importer (FCS, count rates, ...)"); }
         /** \copydoc QFExtension::getAuthor() */
-        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); }
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger, Sebastian Isbaner"); }
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2012 by Jan W. krieger"); }
+        virtual QString getCopyright() const  { return tr("(c) 2012-2015 by Jan W. Krieger (TTTR correlator code by Sebastian Isbaner)"); }
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
         /** \copydoc QFExtension::getIconFilename() */
@@ -71,7 +71,7 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=2;
         }
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();

@@ -54,7 +54,7 @@ QVariant QFTreeViewComboBox::getCurrentIndexData(int role) const
 void QFTreeViewComboBox::setCurrentFromModelData(const QVariant &data, int role)
 {
     //qDebug()<<"setCurrentFromModelData("<<data<<", "<<role<<")";
-    if (!setCurrentFromModelData(data, QModelIndex()))//model()->index(0,0)))
+    if (!setCurrentFromModelData(data, QModelIndex(), role))//model()->index(0,0)))
         setCurrentIndex(-1);
 }
 
@@ -93,8 +93,7 @@ void QFTreeViewComboBox::showPopup()
 {
     setRootModelIndex(QModelIndex());
 
-    for(int i=1;i<model()->columnCount();++i)
-    _treeView->hideColumn(i);
+    for(int i=1;i<model()->columnCount();++i)  _treeView->hideColumn(i);
 
     _treeView->expandAll();
     _treeView->setItemsExpandable(false);
@@ -123,6 +122,7 @@ void QFTreeViewComboBox::indexSelected(const QModelIndex &idx)
 {
     //qDebug()<<"indexSelected("<<idx<<")";
     currentItemIndex=idx;
+    setRootModelIndex(idx.parent());
 }
 
 

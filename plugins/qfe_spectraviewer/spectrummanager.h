@@ -46,7 +46,7 @@
 #include "jkiniparser2.h"
 #include <QStringList>
 #include <QSettings>
-#include "qfsimpletreemodel.h"
+#include "QFPseudoTreeModel.h"
 
 /** \brief this class is used to manage fluorophor properties and spectra
  *  \ingroup diff4_tools
@@ -229,18 +229,18 @@ class SpectrumManager {
 
         /** \brief fluorophor database */
         QMap<QString, FluorophoreData> fluorophores;
-        QFSimpleTreeModel* fluorophoresTree;
+        QFPseudoTreeModel* fluorophoresTree;
         /** \brief lightsource database */
         QMap<QString, LightSourceData> lightsources;
-        QFSimpleTreeModel* lightsourcesTree;
+        QFPseudoTreeModel* lightsourcesTree;
         /** \brief filter database */
         QMap<QString, FilterData> filters;
-        QFSimpleTreeModel* filtersTree;
+        QFPseudoTreeModel* filtersTree;
         /** \brief detector database */
         QMap<QString, DetectorData> detectors;
-        QFSimpleTreeModel* detectorsTree;
+        QFPseudoTreeModel* detectorsTree;
 
-        QFSimpleTreeModel* laserlinesTree;
+        QFPseudoTreeModel* laserlinesTree;
 
     private:
 
@@ -271,15 +271,15 @@ class SpectrumManager {
         QStringList getDetectors() const;
 
         /** \brief get fluorophore IDs */
-        QFSimpleTreeModel* getFluorophoresTree() const;
+        QFPseudoTreeModel* getFluorophoresTree() const;
         /** \brief get lightsource IDs */
-        QFSimpleTreeModel* getLightSourcesTree() const;
+        QFPseudoTreeModel* getLightSourcesTree() const;
         /** \brief get filter IDs*/
-        QFSimpleTreeModel* getFiltersTree() const;
+        QFPseudoTreeModel* getFiltersTree() const;
         /** \brief get detector IDs */
-        QFSimpleTreeModel* getDetectorsTree() const;
+        QFPseudoTreeModel* getDetectorsTree() const;
         /** \brief get detector IDs */
-        QFSimpleTreeModel* getLaserlinesTree() const;
+        QFPseudoTreeModel* getLaserlinesTree() const;
 
         void clear();
 

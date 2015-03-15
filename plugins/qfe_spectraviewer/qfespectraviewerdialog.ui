@@ -373,7 +373,7 @@
                  </layout>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QFTreeViewComboBox" name="cmbFilter"/>
+                 <widget class="QFEnhancedComboBox" name="cmbFilter"/>
                 </item>
                 <item row="2" column="1">
                  <spacer name="verticalSpacer_6">
@@ -529,14 +529,14 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QFTreeViewComboBox" name="cmbLaserLine"/>
+                 <widget class="QFEnhancedComboBox" name="cmbLaserLine"/>
                 </item>
                </layout>
               </widget>
               <widget class="QWidget" name="widLSSpectrum">
                <layout class="QGridLayout" name="gridLayout_4">
                 <item row="0" column="1">
-                 <widget class="QFTreeViewComboBox" name="cmbLightsource"/>
+                 <widget class="QFEnhancedComboBox" name="cmbLightsource"/>
                 </item>
                 <item row="1" column="1">
                  <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -599,7 +599,7 @@
           <widget class="QWidget" name="widDetector">
            <layout class="QGridLayout" name="gridLayout_3">
             <item row="0" column="1">
-             <widget class="QFTreeViewComboBox" name="cmbDetector"/>
+             <widget class="QFEnhancedComboBox" name="cmbDetector"/>
             </item>
             <item row="1" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -657,7 +657,7 @@
           <widget class="QWidget" name="widFluorophore">
            <layout class="QGridLayout" name="gridLayout_2">
             <item row="0" column="1">
-             <widget class="QFTreeViewComboBox" name="cmbFluorophore"/>
+             <widget class="QFEnhancedComboBox" name="cmbFluorophore"/>
             </item>
             <item row="1" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -768,9 +768,9 @@
    <header>qenhancedtableview.h</header>
   </customwidget>
   <customwidget>
-   <class>QFTreeViewComboBox</class>
+   <class>QFEnhancedComboBox</class>
    <extends>QComboBox</extends>
-   <header>qftreeviewcombobox.h</header>
+   <header>qfenhancedcombobox.h</header>
   </customwidget>
  </customwidgets>
  <resources>

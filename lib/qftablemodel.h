@@ -440,13 +440,13 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         };
 
         /** \brief reads an XML-encoded table (see saveXML() ) from the string \a data and inserts it ito the table, starting at \a start_row, \a start_col */
-        bool readXML(const QString& data, int start_row=0, int start_col=0, bool clearTable=false, bool read_template_only=false, ReadHeaderMode alsoReadHeaders=rhmOverwriteNondefault);
+        bool readXML(const QString& data, int start_row=0, int start_col=0, bool clearTable=false, bool read_template_only=false, ReadHeaderMode alsoReadHeaders=rhmOverwriteNondefault, const QSet<int>& dontImportRoles=QSet<int>(), const QSet<int>& dontImportHeaderRoles=QSet<int>());
         /** \brief reads an XML-encoded table (see saveXML() ) from the file \a filename */
         bool readXMLFile(const QString& filename, int start_row=0, int start_col=0, bool clearTable=true, bool read_template_only=false);
         /** \brief copies the given selection (or all cells, if the selection is empty) to the clipboard in an XML format (see saveXML() ) */
         void copy(QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false, bool template_only=false);
         /*! \brief pastes data from the cklipboard into the table, starting from the given position ... the table is resized if needed */
-        void paste(int row_start=0, int column_start=0);
+        void paste(int row_start=0, int column_start=0, const QSet<int> &dontImportRoles=QSet<int>(), const QSet<int> &dontImportHeaderRoles=QSet<int>());
         /*! \brief pastes data from the cklipboard into the table, starting from the given position ... the table is resized if needed */
         void pasteHeaderTemplate(int row_start=0, int column_start=0);
 

@@ -413,6 +413,9 @@
             <li>reordered menus a bit</li>
             <li>added mtuli-column properties editor</li>
             <li>added "Cells | set value in cells" function, which fills alls elected cells with a single value!</li>
+            <li>added "Edit | Paste without expressions", which pastes the contenst of the clipboard into the table, but omitting the expressions</li>
+            <li>improved error-reporting of column/data functions in parser</li>
+            <li>improved error reporting in column/cell expression editor dialogs (now also errors during evaluation are reported!)</li>
       </ul></li>
       <li><b>B040SPIM</b><ul>
             <li>added JavaScript functions to set preview acquisition camera parameters</li>
@@ -539,6 +542,7 @@
       <li><b>tcspcimporter:</b><ul>
         <li>improvements: now group+role of the output records are set properly (according to input file!)</li>
         <li>the tcspcimporter now create the new QF3 ASCII correlation data files and imports those into the project. This fixes different inconsistencies with groups, roles and count-rates, when creating FCCS datasets from TCSPC data.</li>
+        <li>added initial support for TTTR correlator</li>
       </ul></li>
       <li><b>qfe_calculator</b><ul>
             <li>a new set of plot-commands allows to generate graphs (somewhat working like the respective Matlab functions): <tt>plot(), bar(), scatter(), semilogx(), semilogy(), colorscatter(), errorbar(), xerrorbar(), yerrorbar(), ...</tt></li>

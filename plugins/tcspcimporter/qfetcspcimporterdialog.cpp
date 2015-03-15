@@ -466,7 +466,7 @@ void QFETCSPCImporterDialog::updateCorrelator() {
     double taumin=ui->spinFCSTauMin->value();
     double taumax=taumin;
 
-    if (corrType==0) {
+    if (corrType==CORRELATOR_MTAUALLMON/* || corrType==CORRELATOR_TTTR*/) {
         taumax=0;
         for (int s=0; s<S; s++) {
             if (s==0) {
@@ -494,7 +494,7 @@ void QFETCSPCImporterDialog::updateDuration() {
         stop=qMin(duration, ui->spinRangeEnd->value());
     }
     ui->labRange->setText(tr("duration: %1s countrates: [ %2 ] kHz").arg(fabs(stop-start)).arg(countRateString));
-    ui->labSegments->setText(tr("à %1 seconds").arg(fabs(stop-start)/double(ui->spinSegments->value())));
+    ui->labSegments->setText(tr("%1 seconds each").arg(fabs(stop-start)/double(ui->spinSegments->value())));
 }
 
 
@@ -574,6 +574,7 @@ void QFETCSPCImporterDialog::updateFromFile(bool readFrameCount) {
             }
             tmFCS->setReadonly(true);
             ui->tvFCS->setModel(tmFCS);
+            ui->spinFCSCRBinning->setValue((duration/double(ui->spinSegments->value())/1000.0)*1.0e3);
 
             countRateString="";
             for (int i=0; i<channels; i++) {

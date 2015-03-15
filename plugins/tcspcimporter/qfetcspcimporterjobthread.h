@@ -48,6 +48,7 @@ class QFETCSPCImporterJobThread; // forward
 
 #define CORRELATOR_MTAUALLMON 0
 #define CORRELATOR_MTAUONEMON 1
+#define CORRELATOR_TTTR 2
 
 
 /*! \brief job description for tcspc evaluation
@@ -280,13 +281,14 @@ protected:
 
     QMap<uint32_t, corrjb_type*> corrjb;
     QMap<uint32_t, corrjk_type*> corrjk;
+    QMap<uint32_t, QVector<double> > corrtttr;
     QMap<uint64_t, QVector<double> > fcs_ccfs;
     QMap<uint32_t, QVector<double> > fcs_crs;
     QVector<double> fcs_tau;
 
     void clearCorrelators();
     void createCorrelators();
-    void copyCorrelatorIntermediateResults(uint16_t fcs_segment);
+    void copyCorrelatorIntermediateResults(uint16_t fcs_segment, const QList<QVector<double> > &arrivaltimes=QList<QVector<double> >());
     void shiftIntoCorrelators(uint16_t *fcs_countrate, uint32_t count);
 
     double starttime;

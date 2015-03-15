@@ -26,16 +26,20 @@ For the FCS/FCCS functionality you may set several options:
   <li><b>FCS countrate binning:</b> This plugin saves a binned countrate together with the correlation function. This is used to present a rough overview of the countrate during the experiment to the user. It has no influence on the data processing! Set this bining to an intermediate level such as 10-100ms, which will result an intermediate number of datapoints to the user. A finer resolution usually does not contain more information, but will slow down the display routines.</li>
 </ul>
 
-$$qf_commondoc_backtop$$
+
 <a name="#createdFiles"><h2>Created Files</h2>
 <ul>
   <li>See <a href="$$mainhelpdir$$/fcs_qf3format.html">QF3 ASCII FCS Data Format</a> for a description of the ASCII-dataformat, used for FCS/FCCS auto- and cross-correlation data.</li>
 </ul>
 
-$$qf_commondoc_backtop$$
+
+
 <a name="#correlators"><h2>Correlators</h2>
 <h3>Bin&amp;Correlate: Multi-&tau; Correlator:</h3>
 
+
+<h4>Algorithm</h4>
+<p>
 Here the input photon stream is binned into bins of width &tau;<sub>min</sub> that are then processed by a multi-&tau; correlator:
                            <blockquote>
      <img src="./pic/discrete_timeseries.png">
@@ -46,9 +50,9 @@ Here the input photon stream is binned into bins of width &tau;<sub>min</sub> th
   </blockquote>
                           this corresponds to the continuum definition:
                           $$bmath:g(\tau)=\frac{\langle I(t)\cdot J(t+\tau)\rangle}{\langle I\rangle\cdot\langle J\rangle}$$
-		  with
-		  $$bmath:\langle I(t)\rangle=\limi_{T\rightarrow\infty}\frac{1}{T}\int_0^T I(t)\;\mathrm{d}t$$
-  The correlation scheme used in this function was introduced by K. Schätzel [1,2] for hardware correlators. It allows to estimate the ACF/CCF without keeping the whole time series in memory. It is based on the above semi-logarithmically spaced values of <i>&tau;<sub>s,p</sub></i>. For each of the <i>P</i> linear blocks an averaged set of input signals is created:
+          with
+          $$bmath:\langle I(t)\rangle=\limi_{T\rightarrow\infty}\frac{1}{T}\int_0^T I(t)\;\mathrm{d}t$$
+  The correlation scheme used in this function was introduced by K. Sch&auml;tzel $$ref:SCHAETZEL85: K. Sch&auml;tzel (1985): <b>New concepts in correlator design</b>, <i>Institute of Physics Conference Series</i> <b>77</b>, 175-184.$$$$ref:SCHAETZEL90:K. Sch&auml;tzel (1990): <b>Noise on photon correlation data: I. Autocorrelation functions</b>, <i>Quantum Opt.</i> <b>2</b>, 287-305$$ for hardware correlators. It allows to estimate the ACF/CCF without keeping the whole time series in memory. It is based on the above semi-logarithmically spaced values of <i>&tau;<sub>s,p</sub></i>. For each of the <i>P</i> linear blocks an averaged set of input signals is created:
      <blockquote>
        <img src="./pic/multitau_signals.png">
      </blockquote>      
@@ -56,19 +60,19 @@ Here the input photon stream is binned into bins of width &tau;<sub>min</sub> th
      <blockquote>
        <img src="./pic/multitau_ccf.png">
      </blockquote>            
-  As can be seen only the averages intensities <i>I<sub>s,n</sub></i> appear in the formula. This scheme can also be drawn as a schematic, which shows the direct connection to a simple hardware implementation [3]:
+  As can be seen only the averages intensities <i>I<sub>s,n</sub></i> appear in the formula. This scheme can also be drawn as a schematic, which shows the direct connection to a simple hardware implementation $$ref:BUCHHOLZ2011:J. Buchholz, J.W. Krieger, etal (2011): <b>FPGA implementation of a 32&times;32 autocorrelator array for analysis of fast image series</b>, <i>Optics Express</i>, vol. 20, issue 16, p. 17767$$:
      <blockquote>
        <img src="./pic/multi_tau_schaematic.png">
      </blockquote>
-    The &Delta;&tau; blocks delay the input signal by &Delta;&tau;, the &times;-blocks multiply the two input signals and the &Sigma;-blocks accumulate the input. The top row (a) shows a fully linear implementation (no logarithmic spacing) and (b)/(c) the multi-&tau; implementation. This plugin contains a software version of this scheme. Using this scheme introduces an additional (triangular) averaging into the ACF/CCF (as compared to the direct estimation), but allows to calculate it without the need to keep the whole image series in memory. Also this averaging depends on the linear block <i>s</i> and has only little impakt for small <i>s</i>. the systematic error introduced increases for the larger lags for which usually measured ACFs/CCFs already decayed to 0 [4]:
+    The &Delta;&tau; blocks delay the input signal by &Delta;&tau;, the &times;-blocks multiply the two input signals and the &Sigma;-blocks accumulate the input. The top row (a) shows a fully linear implementation (no logarithmic spacing) and (b)/(c) the multi-&tau; implementation. This plugin contains a software version of this scheme. Using this scheme introduces an additional (triangular) averaging into the ACF/CCF (as compared to the direct estimation), but allows to calculate it without the need to keep the whole image series in memory. Also this averaging depends on the linear block <i>s</i> and has only little impakt for small <i>s</i>. the systematic error introduced increases for the larger lags for which usually measured ACFs/CCFs already decayed to 0 $$ref:KOJIRO:Z. Kojro, A. Riede, M. Schubert and W. Grill (1999): <b>Systematic and statistical errors in correlation estimators obtained from various digital correlators</b> <i>Review of Scientific Instruments</i> <b>70</b>, 4487-4496$$:
      <blockquote>
        <img src="./pic/multitau_avg.png">
      </blockquote>
-  Here <img src="./pic/multitau_avg_triangle.png"> is a triangular kernel function and * denotes the convolution product. 
+  Here <img src="./pic/multitau_avg_triangle.png"> is a triangular kernel function and * denotes the convolution product. </p>
 
 
 <h4>Normalization</h4>
-All types of correlators use the same normalization scheme for the term <i>1/&lang;I&rang;&lang;J&rang;</i> in the definition of the ACF/CCF. The normalization scheme is called "symmetric normalization", introduced in [2]. This normalization takes care for the reduced number <i>T-&tau;<sub>s,p</sub></i> of accumulations in the ACF/CCF and is defined as:
+<p>All types of correlators use the same normalization scheme for the term <i>1/&lang;I&rang;&lang;J&rang;</i> in the definition of the ACF/CCF. The normalization scheme is called "symmetric normalization", introduced in $$ref:SCHAETZEL90:$$. This normalization takes care for the reduced number <i>T-&tau;<sub>s,p</sub></i> of accumulations in the ACF/CCF and is defined as:
      <blockquote>
        <img src="./pic/symm_normalization.png">
      </blockquote>
@@ -76,8 +80,17 @@ The "delayed monitor" <i>M(&tau;<sub>k</sub>)</i> may be estimated in two ways. 
      <blockquote>
        <img src="./pic/symm_normalization_estimate.png">
      </blockquote>
-from the zero-lag monitor <i>M(0)</i>. This method possibly introduces additional errors that are but negligible for longer image series (see [3] for a detailed discussion).
+from the zero-lag monitor <i>M(0)</i>. This method possibly introduces additional errors that are but negligible for longer image series (see $$ref:BUCHHOLZ2011:$$ for a detailed discussion).
 </p>
+
+
+
+<h3>TTTR correlation</h3>
+<p>This correlator is described in Ref. $$ref:LAURENCE06:
+Laurence T A, Fore S, Huser T  (2006) Fast, flexible algorithm for calculating photon correlations. <i>Optics Letters</i> <b>31</b><b>:</b> 829ff $$. It directly takes the photon-arrivaltimes from the TCSPC file as input. basically it counts the number of photons with a given arrival-time distance $(\tau)$, which  only differs from $(g(\tau))$ by a normalization factor. This algorithm is advisable, if the countrate is low (a few kHz). For higher countrates, the bin&amp;correlate algorithms are usually faster. This algorithm was implemented by Sebastian Isbaner.$$invisibleref:WAHL03:
+Wahl M, Gregor I, Patting M, Enderlein J  (2003) Fast calculation of fluorescence correlation data with asynchronous time-correlated single-photon counting. <i>Optics Express</i> <b>11</b><b>:</b> 3583-3591$$
+ </p>
+
 <h3>Comparison of the correlators</h3>
 <p>
   In general the results of all correlation scheme are the same. Those with intrinsic averaging will decrease the noise on the correlation curve at larger lag times, where the statistics tends to get worse due to the fewer summands in the average. This is beneficial, when the correlation curves decay to zero/one in this regime, as then the estimation error is decreased. If the correlation curves do not decay, using a correlator with averaging will introduce an additional systematic error. This can be illustrated in these examples:
@@ -92,18 +105,14 @@ from the zero-lag monitor <i>M(0)</i>. This method possibly introduces additiona
     In addition to these discussed errors there are other differences in the implementations: The <i>direct correlators</i> need the whole image series to reside in memory, so if your image series is very long (longer than ~1,000,000 frames and with many pixels) it is usually better to use the multi-&tau; correlators, as these are fed frame by frame, so only few frames reside in memory at every time. 
   </p>
 
-$$qf_commondoc_backtop$$
+
   <p></p>
   <p></p>
   <p></p>
 
 
-<a name="#references"><h2>References:</h2><blockquote>
-  [1]: K. Sch&auml;tzel (1985): <b>New concepts in correlator design</b>, <i>Institute of Physics Conference Series</i> <b>77</b>, 175-184.<br>
-  [2]: K. Sch&auml;tzel (1990): <b>Noise on photon correlation data: I. Autocorrelation functions</b>, <i>Quantum Opt.</i> <b>2</b>, 287-305<br>
-  [3]: J. Buchholz, J.W. Krieger, etal (2011): <b>FPGA implementation of a 32&times;32 autocorrelator array for analysis of fast image series</b>, <i>Optics Express</i>, vol. 20, issue 16, p. 17767<br>
-  [4]: Z. Kojro, A. Riede, M. Schubert and W. Grill (1999): <b>Systematic and statistical errors in correlation estimators obtained from various digital correlators</b> <i>Review of Scientific Instruments</i> <b>70</b>, 4487-4496<br>
-</blockquote></p>
+<a name="#references"><h2>References</h2>
+<p>$$references$$</p>
 </body>
 </html>
 

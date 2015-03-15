@@ -138,11 +138,16 @@ void QFRDRTableFormulaDialog::on_edtFormula_textChanged(QString text) {
     // parse some numeric expression
     n=mp.parse(getExpression());
     if (mp.hasErrorOccured()) {
-        ui->labError->setText(tr("<font color=\"red\">ERROR:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
+        ui->labError->setText(tr("<font color=\"red\">PARSE ERROR:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
     } else {
         if (ui->chkPreview->isChecked()) {
+            mp.resetErrors();
             QString testout=qfShortenString(n->evaluate().toTypeString(), 250, 30, tr(" ... "));
-            ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>&nbsp;&nbsp;&nbsp;&nbsp;<i>expression result preview:</i>&nbsp;&nbsp;%1").arg(testout));
+            if (mp.hasErrorOccured()) {
+                ui->labError->setText(tr("<font color=\"red\">EVALUATION ERROR:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
+            } else {
+                ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>&nbsp;&nbsp;&nbsp;&nbsp;<i>expression result preview:</i>&nbsp;&nbsp;%1").arg(testout));
+            }
         } else {
             ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
         }

@@ -78,6 +78,9 @@ public:
 
 
 
+
+
+
  class QFLIB_EXPORT QFSimpleTreeModelItem {
  public:
          QFSimpleTreeModelItem(const QString &text, QFSimpleTreeModelItem *parent = 0);

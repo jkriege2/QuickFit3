@@ -99,6 +99,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slResize();
         void slCopy();
         void slPaste();
+        void slPasteNoEquations();
         void slCut();
         void slDelete();
         void slMakeEditable();
@@ -200,6 +201,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actCopy;
         QAction* actCut;
         QAction* actPaste;
+        QAction* actPasteNoEquations;
         QAction* actImportFromClipboard;
         QAction* actHistogram;
         QAction * actHistogram2D;

@@ -408,7 +408,7 @@ bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, 
                         reader->readFrameDouble(d, filechannel);
                     } else {
                         if (reader->frameChannels()==1)  {
-                            double* tmp=(double*)qfMalloc(reader->frameWidth()*reader->frameHeight()*sizeof(double));
+                            double* tmp=(double*)qfCalloc(reader->frameWidth()*reader->frameHeight()*sizeof(double));
                             reader->readFrameDouble(tmp);
                             if (whichHalfToLoad==qfihAny) {
                                 double* d1=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);

@@ -31,8 +31,50 @@ QVariant QFEnhancedComboBox::currentData(int role) const
     return itemData(currentIndex(), role);
 }
 
+QVariant QFEnhancedComboBox::getCurrentIndexData(int role) const
+{
+    return currentData(role);
+}
+
+void QFEnhancedComboBox::setCurrentFromModelData(const QVariant &data, int role)
+{
+    setCurrentData(data, role);
+}
+
+void QFEnhancedComboBox::selectIndex(const QModelIndex &index)
+{
+    setCurrentIndex(index.row());
+    correctCurrentItem();
+}
+
 void QFEnhancedComboBox::setCurrentData(const QVariant &data, int role)
 {
     int idx=findData(data, role);
     setCurrentIndex(idx);
+    correctCurrentItem();
+}
+
+void QFEnhancedComboBox::wheelEvent(QWheelEvent *e)
+{
+    QComboBox::wheelEvent(e);
+    correctCurrentItem();
+}
+
+void QFEnhancedComboBox::keyPressEvent(QKeyEvent *e)
+{
+    QComboBox::keyPressEvent(e);
+    correctCurrentItem();
+}
+
+void QFEnhancedComboBox::correctCurrentItem()
+{
+    int r=currentIndex();
+    Qt::ItemFlags flags=model()->flags(model()->index(r, 0, rootModelIndex()));
+    if (flags&Qt::ItemIsSelectable==0 || flags&Qt::ItemIsEnabled==0) {
+        Qt::ItemFlags f=model()->flags(model()->index(r, 0, rootModelIndex()));
+        while (r>=0 && (f&Qt::ItemIsSelectable==0 || f&Qt::ItemIsEnabled==0)) {
+            r--;
+        }
+        setCurrentIndex(r);
+    }
 }

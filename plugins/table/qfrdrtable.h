@@ -428,6 +428,10 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             bool axis0;
 
             double TickSpacing;
+            double TickSpacingLog;
+            bool minorTickLabelsOnlyDigit;
+            bool LinTicksForLogAxis;
+            bool minorTickLabels;
             bool AutoTicks;
             double AxisTickWidth;
             double AxisMinorTickWidth;
@@ -479,6 +483,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
             double labelFontSize;
             double axisFontSize;
+            double axisMinorFontSize;
             double axisLabelFontSize;
             double keyTransparency;
             JKQTPkeyPosition keyPosition;

@@ -207,6 +207,10 @@ void QFRDRTableEditor::createWidgets() {
     connect(this, SIGNAL(enableActions(bool)), actPaste, SLOT(setEnabled(bool)));
     connect(actPaste, SIGNAL(triggered()), this, SLOT(slPaste()));
 
+    actPasteNoEquations=new QAction(QIcon(":/table/paste.png"), tr("Paste without expressions"), this);
+    connect(this, SIGNAL(enableActions(bool)), actPasteNoEquations, SLOT(setEnabled(bool)));
+    connect(actPasteNoEquations, SIGNAL(triggered()), this, SLOT(slPasteNoEquations()));
+
     actImportFromClipboard=new QAction(tr("Import from Clipboard (extended Paste)"), this);
     connect(this, SIGNAL(enableActions(bool)), actImportFromClipboard, SLOT(setEnabled(bool)));
     connect(actImportFromClipboard, SIGNAL(triggered()), this, SLOT(slImportFromClipboard()));
@@ -442,6 +446,7 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(actCopyResultsNoHead);
     tvMain->addAction(actCut);
     tvMain->addAction(actPaste);
+    tvMain->addAction(actPasteNoEquations);
     tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actDelete);
     tvMain->addAction(actDeleteRow);
@@ -488,6 +493,7 @@ void QFRDRTableEditor::createWidgets() {
     menuEdit->addAction(actCopy);
     menuEdit->addAction(actCut);
     menuEdit->addAction(actPaste);
+    menuEdit->addAction(actPasteNoEquations);
     menuEdit->addAction(actImportFromClipboard);
     menuEdit->addSeparator();
     menuEdit->addAction(actCopyResults);
@@ -1276,6 +1282,22 @@ void QFRDRTableEditor::slPaste() {
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QModelIndex c=tvMain->selectionModel()->currentIndex();
             m->model()->paste(c.row(), c.column());
+            QApplication::restoreOverrideCursor();
+        }
+    }
+}
+
+void QFRDRTableEditor::slPasteNoEquations()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            QModelIndex c=tvMain->selectionModel()->currentIndex();
+            QSet<int> dontImportRoles;
+            dontImportRoles.insert(QFRDRTable::TableExpressionRole);
+            dontImportRoles.insert(QFRDRTable::ColumnExpressionRole);
+            m->model()->paste(c.row(), c.column(), dontImportRoles, dontImportRoles);
             QApplication::restoreOverrideCursor();
         }
     }

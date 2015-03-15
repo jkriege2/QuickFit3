@@ -29,11 +29,11 @@
 #include "statistics_tools.h"
 
 SpectrumManager::SpectrumManager(){
-    laserlinesTree=new QFSimpleTreeModel(NULL);
-    fluorophoresTree=new QFSimpleTreeModel(NULL);
-    lightsourcesTree=new QFSimpleTreeModel(NULL);
-    filtersTree=new QFSimpleTreeModel(NULL);
-    detectorsTree=new QFSimpleTreeModel(NULL);
+    laserlinesTree=new QFPseudoTreeModel(NULL);
+    fluorophoresTree=new QFPseudoTreeModel(NULL);
+    lightsourcesTree=new QFPseudoTreeModel(NULL);
+    filtersTree=new QFPseudoTreeModel(NULL);
+    detectorsTree=new QFPseudoTreeModel(NULL);
 }
 
 SpectrumManager::~SpectrumManager() {
@@ -90,27 +90,27 @@ QStringList SpectrumManager::getDetectors() const
     return detectors.keys();
 }
 
-QFSimpleTreeModel *SpectrumManager::getFluorophoresTree() const
+QFPseudoTreeModel *SpectrumManager::getFluorophoresTree() const
 {
     return fluorophoresTree;
 }
 
-QFSimpleTreeModel *SpectrumManager::getLightSourcesTree() const
+QFPseudoTreeModel *SpectrumManager::getLightSourcesTree() const
 {
     return lightsourcesTree;
 }
 
-QFSimpleTreeModel *SpectrumManager::getFiltersTree() const
+QFPseudoTreeModel *SpectrumManager::getFiltersTree() const
 {
     return filtersTree;
 }
 
-QFSimpleTreeModel *SpectrumManager::getDetectorsTree() const
+QFPseudoTreeModel *SpectrumManager::getDetectorsTree() const
 {
     return detectorsTree;
 }
 
-QFSimpleTreeModel *SpectrumManager::getLaserlinesTree() const
+QFPseudoTreeModel *SpectrumManager::getLaserlinesTree() const
 {
     return laserlinesTree;
 }

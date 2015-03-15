@@ -1679,7 +1679,7 @@ void QFTableModel::copy(QModelIndexList selection, bool createXMLFragment, bool 
     QApplication::clipboard()->setMimeData(mime);
 }
 
-void QFTableModel::paste(int row_start, int column_start) {
+void QFTableModel::paste(int row_start, int column_start, const QSet<int>& dontImportRoles, const QSet<int>& dontImportHeaderRoles) {
     QClipboard* clip=QApplication::clipboard();
     const QMimeData* mime=clip->mimeData();
 
@@ -1702,11 +1702,11 @@ void QFTableModel::paste(int row_start, int column_start) {
     if (mime && (mime->hasFormat("quickfit3/qfrdrtable")|| mime->hasFormat("application/x-qt-windows-mime;value=\"quickfit3/qfrdrtable\""))) {
         QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable").data());
         //qDebug()<<"pasting quickfit3/qfrdrtable";
-        readXML(data, row, column, false, false, QFTableModel::rhmAskOverwrite);
+        readXML(data, row, column, false, false, QFTableModel::rhmAskOverwrite, dontImportRoles, dontImportHeaderRoles);
     } else if (mime && mime->hasFormat("quickfit3/qfrdrtable_template")) {
         QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable_template").data());
         //qDebug()<<"pasting quickfit3/qfrdrtable_template";
-        readXML(data, row, column, false, true, QFTableModel::rhmAskOverwrite);
+        readXML(data, row, column, false, true, QFTableModel::rhmAskOverwrite, dontImportRoles, dontImportHeaderRoles);
     } else if (mime && mime->hasFormat("jkqtplotter/csv")) {
         QString data=QString::fromUtf8(mime->data("jkqtplotter/csv").data());
         //qDebug()<<"pasting jkqtplotter/csv: \n"<<data;
@@ -1793,7 +1793,7 @@ void QFTableModel::disableSignals()
 }
 
 
-bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bool clearTable, bool read_template_only, QFTableModel::ReadHeaderMode alsoReadHeaders) {
+bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bool clearTable, bool read_template_only, QFTableModel::ReadHeaderMode alsoReadHeaders, const QSet<int> &dontImportRoles, const QSet<int> &dontImportHeaderRoles) {
     bool oldEmit=doEmitSignals;
 
     doEmitSignals=false;
@@ -1848,17 +1848,20 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                                 if (rxAtrD.indexIn(atr.name())>=0) {
                                     //qDebug()<< "   num = "<<rxAtrD.cap(1);
                                     QString typ=e.attribute(QString("more_type%1").arg(rxAtrD.cap(1)));
-                                    //qDebug()<< "   type = "<<typ;
-                                    QVariant md=getQVariantFromString(typ, atr.value());
-                                    if (clearTable || read_template_only || alsoReadHeaders==QFTableModel::rhmReadHeader) setColumnHeaderData(c, rxAtrD.cap(1).toInt(), md);
-                                    else if (alsoReadHeaders==QFTableModel::rhmOverwriteNondefault || alsoReadHeaders==QFTableModel::rhmAskOverwrite) {
-                                        QVariant hdold=getColumnHeaderData(c, rxAtrD.cap(1).toInt());
-                                        if (alsoReadHeaders==QFTableModel::rhmAskOverwrite && firstOverwrite && hdold.isValid() && hdold!=md && !hdold.isNull()) {
-                                            firstOverwrite=false;
-                                            overwriteHeader=QMessageBox::question(NULL, tr("Overwrite Headers?"), tr("Overwrite already existing table header properties?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
-                                        }
-                                        if (!hdold.isValid() || hdold.isNull() || overwriteHeader)  {
-                                            setColumnHeaderData(c, rxAtrD.cap(1).toInt(), md);
+                                    int role=rxAtrD.cap(1).toInt();
+                                    if (!dontImportHeaderRoles.contains(role)) {
+                                        //qDebug()<< "   type = "<<typ;
+                                        QVariant md=getQVariantFromString(typ, atr.value());
+                                        if (clearTable || read_template_only || alsoReadHeaders==QFTableModel::rhmReadHeader) setColumnHeaderData(c, rxAtrD.cap(1).toInt(), md);
+                                        else if (alsoReadHeaders==QFTableModel::rhmOverwriteNondefault || alsoReadHeaders==QFTableModel::rhmAskOverwrite) {
+                                            QVariant hdold=getColumnHeaderData(c, rxAtrD.cap(1).toInt());
+                                            if (alsoReadHeaders==QFTableModel::rhmAskOverwrite && firstOverwrite && hdold.isValid() && hdold!=md && !hdold.isNull()) {
+                                                firstOverwrite=false;
+                                                overwriteHeader=QMessageBox::question(NULL, tr("Overwrite Headers?"), tr("Overwrite already existing table header properties?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
+                                            }
+                                            if (!hdold.isValid() || hdold.isNull() || overwriteHeader)  {
+                                                setColumnHeaderData(c, role, md);
+                                            }
                                         }
                                     }
                                 }
@@ -1881,7 +1884,7 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                     QVariant d=getQVariantFromString(t, ds);
                     setCellCreate(r, c, d);
 
-                    if (e.hasAttribute("checked")) {
+                    if (e.hasAttribute("checked") && !dontImportRoles.contains(Qt::CheckStateRole)) {
                         setCellCheckedRoleCreate(r,c,e.attribute("checked").toInt());
                     }
                     QDomNamedNodeMap nm=e.attributes();
@@ -1889,15 +1892,17 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                     for (int na=0; na<nm.size(); na++) {
                         //qDebug()<<na;
                         QDomAttr atr=nm.item(na).toAttr();
+                        bool roleOK=false;
+                        int role=rxAtrD.cap(1).toInt(&roleOK);
 
-                        if (!atr.isNull()) {
+                        if (!atr.isNull()  && !dontImportRoles.contains(role) && role>=0 && roleOK) {
                             //qDebug()<<atr.name()<<" = "<<atr.value();
                             if (rxAtrD.indexIn(atr.name())>=0) {
                                 //qDebug()<< "   num = "<<rxAtrD.cap(1);
-                                QString typ=e.attribute(QString("more_type%1").arg(rxAtrD.cap(1)));
+                                QString typ=e.attribute(QString("more_type%1").arg(role));
                                 //qDebug()<< "   type = "<<typ;
                                 QVariant md=getQVariantFromString(typ, atr.value());
-                                setCellUserRoleCreate(rxAtrD.cap(1).toInt(), r, c, md);
+                                setCellUserRoleCreate(role, r, c, md);
                             }
                         }
                     }

@@ -163,7 +163,10 @@ QFRDRTable::AxisInfo::AxisInfo()
     axis0=false;
     columnNamedTickNames=-1;
     columnNamedTickValues=-2;
-
+    TickSpacingLog=10;
+    minorTickLabelsOnlyDigit=false;
+    LinTicksForLogAxis=false;
+    minorTickLabels=false;
 
      labelPos=JKQTPlabelCenter;
      labelType=JKQTPCALTexponent;
@@ -217,6 +220,7 @@ QFRDRTable::PlotInfo::PlotInfo()
     else if (fdb.contains("Helvetica")) fontName="Helvetica";
     keyFontSize=10;
     axisFontSize=8;
+    axisMinorFontSize=6;
     axisLabelFontSize=10;
     labelFontSize=12;
     keyTransparency=0.5;
@@ -1732,6 +1736,11 @@ void QFRDRTable::writeAxisInfo(QXmlStreamWriter &w, const QFRDRTable::AxisInfo &
     w.writeAttribute(axisName+"min", CDoubleToQString(plot.min));
     w.writeAttribute(axisName+"max", CDoubleToQString(plot.max));
 
+    w.writeAttribute(axisName+"minor_tick_labels_only_digit", boolToQString(plot.minorTickLabelsOnlyDigit));
+    w.writeAttribute(axisName+"lin_ticks_for_log_axis", boolToQString(plot.LinTicksForLogAxis));
+    w.writeAttribute(axisName+"minor_tick_label", boolToQString(plot.minorTickLabels));
+    w.writeAttribute(axisName+"tickspacing_log", CDoubleToQString(plot.TickSpacingLog));
+
     w.writeAttribute(axisName+"autoticks", boolToQString(plot.AutoTicks));
     w.writeAttribute(axisName+"axisinverted", boolToQString(plot.AxisInverted));
     w.writeAttribute(axisName+"tickspacing", CDoubleToQString(plot.TickSpacing));
@@ -1771,6 +1780,7 @@ void QFRDRTable::writePlotInfo(QXmlStreamWriter &w, const QFRDRTable::PlotInfo &
 
     w.writeAttribute("keyfontsize", CDoubleToQString(plot.keyFontSize));
     w.writeAttribute("axisfontsize", CDoubleToQString(plot.axisFontSize));
+    w.writeAttribute("axisminorfontsize", CDoubleToQString(plot.axisMinorFontSize));
     w.writeAttribute("axislabelfontsize", CDoubleToQString(plot.axisLabelFontSize));
     w.writeAttribute("labelfontsize", CDoubleToQString(plot.labelFontSize));
     w.writeAttribute("fontname", plot.fontName);
@@ -1992,6 +2002,7 @@ void QFRDRTable::readPlotInfo(PlotInfo& plot, QDomElement te, bool readLabels) {
     plot.fontName=te.attribute("fontname", "Arial");
     plot.keyFontSize=CQStringToDouble(te.attribute("keyfontsize", "12"));
     plot.axisFontSize=CQStringToDouble(te.attribute("axisfontsize", "10"));
+    plot.axisMinorFontSize=CQStringToDouble(te.attribute("axisminorfontsize", "6"));
     plot.axisLabelFontSize=CQStringToDouble(te.attribute("axislabelfontsize", "12"));
     plot.labelFontSize=CQStringToDouble(te.attribute("labelFontSize", "16"));
 
@@ -2073,6 +2084,16 @@ void QFRDRTable::readAxisInfo(AxisInfo& plot, const QString& axisName, QDomEleme
     plot.labelAngel=CQStringToDouble(te.attribute(axisName+"labelangel", "0"));
     plot.zeroAxisLineWidth=CQStringToDouble(te.attribute(axisName+"axis0_linewidth", "1.5"));
     plot.axis1LineWidth=CQStringToDouble(te.attribute(axisName+"axis1_linewidth", "1.5"));
+
+
+
+
+    plot.minorTickLabelsOnlyDigit=QStringToBool( te.attribute(axisName+"minor_tick_labels_only_digit", "false"));
+    plot.LinTicksForLogAxis=QStringToBool( te.attribute(axisName+"lin_ticks_for_log_axis", "false"));
+    plot.minorTickLabels=QStringToBool( te.attribute(axisName+"minor_tick_label", "false"));
+    plot.TickSpacingLog=CQStringToDouble(te.attribute(axisName+"tickspacing_log", "10"));
+
+
 
     plot.columnNamedTickNames=te.attribute(axisName+"namedticks_namecol", "-1").toInt();
     plot.columnNamedTickValues=te.attribute(axisName+"namedticks_valcol", "-2").toInt();

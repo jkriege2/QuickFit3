@@ -197,7 +197,7 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
      QFSimpleTreeModelItem *childItem = static_cast<QFSimpleTreeModelItem*>(index.internalPointer());
      QFSimpleTreeModelItem *parentItem = childItem->parent();
 
-     if (parentItem == rootItem)
+     if (parentItem == rootItem || !parentItem)
          return QModelIndex();
 
      return createIndex(parentItem->row(), 0, parentItem);

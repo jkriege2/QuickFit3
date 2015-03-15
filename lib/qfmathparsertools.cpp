@@ -523,7 +523,7 @@ QVariantList qfmpResult::asVariantList() const
      return vl;
 }
 
-bool qfmpResult::setVariant(const QVariant& data) {
+bool qfmpResult::setVariant(const QVariant& data, bool convertLists) {
     setInvalid();
     switch (data.type()) {
         case QVariant::Bool: setBoolean(data.toBool()); break;
@@ -550,7 +550,7 @@ bool qfmpResult::setVariant(const QVariant& data) {
         case QVariant::Invalid: setInvalid(); break;
         case QVariant::List: {
                 QVariantList vl=data.toList();
-                if (vl.size()>0) {
+                if (vl.size()>0 && convertLists) {
                     switch (vl[0].type()) {
                         case QVariant::Bool: { isValid=true; type=qfmpBoolVector; boolVec.clear(); for (int i=0; i<vl.size(); i++) boolVec<<vl[i].toBool();} break;
                         case QVariant::Double:
@@ -565,6 +565,7 @@ bool qfmpResult::setVariant(const QVariant& data) {
                         case QVariant::Url:
                         default: {isValid=true; type=qfmpStringVector; strVec.clear(); for (int i=0; i<vl.size(); i++) strVec<<vl[i].toString();} break;
                     }
+                } else {
                 }
             } break;
 

@@ -26,10 +26,12 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionselectdialog.h"
 
 QFFitFunctionComboBox::QFFitFunctionComboBox(QWidget *parent) :
-    QFTreeViewComboBox(parent)
+    QFEnhancedComboBox(parent)
+    //QFTreeViewComboBox(parent)
 {
     setContextMenuPolicy(Qt::ActionsContextMenu);
-    m_model=new QFSimpleTreeModel(this);
+    m_model=new QFPseudoTreeModel(this);
+    //m_model=new QFSimpleTreeModel(this);
     updateFitFunctions("");
     connect(QFFitFunctionManager::getInstance(), SIGNAL(fitFunctionsChanged()), this, SLOT(reloadFitFunctions()));
     actHelp=new QAction(QIcon(":/lib/help/help.png"), tr("Fit model help ..."), this);
@@ -59,7 +61,7 @@ void QFFitFunctionComboBox::setCurrentFitFunction(const QString &id)
     //if (idx>=0) setCurrentIndex(idx);
     //else setCurrentIndex(0);
     //qDebug()<<"setCurrentFitFunction("<<id;
-    QModelIndex idx=m_model->index(id, Qt::UserRole);
+    QModelIndex idx=m_model->index(QVariant(id), Qt::UserRole);
     //qDebug()<<"setCurrentFitFunction("<<id<<"): "<<idx;
     selectIndex(idx);
 }
@@ -96,12 +98,12 @@ void QFFitFunctionComboBox::reloadFitFunctions()
 
 int QFFitFunctionComboBox::currentIndex() const
 {
-    return QFTreeViewComboBox::currentIndex();
+    return QFEnhancedComboBox::currentIndex();
 }
 
 void QFFitFunctionComboBox::setCurrentIndex(int idx)
 {
-    QFTreeViewComboBox::setCurrentIndex(idx);
+    QFEnhancedComboBox::setCurrentIndex(idx);
 }
 
 void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
@@ -134,7 +136,8 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
     while (it.hasNext())  {
         it.next();
         if (it.value()) {
-            QFSimpleTreeModelItem* item=m_model->addFolderedItem(it.value()->category(), it.value()->shortName(), it.key());
+            //QFSimpleTreeModelItem* item=m_model->addFolderedItem(it.value()->category(), it.value()->shortName(), it.key());
+            QFPseudoTreeModelItem* item=m_model->addFolderedItem(it.value()->category(), it.value()->shortName(), it.key());
             item->setIcon(QIcon(":/lib/fitfunc_icon.png"));
             if (it.value()->isDeprecated()) {
                 item->setForeground(QColor("darkgrey"));
@@ -166,7 +169,8 @@ void QFFitFunctionComboBox::updateFitFunctions(const QStringList &availableFF)
         for (int i=0; i<m_availableFuncs.size(); i++)  {
             QFFitFunction* ff=manager->createFunction(m_availableFuncs[i], this);
             if (ff) {
-                QFSimpleTreeModelItem* item=m_model->addFolderedItem(ff->category(), ff->shortName(), ff->id());
+                //QFSimpleTreeModelItem* item=m_model->addFolderedItem(ff->category(), ff->shortName(), ff->id());
+                QFPseudoTreeModelItem* item=m_model->addFolderedItem(ff->category(), ff->shortName(), ff->id());
                 item->setIcon(QIcon(":/lib/fitfunc_icon.png"));
                 if (ff->isDeprecated()) {
                     item->setForeground(QColor("darkgrey"));

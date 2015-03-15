@@ -112,6 +112,12 @@ void QFRDRTableAxisSettingsWidget::loadPlotData(const QFRDRTable::AxisInfo& g, b
     ui->spinAxis1Width->setValue(g.axis1LineWidth);
 
 
+    ui->edtXTickSpacingLog->setValue(g.TickSpacingLog);
+    ui->chkMinorTickOnlyDigits->setChecked(g.minorTickLabelsOnlyDigit);
+    ui->chkLinTicksLogAxis->setChecked(g.LinTicksForLogAxis);
+    ui->chkMinorTickLabels->setChecked(g.minorTickLabels);
+
+
     updating=false;
     connectWidgets();
     doUpdateGraph();
@@ -150,6 +156,10 @@ void QFRDRTableAxisSettingsWidget::storePlotData(QFRDRTable::AxisInfo &g)
     g.zeroAxisLineWidth=ui->spin0AxisWidth->value();
     g.axis1LineWidth=ui->spinAxis1Width->value();
 
+    g.TickSpacingLog=ui->edtXTickSpacingLog->value();
+    g.minorTickLabelsOnlyDigit=ui->chkMinorTickOnlyDigits->isChecked();
+    g.LinTicksForLogAxis=ui->chkLinTicksLogAxis->isChecked();
+    g.minorTickLabels=ui->chkMinorTickLabels->isChecked();
 }
 
 bool QFRDRTableAxisSettingsWidget::getLogX() const
@@ -195,6 +205,12 @@ void QFRDRTableAxisSettingsWidget::saveToSettings(QSettings &set, const QString 
 
     set.setValue(axis+"axis0_linewidth", ui->spin0AxisWidth->value());
     set.setValue(axis+"axis1_linewidth", ui->spinAxis1Width->value());
+
+    set.setValue(axis+"minor_tick_labels_only_digit",ui->chkMinorTickOnlyDigits->isChecked());
+    set.setValue(axis+"lin_ticks_for_log_axis",ui->chkLinTicksLogAxis->isChecked());
+    set.setValue(axis+"minor_tick_label",ui->chkMinorTickLabels->isChecked());
+    set.setValue(axis+"tickspacing_log",ui->edtXTickSpacingLog->value());
+
 }
 
 void QFRDRTableAxisSettingsWidget::loadFromSettings(QSettings &set, const QString &axis)
@@ -229,6 +245,10 @@ void QFRDRTableAxisSettingsWidget::loadFromSettings(QSettings &set, const QStrin
     ui->spin0AxisWidth->setValue(set.value(axis+"axis0_linewidth", ui->spin0AxisWidth->value()).toDouble());
     ui->spinAxis1Width->setValue(set.value(axis+"axis1_linewidth", ui->spinAxis1Width->value()).toDouble());
 
+    ui->chkMinorTickOnlyDigits->setChecked(set.value(axis+"minor_tick_labels_only_digit", ui->chkMinorTickOnlyDigits->isChecked()).toBool());
+    ui->chkLinTicksLogAxis->setChecked(set.value(axis+"lin_ticks_for_log_axis", ui->chkLinTicksLogAxis->isChecked()).toBool());
+    ui->chkMinorTickLabels->setChecked(set.value(axis+"minor_tick_label", ui->chkMinorTickLabels->isChecked()).toBool());
+    ui->edtXTickSpacingLog->setValue(set.value(axis+"tickspacing_log", ui->edtXTickSpacingLog->value()).toDouble());
 
     updating=false;
     connectWidgets();
@@ -302,6 +322,12 @@ void QFRDRTableAxisSettingsWidget::updateComboboxes()
     reloadColumns(ui->cmbNamedTicksValues);
 }
 
+void QFRDRTableAxisSettingsWidget::on_chkXAutoTicks_toggled(bool enabled)
+{
+    ui->edtXTickSpacingLog->setEnabled(!enabled && ui->chkLogX->isChecked());
+    ui->labXTickSpacingLog->setEnabled(!enabled && ui->chkLogX->isChecked());
+}
+
 void QFRDRTableAxisSettingsWidget::reloadColumns(QComboBox *combo)
 {
     bool updt=updating;
@@ -358,6 +384,10 @@ void QFRDRTableAxisSettingsWidget::connectWidgets()
     connect(ui->spin0AxisWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->spinAxis1Width, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
+    connect(ui->chkMinorTickOnlyDigits, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkLinTicksLogAxis, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkMinorTickLabels, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->edtXTickSpacingLog, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
 }
 
@@ -392,5 +422,11 @@ void QFRDRTableAxisSettingsWidget::disconnectWidgets()
     disconnect(ui->spin0AxisWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinAxis1Width, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
+    disconnect(ui->chkMinorTickOnlyDigits, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkLinTicksLogAxis, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkMinorTickLabels, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->edtXTickSpacingLog, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+
 }
+
 

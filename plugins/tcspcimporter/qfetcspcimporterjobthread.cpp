@@ -29,6 +29,7 @@
 #include "binarydatatools.h"
 #include "qftools.h"
 #include "qf3correlationdataformattool.h"
+#include "tttrtools.h"
 
 QMutex* QFETCSPCImporterJobThread::mutexFilename=NULL;
 
@@ -152,6 +153,7 @@ QString QFETCSPCImporterJobThread::replacePostfixSpecials(const QString& input, 
     if (job.correlator==CORRELATOR_DIRECTAVG) corr="directavg";*/
     if (job.fcs_correlator==CORRELATOR_MTAUALLMON) corr="mtauallmon";
     if (job.fcs_correlator==CORRELATOR_MTAUONEMON) corr="mtauonemon";
+    if (job.fcs_correlator==CORRELATOR_TTTR) corr="tttr";
 
     result=result.replace("%correlator%", corr, Qt::CaseInsensitive);
     result=result.replace("%correlatorid%", QString::number(job.fcs_correlator), Qt::CaseInsensitive);
@@ -676,10 +678,10 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
     }
     fcs_storecountrate=(uint16_t*)qfCalloc(channels, sizeof(uint16_t));
 
-    QList<QVector<float> > arrivaltimes;
+    QList<QVector<double> > arrivaltimes;
     arrivaltimes.clear();
     for (int i=0; i<channels; i++) {
-        QVector<float> dummy;
+        QVector<double> dummy;
         arrivaltimes.append(dummy);
     }
 
@@ -760,19 +762,18 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                         createCorrelators();
                         memset(fcs_countrate, 0, channels*FCS_CHANNELBUFFER_ITEMS*sizeof(uint16_t));
                         fcs_countrate_counter=0;
-                        fcs_segment++;
-                        fcsNextSegmentValue=fcsNextSegmentValue+range_duration/double(job.fcs_segments);
                         //qDebug()<<"-- fcsNextSegmentValue "<<fcsNextSegmentValue;
                     }
                 } else {
 
                     if (isNextSegment) {
                         // correlate arrivaltime data
-
+                        copyCorrelatorIntermediateResults(fcs_segment, arrivaltimes);
+                        createCorrelators();
                         // clear arrivaltimes
                         arrivaltimes.clear();
                         for (int i=0; i<channels; i++) {
-                            QVector<float> dummy;
+                            QVector<double> dummy;
                             arrivaltimes.append(dummy);
                         }
                     } else {
@@ -802,6 +803,9 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                     for (register int cc=0; cc<channels; cc++) {
                         fcs_storecountrate[cc]=0;
                     }
+                    fcs_segment++;
+                    fcsNextSegmentValue=fcsNextSegmentValue+range_duration/double(job.fcs_segments);
+
                 }
             }
         }
@@ -815,16 +819,18 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
 
         done=(t>range_duration);
     } while (reader->nextRecord() && (m_status==1) && (!was_canceled) && !done);
+
     if (job.doFCS) {
         if (job.fcs_correlator<=CORRELATOR_MTAUONEMON) {
             if (fcs_countrate_counter>0) shiftIntoCorrelators(fcs_countrate, fcs_countrate_counter);
-            while (fcs_segment<job.fcs_segments) {
-                //qDebug()<<"-- fcs segment "<<fcs_segment<<" -----------------------------";
-                copyCorrelatorIntermediateResults(fcs_segment);
-                fcs_segment++;
-            }
-            qfFree(fcs_storecountrate);
         }
+        while (fcs_segment<job.fcs_segments) {
+            //qDebug()<<"-- fcs segment "<<fcs_segment<<" -----------------------------";
+            copyCorrelatorIntermediateResults(fcs_segment, arrivaltimes);
+            arrivaltimes.clear();
+            fcs_segment++;
+        }
+        qfFree(fcs_storecountrate);
     }
     qfFree(countrate);
     qfFree(fcs_countrate);
@@ -843,6 +849,8 @@ void QFETCSPCImporterJobThread::clearCorrelators() {
         delete ii.value();
     }
     corrjk.clear();
+
+    corrtttr.clear();
     //qDebug()<<"clearCorrelators() ... DONE";
 }
 
@@ -876,13 +884,19 @@ void QFETCSPCImporterJobThread::createCorrelators() {
                  qfFree(corr1[1]);
                  qfFree(corr1);
              }
+         } else if (job.fcs_correlator==CORRELATOR_TTTR) {
+             QVector<double> ctemp(job.fcs_S*job.fcs_P, 0.0);
+             corrtttr[id]=ctemp;
+
+             fcs_tau.resize(job.fcs_S*job.fcs_P);
+             statisticsAutocorrelateCreateMultiTau(fcs_tau.data(), job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
          }
 
     }
     //qDebug()<<"createCorrelators() ... DONE";
 }
 
-void QFETCSPCImporterJobThread::copyCorrelatorIntermediateResults(uint16_t fcs_segment) {
+void QFETCSPCImporterJobThread::copyCorrelatorIntermediateResults(uint16_t fcs_segment, const QList<QVector<double> >& arrivaltimes) {
     //qDebug()<<"copyCorrelatorIntermediateResults("<<fcs_segment<<") ... ";
 
     if (job.fcs_correlator==CORRELATOR_MTAUALLMON) {
@@ -917,6 +931,33 @@ void QFETCSPCImporterJobThread::copyCorrelatorIntermediateResults(uint16_t fcs_s
              qfFree(data[0]);
              qfFree(data[1]);
              qfFree(data);
+        }
+
+    } else if (job.fcs_correlator==CORRELATOR_TTTR) {
+        for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
+             QPair<int, int> ccf=*i;
+             qDebug()<<ccf.first<<ccf.second<<fcs_segment<<arrivaltimes.size();
+             uint64_t id=xyzAdressToUInt64(ccf.first, ccf.second, fcs_segment);
+             uint32_t idc=xyAdressToUInt32(ccf.first, ccf.second);
+
+             if (arrivaltimes.size()>0) {
+                 if (ccf.first==ccf.second) {
+                     qDebug()<<arrivaltimes[ccf.first].size()<<fcs_tau.size()<<corrtttr[idc].size();
+                     TTTRcorrelate(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), corrtttr[idc].data(), fcs_tau.data(), fcs_tau.size());
+                     //TTTRcorrelateWithAvg(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), corrtttr[idc], fcs_tau, job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
+                 } else {
+                     qDebug()<<arrivaltimes[ccf.first].size()<<arrivaltimes[ccf.second].size()<<fcs_tau.size()<<corrtttr[idc].size();
+                     TTTRcrosscorrelate(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), arrivaltimes[ccf.second].data() , arrivaltimes[ccf.second].size(), corrtttr[idc].data(), fcs_tau.data(), fcs_tau.size());
+                     //TTTRcrosscorrelateWithAvg(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), arrivaltimes[ccf.second].data() , arrivaltimes[ccf.second].size(), corrtttr[idc], fcs_tau, job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
+                 }
+
+             }
+
+             fcs_ccfs[id]=QVector<double>();
+             //qDebug()<<"added empty vector";
+             for (int tau=0; tau<qMin(corrtttr[idc].size(), fcs_tau.size()); tau++) {
+                 fcs_ccfs[id].append(corrtttr[idc].value(tau)-1.0);
+             }
         }
 
     }

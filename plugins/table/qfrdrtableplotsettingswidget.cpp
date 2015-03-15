@@ -108,6 +108,7 @@ void QFRDRTablePlotSettingsWidget::setRecord(QFRDRTable *record, int graph)
 
             ui->cmbFontname->setCurrentFont(QFont(g.fontName));
             ui->spinAxisFontSize->setValue(g.axisFontSize);
+            ui->spinMinorAxisFontSize->setValue(g.axisMinorFontSize);
             ui->spinAxisLabelFontSize->setValue(g.axisLabelFontSize);
             ui->spinTitleFontSize->setValue(g.labelFontSize);
             ui->chkKeepAxisAspect->setChecked(g.keepAxisAspectRatio);
@@ -259,6 +260,7 @@ void QFRDRTablePlotSettingsWidget::plotDataChanged() {
 
         p.fontName=ui->cmbFontname->currentFont().family();
         p.axisFontSize=ui->spinAxisFontSize->value();
+        p.axisMinorFontSize=ui->spinMinorAxisFontSize->value();
         p.axisLabelFontSize=ui->spinAxisLabelFontSize->value();
         p.keyFontSize=ui->spinKeyFontSize->value();
         p.labelFontSize=ui->spinTitleFontSize->value();
@@ -322,6 +324,7 @@ void QFRDRTablePlotSettingsWidget::connectWidgets()
     connect(ui->chkShowKey, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->cmbFontname, SIGNAL(currentIndexChanged(QString)), this, SLOT(plotDataChanged()));
     connect(ui->spinAxisFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinMinorAxisFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->spinAxisLabelFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->spinKeyFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->spinTitleFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
@@ -391,6 +394,7 @@ void QFRDRTablePlotSettingsWidget::disconnectWidgets()
     disconnect(ui->grpMinor, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbFontname, SIGNAL(currentIndexChanged(QString)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinAxisFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinMinorAxisFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinAxisLabelFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinKeyFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinTitleFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
@@ -494,6 +498,7 @@ void QFRDRTablePlotSettingsWidget::on_btnLoadSystem_clicked() {
             ui->chkShowKey->setChecked(set.value("showkey",ui->chkShowKey->isChecked()).toBool());
             ui->cmbFontname->setCurrentFont(QFont(set.value("fontname", ui->cmbFontname->currentFont().family()).toString()));
             ui->spinAxisFontSize->setValue(set.value("axisfontsize", ui->spinAxisFontSize->value()).toDouble());
+            ui->spinMinorAxisFontSize->setValue(set.value("axisminorfontsize", ui->spinMinorAxisFontSize->value()).toDouble());
             ui->spinAxisLabelFontSize->setValue(set.value("axislabelfontsize", ui->spinAxisLabelFontSize->value()).toDouble());
             ui->spinKeyFontSize->setValue(set.value("keyfontsize", ui->spinKeyFontSize->value()).toDouble());
             ui->spinTitleFontSize->setValue(set.value("titlefontsize", ui->spinTitleFontSize->value()).toDouble());
