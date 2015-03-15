@@ -57,12 +57,17 @@ QVariant QFPseudoTreeModel::data(const QModelIndex &index, int role) const
 
         if (role==Qt::DisplayRole) return  item->displayText();
         if (role==Qt::DecorationRole) {
-            QVariant d=index.data(role);
-            QPixmap ic(QSize(32,16));
+            QVariant d=item->data(role);
+            int w=16;
+            if (d.type()==QVariant::Icon) {
+                w=32;
+            }
+            QPixmap ic(QSize(w,16));
+
             ic.fill(Qt::transparent);
             {
                 QPainter p(&ic);
-                QPen pen(QApplication::palette("QListView").color(QPalette::Midlight));
+                QPen pen(QApplication::palette("QWidget").color(QPalette::Mid));
                 pen.setStyle(Qt::DotLine);
                 p.setPen(pen);
                 if (isLastInFolder(index)) {
@@ -70,10 +75,9 @@ QVariant QFPseudoTreeModel::data(const QModelIndex &index, int role) const
                 } else {
                     p.drawLine(8,0,8,17);
                 }
-                p.drawLine(8,8,14,8);
+                p.drawLine(8,8,15,8);
 
                 if (d.type()==QVariant::Icon) {
-
                     p.drawPixmap(16,0,16,16, d.value<QIcon>().pixmap(QSize(16,16)));
                 }
             }

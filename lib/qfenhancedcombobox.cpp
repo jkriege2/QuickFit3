@@ -20,7 +20,7 @@
 */
 
 #include "qfenhancedcombobox.h"
-
+#include <QDebug>
 QFEnhancedComboBox::QFEnhancedComboBox(QWidget *parent) :
     QComboBox(parent)
 {
@@ -70,11 +70,17 @@ void QFEnhancedComboBox::correctCurrentItem()
 {
     int r=currentIndex();
     Qt::ItemFlags flags=model()->flags(model()->index(r, 0, rootModelIndex()));
-    if (flags&Qt::ItemIsSelectable==0 || flags&Qt::ItemIsEnabled==0) {
+    //qDebug()<<model()->flags(model()->index(r, 0, rootModelIndex()))<<model()->data(model()->index(r, 0, rootModelIndex()));
+    if (((flags&Qt::ItemIsSelectable)==0) || ((flags&Qt::ItemIsEnabled)==0)) {
         Qt::ItemFlags f=model()->flags(model()->index(r, 0, rootModelIndex()));
-        while (r>=0 && (f&Qt::ItemIsSelectable==0 || f&Qt::ItemIsEnabled==0)) {
-            r--;
+        int rows=model()->rowCount();
+        while (r<rows && (((f&Qt::ItemIsSelectable)==0) || ((f&Qt::ItemIsEnabled)==0))) {
+            r++;
+            f=model()->flags(model()->index(r, 0, rootModelIndex()));
         }
-        setCurrentIndex(r);
+        if (r>=rows)
+            setCurrentIndex(-1);
+        else
+            setCurrentIndex(r);
     }
 }
