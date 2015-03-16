@@ -46,7 +46,7 @@
 #include "jkiniparser2.h"
 #include <QStringList>
 #include <QSettings>
-#include "QFPseudoTreeModel.h"
+#include "qfpseudotreemodel.h"
 
 /** \brief this class is used to manage fluorophor properties and spectra
  *  \ingroup diff4_tools
