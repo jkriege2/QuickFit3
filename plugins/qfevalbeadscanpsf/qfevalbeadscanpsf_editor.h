@@ -129,6 +129,7 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
         void on_btnSaveAvgROI_clicked();
         void evaluateAll();
         void saveROI(const QString& filename, const QString &exportID, QFRawDataRecord* rdr, int bead=0, int channel=0);
+        void on_chkUseMask_toggled(bool value);
 };
 
 #endif // QFEVALBEADSCANPSFEDITOR_H

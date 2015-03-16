@@ -199,6 +199,7 @@ void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* formerRecord,
         ui->spinAxRatioMin->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMin", eval->getProperty("FilterBeads_AxRatMin", ui->spinAxRatioMin->value()).toDouble()).toDouble());
         ui->spinAxRatioMax->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMax", eval->getProperty("FilterBeads_AxRatMax", ui->spinAxRatioMax->value()).toDouble()).toDouble());
         ui->chkMedianFIlter->setChecked(record->getProperty(eval->getEvaluationResultID()+"_MEDIAN", eval->getProperty("USE_MEDIAN_FILTER", ui->chkMedianFIlter->isChecked()).toBool()).toBool());
+        ui->chkUseMask->setChecked(record->getProperty(eval->getEvaluationResultID()+"_USEMASK", eval->getProperty("USEMASK", ui->chkUseMask->isChecked()).toBool()).toBool());
 
         ui->spinXYWidthMin->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_WxyMin", eval->getProperty("FilterBeads_WxyMin", ui->spinXYWidthMin->value()).toDouble()).toDouble());
         ui->spinXYWidthMax->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_WxyMax", eval->getProperty("FilterBeads_WxyMax", ui->spinXYWidthMax->value()).toDouble()).toDouble());
@@ -943,6 +944,7 @@ void QFEvalBeadScanPSFEditor::displayResults()
 
         int beads=record->resultsGetAsInteger(evalID, "channel0_beads", &ok);
         if (!ok) beads=0;
+        ui->cmbBead->clear();
         for (int i=0; i<beads; i++) {
             ui->cmbBead->addItem(tr("bead %1").arg(i+1));
         }
@@ -1025,6 +1027,8 @@ void QFEvalBeadScanPSFEditor::displayResults()
     ui->spinPSFWidth->setEnabled(!hasRes);
     ui->spinPSFHeight->setEnabled(!hasRes);
     ui->spinWZFraction->setEnabled(!hasRes);
+    ui->chkMedianFIlter->setEnabled(!hasRes);
+    ui->chkUseMask->setEnabled(!hasRes);
 
     connect(ui->cmbChannel, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationBead()));
     connect(ui->cmbBead, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationBead()));
@@ -1050,6 +1054,21 @@ void QFEvalBeadScanPSFEditor::on_chkMedianFIlter_toggled(bool value)
         record->setQFProperty(eval->getEvaluationResultID()+"_MEDIAN", value, false, false);
     }
 }
+
+
+void QFEvalBeadScanPSFEditor::on_chkUseMask_toggled(bool value)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
+
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_USEMASK", value, false, false);
+    }
+}
+
 
 
 
@@ -1461,7 +1480,7 @@ void QFEvalBeadScanPSFEditor::evaluateAll() {
         if ((record)/*&&(data)*/) {
             dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));
             // here we call doEvaluation to execute our evaluation for the current record only
-            eval->doEvaluation(record, ui->spinA->value(), ui->spinZ->value(), ui->spinROIXY->value(), ui->spinROIZ->value(), ui->spinPixPerFrame->value(), ui->spinPSFWidth->value(), ui->spinPSFHeight->value(), ui->spinWZFraction->value()/100.0, ui->chkMedianFIlter->isChecked(), dlgEvaluationProgress);
+            eval->doEvaluation(record, ui->spinA->value(), ui->spinZ->value(), ui->spinROIXY->value(), ui->spinROIZ->value(), ui->spinPixPerFrame->value(), ui->spinPSFWidth->value(), ui->spinPSFHeight->value(), ui->spinWZFraction->value()/100.0, ui->chkMedianFIlter->isChecked(), ui->chkUseMask->isChecked(), dlgEvaluationProgress);
         }
         dlgEvaluationProgress->setValue(i);
         // check whether the user canceled this evaluation
@@ -1499,7 +1518,7 @@ void QFEvalBeadScanPSFEditor::evaluateCurrent() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     // here we call doEvaluation to execute our evaluation for the current record only
-    eval->doEvaluation(record, ui->spinA->value(), ui->spinZ->value(), ui->spinROIXY->value(), ui->spinROIZ->value(), ui->spinPixPerFrame->value(), ui->spinPSFWidth->value(), ui->spinPSFHeight->value(), ui->spinWZFraction->value()/100.0, ui->chkMedianFIlter->isChecked(), dlgEvaluationProgress);
+    eval->doEvaluation(record, ui->spinA->value(), ui->spinZ->value(), ui->spinROIXY->value(), ui->spinROIZ->value(), ui->spinPixPerFrame->value(), ui->spinPSFWidth->value(), ui->spinPSFHeight->value(), ui->spinWZFraction->value()/100.0, ui->chkMedianFIlter->isChecked(), ui->chkUseMask->isChecked(), dlgEvaluationProgress);
 
     displayResults();
     dlgEvaluationProgress->close();

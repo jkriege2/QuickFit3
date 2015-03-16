@@ -77,7 +77,7 @@ QString QFEvalBeadScanPSFItem::getEvaluationResultID() {
 }
 
 
-void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY, double deltaZ, int ROIxy, int ROIz, int pixels_per_frame, double est_psf_width, double est_psf_height, double fitXY_Z_fraction, bool medianFilterBeforeFindBeads, QFListProgressDialog *dlgEvaluationProgress) {
+void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY, double deltaZ, int ROIxy, int ROIz, int pixels_per_frame, double est_psf_width, double est_psf_height, double fitXY_Z_fraction, bool medianFilterBeforeFindBeads, bool useMask, QFListProgressDialog *dlgEvaluationProgress) {
     QApplication::processEvents();
     if (dlgEvaluationProgress&& dlgEvaluationProgress->wasCanceled()) return; // canceled by user ?
 
@@ -131,13 +131,19 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
     qDebug()<<"ROIz="<<ROIz;
     qDebug()<<"pixels_per_frame="<<pixels_per_frame;
     qDebug()<<"min_distance="<<min_distance;*/
-    bool useMask=true;
+
     bool* mask=NULL;
-    if (maskI && (int64_t)maskI->maskGetHeight()==height && (int64_t)maskI->maskGetWidth()==width) {
+    int maskedPixels=0;
+    if (useMask && maskI && (int64_t)maskI->maskGetHeight()==height && (int64_t)maskI->maskGetWidth()==width) {
         mask=maskI->maskGet();
+        for (int i=0; i<width*height; i++) {
+            if (mask[i]) maskedPixels++;
+        }
     }
+    //if (mask) qDebug()<<mask[0]<<mask[1];
     int updateCounter=0;
     QList<int> initial_beads_x, initial_beads_y, initial_beads_z;
+    QVector<double> segmentation_levels;
 
 
     // FIND INITIAL BEAD POSITIONS
@@ -152,8 +158,11 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         if (dlgEvaluationProgress) dlgEvaluationProgress->setMinorProgress(z);
         double* frame=data->getImageStack(stack, z, 0);
         // DETERMINE level for SEGMENTATION
-        double level=statisticsQuantile(frame, width*height, 1.0-double(pixels_per_frame)/double(width*height));
-        //qDebug()<<"step "<<z<<"  level="<<level;
+        double level=0;
+        if (mask && useMask) level=statisticsQuantileMasked(mask, frame, width*height, 1.0-double(pixels_per_frame)/double(width*height), false);
+        else level=statisticsQuantile(frame, width*height, 1.0-double(pixels_per_frame)/double(width*height));
+        qDebug()<<"step "<<z<<"  level="<<level<<mask<<useMask<<frame<<width*height<<1.0-double(pixels_per_frame)/double(width*height);
+        segmentation_levels<<level;
         const int lx=ceil(double(ROIxy)/2.0);
         const int ly=lx;
 
@@ -280,11 +289,16 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         // filter output beads once again:
         for (int i=initial_beads_x.size()-1; i>=0; i--) {
             for (int j=0; j<i; j++) {
+                const double maxZ=double(ROIz)/2.0*deltaZ;
+
                 double d=sqrt(qfSqr(deltaXY*(initial_beads_x[i]-initial_beads_x[j]))+qfSqr(deltaXY*(initial_beads_y[i]-initial_beads_y[j]))+qfSqr(deltaZ*(initial_beads_z[i]-initial_beads_z[j])));
-                if (d<min_distance*deltaXY || d<double(ROIz)/2.0*deltaZ) {
+                double dxy=sqrt(qfSqr(deltaXY*(initial_beads_x[i]-initial_beads_x[j]))+qfSqr(deltaXY*(initial_beads_y[i]-initial_beads_y[j])));
+                double dz=fabs(deltaZ*(initial_beads_z[i]-initial_beads_z[j]));
+                if (i!=j && ((d<min_distance*deltaXY) || (dz<maxZ && dxy<min_distance*deltaXY))) {
                     initial_beads_x.removeAt(i);
                     initial_beads_y.removeAt(i);
                     initial_beads_z.removeAt(i);
+                    //qDebug()<<"removed bead i="<<i<<d<<min_distance*deltaXY<<double(ROIz)/2.0*deltaZ;
                     break;
                 }
             }
@@ -310,11 +324,14 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         record->resultsSetString(evalID, "dataorder", "beadslists");
         record->resultsSetNumber(evalID, "pixel_size", deltaXY);
         record->resultsSetNumber(evalID, "step_size", deltaZ);
+        record->resultsSetBoolean(evalID, "mask_use", useMask);
         record->resultsSetInteger(evalID, "initial_beads_found", initial_beads_x.size());
         record->resultsSetInteger(evalID, "roi_size_xy", ROIxy);
         record->resultsSetInteger(evalID, "roi_size_z", ROIz);
         record->resultsSetInteger(evalID, "beadsearch_zstep_size", zsteps);
         record->resultsSetInteger(evalID, "beadsearch_pixels_per_frame", pixels_per_frame);
+        record->resultsSetInteger(evalID, "masked_pixels_per_frame", maskedPixels);
+        record->resultsSetNumberList(evalID, "beadsearch_segmentation_levels", segmentation_levels);
         record->resultsSetNumberList(evalID, "beadsearch_initial_positions_x", initial_beads_x);
         record->resultsSetNumberList(evalID, "beadsearch_initial_positions_y", initial_beads_y);
         record->resultsSetNumberList(evalID, "beadsearch_initial_positions_z", initial_beads_z);
@@ -339,7 +356,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                 // CUT ROI AROUND PIXEL
                 cimg_library::CImg<double> roi=image.get_crop(initial_beads_x[b]-ROIxy/2, initial_beads_y[b]-ROIxy/2, initial_beads_z[b]-ROIz/2, initial_beads_x[b]+ROIxy/2, initial_beads_y[b]+ROIxy/2, initial_beads_z[b]+ROIz/2);
                 QVector<bool> msk(roi.width()*roi.height(), false);
-                if (mask) {
+                if (mask && useMask) {
                     int iy=0;
                     for (int y=initial_beads_y[b]-ROIxy/2; y<=initial_beads_y[b]+ROIxy/2; y++) {
                         int ix=0;
@@ -365,45 +382,67 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                 const int y0i=ROIxy/2;
                 const int z0i=ROIz/2;
                 // absolute X,Y,Z coordinates (in nanometers) of the ROI
-                QVector<double> X, Y, Z;
-                qfGridXYZ(X, Y, Z, x0tl, y0tl, z0tl, roi.width(), roi.height(), roi.depth(), deltaXY, deltaXY, deltaZ);
-                for (int i=X.size()-1; i>=0; i--) {
-                    int z=i/(roi.width()*roi.height());
-                    int idxxy=i%(roi.width()*roi.height());
-                    int y=idxxy/roi.width();
-                    int x=idxxy%roi.width();
+                QVector<double> X, Y, Z, roiXYZ;
+                //qfGridXYZ(X, Y, Z, x0tl, y0tl, z0tl, roi.width(), roi.height(), roi.depth(), deltaXY, deltaXY, deltaZ);
+                for (int z=0; z<roi.depth(); z++) {
+                    for (int y=0; y<roi.height(); y++) {
+                        for (int x=0; x<roi.width(); x++) {
+                            if (!useMask || !msk[y*roi.width()+x]){
+                                X<<(x0tl+double(x)*deltaXY);
+                                Y<<(y0tl+double(y)*deltaXY);
+                                Z<<(z0tl+double(z)*deltaZ);
+                                roiXYZ<<roi(x,y,z);
+                            }
+                        }
+                    }
                 }
+
 
                 // cuts through center pixel with x-coordinate vectors
                 QVector<double> cutX(roi.width()); //=image.get_crop(0, y0i, z0i, roi.width()-1, y0i, z0i).unroll('x');
                 QVector<double> cutXX;
                 qfGridX(cutXX, x0tl, roi.width(), deltaXY);
+                int cutXN=0;
                 for (int i=0; i<cutX.size(); i++) {
-                    cutX[i]=roi(i, y0i, z0i);
+                    if (!useMask || !msk[y0i*roi.width()+i]){
+                        cutX[cutXN]=roi(i, y0i, z0i);
+                        cutXX[cutXN]=cutXX[i];
+                        cutXN++;
+                    }
                 }
                 QVector<double> cutY(roi.height()); //=image.get_crop(x0i, 0, z0i, x0i, roi.height()-1, z0i).unroll('x');
                 QVector<double> cutYX;
+                int cutYN=0;
                 qfGridX(cutYX, y0tl, roi.height(), deltaXY);
                 for (int i=0; i<cutY.size(); i++) {
-                    cutY[i]=roi(x0i, i, z0i);
+                    if (!useMask || !msk[i*roi.width()+x0i]){
+                        cutY[cutYN]=roi(x0i, i, z0i);
+                        cutYX[cutYN]=cutYX[i];
+                        cutYN++;
+                    }
                 }
                 QVector<double> cutZ(roi.depth()); //=image.get_crop(x0i, y0i, 0, x0i, y0i, roi.depth()-1).unroll('x');
                 QVector<double> cutZX;
-                qfGridX(cutZX, z0tl, roi.depth(), deltaZ);
+                qfGridX(cutZX, z0tl, roi.depth(), deltaZ);                 
+                int cutZN=0;
                 for (int i=0; i<cutZ.size(); i++) {
-                    cutZ[i]=roi(x0i, y0i, i);
+                    if (!useMask || !msk[y0i*roi.width()+x0i]){
+                        cutZ[cutZN]=roi(x0i, y0i, i);
+                        cutZX[cutZN]=cutZX[i];
+                        cutZN++;
+                    }
                 }
 
                 // estimate initial params
                 double init_background=qfstatisticsAverage(constructQVectorFromItems(
-                                                               statisticsQuantile(cutX.data(), cutX.size(), 0.1),
-                                                               statisticsQuantile(cutY.data(), cutY.size(), 0.1),
-                                                               statisticsQuantile(cutZ.data(), cutZ.size(), 0.1))
+                                                               statisticsQuantile(cutX.data(), cutXN, 0.1),
+                                                               statisticsQuantile(cutY.data(), cutYN, 0.1),
+                                                               statisticsQuantile(cutZ.data(), cutZN, 0.1))
                                                            );
                 double init_amplitude=qfstatisticsAverage(constructQVectorFromItems(
-                                                              statisticsMax(cutX.data(), cutX.size()),
-                                                              statisticsMax(cutY.data(), cutY.size()),
-                                                              statisticsMax(cutZ.data(), cutZ.size()))
+                                                              statisticsMax(cutX.data(), cutXN),
+                                                              statisticsMax(cutY.data(), cutYN),
+                                                              statisticsMax(cutZ.data(), cutZN))
                                                           )-init_background;
                 double init_w12=est_psf_width;
                 double init_w3=est_psf_height;
@@ -417,7 +456,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                     else if (ff1D->getParameterID(i)=="position") cutXP[i]=x0;
                     else if (ff1D->getParameterID(i)=="width") { cutXi=i; cutXP[i]=init_w12; }
                 }
-                alg->fit(cutXP.data(), NULL, cutXX.data(), cutX.data(), NULL, cutX.size(), ff1D, cutXP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
+                alg->fit(cutXP.data(), NULL, cutXX.data(), cutX.data(), NULL, cutXN, ff1D, cutXP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
 
 
                 // fit Y-cut
@@ -429,7 +468,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                     else if (ff1D->getParameterID(i)=="position") cutYP[i]=y0;
                     else if (ff1D->getParameterID(i)=="width")  {cutYi=i; cutYP[i]=init_w12; }
                 }
-                alg->fit(cutYP.data(), NULL, cutYX.data(), cutY.data(), NULL, cutY.size(), ff1D, cutYP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
+                alg->fit(cutYP.data(), NULL, cutYX.data(), cutY.data(), NULL, cutYN, ff1D, cutYP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
 
 
 
@@ -442,7 +481,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                     else if (ff1D->getParameterID(i)=="position") cutZP[i]=z0;
                     else if (ff1D->getParameterID(i)=="width") { cutZi=i; cutZP[i]=init_w3; }
                 }
-                alg->fit(cutZP.data(), NULL, cutZX.data(), cutZ.data(), NULL, cutZ.size(), ff1D, cutZP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
+                alg->fit(cutZP.data(), NULL, cutZX.data(), cutZ.data(), NULL, cutZN, ff1D, cutZP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
 
 
                 // fit X/Y-cuts along Z-axis
@@ -451,8 +490,12 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                     zpos<<(z0+double(z)*deltaZ);
 
                     // fit X-cut
+                    cutXN=0;
                     for (int i=0; i<cutX.size(); i++) {
-                        cutX[i]=roi(i, y0i, z);
+                        if (!useMask || !msk[y0i*roi.width()+i]){
+                            cutX[cutXN]=roi(i, y0i, z);
+                            cutXN++;
+                        }
                     }
                     QVector<double> cutZXP=ff1D->getInitialParamValues();
                     int wid=-1;
@@ -462,13 +505,17 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                         else if (ff1D->getParameterID(i)=="position") cutZXP[i]=x0;
                         else if (ff1D->getParameterID(i)=="width") { wid=i; cutZXP[i]=init_w12; }
                     }
-                    alg->fit(cutZXP.data(), NULL, cutXX.data(), cutX.data(), NULL, cutX.size(), ff1D, cutZXP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
+                    alg->fit(cutZXP.data(), NULL, cutXX.data(), cutX.data(), NULL, cutXN, ff1D, cutZXP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
                     fitZX_width<<cutZXP[wid];
 
 
                     // fit Y-cut
+                    cutYN=0;
                     for (int i=0; i<cutY.size(); i++) {
-                        cutY[i]=roi(x0i, i, z);
+                        if (!useMask || !msk[i*roi.width()+x0i]){
+                            cutY[cutYN]=roi(x0i, i, z);
+                            cutYN++;
+                        }
                     }
                     QVector<double> cutZYP=ff1D->getInitialParamValues();
                     wid=-1;
@@ -478,7 +525,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                         else if (ff1D->getParameterID(i)=="position") cutZYP[i]=y0;
                         else if (ff1D->getParameterID(i)=="width") {wid=i; cutZYP[i]=init_w12; }
                     }
-                    alg->fit(cutZYP.data(), NULL, cutYX.data(), cutY.data(), NULL, cutY.size(), ff1D, cutZYP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
+                    alg->fit(cutZYP.data(), NULL, cutYX.data(), cutY.data(), NULL, cutYN, ff1D, cutZYP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
                     fitZY_width<<cutZYP[wid];
                 }
 
@@ -514,7 +561,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                 }
                 //qDebug()<<"c="<<c<<"  b="<<b;
                 //qDebug()<<"init: "<<fit3DP;
-                alg->fit3D(fit3DP.data(), NULL, X.data(), Y.data(), Z.data(), roi.data(), NULL, roi.size(), ff3D, fit3DP.data(), NULL, ff3Dmin.data(), ff3Dmax.data());
+                alg->fit3D(fit3DP.data(), NULL, X.data(), Y.data(), Z.data(), roiXYZ.data(), NULL, roiXYZ.size(), ff3D, fit3DP.data(), NULL, ff3Dmin.data(), ff3Dmax.data());
                 //qDebug()<<"fit:  "<<fit3DP<<"\n\n";
 
                 QVector<double> axialRatios, axialRatios3D;

@@ -28,6 +28,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "libwid_imexport.h"
 #include "qfhtmlhelptools.h"
 #include "qftools.h"
+#include <QApplication>
+#include <QCursor>
 
 QFFitFunctionSelectDialog::QFFitFunctionSelectDialog(QWidget *parent) :
     QDialog(parent),
@@ -214,11 +216,13 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
 
 void QFFitFunctionSelectDialog::currentRowChanged(const QModelIndex & current, const QModelIndex & previous)
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QString pid=getCurrentItem();
     int ppid=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginForID(pid);
     QString help=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginHelp(ppid, pid);
     ui->txtHelp->setHtml(transformQF3HelpHTMLFile(help));
     currentFunction=pid;
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFitFunctionSelectDialog::currentRowAccepted(const QModelIndex &current, const QModelIndex &previous)
