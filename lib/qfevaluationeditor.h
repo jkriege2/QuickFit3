@@ -66,7 +66,7 @@ class QFLIB_EXPORT QFEvaluationEditor : public QWidget {
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) =0;
         /** \brief connected to the rawDataChanged() signal of the current record */
-        virtual void resultsChanged(QFRawDataRecord* record, const QString& evalName=QString(""), const QString& resultName=QString("")) {};
+        virtual void resultsChanged(QFRawDataRecord* record, const QString& evalName=QString(""), const QString& resultName=QString("")) {Q_UNUSED(record);Q_UNUSED(evalName);Q_UNUSED(resultName);};
 
     public slots:
         /** \brief read the settings */

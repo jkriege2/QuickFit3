@@ -44,16 +44,25 @@ void QFFitFunctionGeneralPDFLogGaussian::calcParameter(double* data, double* err
 }
 
 bool QFFitFunctionGeneralPDFLogGaussian::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
     // all parameters are visible at all times
 }
 
 unsigned int QFFitFunctionGeneralPDFLogGaussian::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
 QString QFFitFunctionGeneralPDFLogGaussian::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

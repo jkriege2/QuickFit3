@@ -221,7 +221,7 @@ void QFEvaluationItem::readXML(QDomElement& e, bool loadAsDummy, bool readID) {
 }
 
 
-void QFEvaluationItem::writeXML(QXmlStreamWriter& w, const QString &projectfilename, bool copyFilesToSubfolder, const QString &subfoldername, QList<QFProject::FileCopyList> *filecopylist, int writeMode) {
+void QFEvaluationItem::writeXML(QXmlStreamWriter& w, const QString &/*projectfilename*/, bool /*copyFilesToSubfolder*/, const QString &/*subfoldername*/, QList<QFProject::FileCopyList> */*filecopylist*/, int /*writeMode*/) {
     QFEvalReadLocker locker(p->lock);
     w.writeStartElement("evaluationelement");
     w.writeAttribute("type", getType());
@@ -251,7 +251,7 @@ void QFEvaluationItem::writeXML(QXmlStreamWriter& w, const QString &projectfilen
     w.writeEndElement();
 }
 
-bool QFEvaluationItem::doCopyFileForExport(const QString &filename, const QString &fileType, QString &newFilename, const QList<QFProject::FileCopyList> *filecopylist, const QString &subfoldername) const
+bool QFEvaluationItem::doCopyFileForExport(const QString &/*filename*/, const QString &/*fileType*/, QString &/*newFilename*/, const QList<QFProject::FileCopyList> */*filecopylist*/, const QString &/*subfoldername*/) const
 {
     return true;
 }

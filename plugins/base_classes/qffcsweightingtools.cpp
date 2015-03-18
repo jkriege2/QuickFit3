@@ -184,7 +184,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
         return w;
     }
     //qDebug()<<"QFFCSWeightingTools::allocWeights: "<<NULL;
-    if (weightsOKK) weightsOKK=false;
+    if (weightsOKK) *weightsOKK=false;
     return NULL;
 }
 

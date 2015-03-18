@@ -157,16 +157,19 @@ uint32_t QFImageReaderRadhard::intFrameHeight() {
 }
 
 bool QFImageReaderRadhard::intReadFrameUINT16(uint16_t* data, int channel) {
+    Q_UNUSED(channel);
   if (!file) return false;
   return readFrame_<uint16_t>(data);
 }
 
 bool QFImageReaderRadhard::intReadFrameDouble(double *data, int channel) {
+    Q_UNUSED(channel);
     if (!file) return false;
     return readFrame_<double>(data);
 }
 
 bool QFImageReaderRadhard::intReadFrameFloat(float* data, int channel) {
+    Q_UNUSED(channel);
     if (!file) return false;
   return readFrame_<float>(data);
 }

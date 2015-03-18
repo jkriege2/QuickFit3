@@ -253,10 +253,16 @@ bool QFFitFunctionsSPIMFCCSDiffCENewVeff2::isParameterVisible(int parameter, con
 }
 
 unsigned int QFFitFunctionsSPIMFCCSDiffCENewVeff2::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsSPIMFCCSDiffCENewVeff2::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

@@ -102,7 +102,7 @@ void QFEvaluationRawDataModelProxy::setEditor(QFEvaluationPropertyEditor* editor
 }
 
 
-void QFEvaluationRawDataModelProxy::selectionChanged(QList<QPointer<QFRawDataRecord> > selectedRecords) {
+void QFEvaluationRawDataModelProxy::selectionChanged(QList<QPointer<QFRawDataRecord> > /*selectedRecords*/) {
     //std::cout<<"QFEvaluationRawDataModelProxy::selectionChanged()\n";
     invalidateFilter();
     //qDebug()<<rowCount()<<editor;

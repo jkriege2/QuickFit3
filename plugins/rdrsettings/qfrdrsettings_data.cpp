@@ -35,6 +35,10 @@ QFRDRSettingsData::~QFRDRSettingsData()
 }
 
 void QFRDRSettingsData::exportData(const QString& format, const QString& filename)const  {
+    Q_UNUSED(format);
+
+    Q_UNUSED(filename);
+
 	// here you may export the data of the record into the specified format (see getExportFiletypes() )
     // THIS IS OPTIONAL
 }
@@ -51,6 +55,8 @@ QSettings *QFRDRSettingsData::getData() const
 
 
 void QFRDRSettingsData::intWriteData(QXmlStreamWriter& w) const {
+    Q_UNUSED(w);
+
 	// write data to the project XML file using the QXmlStreamWriter
     /*        
 	w.writeStartElement("mytag");
@@ -60,6 +66,8 @@ void QFRDRSettingsData::intWriteData(QXmlStreamWriter& w) const {
 }
 
 void QFRDRSettingsData::intReadData(QDomElement* e) {
+    Q_UNUSED(e);
+
 	// read data from the project XML file 
 
 	/*

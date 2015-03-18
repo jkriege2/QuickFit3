@@ -215,9 +215,15 @@ bool QFFitFunctionsFCCSFWDiff2ColorACFG::isParameterVisible(int parameter, const
 }
 
 unsigned int QFFitFunctionsFCCSFWDiff2ColorACFG::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsFCCSFWDiff2ColorACFG::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

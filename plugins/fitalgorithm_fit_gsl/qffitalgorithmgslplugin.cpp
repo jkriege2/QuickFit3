@@ -43,7 +43,7 @@ QStringList QFFitAlgorithmGSLPluginPlugin::getIDs() const {
     return sl;
 }
 
-QFFitAlgorithm* QFFitAlgorithmGSLPluginPlugin::get(QString id, QObject* parent) const {
+QFFitAlgorithm* QFFitAlgorithmGSLPluginPlugin::get(QString id, QObject* /*parent*/) const {
     if (id=="fit_gsl_simplex") return new QFFitAlgorithmGSLSimplex();
     if (id=="fit_gsl_simplexrand") return new QFFitAlgorithmGSLSimplexRand();
     if (id=="fit_gsl_bfgs2") return new QFFitAlgorithmGSLBFGS2();

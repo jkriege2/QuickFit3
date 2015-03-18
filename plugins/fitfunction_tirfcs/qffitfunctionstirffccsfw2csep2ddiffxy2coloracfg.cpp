@@ -177,14 +177,23 @@ void QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorACFG::calcParameter(double* data
 }
 
 bool QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorACFG::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
 }
 
 unsigned int QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorACFG::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorACFG::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

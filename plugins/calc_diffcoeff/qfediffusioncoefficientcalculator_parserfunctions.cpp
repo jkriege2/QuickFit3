@@ -57,7 +57,7 @@ void fCalcD_getDSphere(qfmpResult &res, const qfmpResult *params, unsigned int n
         }
 
         if (n>=1 && params[0].type==qfmpDouble) {
-            res.setDouble(inst->getSphereDCoeff(0, params[0].num, params[0].num));
+            res.setDouble(inst->getSphereDCoeff(0, params[0].num, T));
         } else {
             parser->qfmpError(QObject::tr("%1(diameter, temperature=293.15): requires one or two number parameters").arg(fname));
         }
@@ -78,7 +78,7 @@ void fCalcD_getDRotSphere(qfmpResult &res, const qfmpResult *params, unsigned in
         }
 
         if (n>=1 && params[0].type==qfmpDouble) {
-            res.setDouble(inst->getSphereDRotCoeff(0, params[0].num, params[0].num));
+            res.setDouble(inst->getSphereDRotCoeff(0, params[0].num, T));
         } else {
             parser->qfmpError(QObject::tr("%1(diameter, temperature=293.15): requires one or two number parameters").arg(fname));
         }
@@ -98,7 +98,7 @@ void fCalcD_getTauDRotSphere(qfmpResult &res, const qfmpResult *params, unsigned
         }
 
         if (n>=1 && params[0].type==qfmpDouble) {
-            res.setDouble(1.0/6.0/inst->getSphereDRotCoeff(0, params[0].num, params[0].num));
+            res.setDouble(1.0/6.0/inst->getSphereDRotCoeff(0, params[0].num, T));
         } else {
             parser->qfmpError(QObject::tr("%1(diameter, temperature=293.15): requires one or two number parameters").arg(fname));
         }

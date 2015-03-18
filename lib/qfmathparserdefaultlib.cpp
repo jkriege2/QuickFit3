@@ -184,7 +184,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("size", QFMathParser_DefaultLib::fLength);
     p->addFunction("sort", QFMathParser_DefaultLib::fSort);
     p->addFunction("dsort", QFMathParser_DefaultLib::fDSort);
-    p->addFunction("count", QFMathParser_DefaultLib::fCount);
+    p->addFunction("count", QFMathParser_DefaultLib::fCountOccurences);
     p->addFunction("sum", QFMathParser_DefaultLib::fSum);
     p->addFunction("diff", QFMathParser_DefaultLib::fDiff);
     p->addFunction("cumsum", QFMathParser_DefaultLib::fCumSum);
@@ -794,17 +794,16 @@ namespace QFMathParser_DefaultLib {
 
 
     void fCountOccurences(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
-        if (n!=1) {
-            p->qfmpError(QObject::tr("%1(x, value) needs exacptly 2 arguments").arg("countoccurences"));
-            r.setInvalid();
-            return;
-        }
-        if(params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble) {
-            r.setBoolean(params[0].numVec.count(params[1].num));
-        } else if(params[0].type==qfmpStringVector && params[1].type==qfmpString) {
-            r.setBoolean(params[0].strVec.count(params[1].str));
-        } else if(params[0].type==qfmpBoolVector && params[1].type==qfmpBool) {
-            r.setBoolean(params[0].boolVec.count(params[1].boolean));
+        if(n==1 && params[0].type==qfmpDoubleVector) {
+            r.setDouble(qfstatisticsCount(params[0].numVec));
+        } else if(n==2 && params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble) {
+            r.setDouble(params[0].numVec.count(params[1].num));
+        } else if(n==2 && params[0].type==qfmpStringVector && params[1].type==qfmpString) {
+            r.setDouble(params[0].strVec.count(params[1].str));
+        } else if(n==2 && params[0].type==qfmpBoolVector && params[1].type==qfmpBool) {
+            r.setDouble(params[0].boolVec.count(params[1].boolean));
+        } else if(n==1 && params[0].type==qfmpBoolVector) {
+            r.setDouble(params[0].boolVec.count(true));
         } else {
             p->qfmpError(QObject::tr("%1(x, value) argument 1 has to be a vector of numbers/booleans/strings and argument 2 the according item type number/string/boolean").arg("countoccurences"));
             r.setInvalid();
@@ -2928,6 +2927,7 @@ namespace QFMathParser_DefaultLib {
     }
 
     void fNow(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        Q_UNUSED(params);
         QString iname="now";
         r.setInvalid();
         if (n!=0) {
@@ -3681,7 +3681,7 @@ namespace QFMathParser_DefaultLib {
     {
         const QString iname="rangedhistogrambins";
         int bins=11;
-        int paramoffset=0;
+        unsigned int paramoffset=0;
         if (n>0 && params[0].type==qfmpDoubleVector) paramoffset=1;
         if ((n==2+paramoffset || n==3+paramoffset || n==4+paramoffset) && params[paramoffset+0].type==qfmpDouble && params[paramoffset+1].type==qfmpDouble) {
             bool norm=false;
@@ -4134,7 +4134,7 @@ namespace QFMathParser_DefaultLib {
 
     void fStruct(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
     {
-        int NN=0;
+        unsigned int NN=0;
         if (n>0 && params[0].type==qfmpStruct) {
             r=params[0];
             NN=1;
@@ -4142,7 +4142,7 @@ namespace QFMathParser_DefaultLib {
             r.setStruct();
         }
         if (n>NN && (n-NN)%2==0) {
-            for (int i=NN; i<n; i=i+2) {
+            for (unsigned int i=NN; i<n; i=i+2) {
                 if (params[i].type==qfmpString) {
                     r.structData[params[i].str]=params[i+1];
                 } else {
@@ -5811,6 +5811,7 @@ namespace QFMathParser_DefaultLib {
 
     void fFitFunctionIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
+        Q_UNUSED(params);
         res.setInvalid();
 
             if (n==0) {
@@ -5826,6 +5827,7 @@ namespace QFMathParser_DefaultLib {
 
     void fFitAlgorithmsIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
+        Q_UNUSED(params);
         res.setInvalid();
              if (n==0) {
                 res.setStringVec(QFPluginServices::getInstance()->getFitAlgorithmManager()->getIDList());

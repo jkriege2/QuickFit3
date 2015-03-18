@@ -45,7 +45,7 @@ class QFPFitFunctionsDLS : public QObject, public QFPluginFitFunction {
     public:
 
         /** Default constructor */
-        QFPFitFunctionsDLS(QObject* parent=NULL) {}
+        QFPFitFunctionsDLS(QObject* parent=NULL);
         /** Default destructor */
         virtual ~QFPFitFunctionsDLS() {}
 

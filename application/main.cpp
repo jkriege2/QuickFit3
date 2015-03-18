@@ -36,6 +36,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfsplashscreen.h"
 #include <QPainter>
 
+#ifdef _OPENMP
+# include <omp.h>
+#endif
+
 #ifndef __WINDOWS__
 # if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
 #  define __WINDOWS__

@@ -161,7 +161,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         double level=0;
         if (mask && useMask) level=statisticsQuantileMasked(mask, frame, width*height, 1.0-double(pixels_per_frame)/double(width*height), false);
         else level=statisticsQuantile(frame, width*height, 1.0-double(pixels_per_frame)/double(width*height));
-        qDebug()<<"step "<<z<<"  level="<<level<<mask<<useMask<<frame<<width*height<<1.0-double(pixels_per_frame)/double(width*height);
+        //qDebug()<<"step "<<z<<"  level="<<level<<mask<<useMask<<frame<<width*height<<1.0-double(pixels_per_frame)/double(width*height);
         segmentation_levels<<level;
         const int lx=ceil(double(ROIxy)/2.0);
         const int ly=lx;

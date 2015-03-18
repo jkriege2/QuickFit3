@@ -248,13 +248,22 @@ void QFFitFunctionsSPIMFCCSFWSepDiff2ColorCCF::calcParameter(double* data, doubl
 }
 
 bool QFFitFunctionsSPIMFCCSFWSepDiff2ColorCCF::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
 }
 
 unsigned int QFFitFunctionsSPIMFCCSFWSepDiff2ColorCCF::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsSPIMFCCSFWSepDiff2ColorCCF::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

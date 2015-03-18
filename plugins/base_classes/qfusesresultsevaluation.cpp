@@ -505,21 +505,30 @@ bool QFUsesResultsEvaluation::getFitFix(const QFRawDataRecord *r, const QString 
 
 QString QFUsesResultsEvaluation::getParameterName(int model, int id, bool html) const
 {
+    Q_UNUSED(model);
+    Q_UNUSED(id);
+    Q_UNUSED(html);
     return QString("");
 }
 
 QString QFUsesResultsEvaluation::getParameterUnit(int model, int id, bool html) const
 {
+    Q_UNUSED(model);
+    Q_UNUSED(id);
+    Q_UNUSED(html);
     return QString("");
 }
 
 int QFUsesResultsEvaluation::getParameterCount(int model) const
 {
+    Q_UNUSED(model);
     return 0;
 }
 
 QString QFUsesResultsEvaluation::getParameterID(int model, int param) const
 {
+    Q_UNUSED(model);
+    Q_UNUSED(param);
     return QString("");
 }
 
@@ -562,10 +571,20 @@ QString QFUsesResultsEvaluation::getFitParamFixID(QString fitparam) const {
 }
 
 bool QFUsesResultsEvaluation::hasSpecial(const QFRawDataRecord *r, const QString &resultID, const QString &paramid, double &value, double &error) const {
+    Q_UNUSED(r);
+    Q_UNUSED(resultID);
+    Q_UNUSED(paramid);
+    Q_UNUSED(value);
+    Q_UNUSED(error);
     return false;
 }
 
 bool QFUsesResultsEvaluation::getParameterDefault(const QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
+    Q_UNUSED(r);
+    Q_UNUSED(resultID);
+    Q_UNUSED(parameterID);
+    Q_UNUSED(defaultValue);
+
     return false;
 }
 

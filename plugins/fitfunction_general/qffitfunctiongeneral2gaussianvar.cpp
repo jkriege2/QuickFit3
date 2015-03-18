@@ -57,6 +57,9 @@ void QFFitFunctionGeneral2GaussianVar::calcParameter(double* data, double* error
 }
 
 bool QFFitFunctionGeneral2GaussianVar::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
     // all parameters are visible at all times
 }

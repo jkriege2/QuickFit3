@@ -91,10 +91,16 @@ bool QFFitFunctionGeneralPolynom::isParameterVisible(int parameter, const double
     return true;
 }
 unsigned int QFFitFunctionGeneralPolynom::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionGeneralPolynom::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

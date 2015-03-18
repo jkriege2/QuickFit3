@@ -739,7 +739,7 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
     }
 }
 
-void QFProject::writeXMLSubset(QIODevice *file, const QSet<int> &rdrSelected, const QSet<int> &evalSelected, bool writeRecordsOnly, int writeMode, const QString &filename_in) const
+void QFProject::writeXMLSubset(QIODevice *file, const QSet<int> &rdrSelected, const QSet<int> &evalSelected, bool /*writeRecordsOnly*/, int /*writeMode*/, const QString &filename_in) const
 {
     QString filename=filename_in;
     QFile* ffile=qobject_cast<QFile*>(file);
@@ -1992,7 +1992,7 @@ QString QFProject::ensureUniqueFilename(const QString &inFilename, const QString
     return newFN;
 }
 
-int QFProject::fileCopyListConatins(const QString &inFilename, const QString &outFile, const QList<FileCopyList> *filecopylist)
+int QFProject::fileCopyListConatins(const QString &/*inFilename*/, const QString &outFile, const QList<FileCopyList> *filecopylist)
 {
     for (int i=0; i<filecopylist->size(); i++) {
         if ((*filecopylist)[i].outFile==outFile) {

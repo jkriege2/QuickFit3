@@ -125,7 +125,7 @@ class QFPFitAlgorithmLevmar : public QObject, public QFPluginFitAlgorithm {
         QF_PLUGIN
 
         /** Default constructor */
-        QFPFitAlgorithmLevmar(QObject* parent=NULL) {}
+        QFPFitAlgorithmLevmar(QObject* parent=NULL): QObject(parent) {}
         /** Default destructor */
         virtual ~QFPFitAlgorithmLevmar() {}
 

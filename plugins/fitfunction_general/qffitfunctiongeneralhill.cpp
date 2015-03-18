@@ -53,13 +53,22 @@ void QFFitFunctionGeneralHill::calcParameter(double* data, double* error) const 
 }
 
 bool QFFitFunctionGeneralHill::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
 }
 unsigned int QFFitFunctionGeneralHill::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionGeneralHill::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

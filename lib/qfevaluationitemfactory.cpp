@@ -185,7 +185,7 @@ QString QFEvaluationItemFactory::getName(QString ID) {
     return QString("");
 };
 
-QFEvaluationItem* QFEvaluationItemFactory::createRecord(QString ID, QFPluginServices* services, QFProject* parent)  {
+QFEvaluationItem* QFEvaluationItemFactory::createRecord(QString ID, QFPluginServices* /*services*/, QFProject* parent)  {
     if (items.contains(ID)) return items[ID]->createRecord(parent);
     return NULL;
 };

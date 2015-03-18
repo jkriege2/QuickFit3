@@ -163,10 +163,6 @@ double QFFitFunctionsSPIMFCSADiff::evaluate(double t, const double* data) const 
 
 
 
-void QFFitFunctionsSPIMFCSADiff::sortParameter(double *parameterValues, double *error, bool *fix) const {
-
-
-}
 
 void QFFitFunctionsSPIMFCSADiff::calcParameter(double* data, double* error) const {
     double N=data[SPIMFCSADIFF_n_particle];
@@ -302,9 +298,15 @@ bool QFFitFunctionsSPIMFCSADiff::isParameterVisible(int parameter, const double*
 }
 
 unsigned int QFFitFunctionsSPIMFCSADiff::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsSPIMFCSADiff::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

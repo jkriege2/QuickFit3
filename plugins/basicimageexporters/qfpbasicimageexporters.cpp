@@ -29,7 +29,8 @@ Copyright (c) 2014
 #include "qfpluginservices.h"
 
 
-QFPBasicImageExporters::QFPBasicImageExporters(QObject *parent)
+QFPBasicImageExporters::QFPBasicImageExporters(QObject *parent):
+    QObject(parent)
 {
     QFPluginServices::getInstance()->registerSettingsPane(this);
 }

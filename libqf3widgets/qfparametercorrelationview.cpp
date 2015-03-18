@@ -358,7 +358,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
             CorrelationItem hist=histograms[hh];
             if (hist.data1 && hist.data2 && (hist.size>0)) {
 
-                double dmean, dstd=0, dmin, dmax, dmedian, dq25, dq75, dskew, dql, dqu;
+                double dmean, dstd=0, dmin, dmax, dmedian, dq25, dq75, dskew;//, dql, dqu;
                 double* d1=duplicateArray(hist.data1, hist.size);
                 double* d2=duplicateArray(hist.data2, hist.size);
                 double* d3=NULL;
@@ -495,8 +495,8 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 dmedian=statisticsSortedMedian(d2, datasize);
                 dq25=statisticsSortedQuantile(d2, datasize, 0.25);
                 dq75=statisticsSortedQuantile(d2, datasize, 0.75);
-                dql=statisticsSortedQuantile(d1, datasize, spinHistogramQL2->value()/100.0);
-                dqu=statisticsSortedQuantile(d1, datasize, (100.0-spinHistogramQU2->value())/100.0);
+                //dql=statisticsSortedQuantile(d1, datasize, spinHistogramQL2->value()/100.0);
+                //dqu=statisticsSortedQuantile(d1, datasize, (100.0-spinHistogramQU2->value())/100.0);
                 dskew=statisticsSkewness(d2, datasize);
                 tabHistogramParameters->setCellCreate(col++, hh+1, datasize);
                 tabHistogramParameters->setCellCreate(col++, hh+1, dmean);
@@ -1663,6 +1663,7 @@ void QFParameterCorrelationView::fillDataArray(QList<QVector<double> > &data, QS
 
 void QFParameterCorrelationView::rangeSelectionRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers)
 {
+    Q_UNUSED(modifiers);
     currentRangeSelection_xmin=qMin(x, x+width);
     currentRangeSelection_xmax=qMax(x, x+width);
     currentRangeSelection_ymin=qMin(y, y+height);

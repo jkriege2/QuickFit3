@@ -51,6 +51,12 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 
+QFPFitFunctionFCS::QFPFitFunctionFCS(QObject *parent):
+    QObject(parent)
+{
+
+}
+
 QStringList QFPFitFunctionFCS::getIDs() const {
     QStringList res;
     res<<"fcs_diff"<<"fcs_diff2d"<<"fcs_tir_diff2d"
@@ -70,6 +76,7 @@ QStringList QFPFitFunctionFCS::getIDs() const {
 }
 
 QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
+    Q_UNUSED(parent);
     if (id=="fcs_diff") {
         return new QFFitFunctionFCSDiff();
     } else if (id=="fcs_diff_stretchpp") {

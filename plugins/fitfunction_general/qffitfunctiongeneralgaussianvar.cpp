@@ -54,16 +54,25 @@ void QFFitFunctionGeneralGaussianVar::calcParameter(double* data, double* error)
 }
 
 bool QFFitFunctionGeneralGaussianVar::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
     // all parameters are visible at all times
 }
 
 unsigned int QFFitFunctionGeneralGaussianVar::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
 QString QFFitFunctionGeneralGaussianVar::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

@@ -288,9 +288,15 @@ bool QFFitFunctionsTIRFCCSDiffFlowE2::isParameterVisible(int parameter, const do
 }
 
 unsigned int QFFitFunctionsTIRFCCSDiffFlowE2::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsTIRFCCSDiffFlowE2::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

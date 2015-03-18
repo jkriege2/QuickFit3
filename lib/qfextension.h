@@ -123,7 +123,7 @@ class QFLIB_EXPORT QFExtensionBase: public QFExtension {
         QWidget* parentWidget;
 
         /** \brief this method is called whenever the current project changes */
-        virtual void projectChanged(QFProject* oldProject, QFProject* project) {};
+        virtual void projectChanged(QFProject* oldProject, QFProject* project) {Q_UNUSED(oldProject);Q_UNUSED(project);};
 
         /*! \brief initialize the plugin in this method
 
@@ -132,10 +132,10 @@ class QFLIB_EXPORT QFExtensionBase: public QFExtension {
         virtual void initExtension() {};
 
         /** \brief read settings from given \a settings object */
-        virtual void loadSettings(ProgramOptions* settings) {};
+        virtual void loadSettings(ProgramOptions* settings) {Q_UNUSED(settings);};
 
         /** \brief write settings to given \a settings object */
-        virtual void storeSettings(ProgramOptions* settings) {};
+        virtual void storeSettings(ProgramOptions* settings) {Q_UNUSED(settings);};
 
 };
 

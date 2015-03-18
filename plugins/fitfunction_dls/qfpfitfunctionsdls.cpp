@@ -26,6 +26,12 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctiondlsg2_gaussiantaudist.h"
 #include "qffitfunctiondlsg2_loggaussiantaudist.h"
 
+QFPFitFunctionsDLS::QFPFitFunctionsDLS(QObject *parent):
+    QObject(parent)
+{
+
+}
+
 QStringList QFPFitFunctionsDLS::getIDs() const {
     QStringList res;
     res<<"dls_g2"<<"dls_g2_ind"<<"dls_g2_ind_ext"<<"dls_g2_int_taunormdist"<<"dls_g2_int_taulognormdist";
@@ -33,6 +39,7 @@ QStringList QFPFitFunctionsDLS::getIDs() const {
 }
 
 QFFitFunction* QFPFitFunctionsDLS::get(QString id, QObject* parent) const  {
+    Q_UNUSED(parent);
     if (id=="dls_g2") {
         return new QFFitFunctionDLSG2();
     } else if (id=="dls_g2_int_taunormdist") {

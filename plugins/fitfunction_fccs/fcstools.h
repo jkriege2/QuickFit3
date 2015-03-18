@@ -29,7 +29,7 @@ inline double FCS_newVeff(double wxy, double wz) {
     return qfCube(QF_SQRTPI)*qfSqr(wxy)*wz;
 }
 
-inline double FCS_newVeffError(double wxy, double ewxy, double wz, double ewz){
+inline double FCS_newVeffError(double /*wxy*/, double /*ewxy*/, double /*wz*/, double /*ewz*/){
     return 0;
 }
 

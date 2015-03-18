@@ -48,7 +48,7 @@ class QFPFitFunctionsSPIMFCS : public QObject, public QFPluginFitFunction, publi
 
 
         /** Default constructor */
-        QFPFitFunctionsSPIMFCS(QObject* parent=NULL) {}
+        QFPFitFunctionsSPIMFCS(QObject* parent=NULL): QObject(parent) {}
         /** Default destructor */
         virtual ~QFPFitFunctionsSPIMFCS() {}
 

@@ -51,9 +51,13 @@ QFExtensionTestFilterChanger::~QFExtensionTestFilterChanger() {
 
 
 void QFExtensionTestFilterChanger::projectChanged(QFProject* oldProject, QFProject* project) {
-	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
-	   But: possibly you could read config information from the project here
-	 */
+    /* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
+       But: possibly you could read config information from the project here
+     */
+
+    Q_UNUSED(project);
+    Q_UNUSED(oldProject);
+
 }
 
 void QFExtensionTestFilterChanger::initExtension() {

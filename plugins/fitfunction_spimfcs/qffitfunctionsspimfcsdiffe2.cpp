@@ -128,8 +128,6 @@ double QFFitFunctionsSPIMFCSDiffE2::evaluate(double t, const double* data) const
     return offset+pre/N*cfac*backfactor;
 }
 
-void QFFitFunctionsSPIMFCSDiffE2::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
 
 void QFFitFunctionsSPIMFCSDiffE2::sortParameter(double *parameterValues, double *error, bool *fix) const {
 
@@ -295,9 +293,15 @@ bool QFFitFunctionsSPIMFCSDiffE2::isParameterVisible(int parameter, const double
 }
 
 unsigned int QFFitFunctionsSPIMFCSDiffE2::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsSPIMFCSDiffE2::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

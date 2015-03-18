@@ -499,6 +499,8 @@ QVariant QFRDRImageStackData::getDoubleEnumeratedProperty(const QString &prop, i
 
 void QFRDRImageStackData::setStackProperties(const QMap<QString, QVariant> &props, int stack, int channel)
 {
+    Q_UNUSED(channel);
+
     QMapIterator<QString,QVariant> it(props);
     while (it.hasNext()) {
         it.next();

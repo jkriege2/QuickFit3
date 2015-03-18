@@ -74,6 +74,7 @@ QFFCSMaxEntEvaluationEditor::~QFFCSMaxEntEvaluationEditor()
 
 void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plotdata, int option, const QString &optionName)
 {
+    Q_UNUSED(optionName);
     if (!current) return;
     if (!cmbModel) return;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);

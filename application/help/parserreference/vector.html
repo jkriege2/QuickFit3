@@ -274,10 +274,12 @@ $$funcref_description$$
 $$funcref_end$$
 
   
-  $$funcref_start$$<a name="countoccurences"/><!-- func:countoccurences -->
-  <b><tt><!-- template -->countoccurences(x, value)<!-- /template --></tt> - <i>returns the number of elements in the vector <tt>x</tt> that have value <tt>value</tt> </i>:</b>
+  $$funcref_start$$<a name="count"/><!-- func:count -->
+  <b><tt><!-- template -->count(x[, value])<!-- /template --></tt> - <i>returns the number of elements in the vector <tt>x</tt> that have value <tt>value</tt> </i>:</b>
 $$funcref_description$$
-  <!-- /func:countoccurences-->  
+    If <tt>x</tt> is a number vector and no <tt>value</tt> is given, the function counts the number of good values (non-inf/nan/...) in <tt>x</tt>. <br>
+	If <tt>x</tt> is a boolean vector and no <tt>value</tt> is given, the function counts the number of trues in <tt>x</tt>. 
+  <!-- /func:count-->  
 $$funcref_end$$
 
 

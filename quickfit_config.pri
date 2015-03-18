@@ -49,7 +49,7 @@ exists(quickfit.inc):include(quickfit.inc)
     !macx:CXXTUNE= -march=native
     DEFINES += \'GLOBALCONFIGDIR=\"$$GLOBALCONFIGDIR\"\'
 }
-QMAKE_CXXFLAGS += -Wno-unused-variable -Werror=return-type $${CXXTUNE} -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -malign-double
+QMAKE_CXXFLAGS += -Wno-unused-variable -Wno-unused-but-set-variable -Werror=return-type $${CXXTUNE} -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -malign-double
 #-ftree-vectorizer-verbose=5
 
 contains( HAS_LAPACK, true ) {

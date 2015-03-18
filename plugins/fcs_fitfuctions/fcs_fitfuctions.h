@@ -51,7 +51,7 @@ class QFPFitFunctionFCS : public QObject, public QFPluginFitFunction {
         QF_PLUGIN
 
         /** Default constructor */
-        QFPFitFunctionFCS(QObject* parent=NULL) {}
+        QFPFitFunctionFCS(QObject* parent=NULL);
         /** Default destructor */
         virtual ~QFPFitFunctionFCS() {}
 

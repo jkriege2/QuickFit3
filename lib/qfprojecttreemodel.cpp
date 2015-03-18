@@ -140,6 +140,8 @@ void QFProjectTreeModel::createModelTree() {
 }
 
 int QFProjectTreeModel::columnCount ( const QModelIndex & parent ) const {
+    Q_UNUSED(parent);
+
     if (!current || !rootItem) return 0;
     return qMax(qMax(1, groupCol+1), roleCol+1);
 }

@@ -51,7 +51,7 @@ void QFFitFunction::multiEvaluate(double *y, const double *x, uint64_t N, const 
     }
 }
 
-void QFFitFunction::evaluateDerivatives(double *derivatives, double x, const double *parameters) const
+void QFFitFunction::evaluateDerivatives(double */*derivatives*/, double /*x*/, const double */*parameters*/) const
 {
 
 }
@@ -60,7 +60,7 @@ void QFFitFunction::evaluateDerivatives(double *derivatives, double x, const dou
 
 
 
-bool QFFitFunction::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunction::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool */*fix*/)
 {
     return false;
 }

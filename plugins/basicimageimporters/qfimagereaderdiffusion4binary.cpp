@@ -155,6 +155,7 @@ uint32_t QFImageReaderDiffusion4Binary::intFrameHeight() {
 
 
 bool QFImageReaderDiffusion4Binary::intReadFrameFloat(float *data, int channel) {
+    Q_UNUSED(channel);
     if (!(input.isOpen() && input.isReadable())) return false;
     if (framedata.isEmpty()) return false;
 
@@ -164,6 +165,7 @@ bool QFImageReaderDiffusion4Binary::intReadFrameFloat(float *data, int channel) 
 }
 
 bool QFImageReaderDiffusion4Binary::intReadFrameUINT16(uint16_t *data, int channel) {
+    Q_UNUSED(channel);
     if (!(input.isOpen() && input.isReadable())) return false;
     if (framedata.isEmpty()) return false;
 
@@ -173,6 +175,7 @@ bool QFImageReaderDiffusion4Binary::intReadFrameUINT16(uint16_t *data, int chann
 }
 
 bool QFImageReaderDiffusion4Binary::intReadFrameDouble(double *data, int channel) {
+    Q_UNUSED(channel);
     if (!(input.isOpen() && input.isReadable())) return false;
     if (framedata.isEmpty()) return false;
 

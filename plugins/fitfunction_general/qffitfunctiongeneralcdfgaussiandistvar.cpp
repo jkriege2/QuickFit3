@@ -48,16 +48,25 @@ void QFFitFunctionGeneralCDFGaussianDistVar::calcParameter(double* data, double*
 }
 
 bool QFFitFunctionGeneralCDFGaussianDistVar::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
     // all parameters are visible at all times
 }
 
 unsigned int QFFitFunctionGeneralCDFGaussianDistVar::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
 QString QFFitFunctionGeneralCDFGaussianDistVar::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

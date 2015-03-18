@@ -279,9 +279,15 @@ bool QFFitFunctionsTIRFCSADiff3DPixelE2::isParameterVisible(int parameter, const
 }
 
 unsigned int QFFitFunctionsTIRFCSADiff3DPixelE2::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsTIRFCSADiff3DPixelE2::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

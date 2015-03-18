@@ -296,9 +296,15 @@ bool QFFitFunctionsSPIMFCSADiffCE2::isParameterVisible(int parameter, const doub
 }
 
 unsigned int QFFitFunctionsSPIMFCSADiffCE2::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsSPIMFCSADiffCE2::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

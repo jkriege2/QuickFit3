@@ -27,6 +27,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 qfmpResult QFMathParserWidget_dummy(const qfmpResult* params, unsigned char n, QFMathParser* p) {
     qfmpResult res;
+    Q_UNUSED(params);
+    Q_UNUSED(n);
+    Q_UNUSED(p);
 
     return res;
 }
@@ -99,6 +102,7 @@ void QFMathParserWidget::addFunctionReferenceDirectory(const QString &directory)
 }
 
 void QFMathParserWidget::on_edtFormula_textChanged(QString text) {
+    Q_UNUSED(text);
     QFMathParser::qfmpNode* n;
     mp->resetErrors();
     // parse some numeric expression
@@ -215,5 +219,6 @@ QString QFMathParserWidget::getFunctionHelp(QString name)
 {
     return functionRef->getFunctionHelp(name);
 }
+
 
 

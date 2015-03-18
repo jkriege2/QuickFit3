@@ -119,7 +119,7 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
               double* buf=(double*)qfMalloc(PTUTagHead.TagValue);
               fread(buf, PTUTagHead.TagValue, 1, fpin);
               QVariantList vl;
-              for (int i=0; i<PTUTagHead.TagValue/sizeof(double); i++) {
+              for ( long long i=0; i<PTUTagHead.TagValue/(int)sizeof(double); i++) {
                   vl<<buf[i];
               }
               tagData=vl;

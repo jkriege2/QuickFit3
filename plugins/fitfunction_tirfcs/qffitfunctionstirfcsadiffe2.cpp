@@ -278,9 +278,15 @@ bool QFFitFunctionsTIRFCSADiffE2::isParameterVisible(int parameter, const double
 }
 
 unsigned int QFFitFunctionsTIRFCSADiffE2::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsTIRFCSADiffE2::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

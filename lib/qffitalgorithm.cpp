@@ -31,6 +31,8 @@
 #include "qftools.h"
 
 void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, const double* params) {
+    Q_UNUSED(evalout);
+    Q_UNUSED(params);
 }
 
 
@@ -1561,7 +1563,8 @@ void QFFitAlgorithm::FitQFFitFunction3DFunctor::evaluate(double *evalout, const 
 
 void QFFitAlgorithm::FitQFFitFunction3DFunctor::evaluateJacobian(double *evalout, const double *params)
 {
-
+    Q_UNUSED(evalout);
+    Q_UNUSED(params);
 }
 
 void QFFitAlgorithm::FitQFFitFunction3DFunctor::transfromParameters(double *params)
@@ -1906,7 +1909,8 @@ void QFFitAlgorithm::FitQFFitFunction2DFunctor::evaluate(double *evalout, const 
 
 void QFFitAlgorithm::FitQFFitFunction2DFunctor::evaluateJacobian(double *evalout, const double *params)
 {
-
+    Q_UNUSED(evalout);
+    Q_UNUSED(params);
 }
 
 void QFFitAlgorithm::FitQFFitFunction2DFunctor::transfromParameters(double *params)

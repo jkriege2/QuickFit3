@@ -78,6 +78,8 @@ void MaxEntB040::setData(const double* taus, const double* correlation,\
                          int rangeMaxDatarange,uint32_t Ndist, double * dist,double * distTaus,\
                          int model,int parameterCount, double *param_list, double wxy, MaxEntB040::TauMode tauMode, double tauMin, double tauMax)
 {
+    Q_UNUSED(Nd);
+    Q_UNUSED(parameterCount);
     m_wxy=wxy;
     m_Nd=rangeMaxDatarange-rangeMinDatarange;
 	m_xdata.resize(rangeMaxDatarange-rangeMinDatarange);

@@ -329,9 +329,15 @@ bool QFFitFunctionsSPIMFCSDiff::isParameterVisible(int parameter, const double* 
 }
 
 unsigned int QFFitFunctionsSPIMFCSDiff::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsSPIMFCSDiff::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

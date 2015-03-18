@@ -45,7 +45,7 @@ class QFPFitAlgorithmLMFitPlugin : public QObject, public QFPluginFitAlgorithm {
 		QF_PLUGIN
 	
         /** Default constructor */
-        QFPFitAlgorithmLMFitPlugin(QObject* parent=NULL) {}
+        QFPFitAlgorithmLMFitPlugin(QObject* parent=NULL): QObject(parent) {}
         /** Default destructor */
         virtual ~QFPFitAlgorithmLMFitPlugin() {}
 

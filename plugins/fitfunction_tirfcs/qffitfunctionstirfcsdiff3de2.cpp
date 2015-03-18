@@ -334,9 +334,15 @@ bool QFFitFunctionsTIRFCSDiff3DE2::isParameterVisible(int parameter, const doubl
 }
 
 unsigned int QFFitFunctionsTIRFCSDiff3DE2::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsTIRFCSDiff3DE2::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

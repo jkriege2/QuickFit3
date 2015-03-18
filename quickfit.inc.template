@@ -37,3 +37,7 @@
 
 # activate if webkit is NOT available
 QF3CONFIG+=nowebkit
+
+# if you want to use OpenMP (some libraries may profit from this)
+#QMAKE_CXXFLAGS += -fopenmp
+#QMAKE_LFLAGS += -fopenmp

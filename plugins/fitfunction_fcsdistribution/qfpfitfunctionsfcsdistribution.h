@@ -45,7 +45,7 @@ class QFPFitFunctionsFCSDistribution : public QObject, public QFPluginFitFunctio
     public:
 
         /** Default constructor */
-        QFPFitFunctionsFCSDistribution(QObject* parent=NULL) {}
+        QFPFitFunctionsFCSDistribution(QObject* parent=NULL): QObject(parent) {}
         /** Default destructor */
         virtual ~QFPFitFunctionsFCSDistribution() {}
 

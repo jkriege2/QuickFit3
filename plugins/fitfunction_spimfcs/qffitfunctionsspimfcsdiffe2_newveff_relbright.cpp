@@ -293,9 +293,15 @@ bool QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright::isParameterVisible(int parame
 }
 
 unsigned int QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

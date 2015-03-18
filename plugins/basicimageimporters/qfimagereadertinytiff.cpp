@@ -197,6 +197,7 @@ void readTinyTIFFFrame(TinyTIFFReaderFile* tif, Tout* buffer) {
 
 
 bool QFImageReaderTinyTIFF::intReadFrameFloat(float *data, int channel) {
+    Q_UNUSED(channel);
     if (!tif) return false;
 
     uint32_t wwidth=TinyTIFFReader_getWidth(tif);
@@ -242,6 +243,7 @@ bool QFImageReaderTinyTIFF::intReadFrameFloat(float *data, int channel) {
 }
 
 bool QFImageReaderTinyTIFF::intReadFrameUINT16(uint16_t *data, int channel) {
+    Q_UNUSED(channel);
     if (!tif) return false;
 
     uint32_t wwidth=TinyTIFFReader_getWidth(tif);
@@ -282,6 +284,7 @@ bool QFImageReaderTinyTIFF::intReadFrameUINT16(uint16_t *data, int channel) {
 }
 
 bool QFImageReaderTinyTIFF::intReadFrameDouble(double *data, int channel) {
+    Q_UNUSED(channel);
     if (!tif) return false;
 
     uint32_t wwidth=TinyTIFFReader_getWidth(tif);

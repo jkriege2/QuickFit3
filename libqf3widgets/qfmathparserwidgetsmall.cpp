@@ -27,7 +27,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 qfmpResult QFMathParserWidgetSmall_dummy(const qfmpResult* params, unsigned char n, QFMathParser* p) {
     qfmpResult res;
-
+    Q_UNUSED(params);
+    Q_UNUSED(n);
+    Q_UNUSED(p);
     return res;
 }
 

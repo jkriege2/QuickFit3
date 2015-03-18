@@ -121,6 +121,7 @@ QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
 }
 
 QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
+    Q_UNUSED(parent);
     if (id=="fcs_spim_diff") {
         return new QFFitFunctionsSPIMFCSDiff();
     } else if (id=="fcs_spim_diffc") {

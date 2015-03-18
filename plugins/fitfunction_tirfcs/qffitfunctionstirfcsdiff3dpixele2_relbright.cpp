@@ -272,9 +272,15 @@ bool QFFitFunctionsTIRFCSDiffE2Diff3DPixelbright::isParameterVisible(int paramet
 }
 
 unsigned int QFFitFunctionsTIRFCSDiffE2Diff3DPixelbright::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionsTIRFCSDiffE2Diff3DPixelbright::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }

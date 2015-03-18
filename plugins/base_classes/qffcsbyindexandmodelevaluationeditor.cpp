@@ -503,6 +503,8 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
 }
 
 int QFFCSByIndexAndModelEvaluationEditor::getUserMinAbsMax(QFRawDataRecord *rec, int index) {
+    Q_UNUSED(index);
+
     QFRDRFCSDataInterface* dintf=qobject_cast<QFRDRFCSDataInterface*>(rec);
     if (dintf) return dintf->getCorrelationN()-1;
     return 0;
@@ -739,6 +741,9 @@ void QFFCSByIndexAndModelEvaluationEditor::plotMouseMove(double x, double y) {
 }
 
 void QFFCSByIndexAndModelEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender) {
+    Q_UNUSED(newymin);
+    Q_UNUSED(newymax);
+
     if (!dataEventsEnabled) return;
     if (sender==pltData) {
         pltResiduals->setX(newxmin, newxmax);
@@ -792,6 +797,10 @@ void QFFCSByIndexAndModelEvaluationEditor::runChanged(int run) {
 }
 
 void QFFCSByIndexAndModelEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
+    Q_UNUSED(min);
+
+    Q_UNUSED(max);
+
     if (!dataEventsEnabled) return;
     QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
     if (!data) return;
@@ -803,6 +812,7 @@ void QFFCSByIndexAndModelEvaluationEditor::slidersChanged(int userMin, int userM
 
 
 void QFFCSByIndexAndModelEvaluationEditor::chkXLogScaleToggled(bool checked) {
+    Q_UNUSED(checked);
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
@@ -812,6 +822,7 @@ void QFFCSByIndexAndModelEvaluationEditor::chkXLogScaleToggled(bool checked) {
 }
 
 void QFFCSByIndexAndModelEvaluationEditor::chkGridToggled(bool checked) {
+    Q_UNUSED(checked);
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
@@ -821,6 +832,7 @@ void QFFCSByIndexAndModelEvaluationEditor::chkGridToggled(bool checked) {
 }
 
 void QFFCSByIndexAndModelEvaluationEditor::chkKeyVisibleToggled(bool checked) {
+    Q_UNUSED(checked);
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
@@ -829,6 +841,7 @@ void QFFCSByIndexAndModelEvaluationEditor::chkKeyVisibleToggled(bool checked) {
     QApplication::restoreOverrideCursor();
 }
 void QFFCSByIndexAndModelEvaluationEditor::plotStyleChanged(int style) {
+    Q_UNUSED(style);
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
@@ -838,6 +851,7 @@ void QFFCSByIndexAndModelEvaluationEditor::plotStyleChanged(int style) {
 }
 
 void QFFCSByIndexAndModelEvaluationEditor::errorStyleChanged(int style) {
+    Q_UNUSED(style);
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
@@ -847,6 +861,7 @@ void QFFCSByIndexAndModelEvaluationEditor::errorStyleChanged(int style) {
 }
 
 void QFFCSByIndexAndModelEvaluationEditor::residualStyleChanged(int style) {
+    Q_UNUSED(style);
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
@@ -856,6 +871,7 @@ void QFFCSByIndexAndModelEvaluationEditor::residualStyleChanged(int style) {
 }
 
 void QFFCSByIndexAndModelEvaluationEditor::chkWeightedResidualsToggled(bool checked) {
+    Q_UNUSED(checked);
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
@@ -865,6 +881,7 @@ void QFFCSByIndexAndModelEvaluationEditor::chkWeightedResidualsToggled(bool chec
 }
 
 void QFFCSByIndexAndModelEvaluationEditor::residualHistogramBinsChanged(int bins) {
+    Q_UNUSED(bins);
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
@@ -1042,6 +1059,9 @@ void QFFCSByIndexAndModelEvaluationEditor::copyToAllCurrentRun() {
 }
 
 void QFFCSByIndexAndModelEvaluationEditor::copyMoreData(QFRawDataRecord *record, int index, int model) {
+    Q_UNUSED(record);
+    Q_UNUSED(index);
+    Q_UNUSED(model);
     // may be overwritten by derived classes
 }
 

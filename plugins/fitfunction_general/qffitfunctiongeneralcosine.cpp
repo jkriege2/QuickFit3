@@ -54,13 +54,22 @@ void QFFitFunctionGeneralCosine::calcParameter(double* data, double* error) cons
 }
 
 bool QFFitFunctionGeneralCosine::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
 }
 unsigned int QFFitFunctionGeneralCosine::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionGeneralCosine::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

@@ -67,8 +67,6 @@ class QFFitFunctionsSPIMFCSADiff: public QFFitFunction {
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() const { return false; }
 
-        /*! \copydoc QFFitFunction::sortParameter()   */
-        virtual void sortParameter(double* parameterValues, double* error=NULL , bool *fix=NULL) const;
 };
 
 #endif // QFFITFUNCTIONSSPIMFCSADIFF_H

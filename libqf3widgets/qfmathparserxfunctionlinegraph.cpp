@@ -89,6 +89,7 @@ QFMathParserXFunctionLineGraph::~QFMathParserXFunctionLineGraph()
 
 void QFMathParserXFunctionLineGraph::createPlotData(bool collectParams)
 {
+    Q_UNUSED(collectParams);
     collectParameters();
     QElapsedTimer timer;
     timer.start();

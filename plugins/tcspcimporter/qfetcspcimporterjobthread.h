@@ -277,7 +277,7 @@ protected:
     QFPluginServices* pluginServices;
 
     typedef correlatorjb<double, double> corrjb_type;
-    typedef MultiTauCorrelator<uint16_t, uint64_t> corrjk_type;
+    typedef MultiTauCorrelator<double, double> corrjk_type;
 
     QMap<uint32_t, corrjb_type*> corrjb;
     QMap<uint32_t, corrjk_type*> corrjk;

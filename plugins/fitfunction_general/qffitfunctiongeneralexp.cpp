@@ -49,13 +49,22 @@ void QFFitFunctionGeneralExp::calcParameter(double* data, double* error) const {
 }
 
 bool QFFitFunctionGeneralExp::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
 }
 unsigned int QFFitFunctionGeneralExp::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionGeneralExp::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

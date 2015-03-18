@@ -213,7 +213,7 @@ void fStack_getframe(qfmpResult &res, const qfmpResult *params, unsigned int n, 
 
         if (n>=3 && params[2].type==qfmpDouble) {
             frame=params[2].toInteger();
-            if (frame<0 || frame>=rdr->getImageStackFrames(stack)) {
+            if (frame<0 || frame>=(int)rdr->getImageStackFrames(stack)) {
                 parser->qfmpError(QObject::tr("imagestack_getframe(rdrid,stack,frame,...): the specified frame is not available in this RDR"));
                 res.setInvalid();
                 return;

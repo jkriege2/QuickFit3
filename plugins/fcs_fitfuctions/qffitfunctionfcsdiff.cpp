@@ -330,10 +330,12 @@ bool QFFitFunctionFCSDiff::isParameterVisible(int parameter, const double* data)
 }
 
 unsigned int QFFitFunctionFCSDiff::getAdditionalPlotCount(const double* params) {
+    Q_UNUSED(params);
     return 1;
 }
 
 QString QFFitFunctionFCSDiff::transformParametersForAdditionalPlot(int plot, double* params) {
+    Q_UNUSED(plot);
     params[FCSDiff_n_nonfluorescent]=0;
     return "without non-fluorescent";
 }

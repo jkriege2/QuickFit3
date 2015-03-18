@@ -571,7 +571,7 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) =0;
 
             /** \brief create bytecode that evaluates the current node */
-            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) { return false; }
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) { Q_UNUSED(program);Q_UNUSED(environment);return false; }
 
             /** \brief print the expression */
             virtual QString print() const;

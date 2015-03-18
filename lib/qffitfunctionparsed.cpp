@@ -149,24 +149,31 @@ bool QFFitFunctionParsed::get_implementsDerivatives() const
 
 QString QFFitFunctionParsed::transformParametersForAdditionalPlot(int plot, double *params)
 {
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 
 
 unsigned int QFFitFunctionParsed::getAdditionalPlotCount(const double *params)
 {
+    Q_UNUSED(params);
     return 0;
 }
 
 
 bool QFFitFunctionParsed::isParameterVisible(int parameter, const double *parameterValues) const
 {
+    Q_UNUSED(parameter);
+    Q_UNUSED(parameterValues);
     return true;
 }
 
 
 void QFFitFunctionParsed::calcParameter(double *parameterValues, double *error) const
 {
+    Q_UNUSED(parameterValues);
+    Q_UNUSED(error);
 }
 
 

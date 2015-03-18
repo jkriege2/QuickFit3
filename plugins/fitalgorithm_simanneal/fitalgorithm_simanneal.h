@@ -200,7 +200,7 @@ class QFPFitAlgorithmSimAnneal : public QObject, public QFPluginFitAlgorithm {
         QF_PLUGIN
 
         /** Default constructor */
-        QFPFitAlgorithmSimAnneal(QObject* parent=NULL) {}
+        QFPFitAlgorithmSimAnneal(QObject* parent=NULL): QObject(parent) {}
         /** Default destructor */
         virtual ~QFPFitAlgorithmSimAnneal() {}
 

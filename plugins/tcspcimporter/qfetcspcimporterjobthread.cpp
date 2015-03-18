@@ -602,6 +602,7 @@ void QFETCSPCImporterJobThread::run() {
                                 switch(job.fcs_correlator) {
                                     case CORRELATOR_MTAUALLMON:  text<<"multi-tau with monitors for all channels\n"; break;
                                     case CORRELATOR_MTAUONEMON:  text<<"multi-tau with a single monitor\n"; break;
+                                    case CORRELATOR_TTTR:  text<<"TTTR\n"; break;
 
                                     default: text<<"FCS: correlator type name        : unknown\n"; break;
                                 }

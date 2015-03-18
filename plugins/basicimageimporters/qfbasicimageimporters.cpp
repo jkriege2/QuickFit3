@@ -89,7 +89,8 @@ QFPluginOptionsWidget *QFBasicImageImporters::createOptionsWidget(QWidget *paren
     return new QFBasicImageImportersOptionsWidget(this, parent);
 }
 
-QFBasicImageImporters::QFBasicImageImporters(QObject *parent)
+QFBasicImageImporters::QFBasicImageImporters(QObject *parent):
+    QObject(parent)
 {
     QFPluginServices::getInstance()->registerSettingsPane(this);
 }

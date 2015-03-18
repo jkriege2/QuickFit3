@@ -237,7 +237,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName() { return QString(""); };
         /** \brief create an object for the i-th editor pane */
-        virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL) { return NULL; };
+        virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL) { Q_UNUSED(services);Q_UNUSED(propEditor);Q_UNUSED(parent);return NULL; };
         /** \brief write object contents into XML file
          *
          *  \param w QXmlStreamWriter class for the output
@@ -269,7 +269,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
 
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
-        virtual bool isApplicable(const QFRawDataRecord* record) const { return true; };
+        virtual bool isApplicable(const QFRawDataRecord* record) const { Q_UNUSED(record);return true; };
 
         /** \brief list of the raw data records this evaluation is applicable to */
         QList<QPointer<QFRawDataRecord> > getApplicableRecords() const;
@@ -395,7 +395,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          * evaluation class in order to ensure that all data is correctly stored to the project file! Do so by calling
          * \code QFEvaluationItem::intWriteData(e); \endcode at the start of your method !!!
          */
-        virtual void intWriteData(QXmlStreamWriter& w) const {};
+        virtual void intWriteData(QXmlStreamWriter& w) const {Q_UNUSED(w);};
         /** \brief read in data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * This method may be used to read additional data (like algorithm configuration ...) from the project file
@@ -403,7 +403,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          * evaluation class in order to ensure that all data is correctly read from the project file!  Do so by calling
          * \code QFEvaluationItem::intReadData(e); \endcode at the start of your method !!!
          */
-        virtual void intReadData(QDomElement* e) {};
+        virtual void intReadData(QDomElement* e) {Q_UNUSED(e);};
         /** \brief set the internal error flag and description */
         void setError(QString description) { errorOcc=true; errorDesc=description; }
 

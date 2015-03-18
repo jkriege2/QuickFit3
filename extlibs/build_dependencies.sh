@@ -41,21 +41,23 @@ read -p "Do you want to use more agressive optimizations for the built libraries
 echo -e  "\n"
 read -p "Do you want to optimize libraries for your local machine? (y/n)? " -n 1  MAKE_COMPILEFORLOCAL
 echo -e  "\n"
+read -p "Do you want to use OpenMP? (y/n)? " -n 1  MAKE_USEOPENMP
+echo -e  "\n"
 
 
 #sh ../output/get_bit_depth.sh
 MORECFLAGS=" -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
 if [ $MAKE_COMPILEFORLOCAL == "y" ] ; then
-	if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
-		MORECFLAGS=" -mtune=native -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -ftree-vectorizer-verbose=1"
-	else
-		MORECFLAGS=" -mtune=native -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
-	fi
-else
-	if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
-		MORECFLAGS=" -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -ftree-vectorizer-verbose=1"
-	fi
+	MORECFLAGS=" -mtune=native -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
 fi
+if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
+	MORECFLAGS=" $MORECFLAGS -ftree-vectorize -ftree-vectorizer-verbose=1"
+fi
+if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
+	MORECFLAGS=" $MORECFLAGS -fopenmp"
+fi
+
+
 
 CURRENTDIR=${PWD}
 QT_INFO_LIBS=`qmake -query QT_INSTALL_LIBS`

@@ -37,7 +37,7 @@ QStringList QFPFitAlgorithmLMFitPlugin::getIDs() const {
     return sl;
 }
 
-QFFitAlgorithm* QFPFitAlgorithmLMFitPlugin::get(QString id, QObject* parent) const {
+QFFitAlgorithm* QFPFitAlgorithmLMFitPlugin::get(QString id, QObject* /*parent*/) const {
     if (id=="fit_lmfit") return new QFFitAlgorithmLMFitBox();
     if (id=="fit_lmfit_nobox") return new QFFitAlgorithmLMFit();
     if (id=="fit_irls_lmfit") return new QFFitAlgorithmLMFitIRLS();

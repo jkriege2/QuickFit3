@@ -32,7 +32,7 @@ QStringList QFPFitFunctionsFCSDistribution::getIDs() const {
     return res;
 }
 
-QFFitFunction* QFPFitFunctionsFCSDistribution::get(QString id, QObject* parent) const  {
+QFFitFunction* QFPFitFunctionsFCSDistribution::get(QString id, QObject* /*parent*/) const  {
     if (id=="fcs_dist_lognorm") {
         return new QFFitFunctionFCSDistributionLogGaussian();
     } else if (id=="fcs_dist_norm") {

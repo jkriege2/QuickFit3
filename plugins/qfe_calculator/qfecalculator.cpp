@@ -58,9 +58,12 @@ void QFECalculator::deinit() {
 
 void QFECalculator::setHistory(const QString &history)
 {
+    Q_UNUSED(history);
 }
 
 void QFECalculator::projectChanged(QFProject* oldProject, QFProject* project) {
+    Q_UNUSED(oldProject);
+    Q_UNUSED(project);
 	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
 	   But: possibly you could read config information from the project here
 	 */

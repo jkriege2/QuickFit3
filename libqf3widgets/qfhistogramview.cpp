@@ -374,6 +374,7 @@ void QFHistogramView::writeSettings(QSettings& settings, const QString& prefix) 
 
 void QFHistogramView::writeQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
 {
+    Q_UNUSED(egroup);
     current->setQFProperty(prefix+QString("bins_%1").arg(param), getBins(), false, false);
     current->setQFProperty(prefix+QString("norm_%1").arg(param), getNormalized(), false, false);
     current->setQFProperty(prefix+QString("log_%1").arg(param), getLog(), false, false);

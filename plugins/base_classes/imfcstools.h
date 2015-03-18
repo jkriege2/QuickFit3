@@ -37,15 +37,15 @@ inline double SPIMFCS_newAeff_xz(double a, double wxy, double wz) {
     return QF_SQRTPI*wz*a/(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
 }
 
-inline double SPIMFCS_newVeffError(double a, double ea, double wxy, double ewxy, double wz, double ewz){
+inline double SPIMFCS_newVeffError(double /*a*/, double /*ea*/, double /*wxy*/, double /*ewxy*/, double /*wz*/, double /*ewz*/){
     return 0;
 }
 
-inline double SPIMFCS_newAeffError(double a, double ea, double wxy, double ewxy){
+inline double SPIMFCS_newAeffError(double /*a*/, double /*ea*/, double /*wxy*/, double /*ewxy*/){
     return 0;
 }
 
-inline double SPIMFCS_newAeffError_xz(double a, double ea, double wxy, double ewxy, double wz, double ewz){
+inline double SPIMFCS_newAeffError_xz(double /*a*/, double /*ea*/, double /*wxy*/, double /*ewxy*/, double /*wz*/, double /*ewz*/){
     return 0;
 }
 
@@ -68,7 +68,7 @@ inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(double a, double 
            QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(dz, D, t, zg, zr);
 }
 
-inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor_2Dxy(double a, double dx, double dy, double D, double t, double wg, double wr, double zg, double zr) {
+inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor_2Dxy(double a, double dx, double dy, double D, double t, double wg, double wr, double /*zg*/, double /*zr*/) {
     return QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_pixelcorrfactor(a, dx, D, t, wg, wr)*
            QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_pixelcorrfactor(a, dy, D, t, wg, wr);
 }
@@ -78,7 +78,7 @@ inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor_2Dxz(double a, do
            QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(dz, D, t, zg, zr);
 }
 
-inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor_2Dyz(double a, double dx, double dy, double dz, double D, double t, double wg, double wr, double zg, double zr) {
+inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor_2Dyz(double a, double /*dx*/, double dy, double dz, double D, double t, double wg, double wr, double zg, double zr) {
     return QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_pixelcorrfactor(a, dy, D, t, wg, wr)*
            QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(dz, D, t, zg, zr);
 }
@@ -107,7 +107,7 @@ inline double TIRFCS_newAeff(double a, double wxy) {
 }
 
 
-inline double TIRFCS_newAeffError(double a, double ea, double wxy, double ewxy){
+inline double TIRFCS_newAeffError(double /*a*/, double /*ea*/, double /*wxy*/, double /*ewxy*/){
     return 0;
 }
 
@@ -117,7 +117,7 @@ inline double TIRFCS_newVeff(double a, double wxy, double d) {
 }
 
 
-inline double TIRFCS_newVeffError(double a, double ea, double wxy, double ewxy, double d, double ed){
+inline double TIRFCS_newVeffError(double /*a*/, double /*ea*/, double /*wxy*/, double /*ewxy*/, double /*d*/, double /*ed*/){
     return 0;
 }
 
@@ -126,7 +126,7 @@ inline double TIRFCS_confocalVeff(double wxy, double d) {
 }
 
 
-inline double TIRFCS_confocalVeffError(double wxy, double ewxy, double d, double ed){
+inline double TIRFCS_confocalVeffError(double /*wxy*/, double /*ewxy*/, double/* d*/, double /*ed*/){
     return 0;
 }
 
@@ -136,7 +136,7 @@ inline double TIRFCS_confocalAeff(double wxy) {
 }
 
 
-inline double TIRFCS_confocalAeffError(double wxy, double ewxy, double d, double ed){
+inline double TIRFCS_confocalAeffError(double /*wxy*/, double /*ewxy*/, double /*d*/, double /*ed*/){
     return 0;
 }
 

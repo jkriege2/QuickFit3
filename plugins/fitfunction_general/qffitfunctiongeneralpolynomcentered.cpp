@@ -92,10 +92,16 @@ bool QFFitFunctionGeneralPolynomCentered::isParameterVisible(int parameter, cons
     return true;
 }
 unsigned int QFFitFunctionGeneralPolynomCentered::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionGeneralPolynomCentered::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

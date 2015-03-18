@@ -1442,9 +1442,11 @@ QString QFMathParser::readDelim(QChar delimiter){
                 getFromStream(program, ch);
                 res=res+"/";
             } else {
-                qfmpError(QObject::tr("read_delmited_string: found unexpected escape sequence '\\%1'").arg(QString(ch1)));
-                return res;
-                break;
+                //qfmpError(QObject::tr("read_delmited_string: found unexpected escape sequence '\\%1'").arg(QString(ch1)));
+                //return res;
+                //break;
+                res=res+QString(ch)+QString(ch1);
+                getFromStream(program, ch);
             }
         } else if ((program) && (ch!=delimiter)) res=res+ch;
 	}
@@ -3083,6 +3085,7 @@ QFMathParser::qfmpNode *QFMathParser::qfmpFunctionAssignNode::copy(QFMathParser:
 
 bool QFMathParser::qfmpFunctionAssignNode::createByteCode(QFMathParser::ByteCodeProgram &program, QFMathParser::ByteCodeEnvironment *environment)
 {
+    Q_UNUSED(program);
     if (child) {
         environment->functionDefs[function]=qMakePair(parameterNames, child);
         return true;
@@ -3119,6 +3122,7 @@ QFMathParser::qfmpNode *QFMathParser::qfmpConstantNode::copy(QFMathParser::qfmpN
 
 bool QFMathParser::qfmpConstantNode::createByteCode(QFMathParser::ByteCodeProgram &program, ByteCodeEnvironment *environment)
 {
+    Q_UNUSED(environment);
     if (data.type==qfmpDouble) {
         program.append(QFMathParser::ByteCodeInstruction(bcPush, data.num));
     } else if (data.type==qfmpBool) {
@@ -3231,6 +3235,8 @@ QFMathParser::qfmpNode *QFMathParser::qfmpVectorList::copy(QFMathParser::qfmpNod
 
 bool QFMathParser::qfmpVectorList::createByteCode(QFMathParser::ByteCodeProgram &program, QFMathParser::ByteCodeEnvironment *environment)
 {
+    Q_UNUSED(program);
+    Q_UNUSED(environment);
     if (getParser()) getParser()->qfmpError(QObject::tr("no vector constructs in byte-code allowed"));
     return false;
 }

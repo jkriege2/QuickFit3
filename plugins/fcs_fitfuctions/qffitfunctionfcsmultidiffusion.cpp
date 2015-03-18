@@ -184,13 +184,13 @@ void QFFitFunctionFCSMultiDiffusion::calcParameter(double* data, double* error) 
     double N=data[FCSMULTI_n_particle];
     double eN=0;
     //double nf_tau1=data[FCSMULTI_nonfl_tau1];
-    double enf_tau1=0;
+    double enf_tau1;//=0;
     double nf_theta1=data[FCSMULTI_nonfl_theta1];
-    double enf_theta1=0;
+    double enf_theta1;//=0;
     //double nf_tau2=data[FCSMULTI_nonfl_tau2];
-    double enf_tau2=0;
+    double enf_tau2;//=0;
     double nf_theta2=data[FCSMULTI_nonfl_theta2];
-    double enf_theta2=0;
+    double enf_theta2;//=0;
     double rho1=1.0;
     double erho1=0;
     double tauD1=data[FCSMULTI_diff_tau1];
@@ -361,10 +361,12 @@ bool QFFitFunctionFCSMultiDiffusion::isParameterVisible(int parameter, const dou
 }
 
 unsigned int QFFitFunctionFCSMultiDiffusion::getAdditionalPlotCount(const double* params) {
+    Q_UNUSED(params);
     return 1;
 }
 
 QString QFFitFunctionFCSMultiDiffusion::transformParametersForAdditionalPlot(int plot, double* params) {
+    Q_UNUSED(plot);
     params[FCSMULTI_n_nonfluorescent]=0;
     return "without non-fluorescent";
 }

@@ -54,13 +54,22 @@ void QFFitFunctionGeneralSine::calcParameter(double* data, double* error) const 
 }
 
 bool QFFitFunctionGeneralSine::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
 }
 unsigned int QFFitFunctionGeneralSine::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 
 QString QFFitFunctionGeneralSine::transformParametersForAdditionalPlot(int plot, double* params) {
+
+
+    Q_UNUSED(plot);
+    Q_UNUSED(params);
     return "";
 }
 

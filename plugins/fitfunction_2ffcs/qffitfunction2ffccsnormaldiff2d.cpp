@@ -304,6 +304,8 @@ bool QFFitFunctionFCCSNormalDiff2D2Focus::isParameterVisible(int parameter, cons
 }
 
 unsigned int QFFitFunctionFCCSNormalDiff2D2Focus::getAdditionalPlotCount(const double* params) {
+
+    Q_UNUSED(params);
     return 0;
 }
 

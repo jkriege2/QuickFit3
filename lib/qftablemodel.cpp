@@ -1893,16 +1893,19 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                         //qDebug()<<na;
                         QDomAttr atr=nm.item(na).toAttr();
                         bool roleOK=false;
-                        int role=rxAtrD.cap(1).toInt(&roleOK);
-
-                        if (!atr.isNull()  && !dontImportRoles.contains(role) && role>=0 && roleOK) {
+                        if (!atr.isNull()) {
                             //qDebug()<<atr.name()<<" = "<<atr.value();
                             if (rxAtrD.indexIn(atr.name())>=0) {
-                                //qDebug()<< "   num = "<<rxAtrD.cap(1);
-                                QString typ=e.attribute(QString("more_type%1").arg(role));
-                                //qDebug()<< "   type = "<<typ;
-                                QVariant md=getQVariantFromString(typ, atr.value());
-                                setCellUserRoleCreate(role, r, c, md);
+                                int role=rxAtrD.cap(1).toInt(&roleOK);
+                                //qDebug()<<rxAtrD.cap(1)<<role<<roleOK<<atr.value();
+                                if (!dontImportRoles.contains(role) && role>=0 && roleOK) {
+                                    //qDebug()<< "   num = "<<rxAtrD.cap(1);
+                                    QString typ=e.attribute(QString("more_type%1").arg(role));
+                                    //qDebug()<< "   type = "<<typ;
+                                    QVariant md=getQVariantFromString(typ, atr.value());
+                                    //qDebug()<<typ<<md;
+                                    setCellUserRoleCreate(role, r, c, md);
+                                }
                             }
                         }
                     }

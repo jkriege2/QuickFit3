@@ -342,12 +342,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
          */
         void readXML(QDomElement& e, bool loadAsDummy=false, bool readID=true);
         /** \brief write data contents to QXmlStreamWriter (data tag) <b>IMPLEMENT IN CHILD CLASSES!</b> */
-        virtual void intWriteData(QXmlStreamWriter& w) const {}
+        virtual void intWriteData(QXmlStreamWriter& w) const {Q_UNUSED(w);}
         /** \brief read in external data files <b>and</b> data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * If \a e is \c NULL then this method should only read the datafiles already saved in the files property.
          */
-        virtual void intReadData(QDomElement* e=NULL) {}
+        virtual void intReadData(QDomElement* e=NULL) {Q_UNUSED(e);}
         /** \brief set the internal error flag and description */
         void setError(const QString& description) { errorOcc=true; errorDesc=description; }
 
@@ -744,10 +744,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                 inline void resultsSetStringAndBool(const QString& resultID, const QString& value, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
                     fitresults[resultID].resultsSetString(value);
                     fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                    Q_UNUSED(unit);
                 }
                 inline void resultsSetBooleanAndBool(const QString& resultID, bool value, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
                     fitresults[resultID].resultsSetBoolean(value);
                     fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                    Q_UNUSED(unit);
                 }
 
         };

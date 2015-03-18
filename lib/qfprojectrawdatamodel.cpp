@@ -52,6 +52,7 @@ void QFProjectRawDataModel::setProject(QFProject* parent) {
 }
 
 void QFProjectRawDataModel::projectChanged(bool data) {
+    Q_UNUSED(data);
     QTime t;
     t.start();
     //qDebug()<<"QFProjectRawDataModel::projectChanged()";
@@ -80,16 +81,22 @@ QVariant QFProjectRawDataModel::data(const QModelIndex &index, int role) const {
 }
 
 Qt::ItemFlags QFProjectRawDataModel::flags(const QModelIndex &index) const {
+    Q_UNUSED(index);
     Qt::ItemFlags defaultFlags =Qt::ItemIsSelectable|Qt::ItemIsEnabled;
     return defaultFlags;
 }
 
 QVariant QFProjectRawDataModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    Q_UNUSED(section);
+    Q_UNUSED(orientation);
+    Q_UNUSED(role);
     return QVariant();
 }
 
 
 int QFProjectRawDataModel::rowCount(const QModelIndex &parent) const {
+    Q_UNUSED(parent);
+
     if (item!=NULL) {
         return item->getRawDataCount();
     }
@@ -97,6 +104,8 @@ int QFProjectRawDataModel::rowCount(const QModelIndex &parent) const {
 };
 
 int QFProjectRawDataModel::columnCount(const QModelIndex &parent) const {
+    Q_UNUSED(parent);
+
     return 1;
 };
 

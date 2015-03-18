@@ -81,7 +81,7 @@ class QFRawDataRecordPrivate {
 
 };
 
-QFRawDataRecordPrivate::evaluationIDMetadata::evaluationIDMetadata(int initsize) {
+QFRawDataRecordPrivate::evaluationIDMetadata::evaluationIDMetadata(int /*initsize*/) {
     //results.reserve(initsize);
 }
 
@@ -113,7 +113,7 @@ QFRawDataRecord::~QFRawDataRecord() {
     //std::cout<<"deleting QFRawDataRecord ... OK\n";
 }
 
-void QFRawDataRecord::setResultsInitSize(int initSize) {
+void QFRawDataRecord::setResultsInitSize(int /*initSize*/) {
     //if (initSize>dstore->results.capacity()) dstore->results.reserve(initSize);
 }
 
@@ -1385,6 +1385,12 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 
 bool QFRawDataRecord::doCopyFileForExport(const QString &filename, const QString &fileType, QString &newFilename, const QList<QFProject::FileCopyList> *filecopylist, const QString& subfoldername) const
 {
+    Q_UNUSED(filename);
+    Q_UNUSED(fileType);
+    Q_UNUSED(newFilename);
+    Q_UNUSED(filecopylist);
+    Q_UNUSED(subfoldername);
+
     return true;
 }
 
@@ -1414,10 +1420,15 @@ int QFRawDataRecord::getEditorCount() {
 }
 
 QString QFRawDataRecord::getEditorName(int i) {
+    Q_UNUSED(i);
     return QString("");
 }
 
 QFRawDataEditor* QFRawDataRecord::createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i, QWidget* parent) {
+    Q_UNUSED(services);
+    Q_UNUSED(propEditor);
+    Q_UNUSED(i);
+    Q_UNUSED(parent);
     return NULL;
 }
 
@@ -1435,7 +1446,8 @@ QString QFRawDataRecord::getExportDialogFiletypes() const {
 
 void QFRawDataRecord::exportData(const QString &format, const QString &filename) const
 {
-
+    Q_UNUSED(format);
+    Q_UNUSED(filename);
 }
 
 
@@ -1446,11 +1458,17 @@ QFRawDataRecord::FileListEditOptions QFRawDataRecord::isFilesListEditable() cons
 
 bool QFRawDataRecord::selectNewFiles(QStringList &files, QStringList &types, QStringList &descriptions) const
 {
+    Q_UNUSED(files);
+    Q_UNUSED(types);
+    Q_UNUSED(descriptions);
     return false;
 }
 
 bool QFRawDataRecord::mayDeleteFiles(QStringList &files, QStringList &types, QStringList &descriptions) const
 {
+    Q_UNUSED(files);
+    Q_UNUSED(types);
+    Q_UNUSED(descriptions);
     return true;
 }
 
@@ -3721,6 +3739,7 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(const QString &evalName, const QS
 }
 
 double QFRawDataRecord::resultsGetAsDouble(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
+    if (ok) *ok=true;
     const evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreInteger:
@@ -3758,6 +3777,7 @@ double QFRawDataRecord::resultsGetAsDouble(const QString &evalName, const QStrin
 
 double QFRawDataRecord::resultsGetErrorAsDouble(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
     const evaluationResult r=resultsGet(evalName, resultName);
+    if (ok) *ok=true;
     switch(r.type) {
         case qfrdreNumberErrorMatrix:
         case qfrdreNumberErrorVector: {
@@ -3768,13 +3788,15 @@ double QFRawDataRecord::resultsGetErrorAsDouble(const QString &evalName, const Q
             if (alsoGetNonVec) return r.derror;
             else return 0;
 
-        default: return 0.0;
-    }
+        default: break;
+    }    
+    if (ok) *ok=false;
     return 0.0;
 }
 
 bool QFRawDataRecord::resultsGetAsBoolean(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
     const evaluationResult r=resultsGet(evalName, resultName);
+    if (ok) *ok=true;
     switch(r.type) {
         case qfrdreBooleanVector:
         case qfrdreBooleanMatrix: {
@@ -3784,13 +3806,15 @@ bool QFRawDataRecord::resultsGetAsBoolean(const QString &evalName, const QString
         case qfrdreBoolean:
             if (alsoGetNonVec) return r.bvalue;
             else return 0;
-        default: return false;
+        default: break;
     }
+    if (ok) *ok=false;
     return false;
 }
 
 int64_t QFRawDataRecord::resultsGetAsInteger(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
     const evaluationResult r=resultsGet(evalName, resultName);
+    if (ok) *ok=true;
     switch(r.type) {
         case qfrdreInteger:
             if (alsoGetNonVec) return r.ivalue;
@@ -3808,8 +3832,9 @@ int64_t QFRawDataRecord::resultsGetAsInteger(const QString &evalName, const QStr
                 if (position>= r.bvec.size()) return 0;
                 return (r.bvec[position])?1:0;
         }
-        default: return 0;
+        default: break;
     }
+    if (ok) *ok=false;
     return 0;
 }
 

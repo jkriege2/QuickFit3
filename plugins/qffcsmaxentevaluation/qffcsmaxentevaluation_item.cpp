@@ -257,6 +257,7 @@ double QFFCSMaxEntEvaluationItem::getDLSQ(QFRawDataRecord *r, int index, int mod
 
 
 QVector<double> QFFCSMaxEntEvaluationItem::getDistribution(QFRawDataRecord *record, int index, int model) const {
+    Q_UNUSED(model);
     QVector<double> res;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
@@ -266,6 +267,7 @@ QVector<double> QFFCSMaxEntEvaluationItem::getDistribution(QFRawDataRecord *reco
 }
 
 QVector<double> QFFCSMaxEntEvaluationItem::getDistributionTaus(QFRawDataRecord *record, int index, int model) const {
+    Q_UNUSED(model);
     QVector<double> res;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
@@ -478,6 +480,8 @@ QString QFFCSMaxEntEvaluationItem::getModelName(int model) const {
 }
 
 bool QFFCSMaxEntEvaluationItem::getParameterDefault(const QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
+    Q_UNUSED(r);
+    Q_UNUSED(resultID);
     switch (currentModel)
     {
     case 0:
@@ -1159,5 +1163,7 @@ QString QFFCSMaxEntEvaluationItem::getParameterID(int model, int id) const {
 }
 
 int QFFCSMaxEntEvaluationItem::getModelCount(QFRawDataRecord *r, int index) const {
+    Q_UNUSED(r);
+    Q_UNUSED(index);
     return 7;
 }

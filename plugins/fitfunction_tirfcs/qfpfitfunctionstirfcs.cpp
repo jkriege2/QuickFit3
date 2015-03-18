@@ -55,7 +55,7 @@ QStringList QFPFitFunctionsTIRFCS::getIDs() const {
     return res;
 }
 
-QFFitFunction* QFPFitFunctionsTIRFCS::get(QString id, QObject* parent) const  {
+QFFitFunction* QFPFitFunctionsTIRFCS::get(QString id, QObject* /*parent*/) const  {
     if (id=="fcs_tir_diffe2") {
         return new QFFitFunctionsTIRFCSDiffE2();
     } else if (id=="fcs_tir_adiffe2") {

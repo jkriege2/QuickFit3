@@ -46,7 +46,7 @@ class QFPFitFunctions2FFCS : public QObject, public QFPluginFitFunction, public 
     public:
 
         /** Default constructor */
-        QFPFitFunctions2FFCS(QObject* parent=NULL) {}
+        inline QFPFitFunctions2FFCS(QObject* parent=NULL): QObject(parent) {}
         /** Default destructor */
         virtual ~QFPFitFunctions2FFCS() {}
 

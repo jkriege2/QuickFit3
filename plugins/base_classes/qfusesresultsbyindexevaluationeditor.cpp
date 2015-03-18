@@ -77,11 +77,20 @@ void QFUsesResultsByIndexEvaluationEditor::getPlotData(QFRawDataRecord *rec, QLi
 
 void QFUsesResultsByIndexEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option, const QString &optionName)
 {
+    Q_UNUSED(rec);
+    Q_UNUSED(index);
+    Q_UNUSED(data);
+    Q_UNUSED(option);
+    Q_UNUSED(optionName);
 
 }
 
 bool QFUsesResultsByIndexEvaluationEditor::getPlotDataSpecs(QStringList *optionNames, QList<QFGetPlotdataInterface::GetPlotPlotOptions> *listPlotOptions)
 {
+    Q_UNUSED(optionNames);
+
+    Q_UNUSED(listPlotOptions);
+
     return false;
 }
 
@@ -128,6 +137,10 @@ int QFUsesResultsByIndexEvaluationEditor::getUserMin(QFRawDataRecord* rec, int i
 
 void QFUsesResultsByIndexEvaluationEditor::connectDefaultWidgets(QFEvaluationItem *current, QFEvaluationItem *old)
 {
+    Q_UNUSED(current);
+
+    Q_UNUSED(old);
+
     actOverlayPlot->setEnabled(this->getPlotDataSpecs());
 }
 
@@ -338,5 +351,9 @@ void QFUsesResultsByIndexEvaluationEditor::createOverlayPlot()
 }
 
 int QFUsesResultsByIndexEvaluationEditor::getUserMinAbsMax(QFRawDataRecord *rec, int index) {
+    Q_UNUSED(rec);
+
+    Q_UNUSED(index);
+
     return 0;
 }

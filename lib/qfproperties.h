@@ -138,13 +138,13 @@ class QFLIB_EXPORT QFProperties {
          *  signals, we have to use a method that will then be implemented by the inheriting
          *  class.
          */
-        virtual void emitPropertiesChanged(const QString& property=QString(""), bool visible=true ) {};
+        virtual void emitPropertiesChanged(const QString& property=QString(""), bool visible=true ) {Q_UNUSED(property);Q_UNUSED(visible);};
         /** \brief issue an error report/set object into error state
          *
          * This should be reimplemented by the inheriting object, to comply woth its error
          * reporting system!
          */
-        virtual void setPropertiesError(const QString& message) {};
+        virtual void setPropertiesError(const QString& message) {Q_UNUSED(message);};
 
         /*! \brief write the properties to an XML, using the given QXmlStreamWriter object
 

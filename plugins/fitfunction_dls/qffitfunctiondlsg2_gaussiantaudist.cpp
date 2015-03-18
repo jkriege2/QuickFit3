@@ -169,10 +169,13 @@ void QFFitFunctionDLSG2NormTauDist::calcParameter(double* data, double* error) c
 }
 
 bool QFFitFunctionDLSG2NormTauDist::isParameterVisible(int parameter, const double* data) const {
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
 }
 
 unsigned int QFFitFunctionDLSG2NormTauDist::getAdditionalPlotCount(const double* params) {
+    Q_UNUSED(params);
     return 1;
 }
 

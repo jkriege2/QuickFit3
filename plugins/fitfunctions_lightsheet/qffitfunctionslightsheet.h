@@ -45,7 +45,7 @@ class QFFitFunctionsLightsheet : public QObject, public QFPluginFitFunction {
     public:
 
         /** Default constructor */
-        QFFitFunctionsLightsheet(QObject* parent=NULL) {}
+        QFFitFunctionsLightsheet(QObject* parent=NULL):QObject(parent) {}
         /** Default destructor */
         virtual ~QFFitFunctionsLightsheet() {}
 

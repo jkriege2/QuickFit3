@@ -61,6 +61,9 @@ void QFFitFunctionGeneral2LogNormal::calcParameter(double* data, double* error) 
 }
 
 bool QFFitFunctionGeneral2LogNormal::isParameterVisible(int parameter, const double* data) const {
+
+    Q_UNUSED(parameter);
+    Q_UNUSED(data);
     return true;
 }
 unsigned int QFFitFunctionGeneral2LogNormal::getAdditionalPlotCount(const double* params) {

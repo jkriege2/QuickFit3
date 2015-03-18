@@ -234,12 +234,12 @@ long QFRDRImageMaskTools::maskGetCount() const
 
 void QFRDRImageMaskTools::maskSetIdx(uint32_t idx, bool value)
 {
-    if (idx>=0 && idx<mask_w*mask_h) mask[idx]=value;
+    if (idx<mask_w*mask_h) mask[idx]=value;
 }
 
 bool QFRDRImageMaskTools::maskGetIdx(uint32_t idx) const
 {
-    if (idx>=0 && idx<mask_w*mask_h) return mask[idx];
+    if (idx<mask_w*mask_h) return mask[idx];
     return false;
 }
 

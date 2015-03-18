@@ -45,7 +45,7 @@ class QFGeneralFitFunctionsPlugin : public QObject, public QFPluginFitFunction {
     public:
 
         /** Default constructor */
-        QFGeneralFitFunctionsPlugin(QObject* parent=NULL) {}
+        QFGeneralFitFunctionsPlugin(QObject* parent=NULL): QObject(parent) {}
         /** Default destructor */
         virtual ~QFGeneralFitFunctionsPlugin() {}
 

@@ -48,7 +48,7 @@ class QFFitAlgorithmGSLPluginPlugin : public QObject, public QFPluginFitAlgorith
 		QF_PLUGIN
 
         /** Default constructor */
-        QFFitAlgorithmGSLPluginPlugin(QObject* parent=NULL) {}
+        QFFitAlgorithmGSLPluginPlugin(QObject* parent=NULL): QObject(parent) {}
         /** Default destructor */
         virtual ~QFFitAlgorithmGSLPluginPlugin() {}
 

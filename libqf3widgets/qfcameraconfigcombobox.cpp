@@ -71,6 +71,7 @@ QFCameraConfigComboBox::~QFCameraConfigComboBox()
 }
 
 void QFCameraConfigComboBox::directoryChanged(const QString& path) {
+    Q_UNUSED(path);
     cameraChanged(m_extension, m_cam, m_camIdx);
 }
 

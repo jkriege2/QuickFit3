@@ -228,7 +228,7 @@ inline double qfCauchy(double x, double A, double fwhm, double center) {
     \f[ f=\alpha a\pm\beta b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
  */
-inline double qfErrorSumMinus(double a, double ea, double b, double eb, double factorA=1.0, double factorB=1.0) {
+inline double qfErrorSumMinus(double /*a*/, double ea, double /*b*/, double eb, double factorA=1.0, double factorB=1.0) {
     return sqrt(qfSqr(factorA*ea)+qfSqr(factorB*eb));
 }
 
@@ -238,7 +238,7 @@ inline double qfErrorSumMinus(double a, double ea, double b, double eb, double f
     \f[ f=\alpha a+\beta b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
  */
-inline double qfErrorAdd(double a, double ea, double b, double eb) {
+inline double qfErrorAdd(double /*a*/, double ea, double /*b*/, double eb) {
     return sqrt(qfSqr(ea)+qfSqr(eb));
 }
 
@@ -248,7 +248,7 @@ inline double qfErrorAdd(double a, double ea, double b, double eb) {
     \f[ f=\alpha a-\beta b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
  */
-inline double qfErrorSub(double a, double ea, double b, double eb) {
+inline double qfErrorSub(double /*a*/, double ea, double /*b*/, double eb) {
     return sqrt(qfSqr(ea)+qfSqr(eb));
 }
 

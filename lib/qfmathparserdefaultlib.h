@@ -182,7 +182,7 @@ namespace QFMathParser_DefaultLib {
 
     QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fDiff, diff, qfstatisticsDiff)
     QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fSum, sum, qfstatisticsSum)
-    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fCount, count, qfstatisticsCount)
+    //QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fCount, count, qfstatisticsCount)
     QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fProd, prod, qfstatisticsProd)
     QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fSum2, sum2, qfstatisticsSum2)
     QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fVar, var, qfstatisticsVariance)
