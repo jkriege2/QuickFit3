@@ -547,10 +547,55 @@ void QFHTMLHelpWindow::print() {
     }
     delete pdlg;*/
 #ifdef QF3_USE_WEBKIT
-    doc.print(p);
+    QTextDocument* ddoc=&doc;
 #else
-    descriptionBrowser->print(p);
+    QTextDocument* ddoc=descriptionBrowser->document();
 #endif
+    QTextDocument* ddc=ddoc->clone(NULL);
+
+    if (ddc) {
+        QTextCursor cur(ddc);
+        while (!cur.atEnd()) {
+            if (cur.charFormat().isImageFormat()) {
+                QTextImageFormat itf=cur.charFormat().toImageFormat();
+                if (itf.isValid()) {
+                    //qDebug()<<itf.name()<<itf.width()<<itf.height()<<ddc->textWidth();
+                    if (itf.width()>ddc->textWidth()*0.95) {
+                        double scale=double(ddc->textWidth())*0.85/itf.width();
+                        itf.setWidth(scale*itf.width());
+                        itf.setHeight(scale*itf.height());
+                        cur.setCharFormat(itf);
+                    }
+                    //qDebug()<<"  => "<<itf.width()<<itf.height()<<ddc->textWidth();
+                }
+            }
+            if (!cur.movePosition(QTextCursor::NextCharacter)) {
+                break;
+            }
+        }
+
+
+        /*QTextBlock b=ddc->firstBlock();
+        for (int i=0; i<ddc->blockCount(); i++) {
+            QTextFormat tf=b.charFormat();
+            if (tf.isImageFormat()) {
+                QTextImageFormat* itf=static_cast<QTextImageFormat*>(&tf);
+                if (itf) {
+                    qDebug()<<itf->width()<<ddc->textWidth();
+                    if (itf->width()>ddc->textWidth()*0.95) {
+                        itf->setWidth(double(ddc->textWidth())*0.85);
+                    }
+                    qDebug()<<"  => "<<itf->width()<<ddc->textWidth();
+                }
+            }
+
+            b=b.next();
+        }*/
+
+        ddc->print(p);
+
+        delete ddc;
+    }
 
     delete p;
     QApplication::restoreOverrideCursor();
