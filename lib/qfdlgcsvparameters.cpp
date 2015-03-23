@@ -44,13 +44,13 @@ QFDlgCSVParameters::QFDlgCSVParameters(QWidget* parent, QString columnSeparator,
     ui->widConfig->registerWidget("header_start", ui->edtHeader);
     ui->widConfig->setFilename(QFPluginServices::getInstance()->getConfigFileDirectory()+QString("/csvdlg_csvconfig.ini"));
     ui->edtColumn->setText(QString(columnSeparator));
-    if (QString(columnSeparator).isEmpty()) ui->edtColumn->setEnabled(false);
+    //if (QString(columnSeparator).isEmpty()) ui->edtColumn->setEnabled(false);
     ui->edtDecimal->setText(QString(decimalSeparator));
-    if (QString(decimalSeparator).isEmpty()) ui->edtDecimal->setEnabled(false);
+    //if (QString(decimalSeparator).isEmpty()) ui->edtDecimal->setEnabled(false);
     ui->edtComment->setText(QString(commentStart));
-    if (QString(commentStart).isEmpty()) ui->edtComment->setEnabled(false);
+    //if (QString(commentStart).isEmpty()) ui->edtComment->setEnabled(false);
     ui->edtHeader->setText(headerStart);
-    if (headerStart.isEmpty()) ui->edtHeader->setEnabled(false);
+    //if (headerStart.isEmpty()) ui->edtHeader->setEnabled(false);
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(checkValues()));
     ui->tableView->setModel(tabmodel);
 
