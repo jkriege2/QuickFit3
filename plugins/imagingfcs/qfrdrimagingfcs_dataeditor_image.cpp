@@ -5753,8 +5753,10 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                             for (int jj=0; jj<fix.size(); jj++) {
                                                 if (d.gfix[jj]!=fix[jj]) d.gfix[jj]=Qt::PartiallyChecked;
                                             }
-                                            for (int jj=0; jj<values.size(); jj++) {
-                                                d.gvalues[jj].append(values[jj]);
+                                            if (d.gvalues.size()>=values.size()) {
+                                                for (int jj=0; jj<values.size(); jj++) {
+                                                    d.gvalues[jj].append(values[jj]);
+                                                }
                                             }
 
                                             for (int c=0; c<channels; c++) {
@@ -5799,8 +5801,10 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                             }
 
                                         } else {
-                                            for (int jj=0; jj<values.size(); jj++) {
-                                                d.gvalues[jj].append(values[jj]);
+                                            if (d.gvalues.size()>=values.size()) {
+                                                for (int jj=0; jj<values.size(); jj++) {
+                                                    d.gvalues[jj].append(values[jj]);
+                                                }
                                             }
 
                                             for (int c=0; c<channels; c++) {
