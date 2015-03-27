@@ -7,6 +7,104 @@
   <body> 
   $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
   
+  <h2>Vector Creation</h2>
+  $$funcref_start$$<a name="zeros"/><!-- func:zeros -->
+  <b><tt><!-- template -->zeros(N)<!-- /template --></tt> - <i>creates a number-vector containing <tt>N</tt> elements, which are all 0</i>:</b>
+$$funcref_description$$
+  <!-- /func:zeros -->  
+$$funcref_end$$
+
+  $$funcref_start$$<a name="ones"/><!-- func:ones -->
+  <b><tt><!-- template -->ones(N)<!-- /template --></tt> - <i>creates a number-vector containing <tt>N</tt> elements, which are all 1</i>:</b>
+$$funcref_description$$
+  <!-- /func:ones -->  
+$$funcref_end$$
+
+  $$funcref_start$$<a name="vector"/><!-- func:vector -->
+  <b><tt><!-- template -->vector(N, v)<!-- /template --></tt> - <i>creates a vector containing <tt>N</tt> elements, which are all <tt>v</tt>. </i>:</b>
+$$funcref_description$$
+  If <tt>v</tt> is a vector, the output is a vector of <tt>N*length(v)</tt> elements, which contains <tt>N</tt> repeats of the entries in <tt>v</tt>.
+  <!-- /func:vector -->  
+$$funcref_end$$
+
+  $$funcref_start$$<a name="linspace"/><!-- func:linspace -->
+  <b><tt><!-- template -->linspace(x0, x1)<!-- /template --></tt> / <tt><!-- template -->linspace(x0, x1, N)<!-- /template --></tt> - <i>creates a number-vector containing <tt>N</tt> (default: 100) elements, which contains linearly spaced numbers between <tt>x0</tt> and <tt>x1</tt> (inclusive)</i>:</b>
+$$funcref_description$$
+  <!-- /func:linspace -->  
+$$funcref_end$$
+
+  $$funcref_start$$<a name="logspace"/><!-- func:logspace -->
+  <b><tt><!-- template -->logspace(a, b)<!-- /template --></tt> / <tt><!-- template -->logspace(a, b, N)<!-- /template --></tt> - <i>creates a number-vector containing <tt>N</tt> (default: 50) elements, which contains logarithmically spaced numbers between 10<sup><tt>a</tt></sup> and 10<sup><tt>b</tt></sup> (inclusive)</i>:</b>
+$$funcref_description$$
+  <!-- /func:logspace -->  
+$$funcref_end$$
+
+
+  $$funcref_start$$<a name="meshgrid2d_x"/><!-- func:meshgrid2d_x -->
+  <b><tt><!-- template -->meshgrid2d_x(X, Y)<!-- /template --></tt> - <i>creates a number-vector containing <tt>length(X)*length(Y)</tt> elements (interpretable as a 2D row-major matrix), which contains the x-ccordinate from a <tt>length(X)*length(Y)</tt> matrix with axes <tt>X</tt> and <tt>Y</tt></i>:</b>
+$$funcref_description$$
+The vecors <tt>X</tt> and <tt>Y</tt> give x- and y-ranges of coordinates of a 2D matrix with <tt>length(X)*length(Y)</tt> entries:
+<pre>(x,y):
++----------+----------+----------+----------+-------------+
+| (0,0)    | (1,0)    | (2,0)    | ........ | (Nx-1,0)    |
++----------+----------+----------+----------+-------------+
+| (0,1)    | (1,1)    | (2,1)    | ........ | (Nx-1,1)    |
++----------+----------+----------+----------+-------------+
+| ........ | ........ | ........ | ........ | ........... |
++----------+----------+----------+----------+-------------+
+| (0,Ny-1) | (1,Ny-1) | (2,Ny-1) | ........ | (Nx-1,Ny-1) |
++----------+----------+----------+----------+-------------+
+</pre>
+The matrix is oriented in row-major format. This function returns the x-coordinates for each entry as a row-major list (from a matrix), i.e.:
+<pre>result:
++----------+----------+----------+----------+-------------+
+| X[0]     | X[1]     | X[2]     | ........ | X[Nx-1]     |
++----------+----------+----------+----------+-------------+
+| X[0]     | X[1]     | X[2]     | ........ | X[Nx-1]     |
++----------+----------+----------+----------+-------------+
+| ........ | ........ | ........ | ........ | ........... |
++----------+----------+----------+----------+-------------+
+| X[0]     | X[1]     | X[2]     | ........ | X[Nx-1]     |
++----------+----------+----------+----------+-------------+
+</pre>
+
+  <!-- /func:meshgrid2d_x -->  
+$$funcref_end$$
+
+
+  $$funcref_start$$<a name="meshgrid2d_y"/><!-- func:meshgrid2d_y -->
+  <b><tt><!-- template -->meshgrid2d_y(X, Y)<!-- /template --></tt> - <i>creates a number-vector containing <tt>length(X)*length(Y)</tt> elements (interpretable as a 2D row-major matrix), which contains the y-ccordinate from a <tt>length(X)*length(Y)</tt> matrix with axes <tt>X</tt> and <tt>Y</tt></i>:</b>
+$$funcref_description$$
+The vecors <tt>X</tt> and <tt>Y</tt> give x- and y-ranges of coordinates of a 2D matrix with <tt>length(X)*length(Y)</tt> entries:
+<pre>(x,y):
++----------+----------+----------+----------+-------------+
+| (0,0)    | (1,0)    | (2,0)    | ........ | (Nx-1,0)    |
++----------+----------+----------+----------+-------------+
+| (0,1)    | (1,1)    | (2,1)    | ........ | (Nx-1,1)    |
++----------+----------+----------+----------+-------------+
+| ........ | ........ | ........ | ........ | ........... |
++----------+----------+----------+----------+-------------+
+| (0,Ny-1) | (1,Ny-1) | (2,Ny-1) | ........ | (Nx-1,Ny-1) |
++----------+----------+----------+----------+-------------+
+</pre>
+The matrix is oriented in row-major format. This function returns the x-coordinates for each entry as a row-major list (from a matrix), i.e.:
+<pre>result:<br>
++----------+----------+----------+----------+-------------+
+| Y[0]     | Y[0]     | Y[0]     | ........ | Y[0]        |
++----------+----------+----------+----------+-------------+
+| Y[1]     | Y[1]     | Y[1]     | ........ | Y[1]        |
++----------+----------+----------+----------+-------------+
+| ........ | ........ | ........ | ........ | ........... |
++----------+----------+----------+----------+-------------+
+| Y[Ny-1]  | Y[Ny-1]  | Y[Ny-1]  | ........ | Y[Ny-1]     |
++----------+----------+----------+----------+-------------+
+</pre>
+
+  <!-- /func:meshgrid2d_y -->  
+$$funcref_end$$
+
+
+  
   <h2>Sorting &amp; Reordering</h2>
   
 
@@ -41,7 +139,7 @@ $$funcref_end$$
 
 
 
-<h2>Concatenation</h2>
+<h2>Vector Concatenation</h2>
   
   $$funcref_start$$<a name="concat"/><!-- func:concat -->
   <b><tt><!-- template -->concat(x1, x2, ...)<!-- /template --></tt> - <i>concatenate the parameter vectors <tt>x1, x2, ...</tt> </i>:</b>
@@ -56,7 +154,7 @@ $$funcref_end$$
   
   
   
-<h2>Filtering</h2>
+<h2>Vector Filtering</h2>
   $$funcref_start$$<a name="removeall"/><!-- func:removeall -->
   <b><tt><!-- template -->removeall(x, val)<!-- /template --></tt> - <i>remove all occurenced of value <tt>val</tt> from vector <tt>x</tt> </i>:</b>
 $$funcref_description$$

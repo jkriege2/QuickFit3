@@ -382,6 +382,13 @@ namespace QFMathParser_DefaultLib {
     void fReturnFirstValid(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fReturnLastValid(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fReturnNth(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fZeros(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fOnes(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fVector(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fLinSpace(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fLogSpace(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fMeshGrid2Dx(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fMeshGrid2Dy(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fLast(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fLastInVector(const qfmpResult* params, unsigned int  n, QFMathParser* p);

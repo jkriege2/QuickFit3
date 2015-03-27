@@ -5652,15 +5652,11 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                         //qDebug()<<"  iss="<<iss<<masel_name;
                         for (int avgIdx=0; avgIdx<avgs; avgIdx++) {
                             //qDebug()<<"    avgIdx="<<avgIdx;
-                            double* corr=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
-                            double* cerr=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
-                            double* corr1=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
                             copyFitResultStatistics_data d;
                             d.file=curRec->getName();
                             for (int pip=0; pip<props.size(); pip++) {
                                 d.props.append(curRec->getQFProperty(props[pip], QVariant()));
                             }
-                            for (int i=0; i<m->getCorrelationN(); i++) { corr[i]=0; cerr[i]=0; }
                             double N=0;
                             d.Nfit=0;
                             for (int i=0; i<m->getCorrelationRuns(); i++) {
@@ -5671,11 +5667,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                      && !m->leaveoutRun(i)
                                      && ((avgs==1)||(avgIdx==0 && !indexIsDualView2(i)) || (avgIdx==1 && indexIsDualView2(i))))
                                 {
-                                    double* tmp=m->getCorrelationRun(i);
-                                    for (int jj=0; jj<m->getCorrelationN(); jj++) {
-                                        corr[jj]=corr[jj]+tmp[jj];
-                                        cerr[jj]=cerr[jj]+tmp[jj]*tmp[jj];
-                                    }
+
 
                                     QList<double> values, errors;
                                     QList<bool> fix;
@@ -5725,7 +5717,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                     //if (d.Nfit==0) qDebug()<<recsi<<curRec->getName()<<"\n:"<<resultID<<evalFound <<hasFitFunction<<names<<evalGroup<<evals;
 
                                     QStringList tmpn, tmpi;
-                                    if (evaluateFitFunction(curRec, m->getCorrelationT(), corr1, m->getCorrelationN(), tmpn, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i, &tmpi)) {
+                                    if (evaluateFitFunction(curRec, NULL, NULL, m->getCorrelationN(), tmpn, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i, &tmpi)) {
                                         if (d.Nfit==0) {
                                             for (int jj=0; jj<fix.size(); jj++) {
                                                 d.gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);
@@ -5747,8 +5739,6 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                                 v.append(img[i]);
                                                 d.gvalues.append(v);
                                             }
-
-
                                         } else {
                                             for (int jj=0; jj<fix.size(); jj++) {
                                                 if (d.gfix[jj]!=fix[jj]) d.gfix[jj]=Qt::PartiallyChecked;
@@ -5824,9 +5814,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                             }
 
 
-                            qfFree(corr);
-                            qfFree(cerr);
-                            qfFree(corr1);
+
                             dataint.append(d);
 
                         }

@@ -267,6 +267,15 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("indexedncmoment", QFMathParser_DefaultLib::fIndexedNonCentralMoment);
     p->addFunction("indexedcorrcoeff", QFMathParser_DefaultLib::fIndexedCorrCoeff);
 
+    p->addFunction("zeros", QFMathParser_DefaultLib::fZeros);
+    p->addFunction("ones", QFMathParser_DefaultLib::fOnes);
+    p->addFunction("vector", QFMathParser_DefaultLib::fVector);
+    p->addFunction("linspace", QFMathParser_DefaultLib::fLinSpace);
+    p->addFunction("logspace", QFMathParser_DefaultLib::fLogSpace);
+    p->addFunction("meshgrid2d_x", QFMathParser_DefaultLib::fMeshGrid2Dx);
+    p->addFunction("meshgrid2d_y", QFMathParser_DefaultLib::fMeshGrid2Dy);
+
+
     p->addFunction("polyval", QFMathParser_DefaultLib::fPolynom);
     p->addFunction("polyder", QFMathParser_DefaultLib::fDerivPolynom);
 
@@ -2249,6 +2258,175 @@ namespace QFMathParser_DefaultLib {
             return res;
         }
         return params[0];
+    }
+
+    void fZeros(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        res.setInvalid();
+
+        if (n==1 && params[0].isUInt())  {
+            res.setDoubleVec(params[0].toUInt(), 0.0);
+        } else {
+            p->qfmpError("zeros(x) needs one unsigned integer argument");
+            res.setInvalid();
+            return ;
+        }
+    }
+
+
+    void fOnes(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        res.setInvalid();
+
+        if (n==1 && params[0].isUInt())  {
+            res.setDoubleVec(params[0].toUInt(), 1.0);
+        } else {
+            p->qfmpError("ones(x) needs one unsigned integer argument");
+            res.setInvalid();
+            return ;
+        }
+    }
+    void fVector(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        res.setInvalid();
+
+        if (n==2 && params[0].isUInt())  {
+            int items=params[0].toUInt();
+            if (params[1].type==qfmpDouble) {
+                res.setDoubleVec(items, params[1].num);
+            } else if (params[1].type==qfmpString) {
+                res.setStringVec(items, params[1].str);
+            } else if (params[1].type==qfmpBool) {
+                res.setBoolVec(items, params[1].boolean);
+            } else if (params[1].type==qfmpDoubleVector) {
+                res.setDoubleVec(items*params[1].numVec.size());
+                int n=0;
+                for (int i=0; i<items; i++) {
+                    for (int j=0; j<params[1].numVec.size(); j++) {
+                        res.numVec[n]=params[1].numVec[j];
+                        n++;
+                    }
+                }
+            } else if (params[1].type==qfmpStringVector) {
+                res.setStringVec(items*params[1].strVec.size());
+                int n=0;
+                for (int i=0; i<items; i++) {
+                    for (int j=0; j<params[1].strVec.size(); j++) {
+                        res.strVec[n]=params[1].strVec[j];
+                        n++;
+                    }
+                }
+            } else if (params[1].type==qfmpBoolVector) {
+                res.setBoolVec(items*params[1].boolVec.size());
+                int n=0;
+                for (int i=0; i<items; i++) {
+                    for (int j=0; j<params[1].boolVec.size(); j++) {
+                        res.boolVec[n]=params[1].boolVec[j];
+                        n++;
+                    }
+                }
+            }
+        } else {
+            p->qfmpError("vector(x, value) needs one unsigned integer argument and a non-vector argument");
+            res.setInvalid();
+            return ;
+        }
+    }
+
+    void fLinSpace(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        res.setInvalid();
+        int items=100;
+        double x0=0;
+        double x1=0;
+
+        if (n>=2 && params[0].type==qfmpDouble && params[1].type==qfmpDouble)  {
+            x0=params[0].num;
+            x1=params[1].num;
+
+            if (n==3 && params[2].isUInt()) {
+                items=params[2].toUInt();
+            } else if (n==3) {
+                p->qfmpError("linspace(x0, x1[, items]) needs an unsigned integer as third (optional) parameter");
+                res.setInvalid();
+                return;
+            }
+            res.setDoubleVec(items, 0.0);
+            for (int i=0; i<items; i++) {
+                res.numVec[i]=x0+double(i)/double(items-1)*(x1-x0);
+            }
+        } else {
+            p->qfmpError("linspace(x0, x1[, items]) needs two number parameters x0, x1");
+            res.setInvalid();
+            return ;
+        }
+    }
+
+    void fLogSpace(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        res.setInvalid();
+        int items=50;
+        double x0=0;
+        double x1=0;
+
+        if (n>=2 && params[0].type==qfmpDouble && params[1].type==qfmpDouble)  {
+            x0=params[0].num;
+            x1=params[1].num;
+
+            if (n==3 && params[2].isUInt()) {
+                items=params[2].toUInt();
+            } else if (n==3) {
+                p->qfmpError("logspace(a, b[, items]) needs an unsigned integer as third (optional) parameter");
+                res.setInvalid();
+                return;
+            }
+            res.setDoubleVec(items, 0.0);
+            for (int i=0; i<items; i++) {
+                res.numVec[i]=pow(10.0, x0+double(i)/double(items-1)*(x1-x0));
+            }
+        } else {
+            p->qfmpError("logspace(a, b[, items]) needs two number parameters x0, x1");
+            res.setInvalid();
+            return ;
+        }
+    }
+
+    void fMeshGrid2Dx(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        res.setInvalid();
+        if (n==2 && params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)  {
+            int Nx=params[0].numVec.size();
+            int Ny=params[1].numVec.size();
+
+            res.setDoubleVec(Nx*Ny, 0.0);
+            int i=0;
+            for (int y=0; y<Ny; y++) {
+                for (int x=0; x<Nx; x++) {
+                    res.numVec[i]=params[0].numVec[x];
+                    i++;
+                }
+            }
+        } else {
+            p->qfmpError("meshgrid2d_x(X,Y) needs two number vector parameters");
+            res.setInvalid();
+            return ;
+        }
+    }
+
+
+    void fMeshGrid2Dy(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        res.setInvalid();
+        if (n==2 && params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)  {
+            int Nx=params[0].numVec.size();
+            int Ny=params[1].numVec.size();
+
+            res.setDoubleVec(Nx*Ny, 0.0);
+            int i=0;
+            for (int y=0; y<Ny; y++) {
+                for (int x=0; x<Nx; x++) {
+                    res.numVec[i]=params[1].numVec[y];
+                    i++;
+                }
+            }
+        } else {
+            p->qfmpError("meshgrid2d_y(X,Y) needs two number vector parameters");
+            res.setInvalid();
+            return ;
+        }
     }
 
     qfmpResult fLast(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
@@ -6019,6 +6197,7 @@ namespace QFMathParser_DefaultLib {
 
 #endif
 }
+
 
 
 
