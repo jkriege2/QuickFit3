@@ -82,7 +82,7 @@ QVariant QFTableModel::data(const QModelIndex &index, int role) const {
         } else if (role == Qt::BackgroundRole) {
             if (state.dataBackgroundMap.contains(a)) return state.dataBackgroundMap[a];
         } else if (role == Qt::ToolTipRole) {
-            if (state.dataMap.contains(a)) return tr("row: <i>%2</i><br>column: <i>%3 (\"%4\")</i><br>datatype: <i>%1</i><br>data: <b>%5</b>").arg(qfHTMLExcape(getQVariantType(state.dataMap[a]))).arg(index.row()).arg(index.column()).arg(qfHTMLExcape(state.columnNames.value(index.column(), ""))).arg(qfHTMLExcape(getQVariantData(index.data())));
+            if (state.dataMap.contains(a)) return tr("row: <i>%2</i><br>column: <i>%3 (\"%4\")</i><br>datatype: <i>%1</i><br>data: <b>%5</b>").arg(qfHTMLEscape(getQVariantType(state.dataMap[a]))).arg(index.row()).arg(index.column()).arg(qfHTMLEscape(state.columnNames.value(index.column(), ""))).arg(qfHTMLEscape(getQVariantData(index.data())));
         } else if (role >= Qt::UserRole) {
             if (state.moreDataMap.contains(a)) {
                 return state.moreDataMap[a].value(role, QVariant());

@@ -1647,7 +1647,7 @@ QString qfCanonicalOrAbsoluteFilePath(const QString& file) {
     return fn;
 }
 
-QString qfHTMLExcape(const QString& input) {
+QString qfHTMLEscape(const QString& input) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     return input.toHtmlEscaped();
 #else

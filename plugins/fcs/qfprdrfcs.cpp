@@ -305,6 +305,7 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
         services->log_error(tr("Error while importing ALV700X file '%1':\n    %2\n").arg(filename.value(0, "")).arg(E.what()));
 
     }
+    qDebug()<<channelCount<<runCount<<crossCorrelation<<autocorrelation<<firstchannel<<CorrColumns<<mode<<inputchannels;
     QList<ALV700ConfigData> cdata;
     for (unsigned int i=0; i<channelCount; i++) {
         ALV700ConfigData d;
@@ -323,12 +324,19 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
                     d.columns.append(1+i*(runCount+1)+r+1);
                 }
             }
+            qDebug()<<"  "<<d.columns;
             for (int i=d.columns.size()-1; i>=0; i--) {
                 if (CorrColumns>0 && d.columns[i]>=CorrColumns) d.columns.removeAt(i);
             }
+            qDebug()<<d.channel<<d.swapped<< d.role<<d.columns;
             cdata<<d;
         }
     }
+    int ccfOffset=1+channelCount*(runCount+1);
+    if (crossCorrelation && !autocorrelation) {
+        ccfOffset=1;
+    }
+    qDebug()<<"ccfOffset="<<ccfOffset;
     for (unsigned int i=0; i<channelCount; i++) {
         ALV700ConfigData d;
         d.channel=i+firstchannel;
@@ -349,13 +357,15 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
                 }
             } else {
                 for (unsigned int r=0; r<runCount; r++) {
-                    d.columns.append(1+channelCount*(runCount+1)+i*(runCount+1)+r+1);
+                    d.columns.append(ccfOffset+i*(runCount+1)+r+1);
                 }
             }
+            qDebug()<<"  "<<d.columns;
             for (int i=d.columns.size()-1; i>=0; i--) {
                 if (CorrColumns>0 && d.columns[i]>=CorrColumns) d.columns.removeAt(i);
             }
 
+            qDebug()<<d.channel<<d.swapped<< d.role<<d.columns;
             cdata<<d;
         }
     }

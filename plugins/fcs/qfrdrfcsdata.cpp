@@ -807,7 +807,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
             long long lines=d.tab->get_line_count();
             long long columns=d.tab->get_column_count();
             //qDebug()<<"lines="<<lines<<"   columns="<<columns<<QString::number(separatorchar);
-            QFPluginServices::getInstance()->log_text(tr("read CSV file '%1' as FCS record. Found %2 lines and %3 columns.").arg(d.filename).arg(lines).arg(columns));
+            QFPluginServices::getInstance()->log_text(tr("  read CSV file '%1' as FCS record.\n  Found %2 lines and %3 columns.\n").arg(d.filename).arg(lines).arg(columns));
             if (mode==0) { // tau, corr, corr, ...
                 rruns=rruns+columns-1;
             } else if (mode==1) { // tau, corr, error, corr, error, ...
@@ -1860,7 +1860,7 @@ bool QFRDRFCSData::loadFromALV7000File(QString &filename)
             if (data.findIdentifier) {
                 if (data.token.type==ALV7_NAME) {
                     //qDebug()<<"finID: "<<data.token.value;
-                    if (data.token.value.contains("ALV-700", Qt::CaseInsensitive)) {
+                    if (data.token.value.contains("ALV-7", Qt::CaseInsensitive)) {
                         setQFProperty("ALV_TYPE", data.token.value, false, true);
                         data.findIdentifier=false;
                     } else if (data.token.type!=ALV7_LINEBREAK && data.token.type!=ALV7_EOF) {

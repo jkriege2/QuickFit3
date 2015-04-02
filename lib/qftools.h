@@ -1349,6 +1349,8 @@ inline QString listToString(const T& input, bool withIDs=false, bool withBracket
 template <class T>
 inline QString numlistToString(const T& input, bool withIDs=false, int precision=10) {
     QString res;
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
     {
         QTextStream txt(&res, QIODevice::WriteOnly);
         bool first=true;
@@ -1359,7 +1361,7 @@ inline QString numlistToString(const T& input, bool withIDs=false, int precision
             if (withIDs) {
                 txt<<i<<":";
             }
-            txt<<QLocale::c().toString(input[i], 'g', precision);
+            txt<<loc.toString(input[i], 'g', precision);
             first=false;
         }
     }
@@ -1984,7 +1986,7 @@ QFLIB_EXPORT QImage cropTopBottom(const QImage& pix);
 
 QFLIB_EXPORT QString qfCanonicalOrAbsoluteFilePath(const QString& file);
 
-QFLIB_EXPORT QString qfHTMLExcape(const QString& input);
+QFLIB_EXPORT QString qfHTMLEscape(const QString& input);
 
 #endif // QFTOOLS_H
 
