@@ -845,9 +845,13 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
                         runincrement=(columns-1);
                     } else if (mode==1) { // tau, corr, error, corr, error, ...
                         for (int c=1; c<columns; c+=2) {
-                            if (c+1<columns) {
+                            if (c<columns) {
                                 correlation[(run0+(c-1)/2)*correlationN+l]=data[ii].tab->get(c, l);
+                            }
+                            if (c+1<columns) {
                                 correlationErrors[(run0+(c-1)/2)*correlationN+l]=data[ii].tab->get(c+1, l);
+                            } else {
+                                correlationErrors[(run0+(c-1)/2)*correlationN+l]=0;
                             }
                         }
                         runincrement=(columns-1)/2;
