@@ -239,7 +239,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
             QFEvaluationEditor* edt=pedt->getEditor();
             QFImFCSFitEvaluationEditor* eedt=qobject_cast<QFImFCSFitEvaluationEditor*>(edt);
             if (eedt && e->getName().toLower().contains("wxy")) {
-                eedt->fitEverythingThreaded();
+                eedt->fitEverythingThreadedWriter();
             }
             if (pedt) pedt->close();
             log_text(tr("        DONE!\n"));
@@ -559,7 +559,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool3()
             QFEvaluationEditor* edt=pedt->getEditor();
             QFImFCSFitEvaluationEditor* eedt=qobject_cast<QFImFCSFitEvaluationEditor*>(edt);
             if (eedt) {
-                eedt->fitEverythingThreaded();
+                eedt->fitEverythingThreadedWriter();
             }
             if (pedt) pedt->close();
             log_text(tr("        DONE!\n"));
