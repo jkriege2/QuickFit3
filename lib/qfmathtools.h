@@ -28,6 +28,7 @@
 #include "lib_imexport.h"
 #include <cstdlib>
 #include <QVector>
+#include <QString>
 
 /*!
     \defgroup tools_math_stat QuickFit Statistics tools
@@ -1429,6 +1430,7 @@ inline double roundError(double error, double addSignifcant) {
     return roundError(error, int(addSignifcant));
 }
 
+
 /** \brief used as result type for the function calcFitStatistics()
  *  \ingroup tools_math_stat
  */
@@ -1440,18 +1442,21 @@ struct QFLIB_EXPORT QFFitStatistics {
         /** \brief free all heap memory allocated in this struct */
         void free();
 
+        QString getAsHTMLTable(bool addExplanation=true, bool includeR2=true) const;
+
+
         int runAvgStart;   /**<  */
-        QVector<double> fitfunc;   /**<  */
-        QVector<double> residuals;   /**<  */
-        QVector<double> residuals_weighted;   /**<  */
-        int runAvgMaxN;   /**<  */
-        int runAvgN;   /**<  */
-        QVector<double> tau_runavg;   /**<  */
-        QVector<double> residuals_runavg;   /**<  */
-        QVector<double> residuals_runavg_weighted;   /**<  */
-        int fitparamN;   /**<  */
-        int dataSize;   /**<  */
-        int degFreedom;   /**<  */
+        QVector<double> fitfunc;   /**< evaluated fit function */
+        QVector<double> residuals;   /**< residuals */
+        QVector<double> residuals_weighted;   /**< weighted residuals */
+        int runAvgMaxN;   /**< entries in running average vectors */
+        int runAvgN;   /**< number of items averaged for running averages */
+        QVector<double> tau_runavg;   /**< lag-times for running averages of residuals */
+        QVector<double> residuals_runavg;   /**< running average of residuals */
+        QVector<double> residuals_runavg_weighted;   /**< running average of weighted residuals */
+        int fitparamN;   /**< number of fit parameters */
+        int dataSize;   /**< number of datapoints */
+        int degFreedom;   /**< degrees of freedom */
         double residSqrSum;        /**<  sum of squared residuals */
         double residWeightSqrSum;  /**<  sum of squared weighted residuals */
         double residSum;           /**<  sum of residuals */
@@ -1464,22 +1469,30 @@ struct QFLIB_EXPORT QFFitStatistics {
         double rmax;       /**<  max of residuals */
         double rminw;      /**<  min of weighted residuals */
         double rmaxw;      /**<  max of weighted residuals */
-        double residAverage;   /**<  */
-        double residWeightAverage;   /**<  */
-        double residStdDev;   /**<  */
-        double residWeightStdDev;   /**<  */
-        double TSS;   /**<  */
-        double Rsquared;   /**<  */
+        double residAverage;   /**< average of residuals */
+        double residWeightAverage;   /**< average of weighted residuals */
+        double residStdDev;   /**< stddev of residuals */
+        double residWeightStdDev;   /**< stddev of weighted residuals */
+        double TSS;   /**< TSS */
+        double Rsquared;   /**< R^2 */
+        double AdjustedRsquared;   /**<  adjusted R^2 */
+        double RsquaredWeighted;   /**< weighted R^2 */
+        double AdjustedRsquaredWeighted;   /**<  adjusted weighted R^2 */
+        double maxRelParamError; /**< maximum relative parameter error (optional) */
+        double AICc; /**< Akaike's information riterion (AICc), corrected for small datasize */
+        double AICcWeighted; /**< Akaike's information riterion (AICc) calculated from the weighted residuals, corrected for small datasize */
+        double BIC; /**< Bayesian information riterion (BIC, also: Schwarz criterion), corrected for finite datasize */
+        double BICweighted; /**< Bayesian information riterion (BIC, also: Schwarz criterion) calculated from the weighted residuals, corrected for finite datasize */
 
-        double residHistBinWidth;   /**<  */
-        double residHistWBinWidth;   /**<  */
-        QVector<double> resHistogram;   /**<  */
-        double resHistogramCount;   /**<  */
-        QVector<double> resWHistogram;   /**<  */
-        double resWHistogramCount;   /**<  */
-        QVector<double> resCorrelation;   /**<  */
-        QVector<double> resWCorrelation;   /**<  */
-        int resN;   /**<  */
+        double residHistBinWidth;   /**< histogram bin width of residual histogram  */
+        double residHistWBinWidth;   /**< histogram bin width of weighted residual histogram */
+        QVector<double> resHistogram;   /**< residual histogram (bins between rmin and rmax with width residHistBinWidth) */
+        double resHistogramCount;   /**< integral of residual histogram (number of used residual entries) */
+        QVector<double> resWHistogram;   /**< weighted residulas histogram (bins between rmin and rmax with width residHistBinWidth) */
+        double resWHistogramCount;   /**< integral of weighted residual histogram (number of used residual entries) */
+        QVector<double> resCorrelation;   /**< residual rank-ordered correlation */
+        QVector<double> resWCorrelation;   /**< weighted rank-ordered residual correlation */
+        int resN;   /**< entries in (weighted) residual correlation */
 };
 
 /*! \brief calculate fit statistics for the given measurement dataset, using this fit function with the given parameters
@@ -1497,9 +1510,11 @@ struct QFLIB_EXPORT QFFitStatistics {
     \param paramsFix which parameters are fixed
     \param runAvgWidth width of the averaging in the running averge
     \param residualHistogramBins bins in the residual histogram
+    \param fitFuncParams fit result: parameter values (optional, paramCount entries)
+    \param fitFuncParamErrors fit result: parameter values (optional, paramCount entries)
 
     \note the arrays in the resulting struct are allocated using \c qfMalloc(), so you will have to free them using \c qfFree() !!!
   */
-QFLIB_EXPORT QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins);
+QFLIB_EXPORT QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, double* fitFuncParams=NULL, double* fitFuncParamErrors=NULL);
 
 #endif // QFMATHTOOLS_H

@@ -412,6 +412,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual void calcChi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1);
 
 
+
     public slots:
         /** \brief set the current index to use */
         virtual void setCurrentIndex(int index);

@@ -104,6 +104,9 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
         virtual QString getParamNameLocalStore(const QString& paramID) const;
         virtual bool isParamNameLocalStore(const QString& paramID) const;
 
+        virtual void setFitResultFitStatisticsInResultStore(QFRawDataRecord::QFFitFitResultsStore& fitresult, const QFFitStatistics& result, const QString& group, const QString& prefix) const;
+        virtual void setFitResultFitStatisticsInVector(QFRawDataRecord *record, const QString& evalID, int index, const QFFitStatistics &result, const QString &prefix, const QString &group) const;
+
     public:
 
         /* explicitly make some functions visible again, as the C++ compiler hides function definitions
@@ -113,6 +116,7 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
          */
 
 
+        using QFFitResultsByIndexEvaluation::setFitResultFitStatistics;
         using QFFitResultsByIndexEvaluation::setFitResultValuesVisibleWithGroupAndLabel;
         using QFFitResultsByIndexEvaluation::hasFit;
         using QFFitResultsByIndexEvaluation::setFitResultValue;

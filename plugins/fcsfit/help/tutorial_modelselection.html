@@ -1,0 +1,200 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>FCS Fit:  Model Selection</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+     <p>This tutorial will explain how you can compare different fit models and choose the most appropriate one for a given measurement.</p>
+     <h2>Experiment Description</h2>
+     <p>For this tutorial, we will use some test datasets provided together with QuickFit (in the directory <tt>$$local_plugin_assets$$</tt>):
+     <ol>
+         <li><tt>qd525_20nM_15ul_al488_20nM_15ul.ASC</tt> contains ACFs taken from a solution, which contained a mixture of QDot-525 (a ~10nm large spherical quantum dot) and Alexa-488</li>
+     </ol>
+     We will perform different fits to the data and see, which one fits best. The model, that we will choose is the standrad confocal FCS model: <a href="$$fitfunction:help:fcs_diff$$">$$fitfunction:name:fcs_diff$$</a>, but we will configure it to contain 1, 2 or 3 diffusing species and a triplet fraction.
+     </p>
+     <p></p>
+     <p></p>
+     <h2>Loading FCS data</h2>
+     <p>First we need to load the FCS curves to do so, we rely on the plugin '<a href="$$plugin_info:help:fcs$$">FCS</a>' which is by default part of QuickFit. 
+<ol>
+    <li>First you create an empty project and in the main window click on <b>Data Items | Insert Raw Data | FCS/DLS | Open FCS/DLS Data from File</b>. Now you may browse to the directory <tt>$$local_plugin_assets$$</tt> and select the file <tt>qd525_20nM_15ul_al488_20nM_15ul.ASC</tt> from the sub-directory <tt>fcs_testdata</tt>. </li>
+    <li> You will find the file in the project tree folder <i>Raw Data</i>. </li>
+    <li>By double-clicking its entry you may open a view on the data contained in the file: 
+<center><a name="tutorial_modelselection_pic000"><img src="./pic/tutorial_modelselection_pic000.png" border="1">
+</center></li>
+</ol>
+</p>
+
+
+  
+  <h2>Performing a First Fit</h2>
+  <p>Now we have to add a new fitting object and perform a fit:
+  <ol>
+      <li>Add a <a href="$$plugin_info:help:fcs_fit$$">FCS Fit item</a> to the project, by clicking <b>Data Items | Insert Evaluation | FCS Curve Fitting</b>. A new entry with the fit will appear in the project tree.</li>
+      <li>Double-click the fit in the project tree and the fit dialg will open. Here we will perform the fit:
+<center><a name="tutorial_modelselection_pic001"><img src="./pic/tutorial_modelselection_pic001.png" border="1">
+</center>
+ On the rhs you can select one of the available FCS files/RDRs in the project, but currently there is only one. On the left you see the correlation curve from the selected file/RDR (red), the fit with the current (initial) parameters (green/blue) and below that the residuals plot (red crosses). At the bottom, the plugin shows you the fit result statistics. On the right of the plots you see the current fit parameters and below them the buttons, that allow to perform the fits. At the top of the dialog you can choose the fit algoruhtm (should be: <a href="$$fitalgorithm:help:fit_levmar$$">$$fitalgorithm:name:fit_levmar$$</a>) and the fit model (choose: <a href="$$fitfunction:help:fcs_diff$$">$$fitfunction:name:fcs_diff$$</a>).</li>
+      <li>After ensuring the proper fit model (<a href="$$fitfunction:help:fcs_diff$$">$$fitfunction:name:fcs_diff$$</a>), we first have to get rid of the sharp increase of the correlation curve at low lag times, which is caused by detector afterpulsing. This is done by setting the <b>lower-bound</b> spin-box at the right below the residuals plot to 3 or 4, which will remove the first 3 or 4 datapoints from the measurement:
+<center><a name="tutorial_modelselection_pic002"><img src="./pic/tutorial_modelselection_pic002.png" border="1">
+</center>
+</li>
+      <li>Next we will set the parameter ranges properly: To do so, choose the tab <b>Parameter Ranges</b> above the fit parameters:
+<center><a name="tutorial_modelselection_pic003"><img src="./pic/tutorial_modelselection_pic003.png" border="1">
+</center>
+Here you should set the lower bound of the diffusion time &tau;<sub>D,1</sub> (and later of all other diffusion times) to 15µs, also the triplet ranges should be altered a bit:
+<center><a name="tutorial_modelselection_pic004"><img src="./pic/tutorial_modelselection_pic004.png" border="1">
+</center>
+This will prevent the model parameters from going all over the place and the fit from using e.g. a diffusin component to describe the triplett dynamics. Also we use the information, that the Alexa-488 in the mixture has a triplet decay time of typically 2-3µs at the used measurement conditions and its raction is typiically 0.1-0.3.
+</li>
+      <li>Now switch back to the fit paramteers, by choosing the tab <b>Parameter Values</b>.</li>
+      <li>Now we are ready to perform the first fit, by clicking on the button <b>Fit Current</b> below the fit parameters. This is the result we get:
+<center><a name="tutorial_modelselection_pic005"><img src="./pic/tutorial_modelselection_pic005.png" border="1">
+</center>
+As you can see, the fit is not very good, as there is a significant "S"-shape in the residuals. This result is also somehow expected, since we know, that there are two different particles in the solution.
+</li>
+  </ol>
+  </p>
+  
+
+
+<h2>Perform Fits with more components</h2>
+<p>In principle one could simply go on from the last step and increase the number of components in the fit object. But this would overwrite the fit results, we already obtained and make the comparison of different models impossible. Therefore, we add three more fit objects of the type <a href="$$plugin_info:help:fcs_fit$$">fcs_fit Help</a> to the project and for each one repeat the steps from the last section. The only difference is, that we choose different numbers of (diffusing) components and non-fluorescent (states) for the model in each object:
+<center><table cellspacing="0" cellpadding="1" border="1">
+  <tr>
+    <th bgcolor="#cccccc"><b>fit item</b></th>
+    <th bgcolor="#cccccc"><b>components</b></th>
+    <th bgcolor="#cccccc"><b># non-fluorescent</b></th>
+  </tr>
+  <tr>
+    <td><b>1-comp + triplet</b> (already done)</td>
+    <td>1</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td><b>2-comp + triplet</b></td>
+    <td>2</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td><b>3-comp + triplet</b></td>
+    <td>3</td>
+    <td>1</td>
+  </tr>
+ <tr>
+    <td><b>1-comp + 2 non-fluorescent</b></td>
+    <td>1</td>
+    <td>2</td>
+  </tr>
+</table></center>
+$$note:Set the parameter ranges again as proposed above and don't forget to cut the first few datapoints from teh measurements!$$
+$$startbox_note$$
+If you have problems with the convergence of the fits, here are two things that you can try:
+<ol>
+    <li>Initially configure the fit model for 1-comp+triplett and perfomr that fit, then add one-by-one the other components and repeat the fit. This usually converges better, than immediately taking the full model and trying a fit.</li>
+    <li>It often helps to use another fit algorithm, such as the <a href="$$fitalgorithm:help:fit_simanneal$$">$$fitalgorithm:name:fit_simanneal$$</a>, which is a stochastic optimizer, which shows much better convergence for complex models, as levmar. So select the Simulatet Annealing <b>fit algorithm</b>, perform a fit and then switch back to <a href="$$fitalgorithm:help:fit_levmar$$">$$fitalgorithm:name:fit_levmar$$</a> and fit again. This combination has proven to be very advantageous, when fitting complex models!</li>
+</ol>
+$$endbox$$
+Here are a few screenshots of the anticipated reults of the new fits:
+<br><br><b>2-comp + triplet:</b>
+<center><a name="tutorial_modelselection_pic006"><img src="./pic/tutorial_modelselection_pic006.png" border="1">
+</center>
+
+<br><br><b>3-comp + triplet:</b>
+<center><a name="tutorial_modelselection_pic007"><img src="./pic/tutorial_modelselection_pic007.png" border="1">
+</center>
+
+<br><br><b>1-comp + e non-fluorescnet:</b>
+<center><a name="tutorial_modelselection_pic008"><img src="./pic/tutorial_modelselection_pic008.png" border="1">
+</center>
+</p>
+
+
+
+
+<h2>Model Selection</h2>
+<p>Now we are in a position to choose the model, which best fits our data and has the best relation between complexity and goodness of fit, i.e. honors the principle of parsimony, which states that you should use as few model parameters as possible.
+<ol>
+    <li>Close all the fit windows and double-click the raw-data item. Then choose the tab <b>"Evaluation Results"</b>, which shows you a table of all the fit results for this RDR:
+<center><a name="tutorial_modelselection_pic009"><img src="./pic/tutorial_modelselection_pic009.png" border="1">
+</center>
+</li>
+<li>Each row in this table corresponds to one fit parameter and each column corresponds to one of the fit evaluation objects in the projects. The names of the columns are e.g. <tt>fcs_fit_10_fcs_diff_runavg</tt>, which is a combination of the evaluation type <tt>fcs_fit</tt>, the evaluation ID <tt>10</tt>, which can also be found on the first tab of the evaluation editor), the fit model ID <tt>fcs_diff</tt> and the run, that we fitted (average over all runs in the file, but there was only one run in the file!).</li>
+<li>The fit evaluation did not only save the fit results (e.g. the diffusion times, which can be found in the table), but also additional statistical parameters, which describe the goodness of fit. They are described in <a href="$$mainhelpdir$$/fit_statistics.html">the fit statistics help page</a> in detail. Here we will use two of these parameters. First, the <b>residual sum of squares</b> describes the squared deviations of the data from the model (it is also known as $(\chi^2)$ of the fit):
+$[ \mbox{RSS}\ =\ \chi^2\ =\ \sum_{i=1}^K\left(\hat{g}_i-g(\hat{\tau}_i)\right)^2, ]$
+where $(hat{\tau}_i,\hat{g}_i)$ are the $(K)$ measured datapoints on the autocorrelation curve and $(g(\tau))$ is the best-fit model function. This number gets smaller, when the model fits better. SO we expect it to get smaller and smaller, as we add components (i.e. degrees of freedom) to the model. So based on the $(\chi^2)$ one should select the model with the smalles $\chi^2)$-value.<br>The second number, that we will use is the so calle Akaike information criterion (AICc) $$ref:Akaike1974:Akaike H  (1974) A new look at the statistical model identification. <i>IEEE Transactions on Automatic Control</i> <b>19</b><b>:</b> 716-723 DOI: 10.1109/TAC.1974.1100705$$$$ref:Levin2004:Levin M K, Carson J H  (2004) Fluorescence correlation spectroscopy and quantitative cell biology. <i>Differentiation</i> <b>72</b><b>:</b> 1-10 DOI: 10.1111/j.1432-0436.2004.07201002.x $$$$ref:Burnham2002:
+Burnham K P, Anderson D R  (2002) Model Selection and Multimodel Inference. New York, London, Berlin: Springer$$, which is related to the RSS/$(\chi^2)$, but in addition penalizes more complex models with more parameters. It is defined as:
+$[ \mbox{AICc}\ =\ K\cdot \log_{10}\left[\frac{\mbox{RSS}}{K}\right]+2\cdot\mbox{NP}+\frac{2\cdot\mbox{NP}\cdot (\mbox{NP}+1)}{K-\mbox{NP}-1}, ]$
+where $(\mbox{NP})$ is the number of fit paramters in the model. The AICc is designed, so you should select the model with the smallest value (the most negative value, as you will see).
+</li>
+<li>We can find both parameters in the table by scolling down to the rows, which start with "fit statistics:". But there is a simpler way, as the table can be filtered. To do so, we can use the filter- input field right above the table:
+<center><a name="tutorial_modelselection_pic010"><img src="./pic/tutorial_modelselection_pic010.png" border="1">
+</center>
+The first fields filter the columns and the second set of fields (which we will use) filters the rows/parameters. For a first test, filter out only the fit statistics fields, by entering "fit statistics" in the <b> result filter (contains)</b>. The table will look like this then:
+<center><a name="tutorial_modelselection_pic011"><img src="./pic/tutorial_modelselection_pic011.png" border="1">
+</center>
+The blue column contains average and standard deviation over all entries in each row (and we can ignore it for our purpose). Now it is already easier to find the desired parameters.</li>
+<li>In a second step, we will use more advanced filtering and only select the rows of interest. For this we will use <a href="$$mainhelpdir$$qf3_qtregexp.html">regular expressions</a> for filtering, which are acivated with the checkbox <b>RegExp</b> at the right. Then enter the following filters into the filter fields:
+<ul>
+    <li><b>result filter (constains)</b> = "<tt>akaike|chi squared</tt>", which selects only rows, that either contain "akaike", or "chi squared"</li>
+    <li><b>and not contains</b> = "<tt>weight</tt>", which removes rows, that contain "weighted" statistics parameters, which we don't want to look at here, as we didn't use a weighted fit.</li>
+</ul>
+Now the table should look as follows:
+<center><a name="tutorial_modelselection_pic012"><img src="./pic/tutorial_modelselection_pic012.png" border="1">
+</center>
+The first column (ID 10) is the last fit object (1-comp + 2 non-fluorescent), the second column is the 1-comp+triplett model, the third column the 2-comp+triplett and the last column the 3-comp+triplett (<b>Note</b> that this order mght be different on your computer!). Summarizing the results, we get:
+<center><table cellspacing="0" cellpadding="1" border="1">
+  <tr>
+    <th bgcolor="#cccccc"><b>model</b></th>
+    <th bgcolor="#cccccc"><b>AICc</b></th>
+    <th bgcolor="#cccccc"><b>RSS/$(\chi^2)$</b></th>
+  </tr>
+  <tr>
+    <td>1-comp + triplett</td>
+    <td>-845</td>
+    <td>0.00287248</td>
+  </tr>
+  <tr>
+    <td>2-comp + triplett</td>
+    <td>-1012</td>
+    <td>0.000337944</td>
+  </tr>
+  <tr>
+    <td>3-comp + triplett</td>
+    <td>-1009</td>
+    <td>0.000330887</td>
+  </tr>
+  <tr>
+    <td>1-comp + 2 non-fluorescent</td>
+    <td>-999</td>
+    <td>0.00039897</td>
+  </tr>
+</table>
+</center>
+<center>
+<a name="tutorial_modelselection_pic013"><img src="./pic/tutorial_modelselection_pic013.png" border="1">
+
+<a name="tutorial_modelselection_pic014"><img src="./pic/tutorial_modelselection_pic014.png" border="1">
+</center>
+
+So from this table we can try to do a model selection:
+<ul>
+    <li>First look at the RSS $(\chi^2)$: The model "3-comp+triplett" has the smallest RSS, so we would select this one, but on the other hand we knwo, that we have only two diffusing species (quantum dots + Alexa-488) in the solution, so this might be overfitting, but how can we know that? The RSS does not give an answer to this.</li>
+    <li>Now we look at the AICc, here more complex models are penalized and we get the smallest value for the model "2-comp + triplett". This seems to be a better choice, than the 3-component model from the RSS, as we decide against the overly complex model, which gave us a minor improvement in fit quality, but added two fit parameters to achieve this.</li>
+    <li>Finally you can also look at the last moel, which assumes only one diffusing species, but which may have an additional dark state, which leads to long-term blinking. This model is in all cases better, than the simple 1-component model, but is rejected against the 2- and 3-component modely by both the RSS and the AICc. So only one diffusing species, but with complex photophysics also seems to be out of the question.</li>
+</ul>
+Summarizing you can use the methods presented in here to select a fit model, which is appropriate for your dataset, which is in the case presented here a 2-component model with triplett blinking, which also fits well to the expectation from the known sample.
+</li>
+</ol></p>
+
+
+
+
+<h2>References</h2>
+<p>$$references$$</p>
+
+    </body>
+</html>

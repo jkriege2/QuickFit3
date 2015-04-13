@@ -116,6 +116,13 @@ double roundWithError(double value, double error, int addSignifcant)  {
 
 QFFitStatistics::QFFitStatistics() {
     runAvgStart=0;
+    maxRelParamError=0;
+    AICc=0;
+    AICcWeighted=0;
+    BIC=0;
+    BICweighted=0;
+    RsquaredWeighted=0;
+    AdjustedRsquaredWeighted=0;
     //fitfunc=0;
     //residuals=0;
     //residuals_weighted=0;
@@ -145,6 +152,7 @@ QFFitStatistics::QFFitStatistics() {
     residWeightStdDev=0;
     TSS=0;
     Rsquared=0;
+    AdjustedRsquared=0;
 
     residHistBinWidth=0;
     residHistWBinWidth=0;
@@ -171,9 +179,82 @@ void QFFitStatistics::free() {
     if (resWCorrelation) {std::free(resWCorrelation); resWCorrelation=NULL; }*/
 }
 
-QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins) {
+QString QFFitStatistics::getAsHTMLTable(bool addExplanation, bool includeR2) const
+{
+    QString txtFit;
+    txtFit+=QString("<table border=\"0\" width=\"95%\">");
+    //txtFit+=QString("<tr><td align=\"right\"></td><td align=\"left\"></td><td align=\"right\"></td><td align=\"left\"></td></tr>");
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                    "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(residSqrSum).arg(residWeightSqrSum);
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">&lang;E&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                    "<td align=\"right\" valign=\"bottom\"> &lang;E&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(residAverage).arg(residWeightAverage);
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                    "<td align=\"right\" valign=\"bottom\"> &radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(residStdDev).arg(residWeightStdDev);
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">NP =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td></td>"
+                    "<td align=\"right\" valign=\"bottom\">NR =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(fitparamN).arg(dataSize);
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">DF =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td></td>"
+                    "<td align=\"right\" valign=\"bottom\">TSS =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(degFreedom).arg(TSS);
+    if (includeR2){
+        txtFit+=QString("<tr>"
+                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                        "<td></td>"
+                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                        "</tr>").arg(Rsquared).arg(RsquaredWeighted);
+        txtFit+=QString("<tr>"
+                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup><sub>adjusted</sub> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                        "<td></td>"
+                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup><sub>adjusted</sub> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                        "</tr>").arg(AdjustedRsquared).arg(AdjustedRsquaredWeighted);
+    }
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">AICc =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td></td>"
+                    "<td align=\"right\" valign=\"bottom\">AICc (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(AICc).arg(AICcWeighted);
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">BIC =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td></td>"
+                    "<td align=\"right\" valign=\"bottom\">BIC (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(BIC).arg(BICweighted);
+
+    if (maxRelParamError>0.0) {
+        txtFit+=QString("<tr>"
+                        "<td align=\"right\" valign=\"bottom\"></td><td align=\"left\" valign=\"bottom\"></td>"
+                        "<td></td>"
+                        "<td align=\"right\" valign=\"bottom\">max<sub>P</sub>(&sigma;<sub>P</sub>/|P|) =</td><td align=\"left\" valign=\"bottom\">%1%2</td>"
+                        "</tr>").arg(maxRelParamError*100.0).arg("%");
+    }
+    txtFit+=QString("</table>");
+
+    if (addExplanation) {
+        txtFit+=QString("<br><font size=\"-1\"><i>Legend:</i>: &chi;<sup>2</sup>: sum error square, &lang;E&rang;: residual average, &radic;&lang;E2&rang;: residual stddev., <br>NP: number of fit parameters, NR: number of residuals, <br>DF: degrees of freedom, R<sup>2</sup>: coefficient of determination, <br>R<sup>2</sup><sub>adjusted</sub>: adjusted coefficient of determination, TSS: total sum of squares, max<sub>P</sub>(&sigma;<sub>P</sub>/|P|): maximum relative parameter error<br>AICc: Akaike's infromation criterion, BIC: Bayes information criterion</font>");
+    }
+
+    return txtFit;
+}
+
+
+
+QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, double* fitFuncParams, double* fitFuncParamErrors) {
     datacut_max=qBound((long)datacut_min, (long)datacut_max, (long)N-1);
     QFFitStatistics result;
+
+
     /////////////////////////////////////////////////////////////////////////////////
     // retrieve data and tau-values from rawdata record
     /////////////////////////////////////////////////////////////////////////////////
@@ -269,6 +350,19 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
     result.residWeightStdDev=sqrt(result.residWeightSqrSum/(double)result.dataSize-result.residWeightSum*result.residWeightSum/(double)result.dataSize/(double)result.dataSize);
     result.TSS=result.gSqrSum-result.gSum*result.gSum/(double)result.dataSize;
     result.Rsquared=1.0-result.residSqrSum/result.TSS;
+    result.AdjustedRsquared=1.0-result.residSqrSum/(double(result.dataSize-result.fitparamN))/(result.TSS/(double(result.dataSize-1)));
+
+    result.RsquaredWeighted=1.0-result.residWeightSqrSum/result.TSS;
+    result.AdjustedRsquaredWeighted=1.0-result.residWeightSqrSum/(double(result.dataSize-result.fitparamN))/(result.TSS/(double(result.dataSize-1)));
+
+    {
+        double p=double(result.fitparamN);
+        double n=double(result.dataSize);
+        result.AICc=n*log10(result.residSqrSum/n)+2.0*p+2.0*p*(p+1)/(n-p-1.0);
+        result.AICcWeighted=n*log10(result.residWeightSqrSum/n)+2.0*p+2.0*p*(p+1)/(n-p-1.0);
+        result.BIC=n*log(result.residSqrSum/n)+p*log(n);
+        result.BICweighted=n*log(result.residWeightSqrSum/n)+p*log(n);
+    }
 
     result.residHistBinWidth=(result.rmax-result.rmin)/(double)residualHistogramBins;
     result.residHistWBinWidth=(result.rmaxw-result.rminw)/(double)residualHistogramBins;
@@ -320,6 +414,16 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
     for (register int i=0; i<result.resN; i++) {
         result.resCorrelation[i]/=(result.residStdDev*result.residStdDev);
         result.resWCorrelation[i]/=(result.residWeightStdDev*result.residWeightStdDev);
+    }
+
+    if (fitFuncParams && fitFuncParamErrors && paramCount>0) {
+        result.maxRelParamError=0;
+        for (int i=0; i<paramCount; i++) {
+            double re=fitFuncParamErrors[i]/fabs(fitFuncParams[i]);
+            if (re<1e2 || fabs(fitFuncParams[i])>1e18) {
+                result.maxRelParamError=qMax(result.maxRelParamError, re);
+            }
+        }
     }
 
     return result;

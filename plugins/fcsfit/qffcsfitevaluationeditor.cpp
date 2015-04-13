@@ -486,43 +486,11 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 } else {
                     txtFit+=txtFit+tr("<div style=\"border-style:solid\"><b>Fit Result Message:</b><center>not fit yet</center></div><br>");
                 }
-                txtFit+=QString("<b>%1</b><cebter>").arg(tr("Fit Statistics:"));
-                txtFit+=QString("<table border=\"0\" width=\"95%\">");
-                //txtFit+=QString("<tr><td align=\"right\"></td><td align=\"left\"></td><td align=\"right\"></td><td align=\"left\"></td></tr>");
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
-                                "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitResults.residSqrSum).arg(fitResults.residWeightSqrSum);
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\">&lang;E&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
-                                "<td align=\"right\" valign=\"bottom\"> &lang;E&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitResults.residAverage).arg(fitResults.residWeightAverage);
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\">&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
-                                "<td align=\"right\" valign=\"bottom\"> &radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitResults.residStdDev).arg(fitResults.residWeightStdDev);
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\">NP =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td></td>"
-                                "<td align=\"right\" valign=\"bottom\">NR =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitResults.fitparamN).arg(fitResults.dataSize);
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\">DF =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td></td>"
-                                "<td align=\"right\" valign=\"bottom\"></td><td align=\"left\" valign=\"bottom\"></td>"
-                                "</tr>").arg(fitResults.degFreedom);
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\">TSS  =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td></td>"
-                                "<td align=\"right\" valign=\"bottom\">R<sup>2</sup> =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitResults.TSS).arg(fitResults.Rsquared);
-                //qDebug()<<"    l "<<t.elapsed()<<" ms";
+                txtFit+=QString("<b>%1</b><center>").arg(tr("Fit Statistics:"));
+
+                txtFit+=fitResults.getAsHTMLTable();
                 t.start();
 
-                txtFit+=QString("</table><br><font size=\"-1\"><i>Legend:</i>: &chi;<sup>2</sup>: sum error square, &lang;E&rang;: residual average, &radic;&lang;E2&rang;: residual stddev., <br>NP: number of fit parameters, NR: number of residuals, <br>DF: degrees of freedom, R<sup>2</sup>: coefficient of determination, <br>TSS: total sum of squares</font>");
                 txtFit+=QString("</center></font>");
                 fitStatisticsReport=txtFit;
                 txtFitStatistics->setHtml(txtFit);
@@ -864,6 +832,11 @@ void QFFCSFitEvaluationEditor::replotData() {
     pltResidualCorrelation->set_doDrawing(false);
     pltResidualCorrelation->set_emitSignals(false);
     pltResidualCorrelation->clearGraphs();
+
+    pltData->get_plotter()->set_showKey(chkKey->isChecked());
+    pltResiduals->get_plotter()->set_showKey(chkKey->isChecked());
+    pltResidualHistogram->get_plotter()->set_showKey(chkKey->isChecked());
+    pltResidualCorrelation->get_plotter()->set_showKey(chkKey->isChecked());
     dsres->clear();
     ds->clear();
     dsresh->clear();

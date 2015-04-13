@@ -54,6 +54,112 @@ bool QFFitResultsByIndexAsVectorEvaluation::isParamNameLocalStore(const QString 
     return paramID.endsWith("_islocal");
 }
 
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultStore(QFRawDataRecord::QFFitFitResultsStore &fitresult, const QFFitStatistics &result, const QString &group, const QString &prefix) const
+{
+    QString param="";
+    fitresult.resultsSetNumberAndBool( param=prefix+"chisquared",  result.residSqrSum, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"chisquared_weighted",  result.residWeightSqrSum, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"residavg",  result.residAverage, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("residual average"), QString("&lang;E&rang;"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"residavg_weighted",  result.residWeightAverage, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"residstddev",  result.residStdDev, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"residstddev_weighted",  result.residWeightStdDev, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
+
+    fitresult.resultsSetIntegerAndBool( param=prefix+"fitparams",  result.fitparamN, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("fit params"));
+
+    fitresult.resultsSetIntegerAndBool( param=prefix+"datapoints",  result.dataSize, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("datapoints"));
+
+    fitresult.resultsSetIntegerAndBool( param=prefix+"dof",  result.degFreedom, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("degrees of freedom"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"r2",  result.Rsquared, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("R squared"), tr("R<sup>2</sup>"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"adjusted_r2",  result.AdjustedRsquared, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub>"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"tss",  result.TSS, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("total sum of squares"));
+
+
+
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"r2_weighted",  result.RsquaredWeighted, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted R squared"), tr("R<sup>2</sup> (weighted)"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"adjusted_r2_weighted",  result.AdjustedRsquaredWeighted, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub> (weighted)"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"aicc",  result.AICc, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("Akaike's information criterion"), tr("AICc"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"aicc_weighted",  result.AICcWeighted, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Akaike's information criterion"), tr("AICc (weighted)"));
+
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"bic",  result.BIC, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("Bayesian information criterion"), tr("BIC"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"bic_weighted",  result.BICweighted, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Bayesian information criterion"), tr("BIC (weighted)"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"max_rel_param_error",  result.maxRelParamError, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
+
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInVector(QFRawDataRecord *record, const QString& evalID, int run, const QFFitStatistics &fit_stat, const QString &prefix, const QString &group) const
+{
+    if (run<0) record->resultsSetFitStatistics(fit_stat, evalID, prefix, group);
+    else {
+        QString param="";
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"chisquared", run, fit_stat.residSqrSum, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"chisquared_weighted", run, fit_stat.residWeightSqrSum, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"residavg", run, fit_stat.residAverage, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("residual average"), QString("&lang;E&rang;"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"residavg_weighted", run, fit_stat.residWeightAverage, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"residstddev", run, fit_stat.residStdDev, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"residstddev_weighted", run, fit_stat.residWeightStdDev, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
+
+        record->resultsSetInIntegerListAndBool(evalID, param=prefix+"fitparams", run, fit_stat.fitparamN, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("fit params"));
+
+        record->resultsSetInIntegerListAndBool(evalID, param=prefix+"datapoints", run, fit_stat.dataSize, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("datapoints"));
+
+        record->resultsSetInIntegerListAndBool(evalID, param=prefix+"dof", run, fit_stat.degFreedom, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("degrees of freedom"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"r2", run, fit_stat.Rsquared, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("R squared"), tr("R<sup>2</sup>"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"tss", run, fit_stat.TSS, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("total sum of squares"));
+    }
+}
+
 
 
 void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitValue(const QString& id,  QFRawDataRecord *r) {

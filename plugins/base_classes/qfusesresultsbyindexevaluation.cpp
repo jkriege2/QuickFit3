@@ -172,6 +172,11 @@ int QFUsesResultsByIndexEvaluation::getIndexMax(const QFRawDataRecord *r) const 
     return 0;
 }
 
+void QFUsesResultsByIndexEvaluation::setFitResultFitStatistics(QFRawDataRecord* record, int index, const QFFitStatistics& result, const QString &prefix, const QString &group)
+{
+    setFitResultFitStatistics(record, getEvaluationResultID(index), result, prefix, group);
+}
+
 void QFUsesResultsByIndexEvaluation::setFitResultSortPriority(QFRawDataRecord *r, int index, const QString &parameterID, bool sortPriority) {
     setFitResultSortPriority(r, getEvaluationResultID(index), parameterID, sortPriority);
 }

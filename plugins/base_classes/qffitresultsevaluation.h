@@ -860,6 +860,7 @@ public:
     /*! \brief reset the given parameter fix (\a id) in the given raw data record \a r for the \a resultID to its default/initial value */
     virtual void resetDefaultFitFix(QFRawDataRecord *r, const QString &resultID, const QString &id);
 
+    virtual void setFitResultFitStatistics(QFRawDataRecord *record, const QString &index, const QFFitStatistics &result, const QString &prefix, const QString &group);
 
 signals:
 

@@ -2963,6 +2963,88 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 
 }
 
+void QFRawDataRecord::resultsSetFitStatistics(const QFFitStatistics &result, const QString &evalID, const QString &prefix, const QString &group)
+{
+
+    QString param;
+    resultsSetNumber(evalID, param=prefix+"chisquared", result.residSqrSum);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+
+    resultsSetNumber(evalID, param=prefix+"chisquared_weighted", result.residWeightSqrSum);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+
+    resultsSetNumber(evalID, param=prefix+"residavg", result.residAverage);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("residual average"), QString("&lang;E&rang;"));
+
+    resultsSetNumber(evalID, param=prefix+"residavg_weighted", result.residWeightAverage);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
+
+    resultsSetNumber(evalID, param=prefix+"residstddev", result.residStdDev);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
+
+    resultsSetNumber(evalID, param=prefix+"residstddev_weighted", result.residWeightStdDev);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
+
+    resultsSetInteger(evalID, param=prefix+"fitparams", result.fitparamN);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("fit params"));
+
+    resultsSetInteger(evalID, param=prefix+"datapoints", result.dataSize);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("datapoints"));
+
+    resultsSetInteger(evalID, param=prefix+"dof", result.degFreedom);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("degrees of freedom"));
+
+    resultsSetNumber(evalID, param=prefix+"r2", result.Rsquared);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("R squared"), tr("R<sup>2</sup>"));
+
+    resultsSetNumber(evalID, param=prefix+"adjusted_r2", result.AdjustedRsquared);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub>"));
+
+    resultsSetNumber(evalID, param=prefix+"r2_weighted", result.RsquaredWeighted);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("weighted R squared"), tr("R<sup>2</sup> (weighted)"));
+
+    resultsSetNumber(evalID, param=prefix+"adjusted_r2_weighted", result.AdjustedRsquaredWeighted);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("weighted adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub> (weighted)"));
+
+    resultsSetNumber(evalID, param=prefix+"aicc", result.AICc);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("Akaike's information criterion"), tr("AICc"));
+
+    resultsSetNumber(evalID, param=prefix+"aicc_weighted", result.AICcWeighted);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("weighted Akaike's information criterion"), tr("AICc (weighted)"));
+
+    resultsSetNumber(evalID, param=prefix+"bic", result.BIC);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("Bayesian information criterion"), tr("BIC"));
+
+    resultsSetNumber(evalID, param=prefix+"bic_weighted", result.BICweighted);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("weighted Bayesian information criterion"), tr("BIC (weighted)"));
+
+    resultsSetNumber(evalID, param=prefix+"max_rel_param_error", result.maxRelParamError);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
+
+    resultsSetNumber(evalID, param=prefix+"tss", result.TSS);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("total sum of squares"));
+
+}
+
 QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& evalName, const QString& resultName) const
 {
     #ifdef DEBUG_THREAN

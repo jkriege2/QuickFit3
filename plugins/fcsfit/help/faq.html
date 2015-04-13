@@ -18,7 +18,7 @@ $$faq_end$$
 $$faq_start$$
  <a name="FAQ_FITSTAT"><b>What do the fit statistics mean, that this plugin calculates?</b>
 $$faq_answer$$
- See <a href="./fit_statistics.html">Explanation of Fit Statistics</a> for a detailed explanation
+ See <a href="$$mainhelpdir$$/fit_statistics.html">Explanation of Fit Statistics</a> for a detailed explanation
 $$faq_end$$
 
 $$faq_start$$
@@ -48,12 +48,18 @@ $$faq_answer$$
 $$faq_end$$
 
 $$faq_start$$
-  <a name="FAQ1"><b>How can I filter the list of raw data records, displayed in the plugin screen?</b>
+  <a name="FAQ_FILTER_RDRS"><b>How can I filter the list of raw data records, displayed in the plugin screen?</b>
 $$faq_answer$$
   Above the list (rhs of the evaluation window), there are two fields, that allow to filter the displayed RDRs 
 <center><a name="faq_pic000"><img src="./pic/faq_pic000.png" border="1">
 </center>
 You can enter a simple filter expression there. then only those files will be displayed, which contain the given expression. As an example, if your project contains a full FCCS measurement with three RDRs per measurement (ACF0,ACF1 and FCCS), but you only want to fit ACF0-RDRs with this evaluation, simply enter ACF0 into the left field. the rhs filter-field allows to exclude all records, that do NOT contain the specified filter string. In addition you can use <a href="$$mainhelpdir$$qf3_qtregexp.html">regular expressions</a> for the filter strings.
+$$faq_end$$
+
+$$faq_start$$
+  <a name="FAQ_MODELSELECTION"><b>How can I perform a statistical FCS model selection?</b>
+$$faq_answer$$
+  The fit calculates several <a href="$$mainhelpdir$$fit_statistics.html">fit statistics parameters</a>, which allow to compare models and to find the model, which best fits you data, while obeying the principle of parsimony, which requires to use the simplest model, which is compatible with your data. The simplest parameter is the residual sum of squares (RSS or $(\chi^2)$), which tells you how well a model fits, but does not incorporate the number of model parameters, i.e. the model complexity. Parameters, that are connected to the RSS; but in addition penalize the model complexity are the Akaike information criterion (AICc) and the bayes information criterion (BIC), which are also available.$$note:A <a href="tutorial_modelselection.html">detailed tutorial</a> explains how to perform such a model selection analysis for an FCS measurement.$$
 $$faq_end$$
   </body>
 </html>

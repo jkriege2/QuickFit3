@@ -115,12 +115,16 @@ void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, c
 
 
 
-QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* /*errors*/, const bool* paramsFix, int runAvgWidth, int residualHistogramBins) const {
+QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins) const {
     int fitparamN=0;
     const int pcount=paramCount();
+    QVector<double> fitp, fitpe;
     for (int i=0; i<pcount; i++) {
         if (isParameterVisible(i, fullParams) && (!paramsFix[i]) && getDescription(i).fit) {
             fitparamN++;
+            fitp<<fullParams[i];
+            fitpe<<errors[i];
+
         }
     }
 
@@ -129,7 +133,11 @@ QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, 
         model[i]=evaluate(tauvals[i], fullParams);
     }*/
 
-    return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins);
+    if (fitp.data() && fitpe.data()) {
+        return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins, fitp.data(), fitpe.data());
+    } else {
+        return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins);
+    }
 }
 
 

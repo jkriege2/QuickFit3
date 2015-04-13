@@ -483,6 +483,9 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
     virtual QString getParameterID(int model, int param) const;
 
     virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value, double error);
+
+        virtual void setFitResultFitStatistics(QFRawDataRecord *record, const QString &index, const QFFitStatistics &result, const QString &prefix, const QString &group);
+
 signals:
         
     public slots:

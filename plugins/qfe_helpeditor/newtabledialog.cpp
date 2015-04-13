@@ -63,7 +63,9 @@ QString NewTableDialog::insertText() const
                 QString t=tr("col%1").arg(c+1);
                 if (ui->chkHBold->isChecked()) t=QString("<b>%1</b>").arg(t);
                 if (ui->cmbHCol->currentColor()!=QColor(Qt::transparent)) {
-                    rs+=QString("    <th bgcolor=\"%2\">%1</th>\n").arg(t).arg(ui->cmbHCol->currentColor().name());
+                    QString c=ui->cmbHCol->currentColor().name();
+                    if (c.size()==6) c="#"+c;
+                    rs+=QString("    <th bgcolor=\"%2\">%1</th>\n").arg(t).arg(c);
                 } else {
                     rs+=QString("    <th>%1</th>\n").arg(t);
                 }

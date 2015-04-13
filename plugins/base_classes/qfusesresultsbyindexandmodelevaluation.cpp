@@ -100,6 +100,11 @@ int QFUsesResultsByIndexAndModelEvaluation::getModelCount() const
     return getModelCount(getHighlightedRecord(), getCurrentIndex());
 }
 
+void QFUsesResultsByIndexAndModelEvaluation::setFitResultFitStatistics(QFRawDataRecord *record, int index, int model, const QFFitStatistics &result, const QString& prefix, const QString& group)
+{
+    setFitResultFitStatistics(record, getEvaluationResultID(index, model), result, prefix, group);
+}
+
 
 
 void QFUsesResultsByIndexAndModelEvaluation::setFitResultGroup(QFRawDataRecord *r, int index, int model, const QString &parameterID, const QString &group) {

@@ -1099,43 +1099,13 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 } else {
                     txtFit+=txtFit+tr("<div style=\"border-style:solid\"><b>Fit Result Message:</b><center>not fit yet</center></div><br>");
                 }
-                txtFit+=QString("<b>%1</b><cebter>").arg(tr("Fit Statistics:"));
-                txtFit+=QString("<table border=\"0\" width=\"95%\">");
-                //txtFit+=QString("<tr><td align=\"right\"></td><td align=\"left\"></td><td align=\"right\"></td><td align=\"left\"></td></tr>");
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
-                                "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fit_stat.residSqrSum).arg(fit_stat.residWeightSqrSum);
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\">&lang;E&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
-                                "<td align=\"right\" valign=\"bottom\"> &lang;E&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fit_stat.residAverage).arg(fit_stat.residWeightAverage);
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\">&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
-                                "<td align=\"right\" valign=\"bottom\"> &radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fit_stat.residStdDev).arg(fit_stat.residWeightStdDev);
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\">NP =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td></td>"
-                                "<td align=\"right\" valign=\"bottom\">NR =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fit_stat.fitparamN).arg(fit_stat.dataSize);
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\">DF =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td></td>"
-                                "<td align=\"right\" valign=\"bottom\"></td><td align=\"left\" valign=\"bottom\"></td>"
-                                "</tr>").arg(fit_stat.degFreedom);
-                txtFit+=QString("<tr>"
-                                "<td align=\"right\" valign=\"bottom\">TSS  =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                                "<td></td>"
-                                "<td align=\"right\" valign=\"bottom\">R<sup>2</sup> =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fit_stat.TSS).arg(fit_stat.Rsquared);
+                txtFit+=QString("<b>%1</b><center>").arg(tr("Fit Statistics:"));
+
+                txtFit+=fit_stat.getAsHTMLTable();
+
                 //qDebug()<<"    l "<<t.elapsed()<<" ms";
                 t.start();
 
-                txtFit+=QString("</table><br><font size=\"-1\"><i>Legend:</i>: &chi;<sup>2</sup>: sum error square, &lang;E&rang;: residual average, &radic;&lang;E2&rang;: residual stddev., <br>NP: number of fit parameters, NR: number of residuals, <br>DF: degrees of freedom, R<sup>2</sup>: coefficient of determination, <br>TSS: total sum of squares</font>");
                 txtFit+=QString("</center></font>");
                 fitStatisticsReport=txtFit;
                 txtFitStatistics->setHtml(txtFit);

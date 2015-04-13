@@ -312,6 +312,87 @@ void QFUsesResultsEvaluation::setFitResultValue(QFRawDataRecord *r, const QStrin
     }
 }
 
+void QFUsesResultsEvaluation::setFitResultFitStatistics(QFRawDataRecord *record, const QString &evalID, const QFFitStatistics &result, const QString &prefix, const QString &group)
+{
+    QString param="";
+    setFitResultValue(record, evalID, param=prefix+"chisquared", result.residSqrSum, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+
+    setFitResultValue(record, evalID, param=prefix+"chisquared_weighted", result.residWeightSqrSum, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+
+    setFitResultValue(record, evalID, param=prefix+"residavg", result.residAverage, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("residual average"), QString("&lang;E&rang;"));
+
+    setFitResultValue(record, evalID, param=prefix+"residavg_weighted", result.residWeightAverage, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
+
+    setFitResultValue(record, evalID, param=prefix+"residstddev", result.residStdDev, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
+
+    setFitResultValue(record, evalID, param=prefix+"residstddev_weighted", result.residWeightStdDev, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
+
+    setFitResultValue(record, evalID, param=prefix+"fitparams", result.fitparamN, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("fit params"));
+
+    setFitResultValue(record, evalID, param=prefix+"datapoints", result.dataSize, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("datapoints"));
+
+    setFitResultValue(record, evalID, param=prefix+"dof", result.degFreedom, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("degrees of freedom"));
+
+    setFitResultValue(record, evalID, param=prefix+"r2", result.Rsquared, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("R squared"), tr("R<sup>2</sup>"));
+
+    setFitResultValue(record, evalID, param=prefix+"adjusted_r2", result.AdjustedRsquared, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub>"));
+
+    setFitResultValue(record, evalID, param=prefix+"tss", result.TSS, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("total sum of squares"));
+
+
+    setFitResultValue(record, evalID, param=prefix+"r2_weighted", result.RsquaredWeighted, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("weighted R squared"), tr("R<sup>2</sup> (weighted)"));
+
+    setFitResultValue(record, evalID, param=prefix+"adjusted_r2_weighted", result.AdjustedRsquaredWeighted, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("weighted adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub> (weighted)"));
+
+    setFitResultValue(record, evalID, param=prefix+"aicc", result.AICc, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("Akaike's information criterion"), tr("AICc"));
+
+    setFitResultValue(record, evalID, param=prefix+"aicc_weighted", result.AICcWeighted, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("weighted Akaike's information criterion"), tr("AICc (weighted)"));
+
+    setFitResultValue(record, evalID, param=prefix+"bic", result.BIC, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("Bayesian information criterion"), tr("BIC"));
+
+    setFitResultValue(record, evalID, param=prefix+"bic_weighted", result.BICweighted, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("weighted Bayesian information criterion"), tr("BIC (weighted)"));
+
+    setFitResultValue(record, evalID, param=prefix+"max_rel_param_error", result.maxRelParamError, 0.0);
+    setFitResultGroup(record, evalID, param, group);
+    setFitResultLabel(record, evalID, param, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
+}
+
 void QFUsesResultsEvaluation::setFitResultError(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double error) {
     if (r!=NULL) {
         r->resultsSetNumberErrorError(transformResultID(resultID), getFitParamID(parameterID), error);

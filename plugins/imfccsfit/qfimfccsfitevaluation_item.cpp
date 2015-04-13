@@ -1757,72 +1757,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
                     {
                         QFFitStatistics fit_stat= dfd.ffunc->calcFitStatistics(dfd.N, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_low, dfd.cut_up, params, errors, dfd.paramsFix, 11, 25);
 
-                        QString group=tr("fit statistics");
-                        if (run<0) record->resultsSetNumber(evalID, param="fitstat_chisquared", fit_stat.residSqrSum);
-                        else {
-                            record->resultsSetInNumberListAndBool(evalID, param="fitstat_chisquared", run, fit_stat.residSqrSum, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
-
-                        if (run<0) record->resultsSetNumber(evalID, param="fitstat_chisquared_weighted", fit_stat.residWeightSqrSum);
-                        else {
-                            record->resultsSetInNumberListAndBool(evalID, param="fitstat_chisquared_weighted", run, fit_stat.residWeightSqrSum, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
-
-                        if (run<0) record->resultsSetNumber(evalID, param="fitstat_residavg", fit_stat.residAverage);
-                        else {
-                            record->resultsSetInNumberListAndBool(evalID, param="fitstat_residavg", run, fit_stat.residAverage, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("residual average"), QString("&lang;E&rang;"));
-
-                        if (run<0) record->resultsSetNumber(evalID, param="fitstat_residavg_weighted", fit_stat.residWeightAverage);
-                        else {
-                            record->resultsSetInNumberListAndBool(evalID, param="fitstat_residavg_weighted", run, fit_stat.residWeightAverage, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
-
-                        if (run<0) record->resultsSetNumber(evalID, param="fitstat_residstddev", fit_stat.residStdDev);
-                        else {
-                            record->resultsSetInNumberListAndBool(evalID, param="fitstat_residstddev", run, fit_stat.residStdDev, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
-
-                        if (run<0) record->resultsSetNumber(evalID, param="fitstat_residstddev_weighted", fit_stat.residWeightStdDev);
-                        else {
-                            record->resultsSetInNumberListAndBool(evalID, param="fitstat_residstddev_weighted", run, fit_stat.residWeightStdDev, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
-
-                        if (run<0) record->resultsSetInteger(evalID, param="fitstat_fitparams", fit_stat.fitparamN);
-                        else {
-                            record->resultsSetInIntegerListAndBool(evalID, param="fitstat_fitparams", run, fit_stat.fitparamN, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("fit params"));
-
-                        if (run<0) record->resultsSetInteger(evalID, param="fitstat_datapoints", fit_stat.dataSize);
-                        else {
-                            record->resultsSetInIntegerListAndBool(evalID, param="fitstat_datapoints", run, fit_stat.dataSize, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("datapoints"));
-
-                        if (run<0) record->resultsSetInteger(evalID, param="fitstat_dof", fit_stat.degFreedom);
-                        else {
-                            record->resultsSetInIntegerListAndBool(evalID, param="fitstat_dof", run, fit_stat.degFreedom, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("degrees of freedom"));
-
-                        if (run<0) record->resultsSetNumber(evalID, param="fitstat_r2", fit_stat.Rsquared);
-                        else {
-                            record->resultsSetInNumberListAndBool(evalID, param="fitstat_r2", run, fit_stat.Rsquared, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("R squared"), tr("R<sup>2</sup>"));
-
-                        if (run<0) record->resultsSetNumber(evalID, param="fitstat_tss", fit_stat.TSS);
-                        else {
-                            record->resultsSetInNumberListAndBool(evalID, param="fitstat_tss", run, fit_stat.TSS, QString(""), getParamNameLocalStore(param),  true);
-                        }
-                        record->resultsSetGroupAndLabels(evalID, param, group, tr("total sum of squares"));
+                        setFitResultFitStatisticsInVector(record, evalID, run, fit_stat, "fitstat_", tr("fit statistics"));
 
                         fit_stat.free();
                     }
@@ -2121,42 +2056,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord:
                     {
                         QFFitStatistics fit_stat= dfd.ffunc->calcFitStatistics(dfd.N, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_low, dfd.cut_up, params, errors, dfd.paramsFix, 11, 25);
 
-                        QString group=tr("fit statistics");
-                        fitresult[r].fitresults[param="fitstat_chisquared"].resultsSetNumber(fit_stat.residSqrSum, "", group, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
-                        fitresult[r].fitresults[param="fitstat_chisquared_weighted"].resultsSetNumber(fit_stat.residWeightSqrSum, "", group, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
-
-                        fitresult[r].fitresults[param="fitstat_residavg"].resultsSetNumber(fit_stat.residAverage, "", group, tr("residual average"), QString("&lang;E&rang;"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
-
-                        fitresult[r].fitresults[param="fitstat_residavg_weighted"].resultsSetNumber(fit_stat.residWeightAverage, "", group, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
-                        fitresult[r].fitresults[param="fitstat_residstddev"].resultsSetNumber( fit_stat.residStdDev, "", group, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
-                        fitresult[r].fitresults[param="fitstat_residstddev_weighted"].resultsSetNumber( fit_stat.residWeightStdDev, "", group, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
-                        fitresult[r].fitresults[param="fitstat_fitparams"].resultsSetInteger(fit_stat.fitparamN, "", group, label=tr("fit params"), label, false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
-                        fitresult[r].fitresults[param="fit_datapoints"].resultsSetInteger(fit_stat.dataSize, "", group, label=tr("datapoints"), label, false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
-                        fitresult[r].fitresults[param="fitstat_dof"].resultsSetInteger(fit_stat.degFreedom, "", group, label= tr("degrees of freedom"), label, false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
-                        fitresult[r].fitresults[param="fitstat_r2"].resultsSetNumber(fit_stat.Rsquared, "", group, tr("R squared"), tr("R<sup>2</sup>"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
-                        fitresult[r].fitresults[param="fitstat_tss"].resultsSetNumber(fit_stat.TSS, "", group, label= tr("total sum of squares"), label, false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
-
+                        setFitResultFitStatisticsInResultStore(fitresult[r], fit_stat, tr("fit statistics"), "fitstat_");
 
                         fit_stat.free();
                     }

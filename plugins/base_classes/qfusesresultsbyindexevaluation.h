@@ -279,6 +279,10 @@ class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation {
 
         virtual int getIndexMin(const QFRawDataRecord* r) const;
         virtual int getIndexMax(const QFRawDataRecord* r) const;
+
+
+
+        virtual void setFitResultFitStatistics(QFRawDataRecord *record, int index, const QFFitStatistics &result, const QString &prefix, const QString &group) ;
     protected:
         /** \brief write object contents into XML file
          *
@@ -292,6 +296,7 @@ class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation {
         int currentIndex;
 
     public:
+        using QFUsesResultsEvaluation::setFitResultFitStatistics;
         using QFUsesResultsEvaluation::hasResults;
         using QFUsesResultsEvaluation::getEvaluationResultID;
         using QFUsesResultsEvaluation::setFitResultGroup;

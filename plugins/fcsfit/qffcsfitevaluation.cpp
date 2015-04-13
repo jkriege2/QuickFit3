@@ -804,51 +804,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFunction
 
                 {
                     QFFitStatistics result= ffunc->calcFitStatistics(N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25);
-
-                    record->resultsSetNumber(evalID, param="fitstat_chisquared", result.residSqrSum);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
-
-                    record->resultsSetNumber(evalID, param="fitstat_chisquared_weighted", result.residWeightSqrSum);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
-
-                    record->resultsSetNumber(evalID, param="fitstat_residavg", result.residAverage);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("residual average"), QString("&lang;E&rang;"));
-
-                    record->resultsSetNumber(evalID, param="fitstat_residavg_weighted", result.residWeightAverage);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
-
-                    record->resultsSetNumber(evalID, param="fitstat_residstddev", result.residStdDev);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
-
-                    record->resultsSetNumber(evalID, param="fitstat_residstddev_weighted", result.residWeightStdDev);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
-
-                    record->resultsSetInteger(evalID, param="fitstat_fitparams", result.fitparamN);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("fit params"));
-
-                    record->resultsSetInteger(evalID, param="fitstat_datapoints", result.dataSize);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("datapoints"));
-
-                    record->resultsSetInteger(evalID, param="fitstat_dof", result.degFreedom);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("degrees of freedom"));
-
-                    record->resultsSetNumber(evalID, param="fitstat_r2", result.Rsquared);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("R squared"), tr("R<sup>2</sup>"));
-
-                    record->resultsSetNumber(evalID, param="fitstat_tss", result.TSS);
-                    record->resultsSetGroup(evalID, param, tr("fit statistics"));
-                    record->resultsSetLabel(evalID, param, tr("total sum of squares"));
-
+                    record->resultsSetFitStatistics(result, evalID, "fitstat_", tr("fit statistics"));
                     result.free();
                 }
 

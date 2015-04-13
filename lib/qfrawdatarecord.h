@@ -39,6 +39,7 @@
 #include <QReadLocker>
 #include <QWriteLocker>
 #include <QReadWriteLock>
+#include "qfmathtools.h"
 
 
 class QDomElement; // forward
@@ -728,29 +729,30 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                     fitresults[resultID].resultsSetSortPriority(pr);
                 }
 
-                inline void resultsSetNumberErrorAndBool(const QString& resultID, double value, double error, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
+                inline void resultsSetNumberErrorAndBool(const QString& resultID, double value, double error, const QString& unit, const QString& resultBoolName, bool boolValue=true, bool writeBoolValue=true) {
                     fitresults[resultID].resultsSetNumberError(value, error, unit);
-                    fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                    if (writeBoolValue) fitresults[resultBoolName].resultsSetBoolean(boolValue);
                 }
 
-                inline void resultsSetNumberAndBool(const QString& resultID, double value, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
+                inline void resultsSetNumberAndBool(const QString& resultID, double value, const QString& unit, const QString& resultBoolName, bool boolValue=true, bool writeBoolValue=true) {
                     fitresults[resultID].resultsSetNumber(value,  unit);
-                    fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                    if (writeBoolValue) fitresults[resultBoolName].resultsSetBoolean(boolValue);
                 }
-                inline void resultsSetIntegerAndBool(const QString& resultID, qlonglong value, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
+                inline void resultsSetIntegerAndBool(const QString& resultID, qlonglong value, const QString& unit, const QString& resultBoolName, bool boolValue=true, bool writeBoolValue=true) {
                     fitresults[resultID].resultsSetInteger(value,  unit);
-                    fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                    if (writeBoolValue) fitresults[resultBoolName].resultsSetBoolean(boolValue);
                 }
-                inline void resultsSetStringAndBool(const QString& resultID, const QString& value, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
+                inline void resultsSetStringAndBool(const QString& resultID, const QString& value, const QString& unit, const QString& resultBoolName, bool boolValue=true, bool writeBoolValue=true) {
                     fitresults[resultID].resultsSetString(value);
-                    fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                    if (writeBoolValue) fitresults[resultBoolName].resultsSetBoolean(boolValue);
                     Q_UNUSED(unit);
                 }
-                inline void resultsSetBooleanAndBool(const QString& resultID, bool value, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
+                inline void resultsSetBooleanAndBool(const QString& resultID, bool value, const QString& unit, const QString& resultBoolName, bool boolValue=true, bool writeBoolValue=true) {
                     fitresults[resultID].resultsSetBoolean(value);
-                    fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                    if (writeBoolValue) fitresults[resultBoolName].resultsSetBoolean(boolValue);
                     Q_UNUSED(unit);
                 }
+
 
         };
 
@@ -962,6 +964,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsSet(const QString& evaluationName, const QMap<QString, evaluationResult>& results);
         /** \brief set/add the results in \a results, ignoring the given rdr, assuming that all results shall be given in this RDR! */
         void resultsSet(const QFFitFitResultsStore& results, bool setGroupProps=true);
+
+
+        void resultsSetFitStatistics(const QFFitStatistics& result, const QString &evalID, const QString &prefix=QString("fitstat_"), const QString &group=QString("fit statistics"));
+
+
+
         /** \brief return a specified result  */
         evaluationResult resultsGet(const QString& evalName, const QString& resultName) const;
 

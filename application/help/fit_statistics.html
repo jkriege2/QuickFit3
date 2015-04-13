@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Data Fitting: Explanation of Fit Statistics</title>
+
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+
+<h2>Introduction</h2>
+
+     <p>QuickFit outputs a variety of fit statistics, that allow to evaluate the goodnes of fit (GoF). All of these parameters are 
+calculated for the range of $(K=k_1-k_0+1)$ datapoints $( (\tilde{\tau}_k, \tilde{g}_k, \tilde{\sigma}_k),\ \ k\in [k_0 .. k_1] )$ (here given for the example of FCS/FCCS fitting, where $(\tilde{\tau}_k, \tilde{g}_k)$ are the points in the fitted correlation curve and $(\tilde{\sigma}_k)$ are the uncertainties/errors of the curve, which are used for fit weighting). </p>
+
+<h2>Fit Statistics</h2>
+
+<h3>Residuals</h3>
+<p>First we define from these datapoints the <b>residuals</b> $[ \tilde{E}_k=\tilde{g}_k-g(\tilde{\tau}_k, \vec{p}) ]$ and <b>weighted residuals</b> $[ \tilde{E}_{\text{weighted},k}=\frac{\tilde{g}_k-g(\tilde{\tau}_k, \vec{p})}{\tilde{\sigma}_k^2}. ]$ Starting from these residuals, we can deifne advanced statistical measures, which are described in the following (the weighted variants use $(\tilde{E}_{\text{weighted},k})$ instead of $(\tilde{E}_k)$).<p>
+<p>
+The following images show a bad and a good fit to a dataset (an FCS measureemnt of a mixture of QDot-525 [slow] and Alexa488 [fast] with a fit of 1 or 2 diffusing components) together with the residuals:
+<center><a name="fit_statistics_pic001"><img src="./pic/fit_statistics_pic001.png" border="1">
+<a name="fit_statistics_pic002"><img src="./pic/fit_statistics_pic002.png" border="1">
+</center>
+As can be seen, in the bad fit still contains certain structures in the residuals, that point to the fact, that additional parameters are required.
+</p>
+
+
+<h3>Sum of Squared Residuals (RSS)</h3>
+<p>
+<b>sum of squared resdiuals</b> (sometimes also called the <b>residual sum of squares</b>, $(\mbox{RSS})$): 
+$$bmath: \mbox{RSS}\ \equiv\ \chi^2 = \sum_{k=k_0}^{k_1}\tilde{E}_k^2 $$
+$$bmath: \mbox{RSS}_{\text{weighted}}\ \equiv\ \chi_{\text{weighted}}^2\  =\  \sum_{k=k_0}^{k_1}\tilde{E}_{\text{weighted},k}^2 $$
+$$startbox_note$$
+The better a model fits, the lower its RSS. But the RSS does not penalize the number of parameters in the model, so e.g. inceasing the number of components in a FCS fit model will always improve the fit, although this at one point certainly overfits the data. Therefore you should use other criteria (e.g. the AIC or BIC, see below) for model selection.
+$$endbox$$
+</p>
+
+<h3>Residual Average</h3>
+<p>
+<b>residual average:</b>
+$$bmath: \langle E\rangle\ =\  \frac{1}{K}\cdot\sum_{k=k_0}^{k_1}\tilde{E}_{k} $$
+$$bmath: \langle E_{\text{weighted}}\rangle\ =\  \frac{1}{K}\cdot\sum_{k=k_0}^{k_1}\tilde{E}_{\text{weighted},k} $$
+$$note:The residual average should be as close to 0, as possible. If it deviates from 0, the fit lies systematically above or below the data.$$
+</p>
+
+<h3>Residual Standard Deviation</h3>
+<p>
+<b>residual standard deviation:</b>
+$$bmath: \sqrt{\langle E^2\rangle}\ =\  \sqrt{ \frac{1}{K}\cdot\sum_{k=k_0}^{k_1}\tilde{E}_{k}^2 - \frac{1}{K^2}\cdot\left[\sum_{k=k_0}^{k_1}\tilde{E}_{k}\right]^2 }\ =\ \sqrt{ \left\langle\left[\tilde{E}_{k}-\langle E\rangle\right]^2\right\rangle} $$
+$$bmath: \sqrt{\langle E_{\text{weighted}}^2\rangle}\ =\  \sqrt{ \frac{1}{K}\cdot\sum_{k=k_0}^{k_1}\tilde{E}_{\text{weighted},k}^2 - \frac{1}{K^2}\cdot\left[\sum_{k=k_0}^{k_1}\tilde{E}_{\text{weighted},k}\right]^2 }\ =\ \sqrt{ \left\langle\left[\tilde{E}_{\text{weighted},k}-\langle E_{\text{weighted}}\rangle\right]^2\right\rangle} $$
+$$note:The residual standard deviation measures how much the residuals scatter around the model, or how much the model deviates on average from the single measured datapoints. If the data is ideal, this measure should be 0.$$
+</p>
+
+<h3>Coefficient of Determination R<sup>2</sup></h3>
+<p><ul>
+<li><b>total sum of squares (TSS):</b>
+$$bmath: TSS\  =\  \langle g^2\rangle\ =\  K\cdot\sum_{k=k_0}^{k_1}\tilde{g}_{k}^2 - \frac{1}{K}\cdot\left[\sum_{k=k_0}^{k_1}\tilde{g}_{k}\right]^2 $$
+</li>
+<li><b>number of fit parameters</b> $(\mbox{NP})$: number of free parameters in the parameter vector $( \vec{p})$ of the model $( g(\tilde{\tau}_k, \vec{p}) )$</li>
+<li><b>number of datapoints</b> $[\mbox{NR}\  =\  K]$</li>
+<li><b>degrees of freedom</b> $[ \mbox{DF}\ =\  \mbox{NR}-\mbox{NP}-1]$</li>
+</ul>
+With these we can define<ul>
+<li><b>coefficient of determination</b> 
+$$bmath: R^2\ =\ 1-\frac{\mbox{RSS}}{\mbox{TSS}} \ =\ 1-\frac{\chi^2}{\langle g^2\rangle} $$
+</li>
+<li><b>adjusted coefficient of determination</b> (takes into account the number of degrees of freedom of a model) 
+$$bmath: R_\text{adjusted}^2\ =\ 1-\frac{\frac{\mbox{RSS}}{\mbox{NR}-\mbox{NP}}}{\frac{\mbox{TSS}}{\mbox{NR}-1}} $$
+</li>
+</ul>
+$$startbox_note$$
+The $(R^2)$ is a measure of GoF, which relates the deviation (green) of the data (blue) from the model (red, left) to the deviation of the data from its average (red, right):
+<center><a name="fit_statistics_pic000"><img src="./pic/fit_statistics_pic000.png" border="1">
+</center>
+Ideally this parameter should reach $(R^2=1)$ for a very good fit and will have lower values between 0 and 1 for a worse fit. Note however, that $(R^2)$ is strictly valid only for linear fit models (linear regression), but can still pose a good guidance also for non-linear models, as e.g. usually used in FCS.
+$$endbox$$
+</p>
+
+
+
+
+<h3>Akaike's Information criterion (AICc)</h3>
+<p>The AICc is a measure that can be used for model selection. It is related to the RSS, but in addition penalizes the number of parameters in a model:$$ref:Akaike1974:Akaike H  (1974) A new look at the statistical model identification. <i>IEEE Transactions on Automatic Control</i> <b>19</b><b>:</b> 716-723 DOI: 10.1109/TAC.1974.1100705$$$$ref:Levin2004:Levin M K, Carson J H  (2004) Fluorescence correlation spectroscopy and quantitative cell biology. <i>Differentiation</i> <b>72</b><b>:</b> 1-10 DOI: 10.1111/j.1432-0436.2004.07201002.x $$$$ref:Burnham2002:
+Burnham K P, Anderson D R  (2002) Model Selection and Multimodel Inference. New York, London, Berlin: Springer$$
+$[ \mbox{AICc}\ =\ K\cdot \log_{10}\left[\frac{\mbox{RSS}}{K}\right]+2\cdot \mbox{NP}+\frac{2\cdot \mbox{NP}\cdot (\mbox{NP}+1)}{K-\mbox{NP}-1} ]$
+The version given above contains a summand (the last one), which corrects it for small sample sizes $(K)$, therefore the name AICc. 
+
+$$startbox_note$$
+The following table shows the AICc and RSS for three different fits to the example data from the start of this page:
+<center><table cellspacing="0" cellpadding="1" border="1">
+  <tr>
+    <th bgcolor="grey"><b></b></th>
+    <th bgcolor="grey"><b>1-comp+triplet</b></th>
+    <th bgcolor="grey"><b>2-comp+triplet</b></th>
+    <th bgcolor="grey"><b>3-comp+triplet</b></th>
+  </tr>
+  <tr>
+    <th bgcolor="grey"><b>RSS</b></th>
+    <td>0.00177</td>
+    <td>0.00034</td>
+    <td>0.00034</td>
+  </tr>
+  <tr>
+    <th bgcolor="grey"><b>AICc</b></th>
+    <td>-888</td>
+    <td>-1012</td>
+    <td>-1008</td>
+  </tr>
+</table></center>
+As can be seen, the 2- and 3-component model are equal, when looking at the RSS, but the 2-component model should be favored over the 3-components, based on the AICc. This is due to the larger (+2) number of parameters in that model, which are penalized by the AICc
+$$endbox$$
+</p>
+
+<h3>Bayesian Information criterion (BIC)</h3>
+<p>The BIC (as well as the AICc) is a measure that can be used for model selection. It is related to the AICc and the RSS. All the same as the AICc, it penalizes the number of parameters NP in a model:$$ref:Schwarz1978:Schwarz G  (1978) Estimating the Dimension of a Model. <i>The Annals of Statistics</i> <b>6</b><b>:</b> 461-464 DOI: 10.1214/aos/1176344136$$$$ref:Burnham2002:
+Burnham K P, Anderson D R  (2002) Model Selection and Multimodel Inference. New York, London, Berlin: Springer$$
+$[ \mbox{BIC}\ =\ K\cdot \ln\left[\frac{\mbox{RSS}}{K}\right]+\mbox{NP}\cdot\ln\left[K\right] ]$
+
+
+$$startbox_note$$
+The following table shows the AICc, BIC and RSS for three different fits to the example data from the start of this page:
+<center><table cellspacing="0" cellpadding="1" border="1">
+  <tr>
+    <th bgcolor="grey"><b></b></th>
+    <th bgcolor="grey"><b>1-comp+triplet</b></th>
+    <th bgcolor="grey"><b>2-comp+triplet</b></th>
+    <th bgcolor="grey"><b>3-comp+triplet</b></th>
+  </tr>
+  <tr>
+    <th bgcolor="grey"><b>RSS</b></th>
+    <td>0.00177</td>
+    <td>0.00034</td>
+    <td>0.00034</td>
+  </tr>
+  <tr>
+    <th bgcolor="grey"><b>BIC</b></th>
+    <td>-2042</td>
+    <td>-2328</td>
+    <td>-2318</td>
+  </tr>
+  <tr>
+    <th bgcolor="grey"><b>AICc</b></th>
+    <td>-888</td>
+    <td>-1012</td>
+    <td>-1008</td>
+  </tr>
+</table></center>
+
+	As can be seen, the 2- and 3-component model are equal, when looking at the RSS, but the 2-component model should be favored over the 3-components, based on the BIC (or AICc). This is due to the larger (+2) number of parameters in that model, which are penalized by the BIC.
+$$endbox$$
+</p>
+
+
+
+<h3>Residual Correlation Function</h3>
+<p>Finally also the <b>residual correlation function $(\hat{\gamma}(k))$</b>,
+ i.e. the autocorrelation function of the index-ordered residuals is 
+calculated. This function gives hints on whether there are any 
+non-random structures in the fit values, which might not be visible in 
+the residuals plots: </p>
+<p class="formulaDsp">
+$$bmath: \hat{\gamma}(k)\ =\ \frac{1}{K}\cdot\sum_{i=k_0}^{k_1-k-1}(\tilde{E}_{i}-\langle E\rangle)\cdot(\tilde{E}_{i+k}-\langle E\rangle) $$
+$$startbox_note$$
+The residual correlation function (as well as the running average over the residuals) help to distinguish systematic structures in the residuals from random scattering. The following two images show the residual correlations for the two example fits at the start of this page:
+<center><a name="fit_statistics_pic003"><img src="./pic/fit_statistics_pic003.png" border="1">
+<a name="fit_statistics_pic004"><img src="./pic/fit_statistics_pic004.png" border="1">
+</center>
+
+
+$$endbox$$
+</p>
+<h3>Running Average of Residuals</h3>
+<p>The residuals are displayed together with their <b>running average</b>, 
+where the average over the 10 surrounding values is calculated: </p>
+<p class="formulaDsp">
+$$bmath: \overline{E}^{(10)}(\tilde{\tau}_k)\ =\ \frac{1}{11}\sum_{i=k-5}^{k+5}\tilde{E}_i $$
+$$startbox_note$$
+The running average over the residuals (as well as the residual correlation function) help to distinguish systematic structures in the residuals from random scattering. The images at the start of this page show the averages as thick lines in the residuals.
+$$endbox$$
+</p>
+
+
+
+<h2>References</h2>
+<p>$$references$$</p>
+
+  </body>
+</html>

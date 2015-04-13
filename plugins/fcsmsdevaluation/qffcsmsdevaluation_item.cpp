@@ -476,50 +476,9 @@ QFFitStatistics QFFCSMSDEvaluationItem::calcFitStatistics(QFRawDataRecord *recor
 
         if (record) {
             if (hasResults(record, index)) {
-                QString param="";
-                setFitResultValue(record, index, model, param="fitstat_chisquared", result.residSqrSum);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
 
-                setFitResultValue(record, index,model,  param="fitstat_chisquared_weighted", result.residWeightSqrSum);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+                setFitResultFitStatistics(record, index, model, result, "fitstat_", tr("fit statistics"));
 
-                setFitResultValue(record, index, model, param="fitstat_residavg", result.residAverage);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("residual average"), QString("&lang;E&rang;"));
-
-                setFitResultValue(record, index, model, param="fitstat_residavg_weighted", result.residWeightAverage);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
-
-                setFitResultValue(record, index, model, param="fitstat_residstddev", result.residStdDev);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
-
-                setFitResultValue(record, index, model, param="fitstat_residstddev_weighted", result.residWeightStdDev);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
-
-                setFitResultValue(record, index, model, param="fitstat_fitparams", result.fitparamN);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("fit params"));
-
-                setFitResultValue(record, index, model, param="fitstat_datapoints", result.dataSize);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("datapoints"));
-
-                setFitResultValue(record, index, model, param="fitstat_dof", result.degFreedom);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("degrees of freedom"));
-
-                setFitResultValue(record, index, model, param="fitstat_r2", result.Rsquared);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("R squared"), tr("R<sup>2</sup>"));
-
-                setFitResultValue(record, index, model, param="fitstat_tss", result.TSS);
-                setFitResultGroup(record, index, model, param, tr("fit statistics"));
-                setFitResultLabel(record, index, model, param, tr("total sum of squares"));
 
             }
         }

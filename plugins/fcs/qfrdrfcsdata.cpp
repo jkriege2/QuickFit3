@@ -2555,7 +2555,7 @@ QStringList QFRDRFCSData::getAvailableRoles() const
 
 bool QFRDRFCSData::isRoleUserEditable() const
 {
-    return  false;
+    return  true;
 }
 
 double QFRDRFCSData::getSimpleCountrateAverage(int run, int channel, bool swapChannels) const

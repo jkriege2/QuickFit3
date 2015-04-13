@@ -94,8 +94,6 @@ void QFFitResultsByIndexEvaluation::calcChi2Landscape(double *chi2Landscape, int
 
 
 
-
-
 bool QFFitResultsByIndexEvaluation::hasFit(const QFRawDataRecord *r1, int index) const {
     const QFRawDataRecord* r=r1;
     if (getFitFunction(r)==NULL) return false;
