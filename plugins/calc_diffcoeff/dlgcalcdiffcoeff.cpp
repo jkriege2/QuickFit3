@@ -30,6 +30,7 @@ DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidg
     QDialog(parent),
     ui(new Ui::DlgCalcDiffCoeff)
 {
+
     updating=false;
     userDDescriptor=tr(" (user)");
     dlgInfo=NULL;
@@ -65,6 +66,8 @@ DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidg
     readSettings();
     updateD();
     QTimer::singleShot(10000, this, SLOT(writeSettings()));
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
+
 }
 
 DlgCalcDiffCoeff::~DlgCalcDiffCoeff()
