@@ -1314,6 +1314,7 @@ void QFEvalBeadScanPSFEditor::on_btnSaveAvgROI_clicked()
                     for (int c=0; c<channels; c++) {
                         cimg_library::CImg<double> image(data->getImageStack(stack, 0, c), width, height, size_z, true);
                         cimg_library::CImg<float> roi_out((ROIxy/2+ROIxy/2+1)*supersampling, (ROIxy/2+ROIxy/2+1)*supersampling, (ROIz/2+ROIz/2+1)*supersampling);
+                        roi_out.fill(0.0);
 
                         QStringList params3D=record->resultsGetAsStringList(evalID, "fit3d_fitfunction_parameternames");
                         int posxID=params3D.indexOf("position_x");
@@ -1362,7 +1363,7 @@ void QFEvalBeadScanPSFEditor::on_btnSaveAvgROI_clicked()
 
                             }
                         }
-                        roi_out/=normSum;
+                        if (normSum>0) roi_out/=normSum;
                         if (getImageWriterIDList(QFPluginServices::getInstance()).contains(format) && !filename.isEmpty()) {
                             QFExporterImageSeries* exp=dynamic_cast<QFExporterImageSeries*>(QFPluginServices::getInstance()->getExporterManager()->createExporter(format));
                             if (exp) {
