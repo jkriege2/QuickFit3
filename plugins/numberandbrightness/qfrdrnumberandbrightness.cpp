@@ -804,6 +804,8 @@ void QFRDRNumberAndBrightnessPlugin::startWizardImageStack()
     QFWizard* wiz=new QFWizard(parentWidget);
     wiz->setWindowTitle(tr("Number and Brightness from Image Stacks Wizard"));
 
+
+
     wizAcqType=new QFComboBoxWizardPage(tr("Acquisition Type"));
     wiz->addPage(wizAcqType);
     wizAcqType->setLabel(tr("acquisition type:"));
@@ -919,6 +921,7 @@ void QFRDRNumberAndBrightnessPlugin::startWizardImageStack()
                 QApplication::processEvents();
             }
         }
+        wizFinishedFiles.clear();
 
     }
     delete wiz;
