@@ -2875,7 +2875,7 @@ ProgramOptions* MainWindow::getOptions() {
 }
 
 void MainWindow::autosaveProject() {
-    if (!project->hasChanged()) return;
+    if (!project || !project->hasChanged()) return;
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QString autosaveFilename=curFile;
     if (autosaveFilename.isEmpty()) autosaveFilename="untitled.qfp";
