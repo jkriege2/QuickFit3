@@ -50,7 +50,7 @@ $$faq_end$$
 
 
 $$faq_start$$
-  <a name="FAQ_PlotExportData"><b>How can I export the data used for a plot in QuickFit?</b>
+  <a name="FAQ_PlotExportData"><b>How can I export the graph data used for a plot in QuickFit?</b>
 $$faq_answer$$
   Most plots in QuickFit allow to access the data, which was used to generate them. You have generally several possibilities, that are all accessible in the context-menu (pops open after a right-click) of the plot:
       <ol>
@@ -60,6 +60,27 @@ $$faq_answer$$
         <li>choose <img src=":/jkqtp_showplotdata.png"> <b>Show Plot Data</b>, which opens a new window, which contains the plot data as a table</li>
         <li><a href="#FAQ_PlotTableRDR">copy the plot data to a table RDR</a>, which then contains the plot data as table.</li>
       </ol><br>
+      See also: <a href="$$qf_ui_jkqtplotter_helpfile$$">$$qf_ui_jkqtplotter_helpfiletitle$$</a>.
+$$faq_end$$
+
+
+
+
+$$faq_start$$
+  <a name="FAQ_PlotExportImage"><b>How can I get the image data (without axes etc.) from a plot in QuickFit as an image, or copy them to the clipboard?</b>
+$$faq_answer$$
+  Most plots in QuickFit allow to save the images, that they contain as pixel imagefiles (e.g. PNG/JPEG/BMP/...). Simply right-click on a plot. At the bottom of the context-menu, two submenus <b>"Save Image Plot Images ..."</b> and <b>"Copy Image Plot Images ..."</b> are visible. They contain entries for every saveable/copyable image within the plot.
+$$startbox_example$$
+If the plot (including the context-menu) looks like this:
+<center><a name="faq_pic000"><img src="./pic/faq_pic000.png" border="1">
+</center>
+Copying the right-hand sided image results in:
+<center><a name="faq_pic001"><img src="./pic/faq_pic001.png" border="1">
+</center>
+
+$$endbox$$
+$$note:If the image appears stretched in the plot, the axial ratio is not retained in the exported image ... the pixel axial ratio in an exported graphics is always 1 and the raw pixel data is saved!$$
+<br>
       See also: <a href="$$qf_ui_jkqtplotter_helpfile$$">$$qf_ui_jkqtplotter_helpfiletitle$$</a>.
 $$faq_end$$
 
