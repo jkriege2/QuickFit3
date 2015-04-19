@@ -510,7 +510,7 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(const QFRawDataRecord *r, co
             break;
     case 3:
              if (parameterID=="A") {
-                 defaultValue.value=1.0;
+                 defaultValue.value=0.0;
                  return true;
                  }
 
@@ -985,7 +985,7 @@ QString QFFCSMaxEntEvaluationItem::getParameterName(int model, int id, bool html
             if (id==4) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
                 break;
         case 3: //3D diffusion with 2 blinking components
-            if (id==0) return (html)?tr("A"):tr("A");
+            if (id==0) return (html)?tr("offset G<sub>&#x221E;</sub>"):tr("offset G_infinity");
                 break;
         case 4: //3D diffusion with 2 blinking components
             if (id==0) return (html)?tr("decay time &tau;<sub>1</sub> [&mu;s]"):tr(" decay time 1 [microseconds]");
