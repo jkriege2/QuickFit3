@@ -29,7 +29,20 @@ In those cases the online-help will explain what is not usable. Commonly all plo
 	  <li><img src=":/images/jkqtp_zoomout.png"> <b>Zoom out:</b> Zoom out of the plot</li>
 	  <li><a name="tablerdr"><img src=":/libqf3widgets/qfplotter_copytotable.png"> <b>copy plot data to table RDR:</b> This function can be used to create a <a href="$$plugin_info:help:table$$">table raw data record</a> from the current plot. The record will contain all data necessary to create the plot and the plot itself. This alows to easily save a certain plot inside the project. <br>After activating this function, a dialog will open that allows to select what data is copied and where it is copied:
                  <center><a name="jkqtplotter_pic000"><img src="./pic/jkqtplotter_pic000.png" border="1"></center>First you will have to choose, whether to add the data (and the plot) to an existing table or whether to create a new one. <br> Then you can choose a prefix, which is added to every column inserted into the table. This is especially useful, if several plots should be copied into one table, to later distinguish the different data columns.<br>Finally you can choose whether only the data should be added, or whether also the plot should be copied to the table. In the first case, the plot data will only be added to the table, in the second case, a new plot will be created, or an existing plot will be extended.
-            </li>
+      </li>
+	  <li><b>Save Image Plot Images ...:</b>  Allows to save the raw image of every image graph within the plot separately
+	  $$startbox_example$$
+If the plot (including the context-menu) looks like this:
+<center><a name="faq_pic000"><img src="./pic/faq_pic000.png" border="1">
+</center>
+Copying the right-hand sided image results in:
+<center><a name="faq_pic001"><img src="./pic/faq_pic001.png" border="1">
+</center>
+$$endbox$$
+$$note:If the image appears stretched in the plot, the axial ratio is not retained in the exported image ... the pixel axial ratio in an exported graphics is always 1 and the raw pixel data is saved!$$
+$$note:This submenu is available only if image graphs are part of the plot. If there are only normal function/data raphs, these submenus are not shown.$$
+</li>
+      <li><b>Copy Image Plot Images ...:</b>  Allows to copy the raw image of every image graph within the plot separately (cf. Save Image Plot Images" above)</li>
 	</ul>
 </p>
 <p></p>
