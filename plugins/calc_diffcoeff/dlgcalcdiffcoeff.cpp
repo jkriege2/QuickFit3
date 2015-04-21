@@ -252,7 +252,7 @@ void DlgCalcDiffCoeff::updateD() {
         DD=plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->spinGivenDInSolution->value()/1e12,
                                           lvisc, ui->spinGivenDInSolutionT->value()+273.15, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
         ui->labGivenDInSolutionD20W->setText(QString::number(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->spinGivenDInSolution->value()/1e12,
-                                                                                      lvisc, ui->spinGivenDInSolutionT->value()+273.15, 293.15, comps, ui->spinViscosityFactor->value())*1e12));
+                                                                                      lvisc, ui->spinGivenDInSolutionT->value()+273.15, 293.15, comps, 1)*1e12));
         double RH=plugin->getHydrodynRadius_from_DEtaT(ui->spinGivenDInSolution->value()/1e12, lvisc, ui->spinGivenDInSolutionT->value()+273.15);
         ui->labGivenDInSolutionRH->setText(QString::number(RH*1e9));
 
