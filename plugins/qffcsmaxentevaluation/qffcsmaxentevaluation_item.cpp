@@ -373,6 +373,7 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
                     param_vector[0]=getFitValue(record,index,model,"trip_tau")*1e-6;
                     param_vector[1]=getFitValue(record,index,model,"trip_theta");
                     param_vector[2]=getFitValue(record,index,model,"focus_struct_fac");
+                    param_vector[3]=getFitValue(record,index,model,"offset");
                     break;
             case 1: param_vector[0]=getFitValue(record,index,model,"trip_tau")*1e-6;
                     param_vector[1]=getFitValue(record,index,model,"trip_theta");
@@ -453,6 +454,10 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(const QFRawDataRecord *r, co
                 }
             if (parameterID=="focus_struct_fac") {
                 defaultValue.value=6;
+                return true;
+            }
+            if (parameterID=="offset") {
+                defaultValue.value=0.0;
                 return true;
             }
         break;
@@ -666,6 +671,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
                 case 0: param_vector[0]=getFitValue(record,index,model,"trip_tau")*1e-6;
                         param_vector[1]=getFitValue(record,index,model,"trip_theta");
                         param_vector[2]=getFitValue(record,index,model,"focus_struct_fac");
+                        param_vector[3]=getFitValue(record,index,model,"offset");
                         break;
                 // FCS 3D diffusion with 2 blinking components
                 case 1:
@@ -968,6 +974,7 @@ QString QFFCSMaxEntEvaluationItem::getParameterName(int model, int id, bool html
             if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
             if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
             if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
+            if (id==3) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G<sub>&#x221E;</sub>");
             break;
         case 1: //3D diffusion with 2 blinking components
             if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
@@ -1017,6 +1024,7 @@ QString QFFCSMaxEntEvaluationItem::getParameterUnit(int model, int id, bool html
         if (id==0) return (html)?tr("&mu;s"):tr("microseconds");
         if (id==1) return QString("");
         if (id==2) return QString("");
+        if (id==3) return QString("");
             break;
     case 1:
         if (id==0) return (html)?tr("&mu;s"):tr("microseconds");
@@ -1059,7 +1067,7 @@ QString QFFCSMaxEntEvaluationItem::getParameterUnit(int model, int id, bool html
 int QFFCSMaxEntEvaluationItem::getParameterCount(int model) const {
     switch (model)
     {
-        case 0: return 3;
+        case 0: return 4;
         case 1: return 6;
         case 2: return 5;
         case 3: return 1;
@@ -1079,6 +1087,7 @@ QString QFFCSMaxEntEvaluationItem::getParameterID(int model, int id) const {
         if (id==0) return tr("trip_tau");
         if (id==1) return tr("trip_theta");
         if (id==2) return tr("focus_struct_fac");
+        if (id==3) return tr("offset");
         break;
     case 1:
         if (id==0) return tr("trip_tau");

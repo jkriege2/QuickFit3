@@ -101,6 +101,15 @@ void MaxEntB040::setData(const double* taus, const double* correlation,\
     ///// model specific transformation of the ydata //////////
     switch (model)
     {
+        case 0:{
+                const double offset=param_list[3];
+                for (int i=0;i<m_Nd;i++)
+                {
+                    m_ydata(i)=m_ydata(i)-offset;
+                }
+
+            }
+            break;
         case 1:{
                 const double offset=param_list[5];
                 for (int i=0;i<m_Nd;i++)
@@ -110,8 +119,53 @@ void MaxEntB040::setData(const double* taus, const double* correlation,\
 
             }
             break;
+        case 2:{
+                const double offset=param_list[4];
+                for (int i=0;i<m_Nd;i++)
+                {
+                    m_ydata(i)=m_ydata(i)-offset;
+                }
+
+            }
+            break;
         case 3:{
                 const double offset=param_list[0];
+                //qDebug()<<"correct for DLS, offset="<<offset;
+                for (int i=0;i<m_Nd;i++)
+                {
+                    m_ydata(i)=sqrt(m_ydata(i)-offset);
+                    if (!QFFloatIsOK(m_ydata(i))) m_ydata(i)=0;
+                    //qDebug()<<i<<m_ydata(i);
+                }
+
+            }
+            break;
+        case 4:{
+                const double offset=param_list[5];
+                //qDebug()<<"correct for DLS, offset="<<offset;
+                for (int i=0;i<m_Nd;i++)
+                {
+                    m_ydata(i)=sqrt(m_ydata(i)-offset);
+                    if (!QFFloatIsOK(m_ydata(i))) m_ydata(i)=0;
+                    //qDebug()<<i<<m_ydata(i);
+                }
+
+            }
+            break;
+        case 5:{
+                const double offset=param_list[2];
+                //qDebug()<<"correct for DLS, offset="<<offset;
+                for (int i=0;i<m_Nd;i++)
+                {
+                    m_ydata(i)=sqrt(m_ydata(i)-offset);
+                    if (!QFFloatIsOK(m_ydata(i))) m_ydata(i)=0;
+                    //qDebug()<<i<<m_ydata(i);
+                }
+
+            }
+            break;
+        case 6:{
+                const double offset=param_list[1];
                 //qDebug()<<"correct for DLS, offset="<<offset;
                 for (int i=0;i<m_Nd;i++)
                 {
@@ -293,6 +347,7 @@ void MaxEntB040::setTmatrix(){
         m_tripTau=m_paramStore(0);
         m_tripTheta=m_paramStore(1);
         m_kappa=m_paramStore(2);
+        offset=m_paramStore(3);
 
 
 
@@ -325,7 +380,7 @@ void MaxEntB040::setTmatrix(){
                     {
                         value=(1.0/((1.0+m_xdata(i)/(m_taudiffs(j)))))*\
                         (1.0/(sqrt(1.0+m_xdata(i)/(m_taudiffs(j)*m_kappa*m_kappa))));
-                        m_T(i,j)=tripFactor*value+offset;
+                        m_T(i,j)=tripFactor*value;
                     }
             }
 
@@ -345,7 +400,7 @@ void MaxEntB040::setTmatrix(){
                     {
                         value=(1.0/((1.0+m_xdata(i)/(m_taudiffs(j)))));
                         ///////////////////////////////////////////////////////////////////////////////////////////
-                        m_T(i,j)=tripFactor*value+offset; // this offset that is added here should still be changed
+                        m_T(i,j)=tripFactor*value; // this offset that is added here should still be changed
                         ///////////////////////////////////////////////////////////////////////////////////////////
                     }
             }
@@ -629,6 +684,7 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
                 trip_tau=param_list[0];
                 trip_theta=param_list[1];
                 N_particle=1;
+                offset=param_list[3];
 
                 for (uint32_t i=0; i<N; i++) {
                     trip_factor=(1.0-trip_theta+trip_theta*exp(-taus[i]/trip_tau))/(1.0-trip_theta);
@@ -642,7 +698,7 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
                     } else {
                         sum=1.0/double(N);
                     }
-                    modelEval[i]=sum/N_particle*trip_factor;
+                    modelEval[i]=offset+sum/N_particle*trip_factor;
                 }
                 break;
 
