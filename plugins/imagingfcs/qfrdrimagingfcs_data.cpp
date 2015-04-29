@@ -40,8 +40,9 @@
 //#define DEBUG_TIMING
 
 QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
-    QFRawDataRecord(parent)
+    QFRawDataRecord(parent), QFRDRAnnotationTools(this, true)
 {
+    annotSetRDR(this);
     //m_dualview=QFRDRImagingFCSData::dvNone;
     role="correlation";
     correlations=NULL;

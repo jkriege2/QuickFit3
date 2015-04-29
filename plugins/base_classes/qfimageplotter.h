@@ -26,6 +26,7 @@
 #include <QWidget>
 
 #include "qfplotter.h"
+#include "qfrdrannotationinterface.h"
 
 class JKQTPMathImage; //forward
 class JKQTPOverlayImageEnhanced; //forward
@@ -59,7 +60,7 @@ class QFImagePlotter : public QFPlotter
         void saveImageSettings();
     public slots:
         void updatePlot();
-        void updateImage(double* data, bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, int width, int height, const QString& label, bool deleteData=false, bool clearDatastore=false);
+        void updateImage(double* data, bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, int width, int height, const QString& label, bool deleteData=false, bool clearDatastore=false, QFRDRAnnotationInterface* annotations=NULL, int annotID=-1, QColor annotColor=QColor("yellow"));
         void updateOverlays(double* avgOut=NULL, double* sdOut=NULL);
         void updateOverlays(bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, double* avgOut=NULL, double* sdOut=NULL);
         void setDisplayOverlay(bool displayOverlay, double* avgOut=NULL, double* sdOut=NULL);
@@ -90,6 +91,9 @@ class QFImagePlotter : public QFPlotter
         JKQTPOverlayImageEnhanced* plteImageSelected;
         /** \brief plot for the excluded runs in pltImage, plot plteImageSelectedData */
         JKQTPOverlayImageEnhanced* plteImageExcluded;
+
+        QList<JKQTPgraph*> plteAnnotations;
+
 
         bool displayOverlay;
         bool displayMask;

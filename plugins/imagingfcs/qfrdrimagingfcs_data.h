@@ -50,15 +50,16 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrrunselectiontools.h"
 #include "qfrdrimagemasktools.h"
 #include "qfrdrimagetoruninterface.h"
+#include "qfrdrannotationtools.h"
 
 
 /*! \brief QFRawDataRecord implementation
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDRAdditionalImagesInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface, public QFRDRRunSelectionTools, public QFRDRImageMaskTools {
+class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDRAdditionalImagesInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface, public QFRDRRunSelectionTools, public QFRDRImageMaskTools, public QFRDRAnnotationTools {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDRAdditionalImagesInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface QFRDRImageSelectionInterface QFRDRRunSelectionsInterface QFRDRImageMaskInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDRAdditionalImagesInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface QFRDRImageSelectionInterface QFRDRRunSelectionsInterface QFRDRImageMaskInterface QFRDRAnnotationInterface)
     public:
         enum DualViewMode {
             dvNone=0,

@@ -171,7 +171,7 @@ void QFImagePlotter::updateImage()
     QApplication::restoreOverrideCursor();
 }
 
-void QFImagePlotter::updateImage(double *data, bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, int width, int height, const QString& label, bool deleteData, bool clearDatastore)
+void QFImagePlotter::updateImage(double *data, bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, int width, int height, const QString& label, bool deleteData, bool clearDatastore, QFRDRAnnotationInterface *annotations, int annotID, QColor annotColor)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool draw=get_doDrawing();
@@ -196,9 +196,97 @@ void QFImagePlotter::updateImage(double *data, bool *plteOverviewSelectedData, b
     plteImageLabel=label;
 
 
+    for (int i=0; i<plteAnnotations.size(); i++) {
+        deleteGraph(plteAnnotations[i], true);
+    }
+    plteAnnotations.clear();
+
+
 
     updatePlot();
     setCopyableData();
+    if (annotations) {
+        if (annotID<0 || annotID>=annotations->annotGetCount()) {
+            for (int i=0; i<annotations->annotGetCount(); i++) {
+                if (annotations->annotGetType(i)) {
+                    switch (annotations->annotGetType(i)) {
+                        case QFRDRAnnotationInterface::annotKategoryIndex:{
+                                QVector<double> ax,ay,ac, adat;
+                                QVector<bool> aset;
+                                adat=annotations->annotGetValues(i);
+                                aset=annotations->annotGetValuesSet(i);
+                                int j=0;
+                                for (int y=0; y<height; y++) {
+                                    for (int x=0; x<width; x++) {
+                                        if (j<adat.size() && aset.value(j, false) && adat.value(j, 0)>0) {
+                                            ax<<x;
+                                            ay<<y;
+                                            ac<<adat.value(j, 0);
+                                        }
+                                        j++;
+                                    }
+                                }
+                                JKQTPxyParametrizedScatterGraph* plt=new JKQTPxyParametrizedScatterGraph(get_plotter());
+                                int sx=getDatastore()->getColumnNum(QString("annotation%1_x").arg(i));
+                                if (sx<0) sx=getDatastore()->addCopiedColumn(ax.data(), ax.size(), QString("annotation%1_x").arg(i));
+                                else getDatastore()->getColumn(sx).copy(ax.data(), ax.size());
+                                int sy=getDatastore()->getColumnNum(QString("annotation%1_y").arg(i));
+                                if (sy<0) sy=getDatastore()->addCopiedColumn(ay.data(), ay.size(), QString("annotation%1_y").arg(i));
+                                else getDatastore()->getColumn(sy).copy(ay.data(), ay.size());
+                                int sc=getDatastore()->getColumnNum(QString("annotation%1_category").arg(i));
+                                if (sc<0) sc=getDatastore()->addCopiedColumn(ac.data(), ac.size(), QString("annotation%1_category").arg(i));
+                                else getDatastore()->getColumn(sc).copy(ac.data(), ac.size());
+                                plt->set_symbolColumn(sc);
+                                plt->set_color(annotColor);
+                                plt->set_title(annotations->annotGetLabel(i));
+                                plteAnnotations.append(plt);
+                            }
+                            break;
+                        default: break;
+                    }
+                }
+            }
+        } else {
+            int i=annotID;
+            switch (annotations->annotGetType(i)) {
+                case QFRDRAnnotationInterface::annotKategoryIndex:{
+                        QVector<double> ax,ay,ac, adat;
+                        QVector<bool> aset;
+                        adat=annotations->annotGetValues(i);
+                        aset=annotations->annotGetValuesSet(i);
+                        int j=0;
+                        for (int y=0; y<height; y++) {
+                            for (int x=0; x<width; x++) {
+                                if (j<adat.size() && aset.value(j, false) && adat.value(j, 0)>0) {
+                                    ax<<x;
+                                    ay<<y;
+                                    ac<<adat.value(j, 0);
+                                }
+                                j++;
+                            }
+                        }
+                        JKQTPxyParametrizedScatterGraph* plt=new JKQTPxyParametrizedScatterGraph(get_plotter());
+                        int sx=getDatastore()->getColumnNum(QString("annotation%1_x").arg(i));
+                        if (sx<0) sx=getDatastore()->addCopiedColumn(ax.data(), ax.size(), QString("annotation%1_x").arg(i));
+                        else getDatastore()->getColumn(sx).copy(ax.data(), ax.size());
+                        int sy=getDatastore()->getColumnNum(QString("annotation%1_y").arg(i));
+                        if (sy<0) sy=getDatastore()->addCopiedColumn(ay.data(), ay.size(), QString("annotation%1_y").arg(i));
+                        else getDatastore()->getColumn(sy).copy(ay.data(), ay.size());
+                        int sc=getDatastore()->getColumnNum(QString("annotation%1_category").arg(i));
+                        if (sc<0) sc=getDatastore()->addCopiedColumn(ac.data(), ac.size(), QString("annotation%1_category").arg(i));
+                        else getDatastore()->getColumn(sc).copy(ac.data(), ac.size());
+                        plt->set_symbolColumn(sc);
+                        plt->set_color(annotColor);
+                        plt->set_title(annotations->annotGetLabel(i));
+                        plteAnnotations.append(plt);
+                    }
+                    break;
+                default:
+                    break;
+
+            }
+        }
+    }
     set_doDrawing(draw);
     if (draw) update_plot();
     QApplication::restoreOverrideCursor();

@@ -25,6 +25,7 @@
     <p>Further display options:
     <ul>
       <li><b>Correlation plot styles/Selection Display mode:</b> here you can select what the correlation display should contain if several pixels are selected: Either the curves of all selected pixels are shown (which is possibly slow if you selected many pixels, or an average over these correlation curves is displayed. In that case the parameters table also contains the statistics of all selected fit results. Note that in DualView mode (see above) one average/statistics for every image channel will be displayed!</li>
+	  <li><b>Annotations:</b> are e.g. used to display the results of <a href="imfcs_annotatemodelselection.html">model selection</a> in the overview plot. Basically they add a layer with additional information, that is drawn over the image. The color of this layer can beset on the rhs of the window under "annotations/selection style | annotation color". AT the top of the window, you can choose whether to display annotations at all and if so, which annotation should be displayed.</li>
     </ul>
     </p>
     $$note:In many settings widgets in this tab, a right-click will open a context-menu, in which you can copy the settings in the clicked widget to all other records. So e.g. if you copy the "overview image settings" to all records, the same display settings (color bar, ranges, ...) will be used if you select a different record in this window!$$
@@ -178,6 +179,7 @@ Finally  the red dashed line is the cross-talk-corrected amplitude of the red AC
         <li><b>copy selected CF from all files to table</b>: copy the correlation functions from the currently selected pixels (in the parameter image RDR) and from these in all applicable imagingFCS record in the project, into a table RDR</li>
         <li><b>copy selected pixels average CF from all files to table</b>: same as above, but does not copy the single correlation functions, but averages over all selected pixels in each file.</li>
         <li><b>background from mask in all RDRs</b>: calculates the background intensity from the mask in all RDRs in the current project.</li>
+        <li><a href="imfcs_annotatemodelselection.html"><b>Annotate Model Selection</b></a>: Allows to perform a model selection, based on e.g. the chi<sup>2</sup> or the Akaike's Information Criterion (AIC). the results are displayed as annotations in the overview plot.</li>
         <!--<li><b></b>:</li>-->
       </ul>
 

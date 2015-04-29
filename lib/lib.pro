@@ -176,7 +176,9 @@ HEADERS += dlgnewproperty.h \
     qfpluginexporters.h \
     qfexporttotabledialog.h \
     qfrdrtablecombobox.h \
-    qfpseudotreemodel.h
+    qfpseudotreemodel.h \
+    qfrdrannotationinterface.h \
+    qfrdrannotationtools.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -285,7 +287,8 @@ SOURCES += dlgnewproperty.cpp \
     qfexportermanager.cpp \
     qfexporttotabledialog.cpp \
     qfrdrtablecombobox.cpp \
-    qfpseudotreemodel.cpp
+    qfpseudotreemodel.cpp \
+    qfrdrannotationtools.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

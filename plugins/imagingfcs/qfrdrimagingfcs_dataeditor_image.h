@@ -63,6 +63,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "frawdataimageeditor.h"
 #include "qfselectrdrdialog.h"
 #include "datatools.h"
+#include "colorcombobox.h"
 
 class QFRDRImagingFCSData; // forward
 class QFRDRImagingFCSDiffusionLawDialog;//forward
@@ -297,6 +298,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void copyDataAsColumns();
         /** \brief create FCS diffusion law plots */
         void startFCSDiffusionLawPlot();
+        /** \brief store a fit model comparison as annotation */
+        void annotateModelComparison();
 
         /** \brief copy image data into datastores of the image plots, so they can be copied to other applications. */
         void setCopyableData();
@@ -330,6 +333,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void copySelAvgCFFromAll();
 
         void postBin();
+
+        void annotationChanged();
+        void fillAnnotationsCombo(int nextItem=-1);
     protected:
         void copyCFFromFilesToTable(QList<QFRawDataRecord*>& recs, bool copyAvg=true, bool avgSelected=true, bool copySingle=false, bool nameFromRole=true, QList<int> sel=QList<int>());
 
@@ -426,12 +432,15 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         /** \brief size of plteOverviewSelectedData */
         int plteOverviewSize;
 
+        JKQTPxyParametrizedScatterGraph* plteOverviewAnnot;
+
         /** \brief  plotter for mask image */
         QFPlotter* pltMask;
         /** \brief plot for the mask image in pltMask */
         JKQTPOverlayImage* plteMask;
         /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
         JKQTPOverlayImageEnhanced* plteMaskSelected;
+        QLabel* labAnnotations;
 
         /** \brief  plotter for parameter image */
         QFImagePlotter* pltImage;
@@ -453,6 +462,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QFDoubleEdit* edtOvr2Min;
         QFDoubleEdit* edtOvr2Max;
 
+        QCheckBox* chkShowRDRAnnotation;
+        QFEnhancedComboBox* cmbRDRAnnotation;
+        ColorComboBox* cmbRDRAnnotationColor;
 
 
 
@@ -718,6 +730,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QAction* actUseParam1SetForAll;
         QAction* actUseParam2SetForAll;
         QAction* actUseParam1and2SetForAll;
+
+        QAction* actAnnotateModelComparison;
 
         QMenu* menuData;
         QMenu* menuMask;
