@@ -118,7 +118,7 @@ class QFImageReaderRAW: public QFImporterImageSeries
         /** \brief move on to the next frame in the file. return \c false if no further image exists */
         inline virtual bool nextFrame() {
             if (rawFile) {
-                if (rawFile->read((char*)currentFrame, width*height*channels*sizeof(T))==width*height*channels*sizeof(T)) {
+                if (rawFile->read((char*)currentFrame, width*height*channels*uint64_t(sizeof(T)))==width*height*channels*uint64_t(sizeof(T))) {
                     frame++;
                     return true;
                 }
@@ -145,7 +145,7 @@ class QFImageReaderRAW: public QFImporterImageSeries
         /** \brief read a new frame into the given array of floating point numbers */
         inline virtual bool intReadFrameFloat(float* data, int channel=0) {
             if (!currentFrame) return false;
-            for (int i=0; i<width*height; i++) {
+            for (uint64_t i=0; i<width*height; i++) {
                 data[i]=currentFrame[channel*width*height+i];
             }
             return true;
@@ -154,14 +154,14 @@ class QFImageReaderRAW: public QFImporterImageSeries
         /** \brief read a new frame into the given array of integers */
         inline virtual bool intReadFrameUINT16(uint16_t* data, int channel=0) {
             if (!currentFrame) return false;
-            for (int i=0; i<width*height; i++) {
+            for (uint64_t i=0; i<width*height; i++) {
                 data[i]=currentFrame[channel*width*height+i];
             }
             return true;
         }
         inline virtual bool intReadFrameDouble(double* data, int channel=0) {
             if (!currentFrame) return false;
-            for (int i=0; i<width*height; i++) {
+            for (uint64_t i=0; i<width*height; i++) {
                 data[i]=currentFrame[channel*width*height+i];
             }
             return true;

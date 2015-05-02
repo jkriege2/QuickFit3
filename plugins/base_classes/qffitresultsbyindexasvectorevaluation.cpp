@@ -58,7 +58,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultSto
 {
     QString param="";
     fitresult.resultsSetNumberAndBool( param=prefix+"chisquared",  result.residSqrSum, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("chi squared (RSS)"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"chisquared_weighted",  result.residWeightSqrSum, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
@@ -82,16 +82,16 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultSto
     fitresult.resultsSetGroupAndLabels( param, group, tr("datapoints"));
 
     fitresult.resultsSetIntegerAndBool( param=prefix+"dof",  result.degFreedom, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("degrees of freedom"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("degrees of freedom (DOF)"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"r2",  result.Rsquared, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("R squared"), tr("R<sup>2</sup>"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("R squared (R2)"), tr("R<sup>2</sup>"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"adjusted_r2",  result.AdjustedRsquared, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub>"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("adjusted R squared (R2)"), tr("R<sup>2</sup><sub>adjusted</sub>"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"tss",  result.TSS, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("total sum of squares"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("total sum of squares (TSS)"));
 
 
 
@@ -103,17 +103,17 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultSto
     fitresult.resultsSetGroupAndLabels( param, group, tr("weighted adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub> (weighted)"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"aicc",  result.AICc, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("Akaike's information criterion"), tr("AICc"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("Akaike's information criterion (AICc)"), tr("AICc"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"aicc_weighted",  result.AICcWeighted, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Akaike's information criterion"), tr("AICc (weighted)"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Akaike's information criterion (weighted AICc)"), tr("AICc (weighted)"));
 
 
     fitresult.resultsSetNumberAndBool( param=prefix+"bic",  result.BIC, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("Bayesian information criterion"), tr("BIC"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("Bayesian information criterion (BIC)"), tr("BIC"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"bic_weighted",  result.BICweighted, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Bayesian information criterion"), tr("BIC (weighted)"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Bayesian information criterion (weighted BIC)"), tr("BIC (weighted)"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"max_rel_param_error",  result.maxRelParamError, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
@@ -480,6 +480,15 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r
     }
     setFitResultValue(r, resultID, parameterID, value, unit);
 }
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value)  {
+    QFFitFunction* f=getFitFunction(r);
+    QString unit="";
+    if (f) {
+        int pid=f->getParameterNum(parameterID);
+        if (pid>-1) unit=f->getDescription(pid).unit;
+    }
+    setFitResultValueNoParamTransform(r, resultID, parameterID, value, unit);
+}
 
 void QFFitResultsByIndexAsVectorEvaluation::setAllFitResultValue(QFRawDataRecord *r, const QString &parameterID, double value)
 {
@@ -611,6 +620,21 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r
     }
 }
 
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, QString unit)  {
+    int index=getIndexFromEvaluationResultID(resultID);
+    QString tresultID=transformResultID(resultID);
+    if (index<0) {
+        QFFitResultsByIndexEvaluation::setFitResultValueNoParamTransform(r, resultID, parameterID, value, unit);
+    } else if (r) {
+        bool doEmit=r->isEmitResultsChangedEnabled();
+        r->disableEmitResultsChanged();
+        QString pid=getFitParamID(parameterID);
+        r->resultsSetInBooleanList(tresultID, getParamNameLocalStore(pid), index, true);
+        r->resultsSetInNumberList(tresultID, pid, index, value, unit);
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
+        if (doEmit) r->enableEmitResultsChanged(true);
+    }
+}
 void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, double error)  {
     int index=getIndexFromEvaluationResultID(resultID);
     QString tresultID=transformResultID(resultID);
@@ -633,6 +657,27 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r
     }
 }
 
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, double error)  {
+    int index=getIndexFromEvaluationResultID(resultID);
+    QString tresultID=transformResultID(resultID);
+    if (index<0) {
+        QFFitResultsByIndexEvaluation::setFitResultValueNoParamTransform(r, resultID, parameterID, value, error);
+    } else if (r) {
+        QFFitFunction* f=getFitFunction(r);
+        QString unit="";
+        if (f) {
+            int pid=f->getParameterNum(parameterID);
+            if (pid>-1) unit=f->getDescription(pid).unit;
+        }
+        QString pid=(parameterID);
+        bool doEmit=r->isEmitResultsChangedEnabled();
+        r->disableEmitResultsChanged();
+        r->resultsSetInBooleanList(tresultID, getParamNameLocalStore(pid), index, true);
+        r->resultsSetInNumberErrorList(tresultID, pid, index, value, error, unit);
+        emitResultsChanged(r, resultID, (parameterID));
+        if (doEmit) r->enableEmitResultsChanged(true);
+    }
+}
 void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, double error, QString unit)  {
     int index=getIndexFromEvaluationResultID(resultID);
     QString tresultID=transformResultID(resultID);
@@ -650,7 +695,23 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r
         emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, double error, QString unit)  {
+    int index=getIndexFromEvaluationResultID(resultID);
+    QString tresultID=transformResultID(resultID);
+    if (index<0) {
+        QFFitResultsByIndexEvaluation::setFitResultValueNoParamTransform(r, resultID, parameterID, value, error);
+    } else if (r) {
+        QFFitFunction* f=getFitFunction(r);
 
+        QString pid=(parameterID);
+        bool doEmit=r->isEmitResultsChangedEnabled();
+        r->disableEmitResultsChanged();
+        r->resultsSetInBooleanList(tresultID, getParamNameLocalStore(pid), index, true);
+        r->resultsSetInNumberErrorList(tresultID, pid, index, value, error, unit);
+        if (doEmit) r->enableEmitResultsChanged(true);
+        emitResultsChanged(r, resultID, (parameterID));
+    }
+}
 void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QVector<double> error, QString unit)
 {
     int index=getIndexFromEvaluationResultID(resultID);
@@ -672,6 +733,26 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord *r
     }
 }
 
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QVector<double> error, QString unit)
+{
+    int index=getIndexFromEvaluationResultID(resultID);
+    QString tresultID=transformResultID(resultID);
+    if (index<0) {
+        QFFitResultsByIndexEvaluation::setFitResultValueNoParamTransform(r, resultID, parameterID, value, error);
+    } else if (r) {
+        QFFitFunction* f=getFitFunction(r);
+
+        QString pid=(parameterID);
+        bool doEmit=r->isEmitResultsChangedEnabled();
+        r->disableEmitResultsChanged();
+        QVector<bool> b;
+        for (int i=0; i<value.size(); i++) b<<true;
+        r->resultsSetBooleanList(tresultID, getParamNameLocalStore(pid), b);
+        r->resultsSetNumberErrorList(tresultID, pid, value, error, unit);
+        if (doEmit) r->enableEmitResultsChanged(true);
+        emitResultsChanged(r, resultID, (parameterID));
+    }
+}
 void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QString unit)
 {
     int index=getIndexFromEvaluationResultID(resultID);
@@ -690,6 +771,26 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord *r
         r->resultsSetNumberList(tresultID, pid, value,unit);
         if (doEmit) r->enableEmitResultsChanged(true);
         emitResultsChanged(r, resultID, getFitParamID(parameterID));
+    }
+}
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QString unit)
+{
+    int index=getIndexFromEvaluationResultID(resultID);
+    QString tresultID=transformResultID(resultID);
+    if (index<0) {
+        QFFitResultsByIndexEvaluation::setFitResultValueNoParamTransform(r, resultID, parameterID, value, unit);
+    } else if (r) {
+        QFFitFunction* f=getFitFunction(r);
+
+        QString pid=(parameterID);
+        bool doEmit=r->isEmitResultsChangedEnabled();
+        r->disableEmitResultsChanged();
+        QVector<bool> b;
+        for (int i=0; i<value.size(); i++) b<<true;
+        r->resultsSetBooleanList(tresultID, getParamNameLocalStore(pid), b);
+        r->resultsSetNumberList(tresultID, pid, value,unit);
+        if (doEmit) r->enableEmitResultsChanged(true);
+        emitResultsChanged(r, resultID, (parameterID));
     }
 }
 
@@ -805,6 +906,22 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultGroup(QFRawDataRecord* r
     }
 }
 
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultGroupNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& group)  {
+    int index=getIndexFromEvaluationResultID(resultID);
+    QString tresultID=transformResultID(resultID);
+    if (index<0) {
+        QFFitResultsByIndexEvaluation::setFitResultGroupNoParamTransform(r, resultID, parameterID, group);
+    } else if (r) {
+        QString pid=(parameterID);
+        bool doEmit=r->isEmitResultsChangedEnabled();
+        r->disableEmitResultsChanged();
+        r->resultsSetInBooleanList(tresultID, getParamNameLocalStore(pid), index, true);
+        r->resultsSetGroup(tresultID, pid, group);
+        if (doEmit) r->enableEmitResultsChanged(true);
+        emitResultsChanged(r, resultID, (parameterID));
+    }
+}
+
 void QFFitResultsByIndexAsVectorEvaluation::setFitResultLabel(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& label, const QString& label_richtext)  {
     int index=getIndexFromEvaluationResultID(resultID);
     QString tresultID=transformResultID(resultID);
@@ -818,6 +935,22 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultLabel(QFRawDataRecord* r
         r->resultsSetLabel(tresultID, pid, label, label_richtext);
         if (doEmit) r->enableEmitResultsChanged(true);
         emitResultsChanged(r, resultID, getFitParamID(parameterID));
+    }
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultLabelNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& label, const QString& label_richtext)  {
+    int index=getIndexFromEvaluationResultID(resultID);
+    QString tresultID=transformResultID(resultID);
+    if (index<0) {
+        QFFitResultsByIndexEvaluation::setFitResultLabelNoParamTransform(r, resultID, parameterID, label, label_richtext);
+    } else if (r) {
+        QString pid=(parameterID);
+        bool doEmit=r->isEmitResultsChangedEnabled();
+        r->disableEmitResultsChanged();
+        r->resultsSetInBooleanList(tresultID, getParamNameLocalStore(pid), index, true);
+        r->resultsSetLabel(tresultID, pid, label, label_richtext);
+        if (doEmit) r->enableEmitResultsChanged(true);
+        emitResultsChanged(r, resultID, (parameterID));
     }
 }
 

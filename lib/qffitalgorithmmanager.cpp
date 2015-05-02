@@ -153,12 +153,12 @@ int QFFitAlgorithmManager::getPluginForID(QString id) const {
    return -1;
 }
 
-QFFitAlgorithm* QFFitAlgorithmManager::createAlgorithm(QString id, QObject* parent) const {
+QFFitAlgorithm* QFFitAlgorithmManager::createAlgorithm(const QString& id) const {
     QMutexLocker  locker(mutex);
     for (int i=0; i<fitPlugins.size(); i++) {
         QStringList ids=fitPlugins[i]->getIDs();
         if (ids.contains(id)) {
-            return fitPlugins[i]->get(id, parent);
+            return fitPlugins[i]->get(id);
         }
     }
     return NULL;

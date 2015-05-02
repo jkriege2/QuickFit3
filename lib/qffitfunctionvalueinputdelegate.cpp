@@ -58,7 +58,7 @@ QWidget *QFFitFunctionValueInputDelegate::createEditor(QWidget *parent, const QS
     QVariant fpMin=index.data(QFFitFunctionValueInputTable::fitParameterMinRole);
     QVariant fpMax=index.data(QFFitFunctionValueInputTable::fitParameterMaxRole);
     if (widgetType.isValid()) {
-        QScopedPointer<QFFitFunction> ff(QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffID.toString(), NULL));
+        QScopedPointer<QFFitFunction> ff(QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffID.toString()));
         if (fpID.isValid() && (widgetType.toInt()==QFFitFunctionValueInputTable::wtValueDoubleEdit || widgetType.toInt()==QFFitFunctionValueInputTable::wtValueLogDoubleEdit || widgetType.toInt()==QFFitFunctionValueInputTable::wtRangeEditMin || widgetType.toInt()==QFFitFunctionValueInputTable::wtRangeEditMax || widgetType.toInt()==QFFitFunctionValueInputTable::wtValueIntEdit)) {
             QFDoubleEdit* edt=new QFDoubleEdit(parent);
             edt->setIntegerWidget(widgetType.toInt()==QFFitFunctionValueInputTable::wtValueIntEdit);

@@ -334,7 +334,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
         void postBin();
 
-        void annotationChanged();
+        void annotationChanged(bool replot=true);
         void fillAnnotationsCombo(int nextItem=-1);
     protected:
         void copyCFFromFilesToTable(QList<QFRawDataRecord*>& recs, bool copyAvg=true, bool avgSelected=true, bool copySingle=false, bool nameFromRole=true, QList<int> sel=QList<int>());
@@ -464,6 +464,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
         QCheckBox* chkShowRDRAnnotation;
         QFEnhancedComboBox* cmbRDRAnnotation;
+        QFEnhancedComboBox* cmbRDRAnnotationDrawMode;
         ColorComboBox* cmbRDRAnnotationColor;
 
 

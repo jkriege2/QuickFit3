@@ -65,12 +65,31 @@ void QFRDRImagingFCSSimulator::writeSettings() const {
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/DG", ui->spinDG->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/DR", ui->spinDR->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/DRG", ui->spinDRG->value());
-    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/height", ui->spinHeight->value());
-    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/width", ui->spinWidth->value());
-    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/pixel_size", ui->spinPixelSize->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/walkersr", ui->spinWalkersR->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/walkersg", ui->spinWalkersG->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/walkersrg", ui->spinWalkersRG->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/brightnessG", ui->spinBrightnessG->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/brightnessR", ui->spinBrigthnessR->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DG", ui->chkBottomG->isChecked());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DR", ui->chkBottomR->isChecked());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DRG", ui->chkBottomRG->isChecked());
+
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/DG_2", ui->spinDG_2->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/DR_2", ui->spinDR_2->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/DRG_2", ui->spinDRG_2->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/walkersr_2", ui->spinWalkersR_2->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/walkersg_2", ui->spinWalkersG_2->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/walkersrg_2", ui->spinWalkersRG_2->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/brightnessG_2", ui->spinBrightnessG_2->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/brightnessR_2", ui->spinBrigthnessR_2->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DG_2", ui->chkBottomG_2->isChecked());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DR_2", ui->chkBottomR_2->isChecked());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DRG_2", ui->chkBottomRG_2->isChecked());
+
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/FlowOnlyHalf", ui->chkFlowOnlyHalf->isCheckable());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/height", ui->spinHeight->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/width", ui->spinWidth->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/pixel_size", ui->spinPixelSize->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/frames", ui->spinFrames->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/frametime", ui->spinFrametime->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/warmup", ui->spinWarmup->value());
@@ -81,8 +100,6 @@ void QFRDRImagingFCSSimulator::writeSettings() const {
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/VY", ui->spinVY->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/DualView", ui->chkDualView->isChecked());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/filename", ui->edtFilename->text());
-    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/brightnessG", ui->spinBrightnessG->value());
-    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/brightnessR", ui->spinBrigthnessR->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/background", ui->spinBackground->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/backgroundNoise", ui->spinBackgroundNoise->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/deltax", ui->spinDeltaX->value());
@@ -116,6 +133,29 @@ void QFRDRImagingFCSSimulator::readSettings()
     ui->spinBackgroundNoise->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/backgroundNoise", 2).toDouble());
     ui->spinDeltaX->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/deltax", 0).toDouble());
     ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/deltay", 0).toDouble());
+
+
+
+
+    ui->chkBottomG->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DG", false).toBool());
+    ui->chkBottomR->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DR", false).toBool());
+    ui->chkBottomRG->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DRG", false).toBool());
+    ui->chkBottomG_2->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DG_2", false).toBool());
+    ui->chkBottomR_2->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DR_2", false).toBool());
+    ui->chkBottomRG_2->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DRG_2", false).toBool());
+    ui->chkFlowOnlyHalf->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/FlowOnlyHalf", false).toBool());
+
+    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DG_2", 15).toDouble());
+    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DR_2", 15).toDouble());
+    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DRG_2", 15).toDouble());
+    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/brightnessG_2", 100).toDouble());
+    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/brightnessR_2", 100).toDouble());
+
+    ui->spinWalkersR_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersr_2", 0).toInt());
+    ui->spinWalkersG_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersg_2", 0).toInt());
+    ui->spinWalkersRG_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersrg_2", 0).toInt());
+
+
 }
 
 void QFRDRImagingFCSSimulator::on_btnRun_clicked()
@@ -127,6 +167,9 @@ void QFRDRImagingFCSSimulator::on_btnRun_clicked()
         sim->set_DG(ui->spinDG->value());
         sim->set_DR(ui->spinDR->value());
         sim->set_DRG(ui->spinDRG->value());
+        sim->set_DG2(ui->spinDG_2->value());
+        sim->set_DR2(ui->spinDR_2->value());
+        sim->set_DRG2(ui->spinDRG_2->value());
         sim->set_dualView(ui->chkDualView->isChecked());
         sim->set_filename(ui->edtFilename->text());
         sim->set_frames(ui->spinFrames->value());
@@ -141,15 +184,28 @@ void QFRDRImagingFCSSimulator::on_btnRun_clicked()
         sim->set_walkersG(ui->spinWalkersG->value());
         sim->set_walkersR(ui->spinWalkersR->value());
         sim->set_walkersRG(ui->spinWalkersRG->value());
-        sim->set_DRG(ui->spinDRG->value());
+        sim->set_walkersG2(ui->spinWalkersG_2->value());
+        sim->set_walkersR2(ui->spinWalkersR_2->value());
+        sim->set_walkersRG2(ui->spinWalkersRG_2->value());
         sim->set_VX(ui->spinVX->value());
         sim->set_VY(ui->spinVY->value());
+        sim->set_FlowEeverywhere(!ui->chkFlowOnlyHalf->isChecked());
         sim->set_deltax(ui->spinDeltaX->value());
         sim->set_deltay(ui->spinDeltaY->value());
         sim->set_brightnessG(ui->spinBrightnessG->value());
         sim->set_brightnessR(ui->spinBrigthnessR->value());
         sim->set_background(ui->spinBackground->value());
         sim->set_backgroundNoise(ui->spinBackgroundNoise->value());
+
+        sim->set_onlyHalf_DG(ui->chkBottomG->isChecked());
+        sim->set_onlyHalf_DR(ui->chkBottomR->isChecked());
+        sim->set_onlyHalf_DRG(ui->chkBottomRG->isChecked());
+        sim->set_onlyHalf_DG2(ui->chkBottomG_2->isChecked());
+        sim->set_onlyHalf_DR2(ui->chkBottomR_2->isChecked());
+        sim->set_onlyHalf_DRG2(ui->chkBottomRG_2->isChecked());
+        sim->set_brightnessG2(ui->spinBrightnessG_2->value());
+        sim->set_brightnessR2(ui->spinBrigthnessR_2->value());
+
         sim->start();
         writeSettings();
         setState(dsRunning);

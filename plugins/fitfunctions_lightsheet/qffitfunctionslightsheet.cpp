@@ -34,7 +34,7 @@ QStringList QFFitFunctionsLightsheet::getIDs() const {
     return res;
 }
 
-QFFitFunction* QFFitFunctionsLightsheet::get(QString id, QObject* parent) const  {
+QFFitFunction* QFFitFunctionsLightsheet::get(const QString &id) const  {
     if (id=="lightsheet_gaussian") {
         return new QFFitFunctionLightsheetGaussian();
     } else if (id=="lightsheet_gaussian_sqrte") {

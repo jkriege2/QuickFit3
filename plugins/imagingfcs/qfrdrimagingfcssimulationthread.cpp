@@ -40,7 +40,11 @@ QFRDRImagingFCSSimulationThread::QFRDRImagingFCSSimulationThread(QObject *parent
     canceled=false;
     brightnessG=100;
     brightnessR=100;
+    brightnessG2=100;
+    brightnessR2=100;
     DG=DR=DRG=5;
+    DG2=DR2=DRG2=15;
+    FlowEeverywhere=true;
     VX=VY=0;
     psf_size_g=500;
     psf_size_r=550;
@@ -53,11 +57,15 @@ QFRDRImagingFCSSimulationThread::QFRDRImagingFCSSimulationThread(QObject *parent
     walkersG=10;
     walkersR=0;
     walkersRG=0;
+    walkersG2=10;
+    walkersR2=0;
+    walkersRG2=0;
     background=100;
     backgroundNoise=2;
     crosstalk=5.0/100.0;
     warmup=10000;
     deltax=deltay=0;
+    onlyHalf_DG=onlyHalf_DR=onlyHalf_DRG=onlyHalf_DG2=onlyHalf_DR2=onlyHalf_DRG2=false;
 
 }
 
@@ -123,16 +131,25 @@ void QFRDRImagingFCSSimulationThread::run()
     config.setValue("simulation/DG", DG);
     config.setValue("simulation/DR", DR);
     config.setValue("simulation/DRG", DRG);
+    config.setValue("simulation/DG2", DG2);
+    config.setValue("simulation/DR2", DR2);
+    config.setValue("simulation/DRG2", DRG2);
     config.setValue("simulation/DeltaX", deltax);
     config.setValue("simulation/DeltaY", deltay);
     config.setValue("simulation/VX", VX);
     config.setValue("simulation/VY", VY);
+    config.setValue("simulation/FlowEeverywhere", FlowEeverywhere);
     config.setValue("simulation/walkersG", walkersG);
     config.setValue("simulation/walkersR", walkersR);
     config.setValue("simulation/walkersRG", walkersRG);
+    config.setValue("simulation/walkersG2", walkersG2);
+    config.setValue("simulation/walkersR2", walkersR2);
+    config.setValue("simulation/walkersRG2", walkersRG2);
     config.setValue("simulation/dualView", dualView);
     config.setValue("simulation/brightnessG", brightnessG);
     config.setValue("simulation/brightnessR", brightnessR);
+    config.setValue("simulation/brightnessG2", brightnessG2);
+    config.setValue("simulation/brightnessR2", brightnessR2);
     config.setValue("simulation/pixel_size", pixel_size);
     config.setValue("simulation/psf_size_green", psf_size_g);
     config.setValue("simulation/psf_size_red", psf_size_r);
@@ -140,6 +157,12 @@ void QFRDRImagingFCSSimulationThread::run()
     config.setValue("simulation/warmup", (qlonglong)warmup);
     config.setValue("simulation/background", background);
     config.setValue("simulation/backgroundNoise", backgroundNoise);
+    config.setValue("simulation/onlyHalf_DG", onlyHalf_DG);
+    config.setValue("simulation/onlyHalf_DG2", onlyHalf_DG2);
+    config.setValue("simulation/onlyHalf_DR", onlyHalf_DR);
+    config.setValue("simulation/onlyHalf_DR2", onlyHalf_DR2);
+    config.setValue("simulation/onlyHalf_DRG", onlyHalf_DRG);
+    config.setValue("simulation/onlyHalf_DRG2", onlyHalf_DRG2);
 
     int framesize=width*height;
     int realwidth=width;
@@ -149,9 +172,12 @@ void QFRDRImagingFCSSimulationThread::run()
     }
     TinyTIFFFile* tif=TinyTIFFWriter_open(filename.toLatin1().data(), 16, realwidth, height);
     uint16_t* frame=(uint16_t*)qfMalloc(framesize*sizeof(uint16_t));
-    QVector<QFRDRImagingFCSSimulationThread::WalkerData> wg=createWalkers(walkersG);
-    QVector<QFRDRImagingFCSSimulationThread::WalkerData> wr=createWalkers(walkersR);
-    QVector<QFRDRImagingFCSSimulationThread::WalkerData> wrg=createWalkers(walkersRG);
+    QVector<QFRDRImagingFCSSimulationThread::WalkerData> wg=createWalkers(walkersG, onlyHalf_DG);
+    QVector<QFRDRImagingFCSSimulationThread::WalkerData> wr=createWalkers(walkersR, onlyHalf_DR);
+    QVector<QFRDRImagingFCSSimulationThread::WalkerData> wrg=createWalkers(walkersRG, onlyHalf_DRG);
+    QVector<QFRDRImagingFCSSimulationThread::WalkerData> wg2=createWalkers(walkersG2, onlyHalf_DG2);
+    QVector<QFRDRImagingFCSSimulationThread::WalkerData> wr2=createWalkers(walkersR2, onlyHalf_DR2);
+    QVector<QFRDRImagingFCSSimulationThread::WalkerData> wrg2=createWalkers(walkersRG2, onlyHalf_DRG2);
     TinyTIFFFile* tifBack=TinyTIFFWriter_open(filenameBackground.toLatin1().data(), 16, realwidth, height);
     if (tifBack) {
         emit statusMessage(tr("creating background files ..."));
@@ -169,10 +195,13 @@ void QFRDRImagingFCSSimulationThread::run()
     if (tif) {
         emit statusMessage(tr("warming up simulation ..."));
         for (int wi=0; wi<warmup; wi++) {
-            propagateWalkers(wg, DG);
+            propagateWalkers(wg, DG,onlyHalf_DG);
+            propagateWalkers(wg2, DG2,onlyHalf_DG2);
             if (dualView) {
-                propagateWalkers(wr, DR);
-                propagateWalkers(wrg, DRG);
+                propagateWalkers(wr, DR,onlyHalf_DR);
+                propagateWalkers(wrg, DRG,onlyHalf_DRG);
+                propagateWalkers(wr2, DR2,onlyHalf_DR2);
+                propagateWalkers(wrg2, DRG2,onlyHalf_DRG2);
             }
             if (timer.elapsed()>200) {
                 emit progress(currentFrame+warmup);
@@ -188,7 +217,7 @@ void QFRDRImagingFCSSimulationThread::run()
                 }
 
                 //memset(frame, 0, framesize*sizeof(uint16_t));
-                propagateWalkers(wg, DG);
+                propagateWalkers(wg, DG,onlyHalf_DG);
                 for (int i=0; i<wg.size(); i++) {
                     //if (i==0) qDebug()<<wg[i].x<<", "<<wg[i].y;
                     for (int y=0; y<height; y++) {
@@ -197,9 +226,18 @@ void QFRDRImagingFCSSimulationThread::run()
                         }
                     }
                 }
+                propagateWalkers(wg2, DG2,onlyHalf_DG2);
+                for (int i=0; i<wg2.size(); i++) {
+                    //if (i==0) qDebug()<<wg[i].x<<", "<<wg[i].y;
+                    for (int y=0; y<height; y++) {
+                        for (int x=0; x<width; x++) {
+                            frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG2*exp(-2.0*(sqr(wg2[i].x-double(x)*pixel_size)+sqr(wg2[i].y-double(y)*pixel_size))/sqr(psf_size_g));
+                        }
+                    }
+                }
                 if (dualView) {
-                    propagateWalkers(wr, DR);
-                    propagateWalkers(wrg, DRG);
+                    propagateWalkers(wr, DR,onlyHalf_DR);
+                    propagateWalkers(wrg, DRG,onlyHalf_DRG);
                     for (int i=0; i<wr.size(); i++) {
                         for (int y=0; y<height; y++) {
                             for (int x=0; x<width; x++) {
@@ -212,6 +250,23 @@ void QFRDRImagingFCSSimulationThread::run()
                             for (int x=0; x<width; x++) {
                                 frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size-deltax)+sqr(wrg[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
                                 frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size-deltax)+sqr(wrg[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_g));
+                            }
+                        }
+                    }
+                    propagateWalkers(wr2, DR2,onlyHalf_DR2);
+                    propagateWalkers(wrg2, DRG2,onlyHalf_DRG2);
+                    for (int i=0; i<wr2.size(); i++) {
+                        for (int y=0; y<height; y++) {
+                            for (int x=0; x<width; x++) {
+                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR2*exp(-2.0*(sqr(wr2[i].x-double(x)*pixel_size-deltax)+sqr(wr2[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
+                            }
+                        }
+                    }
+                    for (int i=0; i<wrg2.size(); i++) {
+                        for (int y=0; y<height; y++) {
+                            for (int x=0; x<width; x++) {
+                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR2*exp(-2.0*(sqr(wrg2[i].x-double(x)*pixel_size-deltax)+sqr(wrg2[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
+                                frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG2*exp(-2.0*(sqr(wrg2[i].x-double(x)*pixel_size-deltax)+sqr(wrg2[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_g));
                             }
                         }
                     }
@@ -243,37 +298,41 @@ void QFRDRImagingFCSSimulationThread::run()
     qfFree(frame);
 }
 
-QVector<QFRDRImagingFCSSimulationThread::WalkerData> QFRDRImagingFCSSimulationThread::createWalkers(int count)
+QVector<QFRDRImagingFCSSimulationThread::WalkerData> QFRDRImagingFCSSimulationThread::createWalkers(int count, bool onlyHalfImage)
 {
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> res;
     for (int i=0; i<count; i++) {
         QFRDRImagingFCSSimulationThread::WalkerData d;
         d.x=rng.rand(pixel_size*double(width-1));
-        d.y=rng.rand(pixel_size*double(height-1));
+        if (onlyHalfImage) {
+            d.y=rng.rand(pixel_size*double(height-1)/2.0);
+        } else {
+            d.y=rng.rand(pixel_size*double(height-1));
+        }
         res<<d;
     }
     return res;
 }
 
-void QFRDRImagingFCSSimulationThread::propagateWalkers(QVector<QFRDRImagingFCSSimulationThread::WalkerData> &walkersv, double D)
+void QFRDRImagingFCSSimulationThread::propagateWalkers(QVector<QFRDRImagingFCSSimulationThread::WalkerData> &walkersv, double D, bool onlyHalfImage)
 {
     for (int i=0; i<walkersv.size(); i++) {
         QFRDRImagingFCSSimulationThread::WalkerData d=walkersv[i];
 
-        double dx=d.x+rng.randNorm(0.0, 1.0)*sqrt(2.0*D*frametime*1.0e-6)+VX*frametime*1.0e-6;
-        double dy=d.y+rng.randNorm(0.0, 1.0)*sqrt(2.0*D*frametime*1.0e-6)+VY*frametime*1.0e-6;
+        register double v=(FlowEeverywhere || (d.x>double(width)*pixel_size/2.0))?1.0:0.0;
+        register double dx=d.x+rng.randNorm(0.0, 1.0)*sqrt(2.0*D*frametime*1.0e-6)+v*VX*frametime*1.0e-6;
+        register double dy=d.y+rng.randNorm(0.0, 1.0)*sqrt(2.0*D*frametime*1.0e-6)+v*VY*frametime*1.0e-6;
 
-        /*if ((d.x<0) || (d.x>double(width-1)*pixel_size) || (d.y<0) || (d.y>double(height-1)*pixel_size)) {
-            dx=0;
-            dy=0;
-        } else {
-            d.x=dx;
-            d.y=dy;
-        }*/
+
         if (dx<-4.0*pixel_size) dx=double(width+3)*pixel_size;
         if (dx>(width+3)*pixel_size) dx=-4.0*pixel_size;
-        if (dy<-4.0*pixel_size) dy=double(height+3)*pixel_size;
-        if (dy>(height+3)*pixel_size) dy=-4.0*pixel_size;
+        if (onlyHalfImage) {
+            if (dy<double(height)*pixel_size/2.0) dy=double(height)*pixel_size/2.0;
+            if (dy>double(height+3)*pixel_size) dy=double(height+3)*pixel_size;
+        } else {
+            if (dy<-4.0*pixel_size) dy=double(height+3)*pixel_size;
+            if (dy>double(height+3)*pixel_size) dy=-4.0*pixel_size;
+        }
 
         d.x=dx;
         d.y=dy;

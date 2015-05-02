@@ -64,6 +64,7 @@ class QFWIDLIB_EXPORT QFSelectionListDialog : public QDialog
         void setLabel(const QString& text);
         void writeList(QSettings& settings, const QString& prefix=QString());
         QStringList getSelectedDataStrings() const;
+        QStringList getSelectedTexts() const;
         QList<QVariant> getSelected() const;
         QList<bool> getSelectedBoolList() const;
         QList<int> getSelectedIndexes() const;

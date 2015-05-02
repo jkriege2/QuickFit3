@@ -226,7 +226,7 @@ void QFFitFunctionManager::finalizePluginSearch()
 
 
 
-QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, QObject* parent) const {
+QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start) const {
     QMutexLocker locker(mutex);
     QMap<QString, QFFitFunction*> res;
 
@@ -234,7 +234,7 @@ QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, 
         QStringList ids=fitPlugins[i]->getIDs();
         for (int j=0; j<ids.size(); j++) {
             if (id_start.isEmpty() || ids[j].startsWith(id_start)) {
-                res[ids[j]]=fitPlugins[i]->get(ids[j], parent);
+                res[ids[j]]=fitPlugins[i]->get(ids[j]);
             }
         }
     }
@@ -267,7 +267,7 @@ QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, 
             QStringList ids=fitFactories[it]->fitFunctionFactoryGetIDs();
             for (int i=0; i<ids.size(); i++) {
                 if (id_start.isEmpty() || ids[i].startsWith(id_start)) {
-                    QFFitFunction* f=fitFactories[it]->fitFunctionFactoryGet(ids[i], parent);
+                    QFFitFunction* f=fitFactories[it]->fitFunctionFactoryGet(ids[i]);
                     if ( f && !res.contains(ids[i])) res[ids[i]]=f;
                     else if (f) delete f;
                 }
@@ -340,12 +340,12 @@ QStringList QFFitFunctionManager::getModelIDs(QString id_start) const
     return res;
 }
 
-QFFitFunction *QFFitFunctionManager::createFunction(QString ID, QObject *parent) const {
+QFFitFunction *QFFitFunctionManager::createFunction(const QString& ID) const {
     QMutexLocker locker(mutex);
     for (int i=0; i<fitPlugins.size(); i++) {
         QStringList ids=fitPlugins[i]->getIDs();
         if (ids.contains(ID)) {
-            return fitPlugins[i]->get(ID, parent);
+            return fitPlugins[i]->get(ID);
         }
     }
 
@@ -367,7 +367,7 @@ QFFitFunction *QFFitFunctionManager::createFunction(QString ID, QObject *parent)
         for (int it=0; it<fitFactories.size(); ++it) {
             QStringList ids=fitFactories[it]->fitFunctionFactoryGetIDs();
             if (ids.contains(ID)) {
-                QFFitFunction* f=fitFactories[it]->fitFunctionFactoryGet(ID, parent);
+                QFFitFunction* f=fitFactories[it]->fitFunctionFactoryGet(ID);
                 if (f) return f;
             }
         }
@@ -628,7 +628,7 @@ QString QFFitFunctionManager::getPluginHelp(int ID, QString faID) const {
         return m_options->getAssetsDirectory()+QString("/plugins/help/%1/%2.html").arg(basename).arg(faID);
     }
     if (ID==-3 && libraryFitFunctions.contains(faID)) {
-        QFFitFunction* ff=createFunction(faID, NULL);
+        QFFitFunction* ff=createFunction(faID);
         QFLibraryFitFunction* lff=dynamic_cast<QFLibraryFitFunction*>(ff);
         QString h;
         if (lff) {

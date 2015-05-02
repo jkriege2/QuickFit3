@@ -1254,7 +1254,7 @@ inline T* duplicateArraySort(const T* input, long long N) {
 */
 template <class T>
 inline QVector<T> arrayToVector(const T* input, long long N) {
-    T dummy;
+    T dummy=T();
     QVector<T> out(N, dummy);
     if (input && N>0) memcpy(out.data(), input, N*sizeof(T));
     return out;

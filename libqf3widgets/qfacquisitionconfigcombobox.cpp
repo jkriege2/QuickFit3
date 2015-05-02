@@ -69,7 +69,7 @@ QFAcquisitionConfigComboBox::~QFAcquisitionConfigComboBox()
     //dtor
 }
 
-void QFAcquisitionConfigComboBox::directoryChanged(const QString& path) {
+void QFAcquisitionConfigComboBox::directoryChanged(const QString& /*path*/) {
     deviceChanged(m_extension, m_cam, m_camIdx);
 }
 

@@ -88,7 +88,7 @@ class QFEvalBeadScanPSF : public QObject, public QFPluginEvaluationItemBase, pub
         virtual QStringList fitFunctionFactoryGetIDs() const ;
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
-        virtual QFFitFunction* fitFunctionFactoryGet(QString id, QObject* parent) const ;
+        virtual QFFitFunction* fitFunctionFactoryGet(const QString& id) const ;
 
         virtual QString fitFunctionFactoryGetHelpFile(const QString& id) const ;
     protected slots:

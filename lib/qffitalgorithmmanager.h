@@ -120,7 +120,7 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
          *
          *  \note This function is thread-safe
          */
-        QFFitAlgorithm* createAlgorithm(QString id, QObject* parent=NULL) const;
+        QFFitAlgorithm* createAlgorithm(const QString& id) const;
 
         /** \brief returns a pointer to the instance of the main manager object (singleton within a QuickFit3 instance) */
         static QFFitAlgorithmManager* getInstance() {

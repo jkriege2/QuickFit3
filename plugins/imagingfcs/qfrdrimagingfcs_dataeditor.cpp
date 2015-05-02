@@ -310,11 +310,11 @@ void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
 
 };
 
-void QFRDRImagingFCSDataEditor::selectionChanged(const QModelIndex & current, const QModelIndex & previous ) {
+void QFRDRImagingFCSDataEditor::selectionChanged(const QModelIndex & /*current*/, const QModelIndex & /*previous*/ ) {
     if (cmbRunDisplay->currentIndex()>1) replotData();
 }
 
-void QFRDRImagingFCSDataEditor::selectionChanged(const QItemSelection & current, const QItemSelection & previous ) {
+void QFRDRImagingFCSDataEditor::selectionChanged(const QItemSelection & /*current*/, const QItemSelection & /*previous*/ ) {
     replotData();
 }
 
@@ -351,7 +351,7 @@ void QFRDRImagingFCSDataEditor::correctOffset()
 
 }
 
-void QFRDRImagingFCSDataEditor::runsModeChanged(int c) {
+void QFRDRImagingFCSDataEditor::runsModeChanged(int /*c*/) {
     labRunOptions->setEnabled(cmbRunDisplay->currentIndex()>0);
     cmbRunStyle->setEnabled(cmbRunDisplay->currentIndex()>0);
     cmbRunErrorStyle->setEnabled(cmbRunDisplay->currentIndex()>0);
@@ -372,7 +372,7 @@ void QFRDRImagingFCSDataEditor::rawDataChangedRecalc()
     replotData();
 }
 
-void QFRDRImagingFCSDataEditor::slidersChanged(int userMin, int userMax, int min, int max) {
+void QFRDRImagingFCSDataEditor::slidersChanged(int userMin, int userMax, int /*min*/, int /*max*/) {
     if (!current) return;
     current->setQFProperty("imfcs_correditor_datacut_min", userMin, false, false);
     current->setQFProperty("imfcs_correditor_datacut_max", userMax, false, false);
@@ -525,7 +525,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
     //qDebug()<<"replotOverview ... DONE";
 }
 
-void QFRDRImagingFCSDataEditor::replotData(int dummy) {
+void QFRDRImagingFCSDataEditor::replotData(int /*dummy*/) {
     //qDebug()<<"replot";
     JKQTPdatastore* ds=plotter->getDatastore();
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);

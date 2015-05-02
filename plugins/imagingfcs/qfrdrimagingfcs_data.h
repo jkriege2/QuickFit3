@@ -403,6 +403,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         int videoUncorrected_height;
         uint32_t videoUncorrected_frames;
 
+        QString maskTemp;
+
         QList<ovrImageData> ovrImages;
 
         struct ImageSelection {
@@ -413,6 +415,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
             bool* selection;
             QString name;
+            QString tempSel;
         };
 
         QList<ImageSelection> selections;

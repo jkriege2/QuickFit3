@@ -38,8 +38,8 @@ QStringList QFPFitFunctionsDLS::getIDs() const {
     return res;
 }
 
-QFFitFunction* QFPFitFunctionsDLS::get(QString id, QObject* parent) const  {
-    Q_UNUSED(parent);
+QFFitFunction* QFPFitFunctionsDLS::get(const QString & id) const  {
+    //Q_UNUSED(parent);
     if (id=="dls_g2") {
         return new QFFitFunctionDLSG2();
     } else if (id=="dls_g2_int_taunormdist") {

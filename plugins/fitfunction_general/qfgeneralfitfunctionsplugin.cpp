@@ -86,7 +86,7 @@ QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     return res;
 }
 
-QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) const  {
+QFFitFunction* QFGeneralFitFunctionsPlugin::get(const QString &id) const  {
     if (id=="gen_sigmoid") {
         return new QFFitFunctionGeneralSigmoid();
     } else if (id=="gen_gaussian_sqrte") {

@@ -78,7 +78,7 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param fix value to be stored
          */
-        virtual void setFitFix(const QString& id, bool fix, QFRawDataRecord* r=NULL) {};
+        virtual void setFitFix(const QString& id, bool fix, QFRawDataRecord* r=NULL) ;
         /*! \brief return the fix property of a given parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
         */

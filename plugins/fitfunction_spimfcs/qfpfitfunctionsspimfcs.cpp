@@ -120,8 +120,8 @@ QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
     return res;
 }
 
-QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
-    Q_UNUSED(parent);
+QFFitFunction* QFPFitFunctionsSPIMFCS::get(const QString &id) const  {
+    //Q_UNUSED(parent);
     if (id=="fcs_spim_diff") {
         return new QFFitFunctionsSPIMFCSDiff();
     } else if (id=="fcs_spim_diffc") {

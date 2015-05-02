@@ -985,7 +985,7 @@ void QFRDRTable::colgraphSetImageGraphModifier(int plotid, int graphid, int imag
     }
 }
 
-void QFRDRTable::colgraphSetImageGraphRange(int plotid, int graphid, QFRDRColumnGraphsInterface::ImageGraphRangeChannel channel, bool autoRange, double min, double max)
+void QFRDRTable::colgraphSetImageGraphRange(int plotid, int graphid, QFRDRColumnGraphsInterface::ImageGraphRangeChannel channel, bool autoRange, double /*min*/, double /*max*/)
 {
     if (plotid>=0 && plotid<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(plotid);

@@ -32,7 +32,7 @@ class QFWIDLIB_EXPORT QFFitAlgorithmComboBox : public QFEnhancedComboBox
     public:
         explicit QFFitAlgorithmComboBox(QWidget *parent = 0);
         QString currentFitAlgorithmID() const;
-        QFFitAlgorithm* createCurrentInstance(QObject *parent=NULL) const;
+        QFFitAlgorithm* createCurrentInstance() const;
         QAction* getHelpAction() const { return actHelp; }
     signals:
 

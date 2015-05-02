@@ -88,7 +88,7 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     reactOnRedrawCalls=true;
 
 
-    m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("", this);
+    m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("");
     plteOverviewSelectedData=NULL;
     plteOverviewExcludedData=NULL;
     plteOverviewSize=0;
@@ -614,7 +614,17 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     gli->addRow(tr("selection &style:"), cmbSelectionStyle);
 
     cmbRDRAnnotationColor=new ColorComboBox(wsels);
+    cmbRDRAnnotationColor->addAction(actUseSelStyleForAll);
+    cmbRDRAnnotationColor->setContextMenuPolicy(Qt::ActionsContextMenu);
     gli->addRow(tr("&annotation color:"), cmbRDRAnnotationColor);
+
+    cmbRDRAnnotationDrawMode=new QFEnhancedComboBox(wsels);
+    cmbRDRAnnotationDrawMode->addAction(actUseSelStyleForAll);
+    cmbRDRAnnotationDrawMode->setContextMenuPolicy(Qt::ActionsContextMenu);
+    cmbRDRAnnotationDrawMode->addItem(tr("symbol + color"));
+    cmbRDRAnnotationDrawMode->addItem(tr("symbol only"));
+    //cmbRDRAnnotationDrawMode->addItem(tr("color only"));
+    gli->addRow(tr("annotation &mode:"), cmbRDRAnnotationDrawMode);
 
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: parameter image style
@@ -866,7 +876,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     plteOverviewExcluded->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
     pltOverview->addGraph(plteOverviewExcluded);
 
-    plteOverviewAnnot==new JKQTPxyParametrizedScatterGraph(pltOverview->get_plotter());
+    plteOverviewAnnot=new JKQTPxyParametrizedScatterGraph(pltOverview->get_plotter());
     plteOverviewAnnot->set_visible(false);
     pltOverview->addGraph(plteOverviewAnnot);
 
@@ -1581,7 +1591,8 @@ void QFRDRImagingFCSImageEditor::useThisSelectionStyleForAllRDRs()
                 if (rdrs[i]) {
                     rdrs[i]->setQFProperty(QString("imfcs_imed_overlay"), chkDisplayImageOverlay->isChecked(), false, false);
                     rdrs[i]->setQFProperty(QString("imfcs_imed_ovstyle"), cmbSelectionStyle->currentIndex(), false, false);
-                    rdrs[i]->setQFProperty(QString("imfcs_imed_anotcol"), cmbRDRAnnotationColor->currentColor(), false, false);
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_anotcol"), cmbRDRAnnotationColor->currentColor().name(), false, false);
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_anotmode"), cmbRDRAnnotationDrawMode->currentIndex(), false, false);
                 }
             }
         }
@@ -1830,7 +1841,8 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
 
             current->setQFProperty(QString("imfcs_imed_overlay_%1").arg(egroup), chkDisplayImageOverlay->isChecked(), false, false);
             current->setQFProperty(QString("imfcs_imed_ovstyle_%1").arg(egroup), cmbSelectionStyle->currentIndex(), false, false);
-            current->setQFProperty(QString("imfcs_imed_anotcol"), cmbRDRAnnotationColor->currentColor(), false, false);
+            current->setQFProperty(QString("imfcs_imed_anotcol"), cmbRDRAnnotationColor->currentColor().name(), false, false);
+            current->setQFProperty(QString("imfcs_imed_anotmode"), cmbRDRAnnotationDrawMode->currentIndex(), false, false);
 
             corrView->writeQFProperties(current, "imfcs_imed_corrview", egroup, param+"_"+param2);
             histogram->writeQFProperties(current, "imfcs_imed_hist", egroup, param);
@@ -1879,7 +1891,8 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
 
             chkDisplayImageOverlay->setChecked(current->getQFPropertyHirarchy3(QString("imfcs_imed_overlay_%1").arg(param), QString("imfcs_imed_overlay"), QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), true).toBool());
             cmbSelectionStyle->setCurrentIndex(current->getQFPropertyHirarchy3(QString("imfcs_imed_ovstyle_%1").arg(param), QString("imfcs_imed_ovstyle"), QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), 0).toInt());
-            cmbRDRAnnotationColor->setCurrentColor(current->getQFPropertyHirarchy3(QString("imfcs_imed_anotcol_%1").arg(param), QString("imfcs_imed_anotcol"), QString("imfcs_imed_anotcol_%1_%2").arg(egroup).arg(param), 0).value<QColor>());
+            cmbRDRAnnotationColor->setCurrentColor(QStringToQColor(current->getQFPropertyHirarchy3(QString("imfcs_imed_anotcol_%1").arg(param), QString("imfcs_imed_anotcol"), QString("imfcs_imed_anotcol_%1_%2").arg(egroup).arg(param), 0).toString()));
+            cmbRDRAnnotationDrawMode->setCurrentIndex(current->getQFPropertyHirarchy3(QString("imfcs_imed_anotmode_%1").arg(param), QString("imfcs_imed_anotmode"), QString("imfcs_imed_anotmode_%1_%2").arg(egroup).arg(param), 0).toInt());
 
             corrView->readQFProperties(current, "imfcs_imed_corrview", egroup, param+"_"+param2);
             histogram->readQFProperties(current, "imfcs_imed_hist", egroup, param);
@@ -3176,7 +3189,7 @@ void QFRDRImagingFCSImageEditor::maskChanged()
     rawDataChanged();
 };
 
-void QFRDRImagingFCSImageEditor::resultsChanged(const QString& evalName, const QString& resultName,bool deleted) {
+void QFRDRImagingFCSImageEditor::resultsChanged(const QString& /*evalName*/, const QString& /*resultName*/,bool /*deleted*/) {
     //if (evalName.isEmpty()) {
         QString egroup=currentEvalGroup();
         QString fp=currentFitParameter();
@@ -3213,7 +3226,7 @@ void QFRDRImagingFCSImageEditor::resultsChanged(const QString& evalName, const Q
     //}
 };
 
-void QFRDRImagingFCSImageEditor::slidersChanged(int userMin, int userMax, int min, int max) {
+void QFRDRImagingFCSImageEditor::slidersChanged(int userMin, int userMax, int /*min*/, int /*max*/) {
     if (!current) return;
     current->setQFProperty("imfcs_imed_datacut_min", userMin, false, false);
     current->setQFProperty("imfcs_imed_datacut_max", userMax, false, false);
@@ -3308,7 +3321,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionArrays() {
             plteOverviewSelectedData=(bool*)qfRealloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
             plteOverviewExcludedData=(bool*)qfRealloc(plteOverviewExcludedData, plteOverviewSize*sizeof(bool));
         }
-        for (register int i=0; i<siz; i++) {
+        for (int i=0; i<siz; i++) {
             int x=m->runToX(i);
             int y=m->runToY(i);
             int idx=y*m->getImageFromRunsWidth()+x;
@@ -3897,7 +3910,7 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
 }
 
 
-void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_t> selected, bool plotFit, QFPlotter *plotter, QFPlotter *plotterResid, QFTableModel* tabFitvals, int c_tau_in, QVector<double>* tau_out, QVector<double>* corr_out, QVector<double>* errcorr_out, QColor overrideColor, const QString& overrideTitle) {
+void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_t> selected, bool /*plotFit*/, QFPlotter *plotter, QFPlotter */*plotterResid*/, QFTableModel* tabFitvals, int c_tau_in, QVector<double>* tau_out, QVector<double>* corr_out, QVector<double>* errcorr_out, QColor overrideColor, const QString& overrideTitle) {
     JKQTPdatastore* ds=plotter->getDatastore();
     JKQTPerrorPlotstyle runerrorstyle=cmbRunErrorStyle->getErrorStyle();
     bool runLine=cmbRunStyle->getDrawLine();
@@ -4414,7 +4427,8 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     cmbColorbarOverview->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/ovrcolorbar"), JKQTPMathImageGRAY).toInt());
     chkDisplayImageOverlay->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/image_overlays"), true).toBool());
     cmbSelectionStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/image_overlay_style"), 0).toBool());
-    cmbRDRAnnotationColor->setCurrentColor(settings->getQSettings()->value(QString("imfcsimageeditor/imfcs_imed_anotcol"), QColor("yellow")).value<QColor>());
+    cmbRDRAnnotationColor->setCurrentColor(QStringToQColor(settings->getQSettings()->value(QString("imfcsimageeditor/imfcs_imed_anotcol"), QString("yellow")).toString()));
+    cmbRDRAnnotationDrawMode->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/imfcs_imed_anotmode"), 0).toInt());
     cmbRunStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_style"), 1).toInt());
     cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_error_style"), JKQTPerrorPolygons).toInt());
     loadSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
@@ -4447,7 +4461,8 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_keys"), chkKeys->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/image_overlays"), chkDisplayImageOverlay->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/image_overlay_style"), cmbSelectionStyle->currentIndex());
-    settings->getQSettings()->setValue(QString("imfcsimageeditor/imfcs_imed_anotcol"), cmbRDRAnnotationColor->currentColor());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/imfcs_imed_anotcol"), cmbRDRAnnotationColor->currentColor().name());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/imfcs_imed_anotmode"), cmbRDRAnnotationDrawMode->currentIndex());
 
 
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_resid"), chkDisplayResiduals->isChecked());
@@ -4775,6 +4790,7 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
             connect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(replotSelection()));
             connect(cmbSelectionStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
             connect(cmbRDRAnnotationColor, SIGNAL(currentIndexChanged(int)), this, SLOT(annotationChanged()));
+            connect(cmbRDRAnnotationDrawMode, SIGNAL(currentIndexChanged(int)), this, SLOT(annotationChanged()));
             connect(chkExcludeExcludedRunsFromHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
             connect(chkExcludeExcludedRunsFromHistogram_2, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
             connect(chkExcludeExcludedRunsFromHistogram2, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
@@ -4821,6 +4837,7 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         disconnect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(replotSelection()));
         disconnect(cmbSelectionStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
         disconnect(cmbRDRAnnotationColor, SIGNAL(currentIndexChanged(int)), this, SLOT(annotationChanged()));
+        disconnect(cmbRDRAnnotationDrawMode, SIGNAL(currentIndexChanged(int)), this, SLOT(annotationChanged()));
         disconnect(chkExcludeExcludedRunsFromHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         disconnect(chkExcludeExcludedRunsFromHistogram_2, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         disconnect(chkExcludeExcludedRunsFromHistogram2, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
@@ -4871,7 +4888,7 @@ void QFRDRImagingFCSImageEditor::imageZoomChangedLocally(double newxmin, double 
         pltImage->setXY(newxmin, newxmax, newymin, newymax);
     }
 }
-void QFRDRImagingFCSImageEditor::acfZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender) {
+void QFRDRImagingFCSImageEditor::acfZoomChangedLocally(double newxmin, double newxmax, double /*newymin*/, double /*newymax*/, JKQtPlotter* sender) {
     if (sender==plotter) {
         plotterResid->setX(newxmin, newxmax);
         //qDebug()<<newxmin << newxmax;
@@ -5168,6 +5185,7 @@ void QFRDRImagingFCSImageEditor::setCopyableData()
     pltOverview->getDatastore()->clear();
     pltMask->getDatastore()->clear();
 
+
     if (m) {
 
         pltMask->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
@@ -5176,6 +5194,7 @@ void QFRDRImagingFCSImageEditor::setCopyableData()
         pltOverview->getDatastore()->addCopiedColumn(m->getImageFromRunsPreview(), m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), tr("overview image"));
         pltOverview->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
         pltOverview->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
+        annotationChanged(false);
     }
 }
 
@@ -6233,17 +6252,21 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
         int idx=-1;
         QComboBox* cmbParameter=new QComboBox(dlg);
         for (int i=0; i<this->cmbParameter->count(); i++) {
-            cmbParameter->addItem(this->cmbParameter->itemText(i), this->cmbParameter->itemData(i));
-            if (idx<0 && (this->cmbParameter->itemData(i).toString().toLower().contains("akaike") || this->cmbParameter->itemData(i).toString().toLower().contains("aic"))) {
-                idx=0;
+            QString label=this->cmbParameter->itemText(i);
+            if (!label.contains(", fix") && !label.contains("_fix") && !label.contains(", islocal") && !label.contains("_islocal")) {
+                cmbParameter->addItem(label, this->cmbParameter->itemData(i));
+                label=label.toLower().simplified();
+                if (idx<0 && (label.contains("akaike") || label.contains("aic"))) {
+                    idx=cmbParameter->count()-1;
+                }
             }
         }
         cmbParameter->setCurrentIndex(idx);
         dlg->addWidget(tr("parameter for comparison:"), cmbParameter);
 
         QComboBox* cmbMode=new QComboBox(dlg);
-        cmbMode->addItem(tr("prefer smallest (e.g. AIC, chi^2 ...)"));
-        cmbMode->addItem(tr("prefer largest"));
+        cmbMode->addItem(tr("prefer model with smallest value (e.g. AIC, chi^2 ...)"));
+        cmbMode->addItem(tr("prefer model with largest value"));
         cmbMode->setCurrentIndex(0);
         dlg->addWidget(tr("comparison mode:"), cmbMode);
 
@@ -6251,11 +6274,16 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
         chkAnnotateMoreRDRs->setChecked(settings->value(prefix+"chkAnnotateMoreRDRs", false).toBool());
         dlg->addWidget(tr("annotate several RDRs:"), chkAnnotateMoreRDRs);
 
+        QComboBox* cmbInvisible=new QComboBox(dlg);
+        dlg->addWidget(tr("invisible evaluation:"), cmbInvisible);
+
         QStringList singlelabels, singlenames;
         for (int c=0; c<cmbResultGroup->count(); c++) {
             singlelabels.append(cmbResultGroup->itemText(c));
             singlenames.append(cmbResultGroup->itemData(c).toString());
+            cmbInvisible->addItem(cmbResultGroup->itemText(c));
         }
+        cmbInvisible->setCurrentIndex(0);
 
         dlg->init(singlelabels, singlenames, (*settings), prefix+"selections/");
         if (dlg->exec()) {
@@ -6276,14 +6304,27 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                 recs.append(current);
             }
 
+            QStringList grps=dlg->getSelectedDataStrings();
+            QStringList grpnames=dlg->getSelectedTexts();
+            if (cmbInvisible->currentIndex()>0 && cmbInvisible->currentIndex()<grps.size()) {
+                QString  g=grps[cmbInvisible->currentIndex()];
+                grps.removeAt(cmbInvisible->currentIndex());
+                grps.prepend(g);
+                g=grpnames[cmbInvisible->currentIndex()];
+                grpnames.removeAt(cmbInvisible->currentIndex());
+                grpnames.prepend(g);
+            }
+
+            qDebug()<<"\n\n"<<grps<<"\n\n"<<grpnames<<"\n\n";
+
             for (int i=0; i<recs.size(); i++) {
                 QFRDRImagingFCSData* mr=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
                 QString sma=tr("smallest");
                 if (cmbMode->currentIndex()==1) sma=tr("largest");
-                QString comment=tr("imFCS model comparison by %1 %2:\n").arg(sma).arg(cmbParameter->currentText());
+                QString comment=tr("imFCS model comparison by %1 %2").arg(sma).arg(cmbParameter->currentText());
                 QString label=comment;
+                comment=comment+QString(":\n");
                 if (mr) {
-                    QStringList grps=dlg->getSelectedDataStrings();
                     int w=mr->getImageFromRunsWidth();
                     int h=mr->getImageFromRunsHeight();
                     QVector<int> result;
@@ -6293,7 +6334,12 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                         smallest<<0;
                     }
                     //QList<QVector<double> > dats;
+                    //int symbCnt=2;
                     for (int j=0; j<grps.size(); j++) {
+                        int fitID=j+1;//symbCnt;
+                        //if (j==cmbInvisible->currentIndex()) fitID=0;
+                        //else symbCnt+=2;
+                        //if (symbCnt>19) symbCnt=3;
                         QVector<double> dat;
                         if (cmbMode->currentIndex()==0) {
                             for (int p=0; p<w*h; p++) {
@@ -6308,36 +6354,36 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                         //dats<<dat;
                         for (int p=0; p<w*h; p++) {
                             if (result[p]<0) {
-                                smallest[p]=dat[p];
-                                if (smallest[p]!=DBL_MAX && smallest[p]!=-DBL_MAX && QFFloatIsOK(smallest[p])) {
-                                    result[p]=j+1;
+                                if (dat[p]!=DBL_MAX && dat[p]!=-DBL_MAX && QFFloatIsOK(dat[p])) {
+                                    smallest[p]=dat[p];
+                                    result[p]=fitID;
                                 }
-                            } else if (smallest[p]!=DBL_MAX && smallest[p]!=-DBL_MAX && QFFloatIsOK(smallest[p]) && ((dat[p]<smallest[p] && cmbMode->currentIndex()==0) || (dat[p]>smallest[p] && cmbMode->currentIndex()==1))) {
+                            } else if (dat[p]!=DBL_MAX && dat[p]!=-DBL_MAX && QFFloatIsOK(dat[p]) && ((dat[p]<smallest[p] && cmbMode->currentIndex()==0) || (dat[p]>smallest[p] && cmbMode->currentIndex()==1))) {
                                 smallest[p]=dat[p];
-                                result[p]=j+1;
+                                result[p]=fitID;
                             }
                         }
-                        switch (j+1) {
-                            case 0:
-                            case 1: comment+=tr("none: %1").arg(singlelabels.value(j, "???")); break;
-                            case 2: comment+=tr("x: %1").arg(singlelabels.value(j, "???")); break;
-                            case 3: comment+=tr("+: %1").arg(singlelabels.value(j, "???")); break;
-                            case 4: comment+=tr("o: %1").arg(singlelabels.value(j, "???")); break;
-                            case 5: comment+=tr("filled-o: %1").arg(singlelabels.value(j, "???")); break;
-                            case 6: comment+=tr("rect: %1").arg(singlelabels.value(j, "???")); break;
-                            case 7: comment+=tr("filled-rect: %1").arg(singlelabels.value(j, "???")); break;
-                            case 8: comment+=tr("^: %1").arg(singlelabels.value(j, "???")); break;
-                            case 9: comment+=tr("filled-^: %1").arg(singlelabels.value(j, "???")); break;
-                            case 10: comment+=tr("v: %1").arg(singlelabels.value(j, "???")); break;
-                            case 11: comment+=tr("filled-v: %1").arg(singlelabels.value(j, "???")); break;
-                            case 12: comment+=tr("diamond: %1").arg(singlelabels.value(j, "???")); break;
-                            case 13: comment+=tr("filled-diamond: %1").arg(singlelabels.value(j, "???")); break;
-                            case 14: comment+=tr("star: %1").arg(singlelabels.value(j, "???")); break;
-                            case 15: comment+=tr("filled-star: %1").arg(singlelabels.value(j, "???")); break;
-                            case 16: comment+=tr("pent: %1").arg(singlelabels.value(j, "???")); break;
-                            case 17: comment+=tr("filled-pent: %1").arg(singlelabels.value(j, "???")); break;
-                            case 18: comment+=tr("*: %1").arg(singlelabels.value(j, "???")); break;
-                            case 19: comment+=tr("target: %1").arg(singlelabels.value(j, "???")); break;
+                        switch (fitID) {
+                            //case 0:
+                            case 1: comment+=tr("%2/none: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 2: comment+=tr("%2/x: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 3: comment+=tr("%2/+: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 4: comment+=tr("%2/o: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 5: comment+=tr("%2/filled-o: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 6: comment+=tr("%2/rect: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 7: comment+=tr("%2/filled-rect: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 8: comment+=tr("%2/^: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 9: comment+=tr("%2/filled-^: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 10: comment+=tr("%2/v: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 11: comment+=tr("%2/filled-v: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 12: comment+=tr("%2/diamond: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 13: comment+=tr("%2/filled-diamond: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 14: comment+=tr("%2/star: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 15: comment+=tr("%2/filled-star: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 16: comment+=tr("%2/pent: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 17: comment+=tr("%2/filled-pent: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 18: comment+=tr("%2/*: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 19: comment+=tr("%2/target: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
 
                             default: break;
                         }
@@ -6345,10 +6391,12 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                     mr->disableEmitResultsChanged();
                     int annot=mr->annotAdd(QFRDRAnnotationInterface::annotKategoryIndex, label);
                     mr->annotSetComment(annot, comment);
+                    //qDebug()<<"annotiation "<<annot<<": "<<label<<"\n"<<comment<<"\n\n";
                     for (int p=0; p<w*h; p++) {
+                        //qDebug()<<p<<": "<<result[p];
                         if (result[p]>1) mr->annotAddValue(annot, p, result[p]);
                     }
-                    mr->enableEmitResultsChanged(false);
+                    mr->enableEmitResultsChanged(true);
 
 
                 }
@@ -6787,14 +6835,14 @@ void QFRDRImagingFCSImageEditor::updateHistogram(QFHistogramView* histogram, QFR
         histogram->clear();
         if (plteImageData && (plteImageSize>=0)) {
             if (excludeExcluded) {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && !m->leaveoutRun(i) && indexIsDualView2(i)) {
                         datahist[datasize]=plteImageData[i];
                         datasize++;
                     }
                 }
             } else  {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && indexIsDualView2(i)) {
                         datahist[datasize]=plteImageData[i];
                         datasize++;
@@ -6805,14 +6853,14 @@ void QFRDRImagingFCSImageEditor::updateHistogram(QFHistogramView* histogram, QFR
     } else {
         if (plteImageData && (plteImageSize>=0)) {
             if (excludeExcluded) {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && !m->leaveoutRun(i) && (!dv || (dv && !indexIsDualView2(i)))) {
                         datahist[datasize]=plteImageData[i];
                         datasize++;
                     }
                 }
             } else  {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && (!dv || (dv && !indexIsDualView2(i)))) {
                         datahist[datasize]=plteImageData[i];
                         datasize++;
@@ -6860,7 +6908,7 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
     if (!dv) {
         if ((plteImageSize>=0) && (plteImageSize<=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
             if (excludeExcluded) {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && !m->leaveoutRun(i) && (!dv || (dv && !indexIsDualView2(i)))) {
                         if (data1) datac1[datasize]=data1[i];
                         if (data2) datac2[datasize]=data2[i];
@@ -6876,7 +6924,7 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
                     }
                 }
             } else  {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && (!dv || (dv && !indexIsDualView2(i)))) {
                         if (data1) datac1[datasize]=data1[i];
                         if (data2) datac2[datasize]=data2[i];
@@ -7251,27 +7299,41 @@ void QFRDRImagingFCSImageEditor::postBin() {
     }
 }
 
-void QFRDRImagingFCSImageEditor::annotationChanged()
+void QFRDRImagingFCSImageEditor::annotationChanged(bool replot)
 {
     bool draw=pltOverview->get_doDrawing();
     pltOverview->set_doDrawing(false);
+    bool changed=plteOverviewAnnot->get_visible();
     plteOverviewAnnot->set_visible(false);
     QFRDRAnnotationInterface *annotations=dynamic_cast<QFRDRAnnotationInterface *>(current);
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    qDebug()<<"annotationChanged: "<<chkShowRDRAnnotation->isChecked()<<cmbRDRAnnotation->currentIndex()<<annotations<<m;
+
+    if (m) {
+        m->setQFProperty(QString("imfcs_imed_anotcol"), cmbRDRAnnotationColor->currentColor().name(), false, false);
+        m->setQFProperty(QString("imfcs_imed_anotmode"), cmbRDRAnnotationDrawMode->currentIndex(), false, false);
+        m->setQFProperty(QString("imfcs_imed_show_rdr_annotation"), chkShowRDRAnnotation->isChecked(), false, false);
+        m->setQFProperty(QString("imfcs_imed_rdr_annotation_index"), cmbRDRAnnotation->currentIndex(), false, false);
+
+    }
+
     if (chkShowRDRAnnotation->isChecked() && cmbRDRAnnotation->currentIndex()>=0 && annotations && m) {
         plteOverviewAnnot->set_visible(true);
+        changed=true;
         int i=cmbRDRAnnotation->currentIndex();
         QVector<double> ax,ay,ac, adat;
         QVector<bool> aset;
         adat=annotations->annotGetValues(i);
         aset=annotations->annotGetValuesSet(i);
+        qDebug()<<adat<<"\n\n"<<aset<<"\n\n";
         int j=0;
         for (int y=0; y<m->getImageFromRunsHeight(); y++) {
             for (int x=0; x<m->getImageFromRunsWidth(); x++) {
                 if (j<adat.size() && aset.value(j, false) && (adat.value(j, 0)>0)) {
-                    ax<<x;
-                    ay<<y;
+                    ax<<(double(x)-0.5);
+                    ay<<(double(y)-0.5);
                     ac<<adat.value(j, 0);
+                    qDebug()<<j<<": "<<x<<y<<adat.value(j, 0);
                 }
                 j++;
             }
@@ -7285,16 +7347,29 @@ void QFRDRImagingFCSImageEditor::annotationChanged()
         int sc=pltOverview->getDatastore()->getColumnNum(QString("annotation%1_category").arg(i));
         if (sc<0) sc=pltOverview->getDatastore()->addCopiedColumn(ac.data(), ac.size(), QString("annotation%1_category").arg(i));
         else pltOverview->getDatastore()->getColumn(sc).copy(ac.data(), ac.size());
-        plteOverviewAnnot->set_symbolColumn(sc);
-        plteOverviewAnnot->set_color(cmbRDRAnnotationColor->currentColor());
-        //plteOverviewAnnot->set_title(annotations->annotGetAnnotationLabel(i));
+        plteOverviewAnnot->set_xColumn(sx);
+        plteOverviewAnnot->set_yColumn(sy);
+        if (cmbRDRAnnotationDrawMode->currentIndex()==0) {
+            plteOverviewAnnot->set_colorColumn(sc);
+            plteOverviewAnnot->set_symbolColumn(sc);
+            plteOverviewAnnot->set_color(cmbRDRAnnotationColor->currentColor());
+        } else if (cmbRDRAnnotationDrawMode->currentIndex()==1) {
+            plteOverviewAnnot->set_colorColumn(-1);
+            plteOverviewAnnot->set_symbolColumn(sc);
+            plteOverviewAnnot->set_color(cmbRDRAnnotationColor->currentColor());
+        } else if (cmbRDRAnnotationDrawMode->currentIndex()==2) {
+            plteOverviewAnnot->set_colorColumn(sc);
+            plteOverviewAnnot->set_symbolColumn(-1);
+            plteOverviewAnnot->set_color(cmbRDRAnnotationColor->currentColor());
+        }
+        plteOverviewAnnot->set_gridModeForSymbolSize(true);
         labAnnotations->setText(annotations->annotGetComment(i));
         labAnnotations->setVisible(labAnnotations->text().size()>0);
     }
 
 
     pltOverview->set_doDrawing(draw);
-    if (draw) pltOverview->update_plot();
+    if (draw&&changed&&replot) pltOverview->update_plot();
 }
 
 void QFRDRImagingFCSImageEditor::fillAnnotationsCombo(int nextItem)
@@ -7305,7 +7380,9 @@ void QFRDRImagingFCSImageEditor::fillAnnotationsCombo(int nextItem)
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
     if (m) {
+        qDebug()<<"\n\nget annotations: count="<<m->annotGetCount();
         for (int ai=0; ai<m->annotGetCount(); ai++) {
+            qDebug()<<ai<<": "<<m->annotGetLabel(ai);
             cmbRDRAnnotation->addItem(m->annotGetLabel(ai));
         }
     }

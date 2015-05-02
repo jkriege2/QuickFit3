@@ -1216,7 +1216,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 } else if (g.functionType==QFRDRTable::gtfQFFunction) {
                     JKQTPxQFFitFunctionLineGraph* pgf=new JKQTPxQFFitFunctionLineGraph(ui->plotter->get_plotter());
                     QFFitFunction* ff=NULL;
-                    pgf->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(g.function, NULL), true);                    
+                    pgf->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(g.function), true);
                     pgs<<pgf;
                     if (!g.showallsubfunctions) {
                         pgf->set_subfunction(g.subfunction);
@@ -1224,7 +1224,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                         for (unsigned int i=0; i<ff->getAdditionalPlotCount(ff->getInitialParamValues()); i++) {
                             JKQTPxQFFitFunctionLineGraph* pgfsub=new JKQTPxQFFitFunctionLineGraph(ui->plotter->get_plotter());
                             QFFitFunction* ff=NULL;
-                            pgfsub->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(g.function, NULL), true);
+                            pgfsub->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(g.function), true);
                             pgfsub->set_subfunction(i);
                             pgs<<pgfsub;
                         }

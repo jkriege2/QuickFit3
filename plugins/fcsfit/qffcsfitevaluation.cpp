@@ -107,7 +107,7 @@ bool QFFCSFitEvaluation::overrideFitFunctionPresetFix(const QFRawDataRecord *r, 
     return QFFitResultsByIndexEvaluation::overrideFitFunctionPresetFix(r, paramName, value);
 }
 
-int QFFCSFitEvaluation::getIndexMin(const QFRawDataRecord *r) const {
+int QFFCSFitEvaluation::getIndexMin(const QFRawDataRecord */*r*/) const {
     return -1;
 }
 
@@ -836,7 +836,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFunction
 
 }
 
-void QFFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+void QFFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord *record, int run, int /*defaultMinDatarange*/, int /*defaultMaxDatarange*/, QFPluginLogService */*logservice*/) const
 {
     result.index=run;
     result.rdr=record;
@@ -849,11 +849,11 @@ void QFFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResu
 void QFFCSFitEvaluation::createFitFunctionAndAlgorithm(QFFitAlgorithm *&falg, QFFitFunction *&ffunc, const QFRawDataRecord */*record*/, int /*run*/)
 {
     ffunc=createFitFunction();
-    falg=createFitAlgorithm(NULL);
+    falg=createFitAlgorithm();
     restoreQFFitAlgorithmParameters(falg);
 }
 
-void QFFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYValues, const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange)
+void QFFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int /*paramXFile*/, int paramXID, const QVector<double> &paramXValues, int /*paramYFile*/, int paramYID, const QVector<double> &paramYValues, const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange)
 {
     QFRawDataRecord* record=records.value(0,NULL);
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);

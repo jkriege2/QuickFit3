@@ -100,7 +100,7 @@ class QFPFitFunctionFCS : public QObject, public QFPluginFitFunction {
         virtual QStringList getIDs() const;
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
-        virtual QFFitFunction* get(QString id, QObject* parent) const ;
+        virtual QFFitFunction* get(const QString& id) const ;
     private:
 };
 

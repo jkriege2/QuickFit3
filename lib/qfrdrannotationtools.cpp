@@ -84,7 +84,7 @@ int QFRDRAnnotationTools::annotAdd(QFRDRAnnotationInterface::QFRDRAnnotationType
 void QFRDRAnnotationTools::annotAddValue(int annotation, int index, double data)
 {
     if (idxannot_rdr && annotation>=0 && index>=0) {
-        idxannot_rdr->resultsSetInNumberListAndBool(idxannot_evalid.arg(annotation), QString("value"), index, data, "", QString("annot%1_valueset").arg(annotation), true);
+        idxannot_rdr->resultsSetInNumberListAndBool(idxannot_evalid.arg(annotation), QString("value"), index, data, "", QString("value_set"), true);
     }
 }
 
@@ -114,7 +114,9 @@ QString QFRDRAnnotationTools::annotGetComment(int annotation) const
 int QFRDRAnnotationTools::annotGetCount() const
 {
     if (idxannot_rdr) {
-        return idxannot_rdr->resultsGetAsInteger("annotations", "annotation_count", 0);
+        bool ok=false;
+        int p= idxannot_rdr->resultsGetAsInteger("annotations", "annotation_count", &ok);
+        if (ok) return p;
     }
     return 0;
 }
@@ -130,7 +132,9 @@ QString QFRDRAnnotationTools::annotGetLabel(int annotation) const
 int QFRDRAnnotationTools::annotGetIndex(int annotation) const
 {
     if (idxannot_rdr && annotation>=0) {
-        return idxannot_rdr->resultsGetAsInteger(idxannot_evalid.arg(annotation), QString("index"));
+        bool ok=false;
+        int p= idxannot_rdr->resultsGetAsInteger(idxannot_evalid.arg(annotation), QString("index"), &ok);
+        if (ok) return p;
     }
     return -1;
 }
@@ -162,7 +166,7 @@ double QFRDRAnnotationTools::annotGetValue(int annotation, int index, double def
 QVector<bool> QFRDRAnnotationTools::annotGetValuesSet(int annotation) const
 {
     if (idxannot_rdr && annotation>=0) {
-        return idxannot_rdr->resultsGetAsBooleanList(idxannot_evalid.arg(annotation), QString("valueset"));
+        return idxannot_rdr->resultsGetAsBooleanList(idxannot_evalid.arg(annotation), QString("value_set"));
     }
     return QVector<bool>();
 }
@@ -170,7 +174,7 @@ QVector<bool> QFRDRAnnotationTools::annotGetValuesSet(int annotation) const
 bool QFRDRAnnotationTools::annotIsValueSet(int annotation, int index) const
 {
     if (idxannot_rdr && annotation>=0) {
-        return idxannot_rdr->resultsGetInBooleanList(idxannot_evalid.arg(annotation), QString("valueset"), index, false);
+        return idxannot_rdr->resultsGetInBooleanList(idxannot_evalid.arg(annotation), QString("value_set"), index, false);
     }
     return false;
 }

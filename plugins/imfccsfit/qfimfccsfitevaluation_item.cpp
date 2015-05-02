@@ -94,7 +94,7 @@ QFEvaluationEditor* QFImFCCSFitEvaluationItem::createEditor(QFPluginServices* se
     return new QFImFCCSFitEvaluationEditor(services, propEditor, parent);
 }
 
-int QFImFCCSFitEvaluationItem::getIndexMin(const QFRawDataRecord *r) const
+int QFImFCCSFitEvaluationItem::getIndexMin(const QFRawDataRecord */*r*/) const
 {
     return -1;
 }
@@ -1517,7 +1517,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
     bool saveLongStrings=!getProperty("dontSaveFitResultMessage", true).toBool();
     bool dontFitMasked=getProperty("dontFitMaskedPixels", true).toBool();
 
-    QFFitAlgorithm* falg=createFitAlgorithm(NULL);
+    QFFitAlgorithm* falg=createFitAlgorithm();
     if ((!falg)||records.size()<=0) return;
     QFRDRFCSDataInterface* data0=qobject_cast<QFRDRFCSDataInterface*>(records.first());
     if (!data0) return;
@@ -1802,7 +1802,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord:
     bool saveLongStrings=!getProperty("dontSaveFitResultMessage", true).toBool();
     bool dontFitMasked=getProperty("dontFitMaskedPixels", true).toBool();
 
-    QFFitAlgorithm* falg=createFitAlgorithm(NULL);
+    QFFitAlgorithm* falg=createFitAlgorithm();
     if ((!falg)||records.size()<=0) return;
     const QFRDRFCSDataInterface* data0=dynamic_cast<const QFRDRFCSDataInterface*>(records.first());
     if (!data0) return;

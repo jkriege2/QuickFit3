@@ -48,10 +48,10 @@ QString QFFitFunctionComboBox::currentFitFunctionID() const
     return getCurrentIndexData(Qt::UserRole).toString();// itemData(currentIndex()).toString();
 }
 
-QFFitFunction *QFFitFunctionComboBox::createCurrentInstance(QObject* parent) const
+QFFitFunction *QFFitFunctionComboBox::createCurrentInstance() const
 {
     QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
-    if (manager) return manager->createFunction(currentFitFunctionID(), parent);
+    if (manager) return manager->createFunction(currentFitFunctionID());
     return NULL;
 }
 
@@ -118,7 +118,7 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
     if (filter.contains(",")) {
         QStringList fl=filter.split(",");
         for (int i=0; i<fl.size(); i++) {
-            QMap<QString, QFFitFunction*> ff=manager->getModels(fl[i], this);
+            QMap<QString, QFFitFunction*> ff=manager->getModels(fl[i]);
             QMapIterator<QString, QFFitFunction*> itf(ff);
             while (itf.hasNext()) {
                 itf.next();
@@ -127,7 +127,7 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
             }
         }
     } else {
-        m_fitFunctions=manager->getModels(filter, this);
+        m_fitFunctions=manager->getModels(filter);
     }
 
 
@@ -167,7 +167,7 @@ void QFFitFunctionComboBox::updateFitFunctions(const QStringList &availableFF)
 
         m_model->clear();
         for (int i=0; i<m_availableFuncs.size(); i++)  {
-            QFFitFunction* ff=manager->createFunction(m_availableFuncs[i], this);
+            QFFitFunction* ff=manager->createFunction(m_availableFuncs[i]);
             if (ff) {
                 //QFSimpleTreeModelItem* item=m_model->addFolderedItem(ff->category(), ff->shortName(), ff->id());
                 QFPseudoTreeModelItem* item=m_model->addFolderedItem(ff->category(), ff->shortName(), ff->id());

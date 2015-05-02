@@ -618,7 +618,7 @@ void QEnhancedTableView::copySelectionAsMedianQuantilesToExcel(int medianrole, i
 
 
 
-QString QEnhancedTableView::toHtml(int borderWidth, bool non_breaking, int fontSizePt) const {
+QString QEnhancedTableView::toHtml(int borderWidth, bool /*non_breaking*/, int fontSizePt) const {
     if (!model()) return "";
     QString fsstyle="";
     if (fontSizePt>0) {

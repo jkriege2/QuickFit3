@@ -34,7 +34,7 @@ QStringList QFPFitFunctions2FFCS::getIDs() const {
     return res;
 }
 
-QFFitFunction* QFPFitFunctions2FFCS::get(QString id, QObject* parent) const  {
+QFFitFunction* QFPFitFunctions2FFCS::get(const QString &id) const  {
     if (id=="fccs_2f_diff3d") {
         return new QFFitFunctionFCCSNormalDiff3D2Focus(true);
     } else if (id=="fccs_2f_diff2d") {

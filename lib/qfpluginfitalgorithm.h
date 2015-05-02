@@ -45,13 +45,13 @@ class QFLIB_EXPORT QFPluginFitAlgorithm: public QFPlugin {
         virtual QStringList getIDs() const =0;
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
-        virtual QFFitAlgorithm* get(QString id, QObject* parent) const =0;
+        virtual QFFitAlgorithm* get(const QString& id) const =0;
 
         /** \brief deinit plugin, this function is guaranteed to be called once, before  */
-        virtual void deinit() {};
+        virtual void deinit() {}
 
         /** \brief init plugin, this function is guaranteed to be called once, before  */
-        virtual void init() {};
+        virtual void init() {}
     protected:
     private:
 };

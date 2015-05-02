@@ -286,6 +286,9 @@ int QFFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int index)
 }
 
 void QFFCCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender) {
+    Q_UNUSED(newymin)
+    Q_UNUSED(newymax)
+
     if (sender==ui->pltData) {
         ui->pltResiduals->setX(newxmin, newxmax);
         ui->pltResiduals->update_plot();
@@ -447,7 +450,7 @@ void QFFCCSFitEvaluationEditor::configFitAlgorithm()
     }
 }
 
-void QFFCCSFitEvaluationEditor::fitAlgorithmChanged(int model)
+void QFFCCSFitEvaluationEditor::fitAlgorithmChanged(int /*model*/)
 {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1496,11 +1499,14 @@ void QFFCCSFitEvaluationEditor::on_cmbWeight_currentWeightChanged(QFFCSWeighting
 
 int QFFCCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index)
 {
+    Q_UNUSED(rec)
+    Q_UNUSED(index)
     return 0;
 }
 
 int QFFCCSFitEvaluationEditor::getUserMin(QFRawDataRecord *rec, int index, int defaultMin)
 {
+    Q_UNUSED(index)
     QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
     if (!data) return defaultMin;
     const QString resultID=data->getEvaluationResultID(-1, rec);
@@ -1516,7 +1522,7 @@ int QFFCCSFitEvaluationEditor::getUserMin(QFRawDataRecord *rec, int index, int d
     return defaultM;
 }
 
-int QFFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int index, int defaultMax)
+int QFFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int /*index*/, int defaultMax)
 {
     QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
     if (!data) return defaultMax;
@@ -1549,7 +1555,7 @@ void QFFCCSFitEvaluationEditor::setUserMinMax(int userMin, int userMax)
 
 }
 
-void QFFCCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max)
+void QFFCCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int /*min*/, int /*max*/)
 {
     if (!current) return;
     setUserMinMax(userMin, userMax);
@@ -1669,7 +1675,7 @@ void QFFCCSFitEvaluationEditor::setUserMaxInternal(QFFCCSFitEvaluationItem *data
     rdr->enableEmitPropertiesChanged(true);
 }
 
-int QFFCCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index)
+int QFFCCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int /*index*/)
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     if (data) {
@@ -1683,7 +1689,7 @@ void QFFCCSFitEvaluationEditor::on_chkSaveStrings_toggled(bool checked)
     current->setQFProperty("dontSaveFitResultMessage", !checked, false, false);
 }
 
-void QFFCCSFitEvaluationEditor::on_btnEditRanges_toggled(bool enabled)
+void QFFCCSFitEvaluationEditor::on_btnEditRanges_toggled(bool /*enabled*/)
 {
     setParameterVisibility();
     ensureCorrectParamaterModelDisplay();

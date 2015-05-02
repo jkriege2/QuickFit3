@@ -1827,7 +1827,7 @@ void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
         }
 
     } else if (ui->cmbFunctionType->currentIndex()==4) {
-        QFFitFunction* ff(ui->cmbQFFitFunction->createCurrentInstance(fitfuncValuesTable));
+        QFFitFunction* ff(ui->cmbQFFitFunction->createCurrentInstance());
         //fitfuncValues.clear();
         if (ff) {
             int vsize=ff->paramCount();

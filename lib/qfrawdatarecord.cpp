@@ -3766,7 +3766,7 @@ QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QStri
     return QString("");
 }
 
-QVariant QFRawDataRecord::resultsGetAsStringVariant(const QString &evalName, const QString &resultName, int position, bool alsoGetNonVec) const {
+QVariant QFRawDataRecord::resultsGetAsStringVariant(const QString &evalName, const QString &resultName, int position, bool /*alsoGetNonVec*/) const {
     return QVariant(resultsGetAsString(evalName, resultName, position));
 }
 

@@ -307,7 +307,7 @@ int QFImFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int index)
     return getUserMax(rec, index, ui->datacut->get_userMax());
 }
 
-void QFImFCCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender) {
+void QFImFCCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double /*newymin*/, double /*newymax*/, JKQtPlotter *sender) {
     if (sender==ui->pltData) {
         ui->pltResiduals->setX(newxmin, newxmax);
         ui->pltResiduals->update_plot();
@@ -495,7 +495,7 @@ void QFImFCCSFitEvaluationEditor::configFitAlgorithm()
     }
 }
 
-void QFImFCCSFitEvaluationEditor::fitAlgorithmChanged(int model)
+void QFImFCCSFitEvaluationEditor::fitAlgorithmChanged(int /*model*/)
 {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -815,7 +815,7 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
 
 }
 
-void QFImFCCSFitEvaluationEditor::fileChanged(int num, QFRawDataRecord *file)
+void QFImFCCSFitEvaluationEditor::fileChanged(int /*num*/, QFRawDataRecord *file)
 {
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     QFRawDataRecord* ovr=eval->getFitFile(0);
@@ -1782,12 +1782,12 @@ void QFImFCCSFitEvaluationEditor::on_cmbWeight_currentWeightChanged(QFFCSWeighti
     QApplication::restoreOverrideCursor();
 }
 
-int QFImFCCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index)
+int QFImFCCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord */*rec*/, int /*index*/)
 {
     return 0;
 }
 
-int QFImFCCSFitEvaluationEditor::getUserMin(QFRawDataRecord *rec, int index, int defaultMin)
+int QFImFCCSFitEvaluationEditor::getUserMin(QFRawDataRecord *rec, int /*index*/, int defaultMin)
 {
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!data) return defaultMin;
@@ -1804,7 +1804,7 @@ int QFImFCCSFitEvaluationEditor::getUserMin(QFRawDataRecord *rec, int index, int
     return defaultM;
 }
 
-int QFImFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int index, int defaultMax)
+int QFImFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int /*index*/, int defaultMax)
 {
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!data) return defaultMax;
@@ -1835,7 +1835,7 @@ void QFImFCCSFitEvaluationEditor::setUserMinMax(int userMin, int userMax)
     }
 }
 
-void QFImFCCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max)
+void QFImFCCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int /*min*/, int /*max*/)
 {
     if (!current) return;
     setUserMinMax(userMin, userMax);
@@ -1956,7 +1956,7 @@ void QFImFCCSFitEvaluationEditor::setUserMaxInternal(QFImFCCSFitEvaluationItem *
     rdr->enableEmitPropertiesChanged(true);
 }
 
-int QFImFCCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index)
+int QFImFCCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int /*index*/)
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     if (data) {
@@ -1989,7 +1989,7 @@ void QFImFCCSFitEvaluationEditor::on_chkDontFitMasked_toggled(bool checked)
     current->setQFProperty("dontFitMaskedPixels", checked, false, false);
 }
 
-void QFImFCCSFitEvaluationEditor::on_btnEditRanges_toggled(bool enabled)
+void QFImFCCSFitEvaluationEditor::on_btnEditRanges_toggled(bool /*enabled*/)
 {
     setParameterVisibility();
     ensureCorrectParamaterModelDisplay();

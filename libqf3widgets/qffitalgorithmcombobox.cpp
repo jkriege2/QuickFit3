@@ -37,10 +37,10 @@ QString QFFitAlgorithmComboBox::currentFitAlgorithmID() const
     return itemData(currentIndex()).toString();
 }
 
-QFFitAlgorithm *QFFitAlgorithmComboBox::createCurrentInstance(QObject *parent) const
+QFFitAlgorithm *QFFitAlgorithmComboBox::createCurrentInstance() const
 {
     QFFitAlgorithmManager* manager=QFFitAlgorithmManager::getInstance();
-    return manager->createAlgorithm(currentFitAlgorithmID(), parent);
+    return manager->createAlgorithm(currentFitAlgorithmID());
 
 }
 
@@ -71,7 +71,7 @@ void QFFitAlgorithmComboBox::updateFitAlgorithms()
     clear();
     QStringList m_ids=manager->getIDList();
     for (int i=0; i<m_ids.size(); i++) {
-        QFFitAlgorithm* a=manager->createAlgorithm(m_ids[i], this);
+        QFFitAlgorithm* a=manager->createAlgorithm(m_ids[i]);
         if (a->isThreadSafe()) addItem(QIcon(":/lib/fitalg_icon_mt.png"), a->name() , m_ids[i]);
         else addItem(QIcon(":/lib/fitalg_icon.png"), a->name() , m_ids[i]);
         if (a->isDeprecated()) {

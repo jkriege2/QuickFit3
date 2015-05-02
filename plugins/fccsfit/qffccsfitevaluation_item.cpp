@@ -91,7 +91,7 @@ QFEvaluationEditor* QFFCCSFitEvaluationItem::createEditor(QFPluginServices* serv
     return new QFFCCSFitEvaluationEditor(services, propEditor, parent);
 }
 
-int QFFCCSFitEvaluationItem::getIndexMin(const QFRawDataRecord *r) const
+int QFFCCSFitEvaluationItem::getIndexMin(const QFRawDataRecord */*r*/) const
 {
     return -1;
 }
@@ -1275,11 +1275,11 @@ void QFFCCSFitEvaluationItem::enableAndEmitResultsSignals() const {
     }
 }
 
-void QFFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+void QFFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord *> &/*records*/, int /*run*/, int /*defaultMinDatarange*/, int /*defaultMaxDatarange*/, QFPluginLogService */*logservice*/) const
 {
 }
 
-void QFFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord::QFFitFitResultsStore> &result, const QList<const QFRawDataRecord *> &records, const QStringList &fitfunctionIDs, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+void QFFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord::QFFitFitResultsStore> &result, const QList<const QFRawDataRecord *> &records, const QStringList &/*fitfunctionIDs*/, int run, int /*defaultMinDatarange*/, int /*defaultMaxDatarange*/, QFPluginLogService */*logservice*/) const
 {
     for (int i=0; i<records.size(); i++) {
         QFRawDataRecord::QFFitFitResultsStore r;

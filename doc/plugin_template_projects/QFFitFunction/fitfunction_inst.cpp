@@ -29,7 +29,7 @@ QStringList QFFitAlgorithmInst::getIDs() const {
     return res;
 }
 
-QFFitFunction* QFFitAlgorithmInst::get(QString id, QObject* parent) const  {
+QFFitFunction* QFFitAlgorithmInst::get(const QString& id) const  {
     if (id=="ff_id") {
         return new QFFitAlgorithmInst_F1();
     } 

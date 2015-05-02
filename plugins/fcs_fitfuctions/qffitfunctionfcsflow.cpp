@@ -176,7 +176,7 @@ void QFFitFunctionFCSFlow::calcParameter(double* data, double* error) const {
 
 }
 
-bool QFFitFunctionFCSFlow::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionFCSFlow::isParameterVisible(int /*parameter*/, const double* /*data*/) const {
     return true;
 }
 

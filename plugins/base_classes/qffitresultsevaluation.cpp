@@ -45,12 +45,12 @@ QFFitResultsEvaluation::QFFitResultsEvaluation(const QString& fitFunctionPrefix,
 
     // get list of applicable fit functions
     if (!fitFunctionPrefix.contains(',')) {
-        m_fitFunctions=parent->getServices()->getFitFunctionManager()->getModels(fitFunctionPrefix, this);
+        m_fitFunctions=parent->getServices()->getFitFunctionManager()->getModels(fitFunctionPrefix);
     } else {
         QStringList sl=fitFunctionPrefix.split(',');
         m_fitFunctions.clear();
         for (int i=0; i<sl.size(); i++) {
-            m_fitFunctions=m_fitFunctions.unite(parent->getServices()->getFitFunctionManager()->getModels(sl[i], this));
+            m_fitFunctions=m_fitFunctions.unite(parent->getServices()->getFitFunctionManager()->getModels(sl[i]));
         }
     }
     // select first fit function
@@ -60,7 +60,7 @@ QFFitResultsEvaluation::QFFitResultsEvaluation(const QString& fitFunctionPrefix,
     clearQFFitAlgorithmParameters();
     QStringList fita=parent->getServices()->getFitAlgorithmManager()->getIDList();
     for (int i=0; i<fita.size(); i++) {
-        QFFitAlgorithm* falg=parent->getServices()->getFitAlgorithmManager()->createAlgorithm(fita[i], this);
+        QFFitAlgorithm* falg=parent->getServices()->getFitAlgorithmManager()->createAlgorithm(fita[i]);
         m_fitAlgorithms[fita[i]]=falg;
         storeQFFitAlgorithmParameters(falg);
     }
@@ -145,7 +145,7 @@ QFFitAlgorithm* QFFitResultsEvaluation::getFitAlgorithm(const QString& id) const
 QFFitAlgorithm *QFFitResultsEvaluation::createFitAlgorithm(const QString &id) const
 {
     if (m_fitAlgorithms.contains(id)) {
-        QFFitAlgorithm* falg=QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(id, NULL);
+        QFFitAlgorithm* falg=QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(id);
         return falg;
     }
     return NULL;
@@ -185,32 +185,34 @@ QFFitFunction *QFFitResultsEvaluation::getFitFunction(const QFRawDataRecord *rdr
 
 QString QFFitResultsEvaluation::getFitFunctionID(const QFRawDataRecord *rdr) const
 {
+    Q_UNUSED(rdr)
     return m_fitFunction;
 }
 
 QString QFFitResultsEvaluation::getFitFunctionID(int num) const
 {
+    Q_UNUSED(num)
     return m_fitFunction;
 }
 
-QFFitAlgorithm *QFFitResultsEvaluation::createFitAlgorithm(QObject* parent) const
+QFFitAlgorithm *QFFitResultsEvaluation::createFitAlgorithm() const
 {
-    return QFFitAlgorithmManager::getInstance()->createAlgorithm(m_fitAlgorithm, parent);
+    return QFFitAlgorithmManager::getInstance()->createAlgorithm(m_fitAlgorithm);
 }
 
-QFFitFunction *QFFitResultsEvaluation::createFitFunction(const QFRawDataRecord *rdr, QObject *parent) const
+QFFitFunction *QFFitResultsEvaluation::createFitFunction(const QFRawDataRecord *rdr) const
 {
-    return QFFitFunctionManager::getInstance()->createFunction(getFitFunctionID(rdr), parent);
+    return QFFitFunctionManager::getInstance()->createFunction(getFitFunctionID(rdr));
 }
 
 QFFitFunction *QFFitResultsEvaluation::createFitFunction() const
 {
-    return createFitFunction(getHighlightedRecord(), NULL);
+    return createFitFunction(getHighlightedRecord());
 }
 
-QFFitFunction *QFFitResultsEvaluation::createFitFunction(int rdr, QObject *parent) const
+QFFitFunction *QFFitResultsEvaluation::createFitFunction(int rdr) const
 {
-    return QFFitFunctionManager::getInstance()->createFunction(getFitFunctionID(rdr), parent);
+    return QFFitFunctionManager::getInstance()->createFunction(getFitFunctionID(rdr));
 }
 
 QString QFFitResultsEvaluation::transformResultID(const QString &resultID) const {
@@ -434,7 +436,7 @@ QString QFFitResultsEvaluation::getParameterStoreID(const QFRawDataRecord *rdr, 
     return QString(r+fitfunction+"___"+parameter).trimmed().toLower();
 }
 
-QString QFFitResultsEvaluation::rdrPointerToParameterStoreID(const QFRawDataRecord *rdr) const
+QString QFFitResultsEvaluation::rdrPointerToParameterStoreID(const QFRawDataRecord */*rdr*/) const
 {
     return "";
 }
@@ -466,6 +468,26 @@ bool QFFitResultsEvaluation::hasFit() const {
 
 
 
+void QFFitResultsEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value)  {
+    if (r!=NULL) {
+        QFFitFunction* f=getFitFunction(r);
+        QString unit="";
+        if (f) {
+            int pid=f->getParameterNum(parameterID);
+            if (pid>-1) unit=f->getDescription(pid).unit;
+        }
+        r->resultsSetNumber(transformResultID(resultID), (parameterID), value, unit);
+        emitResultsChanged(r, resultID, (parameterID));
+    }
+}
+void QFFitResultsEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, QString unit)  {
+    if (r!=NULL) {
+        //QFFitFunction* f=getFitFunction(r);
+        r->resultsSetNumber(transformResultID(resultID), (parameterID), value, unit);
+        emitResultsChanged(r, resultID, (parameterID));
+    }
+}
+
 
 void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value)  {
     if (r!=NULL) {
@@ -486,6 +508,8 @@ void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord* r, const QString
         emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
+
+
 
 void QFFitResultsEvaluation::setFitResultValueString(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, QString value)  {
     if (r!=NULL) {
@@ -589,11 +613,11 @@ void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord* r, const QString
     }
 }
 
-void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QVector<double> error, QString unit)
+void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QVector<double> error, QString unit_in)
 {
     if (r!=NULL) {
         QFFitFunction* f=getFitFunction(r);
-        QString unit="";
+        QString unit=unit_in;
         if (f) {
             int pid=f->getParameterNum(parameterID);
             if (pid>-1) unit=f->getDescription(pid).unit;
@@ -603,8 +627,21 @@ void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord *r, const QString
     }
 }
 
-void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QString unit)
+void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QString uniti)
 {
+    if (r!=NULL) {
+        QFFitFunction* f=getFitFunction(r);
+        QString unit=uniti;
+        if (f) {
+            int pid=f->getParameterNum(parameterID);
+            if (pid>-1) unit=f->getDescription(pid).unit;
+        }
+        r->resultsSetNumberList(transformResultID(resultID), getFitParamID(parameterID), value, unit);
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
+    }
+}
+
+void QFFitResultsEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, double error)  {
     if (r!=NULL) {
         QFFitFunction* f=getFitFunction(r);
         QString unit="";
@@ -612,8 +649,36 @@ void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord *r, const QString
             int pid=f->getParameterNum(parameterID);
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
-        r->resultsSetNumberList(transformResultID(resultID), getFitParamID(parameterID), value, unit);
-        emitResultsChanged(r, resultID, getFitParamID(parameterID));
+        r->resultsSetNumberError(transformResultID(resultID), (parameterID), value, error, unit);
+        emitResultsChanged(r, resultID, (parameterID));
+    }
+}
+
+void QFFitResultsEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QVector<double> error, QString uniti)
+{
+    if (r!=NULL) {
+        QFFitFunction* f=getFitFunction(r);
+        QString unit=uniti;
+        if (f) {
+            int pid=f->getParameterNum(parameterID);
+            if (pid>-1) unit=f->getDescription(pid).unit;
+        }
+        r->resultsSetNumberErrorList(transformResultID(resultID), (parameterID), value, error, unit);
+        emitResultsChanged(r, resultID, (parameterID));
+    }
+}
+
+void QFFitResultsEvaluation::setFitResultValueNoParamTransform(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QString u)
+{
+    if (r!=NULL) {
+        QFFitFunction* f=getFitFunction(r);
+        QString unit=u;
+        if (f) {
+            int pid=f->getParameterNum(parameterID);
+            if (pid>-1) unit=f->getDescription(pid).unit;
+        }
+        r->resultsSetNumberList(transformResultID(resultID), (parameterID), value, unit);
+        emitResultsChanged(r, resultID, (parameterID));
     }
 }
 
@@ -693,7 +758,7 @@ void QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDat
     }
 }
 
-bool QFFitResultsEvaluation::hasSpecial(const QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const {
+bool QFFitResultsEvaluation::hasSpecial(const QFRawDataRecord* /*r*/, const QString& /*id*/, const QString& /*paramid*/, double& /*value*/, double& /*error*/) const {
     return false;
 }
 
@@ -830,6 +895,18 @@ void QFFitResultsEvaluation::setFitResultGroup(QFRawDataRecord* r, const QString
     }
 }
 
+void QFFitResultsEvaluation::setFitResultGroupNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& group)  {
+    if (r!=NULL) {
+        //QFFitFunction* f=getFitFunction(r);
+        QString unit="";
+        /*if (f) {
+            int pid=f->getParameterNum(parameterID);
+        }*/
+        r->resultsSetGroup(transformResultID(resultID), (parameterID), group);
+        emitResultsChanged(r, resultID, (parameterID));
+    }
+}
+
 void QFFitResultsEvaluation::setFitResultLabel(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& label, const QString& label_richtext)  {
     if (r!=NULL) {
         //QFFitFunction* f=getFitFunction(r);
@@ -839,6 +916,18 @@ void QFFitResultsEvaluation::setFitResultLabel(QFRawDataRecord* r, const QString
         }*/
         r->resultsSetLabel(transformResultID(resultID), getFitParamID(parameterID), label, label_richtext);
         emitResultsChanged(r, resultID, getFitParamID(parameterID));
+    }
+}
+
+void QFFitResultsEvaluation::setFitResultLabelNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& label, const QString& label_richtext)  {
+    if (r!=NULL) {
+        //QFFitFunction* f=getFitFunction(r);
+        QString unit="";
+        /*if (f) {
+            int pid=f->getParameterNum(parameterID);
+        }*/
+        r->resultsSetLabel(transformResultID(resultID), (parameterID), label, label_richtext);
+        emitResultsChanged(r, resultID, (parameterID));
     }
 }
 
@@ -1309,84 +1398,84 @@ void QFFitResultsEvaluation::resetDefaultFitFix(QFRawDataRecord* rin, const QStr
 void QFFitResultsEvaluation::setFitResultFitStatistics(QFRawDataRecord *record, const QString &evalID, const QFFitStatistics &result, const QString &prefix, const QString &group)
 {
     QString param="";
-    setFitResultValue(record, evalID, param=prefix+"chisquared", result.residSqrSum);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"chisquared", result.residSqrSum, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
 
-    setFitResultValue(record, evalID, param=prefix+"chisquared_weighted", result.residWeightSqrSum);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"chisquared_weighted", result.residWeightSqrSum, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
 
-    setFitResultValue(record, evalID, param=prefix+"residavg", result.residAverage);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("residual average"), QString("&lang;E&rang;"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"residavg", result.residAverage, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("residual average"), QString("&lang;E&rang;"));
 
-    setFitResultValue(record, evalID, param=prefix+"residavg_weighted", result.residWeightAverage);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"residavg_weighted", result.residWeightAverage, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
 
-    setFitResultValue(record, evalID, param=prefix+"residstddev", result.residStdDev);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"residstddev", result.residStdDev, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
 
-    setFitResultValue(record, evalID, param=prefix+"residstddev_weighted", result.residWeightStdDev);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"residstddev_weighted", result.residWeightStdDev, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
 
-    setFitResultValue(record, evalID, param=prefix+"fitparams", result.fitparamN);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("fit params"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"fitparams", result.fitparamN, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("fit params"));
 
-    setFitResultValue(record, evalID, param=prefix+"datapoints", result.dataSize);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("datapoints"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"datapoints", result.dataSize, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("datapoints"));
 
-    setFitResultValue(record, evalID, param=prefix+"dof", result.degFreedom);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("degrees of freedom"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"dof", result.degFreedom, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("degrees of freedom"));
 
-    setFitResultValue(record, evalID, param=prefix+"r2", result.Rsquared);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("R squared"), tr("R<sup>2</sup>"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"r2", result.Rsquared, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("R squared"), tr("R<sup>2</sup>"));
 
-    setFitResultValue(record, evalID, param=prefix+"adjusted_r2", result.AdjustedRsquared);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub>"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"adjusted_r2", result.AdjustedRsquared, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub>"));
 
-    setFitResultValue(record, evalID, param=prefix+"tss", result.TSS);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("total sum of squares"));
-
-
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"tss", result.TSS, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("total sum of squares"));
 
 
-    setFitResultValue(record, evalID, param=prefix+"r2_weighted", result.RsquaredWeighted);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("weighted R squared"), tr("R<sup>2</sup> (weighted)"));
 
-    setFitResultValue(record, evalID, param=prefix+"adjusted_r2_weighted", result.AdjustedRsquaredWeighted);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("weighted adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub> (weighted)"));
 
-    setFitResultValue(record, evalID, param=prefix+"aicc", result.AICc);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("Akaike's information criterion"), tr("AICc"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"r2_weighted", result.RsquaredWeighted, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("weighted R squared"), tr("R<sup>2</sup> (weighted)"));
 
-    setFitResultValue(record, evalID, param=prefix+"aicc_weighted", result.AICcWeighted);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("weighted Akaike's information criterion"), tr("AICc (weighted)"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"adjusted_r2_weighted", result.AdjustedRsquaredWeighted, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("weighted adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub> (weighted)"));
 
-    setFitResultValue(record, evalID, param=prefix+"bic", result.BIC);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("Bayesian information criterion"), tr("BIC"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"aicc", result.AICc, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("Akaike's information criterion"), tr("AICc"));
 
-    setFitResultValue(record, evalID, param=prefix+"bic_weighted", result.BICweighted);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("weighted Bayesian information criterion"), tr("BIC (weighted)"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"aicc_weighted", result.AICcWeighted, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("weighted Akaike's information criterion"), tr("AICc (weighted)"));
 
-    setFitResultValue(record, evalID, param=prefix+"max_rel_param_error", result.maxRelParamError);
-    setFitResultGroup(record, evalID, param, group);
-    setFitResultLabel(record, evalID, param, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"bic", result.BIC, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("Bayesian information criterion"), tr("BIC"));
+
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"bic_weighted", result.BICweighted, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("weighted Bayesian information criterion"), tr("BIC (weighted)"));
+
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"max_rel_param_error", result.maxRelParamError, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
 
 }
 

@@ -101,7 +101,7 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
     if (filter.contains(",")) {
         QStringList fl=filter.split(",");
         for (int i=0; i<fl.size(); i++) {
-            QMap<QString, QFFitFunction*> ff=manager->getModels(fl[i], this);
+            QMap<QString, QFFitFunction*> ff=manager->getModels(fl[i]);
             QMapIterator<QString, QFFitFunction*> itf(ff);
             while (itf.hasNext()) {
                 itf.next();
@@ -110,7 +110,7 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
             }
         }
     } else {
-        m_fitFunctions=manager->getModels(filter, this);
+        m_fitFunctions=manager->getModels(filter);
     }
 
     QFSimpleTreeModel *m = model;
@@ -166,7 +166,7 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
         model=new QFSimpleTreeModel(this);
         QMap<QString, QFFitFunction*> m_fitFunctions;
         for (int i=0; i<availableFF.size(); i++) {
-            m_fitFunctions[availableFF[i]]=manager->createFunction(availableFF[i], this);
+            m_fitFunctions[availableFF[i]]=manager->createFunction(availableFF[i]);
         }
 
         QFSimpleTreeModel *m = model;
@@ -214,7 +214,7 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
     }
 }
 
-void QFFitFunctionSelectDialog::currentRowChanged(const QModelIndex & current, const QModelIndex & previous)
+void QFFitFunctionSelectDialog::currentRowChanged(const QModelIndex & /*current*/, const QModelIndex & /*previous*/)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QString pid=getCurrentItem();

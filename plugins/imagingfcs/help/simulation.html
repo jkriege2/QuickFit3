@@ -32,12 +32,12 @@ The simulation dialog looks like this:
 <h2>Simulation Properties</h2>
 <h3>2D Random Walk</h3>
 <ul>
-    <li>The simulation performs a 2D random walk with periodic boundary conditions for each walker</li>
-    <li>There are up to three sets of walkers: green ones (always there), red ones and red+green ones (the last two only in the dual view mode). 
+    <li>The simulation performs a 2D random walk with periodic boundary conditions for each walker. </li>
+    <li>There are up to six different sets of walkers: 2&times; green walkers (always there), 2&times; red walkers and 2&times; red+green walkers (the last two are only available in the dual view mode). 
     Each set has its own diffusion coefficient  and a global flow may be added in addition. Every walker is thus displaced in every timestep $$math:\Delta t$$: 
       $$bmath:\Delta x=N(0,\sqrt{2\cdot D\cdot \Delta t})+v_x\cdot \Delta t$$ 
       $$bmath:\Delta y=N(0,\sqrt{2\cdot D\cdot \Delta t})+v_y\cdot \Delta t$$ 
-    where $$math:N(0,\sigma)$$ is a normally distributed random number with mean 0 and variance $$math:\sigma^2$$.</li>
+    where $$math:N(0,\sigma)$$ is a normally distributed random number with mean 0 and variance $$math:\sigma^2$$. $$note:The flow may be limited to the right image half (y>width/2).<br>Also the diffusion of each species may be limited to the bottom half (x>width/2) of the image. Then in the x-direction the boundary conditions are no longer periodic, but reflective (in y-direction they stay periodic!). Be aware, that therefore limiting the diffusion space and using flow may lead to a concentration of the particles at a border!$$</li>
     <li>Then the intensity in each pixel is calculated as
     $$bmath:I_g(x,y)=N(B, \sigma_B)+\sum_{i=1}^{N_g} b_g\cdot\exp\left(-2\cdot\frac{(x-x_{g,i})^2+(y-y_{g,i})^2}{w_{xy}^2}\right)+\sum_{i=1}^{N_{rg}} b_g\cdot\exp\left(-2\cdot\frac{(x-x_{rg,i})^2+(y-y_{rg,i})^2}{w_{xy}^2}\right)$$
     $$bmath:I_r(x,y)=N(B, \sigma_B)+\sum_{i=1}^{N_r} b_r\cdot\exp\left(-2\cdot\frac{(x-x_{r,i})^2+(y-y_{r,i})^2}{w_{xy}^2}\right)+\sum_{i=1}^{N_{rg}} b_r\cdot\exp\left(-2\cdot\frac{(x-x_{rg,i})^2+(y-y_{rg,i})^2}{w_{xy}^2}\right)$$

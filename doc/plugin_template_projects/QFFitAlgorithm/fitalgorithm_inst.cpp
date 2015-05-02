@@ -34,7 +34,7 @@ QStringList QFFitAlgorithmInstPlugin::getIDs() const {
 	return sl;
 }
 
-QFFitAlgorithm* QFFitAlgorithmInstPlugin::get(QString id, QObject* parent) const {
+QFFitAlgorithm* QFFitAlgorithmInstPlugin::get(const QString& id) const {
 	if (id=="fa_id") return new QFFitAlgorithmInst_A1();
 	return NULL;
 }

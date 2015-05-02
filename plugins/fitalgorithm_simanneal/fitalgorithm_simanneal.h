@@ -255,7 +255,7 @@ class QFPFitAlgorithmSimAnneal : public QObject, public QFPluginFitAlgorithm {
         };
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
-        virtual QFFitAlgorithm* get(QString id, QObject* parent) const {
+        virtual QFFitAlgorithm* get(const QString& id) const {
             if (id=="fit_simanneal") return new QFFitAlgorithmSimAnneal();
             return NULL;
         }

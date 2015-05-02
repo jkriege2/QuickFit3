@@ -294,18 +294,26 @@ double *QFRDRNumberAndBrightnessData::getOverviewImage(int image) const
 
 void QFRDRNumberAndBrightnessData::intWriteData(QXmlStreamWriter& w) const {
 
-    w.writeAttribute(QString("mask"), maskToListString(", ", "; "));
+    if (maskGetWidth()>0 && maskGetHeight()>0) {
+        w.writeAttribute(QString("mask"), maskToListString(", ", "; "));
+    } else {
+        w.writeAttribute(QString("mask"), maskS);
+    }
     if (selections.size()>0) {
         w.writeStartElement("selections");
         for (int s=0; s<selections.size(); s++) {
             QString l="";
             bool* sel=selections[s].selection;
             int selSize=getImageSelectionWidth()*getImageSelectionHeight();
-            for (int i=0; i<selSize; i++) {
-                if (sel[i]) {
-                    if (l.size()>0) l+=","+QString::number(i);
-                    else l+=QString::number(i);
+            if (selSize>0) {
+                for (int i=0; i<selSize; i++) {
+                    if (sel[i]) {
+                        if (l.size()>0) l+=","+QString::number(i);
+                        else l+=QString::number(i);
+                    }
                 }
+            } else {
+                l=selections[s].tempSel;
             }
 
             w.writeStartElement("selection");
@@ -490,7 +498,7 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
             //qDebug()<<lo<<ok;
         }
 
-        QString maskS="";
+        maskS="";
         if (e) maskS=e->attribute("mask", "").simplified().trimmed();
         maskClear();
         if (maskS.size()>0) maskLoadFromListString(maskS,',', ';');
@@ -508,6 +516,7 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
                 sel.selection=(bool*)qfCalloc(selSize, sizeof(bool));
                 for (int i=0; i<selSize; i++) sel.selection[i]=false;
                 sel.name=n;
+                sel.tempSel=l;
 
                 QStringList li=l.split(",");
                 for (int i=0; i<li.size(); i++) {

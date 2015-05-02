@@ -360,6 +360,6 @@ unsigned int QFFitFunctionFCCSNormalDiff3D2Focus::getAdditionalPlotCount(const d
     return 0;
 }
 
-QString QFFitFunctionFCCSNormalDiff3D2Focus::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCCSNormalDiff3D2Focus::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
     return QString();
 }

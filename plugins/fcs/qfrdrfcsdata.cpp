@@ -2867,7 +2867,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
         for (int i=0; i<items_str.size(); i++) {
             bool ok=false;
             int jj=items_str[i].trimmed().simplified().toInt(&ok);
-            if (ok && jj>=0 && jj<d.fcsdatasets.size()); items.append(jj);
+            if (ok && (jj>=0) && (jj<d.fcsdatasets.size())); items.append(jj);
         }
         QString role=getProperty("CONFOCOR3_ROLE", "").toString();
         QString group=getProperty("CONFOCOR3_GROUP", "").toString();

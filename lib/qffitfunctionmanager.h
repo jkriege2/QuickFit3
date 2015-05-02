@@ -106,7 +106,7 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
          *
          *  \note This function is thread-safe
          */
-        QMap<QString, QFFitFunction*> getModels(QString id_start=QString(""), QObject* parent=NULL) const;
+        QMap<QString, QFFitFunction*> getModels(QString id_start=QString("")) const;
 
         static void freeModels(QMap<QString, QFFitFunction *> &models);
         /** \brief return a list of the models which start with the specified string
@@ -120,7 +120,7 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
          *
          *  \note This function is thread-safe
 */
-        QFFitFunction* createFunction(QString ID, QObject* parent=NULL) const;
+        QFFitFunction* createFunction(const QString &ID) const;
 
         /** \brief return the plugin index for a given fit function id */
         int getPluginForID(QString id) const;

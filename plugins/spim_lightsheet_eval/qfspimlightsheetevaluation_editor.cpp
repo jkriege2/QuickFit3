@@ -526,7 +526,7 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
     if (item>=0 && record->resultsExists(resultID, param=QString("fitok_frame%1").arg(stack_pos))) {
         bool fitOK=record->resultsGetInBooleanList(resultID, param, item, false);
         QString modelID=record->resultsGetAsString(resultID, param=QString("fit_model"));
-        QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID, this);
+        QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID);
         if (fitOK && model) {
             QStringList paramIDs=model->getParameterIDs();
             int pcount=model->paramCount();
@@ -726,7 +726,7 @@ void QFSPIMLightsheetEvaluationEditor::displayEvaluationResults() {
         if (record->resultsExists(resultID, param=QString("fit_model"))) {
             //qDebug()<<"has fit model";
             QString modelID=record->resultsGetAsString(resultID, param);
-            QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID, this);
+            QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID);
             if (model) {
                 QStringList paramIDs=model->getParameterIDs();
                 int pcount=model->paramCount();
@@ -952,7 +952,7 @@ void QFSPIMLightsheetEvaluationEditor::saveImageCutSeries()
                 if (item>=0 && record->resultsExists(resultID, param=QString("fitok_frame%1").arg(z))) {
                     bool fitOK=record->resultsGetInBooleanList(resultID, param, item, false);
                     QString modelID=record->resultsGetAsString(resultID, param=QString("fit_model"));
-                    QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID, this);
+                    QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID);
                     double position=0;
                     double amplitude=1;
                     QVector<double> params;
@@ -1241,8 +1241,8 @@ void QFSPIMLightsheetEvaluationEditor::doEvaluation(QFRawDataRecord *record) {
     dlgEvaluationProgress->setLabelText(tr("evaluating '%1' ... ").arg(record->getName()));
     dlgEvaluationProgress->setValue(0);
 
-    QFFitAlgorithm* alg=ui->cmbAlgorithm->createCurrentInstance(this);
-    QFFitFunction* model=ui->cmbModel->createCurrentInstance(this);
+    QFFitAlgorithm* alg=ui->cmbAlgorithm->createCurrentInstance();
+    QFFitFunction* model=ui->cmbModel->createCurrentInstance();
 
     for (int channel=0; channel<data->getImageStackChannels(stack); channel++) {
         QFSPIMLightsheetEvaluationItem::Orientation o=QFSPIMLightsheetEvaluationItem::fitRows;

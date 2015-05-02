@@ -150,6 +150,15 @@ QStringList QFSelectionListDialog::getSelectedDataStrings() const {
     return data;
 }
 
+QStringList QFSelectionListDialog::getSelectedTexts() const
+{
+    QStringList data;
+    for (int i=0; i<ui->listWidget->count(); i++) {
+        if (ui->listWidget->item(i)->checkState()==Qt::Checked) data.append(ui->listWidget->item(i)->text());
+    }
+    return data;
+}
+
 QList<QVariant> QFSelectionListDialog::getSelected() const
 {
     QList<QVariant> data;

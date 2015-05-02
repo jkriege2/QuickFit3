@@ -37,6 +37,9 @@ class QFRDRImagingFCSSimulationThread : public QThread
         GET_SET_MACRO(double, DG)
         GET_SET_MACRO(double, DR)
         GET_SET_MACRO(double, DRG)
+        GET_SET_MACRO(double, DG2)
+        GET_SET_MACRO(double, DR2)
+        GET_SET_MACRO(double, DRG2)
         GET_SET_MACRO(double, psf_size_g)
         GET_SET_MACRO(double, psf_size_r)
         GET_SET_MACRO(double, crosstalk)
@@ -54,11 +57,25 @@ class QFRDRImagingFCSSimulationThread : public QThread
         GET_SET_MACRO(int, height)
         GET_SET_MACRO(double, brightnessG)
         GET_SET_MACRO(double, brightnessR)
+        GET_SET_MACRO(double, brightnessG2)
+        GET_SET_MACRO(double, brightnessR2)
         GET_SET_MACRO(double, background)
         GET_SET_MACRO(double, backgroundNoise)
         GET_SET_MACRO(int, walkersG)
         GET_SET_MACRO(int, walkersR)
         GET_SET_MACRO(int, walkersRG)
+        GET_SET_MACRO(int, walkersG2)
+        GET_SET_MACRO(int, walkersR2)
+        GET_SET_MACRO(int, walkersRG2)
+
+        GET_SET_MACRO(bool, FlowEeverywhere)
+        GET_SET_MACRO(bool, onlyHalf_DG)
+        GET_SET_MACRO(bool, onlyHalf_DR)
+        GET_SET_MACRO(bool, onlyHalf_DRG)
+        GET_SET_MACRO(bool, onlyHalf_DG2)
+        GET_SET_MACRO(bool, onlyHalf_DR2)
+        GET_SET_MACRO(bool, onlyHalf_DRG2)
+
     public slots:
         void cancel();
         void waitForFinish();
@@ -72,13 +89,23 @@ class QFRDRImagingFCSSimulationThread : public QThread
             double x;
             double y;
         };
-        QVector<WalkerData> createWalkers(int count);
-        void propagateWalkers(QVector<WalkerData>& walkers, double D);
+        QVector<WalkerData> createWalkers(int count, bool onlyHalfImage);
+        void propagateWalkers(QVector<WalkerData>& walkers, double D, bool onlyHalfImage);
 
         bool canceled;
         double DG;
         double DR;
         double DRG;
+        double DG2;
+        double DR2;
+        double DRG2;
+
+        bool onlyHalf_DG;
+        bool onlyHalf_DR;
+        bool onlyHalf_DRG;
+        bool onlyHalf_DG2;
+        bool onlyHalf_DR2;
+        bool onlyHalf_DRG2;
 
         double psf_size_g;
         double psf_size_r;
@@ -87,6 +114,7 @@ class QFRDRImagingFCSSimulationThread : public QThread
         double crosstalk;
         double VX;
         double VY;
+        bool FlowEeverywhere;
         double pixel_size;
         double frametime;
         long frames;
@@ -100,9 +128,14 @@ class QFRDRImagingFCSSimulationThread : public QThread
         int currentFrame;
         double brightnessG;
         double brightnessR;
+        double brightnessG2;
+        double brightnessR2;
         int walkersG;
         int walkersR;
         int walkersRG;
+        int walkersG2;
+        int walkersR2;
+        int walkersRG2;
         double background;
         double backgroundNoise;
 

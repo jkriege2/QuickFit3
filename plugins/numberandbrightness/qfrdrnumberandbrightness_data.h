@@ -243,8 +243,10 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDRAdditio
             }
 
             bool* selection;
+            QString tempSel;
             QString name;
         };
+        QString maskS;
 
         QList<ImageSelection> selections;
 

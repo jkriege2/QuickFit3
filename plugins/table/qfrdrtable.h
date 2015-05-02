@@ -677,7 +677,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         void columnsRemoved(int start, int count, bool emitRebuild=true);
 
     protected slots:
-        void tdataChanged( const QModelIndex & tl, const QModelIndex & br ) {
+        void tdataChanged( const QModelIndex & /*tl*/, const QModelIndex & /*br*/ ) {
             emit rawDataChanged();
         }
         void trawDataChanged() {

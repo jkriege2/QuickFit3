@@ -228,7 +228,7 @@ QFRDRTableCurveFitDialog::~QFRDRTableCurveFitDialog()
 void QFRDRTableCurveFitDialog::saveResults()
 {
 
-    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(this);
+    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance();
     int saveCol=ui->cmbSaveColumn->currentIndex();
     int saveGraph=ui->cmbAddGraph->currentIndex();
     //qDebug()<<"QFRDRTableCurveFitDialog::saveResults(): "<<saveCol<<saveGraph;
@@ -310,8 +310,8 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     connectSignals(false);
 
-    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(this);
-    QFFitAlgorithm* algorithm=ui->cmbFitAlgorithm->createCurrentInstance(this);
+    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance();
+    QFFitAlgorithm* algorithm=ui->cmbFitAlgorithm->createCurrentInstance();
     table->restoreQFFitAlgorithmParameters(algorithm);
 
     int rmin=getRangeMin();
@@ -512,7 +512,7 @@ void QFRDRTableCurveFitDialog::on_btnGuess_clicked()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     connectSignals(false);
 
-    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(this);
+    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance();
 
     int rmin=getRangeMin();
     int rmax=getRangeMax();
@@ -641,7 +641,7 @@ void QFRDRTableCurveFitDialog::on_btnGuess_clicked()
 
 void QFRDRTableCurveFitDialog::on_btnConfigAlgorithm_clicked()
 {
-    QFFitAlgorithm* algorithm=ui->cmbFitAlgorithm->createCurrentInstance(this);
+    QFFitAlgorithm* algorithm=ui->cmbFitAlgorithm->createCurrentInstance();
     if (algorithm) {
         table->restoreQFFitAlgorithmParameters(algorithm);
         table->configFitAlgorithm(algorithm);
@@ -652,7 +652,7 @@ void QFRDRTableCurveFitDialog::on_btnConfigAlgorithm_clicked()
 void QFRDRTableCurveFitDialog::replotGraph()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(this);
+    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance();
     updateFitStatistics();
 
     ui->pltDistribution->set_doDrawing(false);
@@ -771,7 +771,7 @@ void QFRDRTableCurveFitDialog::methodChanged(int method)
     parameterNames.clear();
     parameterLabels.clear();
     //paramMap.clear();
-    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(parameterTable);
+    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance();
     QStringList ids=model->getParameterIDs();
     for (int i=0; i<ids.size(); i++) {
         QFFitFunction::ParameterDescription d=model->getDescription(ids[i]);
@@ -809,7 +809,7 @@ void QFRDRTableCurveFitDialog::methodChanged(int method)
 
 void QFRDRTableCurveFitDialog::updateFitStatistics()
 {
-    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(this);
+    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance();
     if (model) {
         QStringList ids=model->getParameterIDs();
         QVector<double> vecP;
@@ -1059,7 +1059,7 @@ void QFRDRTableCurveFitDialog::writeFitProperties(int pid, int gid, int saveToCo
     table->colgraphSetGraphProperty(pid, gid, "FIT_PLOT", pid);
     table->colgraphSetGraphProperty(pid, gid, "FIT_GRAPH", gid);
     table->colgraphSetGraphProperty(pid, gid, "FIT_SAVEDTOCOLUMN", saveToColumn);
-    QFFitFunction* ff=ui->cmbFitFunction->createCurrentInstance(NULL);
+    QFFitFunction* ff=ui->cmbFitFunction->createCurrentInstance();
     if (ff) {
         QStringList fpids=ff->getParameterIDs();
         QList<QVariant> fixparams, errparams;
@@ -1153,7 +1153,7 @@ void QFRDRTableCurveFitDialog::readFitProperties(int pid, int gid, int* resultCo
     QList<QVariant> fixparams=table->colgraphGetGraphProperty(pid, gid, "FIT_FIXEDPARAMS").toList();
     QList<QVariant> errorparams=table->colgraphGetGraphProperty(pid, gid, "FIT_ERRORPARAMS").toList();
 
-    QFFitFunction* ff=ui->cmbFitFunction->createCurrentInstance(NULL);
+    QFFitFunction* ff=ui->cmbFitFunction->createCurrentInstance();
     //qDebug()<<"readFitProperties :"<<ff<<savedToColumn;
     if (ff) {
         QStringList fpids=ff->getParameterIDs();

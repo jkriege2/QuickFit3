@@ -128,8 +128,6 @@ double QFFitFunctionsTIRFCSDiffE2::evaluate(double t, const double* data) const 
     return offset+pre/(N/Veff)*cfac*backfactor;
 }
 
-void QFFitFunctionsTIRFCSDiffE2::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
 
 void QFFitFunctionsTIRFCSDiffE2::sortParameter(double *parameterValues, double *error, bool *fix) const {
 

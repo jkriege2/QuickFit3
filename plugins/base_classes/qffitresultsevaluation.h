@@ -142,16 +142,16 @@ public:
     virtual QString getFitFunctionID(int num) const;
 
     /** \brief create a new instance of the current fit algorithm ... the user has to destroy the instance */
-    virtual QFFitAlgorithm* createFitAlgorithm(QObject *parent=NULL) const;
+    virtual QFFitAlgorithm* createFitAlgorithm() const;
 
     /** \brief create a new instance of the current fit function ... the user has to destroy the instance */
-    virtual QFFitFunction* createFitFunction(const QFRawDataRecord *rdr , QObject *parent=NULL)const;
+    virtual QFFitFunction* createFitFunction(const QFRawDataRecord *rdr )const;
 
     /** \brief create a new instance of the current fit function ... the user has to destroy the instance */
     virtual QFFitFunction* createFitFunction()const;
 
     /** \brief create a new instance of the current fit function ... the user has to destroy the instance */
-    virtual QFFitFunction* createFitFunction(int rdr , QObject *parent=NULL)const;
+    virtual QFFitFunction* createFitFunction(int rdr )const;
 
 
     /** \brief may be used to transform a resultID before it is used in any of the \c QFRawDataRecord.results... functions */
@@ -159,13 +159,20 @@ public:
 
 
 
-    /** \brief sets the group of the given fit result
+    /** \brief sets the group of the given fit result, this function transforms the parameter ID with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
      *  \param group group to be stored
      */
     virtual void setFitResultGroup(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& group) ;
+    /** \brief sets the group of the given fit result, this function does not transform the parameter ID with getFitParamID()
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param group group to be stored
+     */
+    virtual void setFitResultGroupNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& group) ;
 
     /** \brief sets the label of the given fit result
      *  \param r the record to adress
@@ -175,6 +182,15 @@ public:
      *  \param label_richtext richtext-ed label to be stored
      */
     virtual void setFitResultLabel(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& label, const QString& label_richtext=QString("")) ;
+
+    /** \brief sets the label of the given fit result, this function does not transform the parameter name with getFitParameterID()
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param label label to be stored
+     *  \param label_richtext richtext-ed label to be stored
+     */
+    virtual void setFitResultLabelNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& label, const QString& label_richtext=QString("")) ;
 
     /** \brief sets the group of the given evaluation result ID \a resultID
      *  \param r the record to adress
@@ -243,7 +259,7 @@ public:
      */
     virtual void setFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value);
 
-    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
+    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
@@ -251,7 +267,7 @@ public:
      */
     virtual void setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value) ;
 
-    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
+    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
@@ -260,7 +276,27 @@ public:
      */
     virtual void setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, QString unit)  ;
 
-    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
+
+
+
+    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param value value to be stored
+     */
+    virtual void setFitResultValueNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value) ;
+
+    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param value value to be stored
+     *  \param unit unit associated with \a value
+     */
+    virtual void setFitResultValueNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, QString unit)  ;
+
+    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
@@ -268,7 +304,7 @@ public:
      */
     virtual void setFitResultValueString(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, QString value) ;
 
-    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
+    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
@@ -276,7 +312,7 @@ public:
      */
     virtual void setFitResultValueInt(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, int64_t value) ;
 
-    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
+    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
@@ -285,7 +321,7 @@ public:
      */
     virtual void setFitResultValueInt(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, int64_t value, QString unit) ;
 
-    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
+    /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
@@ -293,7 +329,7 @@ public:
      */
     virtual void setFitResultValueBool(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, bool value) ;
 
-    /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord
+    /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
@@ -301,12 +337,51 @@ public:
      *  \param error error associated with \a value
      */
     virtual void setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, double error)  ;
-
+    /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param value value to be stored
+     *  \param error error associated with \a value
+     *  \param unit unit of the fit result
+     */
     virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QVector<double> error, QString unit=QString(""))  ;
+    /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param value value to be stored
+     *  \param unit unit of the fit result
+     */
     virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QString unit=QString(""))  ;
+    /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function does not transform the fit parameter name with getFitParamID()
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param value value to be stored
+     *  \param error error associated with \a value
+     */
+    virtual void setFitResultValueNoParamTransform(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, double error)  ;
+    /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function does not transform the fit parameter name with getFitParamID()
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param value value to be stored
+     *  \param error error associated with \a value
+     *  \param unit unit of the fit result
+     */
+    virtual void setFitResultValueNoParamTransform(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QVector<double> error, QString unit=QString(""))  ;
+    /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function does not transform the fit parameter name with getFitParamID()
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param value value to be stored
+     *  \param unit unit of the fit result
+     */
+    virtual void setFitResultValueNoParamTransform(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QString unit=QString(""))  ;
 
 
-    /** \brief stores the given error as a fit result, i.e. into the currently highlighted QFRawDataRecord
+    /** \brief stores the given error as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
@@ -314,7 +389,7 @@ public:
      */
     virtual void setFitResultError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double error)  ;
 
-    /** \brief stores the given values and errors as a fit result, i.e. into the currently highlighted QFRawDataRecord
+    /** \brief stores the given values and errors as a fit result, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param values values to be stored
@@ -322,7 +397,7 @@ public:
      */
     virtual void setFitResultValues(QFRawDataRecord* r, const QString& resultID, double* values, double* errors) ;
 
-    /** \brief stores the given values and errors as a fit result if they are visible, i.e. into the currently highlighted QFRawDataRecord
+    /** \brief stores the given values and errors as a fit result if they are visible, i.e. into the currently highlighted QFRawDataRecord, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param values values to be stored
@@ -331,7 +406,7 @@ public:
     virtual void setFitResultValuesVisible(QFRawDataRecord* r, const QString& resultID, double* values, double* errors) ;
 
     /** \brief stores the given values and errors as a fit result if they are visible, i.e. into the currently highlighted QFRawDataRecord.
-     *          Also imports the fit parameter description from the QFFitFunction and sets the parameter group to the given value
+     *          Also imports the fit parameter description from the QFFitFunction and sets the parameter group to the given value, this function transforms the fit parameter name with getFitParamID()
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param values values to be stored
@@ -967,25 +1042,25 @@ protected:
      \param e QDomElement to read from
 
     */
-    virtual void intReadDataFitParam(const QString& parameterID, const FitParameter& fitParam, QDomElement& e) {}
+    virtual void intReadDataFitParam(const QString& parameterID, const FitParameter& fitParam, QDomElement& e) {Q_UNUSED(parameterID)Q_UNUSED(fitParam)Q_UNUSED(e)}
     /*! \brief allows to write additional information to a fit parameter node in the project file
 
      \param parameterID id of the current fit parameter
      \param w XML writer, currently in the parameter node (i.e. write subnode with w.writeStartElement() and attributes with w.writeAttribute() )
     */
-    virtual void intWriteDataFitParam(const QString& parameterID, QXmlStreamWriter& w) const {};
+    virtual void intWriteDataFitParam(const QString& parameterID, QXmlStreamWriter& w) const {Q_UNUSED(w)Q_UNUSED(parameterID)}
     /*! \brief allows to write additional information to a fit algorithm node in the project file
 
      \param w XML writer, currently in the parameter node (i.e. write subnode with w.writeStartElement() and attributes with w.writeAttribute() )
     */
-    virtual void intWriteDataAlgorithm(QXmlStreamWriter& w) const {};
+    virtual void intWriteDataAlgorithm(QXmlStreamWriter& w) const {Q_UNUSED(w)}
 
     /*! \brief allows to read additional information from a fit algorithm node in the project file
 
      \param e QDomElement to read from
 
     */
-    virtual void intReadDataAlgorithm(QDomElement& e) {};
+    virtual void intReadDataAlgorithm(QDomElement& e) {Q_UNUSED(e)}
 
 
 

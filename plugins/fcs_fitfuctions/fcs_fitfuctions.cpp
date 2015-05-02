@@ -75,8 +75,7 @@ QStringList QFPFitFunctionFCS::getIDs() const {
     return res;
 }
 
-QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
-    Q_UNUSED(parent);
+QFFitFunction* QFPFitFunctionFCS::get(const QString &id) const  {
     if (id=="fcs_diff") {
         return new QFFitFunctionFCSDiff();
     } else if (id=="fcs_diff_stretchpp") {

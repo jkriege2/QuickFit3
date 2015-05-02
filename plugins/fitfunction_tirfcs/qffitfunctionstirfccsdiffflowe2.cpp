@@ -127,12 +127,7 @@ double QFFitFunctionsTIRFCCSDiffFlowE2::evaluate(double t, const double* data) c
     return offset+pre/(N/Veff)*cfac*backfactor;
 }
 
-void QFFitFunctionsTIRFCCSDiffFlowE2::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
 
-void QFFitFunctionsTIRFCCSDiffFlowE2::sortParameter(double *parameterValues, double *error, bool *fix) const {
-
-}
 
 void QFFitFunctionsTIRFCCSDiffFlowE2::calcParameter(double* data, double* error) const {
     double N=data[FCSSDiff_n_components];

@@ -173,17 +173,22 @@ double QFRDRFCSFitFunctionSimulator::getFitError(const QString &id, const QFRawD
     return 0;
 }
 
-void QFRDRFCSFitFunctionSimulator::setFitError(const QString &id, double error, QFRawDataRecord *r)
+void QFRDRFCSFitFunctionSimulator::setFitError(const QString &id, double error, QFRawDataRecord */*r*/)
 {
     params[id].error=error;
 }
 
-bool QFRDRFCSFitFunctionSimulator::getFitFix(const QString &id, const QFRawDataRecord *r) const
+void QFRDRFCSFitFunctionSimulator::setFitFix(const QString &/*id*/, bool /*fix*/, QFRawDataRecord */*r*/)
+{
+
+}
+
+bool QFRDRFCSFitFunctionSimulator::getFitFix(const QString &/*id*/, const QFRawDataRecord */*r*/) const
 {
     return false;
 }
 
-void QFRDRFCSFitFunctionSimulator::setFitRange(const QString &id, double min, double max, QFRawDataRecord *r)
+void QFRDRFCSFitFunctionSimulator::setFitRange(const QString &id, double min, double max, QFRawDataRecord */*r*/)
 {
     params[id].min=min;
     params[id].max=max;
@@ -191,11 +196,11 @@ void QFRDRFCSFitFunctionSimulator::setFitRange(const QString &id, double min, do
     params[id].maxset=true;
 }
 
-void QFRDRFCSFitFunctionSimulator::setInitFitValue(const QString &id, double value, double error, QFRawDataRecord *r)
+void QFRDRFCSFitFunctionSimulator::setInitFitValue(const QString &/*id*/, double /*value*/, double /*error*/, QFRawDataRecord */*r*/)
 {
 }
 
-void QFRDRFCSFitFunctionSimulator::resetDefaultFitFix(const QString &id)
+void QFRDRFCSFitFunctionSimulator::resetDefaultFitFix(const QString &/*id*/)
 {
 }
 
@@ -217,11 +222,11 @@ double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id, const
     return 0;
 }
 
-bool QFRDRFCSFitFunctionSimulator::getDefaultFitFix(const QString &id, const QFRawDataRecord *r) const {
+bool QFRDRFCSFitFunctionSimulator::getDefaultFitFix(const QString &/*id*/, const QFRawDataRecord */*r*/) const {
     return false;
 }
 
-QFFitFunction *QFRDRFCSFitFunctionSimulator::getFitFunction(const QFRawDataRecord *r) const {
+QFFitFunction *QFRDRFCSFitFunctionSimulator::getFitFunction(const QFRawDataRecord */*r*/) const {
     //return m_fitFunctions.value(ui->cmbFunction->itemData(ui->cmbFunction->currentIndex()).toString(), NULL);
     return ui->cmbFunction->createCurrentInstance();
 }
@@ -415,7 +420,7 @@ void QFRDRFCSFitFunctionSimulator::updateParameterValues() {
 
 }
 
-void QFRDRFCSFitFunctionSimulator::modelChanged(int index) {
+void QFRDRFCSFitFunctionSimulator::modelChanged(int /*index*/) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     displayModel(true);
     replotFitFunction();
@@ -458,13 +463,13 @@ double QFRDRFCSFitFunctionSimulator::getFitMin(const QString &id, const QFRawDat
     return 0;
 }
 
-void QFRDRFCSFitFunctionSimulator::setFitMax(const QString &id, double max, QFRawDataRecord *r)
+void QFRDRFCSFitFunctionSimulator::setFitMax(const QString &id, double max, QFRawDataRecord */*r*/)
 {
     params[id].max=max;
     params[id].maxset=true;
 }
 
-void QFRDRFCSFitFunctionSimulator::setFitMin(const QString &id, double min, QFRawDataRecord* r)
+void QFRDRFCSFitFunctionSimulator::setFitMin(const QString &id, double min, QFRawDataRecord* /*r*/)
 {
     params[id].min=min;
     params[id].minset=true;
@@ -637,7 +642,7 @@ void QFRDRFCSFitFunctionSimulator::replotFitFunction() {
 
 }
 
-void QFRDRFCSFitFunctionSimulator::on_cmbNoiseModel_currentIndexChanged(int index) {
+void QFRDRFCSFitFunctionSimulator::on_cmbNoiseModel_currentIndexChanged(int /*index*/) {
     updateNoiseEnabled();
 }
 

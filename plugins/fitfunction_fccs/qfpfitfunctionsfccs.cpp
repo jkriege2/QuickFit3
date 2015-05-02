@@ -62,7 +62,7 @@ QStringList QFPFitFunctionsFCCS::getIDs() const {
     return res;
 }
 
-QFFitFunction* QFPFitFunctionsFCCS::get(QString id, QObject* /*parent*/) const  {
+QFFitFunction* QFPFitFunctionsFCCS::get(const QString &id) const  {
     if (id=="fccs_diff3d") {
         return new QFFitFunctionFCCSNormalDiff3D();
     } else if (id=="fccs_fw_diff2coloracfg") {

@@ -51,7 +51,7 @@ FRawDataImageEditor::FRawDataImageEditor(const QString& configprefix, QFPluginSe
 {
     correlationMaskTools=NULL;
     this->configprefix=configprefix;
-    m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("", this);
+    m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("");
     plteOverviewSelectedData=NULL;
     plteOverviewExcludedData=NULL;
     plteOverviewSize=0;

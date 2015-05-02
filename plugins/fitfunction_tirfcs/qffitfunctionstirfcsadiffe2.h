@@ -60,10 +60,10 @@ class QFFitFunctionsTIRFCSADiffE2: public QFFitFunction {
         virtual bool get_implementsDerivatives() const { return false; }
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
-        virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
+        //virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
 
         /*! \copydoc QFFitFunction::sortParameter()   */
-        virtual void sortParameter(double* parameterValues, double* error=NULL , bool *fix=NULL) const;
+        //virtual void sortParameter(double* parameterValues, double* error=NULL , bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionsTIRFCSADiffE2NewVeffE2_H

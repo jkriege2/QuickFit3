@@ -553,7 +553,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
 
 
 
-void QFFCSFitEvaluationEditor::weightsChanged(int model) {
+void QFFCSFitEvaluationEditor::weightsChanged(int /*model*/) {
     if (!dataEventsEnabled) return;
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
@@ -627,7 +627,7 @@ int QFFCSFitEvaluationEditor::getUserMax() {
     return getUserMax(datacut->get_userMax());
 }
 
-int QFFCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index) {
+int QFFCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int /*index*/) {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     if (data) {
         return data->getCorrelationN()-1;
@@ -635,11 +635,11 @@ int QFFCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index) {
     return 0;
 }
 
-int QFFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index) {
+int QFFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord */*rec*/, int /*index*/) {
     return 0;
 }
 
-void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plots, int option, const QString &optionName)
+void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plots, int option, const QString &/*optionName*/)
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);

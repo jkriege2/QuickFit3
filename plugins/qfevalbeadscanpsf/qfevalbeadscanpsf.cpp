@@ -80,7 +80,7 @@ QStringList QFEvalBeadScanPSF::fitFunctionFactoryGetIDs() const
     return s;
 }
 
-QFFitFunction *QFEvalBeadScanPSF::fitFunctionFactoryGet(QString id, QObject *parent) const
+QFFitFunction *QFEvalBeadScanPSF::fitFunctionFactoryGet(const QString &id) const
 {
     if (id=="beadscan_psf_gaussian") {
         return new QFFitFunctionPSFGaussian();

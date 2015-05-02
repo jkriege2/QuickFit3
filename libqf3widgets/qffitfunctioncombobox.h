@@ -39,7 +39,7 @@ class QFWIDLIB_EXPORT QFFitFunctionComboBox : public QFEnhancedComboBox // QFTre
     public:
         explicit QFFitFunctionComboBox(QWidget *parent = 0);
         QString currentFitFunctionID() const;
-        QFFitFunction* createCurrentInstance(QObject *parent=NULL) const;
+        QFFitFunction* createCurrentInstance() const;
         QAction* getHelpAction() const { return actHelp; }
         QAction* getSelectAction() const { return actSelectModel; }
 

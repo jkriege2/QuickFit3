@@ -147,8 +147,6 @@ double QFFitFunctionsSPIMFCSDiffE2NewVeff::evaluate(double t, const double* data
     return offset+pre/(N/Veff)*cfac*backfactor;
 }
 
-void QFFitFunctionsSPIMFCSDiffE2NewVeff::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
 
 void QFFitFunctionsSPIMFCSDiffE2NewVeff::sortParameter(double *parameterValues, double *error, bool *fix) const {
 

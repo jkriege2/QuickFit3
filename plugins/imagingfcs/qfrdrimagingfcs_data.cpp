@@ -276,7 +276,7 @@ void QFRDRImagingFCSData::recalcSegmentedAverages()
     QApplication::restoreOverrideCursor();
 }
 
-void QFRDRImagingFCSData::exportData(const QString& format, const QString& filename)const  {
+void QFRDRImagingFCSData::exportData(const QString& /*format*/, const QString& /*filename*/)const  {
 	// here you may export the data of the record into the specified format (see getExportFiletypes() )
 	// THIS IS OPTIONAL
 }
@@ -287,9 +287,16 @@ void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) const {
     // write data to the project XML file using the QXmlStreamWriter
     QString l=maskToIndexString(',');
 
-    if (l.size()>0) {
+    if ((l.size()>0&&maskGetWidth()>0 && maskGetHeight()>0 && getCorrelationRuns()>0) || (!maskTemp.isEmpty())) {
         w.writeStartElement("leaveout");
-        w.writeAttribute("list", l);
+        qDebug()<<maskGetWidth()<< maskGetHeight()<< getCorrelationRuns()<<"\n"<<l<<"\n"<<maskTemp;
+        if (maskGetWidth()>0 && maskGetHeight()>0 && getCorrelationRuns()>0) {
+            w.writeAttribute("list", l);
+            qDebug()<<"   -> write "<<l;
+        } else {
+            w.writeAttribute("list", maskTemp);
+            qDebug()<<"   -> write "<<maskTemp;
+        }
         w.writeEndElement();
     }
     if (selections.size()>0) {
@@ -298,11 +305,15 @@ void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) const {
             QString l="";
             bool* sel=selections[s].selection;
             int selSize=getImageSelectionWidth()*getImageSelectionHeight();
-            for (int i=0; i<selSize; i++) {
-                if (sel[i]) {
-                    if (l.size()>0) l+=","+QString::number(i);
-                    else l+=QString::number(i);
+            if (selSize>0) {
+                for (int i=0; i<selSize; i++) {
+                    if (sel[i]) {
+                        if (l.size()>0) l+=","+QString::number(i);
+                        else l+=QString::number(i);
+                    }
                 }
+            } else {
+                l=selections[s].tempSel;
             }
 
             w.writeStartElement("selection");
@@ -746,7 +757,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     if (e) {
         QDomElement te=e->firstChildElement("leaveout");
         QString l=te.attribute("list");
+        maskTemp=l;
         QStringList li=l.split(",");
+        //qDebug()<<"read Mask:"<<l;
         for (int i=0; i<li.size(); i++) {
             bool ok=false;
             int lo=li[i].toUInt(&ok);
@@ -763,9 +776,11 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 QString l=te.attribute("list", "");
                 int selSize=getImageSelectionWidth()*getImageSelectionHeight();
                 QFRDRImagingFCSData::ImageSelection sel;
+                sel.tempSel=l;
                 sel.selection=(bool*)qfCalloc(selSize, sizeof(bool));
                 for (int i=0; i<selSize; i++) sel.selection[i]=false;
                 sel.name=n;
+                //qDebug()<<"read Sel:"<<n<<l;
 
                 QStringList li=l.split(",");
                 for (int i=0; i<li.size(); i++) {
@@ -2449,7 +2464,7 @@ QString QFRDRImagingFCSData::getImageStackXUnitName(int stack) const {
     return tr("pixel"); //QString("micrometer");
 }
 
-QString QFRDRImagingFCSData::getImageStackXName(int stack) const {
+QString QFRDRImagingFCSData::getImageStackXName(int /*stack*/) const {
     return tr("x");
 }
 
@@ -2463,7 +2478,7 @@ QString QFRDRImagingFCSData::getImageStackYUnitName(int stack) const {
     return tr("pixel"); //QString("micrometer");
 }
 
-QString QFRDRImagingFCSData::getImageStackYName(int stack) const {
+QString QFRDRImagingFCSData::getImageStackYName(int /*stack*/) const {
     return QString("y");
 }
 
@@ -2497,15 +2512,15 @@ QString QFRDRImagingFCSData::getImageStackTName(int stack) const {
 
 }
 
-double QFRDRImagingFCSData::getImageStackCUnitFactor(int stack) const {
+double QFRDRImagingFCSData::getImageStackCUnitFactor(int /*stack*/) const {
     return 1;
 }
 
-QString QFRDRImagingFCSData::getImageStackCUnitName(int stack) const {
+QString QFRDRImagingFCSData::getImageStackCUnitName(int /*stack*/) const {
     return QString("");
 }
 
-QString QFRDRImagingFCSData::getImageStackCName(int stack) const
+QString QFRDRImagingFCSData::getImageStackCName(int /*stack*/) const
 {
     return tr("channel");
 }
@@ -2517,7 +2532,7 @@ QString QFRDRImagingFCSData::getImageStackDescription(int stack) const {
     return QString("");
 }
 
-QString QFRDRImagingFCSData::getImageStackChannelName(int stack, int channel) const {
+QString QFRDRImagingFCSData::getImageStackChannelName(int /*stack*/, int channel) const {
     return QString("channel %1").arg(channel);
 }
 
@@ -2717,11 +2732,13 @@ void QFRDRImagingFCSData::addImageSelection(const bool *selection, const QString
     s.name=name;
     s.selection=(bool*)qfCalloc(getImageSelectionHeight()*getImageSelectionWidth(), sizeof(bool));
     memcpy(s.selection, selection, getImageSelectionHeight()*getImageSelectionWidth()*sizeof(bool));
-    for (int i=0; i<selections.size(); i++) {
-        if (selections[i].name==name) {
-            qfFree(selections[i].selection);
-            selections[i]=s;
-            return;
+    if (overwriteIfSameNameExists) {
+        for (int i=0; i<selections.size(); i++) {
+            if (selections[i].name==name) {
+                qfFree(selections[i].selection);
+                selections[i]=s;
+                return;
+            }
         }
     }
     selections.append(s);
@@ -2778,7 +2795,7 @@ QFRDRImagingFCSData *QFRDRImagingFCSData::getRoleFromThisGroup(const QString &ro
     return NULL;
 }
 
-bool QFRDRImagingFCSData::doCopyFileForExport(const QString &filename, const QString &fileType, QString &newFilename, const QList<QFProject::FileCopyList> *filecopylist, const QString &subfoldername) const
+bool QFRDRImagingFCSData::doCopyFileForExport(const QString &/*filename*/, const QString &fileType, QString &/*newFilename*/, const QList<QFProject::FileCopyList> */*filecopylist*/, const QString &/*subfoldername*/) const
 {
     if (fileType.toLower()=="input") return false;
     return true;

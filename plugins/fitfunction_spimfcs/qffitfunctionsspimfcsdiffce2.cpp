@@ -144,8 +144,6 @@ double QFFitFunctionsSPIMFCSDiffCE2::evaluate(double t, const double* data) cons
     return offset+pre/C*cfac*backfactor;
 }
 
-void QFFitFunctionsSPIMFCSDiffCE2::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
 
 void QFFitFunctionsSPIMFCSDiffCE2::sortParameter(double *parameterValues, double *error, bool *fix) const {
 

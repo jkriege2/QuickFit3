@@ -208,11 +208,11 @@ bool QFFitFunctionFCCSNormalDiff3D::isParameterVisible(int parameter, const doub
     return true;
 }
 
-unsigned int QFFitFunctionFCCSNormalDiff3D::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCCSNormalDiff3D::getAdditionalPlotCount(const double* /*params*/) {
     return 1;
 }
 
-QString QFFitFunctionFCCSNormalDiff3D::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCCSNormalDiff3D::transformParametersForAdditionalPlot(int /*plot*/, double* params) {
     params[FCCS3DDiff_n_reaction]=0;
     return "without reaction";
 }

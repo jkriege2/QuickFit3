@@ -348,7 +348,7 @@ bool QFFitFunctionFCSADiffDifferentBrightness::isParameterVisible(int parameter,
     return true;
 }
 
-unsigned int QFFitFunctionFCSADiffDifferentBrightness::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSADiffDifferentBrightness::getAdditionalPlotCount(const double* /*params*/) {
     return 1;
 }
 
