@@ -53,6 +53,7 @@ QFESpectraViewerFilterEditor::QFESpectraViewerFilterEditor(QWidget *parent) :
     ui->edtFolder->setCompleter(c=new QFCompleterFromFile);
     ui->edtFolder->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter,ui->edtFolder,ui->edtFolder));
     c->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/qfe_spectraviewer/filtfolder.txt");
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
     modSpectrum.setReadonly(false);
     modSpectrum.setColumnTitleCreate(0,"wavelength [nm]");

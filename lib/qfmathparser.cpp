@@ -5031,7 +5031,7 @@ QFMathParser::ByteCodeEnvironment::ByteCodeEnvironment(QFMathParser *parser)
     heapItemPointer=0;
 }
 
-void QFMathParser::ByteCodeEnvironment::init(QFMathParser *parser)
+void QFMathParser::ByteCodeEnvironment::init(QFMathParser */*parser*/)
 {
     heapItemPointer=0;
 }
@@ -5065,7 +5065,7 @@ QString QFMathParser::qfmpNode::print() const
     return QString();
 }
 
-QString QFMathParser::qfmpNode::printTree(int level) const
+QString QFMathParser::qfmpNode::printTree(int /*level*/) const
 {
     return QString();
 }

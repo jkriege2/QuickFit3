@@ -19,8 +19,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef QFFitFunctionsTIRFCSDiffFlowE2NewVeffE2_H
-#define QFFitFunctionsTIRFCSDiffFlowE2NewVeffE2_H
+#ifndef QFFitFunctionsTIRFCCSDiffFlowE2NewVeffE2_H
+#define QFFitFunctionsTIRFCCSDiffFlowE2NewVeffE2_H
 #include "qfpluginfitfunction.h"
 
 
@@ -67,4 +67,4 @@ class QFFitFunctionsTIRFCCSDiffFlowE2: public QFFitFunction {
         //virtual void sortParameter(double* parameterValues, double* error=NULL , bool *fix=NULL) const;
 };
 
-#endif // QFFitFunctionsTIRFCSDiffFlowE2NewVeffE2_H
+#endif // QFFitFunctionsTIRFCCSDiffFlowE2NewVeffE2_H

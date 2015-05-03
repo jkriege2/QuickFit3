@@ -29,6 +29,7 @@ RenameGroupsDialog::RenameGroupsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->listView->setModel(&model);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 RenameGroupsDialog::~RenameGroupsDialog()

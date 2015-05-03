@@ -58,6 +58,7 @@ QFDlgCSVParameters::QFDlgCSVParameters(QWidget* parent, QString columnSeparator,
     ProgramOptions::getConfigQSplitter(ui->splitter, "QFDlgCSVParameters/splitter/");
     ui->widConfig->setCurrentConfig(ProgramOptions::getConfigValue("QFDlgCSVParameters/config/", "").toString());
     guessParameters();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFDlgCSVParameters::~QFDlgCSVParameters()

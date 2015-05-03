@@ -41,6 +41,8 @@ double QFFitFunctionGeneralPDFLogGaussian::evaluate(double t, const double* data
 
 
 void QFFitFunctionGeneralPDFLogGaussian::calcParameter(double* data, double* error) const {
+    Q_UNUSED(data);
+    Q_UNUSED(error);
 }
 
 bool QFFitFunctionGeneralPDFLogGaussian::isParameterVisible(int parameter, const double* data) const {
@@ -69,5 +71,10 @@ QString QFFitFunctionGeneralPDFLogGaussian::transformParametersForAdditionalPlot
 
 bool QFFitFunctionGeneralPDFLogGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
 {
+    Q_UNUSED(dataX);
+    Q_UNUSED(params);
+    Q_UNUSED(dataY);
+    Q_UNUSED(N);
+    Q_UNUSED(fix);
     return false;
 }

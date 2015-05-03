@@ -821,7 +821,7 @@ void QFESPIMB040OpticsSetup2::closeEvent(QCloseEvent * event) {
     event->accept();
 }
 
-void QFESPIMB040OpticsSetup2::showEvent( QShowEvent * event ) {
+void QFESPIMB040OpticsSetup2::showEvent( QShowEvent * /*event*/ ) {
     QMap<QString, CameraWidgets>::const_iterator it2; ;
     for (it2=ui_cameras.constBegin(); it2 != ui_cameras.constEnd(); ++it2) {
         it2.value().config->show();
@@ -1188,7 +1188,7 @@ void saveObjective(QMap<QString, QVariant>& setup, const QString& prefix, const 
     setup[prefix+QString("%1/manufacturer").arg(id)]=filter.manufacturer;
 }
 
-QMap<QString, QVariant> QFESPIMB040OpticsSetup2::getSetup(int setup_cam) const {
+QMap<QString, QVariant> QFESPIMB040OpticsSetup2::getSetup(int /*setup_cam*/) const {
     QMap<QString, QVariant> setup;
 
     for (QMap<QString, QF3FilterCombobox*>::const_iterator it=ui_filters.begin(); it!=ui_filters.end(); it++) {
@@ -2060,7 +2060,7 @@ void QFESPIMB040OpticsSetup2::saveLightpathConfigEx(QMap<QString, QVariant> &dat
     }
 }
 
-void QFESPIMB040OpticsSetup2::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix,  QList<bool> saveProp, bool saveMeasured) {
+void QFESPIMB040OpticsSetup2::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix,  QList<bool> saveProp, bool /*saveMeasured*/) {
     saveLightpathConfigEx(data, name, prefix, saveProp, false);
 }
 

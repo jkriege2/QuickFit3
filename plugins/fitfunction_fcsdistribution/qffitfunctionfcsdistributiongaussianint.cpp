@@ -281,7 +281,7 @@ bool QFFitFunctionFCSDistributionIntGaussian::isParameterVisible(int parameter, 
     return true;
 }
 
-unsigned int QFFitFunctionFCSDistributionIntGaussian::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSDistributionIntGaussian::getAdditionalPlotCount(const double* /*params*/) {
     return 2;
 }
 

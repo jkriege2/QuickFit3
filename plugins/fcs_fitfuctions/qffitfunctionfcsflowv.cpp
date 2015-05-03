@@ -341,11 +341,11 @@ void QFFitFunctionFCSFlowV::calcParameter(double* data, double* error) const {
 
 }
 
-bool QFFitFunctionFCSFlowV::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionFCSFlowV::isParameterVisible(int /*parameter*/, const double* /*data*/) const {
     return true;
 }
 
-unsigned int QFFitFunctionFCSFlowV::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSFlowV::getAdditionalPlotCount(const double* /*params*/) {
     return 2;
 }
 

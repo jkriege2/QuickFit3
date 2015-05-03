@@ -46,6 +46,7 @@ QFRDRImageMaskByIntensity::QFRDRImageMaskByIntensity(QWidget *parent) :
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "QFRDRImageMaskByIntensity/pos");
     updateWidgets();
     updateEnabledWidgets();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRImageMaskByIntensity::~QFRDRImageMaskByIntensity() {

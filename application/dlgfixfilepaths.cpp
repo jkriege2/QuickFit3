@@ -32,6 +32,7 @@ DlgFixFilepaths::DlgFixFilepaths(const QString& oldName, const QString& lastDir,
 {
     ui->setupUi(this);
     init(oldName, lastDir);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 DlgFixFilepaths::~DlgFixFilepaths()

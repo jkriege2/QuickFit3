@@ -82,7 +82,7 @@ void QFFitMultiQFFitFunctionFunctor::evaluate(double *evalout, const double *par
     //if (m_evalout!=outCnt) qDebug()<<"QFFitMultiQFFitFunctionFunctor::evaluate:   m_evalout="<<m_evalout<<"   outCnt="<<outCnt;
 }
 
-void QFFitMultiQFFitFunctionFunctor::evaluateJacobian(double *evalout, const double *params) {
+void QFFitMultiQFFitFunctionFunctor::evaluateJacobian(double */*evalout*/, const double */*params*/) {
 }
 
 bool QFFitMultiQFFitFunctionFunctor::get_implementsJacobian() const

@@ -44,7 +44,7 @@ double QFFitFunctionGeneralSigmoid::evaluate(double t, const double* data) const
 }
 
 
-void QFFitFunctionGeneralSigmoid::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralSigmoid::calcParameter(double* /*data*/, double* /*error*/) const {
 
 }
 
@@ -73,10 +73,8 @@ bool QFFitFunctionGeneralSigmoid::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralSigmoid::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
 
-bool QFFitFunctionGeneralSigmoid::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionGeneralSigmoid::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

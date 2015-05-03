@@ -60,6 +60,7 @@ UserFitFunctionsEditor::UserFitFunctionsEditor(QWidget *parent) :
     ProgramOptions::getConfigQSplitter(ui->splitter_3, "UserFitFunctionsEditor/splitter_3/");
     //connect(ui->spinPrevRangeMin, SIGNAL(valueChanged(double)), ui->spinPrevRangeMax, SLOT(setMinimum(double)));
     init();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
 }
 

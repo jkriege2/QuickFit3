@@ -153,12 +153,12 @@ void QFFitFunctionValueInputTable::setAuxiliaryWriteTo(QVector<double> *errorvec
     this->fixvector=fixvector;
 }
 
-int QFFitFunctionValueInputTable::rowCount(const QModelIndex &parent) const
+int QFFitFunctionValueInputTable::rowCount(const QModelIndex &/*parent*/) const
 {
     return fitparamids.size();
 }
 
-int QFFitFunctionValueInputTable::columnCount(const QModelIndex &parent) const
+int QFFitFunctionValueInputTable::columnCount(const QModelIndex &/*parent*/) const
 {
     return 1+getColsPerRDR();
 }

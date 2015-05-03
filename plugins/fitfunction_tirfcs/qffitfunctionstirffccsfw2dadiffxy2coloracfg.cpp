@@ -209,6 +209,3 @@ QString QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorACFG::transformParametersForAddit
 }
 
 
-void QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorACFG::sortParameter(double *parameterValues, double *error, bool *fix) const {
-
-}

@@ -40,7 +40,7 @@ double QFFitFunctionGeneralLine::evaluate(double t, const double* data) const {
 }
 
 
-void QFFitFunctionGeneralLine::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralLine::calcParameter(double* /*data*/, double* /*error*/) const {
 
 }
 
@@ -69,7 +69,7 @@ bool QFFitFunctionGeneralLine::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralLine::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralLine::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
 }
 
 bool QFFitFunctionGeneralLine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)

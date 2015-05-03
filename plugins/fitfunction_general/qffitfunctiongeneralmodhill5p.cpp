@@ -51,7 +51,7 @@ double QFFitFunctionGeneralModHill5P::evaluate(double t, const double* data) con
 }
 
 
-void QFFitFunctionGeneralModHill5P::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralModHill5P::calcParameter(double* data, double* /*error*/) const {
     if (data) {
         const double XB=data[PARAM_POSITION]+log10(pow(2,1.0/data[PARAM_ASYMMETRY])-1)/data[PARAM_RATE];
         data[PARAM_INFLECTION]=XB+log10(data[PARAM_ASYMMETRY])/data[PARAM_RATE];
@@ -84,10 +84,10 @@ bool QFFitFunctionGeneralModHill5P::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralModHill5P::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralModHill5P::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
 }
 
-bool QFFitFunctionGeneralModHill5P::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionGeneralModHill5P::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

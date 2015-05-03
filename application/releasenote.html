@@ -35,9 +35,10 @@
       </ul></li>
       <li>expression parser:<ul>
         <li>added vector creation functions ones(), zeros(), linspace(), logspace(), vector() meshgrid2d_x(), meshgrid2d_y()</li>
+        <li>added function for real-values Faddeeva function used in TIR-FCS fit models: faddeeva_real()</li>
       </ul></li>
-      <li></li>
-      <li></li>
+      <li>added Faddeeva Package to support real-valued Faddeeva-Function, which is required by some TIR-FCS fit modelss</li>
+      <li>several dialogs now have a maximize+minimize button in their header</li>
       <li></li>
     </li>
     <li><b>FCS/DLS</b><ul>
@@ -99,7 +100,16 @@
         <li>added button to maximize window (thanks to Norbert M.)</li>
         <li></li>
     </ul></li>
-
+    <li><b>SPIM-FCS fit models</b><ul>
+        <li>added model for SPIM-FCS autocorrelation with diffusion and flow</li>
+        <li></li>
+    </ul></li>
+    <li><b>TIR-FCS fit models</b><ul>
+        <li>added model for TIR-FCS autocorrelation with diffusion and flow (pixel-detector)</li>
+        <li>added 3D/2D anomalous diffusion model for confocal TIR-FCS</li>
+        <li>added 3D/2D normal diffusion model for confocal TIR-FCS</li>
+        <li>added 3D/2D normal diffusion model with variable moleculr brightnesses for confocal TIR-FCS</li>
+    </ul></li>
     </li>
 
 

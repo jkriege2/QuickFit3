@@ -51,7 +51,7 @@ QFRDRTableEditor::~QFRDRTableEditor()
     writeSettings();
 }
 
-void QFRDRTableEditor::requestFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString function, QFRDRTable::GraphDataSelection sel, bool xlog, bool ylog)
+void QFRDRTableEditor::requestFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString /*function*/, QFRDRTable::GraphDataSelection sel, bool xlog, bool ylog)
 {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
@@ -1618,7 +1618,7 @@ void QFRDRTableEditor::editExpression(const QModelIndex &index)
     slCalcCell();
 }
 
-void QFRDRTableEditor::tableKeyPressed(int key, Qt::KeyboardModifiers modifiers, QString text)
+void QFRDRTableEditor::tableKeyPressed(int key, Qt::KeyboardModifiers modifiers, QString /*text*/)
 {
     //qDebug()<<"key="<<key<<"   mods="<<modifiers<<"   text="<<text;
     if (key==Qt::Key_Delete && modifiers==Qt::NoModifier) {

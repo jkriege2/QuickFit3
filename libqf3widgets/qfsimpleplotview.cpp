@@ -26,6 +26,7 @@ QFSimplePlotView::QFSimplePlotView(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QFSimplePlotView)
 {
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
     ui->setupUi(this);
 }
 
@@ -35,31 +36,31 @@ QFSimplePlotView::~QFSimplePlotView()
 }
 
 
-void QFSimplePlotView::readSettings(QSettings &settings, const QString &prefix)
+void QFSimplePlotView::readSettings(QSettings &/*settings*/, const QString &/*prefix*/)
 {
     connectParameterWidgets(false);
 
     connectParameterWidgets(true);
 }
 
-void QFSimplePlotView::writeSettings(QSettings &settings, const QString &prefix)
+void QFSimplePlotView::writeSettings(QSettings &/*settings*/, const QString &/*prefix*/)
 {
 
 }
 
-void QFSimplePlotView::writeQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
+void QFSimplePlotView::writeQFProperties(QFProperties */*current*/, const QString &/*prefix*/, const QString &/*egroup*/, const QString &/*param*/)
 {
 
 }
 
-void QFSimplePlotView::readQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
+void QFSimplePlotView::readQFProperties(QFProperties */*current*/, const QString &/*prefix*/, const QString &/*egroup*/, const QString &/*param*/)
 {
     connectParameterWidgets(false);
 
     connectParameterWidgets(true);
 }
 
-void QFSimplePlotView::connectParameterWidgets(bool connectTo)
+void QFSimplePlotView::connectParameterWidgets(bool /*connectTo*/)
 {
 
 }

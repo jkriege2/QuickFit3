@@ -309,6 +309,6 @@ unsigned int QFFitFunctionFCCSNormalDiff2D2Focus::getAdditionalPlotCount(const d
     return 0;
 }
 
-QString QFFitFunctionFCCSNormalDiff2D2Focus::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCCSNormalDiff2D2Focus::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
     return QString();
 }

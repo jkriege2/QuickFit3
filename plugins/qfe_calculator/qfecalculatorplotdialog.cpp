@@ -149,6 +149,7 @@ QFECalculatorPlotDialog::QFECalculatorPlotDialog(QWidget *parent) :
     if (set) {
         loadWidgetGeometry(*set, this, pos(), size(), "QFECalculatorPlotDialog/windowsize");
     }
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
 }
 

@@ -335,7 +335,7 @@ bool QFFitFunctionFCSDiffStretchPP::isParameterVisible(int parameter, const doub
     return true;
 }
 
-unsigned int QFFitFunctionFCSDiffStretchPP::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSDiffStretchPP::getAdditionalPlotCount(const double* /*params*/) {
     return 1;
 }
 

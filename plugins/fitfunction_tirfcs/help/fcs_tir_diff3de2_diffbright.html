@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+       <title>$$local_plugin_subname$$</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        
+        
+        <h2>Model Definition</h2>
+        
+        
+        <p>This function implements a 1-component 3D + 2-component 2D normal diffusion model for data acquired with a confocal microscope in TIR illumination mode, where each component may have different relative molecular brightnesses $(q_i)$. It also contains contributions by fluorophore blinking (triplet ...).
+        The fit function is defined as:$$ref:HASSLER2005:Hassler, Kai; Anhut, Tiemo; Rigler, Rudolf; G&ouml;sch, Michael; Lasser, Theo (2005): <b>High Count Rates with Total Internal Reflection Fluorescence Correlation Spectroscopy</b>, <i>Biophysical Journal</i> <b>88</b>(1), p. L01-L03, doi: 10.1529/biophysj.104.053884$$$$ref:RIES2005:Ries, Jonas; Petrov, Eugene P.; Schwille, Petra (2008): <b>Total Internal Reflection Fluorescence Correlation Spectroscopy: Effects of Lateral Diffusion and Surface-Generated Fluorescence</b>, <i>Biophysical Journal</i> <b>95</b>(1), p. 390-399, doi: 10.1529/biophysj.107.126193$$
+        $$bmath: G(\tau)=G_\infty+\frac{1}{N\cdot\left((1-\rho_{2D,1}-\rho_{2D,2})+q_{2D,1}\rho_{2D,1}+q_{2D,2}\rho_{2D,2}\right)^2}\cdot X_{back}\cdot\left(\frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}\right)\cdot\left[(1-\rho_{2D,1}-\rho_{2D,2})\cdot g_{3D}(\tau)+\rho_{2D,1}\cdot q_{2D,1}\cdot g_2(\tau)+\rho_{2D,2}\cdot q_{2D,2}\cdot g_3(\tau)\right]$$
+with
+$$bmath: g_{3D}(\tau)=\frac{V_\text{eff}}{\pi d_{TRIF}^2\cdot\left(w_{xy}^2+4D_{3D}\tau}\right)}\cdot\left[ \sqrt{ \frac{D_{3D}\tau}{\pi}}+\frac{1-2D_{3D}\tau/d_{TRIF}^2}{2/d_{TRIF}}\cdot w\left(\mathrm{i}\cdot\frac{\sqrt{D_{3D}\tau}}{d_{TRIF}^2}\right)\right]$$
+$$bmath: g_{2D}(\tau)=\left(1+\frac{4D_{2D}\tau}{w_{xy}^2}\right)^{-1}$$
+In these model functions $(d_{TRIF})$ is the 1/e penetration depth of the evanescent field (in z-direction). The light distribution in z is then given by $(I(z)\propto\exp(-z/d_{TIRF}))$. The function $(w(\mathrm{i}\cdot\xi))$ is the real-part of the <a href="https://en.wikipedia.org/wiki/Faddeeva_function">Faddeeva function</a>:
+$[ w(\mathrm{i}\cdot\xi)=\exp(\xi^2)\cdot\mbox{erfc}(\xi) ]$
+The background correction is performed by factor
+$$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
+
+        The effective volume and focus area are defined as:
+        $$bmath:A_{\text{eff}}=\pi\cdot w_{xy}^2$$
+        $$bmath:V_{\text{eff}}=2\pi\cdot w_{xy}^2\cdot d_{TIRF}$$
+        From these the concentration is estimated:
+        $$bmath:c=\frac{N}{V_{\text{eff}}}$$
+
+
+        For the fractions we have in addition:
+        $$bmath:\rho_{3D}=1-\rho_{2D,1}-\rho_{2D,2}$$
+        
+        
+                
+        For each component the mean squared displacement after a given time $$math:\tau_{MSD}$$ is calculated, as:
+        $$bmath:\mbox{MSD}_i(\tau_{MSD})=6\cdot D_i\cdot\tau_{MSD}.$$
+        Also the time, required for a particle to leave the effective area of the focus is calculated:
+        $$bmath:\tau_i(MSD)=\frac{A_{eff}}{4\cdot D_i}.$$
+        
+        The following plot shows the difference between a 3D TIR-FCS and a best-fit 2D TIR-FCS function (both: &alpha;=1):
+<center><a name="fcs_tir_adiff3de2_pic000"><img src="./pic/fcs_tir_adiff3de2_pic000.png" border="1">
+</center>
+
+        
+        
+        
+        </p>
+        <h2>References</h2>
+        $$references$$
+    </body>
+</html>

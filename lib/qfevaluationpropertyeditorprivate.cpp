@@ -64,7 +64,7 @@ QFEvaluationPropertyEditorPrivate::QFEvaluationPropertyEditorPrivate(QFEvaluatio
 
 
 
-void QFEvaluationPropertyEditorPrivate::resultsChanged(QFRawDataRecord* record, const QString& evalName, const QString& resultName) {
+void QFEvaluationPropertyEditorPrivate::resultsChanged(QFRawDataRecord* /*record*/, const QString& /*evalName*/, const QString& /*resultName*/) {
     if (!d->resultsModel) return;
     //resultsModel->resultsChanged();
     if (tvResults->model()->columnCount()*tvResults->model()->rowCount()<10000) tvResults->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
@@ -447,7 +447,7 @@ void QFEvaluationPropertyEditorPrivate::evaluationAboutToBeDeleted(QFEvaluationI
 }
 
 
-void QFEvaluationPropertyEditorPrivate::propsChanged(const QString& property, bool visible) {
+void QFEvaluationPropertyEditorPrivate::propsChanged(const QString& /*property*/, bool /*visible*/) {
     if (d->current) {
         if (d->current->getName()!=edtName->text()) {
             edtName->setText(d->current->getName());
@@ -925,7 +925,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
 }
 
 
-void QFEvaluationPropertyEditorPrivate::selectionChanged(const QModelIndex& index, const QModelIndex& oldindex) {
+void QFEvaluationPropertyEditorPrivate::selectionChanged(const QModelIndex& index, const QModelIndex& /*oldindex*/) {
     if (d->rdrProxy!=NULL) {
         QFRawDataRecord* rec=d->current->getProject()->getRawDataByID(d->rdrProxy->data(index, Qt::UserRole).toInt());
         if (rec!=NULL) {
@@ -950,7 +950,7 @@ void QFEvaluationPropertyEditorPrivate::rdrModelReset() {
 
 
 
-void QFEvaluationPropertyEditorPrivate::tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
+void QFEvaluationPropertyEditorPrivate::tvResultsSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
     QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
     QMap<int, QString> names;
     QMap<int, double> sum, sum2, count;

@@ -668,7 +668,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
                         corrdata=data->getCorrelationMean();
                     }
                 }
-                double* weights=eval->allocWeights(NULL, rec, eval->getCurrentIndex(), datacut_min, datacut_max);
+                //double* weights=eval->allocWeights(NULL, rec, eval->getCurrentIndex(), datacut_min, datacut_max, true);
 
 
                 /////////////////////////////////////////////////////////////////////////////////
@@ -720,7 +720,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
                 /////////////////////////////////////////////////////////////////////////////////
                 qfFree(fullParams);
                 qfFree(errors);
-                qfFree(weights);
+                //qfFree(weights);
             }
         } catch(std::exception& E) {
             services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
@@ -733,7 +733,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
         item.x=acftau;
         item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
         bool ok=true;
-        double* w=eval->allocWeights(&ok, rec, index);
+        double* w=eval->allocWeights(&ok, rec, index, -1, -1, true);
         if (ok && w) {
             item.yerrors=arrayToVector(w, data->getCorrelationN());
         }

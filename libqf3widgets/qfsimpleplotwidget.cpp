@@ -517,6 +517,7 @@ QFSimplePlotDialog::QFSimplePlotDialog(QWidget *parent, Qt::WindowFlags f):
     setLayout(vbl);
     resize(640,480);
     ProgramOptions::getConfigWindowGeometry(this, "QFSimplePlotDialog/geometry");
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFSimplePlotDialog::~QFSimplePlotDialog()

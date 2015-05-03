@@ -30,12 +30,12 @@ QFImFCCSParameterInputTable::QFImFCCSParameterInputTable(QFImFCCSFitEvaluationIt
     editRanges=true;
 }
 
-int QFImFCCSParameterInputTable::rowCount(const QModelIndex &parent) const
+int QFImFCCSParameterInputTable::rowCount(const QModelIndex &/*parent*/) const
 {
     return 2+fitparamids.size();
 }
 
-int QFImFCCSParameterInputTable::columnCount(const QModelIndex &parent) const
+int QFImFCCSParameterInputTable::columnCount(const QModelIndex &/*parent*/) const
 {
     return 1+getColsPerRDR()*item->getFitFileCount();
 }

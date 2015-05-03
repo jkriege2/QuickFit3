@@ -36,8 +36,9 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
     ui->setupUi(this);
     overwriteGraph=-1;
     overwritePlot=-1;
-    this->sourceGraph=sourceGraph;
+    this->sourceGraph=sourcegraph;
     intInit(table,  colX,  colY,  colW, parent,  logX,  logY,  resultColumn,  addGraph);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int plotid, int graphid, QWidget *parent) :
@@ -54,6 +55,7 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int pl
     this->sourceGraph=-1;
     //qDebug()<<"QFRDRTableRegressionDialog("<<plotid<<graphid<<"): "<<overwriteGraph<<colX<<colY;
     intInit(table,  colX,  colY,  colW, parent,  ui->chkLogX->isChecked(),  ui->chkLogY->isChecked(),  resultColumn,  addGraph, true);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 
@@ -70,7 +72,7 @@ QFRDRTableRegressionDialog::~QFRDRTableRegressionDialog()
     delete ui;
 }
 
-double QFRDRTableRegressionDialog::getWeight(int i) const
+double QFRDRTableRegressionDialog::getWeight(int /*i*/) const
 {
     if (qMin(dataX.size(), dataY.size())<=0) return 1.0;
     const double defaultVal=1.0;//double(qMin(dataX.size(), dataY.size()));
@@ -757,6 +759,7 @@ void QFRDRTableRegressionDialog::readFitProperties(int pid, int gid, int *result
 
 void QFRDRTableRegressionDialog::intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, bool propsAlreadySet)
 {
+    setParent(parent);
     this->colX=colX;
     this->colY=colY;
     this->colW=colW;

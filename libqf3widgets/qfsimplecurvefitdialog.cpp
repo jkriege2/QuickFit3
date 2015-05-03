@@ -140,6 +140,7 @@ QFSimpleCurveFitDialog::QFSimpleCurveFitDialog(const QVector<double>& dataXin, c
     methodChanged(0);//ui->cmbFitFunction->currentIndex());
     connectSignals(true);
     on_btnFit_clicked();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFSimpleCurveFitDialog::~QFSimpleCurveFitDialog()
@@ -564,7 +565,7 @@ void QFSimpleCurveFitDialog::showHelp()
 }
 
 
-void QFSimpleCurveFitDialog::methodChanged(int method)
+void QFSimpleCurveFitDialog::methodChanged(int /*method*/)
 {
     parameterTable->setDoRebuildModel(false);
     parameterTable->setEditErrors(true);

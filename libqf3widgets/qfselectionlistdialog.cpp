@@ -35,6 +35,7 @@ QFSelectionListDialog::QFSelectionListDialog(QWidget *parent, bool selection_sav
     ui->btnSave->setVisible(selection_saveable);
     ui->comboBox->setVisible(selection_saveable);
     ui->btnHelp->setVisible(false);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFSelectionListDialog::~QFSelectionListDialog()
@@ -254,7 +255,7 @@ void QFSelectionListDialog::getDataColumnsByUserComboBoxSelected(int index) {
 }
 
 
-void QFSelectionListDialog::getDataColumnsByUserItemChanged(QListWidgetItem *widgetitem) {
+void QFSelectionListDialog::getDataColumnsByUserItemChanged(QListWidgetItem */*widgetitem*/) {
     if (!selection_saveable) return;
     if (!ui->listWidget) return;
     QStringList data;

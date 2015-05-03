@@ -58,7 +58,7 @@ QList<QVector<double> > importCSVAskUser(const QString& filename, const QString&
     return res;
 }
 
-QList<QVector<double> > readCSV(QTextStream& f, QChar separator_char, QChar decimalsep_char, QChar comment_char, const QString& headerComment, double non_value, const QString& eolChars, const QString& ignoreChars, QStringList* colNames) {
+QList<QVector<double> > readCSV(QTextStream& f, QChar separator_char, QChar /*decimalsep_char*/, QChar comment_char, const QString& /*headerComment*/, double non_value, const QString& eolChars, const QString& ignoreChars, QStringList* colNames) {
     QList<QVector<double> > res;
     while (!f.atEnd())  {
         QVector<double> d=csvReadline(f,separator_char, comment_char, non_value, eolChars, ignoreChars);

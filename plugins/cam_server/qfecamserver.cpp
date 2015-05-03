@@ -140,7 +140,7 @@ unsigned int QFECamServer::getMeasurementDeviceCount()
     return getCameraCount();
 }
 
-void QFECamServer::showMeasurementDeviceSettingsDialog(unsigned int measurementDevice, QWidget *parent)
+void QFECamServer::showMeasurementDeviceSettingsDialog(unsigned int /*measurementDevice*/, QWidget *parent)
 {
     QMessageBox::information(parent, tr("Andor camera driver"), tr("there is no configuration dialog for the camera as measurement device!"));
 }
@@ -156,7 +156,7 @@ void QFECamServer::connectMeasurementDevice(unsigned int measurementDevice)
     connectCameraDevice(measurementDevice);
 }
 
-void QFECamServer::disconnectMeasurementDevice(unsigned int measurementDevice)
+void QFECamServer::disconnectMeasurementDevice(unsigned int /*measurementDevice*/)
 {
     //disconnectCameraDevice(measurementDevice);
 }
@@ -173,7 +173,7 @@ void QFECamServer::setMeasurementDeviceLogging(QFPluginLogService *logService)
 
 unsigned int QFECamServer::getMeasurementDeviceValueCount(unsigned int measurementDevice)
 {
-    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+    if (/*measurementDevice>=0 && */measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
         return sources[measurementDevice].params.size();
     }
     return 0;
@@ -182,8 +182,8 @@ unsigned int QFECamServer::getMeasurementDeviceValueCount(unsigned int measureme
 
 QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value)
 {
-    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
+    if (/*measurementDevice>=0 &&*/ measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (/*value>=0 &&*/ value<(long long)sources[measurementDevice].params.size()) {
             QTcpSocket* server=sources[measurementDevice].server;
             if (!server) return QVariant::Invalid;
 
@@ -250,8 +250,8 @@ QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice,
 
 QString QFECamServer::getMeasurementDeviceValueName(unsigned int measurementDevice, unsigned int value)
 {
-    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
+    if (/*measurementDevice>=0 &&*/ measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (/*value>=0 &&*/ value<(long long)sources[measurementDevice].params.size()) {
             return sources[measurementDevice].params[value].description;
         }
     }
@@ -260,8 +260,8 @@ QString QFECamServer::getMeasurementDeviceValueName(unsigned int measurementDevi
 
 QString QFECamServer::getMeasurementDeviceValueShortName(unsigned int measurementDevice, unsigned int value)
 {
-    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
+    if (/*measurementDevice>=0 &&*/ measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (/*value>=0 && */value<(long long)sources[measurementDevice].params.size()) {
             return sources[measurementDevice].params[value].id;
         }
     }
@@ -270,8 +270,8 @@ QString QFECamServer::getMeasurementDeviceValueShortName(unsigned int measuremen
 
 bool QFECamServer::isMeasurementDeviceValueEditable(unsigned int measurementDevice, unsigned int value)
 {
-    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
+    if (/*measurementDevice>=0 &&*/ measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (/*value>=0 && */value<(long long)sources[measurementDevice].params.size()) {
             return sources[measurementDevice].params[value].editable;
         }
 
@@ -281,8 +281,8 @@ bool QFECamServer::isMeasurementDeviceValueEditable(unsigned int measurementDevi
 
 void QFECamServer::setMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value, const QVariant &data)
 {
-    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<(long long)sources[measurementDevice].params.size() && sources[measurementDevice].params[value].editable) {
+    if (/*measurementDevice>=0 &&*/ measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (/*value>=0 &&*/ value<(long long)sources[measurementDevice].params.size() && sources[measurementDevice].params[value].editable) {
             QTcpSocket* server=sources[measurementDevice].server;
             if (!server) return ;
 
@@ -302,8 +302,8 @@ void QFECamServer::setMeasurementDeviceValue(unsigned int measurementDevice, uns
 
 QVariant::Type QFECamServer::getMeasurementDeviceEditableValueType(unsigned int measurementDevice, unsigned int value)
 {
-    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
+    if (/*measurementDevice>=0 &&*/ measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (/*value>=0 &&*/ value<(long long)sources[measurementDevice].params.size()) {
             return sources[measurementDevice].params[value].type;
         }
 
@@ -313,8 +313,8 @@ QVariant::Type QFECamServer::getMeasurementDeviceEditableValueType(unsigned int 
 
 QFExtensionMeasurementAndControlDevice::WidgetTypes QFECamServer::getMeasurementDeviceValueWidget(unsigned int measurementDevice, unsigned int value, QStringList *comboboxEntries)
 {
-    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
+    if (/*measurementDevice>=0 &&*/ measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (/*value>=0 &&*/ value<(long long)sources[measurementDevice].params.size()) {
             return sources[measurementDevice].params[value].widget;
         }
     }
@@ -323,8 +323,8 @@ QFExtensionMeasurementAndControlDevice::WidgetTypes QFECamServer::getMeasurement
 
 void QFECamServer::getMeasurementDeviceEditableValueRange(unsigned int measurementDevice, unsigned int value, double &minimum, double &maximum)
 {
-    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
+    if (/*measurementDevice>=0 &&*/ measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (/*value>=0 &&*/ value<(long long)sources[measurementDevice].params.size()) {
             minimum=sources[measurementDevice].params[value].range_min;
             maximum=sources[measurementDevice].params[value].range_max;
         }
@@ -349,7 +349,7 @@ void QFECamServer::useCameraSettingsInt(unsigned int camera, const QSettings& se
     if (logService) {
         logService->log_text(QString("\n         -- useCameraSetings: %1\n").arg(camera));
     }
-    if (camera<0 || camera>=getCameraCount()) return;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return;
     if (isMeasurementDeviceConnected(camera) ) {
         int cnt=0;
         for (unsigned int i=0; i<getMeasurementDeviceValueCount(camera); i++) {
@@ -395,7 +395,7 @@ void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& sett
 	   during the measurement.
 	*/
 
-    if (camera<0 || camera>=getCameraCount() || !isMeasurementDeviceConnected(camera) ) return;
+    if (/*camera<0 ||*/ camera>=getCameraCount() || !isMeasurementDeviceConnected(camera) ) return;
 
     useCameraSettingsInt(camera, settings, false, false);
 
@@ -442,7 +442,7 @@ void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& sett
 
 
 bool QFECamServer::connectCameraDevice(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return false;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return false;
     QTcpSocket* server=sources[camera].server;
     if (!server) return false;
 
@@ -574,7 +574,7 @@ bool QFECamServer::connectCameraDevice(unsigned int camera) {
 }
 
 void QFECamServer::disconnectCameraDevice(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return ;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return ;
     QTcpSocket* server=sources[camera].server;
     if (!server) return ;
 
@@ -602,7 +602,7 @@ void QFECamServer::disconnectCameraDevice(unsigned int camera) {
 }
 
 bool QFECamServer::isCameraConnected(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return false;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return false;
     QTcpSocket* server=sources[camera].server;
     if (!server) return false;
 
@@ -617,7 +617,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
         *timestamp=sources[camera].connected_timer.elapsed();
     }
 
-    if (camera<0 || camera>=getCameraCount()) return 0;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return 0;
     QTcpSocket* server=sources[camera].server;
     if (!server) return 0;
 
@@ -767,7 +767,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
 }
 
 int QFECamServer::getCameraImageWidth(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return 0;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return 0;
     QTcpSocket* server=sources[camera].server;
     if (!server) return 0;
 
@@ -788,7 +788,7 @@ int QFECamServer::getCameraImageWidth(unsigned int camera) {
 }
 
 int QFECamServer::getCameraImageHeight(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return 0;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return 0;
     QTcpSocket* server=sources[camera].server;
     if (!server) return 0;
 
@@ -809,32 +809,32 @@ int QFECamServer::getCameraImageHeight(unsigned int camera) {
 }
 
 double QFECamServer::getCameraPixelWidth(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return 0;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return 0;
 
     return sources[camera].pixel_width;
 }
 
 double QFECamServer::getCameraPixelHeight(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return 0;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return 0;
 
     return sources[camera].pixel_height;
 }
 
 
  QString QFECamServer::getCameraName(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return "";
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return "";
 
     return sources[camera].camera_name;
 }
 
  QString QFECamServer::getCameraSensorName(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return "";
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return "";
 
     return sources[camera].sensor_name;
 }
 
 double QFECamServer::getCameraExposureTime(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return 0;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return 0;
     /*QTcpSocket* server=sources[camera].server;
     if (!server) return 0;
 
@@ -856,7 +856,7 @@ double QFECamServer::getCameraExposureTime(unsigned int camera) {
 
 
 bool QFECamServer::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
-    if (camera<0 || camera>=getCameraCount()) return false;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return false;
     useCameraSettingsInt(camera, settings, false);
     sources[camera].last_filenameprefix=filenamePrefix.toLocal8Bit();
     return true;
@@ -864,7 +864,7 @@ bool QFECamServer::prepareCameraAcquisition(unsigned int camera, const QSettings
 
 bool QFECamServer::startCameraAcquisition(unsigned int camera) {
     //RECORD\n<filename>\n
-    if (camera<0 || camera>=getCameraCount()) return false;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return false;
     QTcpSocket* server=sources[camera].server;
     if (!server) return false;
 
@@ -906,7 +906,7 @@ bool QFECamServer::startCameraAcquisition(unsigned int camera) {
 }
 
 void QFECamServer::cancelCameraAcquisition(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return ;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return ;
     QTcpSocket* server=sources[camera].server;
     if (!server) return ;
     if (!sources[camera].hasInstCancel) return;
@@ -921,7 +921,7 @@ void QFECamServer::cancelCameraAcquisition(unsigned int camera) {
 }
 
 bool QFECamServer::isCameraAcquisitionRunning(unsigned int camera) {
-    if (camera<0 || camera>=getCameraCount()) return false;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return false;
     QTcpSocket* server=sources[camera].server;
     if (!server) return false;
 
@@ -950,7 +950,7 @@ bool QFECamServer::isCameraAcquisitionRunning(unsigned int camera) {
 
 void QFECamServer::getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription> *files, QMap<QString, QVariant> *parameters)
 {
-    if (camera<0 || camera>=getCameraCount()) return ;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return ;
 
     QMutex* mutex=sources[camera].mutex;
     QMutexLocker locker(mutex);
@@ -1010,13 +1010,13 @@ void QFECamServer::getCameraAcquisitionDescription(unsigned int camera, QList<QF
 }
 
 
-bool QFECamServer::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {
+bool QFECamServer::getCameraAcquisitionPreview(unsigned int /*camera*/, uint32_t* /*data*/) {
     return false;
 }
 
 int QFECamServer::getCameraAcquisitionProgress(unsigned int camera) {
 
-    if (camera<0 || camera>=getCameraCount()) return 0;
+    if (/*camera<0 ||*/ camera>=getCameraCount()) return 0;
     if (!sources[camera].hasInstProgress ) return 0;
     QTcpSocket* server=sources[camera].server;
     if (!server) return 0;

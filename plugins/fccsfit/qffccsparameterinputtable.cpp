@@ -30,12 +30,12 @@ QFFCCSParameterInputTable::QFFCCSParameterInputTable(QFFCCSFitEvaluationItem *pa
     editRanges=true;
 }
 
-int QFFCCSParameterInputTable::rowCount(const QModelIndex &parent) const
+int QFFCCSParameterInputTable::rowCount(const QModelIndex &/*parent*/) const
 {
     return 2+fitparamids.size();
 }
 
-int QFFCCSParameterInputTable::columnCount(const QModelIndex &parent) const
+int QFFCCSParameterInputTable::columnCount(const QModelIndex &/*parent*/) const
 {
     return 1+getColsPerRDR()*item->getFitFileCount();
 }
@@ -417,7 +417,7 @@ void QFFCCSParameterInputTable::rebuildModel()
     checkRebuildModel(true);
 }
 
-bool QFFCCSParameterInputTable::recalculateFitParameters(bool emitFitParamSignals, bool dataChangedSignals)
+bool QFFCCSParameterInputTable::recalculateFitParameters(bool emitFitParamSignals, bool /*dataChangedSignals*/)
 {
     bool changed=false;
 

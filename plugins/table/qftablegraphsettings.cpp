@@ -180,11 +180,11 @@ void QFTableGraphSettings::rawDataChanged()
     cmbFunctionTypeCurrentIndexChanged(ui->cmbFunctionType->currentIndex());
 }
 
-void QFTableGraphSettings::readSettings(QSettings &settings, const QString &prefix)
+void QFTableGraphSettings::readSettings(QSettings &/*settings*/, const QString &/*prefix*/)
 {
 }
 
-void QFTableGraphSettings::writeSettings(QSettings &settings, const QString &prefix)
+void QFTableGraphSettings::writeSettings(QSettings &/*settings*/, const QString &/*prefix*/)
 {
 }
 
@@ -1754,12 +1754,12 @@ void QFTableGraphSettings::on_btnClearLinesQ75_clicked()
     ui->cmbLinesQ75->setCurrentData(-1);
 }
 
-void QFTableGraphSettings::on_cmbSelectDataLogic12_currentIndexChanged(int index)
+void QFTableGraphSettings::on_cmbSelectDataLogic12_currentIndexChanged(int /*index*/)
 {
     updateSelectDataEnabled();
 }
 
-void QFTableGraphSettings::on_cmbSelectDataLogic23_currentIndexChanged(int index)
+void QFTableGraphSettings::on_cmbSelectDataLogic23_currentIndexChanged(int /*index*/)
 {
     updateSelectDataEnabled();
 }
@@ -1779,7 +1779,7 @@ void QFTableGraphSettings::updateSelectDataEnabled()
 
 }
 
-void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
+void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int /*index*/)
 {
 
     if (ui->cmbFunctionType->currentIndex()==0) {

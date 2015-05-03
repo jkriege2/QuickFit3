@@ -167,7 +167,7 @@ void QFESPIMB040MainWindow2::closeEvent ( QCloseEvent * event ) {
     //deleteLater();
 }
 
-void QFESPIMB040MainWindow2::showEvent( QShowEvent * event )  {
+void QFESPIMB040MainWindow2::showEvent( QShowEvent * /*event*/ )  {
     if (optSetup) optSetup->show();
 }
 
@@ -175,7 +175,7 @@ void QFESPIMB040MainWindow2::displayHelp() {
     m_pluginServices->displayHelpWindow(m_pluginServices->getExtensionManager()->getPluginHelp(plugin->getID()));
 }
 
-void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager, bool newOpticsSetup) {
+void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* /*extManager*/, bool newOpticsSetup) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main tab and help button as corner widget of the QTabWidget
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,7 +364,7 @@ void QFESPIMB040MainWindow2::doDeviceParameterStack()
 
 
 
-bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription, const QString& acquisitionDescriptionPrefix, bool mainShutterOpenOnlyForAcquisition, int frames, bool getMeasurements) {
+bool QFESPIMB040MainWindow2::savePreview(QFExtension* /*extension*/, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription, const QString& acquisitionDescriptionPrefix, bool mainShutterOpenOnlyForAcquisition, int frames, bool getMeasurements) {
     //////////////////////////////////////////////////////////////////////////////////////
     // INIT variables
     //////////////////////////////////////////////////////////////////////////////////////
@@ -565,7 +565,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
 }
 
 
-QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles, QDateTime startDateTime, bool getAcquisitionSettings) {
+QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtension* /*extension*/, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles, QDateTime startDateTime, bool getAcquisitionSettings) {
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
@@ -667,7 +667,7 @@ QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtens
 }
 
 
-QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::CameraAcquititonFileDescription>& files, QDateTime startDateTime, const QString& lightpathPrefix, const QString& prefix) {
+QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension* /*extension*/, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::CameraAcquititonFileDescription>& files, QDateTime startDateTime, const QString& lightpathPrefix, const QString& prefix) {
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
@@ -1259,7 +1259,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
 
 }
 
-bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const QString &imageID, const QString &imageDescription, bool useCam1, QFExtension *extension1, QFExtensionCamera *ecamera1, int camera1, const QString &acquisitionPrefix1, QSettings &acquisitionSettings1, QMap<QString, QVariant> &acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription> &moreFiles1, bool useCam2, QFExtension *extension2, QFExtensionCamera *ecamera2, int camera2, const QString &acquisitionPrefix2, QSettings &acquisitionSettings2, QMap<QString, QVariant> &acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription> &moreFiles2, QList<QFESPIMB040OpticsSetupBase::measuredValues> *measured, QProgressListDialog *progress, bool *userCanceled, bool measureDuringAcquisitions)
+bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const QString &imageID, const QString &imageDescription, bool useCam1, QFExtension */*extension1*/, QFExtensionCamera *ecamera1, int camera1, const QString &acquisitionPrefix1, QSettings &acquisitionSettings1, QMap<QString, QVariant> &acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription> &moreFiles1, bool useCam2, QFExtension */*extension2*/, QFExtensionCamera *ecamera2, int camera2, const QString &acquisitionPrefix2, QSettings &acquisitionSettings2, QMap<QString, QVariant> &acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription> &moreFiles2, QList<QFESPIMB040OpticsSetupBase::measuredValues> *measured, QProgressListDialog *progress, bool *userCanceled, bool measureDuringAcquisitions)
 {
 
     bool ok=true;

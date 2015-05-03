@@ -34,6 +34,7 @@ QFRDRTableHistogramDialog::QFRDRTableHistogramDialog(QWidget *parent) :
     ui->edtRangeMin->setCheckBounds(false, false);
     ui->edtRangeMax->setCheckBounds(false, false);
     ui->edtBinWidth->setCheckBounds(false, false);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRTableHistogramDialog::~QFRDRTableHistogramDialog()
@@ -199,22 +200,22 @@ void QFRDRTableHistogramDialog::updateHistograms(bool estimateBinWidth)
 
 }
 
-void QFRDRTableHistogramDialog::on_edtRangeMax_valueChanged(double value)
+void QFRDRTableHistogramDialog::on_edtRangeMax_valueChanged(double /*value*/)
 {
     if (!ui->chkRangeMax->isChecked())   updateHistograms();
 }
 
-void QFRDRTableHistogramDialog::on_edtRangeMin_valueChanged(double value)
+void QFRDRTableHistogramDialog::on_edtRangeMin_valueChanged(double /*value*/)
 {
     if (!ui->chkRangeMin->isChecked())   updateHistograms();
 }
 
-void QFRDRTableHistogramDialog::on_edtBinWidth_valueChanged(double value)
+void QFRDRTableHistogramDialog::on_edtBinWidth_valueChanged(double /*value*/)
 {
     if (!ui->chkAutoBinWidth->isChecked())   updateHistograms();
 }
 
-void QFRDRTableHistogramDialog::on_spinBins_valueChanged(int value)
+void QFRDRTableHistogramDialog::on_spinBins_valueChanged(int /*value*/)
 {
     if (ui->chkAutoBinWidth->isChecked()) updateHistograms();
 }

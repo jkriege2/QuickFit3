@@ -43,37 +43,37 @@ bool QFFitFunctionBase::get_implementsDerivatives() const
     return false;
 }
 
-void QFFitFunctionBase::calcParameter(double *parameterValues, double *error) const
+void QFFitFunctionBase::calcParameter(double */*parameterValues*/, double */*error*/) const
 {
 
 }
 
-void QFFitFunctionBase::sortParameter(double *parameterValues, double *error, bool *fix) const
+void QFFitFunctionBase::sortParameter(double */*parameterValues*/, double */*error*/, bool */*fix*/) const
 {
 
 }
 
-bool QFFitFunctionBase::isParameterVisible(int parameter, const double *parameterValues) const
+bool QFFitFunctionBase::isParameterVisible(int /*parameter*/, const double */*parameterValues*/) const
 {
     return true;
 }
 
-unsigned int QFFitFunctionBase::getAdditionalPlotCount(const double *params)
+unsigned int QFFitFunctionBase::getAdditionalPlotCount(const double */*params*/)
 {
     return 0;
 }
 
-QString QFFitFunctionBase::transformParametersForAdditionalPlot(int plot, double *params)
+QString QFFitFunctionBase::transformParametersForAdditionalPlot(int /*plot*/, double */*params*/)
 {
     return QString();
 }
 
-double QFFitFunctionBase::customTransform(int parameter, double value) const
+double QFFitFunctionBase::customTransform(int /*parameter*/, double value) const
 {
     return value;
 }
 
-double QFFitFunctionBase::customBackTransform(int parameter, double value) const
+double QFFitFunctionBase::customBackTransform(int /*parameter*/, double value) const
 {
     return value;
 }

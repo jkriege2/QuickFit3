@@ -4342,13 +4342,13 @@ bool QFRawDataRecord::resultsSave(const QString &filename, int format, bool vect
 
 
 
-static bool QFRawDataRecord_StringPairCaseInsensitiveCompare(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
-    return s1.first.toLower() < s2.first.toLower();
-}
+//static bool QFRawDataRecord_StringPairCaseInsensitiveCompare(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
+//    return s1.first.toLower() < s2.first.toLower();
+//}
 
-static bool QFRawDataRecord_StringTripleCaseInsensitiveCompare(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
-    return s1.first.toLower() < s2.first.toLower();
-}
+//static bool QFRawDataRecord_StringTripleCaseInsensitiveCompare(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
+//    return s1.first.toLower() < s2.first.toLower();
+//}
 
 static bool QFRawDataRecord_StringPairCaseInsensitiveCompareSecond(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
     return s1.second.toLower() < s2.second.toLower();

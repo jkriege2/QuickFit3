@@ -34,6 +34,7 @@ QFRDRImageCopyDataSelectDialog::QFRDRImageCopyDataSelectDialog(QWidget *parent) 
     ui->chkOverview->setChecked(ProgramOptions::getConfigValue("QFRDRImageCopyDataSelectDialog/overview", true).toBool());
     ui->chkPixelCoordinate->setChecked(ProgramOptions::getConfigValue("QFRDRImageCopyDataSelectDialog/pixelcoordinate", true).toBool());
     ui->chkPixelNumber->setChecked(ProgramOptions::getConfigValue("QFRDRImageCopyDataSelectDialog/pixelnum", true).toBool());
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRImageCopyDataSelectDialog::~QFRDRImageCopyDataSelectDialog()

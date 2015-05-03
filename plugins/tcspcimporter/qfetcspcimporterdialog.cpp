@@ -55,6 +55,7 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     ui->spinCountrateBinning->setValue(10);
     ui->spinFCSTauMin->setRange(1e-6,1e10);
     ui->spinFCSTauMin->setValue(1);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
     tmCR=new QFTableModel(ui->tabCR);
     tmCR->setReadonly(true);
@@ -219,38 +220,38 @@ void QFETCSPCImporterDialog::setProject(QFProject* project) {
     this->project=project;
 }
 
-void QFETCSPCImporterDialog::on_spinP_valueChanged(int val) {
+void QFETCSPCImporterDialog::on_spinP_valueChanged(int /*val*/) {
     updateCorrelator();
 }
 
-void QFETCSPCImporterDialog::on_spinFCSTauMin_valueChanged(double val) {
+void QFETCSPCImporterDialog::on_spinFCSTauMin_valueChanged(double /*val*/) {
     updateCorrelator();
 }
 
-void QFETCSPCImporterDialog::on_spinSegments_valueChanged(int val) {
+void QFETCSPCImporterDialog::on_spinSegments_valueChanged(int /*val*/) {
     updateDuration();
     updateCorrelator();
 }
 
-void QFETCSPCImporterDialog::on_spinRangeStart_valueChanged(double val) {
+void QFETCSPCImporterDialog::on_spinRangeStart_valueChanged(double /*val*/) {
     updateDuration();
     updateCorrelator();
 }
 
-void QFETCSPCImporterDialog::on_spinRangeEnd_valueChanged(double val) {
+void QFETCSPCImporterDialog::on_spinRangeEnd_valueChanged(double /*val*/) {
     updateDuration();
     updateCorrelator();
 }
 
-void QFETCSPCImporterDialog::on_spinS_valueChanged(int val) {
+void QFETCSPCImporterDialog::on_spinS_valueChanged(int /*val*/) {
     updateCorrelator();
 }
 
-void QFETCSPCImporterDialog::on_spinM_valueChanged(int val) {
+void QFETCSPCImporterDialog::on_spinM_valueChanged(int /*val*/) {
     updateCorrelator();
 }
 
-void QFETCSPCImporterDialog::on_cmbCorrelator_currentIndexChanged(int idx) {
+void QFETCSPCImporterDialog::on_cmbCorrelator_currentIndexChanged(int /*idx*/) {
     updateCorrelator();
 }
 
@@ -499,7 +500,7 @@ void QFETCSPCImporterDialog::updateDuration() {
 
 
 
-void QFETCSPCImporterDialog::updateFromFile(bool readFrameCount) {    
+void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
     QFTCSPCReader* reader=QFETCSPCImporterJobThread::getImporter(ui->cmbFileformat->currentIndex(), pluginServices);    
     if (reader) {
         QString paramName="";

@@ -73,34 +73,35 @@ QFFitFunctionsTIRFCSDiffE2Diff3Dbright::QFFitFunctionsTIRFCSDiffE2Diff3Dbright()
 
     addParameter(FloatNumber,  "penetration_depth",       "TIRF: penetration depth (1/e)",                        "d<sub>TIRF</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 200,          0,        1e4,      10    );
     #define FCSSDiff_penetration_depth 18
-
     addParameter(FloatNumber,  "focus_volume",            "focus: effective volume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSADiff_focus_volume 19
+    #define FCSSDiff_focus_volume 19
+    addParameter(FloatNumber,  "effective_area",            "focus: effective area",                               "A<sub>eff</sub>",          "micron^2",         "&mu;m<sup>2</sup>",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSSDiff_focus_area 20
 
     addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "particles/micron^2",         "particles/&mu;m<sup>2</sup>",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSSDiff_concentration 20
+    #define FCSSDiff_concentration 21
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_count_rate 21
+    #define FCSSDiff_count_rate 22
     addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_background 22
+    #define FCSSDiff_background 23
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_cpm 23
+    #define FCSSDiff_cpm 24
 
 
     addParameter(FloatNumber,  "msd_tau1",                "evaluate MSD at this time",                             "&tau;<sub>MSD</sub>",      "ms",         "ms",                     false,    true,         false,              QFFitFunction::NoError  ,   false, 1,            1e-10,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_tau 24
+    #define FCSDiff_msd_tau 25
     addParameter(FloatNumber,  "msd_at_tau1",              "MSD1 evaluated at given time tau_MSD",                  "MSD1(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_at_tau1 25
+    #define FCSDiff_msd_at_tau1 26
     addParameter(FloatNumber,  "msd_at_tau2",              "MSD2 evaluated at given time tau_MSD",                  "MSD2(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_at_tau2 26
+    #define FCSDiff_msd_at_tau2 27
     addParameter(FloatNumber,  "msd_at_tau3",              "MSD3 evaluated at given time tau_MSD",                  "MSD3(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_at_tau3 27
+    #define FCSDiff_msd_at_tau3 28
     addParameter(FloatNumber,  "msd_time_aeff1",              "time to leave effective focus area with MSD1",      "&tau;<sub>1</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_time_aeff1 28
+    #define FCSDiff_msd_time_aeff1 29
     addParameter(FloatNumber,  "msd_time_aeff2",              "time to leave effective focus area with MSD2",      "&tau;<sub>2</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_time_aeff2 29
+    #define FCSDiff_msd_time_aeff2 30
     addParameter(FloatNumber,  "msd_time_aeff3",              "time to leave effective focus area with MSD3",      "&tau;<sub>3</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_time_aeff3 30
+    #define FCSDiff_msd_time_aeff3 31
 
 }
 
@@ -119,7 +120,7 @@ double QFFitFunctionsTIRFCSDiffE2Diff3Dbright::evaluate(double t, const double* 
     const double D3=data[FCSSDiff_diff_coeff3];
     const double rho3=data[FCSSDiff_diff_rho3];
     const double wxy=data[FCSSDiff_focus_width]/1.0e3;
-    const double a=data[FCSSDiff_pixel_width]/1.0e3;
+    //const double a=data[FCSSDiff_pixel_width]/1.0e3;
     const double offset=data[FCSSDiff_offset];
     const double background=data[FCSSDiff_background];
     const double cr=data[FCSSDiff_count_rate];
@@ -130,11 +131,11 @@ double QFFitFunctionsTIRFCSDiffE2Diff3Dbright::evaluate(double t, const double* 
 
     double rho1=1;
     double cnorm=rho1;
-    if (comp==2) {
+    if (comp==1) {
         rho1=1.0-rho2;
         cnorm=rho1+rho2*q2;
     }
-    if (comp==3) {
+    if (comp==2) {
         rho1=1.0-rho2-rho3;
         cnorm=rho1+rho2*q2+rho3*q3;
     }
@@ -142,25 +143,26 @@ double QFFitFunctionsTIRFCSDiffE2Diff3Dbright::evaluate(double t, const double* 
     double cfac=0;
 
     if (comp>0) {
-        cfac=rho1*QFFitFunctionsTIRFCCSFWDiff2ColorCCF_corrfactor_2Dxy(a, 0, 0, D1, t, wxy, wxy);
+        cfac=rho1*QFFitFunctionsConfocalTIRFCSDiff3D_gausscorrfactor(D1, t, wxy, pdepth);
     }
 
     if (comp>1) {
-        cfac=cfac+rho2*q2*q2*QFFitFunctionsTIRFCCSFWDiff2ColorCCF_corrfactor_2Dxy(a, 0, 0, D2, t, wxy, wxy);
+        cfac=cfac+rho2*q2*q2*QFFitFunctionsConfocalTIRFCSDiff2D_gausscorrfactor(D2, t, wxy);
     }
 
     if (comp>2) {
-        cfac=cfac+rho3*q3*q3*QFFitFunctionsTIRFCCSFWDiff2ColorCCF_corrfactor_2Dxy(a, 0, 0, D3, t, wxy, wxy);
+        cfac=cfac+rho3*q3*q3*QFFitFunctionsConfocalTIRFCSDiff2D_gausscorrfactor(D3, t, wxy);
     }
 
-    const double Veff=TIRFCS_newAeff(a, wxy);
-    const double pre=1.0/sqr(a);
+    double pre=1.0;
     if (nonfl_comp==1) {
         pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1))/(1.0-nf_theta1);
     } else if (nonfl_comp==2) {
         pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1)-nf_theta2+nf_theta2*exp(-t/nf_tau2))/(1.0-nf_theta1-nf_theta2);
     }
-    return offset+pre/(N/Veff*qfSqr(cnorm))*cfac*backfactor;
+
+    return offset+pre/N/qfSqr(cnorm)*cfac*backfactor;
+
 }
 
 void QFFitFunctionsTIRFCSDiffE2Diff3Dbright::calcParameter(double* data, double* error) const {
@@ -170,10 +172,11 @@ void QFFitFunctionsTIRFCSDiffE2Diff3Dbright::calcParameter(double* data, double*
     double eD1=0;
     double wxy=data[FCSSDiff_focus_width]/1.0e3;
     double ewxy=0;
-    double a=data[FCSSDiff_pixel_width]/1.0e3;
-    double ea=0;
     //double offset=data[FCSSDiff_offset];
     double eoffset=0;
+    const double pdepth=data[FCSSDiff_penetration_depth]/1.0e3;
+    double epdepth=0;
+    if (error) epdepth=error[FCSSDiff_penetration_depth]/1.0e3;
 
     int comp=data[FCSSDiff_n_components];
     double rho2=data[FCSSDiff_diff_rho2];
@@ -186,17 +189,17 @@ void QFFitFunctionsTIRFCSDiffE2Diff3Dbright::calcParameter(double* data, double*
     double background=data[FCSSDiff_background];
     double ebackground=0;
 
-    double tau_msd=data[SPIMFCSADIFF_msd_tau];
+    double tau_msd=data[FCSDiff_msd_tau];
     double etau_msd=0;
     const double D1=data[FCSSDiff_diff_coeff1];
     const double D2=data[FCSSDiff_diff_coeff2];
     const double D3=data[FCSSDiff_diff_coeff3];
 
+
     if (error) {
         eN=error[FCSSDiff_n_particle];
         eD1=error[FCSSDiff_diff_coeff1];
         ewxy=error[FCSSDiff_focus_width]/1.0e3;
-        ea=error[FCSSDiff_pixel_width]/1.0e3;
         eoffset=error[FCSSDiff_offset];
         erho2=error[FCSSDiff_diff_rho2];
         erho3=error[FCSSDiff_diff_rho3];
@@ -209,7 +212,7 @@ void QFFitFunctionsTIRFCSDiffE2Diff3Dbright::calcParameter(double* data, double*
     // calculate rho1
     double rho1=1;
     double erho1=0;
-    if (comp==2) {
+    if (comp==1) {
         if (rho2>1.0) rho2=1.0;
         if (rho2<0.0) rho2=0.0;
         if (rho2>1.0) {
@@ -219,7 +222,7 @@ void QFFitFunctionsTIRFCSDiffE2Diff3Dbright::calcParameter(double* data, double*
         rho1=1.0-rho2;
         erho1=erho2;
     }
-    if (comp==3) {
+    if (comp==2) {
         if (rho2>1.0) rho2=1.0;
         if (rho2<0.0) rho2=0.0;
         if (rho3>1.0) rho3=1.0;
@@ -247,59 +250,64 @@ void QFFitFunctionsTIRFCSDiffE2Diff3Dbright::calcParameter(double* data, double*
     if (error) error[FCSSDiff_1n_particle]=fabs(eN/N/N);
 
     // calculate Veff
-    double Aeff=data[FCSSDiff_focus_volume]=TIRFCS_newAeff(a, wxy);;
-    if (error) error[FCSSDiff_focus_volume]=TIRFCS_newAeffError(a, ea, wxy, ewxy);
+    double Veff=data[FCSSDiff_focus_volume]=TIRFCS_confocalVeff(wxy, pdepth);;
+    double Aeff=data[FCSSDiff_focus_area]=TIRFCS_confocalAeff(wxy);;
+    if (error) error[FCSSDiff_focus_volume]=TIRFCS_confocalVeffError(wxy, ewxy, pdepth, epdepth);
+    if (error) error[FCSSDiff_focus_area]=TIRFCS_confocalAeffError(wxy, ewxy, pdepth, epdepth);
 
     // calculate C = N / Veff
-    if (data[FCSSDiff_focus_volume]!=0) {
-        data[FCSSDiff_concentration]=N/data[FCSSDiff_focus_volume];
-    } else {
-        data[FCSSDiff_concentration]=0;
-    }
-    if (data[FCSSDiff_focus_volume]!=0 && error) {
-        error[FCSSDiff_concentration]=sqrt(qfSqr(eN/data[FCSSDiff_focus_volume])+qfSqr(error[FCSSDiff_focus_volume]*N/qfSqr(data[FCSSDiff_focus_volume])));//N/data[FCSSDiff_focus_volume]
-    }
+//    if (data[FCSSDiff_focus_volume]!=0) {
+//        data[FCSSDiff_concentration]=N/data[FCSSDiff_focus_volume];
+//    } else {
+//        data[FCSSDiff_concentration]=0;
+//    }
+//    if (data[FCSSDiff_focus_volume]!=0 && error) {
+//        error[FCSSDiff_concentration]=sqrt(qfSqr(eN/data[FCSSDiff_focus_volume])+qfSqr(error[FCSSDiff_focus_volume]*N/qfSqr(data[FCSSDiff_focus_volume])));//N/data[FCSSDiff_focus_volume]
+//    }
 
 
     // calculate CPM = (CPS-background)/N
     data[FCSSDiff_cpm]=(cps-background)/N;
     error[FCSSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
 
-    data[SPIMFCSADIFF_msd_at_tau1]=6.0*D1*tau_msd*1e-3;
-    if (error) error[SPIMFCSADIFF_msd_at_tau1]=0;
-    data[SPIMFCSADIFF_msd_at_tau2]=6.0*D2*tau_msd*1e-3;
-    if (error) error[SPIMFCSADIFF_msd_at_tau2]=0;
-    data[SPIMFCSADIFF_msd_at_tau3]=6.0*D3*tau_msd*1e-3;
-    if (error) error[SPIMFCSADIFF_msd_at_tau3]=0;
-    data[SPIMFCSADIFF_msd_time_aeff1]=Aeff/(4.0*D1)*1e3;
-    if (error) error[SPIMFCSADIFF_msd_time_aeff1]=0;
-    data[SPIMFCSADIFF_msd_time_aeff2]=Aeff/(4.0*D2)*1e3;
-    if (error) error[SPIMFCSADIFF_msd_time_aeff2]=0;
-    data[SPIMFCSADIFF_msd_time_aeff3]=Aeff/(4.0*D3)*1e3;
-    if (error) error[SPIMFCSADIFF_msd_time_aeff3]=0;
+    data[FCSDiff_msd_at_tau1]=6.0*D1*tau_msd*1e-3;
+    if (error) error[FCSDiff_msd_at_tau1]=0;
+    data[FCSDiff_msd_at_tau2]=6.0*D2*tau_msd*1e-3;
+    if (error) error[FCSDiff_msd_at_tau2]=0;
+    data[FCSDiff_msd_at_tau3]=6.0*D3*tau_msd*1e-3;
+    if (error) error[FCSDiff_msd_at_tau3]=0;
+    data[FCSDiff_msd_time_aeff1]=Aeff/(4.0*D1)*1e3;
+    if (error) error[FCSDiff_msd_time_aeff1]=0;
+    data[FCSDiff_msd_time_aeff2]=Aeff/(4.0*D2)*1e3;
+    if (error) error[FCSDiff_msd_time_aeff2]=0;
+    data[FCSDiff_msd_time_aeff3]=Aeff/(4.0*D3)*1e3;
+    if (error) error[FCSDiff_msd_time_aeff3]=0;
 }
 
 bool QFFitFunctionsTIRFCSDiffE2Diff3Dbright::isParameterVisible(int parameter, const double* data) const {
     int comp=data[FCSSDiff_n_components];
+    int nonfl_comp=data[FCSSDiff_n_nonfluorescent];
     switch(parameter) {
-        case FCSSDiff_diff_rho1:  return comp>1;
-        case FCSSDiff_diff_coeff1: return comp>0;
-        case FCSSDiff_diff_rho2: case FCSSDiff_diff_coeff2: case SPIMFCSADIFF_msd_at_tau2: case SPIMFCSADIFF_msd_time_aeff2: return comp>1;
-        case FCSSDiff_diff_rho3: case FCSSDiff_diff_coeff3: case SPIMFCSADIFF_msd_at_tau3: case SPIMFCSADIFF_msd_time_aeff3: return comp>2;
+        case FCSSDiff_diff_rho1:  return comp>0;
+        case FCSDiff_REL_BRIGHTNESS2: case FCSSDiff_diff_rho2: case FCSSDiff_diff_coeff2: case FCSDiff_msd_at_tau2: case FCSDiff_msd_time_aeff2: return comp>0;
+        case FCSDiff_REL_BRIGHTNESS3: case FCSSDiff_diff_rho3: case FCSSDiff_diff_coeff3: case FCSDiff_msd_at_tau3: case FCSDiff_msd_time_aeff3: return comp>1;
+        case FCSSDiff_nonfl_tau1: case FCSSDiff_nonfl_theta1: return nonfl_comp>0;
+        case FCSSDiff_nonfl_tau2: case FCSSDiff_nonfl_theta2: return nonfl_comp>1;
     }
     return true;
+
 }
 
 unsigned int QFFitFunctionsTIRFCSDiffE2Diff3Dbright::getAdditionalPlotCount(const double* params) {
 
     Q_UNUSED(params);
-    return 0;
+    return 1;
 }
 
 QString QFFitFunctionsTIRFCSDiffE2Diff3Dbright::transformParametersForAdditionalPlot(int plot, double* params) {
 
 
     Q_UNUSED(plot);
-    Q_UNUSED(params);
-    return "";
+    params[FCSSDiff_n_nonfluorescent]=0;
+    return "without non-fluorescent";
 }

@@ -47,6 +47,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, QWidget *p
     setDescription("");
     setProject(NULL);
     setOnlineHelp(QFPluginServices::getInstance()->getMainHelpDirectory()+"qfselectrdrdialog.html");
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, bool functorPrivate, QWidget *parent) :
@@ -69,6 +70,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, bool funct
     setDescription("");
     setProject(NULL);
     setOnlineHelp(QFPluginServices::getInstance()->getMainHelpDirectory()+"qfselectrdrdialog.html");
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFSelectRDRDialog::QFSelectRDRDialog(QWidget *parent):
@@ -91,6 +93,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QWidget *parent):
     setDescription("");
     setProject(NULL);
     setOnlineHelp(QFPluginServices::getInstance()->getMainHelpDirectory()+"qfselectrdrdialog.html");
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFSelectRDRDialog::~QFSelectRDRDialog()
@@ -257,7 +260,7 @@ void QFSelectRDRDialog::on_btnNone_clicked()
     ui->listWidget->clearSelection();
 }
 
-void QFSelectRDRDialog::on_lineEditFilter_textChanged(const QString &text)
+void QFSelectRDRDialog::on_lineEditFilter_textChanged(const QString &/*text*/)
 {
     updateRdrList();
     ui->listWidget->selectAll();

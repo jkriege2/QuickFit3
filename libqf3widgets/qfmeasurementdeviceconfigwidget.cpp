@@ -568,7 +568,7 @@ void QFMeasurementDeviceConfigWidget::setValue(int line, const QVariant &power) 
     }
 }
 
-void QFMeasurementDeviceConfigWidget::valuesChanged(QTime time, QList<QVariant> values, QStringList lineNames, QList<bool> widgetsEnabled) {
+void QFMeasurementDeviceConfigWidget::valuesChanged(QTime /*time*/, const QList<QVariant>& values, const QStringList& lineNames, const QList<bool>& /*widgetsEnabled*/) {
     if (dontAccessWidgets) return;
     bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     //qDebug()<<"QFMeasurementDeviceConfigWidget::valuesChanged("<< time<< values <<lineNames<<")";

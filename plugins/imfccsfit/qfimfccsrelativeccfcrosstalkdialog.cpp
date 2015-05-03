@@ -399,7 +399,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::updateProject()
     }
 }
 
-void QFImFCCSRelativeCCFCrosstalkDialog::cmbCCF_currentIndexChanged(int index)
+void QFImFCCSRelativeCCFCrosstalkDialog::cmbCCF_currentIndexChanged(int /*index*/)
 {
     if (ui->cmbCCF->currentRDR()){
         QList<QFRawDataRecord*> lsta=ui->cmbCCF->currentRDR()->getRecordsWithRoleFromGroup("acf0");

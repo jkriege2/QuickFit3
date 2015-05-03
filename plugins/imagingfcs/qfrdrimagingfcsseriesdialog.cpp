@@ -37,6 +37,7 @@ QFRDRImagingFCSSeriesDialog::QFRDRImagingFCSSeriesDialog(QWidget *parent) :
         ui->edtDelta->setValue(ProgramOptions::getInstance()->getQSettings()->value("QFRDRImagingFCSSeriesDialog/delta", 1).toDouble());
 
     }
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRImagingFCSSeriesDialog::~QFRDRImagingFCSSeriesDialog()
@@ -74,6 +75,7 @@ void QFRDRImagingFCSSeriesDialog::closeEvent(QCloseEvent *event) {
         ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRImagingFCSSeriesDialog/delta", ui->edtDelta->value());
 
     }
+    QDialog::closeEvent(event);
 }
 
 void QFRDRImagingFCSSeriesDialog::setParameter(int idx)

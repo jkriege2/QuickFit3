@@ -62,6 +62,7 @@ QFImFCSSetParamFromFileDialog::QFImFCSSetParamFromFileDialog(int width, int heig
     connect(ui->imageTransfrom, SIGNAL(propertiesChanged()), this, SLOT(replotOvr()));
     updateDataFromRDR();
 
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 
@@ -192,7 +193,7 @@ void QFImFCSSetParamFromFileDialog::replotOvr()
     QApplication::restoreOverrideCursor();
 }
 
-void QFImFCSSetParamFromFileDialog::on_cmbParamter_currentIndexChanged(int index)
+void QFImFCSSetParamFromFileDialog::on_cmbParamter_currentIndexChanged(int /*index*/)
 {
     /*ui->cmbResult->setCurrentResult(QString("fitparam_")+parameterIDs.value(index, ""));
     if (ui->cmbResult->currentIndex()<0) ui->cmbResult->setCurrentResult(parameterIDs.value(index, ""));*/

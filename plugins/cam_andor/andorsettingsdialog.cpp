@@ -82,6 +82,7 @@ AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
     m_updatingPreview=false;
     m_calcTiming=false;
     m_updatingSensorSetup=false;
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 AndorSettingsDialog::~AndorSettingsDialog()
@@ -596,25 +597,25 @@ void AndorSettingsDialog::on_btn8_clicked() {
     resizeSubregion(8,8);
 }
 
-void AndorSettingsDialog::on_cmbADChannel_currentIndexChanged(int currentIndex) {
+void AndorSettingsDialog::on_cmbADChannel_currentIndexChanged(int /*currentIndex*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSensorSetup();
     calcTiming();
 }
 
-void AndorSettingsDialog::on_cmbAmplifier_currentIndexChanged(int currentIndex) {
+void AndorSettingsDialog::on_cmbAmplifier_currentIndexChanged(int /*currentIndex*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSensorSetup();
     calcTiming();
 }
 
-void AndorSettingsDialog::on_cmbHorizontalShiftSpeed_currentIndexChanged(int currentIndex) {
+void AndorSettingsDialog::on_cmbHorizontalShiftSpeed_currentIndexChanged(int /*currentIndex*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSensorSetup(1);
     calcTiming();
 }
 
-void AndorSettingsDialog::on_cmbPreampGain_currentIndexChanged(int currentIndex) {
+void AndorSettingsDialog::on_cmbPreampGain_currentIndexChanged(int /*currentIndex*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSensorSetup(0);
     calcTiming();
@@ -628,75 +629,75 @@ void AndorSettingsDialog::on_cmbVerticalShiftSpeed_currentIndexChanged(int /*cur
 }
 
 
-void AndorSettingsDialog::on_spinWidth_valueChanged(int value) {
+void AndorSettingsDialog::on_spinWidth_valueChanged(int /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSubregion();
 }
 
 
-void AndorSettingsDialog::on_spinHeight_valueChanged(int value) {
+void AndorSettingsDialog::on_spinHeight_valueChanged(int /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSubregion();
 }
 
 
-void AndorSettingsDialog::on_spinLeft_valueChanged(int value) {
+void AndorSettingsDialog::on_spinLeft_valueChanged(int /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSubregion();
 }
 
 
-void AndorSettingsDialog::on_spinTop_valueChanged(int value) {
+void AndorSettingsDialog::on_spinTop_valueChanged(int /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSubregion();
 }
 
 
-void AndorSettingsDialog::on_spinHorizontalBinning_valueChanged(int value) {
+void AndorSettingsDialog::on_spinHorizontalBinning_valueChanged(int /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSubregion();
 }
 
 
-void AndorSettingsDialog::on_spinVerticalBinning_valueChanged(int value) {
+void AndorSettingsDialog::on_spinVerticalBinning_valueChanged(int /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSubregion();
 }
 
-void AndorSettingsDialog::on_chkFrameTransfer_toggled(bool value) {
+void AndorSettingsDialog::on_chkFrameTransfer_toggled(bool /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     calcTiming();
 }
 
-void AndorSettingsDialog::on_spinKineticCycles_valueChanged(int value) {
+void AndorSettingsDialog::on_spinKineticCycles_valueChanged(int /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     calcTiming();
 }
 
-void AndorSettingsDialog::on_spinAccumulates_valueChanged(int value) {
-    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
-    calcTiming();
-}
-
-
-void AndorSettingsDialog::on_spinExposure_valueChanged(double value) {
+void AndorSettingsDialog::on_spinAccumulates_valueChanged(int /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     calcTiming();
 }
 
 
-void AndorSettingsDialog::on_spinKineticCycleTime_valueChanged(double value) {
+void AndorSettingsDialog::on_spinExposure_valueChanged(double /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     calcTiming();
 }
 
 
-void AndorSettingsDialog::on_spinAccCycleTime_valueChanged(double value) {
+void AndorSettingsDialog::on_spinKineticCycleTime_valueChanged(double /*value*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     calcTiming();
 }
 
-void AndorSettingsDialog::on_chkEnableExtendedEMGAIN_toggled(bool value)
+
+void AndorSettingsDialog::on_spinAccCycleTime_valueChanged(double /*value*/) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    calcTiming();
+}
+
+void AndorSettingsDialog::on_chkEnableExtendedEMGAIN_toggled(bool /*value*/)
 {
     int i1, i2;
     SetEMAdvanced((ui->chkEnableExtendedEMGAIN->isChecked())?1:0);

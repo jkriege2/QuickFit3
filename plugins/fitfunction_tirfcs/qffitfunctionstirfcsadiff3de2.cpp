@@ -55,19 +55,19 @@ QFFitFunctionsTIRFCSADiff3DE2::QFFitFunctionsTIRFCSADiff3DE2() {
 
     addParameter(FloatNumber,  "diff_rho1",               "fraction of 3D component",                           "&rho;<sub>3D</sub>",        "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1);
     #define FCSSDiff_diff_rho1 8
-    addParameter(FloatNumber,  "diff_acoeff1",             "diffusion coefficient of species 3D",                    "&Gamma;<sub>3D</sub>",            "micron^2/s^{\alpha_1}", "&mu;m<sup>2</sup>/s<sup>&alpha;1</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diff_acoeff1",             "diffusion coefficient of species 3D",                    "&Gamma;<sub>3D</sub>",            "micron^2/s^{alpha_1}", "&mu;m<sup>2</sup>/s<sup>&alpha;1</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define FCSSDiff_diff_coeff1 9
     addParameter(FloatNumber,  "diff_alpha1",             "anomality parameter of species v",                      "&alpha;<sub>3D</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0        );
     #define FCSDiff_diff_alpha1 10
     addParameter(FloatNumber,  "diff_rho2",               "fraction of first 2D component",                          "&rho;<sub>2D,1</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSSDiff_diff_rho2 11
-    addParameter(FloatNumber,  "diff_acoeff2",             "diffusion coefficient of species 2D 1",                    "&Gamma;<sub>2D,1</sub>",            "micron^2/s^{\alpha_1}", "&mu;m<sup>2</sup>/s<sup>&alpha;1</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diff_acoeff2",             "diffusion coefficient of species 2D 1",                    "&Gamma;<sub>2D,1</sub>",            "micron^2/s^{alpha_1}", "&mu;m<sup>2</sup>/s<sup>&alpha;1</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define FCSSDiff_diff_coeff2 12
     addParameter(FloatNumber,  "diff_alpha2",             "anomality parameter of species 2D 2",                      "&alpha;<sub>2D,1</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0        );
     #define FCSDiff_diff_alpha2 13
     addParameter(FloatNumber,  "diff_rho3",               "fraction of second 2D component",                           "&rho;<sub>2D,2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSSDiff_diff_rho3 14
-    addParameter(FloatNumber,  "diff_acoeff3",             "diffusion coefficient of species 2D 2",                    "&Gamma;<sub>2D,2</sub>",            "micron^2/s^{\alpha_1}", "&mu;m<sup>2</sup>/s<sup>&alpha;1</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diff_acoeff3",             "diffusion coefficient of species 2D 2",                    "&Gamma;<sub>2D,2</sub>",            "micron^2/s^{alpha_1}", "&mu;m<sup>2</sup>/s<sup>&alpha;1</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define FCSSDiff_diff_coeff3 15
     addParameter(FloatNumber,  "diff_alpha3",             "anomality parameter of species 2D 2",                      "&alpha;<sub>2D,2</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0        );
     #define FCSDiff_diff_alpha3 16
@@ -86,30 +86,28 @@ QFFitFunctionsTIRFCSADiff3DE2::QFFitFunctionsTIRFCSADiff3DE2() {
     #define FCSSDiff_focus_area 21
 
 
-    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSSDiff_concentration 22
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_count_rate 23
+    #define FCSSDiff_count_rate 22
     addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_background 24
+    #define FCSSDiff_background 23
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_cpm 25
+    #define FCSSDiff_cpm 24
 
 
     addParameter(FloatNumber,  "msd_tau1",                "evaluate MSD at this time",                             "&tau;<sub>MSD</sub>",      "ms",         "ms",                     false,    true,         false,              QFFitFunction::NoError  ,   false, 1,            1e-10,        1e50,     1    );
-    #define FCSDiff_msd_tau 26
+    #define FCSDiff_msd_tau 25
     addParameter(FloatNumber,  "msd_at_tau1",              "MSD1 evaluated at given time tau_MSD",                  "MSD1(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSDiff_msd_at_tau1 27
+    #define FCSDiff_msd_at_tau1 26
     addParameter(FloatNumber,  "msd_at_tau2",              "MSD2 evaluated at given time tau_MSD",                  "MSD2(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSDiff_msd_at_tau2 28
+    #define FCSDiff_msd_at_tau2 27
     addParameter(FloatNumber,  "msd_at_tau3",              "MSD3 evaluated at given time tau_MSD",                  "MSD3(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSDiff_msd_at_tau3 29
+    #define FCSDiff_msd_at_tau3 28
     addParameter(FloatNumber,  "msd_time_aeff1",              "time to leave effective focus area with MSD1",      "&tau;<sub>1</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSDiff_msd_time_aeff1 30
+    #define FCSDiff_msd_time_aeff1 29
     addParameter(FloatNumber,  "msd_time_aeff2",              "time to leave effective focus area with MSD2",      "&tau;<sub>2</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSDiff_msd_time_aeff2 31
+    #define FCSDiff_msd_time_aeff2 30
     addParameter(FloatNumber,  "msd_time_aeff3",              "time to leave effective focus area with MSD3",      "&tau;<sub>3</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSDiff_msd_time_aeff3 32
+    #define FCSDiff_msd_time_aeff3 31
 
 }
 
@@ -150,14 +148,14 @@ double QFFitFunctionsTIRFCSADiff3DE2::evaluate(double t, const double* data) con
 
     double cfac=0;
 
-    cfac=rho1*QFFitFunctionsTIRFCSADiff3D_gausscorrfactor(GAMMA1,a1, t, wxy, pdepth);
+    cfac=rho1*QFFitFunctionsConfocalTIRFCSADiff3D_gausscorrfactor(GAMMA1,a1, t, wxy, pdepth);
 
     if (comp>0) {
-        cfac=cfac+rho2*QFFitFunctionsTIRFCSADiff2D_gausscorrfactor(GAMMA2,a2, t, wxy);
+        cfac=cfac+rho2*QFFitFunctionsConfocalTIRFCSADiff2D_gausscorrfactor(GAMMA2,a2, t, wxy);
     }
 
     if (comp>1) {
-        cfac=cfac+rho3*QFFitFunctionsTIRFCSADiff2D_gausscorrfactor(GAMMA3,a3, t, wxy);
+        cfac=cfac+rho3*QFFitFunctionsConfocalTIRFCSADiff2D_gausscorrfactor(GAMMA3,a3, t, wxy);
     }
 
     double pre=1.0;
@@ -258,20 +256,20 @@ void QFFitFunctionsTIRFCSADiff3DE2::calcParameter(double* data, double* error) c
     if (error) error[FCSSDiff_1n_particle]=fabs(eN/N/N);
 
     // calculate Veff
-    data[FCSSDiff_focus_volume]=TIRFCS_confocalVeff(wxy, pdepth);;
+    double Veff=data[FCSSDiff_focus_volume]=TIRFCS_confocalVeff(wxy, pdepth);;
     double Aeff=data[FCSSDiff_focus_area]=TIRFCS_confocalAeff(wxy);;
     if (error) error[FCSSDiff_focus_volume]=TIRFCS_confocalVeffError(wxy, ewxy, pdepth, epdepth);
     if (error) error[FCSSDiff_focus_area]=TIRFCS_confocalAeffError(wxy, ewxy, pdepth, epdepth);
 
     // calculate C = N / Veff
-    if (data[FCSSDiff_focus_volume]!=0) {
-        data[FCSSDiff_concentration]=N/data[FCSSDiff_focus_volume];
-    } else {
-        data[FCSSDiff_concentration]=0;
-    }
-    if (data[FCSSDiff_focus_volume]!=0 && error) {
-        error[FCSSDiff_concentration]=sqrt(qfSqr(eN/data[FCSSDiff_focus_volume])+qfSqr(error[FCSSDiff_focus_volume]*N/qfSqr(data[FCSSDiff_focus_volume])));//N/data[FCSSDiff_focus_volume]
-    }
+//    if (data[FCSSDiff_focus_volume]!=0) {
+//        data[FCSSDiff_concentration]=N/data[FCSSDiff_focus_volume];
+//    } else {
+//        data[FCSSDiff_concentration]=0;
+//    }
+//    if (data[FCSSDiff_focus_volume]!=0 && error) {
+//        error[FCSSDiff_concentration]=sqrt(qfSqr(eN/data[FCSSDiff_focus_volume])+qfSqr(error[FCSSDiff_focus_volume]*N/qfSqr(data[FCSSDiff_focus_volume])));//N/data[FCSSDiff_focus_volume]
+//    }
 
 
     // calculate CPM = (CPS-background)/N

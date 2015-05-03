@@ -244,7 +244,7 @@ void QFStyledButton::setPressedIcon(const QPixmap& pixmap) {
     setIcon(i);
 }
 
-void QFStyledButton::paintEvent(QPaintEvent* e) {
+void QFStyledButton::paintEvent(QPaintEvent* /*e*/) {
     QSize s=size();
     //std::cout<<"paintEvent size="<<width()<<", "<<height()<<" hover="<<hover<<"\n";
     QPainter painter(this);

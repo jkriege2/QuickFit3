@@ -39,6 +39,7 @@ QFRDRTableColumnValuesDialog::QFRDRTableColumnValuesDialog(QWidget *parent) :
     ui->radColumn->setChecked(ProgramOptions::getConfigValue("QFRDRTableColumnValuesDialog/column", true).toBool());
     ui->radRow->setChecked(ProgramOptions::getConfigValue("QFRDRTableColumnValuesDialog/row", false).toBool());
     updatePreview();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRTableColumnValuesDialog::~QFRDRTableColumnValuesDialog()

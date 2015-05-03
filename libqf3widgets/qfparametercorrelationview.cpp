@@ -89,7 +89,7 @@ void QFParameterCorrelationView::writeSettings(QSettings &settings, const QStrin
     settings.value(prefix+"/symbolsize", spinSymbolSize->value());
 }
 
-void QFParameterCorrelationView::writeQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
+void QFParameterCorrelationView::writeQFProperties(QFProperties *current, const QString &prefix, const QString &/*egroup*/, const QString &param)
 {
     current->setQFProperty(prefix+QString("show_scatter_%1").arg(param), chkScatterPlot->isChecked(), false, false);
     current->setQFProperty(prefix+QString("show_2dhist_%1").arg(param), cmb2DHistogram->currentIndex(), false, false);

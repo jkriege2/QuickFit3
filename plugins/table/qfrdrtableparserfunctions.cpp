@@ -25,7 +25,7 @@
 
 
 
-void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool columnMode) {
+void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool /*columnMode*/) {
     parser->addFunction("data", fQFRDRTableEditor_data);
     parser->addFunction("dataleft", fQFRDRTableEditor_dataleft);
     parser->addFunction("colavg", fQFRDRTableEditor_colavg);
@@ -125,7 +125,7 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
     }
 }
 
-void fQFRDRTableEditor_coltitles(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+void fQFRDRTableEditor_coltitles(qfmpResult& res, const qfmpResult* /*params*/, unsigned int  n, QFMathParser* p) {
     res.setInvalid();
     res.num=NAN;
     QFMathParserData* d=(QFMathParserData*)p->get_data();

@@ -49,6 +49,7 @@ QFRDRMaskByOverviewImage::QFRDRMaskByOverviewImage(QWidget *parent) :
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, iniName+"/pos");
     updateWidgets();
     updateEnabledWidgets();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRMaskByOverviewImage::~QFRDRMaskByOverviewImage() {

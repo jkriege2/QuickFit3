@@ -123,14 +123,24 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param fix value to be stored
          */
-        virtual void setInitFitFix(const QString& id, bool fix, QFRawDataRecord* r=NULL) {};
+        virtual void setInitFitFix(const QString& id, bool fix, QFRawDataRecord* r=NULL) {    Q_UNUSED(id);
+                                                                                              Q_UNUSED(fix);
+                                                                                              Q_UNUSED(r);
+};
 
         /*! \brief set the given parameter \a id to the given value (and error) in all files */
-        virtual void setAllFitValues(const QString& id, double value, double error=0.0, bool currentFileOnly=false) {};
+        virtual void setAllFitValues(const QString& id, double value, double error=0.0, bool currentFileOnly=false) {    Q_UNUSED(id);
+                                                                                                                         Q_UNUSED(value);
+                                                                                                                         Q_UNUSED(error);
+                                                                                                                         Q_UNUSED(currentFileOnly);
+};
         /*! \brief set the given parameter \a id to the given fix value */
-        virtual void setAllFitFixes(const QString& id, bool fix, bool currentFileOnly=false) {};
+        virtual void setAllFitFixes(const QString& id, bool fix, bool currentFileOnly=false) {Q_UNUSED(id);
+                                                                                              Q_UNUSED(fix);
+                                                                                              Q_UNUSED(currentFileOnly);};
         /*! \brief reset the given parameter \a id to the initial/global/default value */
-        virtual void resetDefaultFitValue(const QString& id) {};
+        virtual void resetDefaultFitValue(const QString& id) {Q_UNUSED(id);
+                                                              };
         /*! \brief reset the given parameter \a id to the initial/global/default fix */
         virtual void resetDefaultFitFix(const QString& id);
         /*! \brief return the default/initial/global value of a given parameter        */
@@ -142,9 +152,9 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         /*! \brief reset the all parameters to the initial/global/default fix in all files */
         virtual void resetAllFitFix() {};
         /*! \brief reset the all parameters to the initial/global/default value in current files */
-        virtual void resetAllFitValueCurrent(QFRawDataRecord* r=NULL) {};
+        virtual void resetAllFitValueCurrent(QFRawDataRecord* r=NULL) {Q_UNUSED(r);};
         /*! \brief reset the all parameters to the initial/global/default fix in current files */
-        virtual void resetAllFitFixCurrent(QFRawDataRecord* r=NULL) {};
+        virtual void resetAllFitFixCurrent(QFRawDataRecord* r=NULL) {Q_UNUSED(r);};
 
     signals:
         void insertRecord();

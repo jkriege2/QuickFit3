@@ -27,6 +27,7 @@ include(../extlibs/zlib.pri)
 include(../quickfit3.pri)
 include(../quickfit3_configqtwidgets.pri)
 include(../extlibs/quazip.pri)
+include(../extlibs/faddeeva.pri)
 
 release {
     message("building $$TARGET $$TEMPLATE in RELEASE mode, output is in $$QFOUTPUT")

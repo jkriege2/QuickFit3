@@ -37,6 +37,7 @@ ImFCSCalibrationDialog::ImFCSCalibrationDialog(QWidget *parent) :
         ui->spinFocusHeightError->setValue(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/focusheight_error", ui->spinFocusHeightError->value()).toDouble());
         ui->chkFixOffset->setChecked(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/fixoffset", ui->chkFixOffset->isChecked()).toBool());
     }
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 ImFCSCalibrationDialog::~ImFCSCalibrationDialog()
@@ -57,6 +58,7 @@ void ImFCSCalibrationDialog::closeEvent(QCloseEvent *event) {
         ProgramOptions::setConfigValue("ImFCSCalibrationDialog/focusheight_error", ui->spinFocusHeightError->value());
         ProgramOptions::setConfigValue("ImFCSCalibrationDialog/fixoffset", ui->chkFixOffset->isChecked());
     }
+    QDialog::closeEvent(event);
 }
 
 QList<double> ImFCSCalibrationDialog::getValues() const {

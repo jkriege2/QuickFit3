@@ -48,6 +48,7 @@ DlgWelcomeScreen::DlgWelcomeScreen(QWidget *parent) :
             QApplication::desktop()->availableGeometry()
         ));
     ProgramOptions::getConfigWindowGeometry(this, "welcomescreen/size");
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 DlgWelcomeScreen::~DlgWelcomeScreen()
@@ -128,7 +129,7 @@ void DlgWelcomeScreen::finalizeLayout()
     ui->layTutorials->setColumnStretch(1,1);
 }
 
-void DlgWelcomeScreen::on_chkShow_toggled(bool enabled)
+void DlgWelcomeScreen::on_chkShow_toggled(bool /*enabled*/)
 {
     ProgramOptions::setConfigValue("quickfit/welcomescreen", ui->chkShow->isChecked());
 }

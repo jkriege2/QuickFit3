@@ -47,6 +47,7 @@ QFPlotterCopyToTableDialog::QFPlotterCopyToTableDialog(QWidget *parent) :
     ui->chkShowTableEditor->setChecked(QFPluginServices::getInstance()->getCurrentProject()->getProperty("QFPlotterCopyToTableDialog/showEditor", false).toBool());
     ui->chkOnlyForPlots->setChecked(QFPluginServices::getInstance()->getCurrentProject()->getProperty("QFPlotterCopyToTableDialog/chkOnlyForPlots", false).toBool());
     ui->labDescription->setVisible(false);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFPlotterCopyToTableDialog::~QFPlotterCopyToTableDialog()

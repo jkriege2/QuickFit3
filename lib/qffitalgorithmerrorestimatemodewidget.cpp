@@ -115,17 +115,17 @@ void QFFitAlgorithmErrorEstimateModeWidget::on_cmbMode_currentIndexChanged(int i
     emit modeChanged(QFFitAlgorithm::FitParameterErrorEstimates(index));
 }
 
-void QFFitAlgorithmErrorEstimateModeWidget::on_spinBSRepeats_valueChanged(int value)
+void QFFitAlgorithmErrorEstimateModeWidget::on_spinBSRepeats_valueChanged(int /*value*/)
 {
     emit parametersChanged();
 }
 
-void QFFitAlgorithmErrorEstimateModeWidget::on_spinBSDistortion_valueChanged(double value)
+void QFFitAlgorithmErrorEstimateModeWidget::on_spinBSDistortion_valueChanged(double /*value*/)
 {
     emit parametersChanged();
 }
 
-void QFFitAlgorithmErrorEstimateModeWidget::on_spinBSFraction_valueChanged(double value)
+void QFFitAlgorithmErrorEstimateModeWidget::on_spinBSFraction_valueChanged(double /*value*/)
 {
     emit parametersChanged();
 }

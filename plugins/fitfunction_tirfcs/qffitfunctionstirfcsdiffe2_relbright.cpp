@@ -258,8 +258,8 @@ bool QFFitFunctionsTIRFCSDiffE2Diffbright::isParameterVisible(int parameter, con
     switch(parameter) {
         case FCSSDiff_diff_rho1:  return comp>1;
         case FCSSDiff_diff_coeff1: return comp>0;
-        case FCSSDiff_diff_rho2: case FCSSDiff_diff_coeff2: case SPIMFCSADIFF_msd_at_tau2: case SPIMFCSADIFF_msd_time_aeff2: return comp>1;
-        case FCSSDiff_diff_rho3: case FCSSDiff_diff_coeff3: case SPIMFCSADIFF_msd_at_tau3: case SPIMFCSADIFF_msd_time_aeff3: return comp>2;
+        case FCSDiff_REL_BRIGHTNESS2: case FCSSDiff_diff_rho2: case FCSSDiff_diff_coeff2: case SPIMFCSADIFF_msd_at_tau2: case SPIMFCSADIFF_msd_time_aeff2: return comp>1;
+        case FCSDiff_REL_BRIGHTNESS3: case FCSSDiff_diff_rho3: case FCSSDiff_diff_coeff3: case SPIMFCSADIFF_msd_at_tau3: case SPIMFCSADIFF_msd_time_aeff3: return comp>2;
     }
     return true;
 }

@@ -51,6 +51,7 @@ namespace QFMathParser_DefaultLib {
     QString ptosystempathseparator(const QString& param);
     QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fToSystemPathSeparator,tosystempathseparator, ptosystempathseparator )
 
+    QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fFaddeevaRealW, faddeeva_real, qfFaddeevaRealW)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fSinc, sinc, qfSinc)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fTanc, tanc, qfTanc)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(fSin, sin)

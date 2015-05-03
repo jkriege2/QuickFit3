@@ -32,7 +32,7 @@ QFFitFunctionsTIRFCSDiff3DE2::QFFitFunctionsTIRFCSDiff3DE2() {
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            0,        2,        1,   0,      2);
     #define FCSSDiff_n_nonfluorescent 0
-    addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            1,        3,        1,   1,      2);
+    addParameter(IntCombo,     "n_components",            "number of 2D diffusing components",                     "2D components",             "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            0,        2,        1,   0,      2);
     #define FCSSDiff_n_components 1
 
     addParameter(FloatNumber,  "nonfl_tau1",              "triplet decay time",                                    "&tau;<sub>trip</sub>",     "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, false, 3.0,          0,        10,       0.1, 0  );
@@ -44,37 +44,42 @@ QFFitFunctionsTIRFCSDiff3DE2::QFFitFunctionsTIRFCSDiff3DE2() {
     addParameter(FloatNumber,  "nonfl_theta2",            "dark component 2 fraction",                             "&theta;<sub>dark,2</sub>", "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.2,          0,        0.99999,  0.1, 0,      1);
     #define FCSSDiff_nonfl_theta2 5
 
+
     addParameter(FloatNumber,  "n_particle",              "particle number N",                                     "N",                        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 100,          1e-10,    1e5,      1,   0);
     #define FCSSDiff_n_particle 6
     addParameter(FloatNumber,  "1n_particle",             "1/particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.01,         1e-10,    1e5,      0.1, 0);
     #define FCSSDiff_1n_particle 7
 
-    addParameter(FloatNumber,  "diff_rho1",               "fraction of first component",                           "&rho;<sub>1</sub>",        "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1);
+
+
+
+    addParameter(FloatNumber,  "diff_rho1",               "fraction of 3D component",                           "&rho;<sub>3D</sub>",        "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1);
     #define FCSSDiff_diff_rho1 8
-    addParameter(FloatNumber,  "diff_coeff1",             "diffusion coefficient of species 1",                    "D<sub>1</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diff_coeff1",             "diffusion coefficient of species 3D",                    "D<sub>3D</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define FCSSDiff_diff_coeff1 9
-    addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
+    addParameter(FloatNumber,  "diff_rho2",               "fraction of first 2D component",                          "&rho;<sub>2D,1</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSSDiff_diff_rho2 10
-    addParameter(FloatNumber,  "diff_coeff2",             "diffusion coefficient of species 2",                    "D<sub>2</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diffacoeff2",             "diffusion coefficient of species 2D 1",                    "D<sub>2D,1</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define FCSSDiff_diff_coeff2 11
-    addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
+    addParameter(FloatNumber,  "diff_rho3",               "fraction of second 2D component",                           "&rho;<sub>2D,2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSSDiff_diff_rho3 12
-    addParameter(FloatNumber,  "diff_coeff3",             "diffusion coefficient of species 3",                    "D<sub>3</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diff_coeff3",             "diffusion coefficient of species 2D 2",                    "D<sub>2D,2</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define FCSSDiff_diff_coeff3 13
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define FCSSDiff_offset 14
-    addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/e² radius)",                     "w<sub>x,y</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 600,          0,        1e4,      10    );
+    addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/e^2 radius)",                     "w<sub>x,y</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 250,          0,        1e4,      10    );
     #define FCSSDiff_focus_width 15
 
     addParameter(FloatNumber,  "penetration_depth",       "TIRF: penetration depth (1/e)",                        "d<sub>TIRF</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 200,          0,        1e4,      10    );
     #define FCSSDiff_penetration_depth 16
 
     addParameter(FloatNumber,  "focus_volume",            "focus: effective volume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSADiff_focus_volume 17
+    #define FCSSDiff_focus_volume 17
+    addParameter(FloatNumber,  "effective_area",            "focus: effective area",                               "A<sub>eff</sub>",          "micron^2",         "&mu;m<sup>2</sup>",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSSDiff_focus_area 18
 
-    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "particles/micron^2",         "particles/&mu;m<sup>2</sup>",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSSDiff_concentration 18
+
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
     #define FCSSDiff_count_rate 19
     addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
@@ -84,38 +89,40 @@ QFFitFunctionsTIRFCSDiff3DE2::QFFitFunctionsTIRFCSDiff3DE2() {
 
 
     addParameter(FloatNumber,  "msd_tau1",                "evaluate MSD at this time",                             "&tau;<sub>MSD</sub>",      "ms",         "ms",                     false,    true,         false,              QFFitFunction::NoError  ,   false, 1,            1e-10,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_tau 22
+    #define FCSDiff_msd_tau 22
     addParameter(FloatNumber,  "msd_at_tau1",              "MSD1 evaluated at given time tau_MSD",                  "MSD1(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_at_tau1 23
+    #define FCSDiff_msd_at_tau1 23
     addParameter(FloatNumber,  "msd_at_tau2",              "MSD2 evaluated at given time tau_MSD",                  "MSD2(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_at_tau2 24
+    #define FCSDiff_msd_at_tau2 24
     addParameter(FloatNumber,  "msd_at_tau3",              "MSD3 evaluated at given time tau_MSD",                  "MSD3(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_at_tau3 25
+    #define FCSDiff_msd_at_tau3 25
     addParameter(FloatNumber,  "msd_time_aeff1",              "time to leave effective focus area with MSD1",      "&tau;<sub>1</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_time_aeff1 26
+    #define FCSDiff_msd_time_aeff1 26
     addParameter(FloatNumber,  "msd_time_aeff2",              "time to leave effective focus area with MSD2",      "&tau;<sub>2</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_time_aeff2 27
+    #define FCSDiff_msd_time_aeff2 27
     addParameter(FloatNumber,  "msd_time_aeff3",              "time to leave effective focus area with MSD3",      "&tau;<sub>3</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define SPIMFCSADIFF_msd_time_aeff3 28
+    #define FCSDiff_msd_time_aeff3 28
 
 }
 
 double QFFitFunctionsTIRFCSDiff3DE2::evaluate(double t, const double* data) const {
     const int nonfl_comp=data[FCSSDiff_n_nonfluorescent];
-    const double pdepth=data[FCSSDiff_penetration_depth];
     const double nf_tau1=data[FCSSDiff_nonfl_tau1]/1.0e6;
     const double nf_theta1=data[FCSSDiff_nonfl_theta1];
     const double nf_tau2=data[FCSSDiff_nonfl_tau2]/1.0e6;
     const double nf_theta2=data[FCSSDiff_nonfl_theta2];
+
+    const double pdepth=data[FCSSDiff_penetration_depth]/1.0e3;
+
     const int comp=data[FCSSDiff_n_components];
     const double N=data[FCSSDiff_n_particle];
+    const double rho2=data[FCSSDiff_diff_rho2];
+    const double rho3=data[FCSSDiff_diff_rho3];
     const double D1=data[FCSSDiff_diff_coeff1];
     const double D2=data[FCSSDiff_diff_coeff2];
-    const double rho2=data[FCSSDiff_diff_rho2];
     const double D3=data[FCSSDiff_diff_coeff3];
-    const double rho3=data[FCSSDiff_diff_rho3];
     const double wxy=data[FCSSDiff_focus_width]/1.0e3;
-    const double a=data[FCSSDiff_pixel_width]/1.0e3;
+    //const double a=data[FCSSDiff_pixel_width]/1.0e3;
     const double offset=data[FCSSDiff_offset];
     const double background=data[FCSSDiff_background];
     const double cr=data[FCSSDiff_count_rate];
@@ -123,88 +130,36 @@ double QFFitFunctionsTIRFCSDiff3DE2::evaluate(double t, const double* data) cons
     if (fabs(cr)<1e-15 || fabs(background)<1e-10) backfactor=1;
 
     double rho1=1;
-    if (comp==2) {
+    if (comp==1) {
         rho1=1.0-rho2;
     }
-    if (comp==3) {
+    if (comp==2) {
         rho1=1.0-rho2-rho3;
     }
 
     double cfac=0;
 
+    cfac=rho1*QFFitFunctionsConfocalTIRFCSDiff3D_gausscorrfactor(D1, t, wxy, pdepth);
+
     if (comp>0) {
-        cfac=rho1*QFFitFunctionsTIRFCCSFWDiff2ColorCCF_corrfactor_2Dxy(a, 0, 0, D1, t, wxy, wxy);
+        cfac=cfac+rho2*QFFitFunctionsConfocalTIRFCSDiff2D_gausscorrfactor(D2, t, wxy);
     }
 
     if (comp>1) {
-        cfac=cfac+rho2*QFFitFunctionsTIRFCCSFWDiff2ColorCCF_corrfactor_2Dxy(a, 0, 0, D2, t, wxy, wxy);
+        cfac=cfac+rho3*QFFitFunctionsConfocalTIRFCSDiff2D_gausscorrfactor(D3, t, wxy);
     }
 
-    if (comp>2) {
-        cfac=cfac+rho3*QFFitFunctionsTIRFCCSFWDiff2ColorCCF_corrfactor_2Dxy(a, 0, 0, D3, t, wxy, wxy);
-    }
-
-    const double Veff=TIRFCS_newAeff(a, wxy);
-    const double pre=1.0/sqr(a);
+    double pre=1.0;
     if (nonfl_comp==1) {
         pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1))/(1.0-nf_theta1);
     } else if (nonfl_comp==2) {
         pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1)-nf_theta2+nf_theta2*exp(-t/nf_tau2))/(1.0-nf_theta1-nf_theta2);
     }
 
-    return offset+pre/(N/Veff)*cfac*backfactor;
+    return offset+pre/N*cfac*backfactor;
 }
 
-void QFFitFunctionsTIRFCSDiff3DE2::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
 
-void QFFitFunctionsTIRFCSDiff3DE2::sortParameter(double *parameterValues, double *error, bool *fix) const {
-
-    const int comp=parameterValues[FCSSDiff_n_components];
-    QList<QPair<int, double> > dataForSort;
-
-    if (comp>1) {
-        if (!fix || (!fix[FCSSDiff_diff_coeff1]))dataForSort.append(qMakePair(FCSSDiff_diff_coeff1, parameterValues[FCSSDiff_diff_coeff1]));
-        if (!fix || (!fix[FCSSDiff_diff_coeff2]))dataForSort.append(qMakePair(FCSSDiff_diff_coeff2, parameterValues[FCSSDiff_diff_coeff2]));
-        if (comp>2) {
-            if (!fix || (!fix[FCSSDiff_diff_coeff3]))dataForSort.append(qMakePair(FCSSDiff_diff_coeff3, parameterValues[FCSSDiff_diff_coeff3]));
-        }
-
-        if (dataForSort.size()>1) {
-            QList<int> init, final;
-            final=qfQPairListToFirstList(dataForSort);
-            //QList<double> initvals=qfQPairListToSecondList(dataForSort);
-            qSort(dataForSort.begin(), dataForSort.end(), qfQPairCompareSecondDec<int, double>);
-            init=qfQPairListToFirstList(dataForSort);
-            /*qDebug()<<"sorting: "<<id();
-            qDebug()<<"   Ds:";
-            qDebug()<<"      init  = "<<init;
-            qDebug()<<"       vals = "<<qfSelectFromVector(init, parameterValues);
-            qDebug()<<"       vals = "<<qfSelectFromVector(init, error);
-            qDebug()<<"      final = "<<final;*/
-
-            qfSortVectorByPermutation(init, final, parameterValues);
-            if (error) qfSortVectorByPermutation(init, final, error);
-
-            // now we sort the diffusion fractions, using that ID_rhoI=ID_coeffI-1:
-            for (int i=0; i<qMin(init.size(), final.size()); i++) {
-                init[i]=init[i]-1.0;
-                final[i]=final[i]-1.0;
-            }
-            /*qDebug()<<"   rhos:";
-            qDebug()<<"      init  = "<<init;
-            if (error) qDebug()<<"       vals = "<<qfSelectFromVector(init, error);
-            if (fix) qDebug()<<"       vals = "<<qfSelectFromVector(init, fix);
-            qDebug()<<"      final = "<<final;*/
-
-            qfSortVectorByPermutation(init, final, parameterValues);
-            if (error) qfSortVectorByPermutation(init, final, error);
-            if (fix) qfSortVectorByPermutation(init, final, fix);
-            //qDebug()<<"   fix = "<<fix<<"   error = "<<error;
-        }
-
-    }
-}
 
 void QFFitFunctionsTIRFCSDiff3DE2::calcParameter(double* data, double* error) const {
     double N=data[FCSSDiff_n_particle];
@@ -213,10 +168,11 @@ void QFFitFunctionsTIRFCSDiff3DE2::calcParameter(double* data, double* error) co
     double eD1=0;
     double wxy=data[FCSSDiff_focus_width]/1.0e3;
     double ewxy=0;
-    double a=data[FCSSDiff_pixel_width]/1.0e3;
-    double ea=0;
     //double offset=data[FCSSDiff_offset];
     double eoffset=0;
+    const double pdepth=data[FCSSDiff_penetration_depth]/1.0e3;
+    double epdepth=0;
+    if (error) epdepth=error[FCSSDiff_penetration_depth]/1.0e3;
 
     int comp=data[FCSSDiff_n_components];
     double rho2=data[FCSSDiff_diff_rho2];
@@ -229,17 +185,17 @@ void QFFitFunctionsTIRFCSDiff3DE2::calcParameter(double* data, double* error) co
     double background=data[FCSSDiff_background];
     double ebackground=0;
 
-    double tau_msd=data[SPIMFCSADIFF_msd_tau];
+    double tau_msd=data[FCSDiff_msd_tau];
     double etau_msd=0;
     const double D1=data[FCSSDiff_diff_coeff1];
     const double D2=data[FCSSDiff_diff_coeff2];
     const double D3=data[FCSSDiff_diff_coeff3];
 
+
     if (error) {
         eN=error[FCSSDiff_n_particle];
         eD1=error[FCSSDiff_diff_coeff1];
         ewxy=error[FCSSDiff_focus_width]/1.0e3;
-        ea=error[FCSSDiff_pixel_width]/1.0e3;
         eoffset=error[FCSSDiff_offset];
         erho2=error[FCSSDiff_diff_rho2];
         erho3=error[FCSSDiff_diff_rho3];
@@ -252,7 +208,7 @@ void QFFitFunctionsTIRFCSDiff3DE2::calcParameter(double* data, double* error) co
     // calculate rho1
     double rho1=1;
     double erho1=0;
-    if (comp==2) {
+    if (comp==1) {
         if (rho2>1.0) rho2=1.0;
         if (rho2<0.0) rho2=0.0;
         if (rho2>1.0) {
@@ -262,7 +218,7 @@ void QFFitFunctionsTIRFCSDiff3DE2::calcParameter(double* data, double* error) co
         rho1=1.0-rho2;
         erho1=erho2;
     }
-    if (comp==3) {
+    if (comp==2) {
         if (rho2>1.0) rho2=1.0;
         if (rho2<0.0) rho2=0.0;
         if (rho3>1.0) rho3=1.0;
@@ -290,45 +246,49 @@ void QFFitFunctionsTIRFCSDiff3DE2::calcParameter(double* data, double* error) co
     if (error) error[FCSSDiff_1n_particle]=fabs(eN/N/N);
 
     // calculate Veff
-    double Aeff=data[FCSSDiff_focus_volume]=TIRFCS_newAeff(a, wxy);;
-    if (error) error[FCSSDiff_focus_volume]=TIRFCS_newAeffError(a, ea, wxy, ewxy);
+    double Veff=data[FCSSDiff_focus_volume]=TIRFCS_confocalVeff(wxy, pdepth);;
+    double Aeff=data[FCSSDiff_focus_area]=TIRFCS_confocalAeff(wxy);;
+    if (error) error[FCSSDiff_focus_volume]=TIRFCS_confocalVeffError(wxy, ewxy, pdepth, epdepth);
+    if (error) error[FCSSDiff_focus_area]=TIRFCS_confocalAeffError(wxy, ewxy, pdepth, epdepth);
 
     // calculate C = N / Veff
-    if (data[FCSSDiff_focus_volume]!=0) {
-        data[FCSSDiff_concentration]=N/data[FCSSDiff_focus_volume];
-    } else {
-        data[FCSSDiff_concentration]=0;
-    }
-    if (data[FCSSDiff_focus_volume]!=0 && error) {
-        error[FCSSDiff_concentration]=sqrt(qfSqr(eN/data[FCSSDiff_focus_volume])+qfSqr(error[FCSSDiff_focus_volume]*N/qfSqr(data[FCSSDiff_focus_volume])));//N/data[FCSSDiff_focus_volume]
-    }
+//    if (data[FCSSDiff_focus_volume]!=0) {
+//        data[FCSSDiff_concentration]=N/data[FCSSDiff_focus_volume];
+//    } else {
+//        data[FCSSDiff_concentration]=0;
+//    }
+//    if (data[FCSSDiff_focus_volume]!=0 && error) {
+//        error[FCSSDiff_concentration]=sqrt(qfSqr(eN/data[FCSSDiff_focus_volume])+qfSqr(error[FCSSDiff_focus_volume]*N/qfSqr(data[FCSSDiff_focus_volume])));//N/data[FCSSDiff_focus_volume]
+//    }
 
 
     // calculate CPM = (CPS-background)/N
     data[FCSSDiff_cpm]=(cps-background)/N;
     error[FCSSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
 
-    data[SPIMFCSADIFF_msd_at_tau1]=6.0*D1*tau_msd*1e-3;
-    if (error) error[SPIMFCSADIFF_msd_at_tau1]=0;
-    data[SPIMFCSADIFF_msd_at_tau2]=6.0*D2*tau_msd*1e-3;
-    if (error) error[SPIMFCSADIFF_msd_at_tau2]=0;
-    data[SPIMFCSADIFF_msd_at_tau3]=6.0*D3*tau_msd*1e-3;
-    if (error) error[SPIMFCSADIFF_msd_at_tau3]=0;
-    data[SPIMFCSADIFF_msd_time_aeff1]=Aeff/(4.0*D1)*1e3;
-    if (error) error[SPIMFCSADIFF_msd_time_aeff1]=0;
-    data[SPIMFCSADIFF_msd_time_aeff2]=Aeff/(4.0*D2)*1e3;
-    if (error) error[SPIMFCSADIFF_msd_time_aeff2]=0;
-    data[SPIMFCSADIFF_msd_time_aeff3]=Aeff/(4.0*D3)*1e3;
-    if (error) error[SPIMFCSADIFF_msd_time_aeff3]=0;
+    data[FCSDiff_msd_at_tau1]=6.0*D1*tau_msd*1e-3;
+    if (error) error[FCSDiff_msd_at_tau1]=0;
+    data[FCSDiff_msd_at_tau2]=6.0*D2*tau_msd*1e-3;
+    if (error) error[FCSDiff_msd_at_tau2]=0;
+    data[FCSDiff_msd_at_tau3]=6.0*D3*tau_msd*1e-3;
+    if (error) error[FCSDiff_msd_at_tau3]=0;
+    data[FCSDiff_msd_time_aeff1]=Aeff/(4.0*D1)*1e3;
+    if (error) error[FCSDiff_msd_time_aeff1]=0;
+    data[FCSDiff_msd_time_aeff2]=Aeff/(4.0*D2)*1e3;
+    if (error) error[FCSDiff_msd_time_aeff2]=0;
+    data[FCSDiff_msd_time_aeff3]=Aeff/(4.0*D3)*1e3;
+    if (error) error[FCSDiff_msd_time_aeff3]=0;
 }
 
 bool QFFitFunctionsTIRFCSDiff3DE2::isParameterVisible(int parameter, const double* data) const {
     int comp=data[FCSSDiff_n_components];
+    int nonfl_comp=data[FCSSDiff_n_nonfluorescent];
     switch(parameter) {
-        case FCSSDiff_diff_rho1:  return comp>1;
-        case FCSSDiff_diff_coeff1: return comp>0;
-        case FCSSDiff_diff_rho2: case FCSSDiff_diff_coeff2: case SPIMFCSADIFF_msd_at_tau2: case SPIMFCSADIFF_msd_time_aeff2: return comp>1;
-        case FCSSDiff_diff_rho3: case FCSSDiff_diff_coeff3: case SPIMFCSADIFF_msd_at_tau3: case SPIMFCSADIFF_msd_time_aeff3: return comp>2;
+        case FCSSDiff_diff_rho1:  return comp>0;
+        case FCSSDiff_diff_rho2: case FCSSDiff_diff_coeff2: case FCSDiff_msd_at_tau2: case FCSDiff_msd_time_aeff2: return comp>0;
+        case FCSSDiff_diff_rho3: case FCSSDiff_diff_coeff3: case FCSDiff_msd_at_tau3: case FCSDiff_msd_time_aeff3: return comp>1;
+        case FCSSDiff_nonfl_tau1: case FCSSDiff_nonfl_theta1: return nonfl_comp>0;
+        case FCSSDiff_nonfl_tau2: case FCSSDiff_nonfl_theta2: return nonfl_comp>1;
     }
     return true;
 }
@@ -336,13 +296,13 @@ bool QFFitFunctionsTIRFCSDiff3DE2::isParameterVisible(int parameter, const doubl
 unsigned int QFFitFunctionsTIRFCSDiff3DE2::getAdditionalPlotCount(const double* params) {
 
     Q_UNUSED(params);
-    return 0;
+    return 1;
 }
 
 QString QFFitFunctionsTIRFCSDiff3DE2::transformParametersForAdditionalPlot(int plot, double* params) {
 
 
     Q_UNUSED(plot);
-    Q_UNUSED(params);
-    return "";
+    params[FCSSDiff_n_nonfluorescent]=0;
+    return "without non-fluorescent";
 }

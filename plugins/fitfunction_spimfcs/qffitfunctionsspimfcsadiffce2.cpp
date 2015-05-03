@@ -42,19 +42,19 @@ QFFitFunctionsSPIMFCSADiffCE2::QFFitFunctionsSPIMFCSADiffCE2() {
     #define SPIMFCSADIFF_concentration QFPPM_INC(QFPPM_COUNT_START)
     addParameter(FloatNumber,  "diff_rho1",               "fraction of first component",                           "&rho;<sub>1</sub>",        "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1);
     #define SPIMFCSADIFF_diff_rho1 QFPPM_INC(SPIMFCSADIFF_concentration)
-    addParameter(FloatNumber,  "diff_acoeff1",            "anomalous diffusion coefficient of species 1",          "&Gamma;<sub>1</sub>",      "micron^2/s^{\alpha_1}", "&mu;m<sup>2</sup>/s<sup>&alpha;1</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diff_acoeff1",            "anomalous diffusion coefficient of species 1",          "&Gamma;<sub>1</sub>",      "micron^2/s^{alpha_1}", "&mu;m<sup>2</sup>/s<sup>&alpha;1</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define SPIMFCSADIFF_diff_acoeff1 QFPPM_INC(SPIMFCSADIFF_diff_rho1)
     addParameter(FloatNumber,  "diff_alpha1",             "anomality parameter of species 1",                      "&alpha;<sub>1</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0        );
     #define SPIMFCSADIFF_diff_alpha1 QFPPM_INC(SPIMFCSADIFF_diff_acoeff1)
     addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define SPIMFCSADIFF_diff_rho2 QFPPM_INC(SPIMFCSADIFF_diff_alpha1)
-    addParameter(FloatNumber,  "diff_acoeff2",            "anomalous diffusion coefficient of species 2",          "&Gamma;<sub>2</sub>",      "micron^2/s^{\alpha_2}", "&mu;m<sup>2</sup>/s<sup>&alpha;2</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diff_acoeff2",            "anomalous diffusion coefficient of species 2",          "&Gamma;<sub>2</sub>",      "micron^2/s^{alpha_2}", "&mu;m<sup>2</sup>/s<sup>&alpha;2</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define SPIMFCSADIFF_diff_acoeff2 QFPPM_INC(SPIMFCSADIFF_diff_rho2)
     addParameter(FloatNumber,  "diff_alpha2",             "anomality parameter of species 2",                      "&alpha;<sub>2</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0        );
     #define SPIMFCSADIFF_diff_alpha2 QFPPM_INC(SPIMFCSADIFF_diff_acoeff2)
     addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define SPIMFCSADIFF_diff_rho3 QFPPM_INC(SPIMFCSADIFF_diff_alpha2)
-    addParameter(FloatNumber,  "diff_acoeff3",            "anomalous diffusion coefficient of species 3",          "&Gamma;<sub>3</sub>",      "micron^2/s^{\alpha_3}", "&mu;m<sup>2</sup>/s<sup>&alpha;3</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diff_acoeff3",            "anomalous diffusion coefficient of species 3",          "&Gamma;<sub>3</sub>",      "micron^2/s^{alpha_3}", "&mu;m<sup>2</sup>/s<sup>&alpha;3</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define SPIMFCSADIFF_diff_acoeff3 QFPPM_INC(SPIMFCSADIFF_diff_rho3)
     addParameter(FloatNumber,  "diff_alpha3",             "anomality parameter of species 3",                      "&alpha;<sub>3</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0        );
     #define SPIMFCSADIFF_diff_alpha3 QFPPM_INC(SPIMFCSADIFF_diff_acoeff3)
@@ -161,7 +161,7 @@ double QFFitFunctionsSPIMFCSADiffCE2::evaluate(double t, const double* data) con
 
 
 
-void QFFitFunctionsSPIMFCSADiffCE2::sortParameter(double *parameterValues, double *error, bool *fix) const {
+void QFFitFunctionsSPIMFCSADiffCE2::sortParameter(double */*parameterValues*/, double */*error*/, bool */*fix*/) const {
 
 
 }

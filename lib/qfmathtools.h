@@ -84,9 +84,13 @@ inline float qfPow4(float x) { float x2=x*x; return x2*x2; }
 inline double qfPow5(double x) { double x2=x*x; return x2*x2*x; }
 inline float qfPow5(float x) { float x2=x*x; return x2*x2*x; }
 
-/** \brief sinc function \f$ \mbox{sinc}(x)=\frac{\sin(x)}{x} \f$ */
+/** \brief sinc function \f$ \mbox{sinc}(x)=\frac{\sin(x)}{x} \f$
+    \ingroup tools_math_stat
+*/
 QFLIB_EXPORT double qfSinc(double x);
-/** \brief sinc function \f$ \mbox{tanc}(x)=\frac{\tan(x)}{x} \f$ */
+/** \brief sinc function \f$ \mbox{tanc}(x)=\frac{\tan(x)}{x} \f$
+    \ingroup tools_math_stat
+*/
 QFLIB_EXPORT double qfTanc(double x);
 
 /** \brief 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
@@ -222,6 +226,13 @@ inline double qfCauchy(double x, double fwhm, double center=0.0) {
 inline double qfCauchy(double x, double A, double fwhm, double center) {
     return A/(qfSqr((x-center)/fwhm)+1.0);
 }
+
+/** \brief Faddeeva w-function of a real argument (uses <a href="http://ab-initio.mit.edu/wiki/index.php/Faddeeva_Package">Faddeeva Package</a>)
+    \ingroup tools_math_stat
+
+    \f[ w(\mathrm{i}\xi)=\exp(\xi^2)\cdot\mbox{erfc}(\xi) \f]
+ */
+QFLIB_EXPORT double qfFaddeevaRealW(double xi);
 
 /** \brief calculate the error propagation for <code>factorA*a+factorB*b</code> or <code>factorA*a-factorB*b</code> with errors \a ea and \a eb
     \ingroup tools_math_stat

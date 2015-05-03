@@ -1547,7 +1547,7 @@ double QFRDRTablePlotWidget::getMagnification() const
     }
 }
 
-void QFRDRTablePlotWidget::magnificationChanged(int idx)
+void QFRDRTablePlotWidget::magnificationChanged(int /*idx*/)
 {
     double m=getMagnification();
     if (current) current->setQFProperty(QString("GRAPH%1_MAGNIFICATION").arg(plot),m, false, false);

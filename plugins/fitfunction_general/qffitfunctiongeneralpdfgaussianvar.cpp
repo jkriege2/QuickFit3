@@ -40,7 +40,7 @@ double QFFitFunctionGeneralPDFGaussianVar::evaluate(double t, const double* data
 }
 
 
-void QFFitFunctionGeneralPDFGaussianVar::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralPDFGaussianVar::calcParameter(double* /*data*/, double* /*error*/) const {
 }
 
 bool QFFitFunctionGeneralPDFGaussianVar::isParameterVisible(int parameter, const double* data) const {
@@ -67,7 +67,7 @@ QString QFFitFunctionGeneralPDFGaussianVar::transformParametersForAdditionalPlot
 }
 
 
-bool QFFitFunctionGeneralPDFGaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralPDFGaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

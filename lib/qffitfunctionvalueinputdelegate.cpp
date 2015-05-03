@@ -48,7 +48,7 @@ QSize QFFitFunctionValueInputDelegate::sizeHint(const QStyleOptionViewItem &opti
 }
 
 
-QWidget *QFFitFunctionValueInputDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget *QFFitFunctionValueInputDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/, const QModelIndex &index) const
 {
     QElapsedTimer t;
     t.start();
@@ -163,7 +163,7 @@ void QFFitFunctionValueInputDelegate::setModelData(QWidget *editor, QAbstractIte
     }
 }
 
-void QFFitFunctionValueInputDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void QFFitFunctionValueInputDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &/*index*/) const
 {
     QPoint offset(0,0);
     editor->setGeometry(QRect(offset+option.rect.topLeft(), QSize(option.rect.width()-offset.x(), option.rect.height())));

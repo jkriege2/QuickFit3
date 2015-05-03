@@ -34,13 +34,13 @@ class QFFitFunctionsTIRFCSADiff3DE2: public QFFitFunction {
         QFFitFunctionsTIRFCSADiff3DE2();
         virtual ~QFFitFunctionsTIRFCSADiff3DE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("TIR-FCS: 3D+2D anomalous Diffusion (Gaussian, 1/e^2 radii)"); }
+        virtual QString name() const { return QString("Confocal TIR-FCS: 3D+2D anomalous Diffusion (Gaussian, 1/e^2 radii)"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_tir_adiff3de2"); }
         /*! \copydoc QFFitFunction::category()   */
-        virtual QString category() const { return QObject::tr("TIR-FCS"); }
+        virtual QString category() const { return QObject::tr("Confocal TIR-FCS"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

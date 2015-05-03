@@ -51,6 +51,7 @@ QFERTRegExpDialog::QFERTRegExpDialog(QWidget *parent) :
     connect(ui->syntaxComboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(refresh()));
     refresh();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFERTRegExpDialog::~QFERTRegExpDialog()

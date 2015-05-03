@@ -54,7 +54,7 @@ static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-void myMessageOutputQt5(QtMsgType type, const QMessageLogContext &context, const QString &msg){
+void myMessageOutputQt5(QtMsgType type, const QMessageLogContext &/*context*/, const QString &msg){
     QString m=msg;
     while (m.startsWith('\n') && m.size()>0) {
         m=m.remove(0,1);
@@ -656,7 +656,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     }
 }
 
-void MainWindow::showEvent(QShowEvent *event) {
+void MainWindow::showEvent(QShowEvent */*event*/) {
     QString SVN=qfInfoSVNVersion();
     QString lastSVN=ProgramOptions::getConfigValue("quickfit/lastrunsvn", "").toString();
 
@@ -1029,7 +1029,7 @@ QString MainWindow::createFAQ(bool parser_only)
     return textd;
 }
 
-QString MainWindow::createPluginDocItem(bool docLink, QString id, QString name, QString description, QString iconfilename, QString author, QString copyright, QString weblink, QString file, int verMajor, int verMinor, QStringList additional) {
+QString MainWindow::createPluginDocItem(bool /*docLink*/, QString id, QString name, QString description, QString iconfilename, QString author, QString copyright, QString weblink, QString file, int verMajor, int verMinor, QStringList additional) {
     QString text="";
     text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><img src=\"%2\">&nbsp;<b>%1</b></td></tr>").arg(name).arg(iconfilename);
     text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2.%3</td></tr>").arg(tr("version:")).arg(verMajor).arg(verMinor);
@@ -3251,7 +3251,7 @@ void MainWindow::addCorrelationToView(const QString &name, const QFParameterCorr
 
 }
 
-void MainWindow::addPlotToView(const QString &name, const QFSimplePlotService::PlotData &data)
+void MainWindow::addPlotToView(const QString &/*name*/, const QFSimplePlotService::PlotData &/*data*/)
 {
     /*if (correlationViews.contains(name)) {
         correlationViews[name]->addCopiedCorrelation(data.nameX+tr(" vs. ")+data.nameY, data.dataX.data(), data.dataY.data(), qMin(data.dataX.size(), data.dataY.size()));
@@ -3262,7 +3262,7 @@ void MainWindow::addPlotToView(const QString &name, const QFSimplePlotService::P
 
 }
 
-void MainWindow::clearSimplePlotView(const QString &name)
+void MainWindow::clearSimplePlotView(const QString &/*name*/)
 {
     /*if (correlationViews.contains(name)) {
         correlationViews[name]->clear();
@@ -3271,7 +3271,7 @@ void MainWindow::clearSimplePlotView(const QString &name)
 
 }
 
-QWidget *MainWindow::getCreateSimplePlotView(const QString &name, const QString &title)
+QWidget *MainWindow::getCreateSimplePlotView(const QString &/*name*/, const QString &/*title*/)
 {
     /*if (!correlationViews.contains(name)) {
         correlationViews[name]=new QFParameterCorrelationView(NULL);

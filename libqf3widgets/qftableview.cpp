@@ -22,6 +22,7 @@
 QFTableView::QFTableView(QWidget *parent) :
     QWidget(parent)
 {
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
     setWindowTitle(tr("Data Table View"));
     setWindowIcon(QIcon(":/lib/result_correlation_icon.png"));
     model.setReadonly(false);
@@ -31,28 +32,28 @@ QFTableView::QFTableView(QWidget *parent) :
     createWidgets();
 }
 
-void QFTableView::readSettings(QSettings &settings, const QString &prefix)
+void QFTableView::readSettings(QSettings &/*settings*/, const QString &/*prefix*/)
 {
     connectParameterWidgets(false);
     connectParameterWidgets(true);
 }
 
-void QFTableView::writeSettings(QSettings &settings, const QString &prefix)
+void QFTableView::writeSettings(QSettings &/*settings*/, const QString &/*prefix*/)
 {
 
 }
 
-void QFTableView::writeQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
+void QFTableView::writeQFProperties(QFProperties */*current*/, const QString &/*prefix*/, const QString &/*egroup*/, const QString &/*param*/)
 {
 
 }
 
-void QFTableView::readQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
+void QFTableView::readQFProperties(QFProperties */*current*/, const QString &/*prefix*/, const QString &/*egroup*/, const QString &/*param*/)
 {
 
 }
 
-void QFTableView::connectParameterWidgets(bool connectTo)
+void QFTableView::connectParameterWidgets(bool /*connectTo*/)
 {
 
 }

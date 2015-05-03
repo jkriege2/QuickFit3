@@ -66,7 +66,7 @@ double QFFitFunctionGeneralPolynom::evaluate(double t, const double* data) const
 }
 
 
-void QFFitFunctionGeneralPolynom::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralPolynom::calcParameter(double* /*data*/, double* /*error*/) const {
 
 }
 
@@ -109,10 +109,8 @@ bool QFFitFunctionGeneralPolynom::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralPolynom::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
 
-bool QFFitFunctionGeneralPolynom::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionGeneralPolynom::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {
     if (params && dataX && dataY && N>0) {
         int degree=params[PARAM_DEGREE];

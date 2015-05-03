@@ -28,6 +28,7 @@ QFRDRTableIndexedStatDialog::QFRDRTableIndexedStatDialog(QWidget *parent) :
     ui(new Ui::QFRDRTableIndexedStatDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRTableIndexedStatDialog::~QFRDRTableIndexedStatDialog()

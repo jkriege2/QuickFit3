@@ -1021,7 +1021,7 @@ void QFPRDRFCS::startFCSProjectWizard()
     delete wiz;
 }
 
-void QFPRDRFCS::FCSProjectWizardValidateIntrument(QWizardPage *page, void *fitprops)
+void QFPRDRFCS::FCSProjectWizardValidateIntrument(QWizardPage */*page*/, void *fitprops)
 {
     //qDebug()<<"FCSProjectWizardValidateIntrument"<<page<<fitprops;
     FCSProjectWizardEvalSettingsData* fp=(FCSProjectWizardEvalSettingsData*)fitprops;

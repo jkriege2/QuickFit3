@@ -55,6 +55,7 @@ QFFitFunctionSelectDialog::QFFitFunctionSelectDialog(QWidget *parent) :
         loadWidgetGeometry(*set, this, pos(), size(), "QFFitFunctionSelectDialog/windowsize");
         loadSplitter(*set, ui->splitter, "QFFitFunctionSelectDialog/splitter");
     }
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFFitFunctionSelectDialog::~QFFitFunctionSelectDialog()

@@ -66,7 +66,7 @@ double QFFitFunctionFCSSimpleExp::evaluate(double t, const double* data) const {
 
 
 
-void QFFitFunctionFCSSimpleExp::calcParameter(double* data, double* error) const {
+void QFFitFunctionFCSSimpleExp::calcParameter(double* /*data*/, double* /*error*/) const {
 
  }
 
@@ -79,11 +79,11 @@ bool QFFitFunctionFCSSimpleExp::isParameterVisible(int parameter, const double* 
     return true;
 }
 
-unsigned int QFFitFunctionFCSSimpleExp::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSSimpleExp::getAdditionalPlotCount(const double* /*params*/) {
     return 0;
 }
 
-QString QFFitFunctionFCSSimpleExp::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSSimpleExp::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
     return QString();
 }
 

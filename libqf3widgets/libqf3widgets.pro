@@ -134,7 +134,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/fillstylecombobox.h \
     qfsimplecurvefitdialog.h \
     qfparametercorrelationview.h \
-    qfmeasurementtable.h \
     qfmeasurementdevicecombobox.h \
     qfmeasurementdeviceconfigwidgetthread.h \
     qfmeasurementdeviceconfigwidget.h \
@@ -236,7 +235,6 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/qt/fillstylecombobox.cpp \
     qfsimplecurvefitdialog.cpp \
     qfparametercorrelationview.cpp \
-    qfmeasurementtable.cpp \
     qfmeasurementdevicecombobox.cpp \
     qfmeasurementdeviceconfigwidgetthread.cpp \
     qfmeasurementdeviceconfigwidget.cpp \

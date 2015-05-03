@@ -81,11 +81,11 @@ bool QFFitFunctionGeneralSegmentedLine::isParameterVisible(int parameter, const 
     }
     return true;
 }
-unsigned int QFFitFunctionGeneralSegmentedLine::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralSegmentedLine::getAdditionalPlotCount(const double* /*params*/) {
     return 0;
 }
 
-QString QFFitFunctionGeneralSegmentedLine::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralSegmentedLine::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
     return "";
 }
 
@@ -94,10 +94,10 @@ bool QFFitFunctionGeneralSegmentedLine::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralSegmentedLine::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralSegmentedLine::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
 }
 
-bool QFFitFunctionGeneralSegmentedLine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralSegmentedLine::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool* /*fix*/)
 {
     return false;
 }

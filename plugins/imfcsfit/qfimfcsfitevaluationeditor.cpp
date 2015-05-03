@@ -115,7 +115,7 @@ void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QL
                             corrdata=data->getCorrelationMean();
                         }
                     }
-                    double* weights=eval->allocWeights(NULL, rec, eval->getCurrentIndex(), datacut_min, datacut_max);
+                    //double* weights=eval->allocWeights(NULL, rec, eval->getCurrentIndex(), datacut_min, datacut_max);
 
 
                     /////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +167,7 @@ void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QL
                     /////////////////////////////////////////////////////////////////////////////////
                     qfFree(fullParams);
                     qfFree(errors);
-                    qfFree(weights);
+                    //qfFree(weights);
                 }
             } catch(std::exception& E) {
                 services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
@@ -180,7 +180,7 @@ void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QL
             item.x=acftau;
             item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
             bool ok=true;
-            double* w=eval->allocWeights(&ok, rec, index);
+            double* w=eval->allocWeights(&ok, rec, index, -1, -1, true);
             if (ok && w) {
                 item.yerrors=arrayToVector(w, data->getCorrelationN());
             }
@@ -321,7 +321,7 @@ bool QFImFCSFitEvaluationEditor::getPlotDataSpecs(QStringList *optionNames, QLis
     return true;
 }
 
-int QFImFCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index) {
+int QFImFCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int /*index*/) {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     if (data) {
         return data->getCorrelationN()-1;
@@ -329,7 +329,7 @@ int QFImFCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index)
     return 0;
 }
 
-int QFImFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index) {
+int QFImFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord */*rec*/, int /*index*/) {
     return 0;
 }
 
@@ -990,7 +990,7 @@ void QFImFCSFitEvaluationEditor::updateFitFunctions() {
 
 
 
-void QFImFCSFitEvaluationEditor::weightsChanged(int model) {
+void QFImFCSFitEvaluationEditor::weightsChanged(int /*model*/) {
     if (!dataEventsEnabled) return;
     if (!current) return;
     if (!current->getHighlightedRecord()) return;

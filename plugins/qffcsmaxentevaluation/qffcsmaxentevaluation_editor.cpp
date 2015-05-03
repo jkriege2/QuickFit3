@@ -111,7 +111,8 @@ void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index
                 }
             }
 
-            double* weights=eval->allocWeights(NULL, record, index, datacut_min, datacut_max);
+            bool weightsOK=false;
+            double* weights=eval->allocWeights(&weightsOK, record, index, datacut_min, datacut_max, true);
 
 
             /////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +151,7 @@ void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index
                 QFGetPlotdataInterface::GetPlotDataItem item;
                 item.x=arrayToVector(tauvals, N);
                 item.y=arrayToVector(corrdata, N);
-                item.yerrors=arrayToVector(weights, N);
+                if (weightsOK && weights) item.yerrors=arrayToVector(weights, N);
                 item.name=QString("\\verb{%1: ACF}").arg(record->getName());
                 plotdata.append(item);
             }

@@ -155,7 +155,7 @@ void QFESPIMB040OpticsSetup::closeEvent(QCloseEvent * event) {
     event->accept();
 }
 
-void QFESPIMB040OpticsSetup::showEvent( QShowEvent * event ) {
+void QFESPIMB040OpticsSetup::showEvent( QShowEvent * /*event*/ ) {
     ui->camConfig1->show();
     ui->camConfig2->show();
 }
@@ -857,14 +857,14 @@ int QFESPIMB040OpticsSetup::getLaserID(int laser)
 {
     if (laser==0) return ui->lsLaser1->getLightSourceID();
     if (laser==1) return ui->lsLaser2->getLightSourceID();
-    return NULL;
+    return -1;
 }
 
 
 int QFESPIMB040OpticsSetup::getBrightfieldLightSourceID(int source)
 {
     if (source==0) return ui->lsTransmission->getLightSourceID();
-    return NULL;
+    return -1;
 }
 
 int QFESPIMB040OpticsSetup::getLaserCount() const

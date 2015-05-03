@@ -45,7 +45,7 @@ double QFFitFunctionPSFGaussianBeamZIntensity::evaluate(double t, const double* 
 
 
 
-void QFFitFunctionPSFGaussianBeamZIntensity::calcParameter(double* data, double* error) const {
+void QFFitFunctionPSFGaussianBeamZIntensity::calcParameter(double* /*data*/, double* /*error*/) const {
 }
 
 bool QFFitFunctionPSFGaussianBeamZIntensity::isParameterVisible(int parameter, const double* data) const {
@@ -72,7 +72,7 @@ QString QFFitFunctionPSFGaussianBeamZIntensity::transformParametersForAdditional
 }
 
 
-bool QFFitFunctionPSFGaussianBeamZIntensity::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionPSFGaussianBeamZIntensity::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool* /*fix*/)
 {
 
 

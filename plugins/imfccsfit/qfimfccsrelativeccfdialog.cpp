@@ -235,7 +235,7 @@ void QFImFCCSRelativeCCFDialog::updateProject()
     }
 }
 
-void QFImFCCSRelativeCCFDialog::cmbCCF_currentIndexChanged(int index)
+void QFImFCCSRelativeCCFDialog::cmbCCF_currentIndexChanged(int /*index*/)
 {
     //JKAutoOutputTimer tim(QString("cmbCCF_currentIndexChanged"));
     replotImages();

@@ -50,6 +50,7 @@ dlgCSVParameters::dlgCSVParameters(QWidget* parent, int mode, QString startswith
     spinStartInLine->setValue(startInLine);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(checkValues()));
     loadConfigs();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 dlgCSVParameters::~dlgCSVParameters()

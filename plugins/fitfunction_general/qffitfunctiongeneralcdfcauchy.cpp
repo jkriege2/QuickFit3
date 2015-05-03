@@ -39,12 +39,12 @@ double QFFitFunctionGeneralCDFCauchy::evaluate(double x, const double* data) con
     return atan((x-position)/width)/M_PI+0.5;
 }
 
-void QFFitFunctionGeneralCDFCauchy::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralCDFCauchy::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
     for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
 
 }
 
-void QFFitFunctionGeneralCDFCauchy::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralCDFCauchy::calcParameter(double* /*data*/, double* /*error*/) const {
 }
 
 bool QFFitFunctionGeneralCDFCauchy::isParameterVisible(int parameter, const double* data) const {
@@ -75,7 +75,7 @@ bool QFFitFunctionGeneralCDFCauchy::get_implementsDerivatives()
     return false;
 }
 
-bool QFFitFunctionGeneralCDFCauchy::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralCDFCauchy::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

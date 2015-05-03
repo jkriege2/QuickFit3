@@ -36,6 +36,12 @@ $$faq_answer$$
     $$example:<tt>for(it, -1:0.2:1, num2str(it))</tt><br>evaluates to a string vector <tt>[ "-1", "-0.8", "-0.6", "-0.4", "-0.2", "-5.551115123e-17", "0.2", "0.4", "0.6", "0.8", "1" ]</tt>$$
 $$faq_end$$
 
+$$faq_start$$
+  <a name="FAQ_TIRFCS_W"><b>I want to build a custom 3D diffusion TIR-FCS model. How can I implement that w(&xi;)=exp(&xi;<sup>2</sup>)&middot;erfc(&xi;) function?</b>
+$$faq_answer$$
+  You can use the parser function <tt>faddeeva_real(xi)</tt>, which implements a numerical approximation of that function. $$note:This function is also available to C-programmers in <tt>qfmathtools.h</tt> as <tt>qfFaddeevaRealW()</tt>.$$
+$$faq_end$$
+
 </body>
 </html>
 

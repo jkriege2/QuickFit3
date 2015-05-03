@@ -45,13 +45,7 @@ double QFFitFunctionGeneralLorentzian::evaluate(double t, const double* data) co
     return offset+amplitude/(1.0+qfSqr(t-position)/qfSqr(width));
 }
 
-void QFFitFunctionGeneralLorentzian::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
 
-}
-
-void QFFitFunctionGeneralLorentzian::calcParameter(double* data, double* error) const {
-}
 
 bool QFFitFunctionGeneralLorentzian::isParameterVisible(int parameter, const double* data) const {
 
@@ -81,7 +75,7 @@ bool QFFitFunctionGeneralLorentzian::get_implementsDerivatives()
     return false;
 }
 
-bool QFFitFunctionGeneralLorentzian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralLorentzian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

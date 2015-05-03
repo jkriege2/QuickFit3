@@ -15,9 +15,10 @@
         The fit function is defined as:$$ref:HASSLER2005:Hassler, Kai; Anhut, Tiemo; Rigler, Rudolf; G&ouml;sch, Michael; Lasser, Theo (2005): <b>High Count Rates with Total Internal Reflection Fluorescence Correlation Spectroscopy</b>, <i>Biophysical Journal</i> <b>88</b>(1), p. L01-L03, doi: 10.1529/biophysj.104.053884$$$$ref:RIES2005:Ries, Jonas; Petrov, Eugene P.; Schwille, Petra (2008): <b>Total Internal Reflection Fluorescence Correlation Spectroscopy: Effects of Lateral Diffusion and Surface-Generated Fluorescence</b>, <i>Biophysical Journal</i> <b>95</b>(1), p. 390-399, doi: 10.1529/biophysj.107.126193$$
         $$bmath: G(\tau)=G_\infty+\frac{1}{N}\cdot X_{back}\cdot\left(\frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}\right)\cdot\left[(1-\rho_{2D,1}-\rho_{2D,2})\cdot g_{3D}(\tau)+\rho_{2D,1}\cdot g_2(\tau)+\rho_{2D,2}\cdot g_3(\tau)\right]$$
 with
-$$bmath: g_{3D}(\tau)=\left(1+\frac{4\Gamma_{3D}\tau^{\alpha_{3D}}}{w_{xy}^2}\right)^{-1}\cdot \left[\frac{2\sqrt{\Gamma_{2D}\tau^{\alpha_{2D}}}}{d_{TRIF}\cdot\sqrt{\pi}}+\left(1-\frac{2\Gamma_{2D}\tau^{\alpha_{2D}}}{d_{TIRF}^2}\right)\cdot w\left(\mathrm{i}\cdot\sqrt{\frac{\Gamma_{2D}\tau^{\alpha_{2D}}}{d^2}}\right)\right]$$
+$$bmath: g_{3D}(\tau)=\frac{V_\text{eff}}{\pi d_{TRIF}^2\cdot\left(w_{xy}^2+4\Gamma_{3D}\tau^{\alpha_{3D}}\right)}\cdot\left[ \sqrt{ \frac{\Gamma_{3D}\tau^{\alpha_{3D}}}{\pi}}+\frac{1-2\Gamma_{3D}\tau^{\alpha_{3D}}/d_{TRIF}^2}{2/d_{TRIF}}\cdot w\left(\mathrm{i}\cdot\frac{\sqrt{\Gamma_{3D}\tau^{\alpha_{3D}}}}{d_{TRIF}^2}\right)\right]$$
 $$bmath: g_{2D}(\tau)=\left(1+\frac{4\Gamma_{2D}\tau^{\alpha_{2D}}}{w_{xy}^2}\right)^{-1}$$
-In these model functions $(d_{TRIF})$ is the 1/e penetration depth of the evanescent field (in z-direction). The light distribution in z is then given by $(I(z)\propto\exp(-z/d_{TIRF}))$.
+In these model functions $(d_{TRIF})$ is the 1/e penetration depth of the evanescent field (in z-direction). The light distribution in z is then given by $(I(z)\propto\exp(-z/d_{TIRF}))$. The function $(w(\mathrm{i}\cdot\xi))$ is the real-part of the <a href="https://en.wikipedia.org/wiki/Faddeeva_function">Faddeeva function</a>:
+$[ w(\mathrm{i}\cdot\xi)=\exp(\xi^2)\cdot\mbox{erfc}(\xi) ]$
 The background correction is performed by factor
 $$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
 
@@ -37,6 +38,12 @@ $$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
         $$bmath:\mbox{MSD}_i(\tau_{MSD})=6\cdot\Gamma_i\cdot\tau_{MSD}^{\alpha_i}.$$
         Also the time, required for a particle to leave the effective area of the focus is calculated:
         $$bmath:\tau_i(MSD)=\left(\frac{A_{eff}}{4\cdot\Gamma_i}\right)^{1/\alpha_i}.$$
+        
+        The following plot shows the difference between a 3D TIR-FCS and a best-fit 2D TIR-FCS function (both: &alpha;=1):
+<center><a name="fcs_tir_adiff3de2_pic000"><img src="./pic/fcs_tir_adiff3de2_pic000.png" border="1">
+</center>
+
+        
         
         
         </p>

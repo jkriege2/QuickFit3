@@ -388,7 +388,7 @@ bool QFFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, QF
     return true;
 }
 
-void QFFCCSRelativeCCFCrosstalkDialog::cmbCCF_currentIndexChanged(int index)
+void QFFCCSRelativeCCFCrosstalkDialog::cmbCCF_currentIndexChanged(int /*index*/)
 {
     if (ui->cmbCCF->currentRDR()){
         QList<QFRawDataRecord*> lsta=ui->cmbCCF->currentRDR()->getRecordsWithRoleFromGroup("acf0");

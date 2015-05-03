@@ -212,7 +212,7 @@ class QFWIDLIB_EXPORT QFMeasurementDeviceConfigWidget : public QFrame {
         void setValueChanged(int value);
         void setValueChanged(bool value);
         void setValueChanged(const QString& value);
-        void valuesChanged(QTime time, QList<QVariant> values, QStringList lineNames, QList<bool> widgetsEnabled);
+        void valuesChanged(QTime time,const  QList<QVariant>& values, const QStringList& lineNames, const QList<bool>& widgetsEnabled);
         void setPowerEditingFinished();
 
         

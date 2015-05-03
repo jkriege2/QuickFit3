@@ -80,21 +80,21 @@ void QFRDRFCSRateEditor::includeRuns() {
 }
 
 
-Qt::ItemFlags QFRDRFCSRateEditor::runsModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QFRDRFCSRateEditor::runsModel::flags(const QModelIndex &/*index*/) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-QVariant QFRDRFCSRateEditor::runsModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QFRDRFCSRateEditor::runsModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const {
     return QVariant();
 }
 
-int QFRDRFCSRateEditor::runsModel::rowCount(const QModelIndex &parent) const {
+int QFRDRFCSRateEditor::runsModel::rowCount(const QModelIndex &/*parent*/) const {
     if (!current) return 0;
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
     return 1+m->getRateRuns();
 }
 
-int QFRDRFCSRateEditor::runsModel::columnCount(const QModelIndex &parent) const {
+int QFRDRFCSRateEditor::runsModel::columnCount(const QModelIndex &/*parent*/) const {
     return 1;
 }
 
@@ -253,15 +253,15 @@ void QFRDRFCSRateEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecor
 
 };
 
-void QFRDRFCSRateEditor::selectionChanged(const QModelIndex & current, const QModelIndex & previous ) {
+void QFRDRFCSRateEditor::selectionChanged(const QModelIndex & /*current*/, const QModelIndex & /*previous*/ ) {
     replotData();
 }
 
-void QFRDRFCSRateEditor::selectionChanged(const QItemSelection & current, const QItemSelection & previous ) {
+void QFRDRFCSRateEditor::selectionChanged(const QItemSelection & /*current*/, const QItemSelection & /*previous*/ ) {
     replotData();
 }
 
-void QFRDRFCSRateEditor::runsModeChanged(int c) {
+void QFRDRFCSRateEditor::runsModeChanged(int /*c*/) {
     lstRunsSelect->setEnabled((cmbRunDisplay->currentIndex()<=1) || (cmbRunDisplay->currentIndex()==3));
     replotData();
 }
@@ -278,7 +278,7 @@ void QFRDRFCSRateEditor::rawDataChangedRecalc()
 
 };
 
-void QFRDRFCSRateEditor::slidersChanged(int userMin, int userMax, int min, int max) {
+void QFRDRFCSRateEditor::slidersChanged(int /*userMin*/, int /*userMax*/, int /*min*/, int /*max*/) {
     replotData();
 }
 
@@ -542,7 +542,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m, QList<QVariant>* statData)
 
 }
 
-void QFRDRFCSRateEditor::replotData(int dummy) {
+void QFRDRFCSRateEditor::replotData(int /*dummy*/) {
     //std::cout<<"repainting ...";
     JKQTPdatastore* ds=plotter->getDatastore();
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);

@@ -56,7 +56,7 @@ class QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorACFG: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() const { return false; }
-        void sortParameter(double *parameterValues, double *error, bool *fix) const;
+        //void sortParameter(double *parameterValues, double *error, bool *fix) const;
 };
 
 #endif // QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorACFG_H

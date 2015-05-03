@@ -130,6 +130,7 @@ QFTextDocumentPrintPreview::QFTextDocumentPrintPreview(QPrinter * printer, QText
     toolbar->addAction(overviewModeAction);
     toolbar->addSeparator();
     toolbar->addAction(pageSetupAction);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 

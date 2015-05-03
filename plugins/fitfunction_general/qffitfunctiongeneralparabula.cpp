@@ -89,10 +89,10 @@ bool QFFitFunctionGeneralParabula::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralParabula::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralParabula::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
 }
 
-bool QFFitFunctionGeneralParabula::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionGeneralParabula::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {
     if (params && dataX && dataY && N>0)  {
         double p[3]={0,0,0};

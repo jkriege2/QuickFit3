@@ -46,6 +46,7 @@ DlgEditGroupAndRole::DlgEditGroupAndRole(QFProject *project, QWidget *parent) :
 
     }
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selChanged()));
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 DlgEditGroupAndRole::~DlgEditGroupAndRole()

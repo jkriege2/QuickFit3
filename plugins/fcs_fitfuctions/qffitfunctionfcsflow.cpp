@@ -180,7 +180,7 @@ bool QFFitFunctionFCSFlow::isParameterVisible(int /*parameter*/, const double* /
     return true;
 }
 
-unsigned int QFFitFunctionFCSFlow::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSFlow::getAdditionalPlotCount(const double* /*params*/) {
     return 2;
 }
 

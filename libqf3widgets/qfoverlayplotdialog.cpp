@@ -38,6 +38,7 @@ QFOverlayPlotDialog::QFOverlayPlotDialog(QWidget *parent) :
         loadWidgetGeometry(*set, this, pos(), size(), "QFOverlayPlotDialog/windowsize");
     }
 
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFOverlayPlotDialog::~QFOverlayPlotDialog()
@@ -126,7 +127,7 @@ void QFOverlayPlotDialog::setAxisLabel(const QString &labX, const QString &labY)
     ui->plot->getYAxis()->set_axisLabel(labY);
 }
 
-QFOverlayPlotDialog *QFOverlayPlotDialog::collectOverlayPlot(QFMatchRDRFunctor *matchFunctor)
+QFOverlayPlotDialog *QFOverlayPlotDialog::collectOverlayPlot(QFMatchRDRFunctor */*matchFunctor*/)
 {
     return NULL;
 }

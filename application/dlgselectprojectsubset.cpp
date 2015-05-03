@@ -40,6 +40,7 @@ DlgSelectProjectSubset::DlgSelectProjectSubset(QFProject *project, QWidget *pare
     ui->labName->setText(project->getName());
     ui->labDescription->setText(project->getDescription());
     ui->treeView->expandAll();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 DlgSelectProjectSubset::~DlgSelectProjectSubset()

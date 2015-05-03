@@ -30,6 +30,7 @@ QFESpectraViewerSpilloverDialog::QFESpectraViewerSpilloverDialog(QWidget *parent
     ui->setupUi(this);
     model.setReadonly(false);
     ui->tableView->setModel(&model);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFESpectraViewerSpilloverDialog::~QFESpectraViewerSpilloverDialog()

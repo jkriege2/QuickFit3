@@ -181,7 +181,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
 
 
         /** \brief number of binned count rate runs in this object */
-        inline virtual int getBinnedRateRuns(int channel=0) const { return rateRuns; };
+        inline virtual int getBinnedRateRuns(int channel=0) const { Q_UNUSED(channel); return rateRuns; };
         /** \brief number of datapoints in every binned count rate */
         inline virtual long long getBinnedRateN() const { return binnedRateN; };
         /** \brief sample points (times \f$ \tau \f$ ) of the binned count rate

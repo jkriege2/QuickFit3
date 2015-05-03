@@ -47,7 +47,7 @@ double QFFitFunctionGeneralLogNormal::evaluate(double t, const double* data) con
 }
 
 
-void QFFitFunctionGeneralLogNormal::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralLogNormal::calcParameter(double* /*data*/, double* /*error*/) const {
 
 }
 
@@ -76,10 +76,10 @@ bool QFFitFunctionGeneralLogNormal::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralLogNormal::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralLogNormal::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
 }
 
-bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

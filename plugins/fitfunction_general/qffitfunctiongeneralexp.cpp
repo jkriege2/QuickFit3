@@ -44,9 +44,6 @@ double QFFitFunctionGeneralExp::evaluate(double t, const double* data) const {
 }
 
 
-void QFFitFunctionGeneralExp::calcParameter(double* data, double* error) const {
-
-}
 
 bool QFFitFunctionGeneralExp::isParameterVisible(int parameter, const double* data) const {
 
@@ -71,9 +68,6 @@ QString QFFitFunctionGeneralExp::transformParametersForAdditionalPlot(int plot, 
 bool QFFitFunctionGeneralExp::get_implementsDerivatives()
 {
     return false;
-}
-
-void QFFitFunctionGeneralExp::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
 

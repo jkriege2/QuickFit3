@@ -373,7 +373,7 @@ void QFImFCCSAmplitudeFitDialog::updateProject()
     }
 }
 
-void QFImFCCSAmplitudeFitDialog::cmbCCF_currentIndexChanged(int index)
+void QFImFCCSAmplitudeFitDialog::cmbCCF_currentIndexChanged(int /*index*/)
 {
     if (ui->cmbCCF->currentRDR()){
         QList<QFRawDataRecord*> lsta=ui->cmbCCF->currentRDR()->getRecordsWithRoleFromGroup("acf0");

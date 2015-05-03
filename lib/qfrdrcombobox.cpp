@@ -121,7 +121,7 @@ void QFRDRComboBox::refill()
     emit refilled(count()>0);
 }
 
-void QFRDRComboBox::myCurrentIndexChanged(int i)
+void QFRDRComboBox::myCurrentIndexChanged(int /*i*/)
 {
     emit currentRDRChanged(currentRDR());
 }

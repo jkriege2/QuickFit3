@@ -110,7 +110,7 @@ double QFFitFunctionsSPIMFCCSDiff2Color::evaluate(double t, const double* data) 
     return offset+backfactor*cab/(ca*cb)*cfac;
 }
 
-void QFFitFunctionsSPIMFCCSDiff2Color::calcParameter(double* data, double* error) const {
+void QFFitFunctionsSPIMFCCSDiff2Color::calcParameter(double* /*data*/, double* /*error*/) const {
 
 }
 

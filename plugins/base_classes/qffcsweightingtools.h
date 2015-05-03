@@ -67,11 +67,11 @@ class QFFCSWeightingTools
 
         /** \brief allocate an array for the weights (using qfCalloc(), so use qfFree() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
-        virtual double* allocWeights(bool* weightsOK, const QFRawDataRecord* record_in, int run_in, int data_start=-1, int data_end=-1) const;
+        virtual double* allocWeights(bool* weightsOK, const QFRawDataRecord* record_in, int run_in, int data_start=-1, int data_end=-1, bool returnEmptyForNoWeights=false) const;
 
         /** \brief allocate an array for the weights (using qfCalloc(), so use qfFree() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
-        virtual QVector<double> allocVecWeights(bool* weightsOK, const QFRawDataRecord* record_in, int run_in, int data_start=-1, int data_end=-1) const;
+        virtual QVector<double> allocVecWeights(bool* weightsOK, const QFRawDataRecord* record_in, int run_in, int data_start=-1, int data_end=-1, bool returnEmptyForNoWeights=false) const;
 
         static DataWeight indexToWeight(int index);
     protected:

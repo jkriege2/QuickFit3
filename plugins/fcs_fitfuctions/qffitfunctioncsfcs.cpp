@@ -276,7 +276,7 @@ bool QFFitFunctionCSFCSDiffD::isParameterVisible(int parameter, const double* da
     return true;
 }
 
-unsigned int QFFitFunctionCSFCSDiffD::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionCSFCSDiffD::getAdditionalPlotCount(const double* /*params*/) {
     return 2;
 }
 

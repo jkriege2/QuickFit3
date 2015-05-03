@@ -29,6 +29,7 @@ QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* ser
     QDialog(parent),
     ui(new Ui::QFRDRFCSFitFunctionSimulator)
 {
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
     tauN=0;
     runs=1;
     tau=NULL;
@@ -108,6 +109,7 @@ QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* ser
     connect(ui->chkNoise, SIGNAL(toggled(bool)), this, SLOT(updateFitFunction()));
     connect(ui->chkNoise, SIGNAL(toggled(bool)), this, SLOT(updateNoiseEnabled()));
     connect(ui->cmbNoiseModel, SIGNAL(currentIndexChanged(int)), this, SLOT(updateFitFunction()));
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
 }
 
@@ -129,7 +131,7 @@ QMap<QString,QVariant> QFRDRFCSFitFunctionSimulator::getParams()
     return used_params;
 }
 
-void QFRDRFCSFitFunctionSimulator::setFitValue(const QString &id, double value, QFRawDataRecord *r)
+void QFRDRFCSFitFunctionSimulator::setFitValue(const QString &id, double value, QFRawDataRecord */*r*/)
 {
     params[id].value=value;
     params[id].valueset=true;

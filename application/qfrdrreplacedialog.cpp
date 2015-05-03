@@ -34,6 +34,7 @@ QFRDRReplaceDialog::QFRDRReplaceDialog(QWidget *parent) :
     ui->chkCaseSensitive->setChecked(ProgramOptions::getConfigValue("QFRDRReplaceDialog/casesense", false).toBool());
     ui->edtFind->setText(ProgramOptions::getConfigValue("QFRDRReplaceDialog/find", "").toString());
     ui->edtReplace->setText(ProgramOptions::getConfigValue("QFRDRReplaceDialog/replace", "").toString());
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRReplaceDialog::~QFRDRReplaceDialog()

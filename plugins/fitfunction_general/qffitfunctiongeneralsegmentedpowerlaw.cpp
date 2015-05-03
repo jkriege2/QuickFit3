@@ -114,11 +114,11 @@ bool QFFitFunctionGeneralSegmentedPowerLaw::isParameterVisible(int parameter, co
     }
     return true;
 }
-unsigned int QFFitFunctionGeneralSegmentedPowerLaw::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralSegmentedPowerLaw::getAdditionalPlotCount(const double* /*params*/) {
     return 0;
 }
 
-QString QFFitFunctionGeneralSegmentedPowerLaw::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralSegmentedPowerLaw::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
     return "";
 }
 
@@ -127,10 +127,10 @@ bool QFFitFunctionGeneralSegmentedPowerLaw::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralSegmentedPowerLaw::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralSegmentedPowerLaw::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
 }
 
-bool QFFitFunctionGeneralSegmentedPowerLaw::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionGeneralSegmentedPowerLaw::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

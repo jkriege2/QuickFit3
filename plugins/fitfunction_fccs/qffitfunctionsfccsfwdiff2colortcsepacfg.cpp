@@ -207,11 +207,11 @@ bool QFFitFunctionsFCCSFWDiff2ColorTCSepACFG::isParameterVisible(int parameter, 
     return true;
 }
 
-unsigned int QFFitFunctionsFCCSFWDiff2ColorTCSepACFG::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsFCCSFWDiff2ColorTCSepACFG::getAdditionalPlotCount(const double* /*params*/) {
     return 1;
 }
 
-QString QFFitFunctionsFCCSFWDiff2ColorTCSepACFG::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsFCCSFWDiff2ColorTCSepACFG::transformParametersForAdditionalPlot(int /*plot*/, double* params) {
     params[FCCSDiff_n_nonfluorescent]=0;
     return QObject::tr("only diffusion");
 }

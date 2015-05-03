@@ -62,6 +62,7 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
     on_chkMultiline_toggled(ui->chkMultiline->isChecked());
     ui->edtExpression->setFocus();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 void QFECalculatorDialog::setupParser(QFMathParser *parser) const

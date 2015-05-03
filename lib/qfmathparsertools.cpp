@@ -2026,12 +2026,12 @@ QVariantList qfmpCustomResult::asVariantList() const
 
 
 
-bool qfmpCustomResult::convertsTo(qfmpResultType type) const
+bool qfmpCustomResult::convertsTo(qfmpResultType /*type*/) const
 {
     return false;
 }
 
-void qfmpCustomResult::convertTo(qfmpResult &res, qfmpResultType type) const
+void qfmpCustomResult::convertTo(qfmpResult &res, qfmpResultType /*type*/) const
 {
     res.setInvalid();
 }

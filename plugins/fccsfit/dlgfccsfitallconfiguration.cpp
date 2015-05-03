@@ -27,6 +27,7 @@ DlgFCCSFitAllConfiguration::DlgFCCSFitAllConfiguration(QWidget *parent) :
     ui(new Ui::DlgFCCSFitAllConfiguration)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 DlgFCCSFitAllConfiguration::~DlgFCCSFitAllConfiguration()

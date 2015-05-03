@@ -111,7 +111,7 @@ void QFRawDataResultsComboBox::setEvaluationIDFilter(const QString &evalID)
     refill();
 }
 
-void QFRawDataResultsComboBox::myCurrentIndexChanged(int i)
+void QFRawDataResultsComboBox::myCurrentIndexChanged(int /*i*/)
 {
     emit currentResultChanged(currentResult(), currentEvaluationID());
 }

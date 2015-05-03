@@ -52,6 +52,7 @@ PasteImageDlg::PasteImageDlg(const QString &directory, QWidget *parent, const QS
         connect(clipboard, SIGNAL(dataChanged()), this, SLOT(clipboardChanged()));
         clipboardChanged();
     }
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 PasteImageDlg::~PasteImageDlg()

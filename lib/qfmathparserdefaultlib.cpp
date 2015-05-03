@@ -106,6 +106,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("structget", QFMathParser_DefaultLib::fStructGet);
     p->addFunction("structsaveget", QFMathParser_DefaultLib::fStructGetSave);
     p->addFunction("sinc", QFMathParser_DefaultLib::fSinc, NULL, qfSinc);
+    p->addFunction("faddeeva_real", QFMathParser_DefaultLib::fFaddeevaRealW, NULL, qfFaddeevaRealW);
     p->addFunction("asin", QFMathParser_DefaultLib::fASin, NULL, asin);
     p->addFunction("acos", QFMathParser_DefaultLib::fACos, NULL, acos);
     p->addFunction("atan", QFMathParser_DefaultLib::fATan, NULL, atan);

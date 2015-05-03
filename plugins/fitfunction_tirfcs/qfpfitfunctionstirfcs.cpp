@@ -24,7 +24,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionstirfcsdiffe2.h"
 #include "qffitfunctionstirfcsadiffe2.h"
 #include "qffitfunctionstirfcsadiff3de2.h"
+#include "qffitfunctionstirfcsdiff3de2.h"
+#include "qffitfunctionstirfcsdiff3de2_relbright.h"
 #include "qffitfunctionstirfccsdiffflowe2.h"
+#include "qffitfunctionstirfcsdiffflowe2.h"
 #include "qffitfunctionstirffccsfw2csep2ddiffxy2colorccf.h"
 #include "qffitfunctionstirffccsfw2csep2ddiffxy2coloracfg.h"
 #include "qffitfunctionstirffccsfw2csep2ddiffxy2coloracfr.h"
@@ -42,7 +45,10 @@ QStringList QFPFitFunctionsTIRFCS::getIDs() const {
      res<<"fcs_tir_adiffe2";
      res<<"fcs_tir_diffe2_diffbright";
      res<<"fcs_tir_adiff3de2";
+     res<<"fcs_tir_diff3de2";
+     res<<"fcs_tir_diff3de2_diffbright";
      res<<"fccs_tir_diff_flowe2";
+     res<<"fcs_tir_diff_flowe2";
      res<<"fccs_tir_fw_2csep2ddiffxy2coloracfg";
      res<<"fccs_tir_fw_2csep2ddiffxy2coloracfr";
      res<<"fccs_tir_fw_2csep2ddiffxy2colorccf";
@@ -62,10 +68,16 @@ QFFitFunction* QFPFitFunctionsTIRFCS::get(const QString &id) const  {
         return new QFFitFunctionsTIRFCSADiffE2();
     } else if (id=="fcs_tir_adiff3de2") {
         return new QFFitFunctionsTIRFCSADiff3DE2();
+    } else if (id=="fcs_tir_diff3de2") {
+        return new QFFitFunctionsTIRFCSDiff3DE2();
+    } else if (id=="fcs_tir_diff3de2_diffbright") {
+        return new QFFitFunctionsTIRFCSDiffE2Diff3Dbright();
     } else if (id=="fcs_tir_diffe2_diffbright") {
         return new QFFitFunctionsTIRFCSDiffE2Diffbright();
     } else if (id=="fccs_tir_diff_flowe2") {
         return new QFFitFunctionsTIRFCCSDiffFlowE2();
+    } else if (id=="fcs_tir_diff_flowe2") {
+        return new QFFitFunctionsTIRFCSDiffFlowE2();
     } else if (id=="fccs_tir_fw_2csep2ddiffxy2coloracfg") {
         return new QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorACFG();
     } else if (id=="fccs_tir_fw_2csep2ddiffxy2coloracfr") {

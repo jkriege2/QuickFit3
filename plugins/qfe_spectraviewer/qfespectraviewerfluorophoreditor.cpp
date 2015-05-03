@@ -33,6 +33,7 @@ QFESpectraViewerFluorophoreEditor::QFESpectraViewerFluorophoreEditor(QWidget *pa
     ui(new Ui::QFESpectraVieweFluorophoreEditor)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
     QFCompleterFromFile* c=NULL;
     ui->edtDescription->setCompleter(c=new QFCompleterFromFile);

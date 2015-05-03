@@ -189,22 +189,22 @@ double QFFCSMSDEvaluationItem::getTheoryPre(int i, QFRawDataRecord* record, int 
     return getFitValue(record, run, getCurrentModel(), getTheoryPreName(i, record, run));
 }
 
-QString QFFCSMSDEvaluationItem::getTheoryAlphaName(int i, QFRawDataRecord* record, int run) const
+QString QFFCSMSDEvaluationItem::getTheoryAlphaName(int i, QFRawDataRecord* /*record*/, int /*run*/) const
 {
     return QString("msd_theory%1_alpha").arg(i);
 }
 
-QString QFFCSMSDEvaluationItem::getTheoryDName(int i, QFRawDataRecord* record, int run) const
+QString QFFCSMSDEvaluationItem::getTheoryDName(int i, QFRawDataRecord* /*record*/, int /*run*/) const
 {
     return QString("msd_theory%1_d").arg(i);
 }
 
-QString QFFCSMSDEvaluationItem::getTheoryPreName(int i, QFRawDataRecord* record, int run) const
+QString QFFCSMSDEvaluationItem::getTheoryPreName(int i, QFRawDataRecord* /*record*/, int /*run*/) const
 {
     return QString("msd_theory%1_pre").arg(i);
 }
 
-QString QFFCSMSDEvaluationItem::getTheoryIntersectName(int i, QFRawDataRecord *record, int run) const
+QString QFFCSMSDEvaluationItem::getTheoryIntersectName(int i, QFRawDataRecord */*record*/, int /*run*/) const
 {
     return QString("msd_theory%1_%2_intersect").arg(i).arg(i+1);
 }
@@ -242,7 +242,7 @@ double QFFCSMSDEvaluationItem::getTheoryIntersect(int i, QFRawDataRecord *record
 
 
 
-QVector<double> QFFCSMSDEvaluationItem::getMSD(QFRawDataRecord *record, int index, int model) const {
+QVector<double> QFFCSMSDEvaluationItem::getMSD(QFRawDataRecord *record, int index, int /*model*/) const {
     QVector<double> res;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
@@ -251,7 +251,7 @@ QVector<double> QFFCSMSDEvaluationItem::getMSD(QFRawDataRecord *record, int inde
     return res;
 }
 
-QVector<double> QFFCSMSDEvaluationItem::getMSDTaus(QFRawDataRecord *record, int index, int model) const {
+QVector<double> QFFCSMSDEvaluationItem::getMSDTaus(QFRawDataRecord *record, int index, int /*model*/) const {
     QVector<double> res;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
@@ -482,6 +482,7 @@ QFFitStatistics QFFCSMSDEvaluationItem::calcFitStatistics(QFRawDataRecord *recor
 
             }
         }
+        qfFree(weights);
 
         if (freeModelVals) qfFree(modelVals);
 
@@ -706,7 +707,7 @@ QString QFFCSMSDEvaluationItem::getModelName(int model) const {
 }
 
 
-bool QFFCSMSDEvaluationItem::getParameterDefault(const QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
+bool QFFCSMSDEvaluationItem::getParameterDefault(const QFRawDataRecord */*r*/, const QString &/*resultID*/, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
 
     for (int i=0; i<MSDTHEORYCOUNT; i++) {
         if (parameterID==QString("msd_theory%1_en").arg(i)) {
@@ -894,7 +895,7 @@ struct msd_diff3d_params {
 };
 
 
-void lmfit_msd_diff3d(const double *par, int m_dat, const void *data, double *fvec, int *info) {
+void lmfit_msd_diff3d(const double *par, int /*m_dat*/, const void *data, double *fvec, int */*info*/) {
     msd_diff3d_params* p=(msd_diff3d_params*)data;
 
 
@@ -918,7 +919,7 @@ struct msd_diff3dspim_params {
     double a;
     double gmeasured;
 };
-void lmfit_msd_SPIMdiff3dall(const double *par, int m_dat, const void *data, double *fvec, int *info) {
+void lmfit_msd_SPIMdiff3dall(const double *par, int /*m_dat*/, const void *data, double *fvec, int */*info*/) {
     msd_diff3dspim_params* p=(msd_diff3dspim_params*)data;
 
 
@@ -940,7 +941,7 @@ void lmfit_msd_SPIMdiff3dall(const double *par, int m_dat, const void *data, dou
     *fvec = pre*qfSqr(sqfourdtw/(sqpi*a)*(exp(-qfSqr(a/sqfourdtw))-1.0)+erf(a/sqfourdtw))/sqrt(1.0+fourdt/qfSqr(wz))-gmeasured;
 }
 
-void lmfit_msd_TIRdiff3dall(const double *par, int m_dat, const void *data, double *fvec, int *info) {
+void lmfit_msd_TIRdiff3dall(const double *par, int /*m_dat*/, const void *data, double *fvec, int */*info*/) {
     msd_diff3dspim_params* p=(msd_diff3dspim_params*)data;
 
 
@@ -975,7 +976,7 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
 
     /* IMPLEMENT THIS
 
-      Ergebnisse k�nnen einfach mit einer der setFitResult... Methoden gespeichert werden:
+      Ergebnisse koennen einfach mit einer der setFitResult... Methoden gespeichert werden:
 
         //                                          PARAMETERNAME           WERT
         setFitResultValueBool(record, index, model, "evaluation_completed", true);
@@ -1266,6 +1267,7 @@ QString QFFCSMSDEvaluationItem::getParameterName(int model, int id, bool html) c
 
 
 QString QFFCSMSDEvaluationItem::getParameterUnit(int model, int id, bool html) const {
+
     switch (model) {
         case 0:
             if (id==0) return QString("");
@@ -1280,14 +1282,14 @@ QString QFFCSMSDEvaluationItem::getParameterUnit(int model, int id, bool html) c
             if (id==0) return QString("");
             if (id==1) return tr("nm");
             if (id==2) return QString("");
-            if (id==3) return tr("&mu;s");
+            if (id==3) return (html)?tr("&mu;s"):tr("us");
             break;
         case 3:
             if (id==0) return QString("");
             if (id==1) return tr("nm");
             if (id==2) return QString("");
             if (id==3) return QString("");
-            if (id==4) return tr("&mu;s");
+            if (id==4) return (html)?tr("&mu;s"):tr("us");
             break;
         case 4:
             if (id==0) return QString("");
@@ -1305,9 +1307,9 @@ QString QFFCSMSDEvaluationItem::getParameterUnit(int model, int id, bool html) c
             if (id==1) return tr("nm");
             if (id==2) return QString("");
             if (id==3) return QString("");
-            if (id==4) return tr("&mu;s");
+            if (id==4) return (html)?tr("&mu;s"):tr("us");
             if (id==5) return QString("");
-            if (id==6) return tr("&mu;s");
+            if (id==6) return (html)?tr("&mu;s"):tr("us");
             break;
     }
     return QString();
@@ -1380,6 +1382,6 @@ QString QFFCSMSDEvaluationItem::getParameterID(int model, int id) const {
     return QString("m%1_p%2").arg(model).arg(id);
 }
 
-int QFFCSMSDEvaluationItem::getModelCount(QFRawDataRecord *r, int index) const {
+int QFFCSMSDEvaluationItem::getModelCount(QFRawDataRecord */*r*/, int /*index*/) const {
     return 7;
 }

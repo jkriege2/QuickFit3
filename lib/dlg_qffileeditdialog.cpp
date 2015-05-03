@@ -41,6 +41,7 @@ QFFileEditDialog::QFFileEditDialog(QWidget *parent) :
 
     ui->edtDescription->setCompleter(c2);
     //ui->edtType->setCompleter(c1);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFFileEditDialog::~QFFileEditDialog()

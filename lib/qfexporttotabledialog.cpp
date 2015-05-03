@@ -39,6 +39,7 @@ QFExportToTableDialog::QFExportToTableDialog(QWidget *parent) :
     if (idx) ui->cmbRDR->setCurrentRDRID(idx);
     ui->chkShowTableEditor->setChecked(QFPluginServices::getInstance()->getCurrentProject()->getProperty("QFExportToTableDialog/showEditor", false).toBool());
     ui->labDescription->setVisible(false);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFExportToTableDialog::~QFExportToTableDialog()

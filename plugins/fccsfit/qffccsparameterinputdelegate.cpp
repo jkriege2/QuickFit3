@@ -86,7 +86,7 @@ QSize QFFCCSParameterInputDelegate::sizeHint(const QStyleOptionViewItem &option,
 }
 
 
-QWidget *QFFCCSParameterInputDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget *QFFCCSParameterInputDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/, const QModelIndex &index) const
 {
     //QFAutoOutputTimer ta(QString("QFFCCSParameterInputDelegate::createEditor(%1, %2)").arg(index.row()).arg(index.column()));
     QElapsedTimer t;
@@ -389,7 +389,7 @@ void QFFCCSParameterInputDelegate::setModelData(QWidget *editor, QAbstractItemMo
     QFHTMLDelegate::setModelData(editor, model, index);
 }
 
-void QFFCCSParameterInputDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void QFFCCSParameterInputDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &/*index*/) const
 {
     //QFAutoOutputTimer ta(QString("QFFCCSParameterInputDelegate::updateEditorGeometry(%1, %2)").arg(index.row()).arg(index.column()));
     QPoint offset(0,0);

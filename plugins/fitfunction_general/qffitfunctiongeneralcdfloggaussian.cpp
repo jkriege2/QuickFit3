@@ -39,12 +39,12 @@ double QFFitFunctionGeneralCDFLogGaussian::evaluate(double t, const double* data
     return 0.5*(1.0+erf((log(t)-log(position))/sqrt(2.0*qfSqr(width))));
 }
 
-void QFFitFunctionGeneralCDFLogGaussian::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralCDFLogGaussian::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
     for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
 
 }
 
-void QFFitFunctionGeneralCDFLogGaussian::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralCDFLogGaussian::calcParameter(double* /*data*/, double* /*error*/) const {
 }
 
 bool QFFitFunctionGeneralCDFLogGaussian::isParameterVisible(int parameter, const double* data) const {
@@ -77,5 +77,10 @@ bool QFFitFunctionGeneralCDFLogGaussian::get_implementsDerivatives()
 
 bool QFFitFunctionGeneralCDFLogGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
 {
+    Q_UNUSED(dataX);
+    Q_UNUSED(params);
+    Q_UNUSED(dataY);
+    Q_UNUSED(N);
+    Q_UNUSED(fix);
     return false;
 }

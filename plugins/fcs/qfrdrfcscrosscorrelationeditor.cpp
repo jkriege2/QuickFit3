@@ -70,22 +70,22 @@ QVariant QFRDRFCSCrossCorrelationEditorRunsModel::data(const QModelIndex &index,
     return QVariant();
 }
 
-Qt::ItemFlags QFRDRFCSCrossCorrelationEditorRunsModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QFRDRFCSCrossCorrelationEditorRunsModel::flags(const QModelIndex &/*index*/) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-QVariant QFRDRFCSCrossCorrelationEditorRunsModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QFRDRFCSCrossCorrelationEditorRunsModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const {
     return QVariant();
 }
 
-int QFRDRFCSCrossCorrelationEditorRunsModel::rowCount(const QModelIndex &parent) const {
+int QFRDRFCSCrossCorrelationEditorRunsModel::rowCount(const QModelIndex &/*parent*/) const {
     if (!current) return 0;
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
     if (m) return 1+m->getCorrelationRuns();
     return 1;
 }
 
-int QFRDRFCSCrossCorrelationEditorRunsModel::columnCount(const QModelIndex &parent) const {
+int QFRDRFCSCrossCorrelationEditorRunsModel::columnCount(const QModelIndex &/*parent*/) const {
     return 1;
 }
 
@@ -499,15 +499,15 @@ void QFRDRFCSCrossCorrelationEditor::connectWidgets(QFRawDataRecord* current, QF
 
 }
 
-void QFRDRFCSCrossCorrelationEditor::selectionChanged(const QModelIndex & current, const QModelIndex & previous ) {
+void QFRDRFCSCrossCorrelationEditor::selectionChanged(const QModelIndex & /*current*/, const QModelIndex & /*previous*/ ) {
     replotData();
 }
 
-void QFRDRFCSCrossCorrelationEditor::selectionChanged(const QItemSelection & current, const QItemSelection & previous ) {
+void QFRDRFCSCrossCorrelationEditor::selectionChanged(const QItemSelection & /*current*/, const QItemSelection & /*previous*/ ) {
     replotData();
 }
 
-void QFRDRFCSCrossCorrelationEditor::runsModeChanged(int c) {
+void QFRDRFCSCrossCorrelationEditor::runsModeChanged(int/* c*/) {
     if (cmbRunDisplay->currentIndex()==0) lstRunsSelect->setEnabled(false);
     else lstRunsSelect->setEnabled(true);
     replotData();
@@ -526,7 +526,7 @@ void QFRDRFCSCrossCorrelationEditor::rawDataChangedRecalc()
      runs->setCurrent(current);
 }
 
-void QFRDRFCSCrossCorrelationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
+void QFRDRFCSCrossCorrelationEditor::slidersChanged(int userMin, int userMax, int /*min*/, int /*max*/) {
     if (!current) return;
     current->setQFProperty("fcscorreditor_datacut_min", userMin, false, false);
     current->setQFProperty("fcscorreditor_datacut_max", userMax, false, false);
@@ -554,7 +554,7 @@ void QFRDRFCSCrossCorrelationEditor::correctOffset()
 
 
 
-void QFRDRFCSCrossCorrelationEditor::replotData(int dummy) {
+void QFRDRFCSCrossCorrelationEditor::replotData(int /*dummy*/) {
     //std::cout<<"repainting ...";
     //writeSettings();
     JKQTPdatastore* ds=plotter->getDatastore();

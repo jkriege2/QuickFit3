@@ -4487,49 +4487,69 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
 
 void QFRDRImagingFCSImageEditor::fillParameterComboBox(QComboBox* cmbParameter, QFRDRImagingFCSData* m, const QString& egroup, const QStringList& param1Default, const QString& otherParameter, const QString &indexPropertyName, const QString &parameterDefault, int idxDefault) {
     cmbParameter->setEnabled(true);
-    QList<QPair<QString, QString> > params=m->resultsCalcNamesAndLabels("", "fit results", egroup);
-    QList<QPair<QString, QString> > params1=m->resultsCalcNamesAndLabels("", "results", egroup);
-    QList<QPair<QString, QString> > params2=m->resultsCalcNamesAndLabels("", "evaluation results", egroup);
+    QList<QPair<QString, QString> > params=m->resultsCalcNamesAndLabels("", tr("fit results"), egroup);
+    QList<QPair<QString, QString> > params1=m->resultsCalcNamesAndLabels("", tr("results"), egroup);
+    QList<QPair<QString, QString> > params2=m->resultsCalcNamesAndLabels("", tr("evaluation results"), egroup);
     QList<QPair<QString, QString> > paramsAll=m->resultsCalcNamesAndLabels("", "", egroup);
     params.append(params1);
     params.append(params2);
     cmbParameter->clear();
     QSet<QString> usedresults;
     for (int i=0; i<params.size(); i++) {
-        if (!params[i].second.endsWith("_fix")) {
+        if (!params[i].second.contains("_fix") && !params[i].second.contains("_islocal")) {
             cmbParameter->addItem(params[i].first, params[i].second);
             usedresults.insert(params[i].second);
             //qDebug()<<params[i].second;
         }
     }
+    QList<QPair<QString, QString> > paramsfp=m->resultsCalcNamesAndLabels("", tr("fit properties"), egroup);
+    for (int i=0; i<paramsfp.size(); i++) {
+        if (!paramsfp[i].second.contains("_fix") && !paramsfp[i].second.contains("_islocal")) {
+            cmbParameter->addItem(paramsfp[i].first, paramsfp[i].second);
+            usedresults.insert(paramsfp[i].second);
+        }
+    }
+    QList<QPair<QString, QString> > paramsst=m->resultsCalcNamesAndLabels("", tr("fit statistics"), egroup);
+    for (int i=0; i<paramsst.size(); i++) {
+        if (!paramsst[i].second.contains("_fix") && !paramsst[i].second.contains("_islocal")) {
+            cmbParameter->addItem(paramsst[i].first, paramsst[i].second);
+            usedresults.insert(paramsst[i].second);
+        }
+    }
+
+    for (int i=0; i<paramsAll.size(); i++) {
+        if (!usedresults.contains(paramsAll[i].second) && !paramsAll[i].second.contains("_fix") && !paramsAll[i].second.contains("_islocal")) {
+            cmbParameter->addItem(paramsAll[i].first, paramsAll[i].second);
+            usedresults.insert(paramsAll[i].second);
+        }
+    }
+
+
     for (int i=0; i<params.size(); i++) {
-        if (params[i].second.endsWith("_fix")) {
+        if (params[i].second.contains("_fix")||  params[i].second.contains("_islocal")) {
             cmbParameter->addItem(params[i].first, params[i].second);
             usedresults.insert(params[i].second);
         }
     }
 
-    params=m->resultsCalcNamesAndLabels("", "fit properties", egroup);
-    for (int i=0; i<params.size(); i++) {
-        if (!params[i].second.endsWith("_fix")) {
-            cmbParameter->addItem(params[i].first, params[i].second);
-            usedresults.insert(params[i].second);
+
+    for (int i=0; i<paramsfp.size(); i++) {
+        if (paramsfp[i].second.contains("_fix") ||  paramsfp[i].second.contains("_islocal")) {
+            cmbParameter->addItem(paramsfp[i].first, paramsfp[i].second);
+            usedresults.insert(paramsfp[i].second);
         }
     }
-    for (int i=0; i<params.size(); i++) {
-        if (params[i].second.endsWith("_fix")) {
-            cmbParameter->addItem(params[i].first, params[i].second);
-            usedresults.insert(params[i].second);
+
+    for (int i=0; i<paramsst.size(); i++) {
+        if (paramsst[i].second.contains("_fix")||  paramsst[i].second.contains("_islocal")) {
+            cmbParameter->addItem(paramsst[i].first, paramsst[i].second);
+            usedresults.insert(paramsst[i].second);
         }
     }
+
+
     for (int i=0; i<paramsAll.size(); i++) {
-        if (!usedresults.contains(paramsAll[i].second) && !paramsAll[i].second.endsWith("_fix")) {
-            cmbParameter->addItem(paramsAll[i].first, paramsAll[i].second);
-            usedresults.insert(paramsAll[i].second);
-        }
-    }
-    for (int i=0; i<paramsAll.size(); i++) {
-        if (!usedresults.contains(paramsAll[i].second) && paramsAll[i].second.endsWith("_fix")) {
+        if (!usedresults.contains(paramsAll[i].second) && (paramsAll[i].second.contains("_fix")|| paramsAll[i].second.contains("_islocal"))) {
             cmbParameter->addItem(paramsAll[i].first, paramsAll[i].second);
             usedresults.insert(paramsAll[i].second);
         }

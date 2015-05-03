@@ -48,12 +48,12 @@ double QFFitFunctionGeneral2GaussianVar::evaluate(double t, const double* data) 
                              +data[PARAM_AMPLITUDE2]*exp(-0.5*qfSqr(t-data[PARAM_POSITION2])/qfSqr(data[PARAM_WIDTH2]));
 }
 
-void QFFitFunctionGeneral2GaussianVar::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneral2GaussianVar::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
     for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
 
 }
 
-void QFFitFunctionGeneral2GaussianVar::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneral2GaussianVar::calcParameter(double* /*data*/, double* /*error*/) const {
 }
 
 bool QFFitFunctionGeneral2GaussianVar::isParameterVisible(int parameter, const double* data) const {
@@ -64,7 +64,7 @@ bool QFFitFunctionGeneral2GaussianVar::isParameterVisible(int parameter, const d
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneral2GaussianVar::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneral2GaussianVar::getAdditionalPlotCount(const double* /*params*/) {
     return 2;
     // we have one additional plot
 }
@@ -85,7 +85,7 @@ bool QFFitFunctionGeneral2GaussianVar::get_implementsDerivatives()
     return false;
 }
 
-bool QFFitFunctionGeneral2GaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneral2GaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     if (params && dataX && dataY) {
         double pW=0;

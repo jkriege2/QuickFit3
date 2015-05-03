@@ -415,6 +415,6 @@ unsigned int QFFitFunctionFCCSNormalDiff3DFlow2Focus::getAdditionalPlotCount(con
     return 0;
 }
 
-QString QFFitFunctionFCCSNormalDiff3DFlow2Focus::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCCSNormalDiff3DFlow2Focus::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
     return QString();
 }

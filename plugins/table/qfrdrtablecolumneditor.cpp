@@ -29,7 +29,7 @@
 #include "qfenhancedlineedit.h"
 #include "qfrdrtable.h"
 
-qfmpResult QFRDRTableColumnEditor_dummy(const qfmpResult* params, unsigned int n, QFMathParser* p) {
+qfmpResult QFRDRTableColumnEditor_dummy(const qfmpResult* /*params*/, unsigned int /*n*/, QFMathParser* /*p*/) {
     qfmpResult res;
 
     return res;
@@ -96,6 +96,7 @@ QFRDRTableColumnEditor::QFRDRTableColumnEditor(QFRDRTable *table, QFTablePluginM
     }
 
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
 }
 
@@ -154,7 +155,7 @@ QString QFRDRTableColumnEditor::getColumnTitle() const
     return ui->edtTitle->text();
 }
 
-void QFRDRTableColumnEditor::on_edtFormula_textChanged(QString text) {
+void QFRDRTableColumnEditor::on_edtFormula_textChanged(QString /*text*/) {
     on_edtFormula_textChanged();
 }
 

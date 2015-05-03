@@ -274,7 +274,7 @@ void QFRDRPlotEditor::updatePlotName(int plot, QString title) {
     if (plot>=0 && plot<tabPlots->count()) tabPlots->setTabText(plot, title);
 }
 
-void QFRDRPlotEditor::sendEditorCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
+void QFRDRPlotEditor::sendEditorCommand(const QString &command, const QVariant &param1, const QVariant &/*param2*/, const QVariant &/*param3*/, const QVariant &/*param4*/, const QVariant &/*param5*/)
 {
     QString c=command.toLower().trimmed();
     if (command=="showplot") {

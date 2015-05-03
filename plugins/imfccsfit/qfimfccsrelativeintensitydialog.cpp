@@ -136,7 +136,7 @@ void QFImFCCSRelativeIntensityDialog::updateProject()
     }
 }
 
-void QFImFCCSRelativeIntensityDialog::cmbCCF_currentIndexChanged(int index)
+void QFImFCCSRelativeIntensityDialog::cmbCCF_currentIndexChanged(int /*index*/)
 {
     replotImages();
 }

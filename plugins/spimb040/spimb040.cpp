@@ -125,7 +125,7 @@ void QFESPIMB040::updateFromConfig()
     }
 }
 
-void QFESPIMB040::projectChanged(QFProject* oldProject, QFProject* project) {
+void QFESPIMB040::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
 }
 
 void QFESPIMB040::initExtension() {

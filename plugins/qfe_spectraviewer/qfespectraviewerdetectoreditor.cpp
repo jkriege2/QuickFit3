@@ -67,6 +67,7 @@ QFESpectraViewerDetectorEditor::QFESpectraViewerDetectorEditor(QWidget *parent) 
     manager=NULL;
     oldspectrum=-1;
     spectrumchanged=false;
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFESpectraViewerDetectorEditor::~QFESpectraViewerDetectorEditor()

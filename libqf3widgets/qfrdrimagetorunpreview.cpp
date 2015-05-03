@@ -423,7 +423,7 @@ void QFRDRImageToRunPreview::replotOverview()
     QApplication::restoreOverrideCursor();
 }
 
-void QFRDRImageToRunPreview::previewClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button)
+void QFRDRImageToRunPreview::previewClicked(double x, double y, Qt::KeyboardModifiers /*modifiers*/, Qt::MouseButton button)
 {
     if (button==Qt::LeftButton) {
         QFRDRRunSelectionsInterface* rintf=dynamic_cast<QFRDRRunSelectionsInterface*>(record);

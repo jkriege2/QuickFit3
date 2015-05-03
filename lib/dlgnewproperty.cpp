@@ -30,6 +30,7 @@ dlgNewProperty::dlgNewProperty(QWidget* parent):
 
     ui->cmbName->setFocus(Qt::MouseFocusReason);
     ui->cmbName->lineEdit()->selectAll();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 dlgNewProperty::~dlgNewProperty()

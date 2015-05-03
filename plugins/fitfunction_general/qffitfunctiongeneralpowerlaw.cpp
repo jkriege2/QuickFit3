@@ -42,9 +42,6 @@ double QFFitFunctionGeneralPowerLaw::evaluate(double t, const double* data) cons
 }
 
 
-void QFFitFunctionGeneralPowerLaw::calcParameter(double* data, double* error) const {
-
-}
 
 bool QFFitFunctionGeneralPowerLaw::isParameterVisible(int parameter, const double* data) const {
 
@@ -71,12 +68,3 @@ bool QFFitFunctionGeneralPowerLaw::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralPowerLaw::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
-
-bool QFFitFunctionGeneralPowerLaw::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
-{
-    //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
-
-    return QFFitFunction::estimateInitial(params, dataX, dataY, N);
-}

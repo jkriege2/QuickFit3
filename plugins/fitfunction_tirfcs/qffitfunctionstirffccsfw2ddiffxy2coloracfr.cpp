@@ -244,5 +244,5 @@ QString QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorACFR::transformParametersForAdditi
     return "";
 }
 
-void QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorACFR::sortParameter(double *parameterValues, double *error, bool *fix) const {
+void QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorACFR::sortParameter(double */*parameterValues*/, double */*error*/, bool */*fix*/) const {
 }

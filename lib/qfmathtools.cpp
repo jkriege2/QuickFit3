@@ -23,6 +23,8 @@
 #include <float.h>
 #include <QDebug>
 #include "qftools.h"
+#include <complex>
+#include "Faddeeva.hh"
 
 double qfTanc( double x ) {
     if (x==0) return 1;
@@ -64,7 +66,11 @@ double qfSinc( double x )
 }
 
 
-
+double qfFaddeevaRealW(double xi) {
+    std::complex<double> d(0,xi);
+    std::complex<double> w=Faddeeva::w(d);
+    return w.real();
+}
 
 template <class T>
 double qf_statisticsAverage(const T* data, long long N) {

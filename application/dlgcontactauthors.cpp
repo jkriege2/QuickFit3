@@ -37,6 +37,7 @@ DlgContactAuthors::DlgContactAuthors(QWidget *parent, bool contactMailinglist) :
     ui->edtEMail->setText(ProgramOptions::getConfigValue("DlgContactAuthors/email", "").toString());
     ui->edtName->setText(ProgramOptions::getConfigValue("DlgContactAuthors/name", "").toString());
     on_cmbSendTo_currentIndexChanged(ui->cmbSendTo->currentIndex());
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 DlgContactAuthors::~DlgContactAuthors()

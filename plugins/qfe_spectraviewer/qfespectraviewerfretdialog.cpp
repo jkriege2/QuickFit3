@@ -33,6 +33,7 @@ QFESpectraViewerFRETDialog::QFESpectraViewerFRETDialog(QWidget *parent) :
     ui->tableView->setModel(&model);
     ui->spinKappa2->setValue(ProgramOptions::getConfigValue("QFESpectraViewerFRETDialog/kappa2", 2.0/3.0).toDouble());
     ui->spinN->setValue(ProgramOptions::getConfigValue("QFESpectraViewerFRETDialog/n", 1.333).toDouble());
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFESpectraViewerFRETDialog::~QFESpectraViewerFRETDialog()

@@ -30,6 +30,7 @@ dlgQFFitAlgorithmProgressDialog::dlgQFFitAlgorithmProgressDialog(QWidget* parent
     m_canceled=false;
     m_display=false;
     m_displayDelay=500;
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 dlgQFFitAlgorithmProgressDialog::~dlgQFFitAlgorithmProgressDialog()

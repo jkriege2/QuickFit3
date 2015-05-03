@@ -39,12 +39,12 @@ double QFFitFunctionGeneralCDFGaussianDistVar::evaluate(double t, const double* 
     return 0.5*(1.0+erf((t-position)/sqrt(2.0*qfSqr(width))));
 }
 
-void QFFitFunctionGeneralCDFGaussianDistVar::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralCDFGaussianDistVar::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
     for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
 
 }
 
-void QFFitFunctionGeneralCDFGaussianDistVar::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralCDFGaussianDistVar::calcParameter(double* /*data*/, double* /*error*/) const {
 }
 
 bool QFFitFunctionGeneralCDFGaussianDistVar::isParameterVisible(int parameter, const double* data) const {
@@ -75,7 +75,7 @@ bool QFFitFunctionGeneralCDFGaussianDistVar::get_implementsDerivatives()
     return false;
 }
 
-bool QFFitFunctionGeneralCDFGaussianDistVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralCDFGaussianDistVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

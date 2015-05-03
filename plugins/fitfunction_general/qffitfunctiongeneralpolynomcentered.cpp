@@ -67,7 +67,7 @@ double QFFitFunctionGeneralPolynomCentered::evaluate(double t, const double* dat
 }
 
 
-void QFFitFunctionGeneralPolynomCentered::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralPolynomCentered::calcParameter(double* /*data*/, double* /*error*/) const {
 
 }
 
@@ -110,10 +110,10 @@ bool QFFitFunctionGeneralPolynomCentered::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralPolynomCentered::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralPolynomCentered::evaluateDerivatives(double* /*derivatives*/, double/* t*/, const double* /*data*/) const {
 }
 
-bool QFFitFunctionGeneralPolynomCentered::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionGeneralPolynomCentered::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

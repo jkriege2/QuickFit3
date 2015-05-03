@@ -183,11 +183,11 @@ void QFFitFunctionFCSRot::calcParameter(double* data, double* error) const {
 
 }
 
-bool QFFitFunctionFCSRot::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionFCSRot::isParameterVisible(int /*parameter*/, const double* /*data*/) const {
     return true;
 }
 
-unsigned int QFFitFunctionFCSRot::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSRot::getAdditionalPlotCount(const double* /*params*/) {
     return 2;
 }
 

@@ -40,6 +40,7 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, 
     this->sourceGraph=sourceGraph;
     parameterTable=new QFFitFunctionValueInputTable(this);
     intInit(table,  colX,  colY,  colW, parent,  logX,  logY,  resultColumn,  addGraph);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int plotid, int graphid, QWidget *parent):
@@ -56,10 +57,12 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int plotid
     this->sourceGraph=-1;
     //qDebug()<<"QFRDRTableCurveFitDialog("<<plotid<<graphid<<"): "<<overwriteGraph;
     intInit(table,  colX,  colY,  colW, parent,  ui->chkLogX->isChecked(),  ui->chkLogY->isChecked(),  resultColumn,  addGraph, true);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, bool propsAlreadySet)
 {
+    setParent(parent);
     ui->btnHelpAlgorithm->setDefaultAction(ui->cmbFitAlgorithm->getHelpAction());
     ui->btnHelpModel->setDefaultAction(ui->cmbFitFunction->getHelpAction());
     ui->btnModelSelect->setDefaultAction(ui->cmbFitFunction->getSelectAction());
@@ -762,7 +765,7 @@ void QFRDRTableCurveFitDialog::showHelp()
 }
 
 
-void QFRDRTableCurveFitDialog::methodChanged(int method)
+void QFRDRTableCurveFitDialog::methodChanged(int /*method*/)
 {
     parameterTable->setDoRebuildModel(false);
     parameterTable->setEditErrors(true);

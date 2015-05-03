@@ -47,6 +47,7 @@ QFImFCCSFitChi2LandscapeDialog::QFImFCCSFitChi2LandscapeDialog(QFImFCCSFitEvalua
     updateInputs();
     ui->cmbParameterX->setCurrentIndex(0);
     ui->cmbParameterY->setCurrentIndex(1);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFImFCCSFitChi2LandscapeDialog::~QFImFCCSFitChi2LandscapeDialog()

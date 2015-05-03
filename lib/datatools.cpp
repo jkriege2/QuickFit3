@@ -714,7 +714,7 @@ QList<QVector<double> > dataExpandToDouble(const QList<QList<QVariant> >& data, 
 }
 
 
-QList<QVector<double> > dataToDouble(const QList<QList<QVariant> >& data, QStringList* columnsNames) {
+QList<QVector<double> > dataToDouble(const QList<QList<QVariant> >& data, QStringList* /*columnsNames*/) {
     QList<QVector<double> > res;
     QList<QList<QVariant> > in=data;
     for (int i=0; i<in.size(); i++) {

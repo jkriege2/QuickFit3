@@ -122,6 +122,7 @@ QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     ui->pltIntensity->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     ui->pltImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     ui->pltImageRaw->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
 }
 
@@ -486,7 +487,7 @@ void QFRDRImagingFCSDataExplorer::on_btnPlay_clicked() {
     nextPlayFrame();
 }
 
-void QFRDRImagingFCSDataExplorer::on_chkDisplaySD_toggled(bool checked) {
+void QFRDRImagingFCSDataExplorer::on_chkDisplaySD_toggled(bool /*checked*/) {
     if (ui->chkDisplaySD->isChecked()) {
         avgGraph->set_yErrorStyle(JKQTPerrorLines);
     } else {

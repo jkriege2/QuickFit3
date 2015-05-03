@@ -36,6 +36,7 @@ OptionsDialog::OptionsDialog(QWidget* parent):
     edtUserSettings->addButton(btn);
     btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtGlobalSettings, edtGlobalSettings);
     edtGlobalSettings->addButton(btn);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 OptionsDialog::~OptionsDialog()
@@ -57,7 +58,7 @@ void OptionsDialog::on_cmbStylesheet_currentIndexChanged( const QString & text )
     this->setStyleSheet(qss);
 }
 
-void OptionsDialog::on_cmbStylesheet_highlighted( const QString & text ) {
+void OptionsDialog::on_cmbStylesheet_highlighted( const QString & /*text*/ ) {
     //on_cmbStylesheet_currentIndexChanged(text);
 }
 

@@ -53,6 +53,7 @@ QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent, 
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, iniName+"/geo/");
     updateDualView();
     updateEnabledWidgets();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFRDRImagingFCSMaskByIntensity::~QFRDRImagingFCSMaskByIntensity() {
@@ -238,17 +239,17 @@ void QFRDRImagingFCSMaskByIntensity::updateEnabledWidgets()
 
 }
 
-void QFRDRImagingFCSMaskByIntensity::on_edtImgRangeMin_valueChanged(double val)
+void QFRDRImagingFCSMaskByIntensity::on_edtImgRangeMin_valueChanged(double /*val*/)
 {
     updateImage();
 }
 
-void QFRDRImagingFCSMaskByIntensity::on_edtImgRangeMax_valueChanged(double val)
+void QFRDRImagingFCSMaskByIntensity::on_edtImgRangeMax_valueChanged(double /*val*/)
 {
     updateImage();
 }
 
-void QFRDRImagingFCSMaskByIntensity::on_chkColorScaling_toggled(bool checked)
+void QFRDRImagingFCSMaskByIntensity::on_chkColorScaling_toggled(bool /*checked*/)
 {
     updateImage();
 }

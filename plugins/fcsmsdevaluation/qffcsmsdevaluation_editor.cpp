@@ -75,7 +75,7 @@ QFFCSMSDEvaluationEditor::~QFFCSMSDEvaluationEditor()
 {
 }
 
-void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plotdata, int option, const QString &optionName)
+void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plotdata, int option, const QString &/*optionName*/)
 {
     if (!current) return;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
@@ -118,7 +118,8 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
             QVector<double> acf;
             if (corrdata) acf=arrayToVector(corrdata, N);
 
-            double* weights=eval->allocWeights(NULL, record, index, datacut_min, datacut_max);
+            bool weightsOK=false;
+            double* weights=eval->allocWeights(&weightsOK, record, index, datacut_min, datacut_max, true);
 
 
             /////////////////////////////////////////////////////////////////////////////////
@@ -156,14 +157,14 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                 QFGetPlotdataInterface::GetPlotDataItem item;
                 item.x=acftau;
                 item.y=acf;
-                item.yerrors=arrayToVector(weights, N);
+                if (weightsOK && weights) item.yerrors=arrayToVector(weights, N);
                 item.name=QString("\\verb{%1: ACF}").arg(record->getName());
                 plotdata.append(item);
             } else if (option==2) {
                 QFGetPlotdataInterface::GetPlotDataItem item;
                 item.x=acftau;
                 item.y=acf;
-                item.yerrors=arrayToVector(weights, N);
+                if (weightsOK && weights) item.yerrors=arrayToVector(weights, N);
                 for (int i=0; i<item.y.size(); i++) {
                     item.y[i]=item.y[i]*N_particle;
                 }
@@ -705,7 +706,7 @@ void QFFCSMSDEvaluationEditor::setMSDMax(int MSDMax) {
 }
 
 
-void QFFCSMSDEvaluationEditor::slidersDistChanged(int userMin, int userMax, int min, int max) {
+void QFFCSMSDEvaluationEditor::slidersDistChanged(int userMin, int userMax, int /*min*/, int /*max*/) {
     if (!dataEventsEnabled) return;
     QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
     if (!data) return;
@@ -824,7 +825,7 @@ void QFFCSMSDEvaluationEditor::writeSettings() {
     settings->getQSettings()->setValue("fcsmsdevaleditor/showkeydistresults", chkShowKeyDistResults->isChecked());
 }
 
-void QFFCSMSDEvaluationEditor::plotDistMouseMoved(double x, double y)
+void QFFCSMSDEvaluationEditor::plotDistMouseMoved(double x, double /*y*/)
 {
     ovlDistRange->set_visible(false);
     ovlModel->set_visible(false);
@@ -1230,7 +1231,7 @@ void QFFCSMSDEvaluationEditor::updateFitFunctions() {
                     }
                 }
 
-                double* weights=eval->allocWeights(NULL, record, index, datacut_min, datacut_max);
+                //double* weights=eval->allocWeights(NULL, record, index, datacut_min, datacut_max);
 
                 int rangeMaxDatarange=getUserMax(record, index);
                 int rangeMinDatarange=getUserMin(record, index);
@@ -1426,7 +1427,7 @@ void QFFCSMSDEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // clean memory
                 /////////////////////////////////////////////////////////////////////////////////
-                qfFree(weights);
+                //qfFree(weights);
                 fit_stat.free();
 
                 //qDebug()<<"    n "<<t.elapsed()<<" ms";
@@ -1480,7 +1481,7 @@ void QFFCSMSDEvaluationEditor::displayParameters() {
 
 }
 
-void QFFCSMSDEvaluationEditor::distzoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender) {
+void QFFCSMSDEvaluationEditor::distzoomChangedLocally(double newxmin, double newxmax, double /*newymin*/, double /*newymax*/, JKQtPlotter *sender) {
     if (!dataEventsEnabled) return;
     if (sender==pltDistribution) {
         disconnect(pltDistResults, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(distzoomChangedLocally(double,double,double,double,JKQtPlotter*)));
@@ -2290,7 +2291,7 @@ void QFFCSMSDEvaluationEditor::fitRunsAll() {
 }
 
 
-void QFFCSMSDEvaluationEditor::copyMoreData(QFRawDataRecord *record, int index, int model) {
+void QFFCSMSDEvaluationEditor::copyMoreData(QFRawDataRecord */*record*/, int /*index*/, int /*model*/) {
     QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
     if (!eval) return;
 

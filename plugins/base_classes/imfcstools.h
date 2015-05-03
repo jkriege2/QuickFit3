@@ -21,7 +21,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #ifndef IMFCSTOOLS_H
 #define IMFCSTOOLS_H
-
+#include <QDebug>
 #include <math.h>
 #include "qfmathtools.h"
 
@@ -220,28 +220,35 @@ inline double QFFitFunctionsTIRFCSADiff2D_pixelcorrfactor(double a, double Gamma
 
 
 
+// CONFOCAL!!!
 
 
-inline double QFFitFunctionsTIRFCSDiff3D_gausscorrfactor(double D, double t, double wg, double dg) {
-    return qfSqr(QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(0, D, t, wg, wg))*(M_PI*wg*wg)*(sqrt(4.0*D*t/M_PI)/dg+(1.0-2.0*D*t/dg/dg)*exp(D*t/dg/dg)*erfc(sqrt(D*t)/dg));
-}
-
-
-
-inline double QFFitFunctionsTIRFCSADiff3D_gausscorrfactor(double Gamma, double alpha, double t, double wg, double dg) {
+inline double QFFitFunctionsConfocalTIRFCSADiff3D_gausscorrfactor(double Gamma, double alpha, double t, double wg, double dg) {
     const double dtau=Gamma*pow(t, alpha);
-    return qfSqr(QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(0, Gamma, alpha, t, wg, wg))*(M_PI*wg*wg)*(sqrt(4.0*dtau/M_PI)/dg+(1.0-2.0*dtau/dg/dg)*exp(dtau/dg/dg)*erfc(sqrt(dtau)/dg));
+    const double kappa=1.0/dg;
+    const double kappa2=qfSqr(kappa);
+    const double Veff=TIRFCS_confocalVeff(wg,dg);
+    //qDebug()<<t<<dtau<<sqrt(dtau)<<sqrt(dtau)*kappa<<exp(qfSqr(sqrt(dtau)*kappa))<<erfc(sqrt(dtau)*kappa)<<qfFaddeevaRealW(sqrt(dtau)*kappa);
+    return Veff*kappa2/M_PI/(wg*wg+4.0*dtau)*(sqrt(dtau/M_PI)+(1.0-2.0*dtau*kappa2)*qfFaddeevaRealW(sqrt(dtau)*kappa)/2.0/kappa);
+}
+
+inline double QFFitFunctionsConfocalTIRFCSDiff3D_gausscorrfactor(double D, double t, double wg, double dg) {
+    const double dtau=D*t;
+    const double kappa=1.0/dg;
+    const double kappa2=qfSqr(kappa);
+    const double Veff=TIRFCS_confocalVeff(wg,dg);
+    return Veff*kappa2/M_PI/(wg*wg+4.0*dtau)*(sqrt(dtau/M_PI)+(1.0-2.0*dtau*kappa2)*qfFaddeevaRealW(sqrt(dtau)*kappa)/2.0/kappa);
 }
 
 
-inline double QFFitFunctionsTIRFCSDiff2D_gausscorrfactor(double D, double t, double wg) {
-    return qfSqr(QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(0, D, t, wg, wg))*(M_PI*wg*wg);
+inline double QFFitFunctionsConfocalTIRFCSDiff2D_gausscorrfactor(double D, double t, double wg) {
+    return 1.0/(1.0+4.0*D*t/qfSqr(wg));
 }
 
 
 
-inline double QFFitFunctionsTIRFCSADiff2D_gausscorrfactor(double Gamma, double alpha, double t, double wg) {
-    return qfSqr(QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(0, Gamma, alpha, t, wg, wg))*(M_PI*wg*wg);
+inline double QFFitFunctionsConfocalTIRFCSADiff2D_gausscorrfactor(double Gamma, double alpha, double t, double wg) {
+    return 1.0/(1.0+4.0*Gamma*pow(t,alpha)/qfSqr(wg));
 }
 
 

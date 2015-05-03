@@ -85,22 +85,22 @@ void QFRDRFCSCorrelationEditor::includeRuns() {
 }
 
 
-Qt::ItemFlags QFRDRFCSCorrelationEditorRunsModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QFRDRFCSCorrelationEditorRunsModel::flags(const QModelIndex &/*index*/) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-QVariant QFRDRFCSCorrelationEditorRunsModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QFRDRFCSCorrelationEditorRunsModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const {
     return QVariant();
 }
 
-int QFRDRFCSCorrelationEditorRunsModel::rowCount(const QModelIndex &parent) const {
+int QFRDRFCSCorrelationEditorRunsModel::rowCount(const QModelIndex &/*parent*/) const {
     if (!current) return 0;
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
     if (m) return 1+m->getCorrelationRuns();
     return 1;
 }
 
-int QFRDRFCSCorrelationEditorRunsModel::columnCount(const QModelIndex &parent) const {
+int QFRDRFCSCorrelationEditorRunsModel::columnCount(const QModelIndex &/*parent*/) const {
     return 1;
 }
 
@@ -258,15 +258,15 @@ void QFRDRFCSCorrelationEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
 
 };
 
-void QFRDRFCSCorrelationEditor::selectionChanged(const QModelIndex & current, const QModelIndex & previous ) {
+void QFRDRFCSCorrelationEditor::selectionChanged(const QModelIndex & /*current*/, const QModelIndex & /*previous*/ ) {
     replotData();
 }
 
-void QFRDRFCSCorrelationEditor::selectionChanged(const QItemSelection & current, const QItemSelection & previous ) {
+void QFRDRFCSCorrelationEditor::selectionChanged(const QItemSelection & /*current*/, const QItemSelection & /*previous*/ ) {
     replotData();
 }
 
-void QFRDRFCSCorrelationEditor::runsModeChanged(int c) {
+void QFRDRFCSCorrelationEditor::runsModeChanged(int /*c*/) {
     if (cmbRunDisplay->currentIndex()<=1) lstRunsSelect->setEnabled(false);
     else lstRunsSelect->setEnabled(true);
     replotData();
@@ -285,7 +285,7 @@ void QFRDRFCSCorrelationEditor::rawDataChangedRecalc()
      runs.setCurrent(current);
 };
 
-void QFRDRFCSCorrelationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
+void QFRDRFCSCorrelationEditor::slidersChanged(int userMin, int userMax, int /*min*/, int /*max*/) {
     if (!current) return;
     current->setQFProperty("fcscorreditor_datacut_min", userMin, false, false);
     current->setQFProperty("fcscorreditor_datacut_max", userMax, false, false);
@@ -313,7 +313,7 @@ void QFRDRFCSCorrelationEditor::correctOffset()
 
 
 
-void QFRDRFCSCorrelationEditor::replotData(int dummy) {
+void QFRDRFCSCorrelationEditor::replotData(int /*dummy*/) {
     //std::cout<<"repainting ...";
     //writeSettings();
     JKQTPdatastore* ds=plotter->getDatastore();

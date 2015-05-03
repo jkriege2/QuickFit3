@@ -39,6 +39,7 @@ DlgComponentInfo::DlgComponentInfo(QFEDiffusionCoefficientCalculator *plugin, in
     ui->comboBox->clear();
     ui->comboBox->addItems(plugin->getComponentNames());
     setComponent(component);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 DlgComponentInfo::~DlgComponentInfo()

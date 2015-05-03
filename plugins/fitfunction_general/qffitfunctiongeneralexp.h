@@ -46,8 +46,6 @@ class QFFitFunctionGeneralExp: public QFFitFunction {
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
 
-        /*! \copydoc QFFitFunction::calcParameter()   */
-        virtual void calcParameter(double* parameterValues, double* error=NULL) const;
 
         /*! \copydoc QFFitFunction::isParameterVisible()   */
         virtual bool isParameterVisible(int parameter, const double* parameterValues) const;
@@ -60,8 +58,6 @@ class QFFitFunctionGeneralExp: public QFFitFunction {
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives();
 
-        /*! \copydoc QFFitFunction::evaluateDerivatives()   */
-        virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
 
         /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
         virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL);

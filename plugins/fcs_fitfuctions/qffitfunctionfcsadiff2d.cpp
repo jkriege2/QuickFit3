@@ -302,11 +302,11 @@ bool QFFitFunctionFCSADiff2D::isParameterVisible(int parameter, const double* da
     return true;
 }
 
-unsigned int QFFitFunctionFCSADiff2D::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSADiff2D::getAdditionalPlotCount(const double* /*params*/) {
     return 1;
 }
 
-QString QFFitFunctionFCSADiff2D::transformParametersForAdditionalPlot(int plot,  double* params) {
+QString QFFitFunctionFCSADiff2D::transformParametersForAdditionalPlot(int /*plot*/,  double* params) {
     params[FCSADiff_n_nonfluorescent]=0;
     return "without non-fluorescent";
 }

@@ -34,11 +34,13 @@ class QFFitFunctionsTIRFCSDiffE2Diff3Dbright: public QFFitFunction {
         QFFitFunctionsTIRFCSDiffE2Diff3Dbright();
         virtual ~QFFitFunctionsTIRFCSDiffE2Diff3Dbright() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("TIR-FCS: 3D+2D Diffusion, different molecular brightnesses (rect. pixel, 1/e^2 radii)"); }
+        virtual QString name() const { return QString("Confocal TIR-FCS: 3D+2D Diffusion, different molecular brightnesses (rect. pixel, 1/e^2 radii)"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_tir_diff3de2_diffbright"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("Confocal TIR-FCS"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

@@ -52,6 +52,7 @@ DlgSetRDRPropertyByRegExp::DlgSetRDRPropertyByRegExp(QWidget *parent) :
     ProgramOptions::getConfigWindowGeometry(this, "DlgSetRDRPropertyByExpression/window");
     ProgramOptions::getConfigQSplitter(ui->splitter, "DlgSetRDRPropertyByExpression/splitter");
 
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 DlgSetRDRPropertyByRegExp::~DlgSetRDRPropertyByRegExp()

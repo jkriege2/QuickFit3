@@ -14,6 +14,7 @@ DlgIMportTable::DlgIMportTable(QWidget *parent) :
     ui->tableView->setItemDelegate(new QFRDRTableDelegate(ui->tableView));
     ui->tableView->selectAll();
     ProgramOptions::getConfigWindowGeometry(this, "DlgIMportTable");
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 DlgIMportTable::DlgIMportTable(bool pastAgainEnabled, QWidget *parent) :
@@ -26,6 +27,7 @@ DlgIMportTable::DlgIMportTable(bool pastAgainEnabled, QWidget *parent) :
     ui->tableView->selectAll();
     ui->cmbImportWhere->setCurrentIndex(2);
     ProgramOptions::getConfigWindowGeometry(this, "DlgIMportTable");
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
 }
 

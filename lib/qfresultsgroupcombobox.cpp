@@ -105,7 +105,7 @@ void QFResultsGroupComboBox::setCurrentEvaluationGroup(const QString &group)
 }
 
 
-void QFResultsGroupComboBox::myCurrentIndexChanged(int i)
+void QFResultsGroupComboBox::myCurrentIndexChanged(int/* i*/)
 {
     emit currentEvaluationGroupChanged(currentEvaluationGroup());
 }

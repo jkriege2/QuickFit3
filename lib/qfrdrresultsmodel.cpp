@@ -319,7 +319,7 @@ void QFRDRResultsModel::init(QFRawDataRecord* record) {
     resultsChanged();
 }
 
-int QFRDRResultsModel::rowCount(const QModelIndex &parent ) const {
+int QFRDRResultsModel::rowCount(const QModelIndex &/*parent*/ ) const {
     if (!record) {
         //std::cout<<"result row count=0\n";
         return 0;
@@ -329,7 +329,7 @@ int QFRDRResultsModel::rowCount(const QModelIndex &parent ) const {
     return lastResultNames.size();
 }
 
-int QFRDRResultsModel::columnCount(const QModelIndex &parent) const {
+int QFRDRResultsModel::columnCount(const QModelIndex &/*parent*/) const {
     if (!record) {
         //std::cout<<"result column count=0\n" ;
         return 0;
@@ -339,7 +339,7 @@ int QFRDRResultsModel::columnCount(const QModelIndex &parent) const {
     return lastResultSets.size()+1;
 }
 
-Qt::ItemFlags QFRDRResultsModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QFRDRResultsModel::flags(const QModelIndex &/*index*/) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 

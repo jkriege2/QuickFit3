@@ -46,7 +46,7 @@ double QFFitFunctionGeneralHill::evaluate(double t, const double* data) const {
 }
 
 
-void QFFitFunctionGeneralHill::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralHill::calcParameter(double* data, double* /*error*/) const {
     if (data) {
         data[PARAM_MID_SLOPE]=(data[PARAM_MAX]-data[PARAM_BASE])*data[PARAM_RATE]*log(10)/4.0;
     }
@@ -77,10 +77,10 @@ bool QFFitFunctionGeneralHill::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralHill::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralHill::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
 }
 
-bool QFFitFunctionGeneralHill::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionGeneralHill::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

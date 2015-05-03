@@ -43,6 +43,7 @@ DlgNewVersion::DlgNewVersion(QWidget *parent) :
         ui->edtReleaseNotes->setPlainText(tr("none available :-((("));
     }
     ui->labVersion->setText(tr("version %1 (SVN: %2 compiledate: %3)").arg(qfInfoVersion()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()));
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 DlgNewVersion::~DlgNewVersion()

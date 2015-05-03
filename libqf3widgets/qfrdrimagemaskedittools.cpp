@@ -405,7 +405,7 @@ void QFRDRImageMaskEditTools::copyMaskToGroup()
                     QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
                     if (rm) {
                         maskII=resizeBoolVecImage(maskI, w, h, rm->maskGetWidth(), rm->maskGetHeight(), &resizeMasks, tr("mask"), tr("QuickFit is about to copy the mask to a file/RDR with a different image size!"));
-                        if (maskII.size()==rm->maskGetWidth()*rm->maskGetHeight()){
+                        if (uint64_t(maskII.size())==rm->maskGetWidth()*rm->maskGetHeight()){
                             rm->maskClear();
                             rm->maskSet(maskII.data());
                             rm->maskMaskChangedEvent();
@@ -482,7 +482,7 @@ void QFRDRImageMaskEditTools::copyMaskToFiles()
                     QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
                     if (rm) {
                         maskII=resizeBoolVecImage(maskI, w, h, rm->maskGetWidth(), rm->maskGetHeight(), &resizeMasks, tr("mask"), tr("QuickFit is about to copy the mask to a file/RDR with a different image size!"));
-                        if (maskII.size()==rm->maskGetWidth()*rm->maskGetHeight()){
+                        if (uint64_t(maskII.size())==rm->maskGetWidth()*rm->maskGetHeight()){
                             rm->maskClear();
                             rm->maskSet(maskII.data());
                             rm->maskMaskChangedEvent();
@@ -589,7 +589,7 @@ void QFRDRImageMaskEditTools::copyMaskToFilesOfSameType()
                     if (rm) {
                         maskII=resizeBoolVecImage(maskI, w, h, rm->maskGetWidth(), rm->maskGetHeight(), &resizeMasks, tr("mask"), tr("QuickFit is about to copy the mask to a file/RDR with a different image size!"));
                         //qDebug()<<rm<<maskII.size()<<rm->maskGetWidth()*rm->maskGetHeight();
-                        if (maskII.size()==rm->maskGetWidth()*rm->maskGetHeight()){
+                        if (uint64_t(maskII.size())==rm->maskGetWidth()*rm->maskGetHeight()){
                             rm->maskClear();
                             rm->maskSet(maskII.data());
                             rm->maskMaskChangedEvent();
@@ -760,6 +760,7 @@ void QFRDRImageMaskEditTools::maskBorder()
 {
     if (!imagemask) return;
     QDialog* dlg=new QDialog(parentWidget);
+    dlg->setWindowFlags(dlg->windowFlags()|Qt::WindowMinMaxButtonsHint);
     QGridLayout* grid=new QGridLayout();
     dlg->setLayout(grid);
 
@@ -1007,7 +1008,7 @@ void QFRDRImageMaskEditTools::imageClicked(double x, double y, Qt::KeyboardModif
     }
 }
 
-void QFRDRImageMaskEditTools::imageScribbled(double x, double y, Qt::KeyboardModifiers modifiers, bool first, bool last)
+void QFRDRImageMaskEditTools::imageScribbled(double x, double y, Qt::KeyboardModifiers modifiers, bool first, bool /*last*/)
 {
 
     int xx=(int)floor(x);
@@ -1358,7 +1359,7 @@ void QFRDRImageMaskEditTools::setImageEditMode() {
 
 }
 
-void QFRDRImageMaskEditTools::cmbModeChanged(int index)
+void QFRDRImageMaskEditTools::cmbModeChanged(int /*index*/)
 {
 }
 

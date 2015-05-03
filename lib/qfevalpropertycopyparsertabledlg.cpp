@@ -10,6 +10,7 @@ QFEvalPropertyCopyParsertableDlg::QFEvalPropertyCopyParsertableDlg(QWidget *pare
     ProgramOptions::getConfigQCheckBox(ui->chkCopyErrors, "QFEvalPropertyCopyParsertableDlg/chkCopyErrors");
     ProgramOptions::getConfigQComboBox(ui->cmbDataStat, "QFEvalPropertyCopyParsertableDlg/cmbDataStat");
     ProgramOptions::getConfigQComboBox(ui->cmbErrorStat, "QFEvalPropertyCopyParsertableDlg/cmbErrorStat");
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFEvalPropertyCopyParsertableDlg::~QFEvalPropertyCopyParsertableDlg()

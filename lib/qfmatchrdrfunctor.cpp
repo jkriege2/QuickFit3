@@ -50,7 +50,7 @@ QFMatchRDRFunctorSelectAll::QFMatchRDRFunctorSelectAll():
     //qDebug()<<"QFSelectRDRDialogMatchFunctorSelectAll:constructor ";
 }
 
-bool QFMatchRDRFunctorSelectAll::matches(const QFRawDataRecord *record) const
+bool QFMatchRDRFunctorSelectAll::matches(const QFRawDataRecord */*record*/) const
 {
     //qDebug()<<"QFSelectRDRDialogMatchFunctorSelectAll";
     return true;

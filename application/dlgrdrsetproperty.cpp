@@ -27,6 +27,7 @@ dlgRDRSetProperty::dlgRDRSetProperty(QWidget *parent) :
     ui(new Ui::dlgRDRSetProperty)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 dlgRDRSetProperty::~dlgRDRSetProperty() {

@@ -49,6 +49,7 @@ SelectResourceImage::SelectResourceImage(const QString &directory, QWidget *pare
     ProgramOptions::getConfigQToolButton(ui->btnList, "SelectResourceImage/btnList");
     ProgramOptions::getConfigQToolButton(ui->btnTreeOnly, "SelectResourceImage/btnTreeOnly");
     updateView();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 SelectResourceImage::SelectResourceImage(const QStringList &directories, QWidget *parent, const QStringList &pathPrefixes, const QStringList &baseNodeNames) :
@@ -90,6 +91,7 @@ SelectResourceImage::SelectResourceImage(const QStringList &directories, QWidget
     ProgramOptions::getConfigQToolButton(ui->btnList, "SelectResourceImageMulti/btnList");
     ProgramOptions::getConfigQToolButton(ui->btnTreeOnly, "SelectResourceImageMulti/btnTreeOnly");
     updateView();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 SelectResourceImage::~SelectResourceImage()

@@ -22,6 +22,7 @@ QFRDRTableMultiColumnEditor::QFRDRTableMultiColumnEditor(QFTableModel *model, QW
     for (int i=0; i<hmodel.rowCount(); i++) {
         ui->tableView->setRowHeight(i, 64);
     }
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
 }
 

@@ -173,9 +173,11 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::stringToDataWeight(QString 
 //                const double lx=log(taudat[i]);
 //                weights[i]=fabs(corrdat[i]-statisticsPolyEval<double>(lx, p.data(), P));
 
-double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecord *record_in, int run_in, int data_start, int data_end) const
+double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecord *record_in, int run_in, int data_start, int data_end, bool returnEmptyForNoWeights) const
 {
-    QVector<double> weights=allocVecWeights(weightsOKK, record_in, run_in, data_start, data_end);
+    QFFCSWeightingTools::DataWeight weighting=getFitDataWeighting();
+    if (returnEmptyForNoWeights && weighting==EqualWeighting) return NULL;
+    QVector<double> weights=allocVecWeights(weightsOKK, record_in, run_in, data_start, data_end, returnEmptyForNoWeights);
 
     if (weights.size()>0) {
         double* w=(double*)qfMalloc(weights.size()*sizeof(double));
@@ -188,7 +190,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
     return NULL;
 }
 
-QVector<double> QFFCSWeightingTools::allocVecWeights(bool *weightsOKK, const QFRawDataRecord *record_in, int run_in, int data_start, int data_end) const
+QVector<double> QFFCSWeightingTools::allocVecWeights(bool *weightsOKK, const QFRawDataRecord *record_in, int run_in, int data_start, int data_end, bool returnEmptyForNoWeights) const
 {
     QVector<double> weights;
 
@@ -208,6 +210,7 @@ QVector<double> QFFCSWeightingTools::allocVecWeights(bool *weightsOKK, const QFR
     if (N<=0) return QVector<double>();
 
     QFFCSWeightingTools::DataWeight weighting=getFitDataWeighting();
+    if (returnEmptyForNoWeights && weighting==EqualWeighting) return QVector<double>();
     weights.resize(N);//double* weights=(double*)qfMalloc(N*sizeof(double));
     bool weightsOK=false;
     if (data&&weights.size()>0 && weighting==QFFCSWeightingTools::StdDevWeighting) {

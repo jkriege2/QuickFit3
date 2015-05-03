@@ -277,6 +277,6 @@ QString QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorCCF::transformParametersForAdditio
     return "";
 }
 
-void QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorCCF::sortParameter(double *parameterValues, double *error, bool *fix) const {
+void QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorCCF::sortParameter(double */*parameterValues*/, double */*error*/, bool */*fix*/) const {
 
 }

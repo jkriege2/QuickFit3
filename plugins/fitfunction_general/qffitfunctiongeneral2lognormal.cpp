@@ -56,7 +56,7 @@ double QFFitFunctionGeneral2LogNormal::evaluate(double t, const double* data) co
 }
 
 
-void QFFitFunctionGeneral2LogNormal::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneral2LogNormal::calcParameter(double* /*data*/, double* /*error*/) const {
 
 }
 
@@ -66,7 +66,7 @@ bool QFFitFunctionGeneral2LogNormal::isParameterVisible(int parameter, const dou
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneral2LogNormal::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneral2LogNormal::getAdditionalPlotCount(const double* /*params*/) {
     return 2;
 }
 
@@ -86,10 +86,10 @@ bool QFFitFunctionGeneral2LogNormal::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneral2LogNormal::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneral2LogNormal::evaluateDerivatives(double* /*derivatives*/, double/* t*/, const double* /*data*/) const {
 }
 
-bool QFFitFunctionGeneral2LogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneral2LogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     if (params && dataX && dataY) {
         StatisticsScopedPointer<double> dX(statisticsDuplicateAndApply(dataX, N, log));

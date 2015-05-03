@@ -41,7 +41,7 @@ double QFFitFunctionGeneralPDFCauchy::evaluate(double x, const double* data) con
 }
 
 
-void QFFitFunctionGeneralPDFCauchy::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralPDFCauchy::calcParameter(double* /*data*/, double* /*error*/) const {
 }
 
 bool QFFitFunctionGeneralPDFCauchy::isParameterVisible(int parameter, const double* data) const {
@@ -68,7 +68,7 @@ QString QFFitFunctionGeneralPDFCauchy::transformParametersForAdditionalPlot(int 
 }
 
 
-bool QFFitFunctionGeneralPDFCauchy::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralPDFCauchy::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

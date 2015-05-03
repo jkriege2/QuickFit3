@@ -416,7 +416,7 @@ bool QFFitFunctionFCSDiffDcAfterPulse::isParameterVisible(int parameter, const d
     return true;
 }
 
-unsigned int QFFitFunctionFCSDiffDcAfterPulse::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSDiffDcAfterPulse::getAdditionalPlotCount(const double* /*params*/) {
     return 2;
 }
 

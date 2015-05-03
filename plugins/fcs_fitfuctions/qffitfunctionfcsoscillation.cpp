@@ -56,14 +56,14 @@ void QFFitFunctionFCSOscillation::calcParameter(double *parameterValues, double 
     if (error) error[FCSOSC_period]=fabs(1000.0/sqr(f)*error[FCSOSC_freq]);
 }
 
-bool QFFitFunctionFCSOscillation::isParameterVisible(int parameter, const double *parameterValues) const {
+bool QFFitFunctionFCSOscillation::isParameterVisible(int /*parameter*/, const double */*parameterValues*/) const {
     return true;
 }
 
-unsigned int QFFitFunctionFCSOscillation::getAdditionalPlotCount(const double *params) {
+unsigned int QFFitFunctionFCSOscillation::getAdditionalPlotCount(const double */*params*/) {
     return 0;
 }
 
-QString QFFitFunctionFCSOscillation::transformParametersForAdditionalPlot(int plot, double *params) {
+QString QFFitFunctionFCSOscillation::transformParametersForAdditionalPlot(int /*plot*/, double */*params*/) {
     return QString("");
 }

@@ -334,6 +334,7 @@ QFFitStatistics QFFCSMaxEntEvaluationItem::calcFitStatistics(QFRawDataRecord *re
 
             }
         }
+        qfFree(weights);
 
         if (freeModelVals) qfFree(modelVals);
 

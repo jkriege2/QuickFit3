@@ -49,9 +49,6 @@ double QFFitFunctionGeneralDblExp::evaluate(double t, const double* data) const 
 }
 
 
-void QFFitFunctionGeneralDblExp::calcParameter(double* data, double* error) const {
-
-}
 
 bool QFFitFunctionGeneralDblExp::isParameterVisible(int parameter, const double* data) const {
 
@@ -78,8 +75,6 @@ bool QFFitFunctionGeneralDblExp::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralDblExp::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
 
 
 bool QFFitFunctionGeneralDblExp::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)

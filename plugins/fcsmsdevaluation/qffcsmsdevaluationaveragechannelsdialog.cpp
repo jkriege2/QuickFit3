@@ -30,6 +30,7 @@ QFFCSMSDEvaluationAverageChannelsDialog::QFFCSMSDEvaluationAverageChannelsDialog
     ui->setupUi(this);
     ui->cmbApplyTo->setCurrentIndex(ProgramOptions::getConfigValue("QFFCSMSDEvaluationAverageChannelsDialog/applyto", 0).toInt());
     ui->spinPoints->setValue(ProgramOptions::getConfigValue("QFFCSMSDEvaluationAverageChannelsDialog/points", 5).toInt());
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
 QFFCSMSDEvaluationAverageChannelsDialog::~QFFCSMSDEvaluationAverageChannelsDialog()

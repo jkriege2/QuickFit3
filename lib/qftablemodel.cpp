@@ -55,11 +55,11 @@ QFTableModel::~QFTableModel()
     //dtor
 }
 
-int QFTableModel::rowCount(const QModelIndex &parent) const {
+int QFTableModel::rowCount(const QModelIndex &/*parent*/) const {
     //std::cout<<"rowCount: "<<state.rows<<"\n";
     return state.rows;
 };
-int QFTableModel::columnCount(const QModelIndex &parent) const {
+int QFTableModel::columnCount(const QModelIndex &/*parent*/) const {
     //std::cout<<"columnCount: "<<state.columns<<"\n";
     return state.columns;
 };
@@ -162,7 +162,7 @@ bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int 
     return false;
 }
 
-QVariantList QFTableModel::getColumnData(int column, int role) const
+QVariantList QFTableModel::getColumnData(int column, int /*role*/) const
 {
     QVariantList vl;
     if (column>=0 && column<int64_t(state.columns)) {
@@ -177,7 +177,7 @@ QVariantList QFTableModel::getColumnData(int column, int role) const
     return vl;
 }
 
-QVector<double> QFTableModel::getColumnDataAsNumbers(int column, int role) const
+QVector<double> QFTableModel::getColumnDataAsNumbers(int column, int /*role*/) const
 {
     QVector<double> vl;
     if (column>=0 && column<int64_t(state.columns)) {
@@ -1986,18 +1986,18 @@ QVariant QFTableModelColumnHeaderModel::data(const QModelIndex &index, int role)
     return QVariant();
 }
 
-Qt::ItemFlags QFTableModelColumnHeaderModel::flags(const QModelIndex &index) const
+Qt::ItemFlags QFTableModelColumnHeaderModel::flags(const QModelIndex &/*index*/) const
 {
     return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
 }
 
-QVariant QFTableModelColumnHeaderModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QFTableModelColumnHeaderModel::headerData(int section, Qt::Orientation orientation, int /*role*/) const
 {
     if (orientation==Qt::Horizontal && section==0) return tr("column title");
     return QVariant();
 }
 
-int QFTableModelColumnHeaderModel::rowCount(const QModelIndex &parent) const
+int QFTableModelColumnHeaderModel::rowCount(const QModelIndex &/*parent*/) const
 {
     if (model) {
         if (hasNone) return model->columnCount()+1;
@@ -2016,12 +2016,12 @@ void QFTableModelColumnHeaderModel::nameChanged(int i)
     emit dataChanged(index(i), index(i));
 }
 
-void QFTableModelColumnHeaderModel::nameDeleted(int i)
+void QFTableModelColumnHeaderModel::nameDeleted(int /*i*/)
 {
     //emit state.rowsRemoved(QModelIndex(), i, i);
 }
 
-void QFTableModelColumnHeaderModel::nameAdded(int i)
+void QFTableModelColumnHeaderModel::nameAdded(int /*i*/)
 {
     //emit state.rowsInserted(QModelIndex(), i, i);
 }
@@ -2253,7 +2253,7 @@ bool QFTableModelEditColumnHeaderDataModel::setData(const QModelIndex &index, co
     return false;
 }
 
-Qt::ItemFlags QFTableModelEditColumnHeaderDataModel::flags(const QModelIndex &index) const
+Qt::ItemFlags QFTableModelEditColumnHeaderDataModel::flags(const QModelIndex &/*index*/) const
 {
     return Qt::ItemIsEditable|Qt::ItemIsSelectable|Qt::ItemIsEnabled;
 }
@@ -2276,7 +2276,7 @@ QVariant QFTableModelEditColumnHeaderDataModel::headerData(int section, Qt::Orie
     return QVariant();
 }
 
-int QFTableModelEditColumnHeaderDataModel::rowCount(const QModelIndex &parent) const
+int QFTableModelEditColumnHeaderDataModel::rowCount(const QModelIndex &/*parent*/) const
 {
     if (model) {
         return model->columnCount();
@@ -2284,7 +2284,7 @@ int QFTableModelEditColumnHeaderDataModel::rowCount(const QModelIndex &parent) c
     return 0;
 }
 
-int QFTableModelEditColumnHeaderDataModel::columnCount(const QModelIndex &parent) const
+int QFTableModelEditColumnHeaderDataModel::columnCount(const QModelIndex &/*parent*/) const
 {
     return m_properties.size();
 }

@@ -47,7 +47,7 @@ QList<QFRawDataRecord *> QFImFCCSFileSetsModel::getFileSetForRow(int row) const
     return QList<QFRawDataRecord *>();
 }
 
-int QFImFCCSFileSetsModel::rowCount(const QModelIndex &parent) const
+int QFImFCCSFileSetsModel::rowCount(const QModelIndex &/*parent*/) const
 {
     return fittedSets+guessedSets;
 }

@@ -53,6 +53,7 @@ QFERTResultCalculator::QFERTResultCalculator(QWidget *parent) :
     ui->chkSameResultGroups->setChecked(ProgramOptions::getConfigValue("QFERTResultCalculator/same_result_groups", true).toBool());
 
     checkBoxesChanged();
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
 
 

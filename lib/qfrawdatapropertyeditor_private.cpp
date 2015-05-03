@@ -823,7 +823,7 @@ void QFRawDataPropertyEditor_private::deletePropClicked() {
 }
 
 
-void QFRawDataPropertyEditor_private::tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
+void QFRawDataPropertyEditor_private::tvResultsSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
     QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
     QMap<int, QString> names;
     QMap<int, double> sum, sum2, count;

@@ -272,21 +272,21 @@ void QFEvaluationResultsModel::setMinUnusedIndexesForStatistics(bool enabled)
     mindRunsForVectorStat=enabled;
     resultsChanged();
 }
-int QFEvaluationResultsModel::rowCount(const QModelIndex &parent) const {
+int QFEvaluationResultsModel::rowCount(const QModelIndex &/*parent*/) const {
     if (!evaluation) {
         return 0;
     }
     return lastResults.size()+1;
 }
 
-int QFEvaluationResultsModel::columnCount(const QModelIndex &parent) const {
+int QFEvaluationResultsModel::columnCount(const QModelIndex &/*parent*/) const {
     if (!evaluation) {
         return 0;
     }
     return lastResultNames.size()+displayProperties.size()+getExtraColumns();
 }
 
-Qt::ItemFlags QFEvaluationResultsModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QFEvaluationResultsModel::flags(const QModelIndex &/*index*/) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 

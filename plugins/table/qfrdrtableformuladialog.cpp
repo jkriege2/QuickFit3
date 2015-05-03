@@ -28,7 +28,7 @@
 #include "qfrdrtableparserfunctions.h"
 #include "qfrdrtable.h"
 
-qfmpResult QFRDRTableFormulaDialog_dummy(const qfmpResult* params, unsigned char n, QFMathParser* p) {
+qfmpResult QFRDRTableFormulaDialog_dummy(const qfmpResult* /*params*/, unsigned char /*n*/, QFMathParser* /*p*/) {
     qfmpResult res;
 
     return res;
@@ -52,6 +52,7 @@ QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QFRDRTable *table, QFTablePlugi
     functionRef->setProgress(ui->progress);
     functionRef->setDefaultHelp(QFPluginServices::getInstance()->getPluginHelpDirectory("table")+"mathparser.html");
 
+    setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
 
 
@@ -113,7 +114,7 @@ void QFRDRTableFormulaDialog::setExpression(const QString &exp)
     ui->edtFormula->setText(exp);
 }
 
-void QFRDRTableFormulaDialog::on_edtFormula_textChanged(QString text) {
+void QFRDRTableFormulaDialog::on_edtFormula_textChanged(QString /*text*/) {
 
     QFMathParser mp; // instanciate
 

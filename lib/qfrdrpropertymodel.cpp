@@ -94,13 +94,13 @@ void QFRDRPropertyModel::init(QFRawDataRecord* record) {
     connect(record, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(propertiesChanged(QString,bool)));
 }
 
-int QFRDRPropertyModel::rowCount(const QModelIndex &parent ) const {
+int QFRDRPropertyModel::rowCount(const QModelIndex &/*parent*/ ) const {
     if (!record) return 0;
     //std::cout<<"getVisiblePropertyCount() = "<<record->getVisiblePropertyCount()<<"\n";
     return props.size();
 }
 
-int QFRDRPropertyModel::columnCount(const QModelIndex &parent) const {
+int QFRDRPropertyModel::columnCount(const QModelIndex &/*parent*/) const {
     if (!record) return 0;
     return 3;
 }

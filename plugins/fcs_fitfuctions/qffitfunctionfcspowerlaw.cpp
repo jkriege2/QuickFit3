@@ -66,7 +66,7 @@ double QFFitFunctionFCSPowerLaw::evaluate(double t, const double* data) const {
 
 
 
-void QFFitFunctionFCSPowerLaw::calcParameter(double* data, double* error) const {
+void QFFitFunctionFCSPowerLaw::calcParameter(double* /*data*/, double* /*error*/) const {
 
  }
 
@@ -79,10 +79,10 @@ bool QFFitFunctionFCSPowerLaw::isParameterVisible(int parameter, const double* d
     return true;
 }
 
-unsigned int QFFitFunctionFCSPowerLaw::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSPowerLaw::getAdditionalPlotCount(const double* /*params*/) {
     return 0;
 }
 
-QString QFFitFunctionFCSPowerLaw::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSPowerLaw::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
     return QString();
 }
