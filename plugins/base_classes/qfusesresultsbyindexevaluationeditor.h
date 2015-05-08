@@ -62,8 +62,11 @@ class QFUsesResultsByIndexEvaluationEditor : public QFEvaluationEditor, public Q
         virtual void copyUserMaxToAllRuns(int userMax);
         virtual void copyUserMinMaxToAllRuns(int userMin, int userMax);
         virtual void createOverlayPlot();
+        virtual void createOverlayPlotRuns();
     protected:
         QAction* actOverlayPlot;
+        QAction* actOverlayPlotRuns;
+        QMenu* menuOverlays;
 
 
     protected:

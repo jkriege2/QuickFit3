@@ -1668,6 +1668,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
+ //qDebug()<<getName()<<"\n  ::resultsExistsFromEvaluation("<<evalName<<"): "<<(dstore->results.contains(evalName) && dstore->results.value(evalName) && (dstore->results.value(evalName)->results.size()>0))<<dstore->results.contains(evalName) << dstore->results.value(evalName) << ((dstore->results.value(evalName)!=NULL)?(dstore->results.value(evalName)->results.size()>0):false);
     return dstore->results.contains(evalName) && dstore->results.value(evalName) && (dstore->results.value(evalName)->results.size()>0) ;
 }
 
@@ -2373,7 +2374,11 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
     if (!evr->results.contains(resultName)) return defaultValue;
 
     const evaluationResult& r=evr->results.value(resultName);
-    if (position<r.dvec.size()) return r.dvec.value(position, defaultValue);
+    if (r.type==qfrdreNumberVector || r.type==qfrdreNumberErrorVector || r.type==qfrdreNumberMatrix || r.type==qfrdreNumberErrorMatrix) {
+        if (position<r.dvec.size()) return r.dvec.value(position, defaultValue);
+    } else if (r.type==qfrdreIntegerVector || r.type==qfrdreIntegerMatrix) {
+        if (position>=0 && position<r.ivec.size()) return r.ivec.value(position);
+    }
 
     return defaultValue;
 }
@@ -3043,6 +3048,84 @@ void QFRawDataRecord::resultsSetFitStatistics(const QFFitStatistics &result, con
     resultsSetGroup(evalID, param, group);
     resultsSetLabel(evalID, param, tr("total sum of squares"));
 
+}
+
+void QFRawDataRecord::getStatisticsParams(QStringList *ids, QStringList *labels, QStringList *labelsHTML, const QString &prefix)
+{
+    if (ids) (*ids)<<prefix+"chisquared";
+    if (labels) (*labels)<<tr("chi squared"); if (labelsHTML) (*labelsHTML)<<(("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+
+    if (ids) (*ids)<<prefix+"chisquared_weighted";
+    if (labels) (*labels)<<tr("weighted chi squared");
+    if (labelsHTML) (*labelsHTML)<<(("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+
+    if (ids) (*ids)<<prefix+"residavg";
+    if (labels) (*labels)<<tr("residual average");
+    if (labelsHTML) (*labelsHTML)<<(("&lang;E&rang;"));
+
+    if (ids) (*ids)<<prefix+"residavg_weighted";
+    if (labels) (*labels)<<tr("weighted residual average");
+    if (labelsHTML) (*labelsHTML)<<(("&lang;E&rang; (weighted)"));
+
+    if (ids) (*ids)<<prefix+"residstddev";
+    if (labels) (*labels)<<tr("residual stddev");
+    if (labelsHTML) (*labelsHTML)<<(("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
+
+    if (ids) (*ids)<<prefix+"residstddev_weighted";
+    if (labels) (*labels)<<tr("weighted residual stddev");
+    if (labelsHTML) (*labelsHTML)<<(("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
+
+    if (ids) (*ids)<<prefix+"fitparams";
+    if (labels) (*labels)<<tr("fit params");
+    if (labelsHTML) (*labelsHTML)<<tr("fit params");
+
+    if (ids) (*ids)<<prefix+"datapoints";
+    if (labels) (*labels)<<tr("datapoints");
+    if (labelsHTML) (*labelsHTML)<<tr("datapoints");
+
+    if (ids) (*ids)<<prefix+"dof";
+    if (labels) (*labels)<<tr("degrees of freedom");
+    if (labelsHTML) (*labelsHTML)<<tr("degrees of freedom");
+
+    if (ids) (*ids)<<prefix+"r2";
+    if (labels) (*labels)<<tr("R squared");
+    if (labelsHTML) (*labelsHTML)<<(("R<sup>2</sup>"));
+
+    if (ids) (*ids)<<prefix+"adjusted_r2";
+    if (labels) (*labels)<<tr("adjusted R squared");
+    if (labelsHTML) (*labelsHTML)<<(("R<sup>2</sup><sub>adjusted</sub>"));
+
+    if (ids) (*ids)<<prefix+"r2_weighted";
+    if (labels) (*labels)<<tr("weighted R squared");
+    if (labelsHTML) (*labelsHTML)<<(("R<sup>2</sup> (weighted)"));
+
+    if (ids) (*ids)<<prefix+"adjusted_r2_weighted";
+    if (labels) (*labels)<<tr("weighted adjusted R squared");
+    if (labelsHTML) (*labelsHTML)<<(("R<sup>2</sup><sub>adjusted</sub> (weighted)"));
+
+    if (ids) (*ids)<<prefix+"aicc";
+    if (labels) (*labels)<<tr("Akaike's information criterion");
+    if (labelsHTML) (*labelsHTML)<<(("AICc"));
+
+    if (ids) (*ids)<<prefix+"aicc_weighted";
+    if (labels) (*labels)<<tr("weighted Akaike's information criterion");
+    if (labelsHTML) (*labelsHTML)<<(("AICc (weighted)"));
+
+    if (ids) (*ids)<<prefix+"bic";
+    if (labels) (*labels)<<tr("Bayesian information criterion");
+    if (labelsHTML) (*labelsHTML)<<(("BIC"));
+
+    if (ids) (*ids)<<prefix+"bic_weighted";
+    if (labels) (*labels)<<tr("weighted Bayesian information criterion");
+    if (labelsHTML) (*labelsHTML)<<(("BIC (weighted)"));
+
+    if (ids) (*ids)<<prefix+"max_rel_param_error";
+    if (labels) (*labels)<<tr("maximum rel. parameter error");
+    if (labelsHTML) (*labelsHTML)<<(("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
+
+    if (ids) (*ids)<<prefix+"tss";
+    if (labels) (*labels)<<tr("total sum of squares");
+    if (labelsHTML) (*labelsHTML)<<tr("TSS &chi;<sup>2</sup>");
 }
 
 QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& evalName, const QString& resultName) const

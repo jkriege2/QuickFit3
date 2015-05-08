@@ -92,6 +92,30 @@ void QFRDRImagingFCSSimulationThread::run()
     timer.start();
     emit statusMessage(tr("initialising simulation ..."));
 
+
+    filename=filename.replace("%timestep%", tr("%1uS").arg(frametime));
+    filename=filename.replace("%type%", tr("2DRWsim"));
+    filename=filename.replace("%D1r%", tr("%1").arg(DR));
+    filename=filename.replace("%D1g%", tr("%1").arg(DG));
+    filename=filename.replace("%D1gr%", tr("%1").arg(DRG));
+    filename=filename.replace("%D1rg%", tr("%1").arg(DRG));
+    filename=filename.replace("%D2r%", tr("%1").arg(DR2));
+    filename=filename.replace("%D2g%", tr("%1").arg(DG2));
+    filename=filename.replace("%D2gr%", tr("%1").arg(DRG2));
+    filename=filename.replace("%D2rg%", tr("%1").arg(DRG2));
+    if (dualView) {
+        if (deltax!=0 || deltay!=0) filename=filename.replace("%shift%", tr("shift_%1_%2").arg(deltax).arg(deltay));
+        else filename=filename.replace("%shift%", tr("noshift"));
+        filename=filename.replace("%dvmode%", tr("lrdualview"));
+    } else {
+        filename=filename.replace("%dvmode%", tr("nodualview"));
+    }
+    if (VX!=0 || VY!=0) filename=filename.replace("%flow%", tr("flow_%1_%2").arg(VX).arg(VY));
+    else filename=filename.replace("%flow%", tr("noflow"));
+
+
+
+
     if (filename.contains("%counter%")) {
         int cnt=0;
         QString fn=filename;

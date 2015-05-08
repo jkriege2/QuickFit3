@@ -113,6 +113,8 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
 
         QFRDRFCSFitFunctionSimulator* dlgSimulator;
 
+        QString getRDRName(const QStringList& filenames, const QString &role=QString());
+
         /*! \brief add a ALV5000 file to the current project
 
             \param filename filename of the ALV5000 file
@@ -154,6 +156,7 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         void insertALBAFile(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
         void insertDiffusion4File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
         void insertOlegFile(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+        void insertPicoQuantASCIIFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
 
         /*! \brief add a Zeiss Confocor3 file to the current project
 

@@ -109,9 +109,9 @@ void QFRDRImagingFCSSimulator::writeSettings() const {
 void QFRDRImagingFCSSimulator::readSettings()
 {
     ui->edtFilename->setText(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/filename", "").toString());
-    ui->spinDG->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DG", 5).toDouble());
-    ui->spinDR->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DR", 5).toDouble());
-    ui->spinDRG->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DRG", 5).toDouble());
+    ui->spinDG->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DG", 10).toDouble());
+    ui->spinDR->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DR", 10).toDouble());
+    ui->spinDRG->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DRG", 10).toDouble());
     ui->spinHeight->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/height", 10).toInt());
     ui->spinWidth->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/width", 10).toInt());
     ui->spinPixelSize->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/pixel_size", 0.4).toDouble());
@@ -154,6 +154,11 @@ void QFRDRImagingFCSSimulator::readSettings()
     ui->spinWalkersR_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersr_2", 0).toInt());
     ui->spinWalkersG_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersg_2", 0).toInt());
     ui->spinWalkersRG_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersrg_2", 0).toInt());
+    ui->spinDG_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DG_2", 1).toDouble());
+    ui->spinDR_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DR_2", 1).toDouble());
+    ui->spinDRG_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DRG_2", 1).toDouble());
+    ui->spinBrightnessG_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/brightnessG_2", 20).toDouble());
+    ui->spinBrigthnessR_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/brightnessR_2", 20).toDouble());
 
 
 }

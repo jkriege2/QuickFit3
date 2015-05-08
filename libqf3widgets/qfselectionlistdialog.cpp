@@ -87,6 +87,13 @@ void QFSelectionListDialog::init(QStringList itemNames, QStringList itemData)
     init(itemNames, var);
 }
 
+void QFSelectionListDialog::init(QStringList itemNames)
+{
+    QList<QVariant> var;
+    for (int i=0; i<itemNames.size(); i++) var<<itemNames[i];
+    init(itemNames, var);
+}
+
 void QFSelectionListDialog::init(QStringList itemNames, QStringList itemData, QSettings &settings, const QString &prefix)
 {
     QList<QVariant> var;

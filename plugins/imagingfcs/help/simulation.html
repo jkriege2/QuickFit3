@@ -24,7 +24,23 @@ The simulation dialog looks like this:
 <center><a name="imfcs_usage_pic006"><img src="./pic/imfcs_usage_pic006.png" border="1">
 </center>
 </p>
-<p>After entering all simulation properties (see below), you have to click on <b>Run Simulation</b> to start the process. This will generate the TIFF-file, specified as <b>output filename</b>, along with some text-files, describing the simulation and image properties. When the simulation is finished, the simulation dialog will be closed and the TIFF-file will be loaded into the <a href="imfcs_ui.html">imFCS correlator</a> dialog.
+<p>After entering all simulation properties (see below), you have to click on <b>Run Simulation</b> to start the process. This will generate the TIFF-file, specified as <b>output filename</b>, along with some text-files, describing the simulation and image properties. When specifying the filename, you can use some special strings that will be replaced by certain simulation parameters:give a filename for the main output file (with extension <tt>.tif</tt> or <tt>.tiff</tt>) on the hard-disk.<br>
+<ul>
+  <li><tt>%counter%</tt>: is increased, until a non-existent filename is found (prevents overwriting of old filenames)</li>
+  <li><tt>%type%</tt>: simulation type</li>
+  <li><tt>%timestep%</tt>: simulation timestep in &mu;s</li>
+  <li><tt>%shift%</tt>: shift between g/r foci</li>
+  <li><tt>%dvmode%</tt>: DualView mode</li>
+  <li><tt>%D1g%</tt>: D1, green</li>
+  <li><tt>%D1r%</tt>: D1, red</li>
+  <li><tt>%D1gr%</tt>: D1, green-red</li>
+  <li><tt>%D2g%</tt>: D2, green</li>
+  <li><tt>%D2r%</tt>: D2, red</li>
+  <li><tt>%D2gr%</tt>: D2, green-red</li>
+  <li><tt>%flow%</tt>: flow velocity</li>
+</ul>
+</p>
+<p>When the simulation is finished, the simulation dialog will be closed and the TIFF-file will be loaded into the <a href="imfcs_ui.html">imFCS correlator</a> dialog.
 </p>
 
 

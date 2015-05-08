@@ -114,8 +114,11 @@ class QFFitResultsByIndexEvaluationEditorBase : public QFFitResultsEvaluationEdi
         void log_error(QString message);
 
         virtual void createOverlayPlot();
+        virtual void createOverlayPlotRuns();
     protected:
         QAction* actOverlayPlot;
+        QAction* actOverlayPlotRuns;
+        QMenu* menuOverlays;
      public:
 
         /* explicitly make some functions visible again, as the C++ compiler hides function definitions

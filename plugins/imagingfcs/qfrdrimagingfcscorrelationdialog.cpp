@@ -1485,9 +1485,12 @@ QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> QFRDRImagingFCSCorrelationD
     return filesToAdd;
 }
 
-void QFRDRImagingFCSCorrelationDialog::openFile(const QString &file)
+void QFRDRImagingFCSCorrelationDialog::openFile(const QString &file, const QString &filter)
 {
     ui->edtImageFile->setText(file);
+    int idx=imageFilters.indexOf(filter);
+    if (idx<0) idx=imageFormatNames.indexOf(filter);
+    if (idx>=0) ui->cmbFileformat->setCurrentIndex(idx);
     on_btnLoad_clicked();
 }
 

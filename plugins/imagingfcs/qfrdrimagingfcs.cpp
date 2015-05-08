@@ -205,7 +205,7 @@ void QFRDRImagingFCSPlugin::importCorrelationsFromSimulation()
 {
     correlateAndInsert();
     if (dlgCorrelate) {
-        dlgCorrelate->openFile(dlgSimulate->getSimulationFilename());
+        dlgCorrelate->openFile(dlgSimulate->getSimulationFilename(), "TIFF [tinyTIFF]");
         dlgSimulate->deleteLater();
         dlgSimulate=NULL;
     }

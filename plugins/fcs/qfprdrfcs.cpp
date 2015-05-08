@@ -206,6 +206,19 @@ void QFPRDRFCS::correctOffset()
     }
 }
 
+QString QFPRDRFCS::getRDRName(const QStringList &filenames, const QString& rolein)
+{
+    QString role=rolein;
+    if (role.size()>0) role=QString(" - ")+role;
+    if (filenames.size()==1) {
+        return tr("%1%2").arg(QFileInfo(filenames.value(0, "")).fileName()).arg(role);
+    } else if (filenames.size()<1) {
+        return tr("FCS dat%1").arg(role);
+    } else if (filenames.size()>1) {
+        return tr("Multi-File FCS Data (%1...)%2").arg(QFileInfo(filenames.value(0, "")).fileName()).arg(role);
+    }
+    return "";
+}
 
 void QFPRDRFCS::insertALV5000File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
     unsigned int cc=1;
@@ -231,7 +244,7 @@ void QFPRDRFCS::insertALV5000File(const QStringList& filename, const QMap<QStrin
             if (i>0) role=(QString("FCCS%10").arg(i));
         }
 
-        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(role), filename, p, paramReadonly);
+        QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename, role), filename, p, paramReadonly);
         e->setRole(role);
         if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
@@ -267,7 +280,7 @@ void QFPRDRFCS::insertALV6000File(const QStringList& filename, const QMap<QStrin
             if (i>0) role=(QString("FCCS%10").arg(i));
         }
 
-        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(role), filename, p, paramReadonly);
+        QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename, role), filename, p, paramReadonly);
         e->setRole(role);
         if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
@@ -377,7 +390,7 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
             p["COLUMNS"]=listToString(cdata[i].columns, false, false);
             p["CHANNELS_SWAPPED"]=cdata[i].swapped;
             QString role=cdata[i].role;
-            QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(role), filename, p, pro);
+            QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename, role), filename, p, pro);
             e->setRole(role);
             if (channelCount>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
@@ -392,7 +405,7 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
 
 
 void QFPRDRFCS::insertCSVFile(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
-    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename.value(0, "")).fileName(), filename, paramValues, paramReadonly);
+    QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename), filename, paramValues, paramReadonly);
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename.value(0, "")).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
@@ -402,7 +415,16 @@ void QFPRDRFCS::insertCSVFile(const QStringList &filename, const QMap<QString, Q
 
 
 void QFPRDRFCS::insertALBAFile(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
-    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename.value(0, "")).fileName(), filename, paramValues, paramReadonly);
+    QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename), filename, paramValues, paramReadonly);
+    if (e->error()) {
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename.value(0, "")).arg(e->errorDescription()));
+        services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
+        project->deleteRawData(e->getID());
+    }
+}
+
+void QFPRDRFCS::insertPicoQuantASCIIFile(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
+    QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename), filename, paramValues, paramReadonly);
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename.value(0, "")).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
@@ -411,7 +433,7 @@ void QFPRDRFCS::insertALBAFile(const QStringList& filename, const QMap<QString, 
 }
 
 void QFPRDRFCS::insertDiffusion4File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
-    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename.value(0, "")).fileName(), filename, paramValues, paramReadonly);
+    QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename), filename, paramValues, paramReadonly);
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename.value(0, "")).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
@@ -421,7 +443,7 @@ void QFPRDRFCS::insertDiffusion4File(const QStringList& filename, const QMap<QSt
 
 void QFPRDRFCS::insertOlegFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
 {
-    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename.value(0, "")).fileName(), filename, paramValues, paramReadonly);
+    QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename), filename, paramValues, paramReadonly);
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename.value(0, "")).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
@@ -447,7 +469,7 @@ void QFPRDRFCS::insertConfocor3File(const QStringList &filename, const QMap<QStr
         QList<int> kinetics=d.getKinetics();
         QList<int> positions=d.getPositions();
         QList<QVector<int> > reps=d.getRepetitions();
-        QString name=QFileInfo(filename.value(0, "")).fileName();
+        QString name=getRDRName(filename);
         if (!d.name.isEmpty()) name=d.name;
         for (int r=0; r<reps.size(); r++) {
             if (reps[r].size()>0) {
@@ -494,7 +516,7 @@ void QFPRDRFCS::insertQF3ASCIIFile(const QStringList &filename, const QMap<QStri
             p["QF3ASCII_CORRELATION_TYPE"]=c;
             p["CHANNEL"]=reader.getCorrelationTypePreferredChannel(c);
             pro<<"QF3ASCII_CORRELATION_TYPE";
-            QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(reader.getRole(c)), filename, p, pro);
+            QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename,reader.getRole(c)), filename, p, pro);
             e->setRole(reader.getRole(c));
             e->setFolder(reader.folder);
             e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()+"_"+reader.group));
@@ -545,7 +567,7 @@ void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QStri
            p["FLEX_CF_COLUMN"]=col[j];
            QStringList rop=paramReadonly;
            rop<<"FLEX_CF_COLUMN";
-           QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(roles[j]), filename, p, rop);
+           QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename,roles[j]), filename, p, rop);
            e->setRole(roles[j]);
            if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
@@ -558,120 +580,52 @@ void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QStri
     }
 }
 
-const QString QFPRDRFCS_alvf=QObject::tr("ALV-5000 file (*.asc)");
-const QString QFPRDRFCS_alvf6=QObject::tr("ALV-6000 file (*.asc)");
-const QString QFPRDRFCS_alvf7=QObject::tr("ALV-7000 file (*.asc)");
-const QString QFPRDRFCS_flexf=QObject::tr("correlator.com files (*.sin)");
-const QString QFPRDRFCS_zeisscf3=QObject::tr("Zeiss Confocor3 files (*.fcs)");
-const QString QFPRDRFCS_asciif=QObject::tr("ASCII Data Files (*.txt *.dat *.csv)");
-const QString QFPRDRFCS_albaf=QObject::tr("ISS Alba Files (*.csv)");
-const QString QFPRDRFCS_qf3ascii=QObject::tr("QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)");
-const QString QFPRDRFCS_diff4f=QObject::tr("diffusion4 correlation (*corr.dat)");
-const QString QFPRDRFCS_olegf=QObject::tr("Oleg Kriechevsky's Binary format(*. *.dat)");
 
 QStringList QFPRDRFCS::getFCSFilters() const
 {
-
     QStringList sl;
-    sl<<QFPRDRFCS_alvf<<QFPRDRFCS_alvf6<<QFPRDRFCS_alvf7<<QFPRDRFCS_flexf<<QFPRDRFCS_zeisscf3<<QFPRDRFCS_asciif<<QFPRDRFCS_albaf<<QFPRDRFCS_qf3ascii<<QFPRDRFCS_diff4f<<QFPRDRFCS_olegf;
+    QList<QPair<QString,QString> > ft=QFRDRFCSData::getFileTypesAndFilters();
+    for (int i=0; i<ft.size(); i++) {
+        sl<<ft[i].second;
+    }
     return sl;
 }
 
 void QFPRDRFCS::setFCSFilterProperties(QMap<QString, QVariant> &p, const QString &currentFCSFileFormatFilter, const QString &filename)
 {
-    if (currentFCSFileFormatFilter==QFPRDRFCS_alvf) {
-        p["FILETYPE"]="ALV5000";
-        p["CHANNEL"]=0;
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_alvf6){
-       p["FILETYPE"]="ALV6000";
-       p["CHANNEL"]=0;
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_alvf7){
-       p["FILETYPE"]="ALV7000";
-       p["CHANNEL"]=0;
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_flexf){
-       p["FILETYPE"]="CORRELATOR.COM_SIN";
-       p["CHANNEL"]=0;
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_zeisscf3){
-       p["FILETYPE"]="CONFOCOR3";
-       p["CHANNEL"]=0;
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_olegf){
-       p["FILETYPE"]="OLEGKRIECHEVSKYBINARY";
-       p["CHANNEL"]=0;
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_qf3ascii){
-       p["FILETYPE"]="QF3ASCIICORR";
-       p["CHANNEL"]=0;
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_asciif) {
-        p["FILETYPE"]="CSV_CORR";
-        p["CSV_SEPARATOR"]=QString(",");
-        p["CSV_COMMENT"]=QString("#");
-        p["CSV_STARTSWITH"]=QString("");
-        p["CSV_ENDSWITH"]=QString("");
-        p["CSV_TIMEFACTOR"]=1.0;
-        p["CSV_FIRSTLINE"]=1;
-        p["CSV_MODE"]=0;
-
-        dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("fcs/csv_mode", 0).toInt(),
-                                                      settings->getQSettings()->value("fcs/csv_startswith", "").toString(),
-                                                      settings->getQSettings()->value("fcs/csv_endswith", "").toString(),
-                                                      settings->getQSettings()->value("fcs/csv_separator", ",").toString(),
-                                                      settings->getQSettings()->value("fcs/csv_comment", "#").toString(),
-                                                      settings->getQSettings()->value("fcs/csv_timefactor", 1.0).toDouble(),
-                                                      settings->getQSettings()->value("fcs/csv_firstline", 1).toInt());
-        loadWidgetGeometry(*settings->getQSettings(), csvDlg, QPoint(50,50), csvDlg->size(), QString("fcs/csv_dialog."));
-        if (!filename.isEmpty() && QFile::exists(filename)) csvDlg->setFileContents(filename);
-        if (csvDlg->exec()==QDialog::Accepted) {
-            p["CSV_SEPARATOR"]=QString(csvDlg->get_column_separator());
-            p["CSV_COMMENT"]=QString(csvDlg->get_comment_start());
-            p["CSV_STARTSWITH"]=csvDlg->get_startswith();
-            p["CSV_ENDSWITH"]=csvDlg->get_endswith();
-            p["CSV_TIMEFACTOR"]=csvDlg->get_timefactor();
-            p["CSV_FIRSTLINE"]=csvDlg->get_firstLine();
-            p["CSV_MODE"]=csvDlg->get_mode();
-            settings->getQSettings()->setValue("fcs/csv_separator", QString(csvDlg->get_column_separator()));
-            settings->getQSettings()->setValue("fcs/csv_comment", QString(csvDlg->get_comment_start()));
-            settings->getQSettings()->setValue("fcs/csv_startswith", QString(csvDlg->get_startswith()));
-            settings->getQSettings()->setValue("fcs/csv_endswith", QString(csvDlg->get_endswith()));
-            settings->getQSettings()->setValue("fcs/csv_timefactor", csvDlg->get_timefactor());
-            settings->getQSettings()->setValue("fcs/csv_firstline", csvDlg->get_firstLine());
-            settings->getQSettings()->setValue("fcs/csv_mode", csvDlg->get_mode());
-            saveWidgetGeometry(*settings->getQSettings(), csvDlg, "fcs/csv_dialog.");
-        } else {
-            services->setProgress(0);
-            return;
-        }
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_albaf) {
-        p["FILETYPE"]="ISS_ALBA";
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_diff4f) {
-        p["FILETYPE"]="DIFFUSION4_SIMRESULTS";
-        p["CSV_SEPARATOR"]=",";
-        p["CSV_COMMENT"]="#";
-    }
+    QFRDRFCSData::fileFiltersSetFCSFilterProperties(p,currentFCSFileFormatFilter, filename, settings, parentWidget);
 }
 
 void QFPRDRFCS::loadFCSFilterFiles(const QStringList &files, const QString &currentFCSFileFormatFilter, const QMap<QString, QVariant> &p, const QStringList &paramsReadonly)
 {
-    if (currentFCSFileFormatFilter==QFPRDRFCS_alvf) {
+    if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("ALV5000")) {
         insertALV5000File(files, p, paramsReadonly);
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_alvf6) {
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("ALV6000")) {
         insertALV6000File(files, p, paramsReadonly);
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_alvf7) {
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("ALV7000")) {
         insertALV7000File(files, p, paramsReadonly);
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_olegf) {
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("OLEGKRIECHEVSKYBINARY")) {
         insertOlegFile(files, p, paramsReadonly);
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_albaf) {
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("ISS_ALBA")) {
         insertALBAFile(files, p, paramsReadonly);
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_diff4f) {
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("PICOQUANT_ASCII_FCS")) {
+        insertPicoQuantASCIIFile(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("PICOQUANT_ASCII_FCS_W")) {
+        insertPicoQuantASCIIFile(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("DIFFUSION4_SIMRESULTS")) {
         insertDiffusion4File(files, p, paramsReadonly);
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_flexf) {
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("CORRELATOR.COM_SIN")) {
         insertFLEX_SINFile(files, p, paramsReadonly);
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_zeisscf3) {
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("CONFOCOR3")) {
         insertConfocor3File(files, p, paramsReadonly);
-    } else if (currentFCSFileFormatFilter==QFPRDRFCS_qf3ascii) {
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("QF3ASCIICORR")) {
         insertQF3ASCIIFile(files, p, paramsReadonly);
-    } else {
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("CSV_CORR")){
         insertCSVFile(files, p, paramsReadonly);
     }
 }
+
+
 
 
 

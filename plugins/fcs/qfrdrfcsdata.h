@@ -73,6 +73,11 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         Q_OBJECT
         Q_INTERFACES(QFRDRFCSDataInterface QFRDRCountRatesInterface QFRDRRunSelectionsInterface QFRDRSimpleCountRatesInterface)
     public:
+        static QList<QPair<QString, QString> > getFileTypesAndFilters();
+        static QString getFileTypesFilterForID(const QString& id);
+        static QString getFileTypesIDForFilter(const QString& filter);
+        static void fileFiltersSetFCSFilterProperties(QMap<QString, QVariant> &p, const QString &currentFCSFileFormatFilter, const QString &filename, ProgramOptions* settings, QWidget* parentWidget);
+
         /** Default constructor */
         QFRDRFCSData(QFProject* parent);
         /** Default destructor */
@@ -383,6 +388,13 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
 
         /** \brief load private data format of Oleg Kriechevsky's group */
         bool loadOlegData(QString filenames);
+
+        /** \brief load data from an ASCII file with FCS curves, exported from the PicoQuant software */
+        bool loadCorrelationCurvesFromPicoQuantASCIIFCS(QString filenames, bool weights);
+        /** \brief load data from an ASCII file with FCS curves, exported from the PicoQuant software */
+        bool loadCorrelationCurvesFromPicoQuantASCIIFCSWeights(QString filenames);
+        /** \brief load data from an ASCII file with FCS curves, exported from the PicoQuant software */
+        bool loadCorrelationCurvesFromPicoQuantASCIIFCSNoWeights(QString filenames);
 
         /** \brief load  data format of correlator.com (*.sin) */
         bool loadCorrelatorComSIN(QString filename);

@@ -40,7 +40,21 @@
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>x-errors:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="JKQTPerrorPlotstyleComboBox" name="cmbErrorStyleX"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>y-errors:</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="JKQTPerrorPlotstyleComboBox" name="cmbErrorStyleY"/>
@@ -170,8 +184,8 @@
      <y>23</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1</x>
-     <y>38</y>
+     <x>78</x>
+     <y>145</y>
     </hint>
    </hints>
   </connection>
@@ -186,8 +200,8 @@
      <y>23</y>
     </hint>
     <hint type="destinationlabel">
-     <x>48</x>
-     <y>36</y>
+     <x>124</x>
+     <y>114</y>
     </hint>
    </hints>
   </connection>
@@ -202,8 +216,8 @@
      <y>20</y>
     </hint>
     <hint type="destinationlabel">
-     <x>154</x>
-     <y>38</y>
+     <x>268</x>
+     <y>83</y>
     </hint>
    </hints>
   </connection>
@@ -218,8 +232,8 @@
      <y>24</y>
     </hint>
     <hint type="destinationlabel">
-     <x>268</x>
-     <y>35</y>
+     <x>396</x>
+     <y>59</y>
     </hint>
    </hints>
   </connection>

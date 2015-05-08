@@ -91,6 +91,8 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation, publi
         /** \brief return the largest available index */
         virtual int getIndexMax(const QFRawDataRecord* r) const;
 
+        virtual QString getIndexName(const QFRawDataRecord *rec, int index) const;
+
         /*! \brief perform a fit for the given \a record and \a run
 
             The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
@@ -162,6 +164,7 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation, publi
 
         using QFFitResultsByIndexEvaluation::getEvaluationResultID;
         using QFFitResultsByIndexEvaluation::hasSpecial;
+
 
 
 };

@@ -401,7 +401,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
 
 
     menuTools=propertyEditor->addOrFindMenu("&Tools", 0);
-    menuTools->addAction(actOverlayPlot);
+    menuTools->addAction(menuOverlays->menuAction());
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
     connect(cmbXAxisType, SIGNAL(currentIndexChanged(int)), this, SLOT(chkShowDChanged()));
@@ -678,6 +678,7 @@ void QFFCSMaxEntEvaluationEditor::displayData() {
         if (data->getCorrelationN()>0) {
             size_t c_tau=ds->addColumn(data->getCorrelationT(), data->getCorrelationN(), "tau");
 
+        //qDebug()<<record->getName()<<":\n"<<eval->getCurrentIndex()<<data->getCorrelationRuns()<<data->getCorrelationN();
 
             //////////////////////////////////////////////////////////////////////////////////
             // Plot average + error markers
@@ -1147,27 +1148,18 @@ void QFFCSMaxEntEvaluationEditor::displayParameters() {
     QFSimpleFitParameterEnumeratorInterface* peval=qobject_cast<QFSimpleFitParameterEnumeratorInterface*>(current);
     if ((!record)||(!eval)/*||(!data)*/) return;
 
+    bool hasEval=eval->hasResults(record);
     bool oldde=dataEventsEnabled;
     dataEventsEnabled=false;
     edtNdist->setValue(eval->getNdist());
     edtNumIter->setValue(eval->getNumIter());
     dataEventsEnabled=oldde;
 
-
-    if (eval->hasResults(record)) {
-        datacut->setEnabled(false);
-        edtNdist->setEnabled(false);
-        cmbTauMode->setEnabled(false);
-        edtTauMax->setEnabled(false);
-        edtTauMin->setEnabled(false);
-    } else {
-        datacut->setEnabled(true);
-        edtNdist->setEnabled(true);
-        cmbTauMode->setEnabled(true);
-        edtTauMax->setEnabled(true);
-        edtTauMin->setEnabled(true);
-    }
-
+    datacut->setEnabled(!hasEval);
+    edtNdist->setEnabled(!hasEval);
+    cmbTauMode->setEnabled(!hasEval);
+    edtTauMax->setEnabled(!hasEval);
+    edtTauMin->setEnabled(!hasEval);
 }
 
 
@@ -1204,6 +1196,7 @@ void QFFCSMaxEntEvaluationEditor::fitCurrent() {
     displayParameters();
     displayData();
     dlgEvaluationProgress->setValue(100);
+    dlgEvaluationProgress->close();
 
     QApplication::restoreOverrideCursor();
 }
@@ -1252,6 +1245,7 @@ void QFFCSMaxEntEvaluationEditor::fitRunsCurrent() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged(record);
     dlgEvaluationProgress->setValue(recs.size());
+    dlgEvaluationProgress->close();
     displayParameters();
     displayData();
     QApplication::restoreOverrideCursor();
@@ -1303,6 +1297,7 @@ void QFFCSMaxEntEvaluationEditor::fitAll() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
+    dlgEvaluationProgress->close();
     displayParameters();
     displayData();
     QApplication::restoreOverrideCursor();
@@ -1356,6 +1351,7 @@ void QFFCSMaxEntEvaluationEditor::fitRunsAll() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
+    dlgEvaluationProgress->close();
     displayParameters();
     displayData();
     QApplication::restoreOverrideCursor();

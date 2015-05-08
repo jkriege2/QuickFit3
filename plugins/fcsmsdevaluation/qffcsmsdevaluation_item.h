@@ -151,6 +151,7 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         void setFitType(int type, QFRawDataRecord* record, int run);
 
 
+        QString getIndexName(const QFRawDataRecord *rec, int index) const;
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */

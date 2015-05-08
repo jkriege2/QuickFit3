@@ -578,7 +578,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     menuResults->addAction(actPrintReport);
 
     menuTools=propertyEditor->addOrFindMenu("&Tools", 0);
-    menuTools->addAction(actOverlayPlot);
+    menuTools->addAction(menuOverlays->menuAction());
+
 
 
     propertyEditor->getHelpMenu()->addAction(actAlgorithmHelp);

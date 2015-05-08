@@ -64,6 +64,8 @@ class QFRDRAnnotationInterface {
 
 
         virtual int annotGetCount() const=0;
+        virtual void annotDelete(int i)=0;
+        virtual void annotDeleteAll()=0;
         virtual QString annotGetLabel(int annotation) const=0;
         virtual int annotGetIndex(int annotation) const=0;
         virtual QFRDRAnnotationTypes annotGetType(int annotation) const=0;

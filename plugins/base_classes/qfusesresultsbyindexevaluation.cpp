@@ -154,8 +154,9 @@ void QFUsesResultsByIndexEvaluation::intReadData(QDomElement *e) {
     if (!OK) currentIndex=-1;
 }
 
-void QFUsesResultsByIndexEvaluation::setCurrentIndex(int index) {
+void QFUsesResultsByIndexEvaluation::setCurrentIndex(int index) {    
     currentIndex=index;
+    //qDebug()<<"setCurrentIndex("<<index<<"): currentIndex="<<currentIndex<<getHighlightedRecord()<<getIndexMin(getHighlightedRecord())<<getIndexMax(getHighlightedRecord());
 }
 
 int QFUsesResultsByIndexEvaluation::getCurrentIndex() const {
@@ -170,6 +171,11 @@ int QFUsesResultsByIndexEvaluation::getIndexMin(const QFRawDataRecord *r) const 
 
 int QFUsesResultsByIndexEvaluation::getIndexMax(const QFRawDataRecord *r) const {
     return 0;
+}
+
+QString QFUsesResultsByIndexEvaluation::getIndexName(const QFRawDataRecord *rec, int index) const
+{
+    return QString::number(index);
 }
 
 void QFUsesResultsByIndexEvaluation::setFitResultFitStatistics(QFRawDataRecord* record, int index, const QFFitStatistics& result, const QString &prefix, const QString &group)

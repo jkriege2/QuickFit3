@@ -627,7 +627,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     tabResidulas->addTab(pltOverview, tr("Overview Image"));
 
     menuTools=propertyEditor->addOrFindMenu("&Tools", 0);
-    menuTools->addAction(actOverlayPlot);
+    menuTools->addAction(menuOverlays->menuAction());
 
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
@@ -1451,6 +1451,8 @@ void QFFCSMSDEvaluationEditor::displayParameters() {
     QFSimpleFitParameterEnumeratorInterface* peval=qobject_cast<QFSimpleFitParameterEnumeratorInterface*>(current);
     if ((!record)||(!eval)/*||(!data)*/) return;
 
+    bool hasEval=eval->hasResults(record);
+
     bool oldde=dataEventsEnabled;
     dataEventsEnabled=false;
     spinFitWidth->setValue(eval->getFitWidth(eval->getHighlightedRecord(), eval->getCurrentIndex()));
@@ -1471,13 +1473,7 @@ void QFFCSMSDEvaluationEditor::displayParameters() {
     dataEventsEnabled=oldde;
 
 
-    if (eval->hasResults(record)) {
-        datacut->setEnabled(false);
-        //edtNdist->setEnabled(false);
-    } else {
-        datacut->setEnabled(true);
-        //edtNdist->setEnabled(true);
-    }
+    datacut->setEnabled(!hasEval);
 
 }
 

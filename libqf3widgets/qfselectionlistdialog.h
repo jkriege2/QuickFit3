@@ -52,12 +52,13 @@ class QFWIDLIB_EXPORT QFSelectionListDialog : public QDialog
         ~QFSelectionListDialog();
 
         void init(QStringList itemNames, QList<QVariant> itemData, QList<QColor> colors);
-        void init(QStringList itemNames, QList<QVariant> itemData=QList<QVariant>());
+        void init(QStringList itemNames, QList<QVariant> itemData);
         void init(QStringList itemNames, QList<QVariant> itemData, QSettings &settings, const QString &prefix=QString());
         void init(QStringList itemNames, QList<QVariant> itemData, QList<QColor> colors, QSettings &settings, const QString &prefix=QString());
 
         void init(QStringList itemNames, QStringList itemData, QList<QColor> colors);
         void init(QStringList itemNames, QStringList itemData);
+        void init(QStringList itemNames);
         void init(QStringList itemNames, QStringList itemData, QSettings &settings, const QString &prefix=QString());
         void init(QStringList itemNames, QStringList itemData, QList<QColor> colors, QSettings &settings, const QString &prefix=QString());
 

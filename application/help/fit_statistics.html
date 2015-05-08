@@ -84,7 +84,7 @@ $$endbox$$
 <h3>Akaike's Information criterion (AICc)</h3>
 <p>The AICc is a measure that can be used for model selection. It is related to the RSS, but in addition penalizes the number of parameters in a model:$$ref:Akaike1974:Akaike H  (1974) A new look at the statistical model identification. <i>IEEE Transactions on Automatic Control</i> <b>19</b><b>:</b> 716-723 DOI: 10.1109/TAC.1974.1100705$$$$ref:Levin2004:Levin M K, Carson J H  (2004) Fluorescence correlation spectroscopy and quantitative cell biology. <i>Differentiation</i> <b>72</b><b>:</b> 1-10 DOI: 10.1111/j.1432-0436.2004.07201002.x $$$$ref:Burnham2002:
 Burnham K P, Anderson D R  (2002) Model Selection and Multimodel Inference. New York, London, Berlin: Springer$$
-$[ \mbox{AICc}\ =\ K\cdot \log_{10}\left[\frac{\mbox{RSS}}{K}\right]+2\cdot \mbox{NP}+\frac{2\cdot \mbox{NP}\cdot (\mbox{NP}+1)}{K-\mbox{NP}-1} ]$
+$[ \mbox{AICc}\ =\ K\cdot \ln\left[\frac{\mbox{RSS}}{K}\right]+2\cdot \mbox{NP}+\frac{2\cdot \mbox{NP}\cdot (\mbox{NP}+1)}{K-\mbox{NP}-1} ]$
 The version given above contains a summand (the last one), which corrects it for small sample sizes $(K)$, therefore the name AICc. 
 
 $$startbox_note$$

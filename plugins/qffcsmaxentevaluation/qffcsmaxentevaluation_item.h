@@ -71,8 +71,8 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         /** \brief do the evaluation */
         virtual void doFit(QFRawDataRecord* record, int index, int model, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, int runAvgWidth=11, int residualHistogramBins=25);
 
-        virtual int getIndexMin(QFRawDataRecord* r) const;
-        virtual int getIndexMax(QFRawDataRecord* r) const;
+        virtual int getIndexMin(const QFRawDataRecord* r) const;
+        virtual int getIndexMax(const QFRawDataRecord* r) const;
         virtual int getModelCount(QFRawDataRecord* r, int index) const;
 
         /** \brief set the current alpha value */
@@ -179,7 +179,8 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
          */
         virtual bool hasSpecial(const QFRawDataRecord* r, const QString& resultID, const QString& paramid, double& value, double& error) const;
 
-protected:
+        QString getIndexName(const QFRawDataRecord *rec, int index) const;
+    protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
         virtual bool isApplicable(const QFRawDataRecord* record) const;

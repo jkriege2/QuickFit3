@@ -390,7 +390,7 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     actSetParameterFromFile=new QAction(tr("set fit parameter from file ..."), this)    ;
     connect(actSetParameterFromFile, SIGNAL(triggered()), this, SLOT(setFitParameterFromFile()));
     menuTools->addAction(actSetParameterFromFile);
-    menuTools->addAction(actOverlayPlot);
+    //menuTools->addAction(menuOverlays);
 
     splitPlot->setStretchFactor(0,9);
     splitPlot->setStretchFactor(1,3);

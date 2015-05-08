@@ -30,6 +30,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "alv7000tools.h"
 #include "confocor3tools.h"
 #include "qf3correlationdataformattool.h"
+#include "dlgcsvparameters.h"
 
 #define loadSeveral(res, filenames, loadFunction) {\
     res=false; \
@@ -67,13 +68,13 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
                 ritems=qMin(ritems, otherdata[i].rateN);\
                 if (res) { \
                     for (int t=0; t<correlationN; t++) { \
-                        if (otherdata[0].correlationT[t]!=otherdata[i].correlationT[t]) { \
+                        if (fabs(otherdata[0].correlationT[t]-otherdata[i].correlationT[t])>1e-3*otherdata[0].correlationT[t]) { \
                             res=false; \
                             setError(tr("error loading file '%1': lag-time axis does not equal the previous files").arg(filenames.value(i))); \
                         } \
                     } \
                     for (int t=0; t<ritems; t++) { \
-                        if (otherdata[0].rateT[t]!=otherdata[i].rateT[t]) { \
+                        if (fabs(otherdata[0].rateT[t]-otherdata[i].rateT[t])>1e-3*otherdata[0].rateT[t]) { \
                             res=false; \
                             setError(tr("error loading file '%1': rate time-axis does not equal the previous files").arg(filenames.value(i))); \
                         } \
@@ -117,6 +118,116 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
             otherdata.clear(); \
         } \
     } \
+}
+
+QList<QPair<QString, QString> > QFRDRFCSData::getFileTypesAndFilters()
+{
+    QList<QPair<QString, QString> > ft;
+    ft.append(qMakePair(QString("ALV5000"), tr("ALV-5000 file (*.asc)")));
+    ft.append(qMakePair(QString("ALV6000"), tr("ALV-6000 file (*.asc)")));
+    ft.append(qMakePair(QString("ALV7000"), tr("ALV-7000 file (*.asc)")));
+    ft.append(qMakePair(QString("CORRELATOR.COM_SIN"), tr("correlator.com files (*.sin)")));
+    ft.append(qMakePair(QString("CONFOCOR3"), tr("Zeiss Confocor3 files (*.fcs)")));
+    ft.append(qMakePair(QString("ISS_ALBA"), tr("ISS Alba Files (*.csv)")));
+    ft.append(qMakePair(QString("PICOQUANT_ASCII_FCS_W"), tr("PicoQuant ASCII FCS Curves Files with weights (*.dat)")));
+    ft.append(qMakePair(QString("PICOQUANT_ASCII_FCS"), tr("PicoQuant ASCII FCS Curves Files (*.dat)")));
+    ft.append(qMakePair(QString("QF3ASCIICORR"), tr("QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)")));
+    ft.append(qMakePair(QString("CSV_CORR"), tr("ASCII Data Files (*.txt *.dat *.csv)")));
+    ft.append(qMakePair(QString("DIFFUSION4_SIMRESULTS"), tr("diffusion4 correlation (*corr.dat)")));
+    ft.append(qMakePair(QString("OLEGKRIECHEVSKYBINARY"), tr("Oleg Kriechevsky's Binary format(*. *.dat)")));
+    return ft;
+}
+
+QString QFRDRFCSData::getFileTypesFilterForID(const QString &id)
+{
+    QList<QPair<QString, QString> > fl=getFileTypesAndFilters();
+    for (int i=0; i<fl.size(); i++) {
+        if (fl[i].first.toUpper()==id.trimmed().toUpper()) return fl[i].second;
+    }
+    return "";
+}
+
+QString QFRDRFCSData::getFileTypesIDForFilter(const QString &filter)
+{
+    QList<QPair<QString, QString> > fl=getFileTypesAndFilters();
+    for (int i=0; i<fl.size(); i++) {
+        if (fl[i].second==filter.trimmed()) return fl[i].first;
+    }
+    return "";
+}
+
+void QFRDRFCSData::fileFiltersSetFCSFilterProperties(QMap<QString, QVariant> &p, const QString &currentFCSFileFormatFilter, const QString &filename, ProgramOptions *settings, QWidget *parentWidget)
+{
+    if (currentFCSFileFormatFilter==getFileTypesFilterForID("ALV5000")) {
+        p["FILETYPE"]="ALV5000";
+        p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("ALV6000")){
+       p["FILETYPE"]="ALV6000";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("ALV7000")){
+       p["FILETYPE"]="ALV7000";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("CORRELATOR.COM_SIN")){
+       p["FILETYPE"]="CORRELATOR.COM_SIN";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("CONFOCOR3")){
+       p["FILETYPE"]="CONFOCOR3";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("OLEGKRIECHEVSKYBINARY")){
+       p["FILETYPE"]="OLEGKRIECHEVSKYBINARY";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("QF3ASCIICORR")){
+       p["FILETYPE"]="QF3ASCIICORR";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("CSV_CORR")) {
+        p["FILETYPE"]="CSV_CORR";
+        p["CSV_SEPARATOR"]=QString(",");
+        p["CSV_COMMENT"]=QString("#");
+        p["CSV_STARTSWITH"]=QString("");
+        p["CSV_ENDSWITH"]=QString("");
+        p["CSV_TIMEFACTOR"]=1.0;
+        p["CSV_FIRSTLINE"]=1;
+        p["CSV_MODE"]=0;
+
+        dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("fcs/csv_mode", 0).toInt(),
+                                                      settings->getQSettings()->value("fcs/csv_startswith", "").toString(),
+                                                      settings->getQSettings()->value("fcs/csv_endswith", "").toString(),
+                                                      settings->getQSettings()->value("fcs/csv_separator", ",").toString(),
+                                                      settings->getQSettings()->value("fcs/csv_comment", "#").toString(),
+                                                      settings->getQSettings()->value("fcs/csv_timefactor", 1.0).toDouble(),
+                                                      settings->getQSettings()->value("fcs/csv_firstline", 1).toInt());
+        loadWidgetGeometry(*settings->getQSettings(), csvDlg, QPoint(50,50), csvDlg->size(), QString("fcs/csv_dialog."));
+        if (!filename.isEmpty() && QFile::exists(filename)) csvDlg->setFileContents(filename);
+        if (csvDlg->exec()==QDialog::Accepted) {
+            p["CSV_SEPARATOR"]=QString(csvDlg->get_column_separator());
+            p["CSV_COMMENT"]=QString(csvDlg->get_comment_start());
+            p["CSV_STARTSWITH"]=csvDlg->get_startswith();
+            p["CSV_ENDSWITH"]=csvDlg->get_endswith();
+            p["CSV_TIMEFACTOR"]=csvDlg->get_timefactor();
+            p["CSV_FIRSTLINE"]=csvDlg->get_firstLine();
+            p["CSV_MODE"]=csvDlg->get_mode();
+            settings->getQSettings()->setValue("fcs/csv_separator", QString(csvDlg->get_column_separator()));
+            settings->getQSettings()->setValue("fcs/csv_comment", QString(csvDlg->get_comment_start()));
+            settings->getQSettings()->setValue("fcs/csv_startswith", QString(csvDlg->get_startswith()));
+            settings->getQSettings()->setValue("fcs/csv_endswith", QString(csvDlg->get_endswith()));
+            settings->getQSettings()->setValue("fcs/csv_timefactor", csvDlg->get_timefactor());
+            settings->getQSettings()->setValue("fcs/csv_firstline", csvDlg->get_firstLine());
+            settings->getQSettings()->setValue("fcs/csv_mode", csvDlg->get_mode());
+            saveWidgetGeometry(*settings->getQSettings(), csvDlg, "fcs/csv_dialog.");
+        } else {
+            return;
+        }
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("ISS_ALBA")) {
+        p["FILETYPE"]="ISS_ALBA";
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("PICOQUANT_ASCII_FCS")) {
+        p["FILETYPE"]="PICOQUANT_ASCII_FCS";
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("PICOQUANT_ASCII_FCS_W")) {
+        p["FILETYPE"]="PICOQUANT_ASCII_FCS_W";
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("DIFFUSION4_SIMRESULTS")) {
+        p["FILETYPE"]="DIFFUSION4_SIMRESULTS";
+        p["CSV_SEPARATOR"]=",";
+        p["CSV_COMMENT"]="#";
+    }
 }
 
 QFRDRFCSData::QFRDRFCSData(QFProject* parent):
@@ -180,6 +291,7 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
     if (correlation) qfFree(correlation);
     if (correlationMean) qfFree(correlationMean);
     if (correlationStdDev) qfFree(correlationStdDev);
+    if (correlationErrors) qfFree(correlationErrors);
     correlationRuns=0;
     correlationN=0;
     correlationT=NULL;
@@ -294,23 +406,17 @@ QFRawDataRecord::FileListEditOptions QFRDRFCSData::isFilesListEditable() const
 
 bool QFRDRFCSData::selectNewFiles(QStringList &files, QStringList &types, QStringList &descriptions) const
 {
-    QString filter=tr("All Files (*.*)");
+    QString filter;
     QString filetype=getProperty("FILETYPE", "unknown").toString().toUpper();
-    if (filetype=="ALV5000") filter=tr("ALV-5000 file (*.asc)");
-    if (filetype=="ALV6000") filter=tr("ALV-6000 file (*.asc)");
-    if (filetype=="ALV7000") filter=tr("ALV-7000 file (*.asc)");
-    if (filetype=="OLEGKRIECHEVSKYBINARY") filter=tr("Oleg Kriechevsky's Binary format(*. *.dat)");
-    if (filetype=="CSV_CORR") filter=tr("ASCII Data Files (*.txt *.dat *.csv)");
-    if (filetype=="ISS_ALBA") filter=tr("ISS Alba Files (*.csv)");
-    if (filetype=="DIFFUSION4_SIMRESULTS") filter=tr("Diffusion4 simulation results (*corr.dat *bts.dat)");
-    if (filetype=="CORRELATOR.COM_SIN") filter=tr("correlator.com files (*.sin)");
-    if (filetype=="CONFOCOR3") filter=tr("Zeiss Confocor3 files (*.fcs)");
-    if (filetype=="QF3ASCIICORR") filter=tr("QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)");
+
+    filter=getFileTypesFilterForID(filetype);
+    if (filter.isEmpty()) filter=tr("All Files (*.*)");
+
 
 
     if (filetype!="INTERNAL") {
         files = qfGetOpenFileNamesSet("fcs/new_files/", NULL,
-                              tr("Select FCS Data File(s) to Import ..."),
+                              tr("Select FCS Data File(s) to Add/Import ..."),
                               ProgramOptions::getInstance()->getCurrentRawDataDir(),
                               filter);
         types.clear();
@@ -2077,8 +2183,10 @@ bool QFRDRFCSData::loadFromALV7000File(QString &filename)
 
 QString QFRDRFCSData::getCorrelationRunName(int run) const {
     //if (run<0) return tr("average");
-    if (run<correlationRuns) return tr("run %1").arg(run);
-    return QString("");
+    QString name="";
+    if (run<correlationRuns) name= tr("run %1").arg(run);
+    if (leaveoutRun(run)) name+=tr(" (excl.)");
+    return name;
 }
 
 double *QFRDRFCSData::getRate(int channel) const
@@ -2435,6 +2543,30 @@ bool QFRDRFCSData::reloadFromFiles() {
             return false;
         }
         return loadCorrelationCurvesFromALBA(files);
+    } else if (filetype.toUpper()=="PICOQUANT_ASCII_FCS_W") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return false;
+        }
+        bool res=false;
+        if (files.size()==1) {
+            res=loadCorrelationCurvesFromPicoQuantASCIIFCSWeights(files[0]);
+        } else if (files.size()>1) {
+            loadSeveral(res, files, loadCorrelationCurvesFromPicoQuantASCIIFCSWeights);
+        }
+        return res;
+    } else if (filetype.toUpper()=="PICOQUANT_ASCII_FCS") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return false;
+        }
+        bool res=false;
+        if (files.size()==1) {
+            res=loadCorrelationCurvesFromPicoQuantASCIIFCSNoWeights(files[0]);
+        } else if (files.size()>1) {
+            loadSeveral(res, files, loadCorrelationCurvesFromPicoQuantASCIIFCSNoWeights);
+        }
+        return res;
     } else if (filetype.toUpper()=="DIFFUSION4_SIMRESULTS") {
         if (files.size()<=0) {
             setError(tr("there are no files in the FCS record!"));
@@ -2788,6 +2920,146 @@ bool QFRDRFCSData::loadOlegData(QString filename)
     return ok;
 }
 
+bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantASCIIFCS(QString filename, bool weights)
+{
+    QFile f(filename);
+    if (f.open(QFile::ReadOnly|QFile::Text)) {
+        QTextStream txt(&f);
+        QList<QVector<double> > corr;
+        while (!f.atEnd()) {
+            QVector<double> data=csvReadline(txt, ' ', '#', 0, "\n", "\r");
+            bool added=false;
+            if (data.size()>=2 && QFFloatIsOK(data[0]) && data[0]>0 && QFFloatIsOK(data[1])) {
+                QVector<double> d;
+                d<<data[0]<<data[1];
+                corr<<d;
+                added=true;
+            }
+            if (weights && data.size()>=3 && QFFloatIsOK(data[2]) && data[2]>0 && added) {
+                corr.last().append(data[2]);
+            }
+            //if (added) qDebug()<<corr.last();
+        }
+        f.close();
+        if (corr.size()>0) {
+            //double taumin=corr[0].at(0)*1e-3;
+            resizeCorrelations(corr.size(), 1);
+            //qDebug()<<"correlationN="<<correlationN;
+            for (int i=0; i<correlationN; i++) {
+                if (corr[i].size()>=2) {
+                    correlationT[i]=(round(corr[i].at(0)*1e6)/1e6)*1e-3;
+                    correlation[i]=corr[i].at(1);
+                    if (weights && corr[i].size()>=3) correlationErrors[i]=1/corr[i].at(2);
+                }
+            }
+            recalculateCorrelations();
+            emitRawDataChanged();
+            return true;
+        } else {
+            setError(tr("Error while reading correlation functions from PicoQuant ASCII file '%1': %2").arg(filename).arg(tr("No valid data found in file")));
+            return false;
+        }
+    } else {
+        setError(tr("Error while reading correlation functions from PicoQuant ASCII file '%1': %2").arg(filename).arg(f.errorString()));
+        return false;
+    }
+
+    return false;
+
+}
+
+bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantASCIIFCSWeights(QString filenames)
+{
+    return loadCorrelationCurvesFromPicoQuantASCIIFCS(filenames, true);
+}
+
+bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantASCIIFCSNoWeights(QString filenames)
+{
+    return loadCorrelationCurvesFromPicoQuantASCIIFCS(filenames, false);
+}
+
+//    datatable2 tab;
+
+//        try {
+//            tab.load_csv(d.filename.toStdString(), ' ' , '#', startswith, endswith, firstline);        // load some csv file
+//            long long lines=tab.get_line_count();
+//            long long columns=tab.get_column_count();
+//            //qDebug()<<"lines="<<lines<<"   columns="<<columns<<QString::number(separatorchar);
+//            QFPluginServices::getInstance()->log_text(tr("  read CSV file '%1' as FCS record.\n  Found %2 lines and %3 columns.\n").arg(d.filename).arg(lines).arg(columns));
+//            if (mode==0) { // tau, corr, corr, ...
+//                rruns=rruns+columns-1;
+//            } else if (mode==1) { // tau, corr, error, corr, error, ...
+//                rruns=rruns+(columns-1)/2;
+//            }
+//            ccorrN=qMax(lines, ccorrN);
+//        } catch(datatable2_exception& e) {   // error handling with exceptions
+//            setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(d.filename).arg(QString(e.get_message().c_str())));
+//            error=true;
+//            break;
+//        }
+//        data.append(d);
+//        if (error) break;
+//    }
+//    if (!error) {
+//        resizeCorrelations(ccorrN, rruns);
+//        int run0=0;
+//        for (int ii=0; ii<filenames.size(); ii++) {
+//            try {
+//                long long lines=data[ii].tab->get_line_count();
+//                long long columns=data[ii].tab->get_column_count();
+//                int runincrement=(columns-1);
+
+//                for (long long l=0; l<lines; l++) {
+//                    if (ii==0) correlationT[l]=data[ii].tab->get(0, l)*timefactor;
+//                    else if (correlationT[l]!=data[ii].tab->get(0, l)*timefactor) {
+//                        setError(tr("Error while reading correlation fucntions from CSV file '%1': time does not match time in file '%2'").arg(data[ii].filename).arg(data[0].filename));
+//                        error=true;
+//                        break;
+//                    }
+//                    if (mode==0) { // tau, corr, corr, ...
+//                        for (int c=1; c<columns; c++) {
+//                            correlation[(run0+c-1)*correlationN+l]=data[ii].tab->get(c, l);
+//                        }
+//                        runincrement=(columns-1);
+//                    } else if (mode==1) { // tau, corr, error, corr, error, ...
+//                        for (int c=1; c<columns; c+=2) {
+//                            if (c<columns) {
+//                                correlation[(run0+(c-1)/2)*correlationN+l]=data[ii].tab->get(c, l);
+//                            }
+//                            if (c+1<columns) {
+//                                correlationErrors[(run0+(c-1)/2)*correlationN+l]=data[ii].tab->get(c+1, l);
+//                            } else {
+//                                correlationErrors[(run0+(c-1)/2)*correlationN+l]=0;
+//                            }
+//                        }
+//                        runincrement=(columns-1)/2;
+//                    }
+//                }
+//                run0=run0+runincrement;
+
+//            } catch(datatable2_exception& e) {   // error handling with exceptions
+//                setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(data[ii].filename).arg(QString(e.get_message().c_str())));
+//                error=true;
+//                break;
+//            }
+//            if (error) break;
+//        }
+//    }
+
+//    for (int ii=0; ii<data.size(); ii++) {
+//        delete data[ii].tab;
+//    }
+//    data.clear();
+
+//    if (!error) {
+//        recalculateCorrelations();
+//        emitRawDataChanged();
+//        return true;
+//    } else {
+//        return false;
+//    }
+
+
 bool QFRDRFCSData::loadCorrelatorComSIN(QString filename)
 {
     bool ok=true;
@@ -2934,7 +3206,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                         for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) correlationT[i]=f.tau.value(i, 0.0);
                     } else {
                         bool okT=true;
-                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {if (correlationT[i]!=f.tau.value(i, 0.0)) {okT=false; break;}}
+                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {if (fabs(correlationT[i]-f.tau.value(i, 0.0))>1e-3*correlationT[i]) {okT=false; break;}}
                         if (!okT) {
                             ok=false;
                             setError(tr("Error while importing ConfoCor3 file '%1':\n    lag-time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
@@ -2957,7 +3229,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                         for (int i=0; i<qMin((int64_t)rateN, Nr); i++) rateT[i]=f.time.value(i, 0.0);
                     } else {
                         bool okT=true;
-                        for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {if (rateT[i]!=f.time.value(i, 0.0)) {okT=false; break;}}
+                        for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {if (fabs(rateT[i]-f.time.value(i, 0.0))>1e-3*rateT[i]) {okT=false; break;}}
                         if (!okT) {
                             ok=false;
                             setError(tr("Error while importing ConfoCor3 file '%1':\n    time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));

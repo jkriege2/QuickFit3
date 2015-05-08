@@ -62,7 +62,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
     signals:
         void runSimulation();
     public slots:
-        void openFile(const QString& file);
+        void openFile(const QString& file, const QString& filter=QString());
         void userSelectFile();
         void clickAddJob();
         void clickAddJobSeries(const QString& parameter, double start, double end, double inc);

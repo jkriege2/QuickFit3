@@ -118,7 +118,13 @@ int QFFCSMSDEvaluationItem::getIndexMax(const QFRawDataRecord *r) const {
     return QFUsesResultsByIndexAndModelEvaluation::getIndexMin(r);
 }
 
-
+QString QFFCSMSDEvaluationItem::getIndexName(const QFRawDataRecord *rec, int index) const {
+    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(rec);
+    if (fcs) {
+        return fcs->getCorrelationRunName(index);
+    }
+    return QFUsesResultsByIndexAndModelEvaluation::getIndexName(rec, index);
+}
 
 
 

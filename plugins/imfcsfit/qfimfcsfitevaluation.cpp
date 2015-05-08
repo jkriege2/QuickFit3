@@ -188,7 +188,13 @@ int QFImFCSFitEvaluation::getIndexMax(const QFRawDataRecord *r) const {
     else return fcs->getCorrelationRuns()-1;
 }
 
-
+QString QFImFCSFitEvaluation::getIndexName(const QFRawDataRecord *rec, int index) const {
+    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(rec);
+    if (fcs) {
+        return fcs->getCorrelationRunName(index);
+    }
+    return QFFitResultsByIndexEvaluation::getIndexName(rec, index);
+}
 
 
 

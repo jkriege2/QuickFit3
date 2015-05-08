@@ -256,6 +256,7 @@ QString QFFitStatistics::getAsHTMLTable(bool addExplanation, bool includeR2) con
 
 
 
+
 QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, double* fitFuncParams, double* fitFuncParamErrors) {
     datacut_max=qBound((long)datacut_min, (long)datacut_max, (long)N-1);
     QFFitStatistics result;
@@ -364,8 +365,8 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
     {
         double p=double(result.fitparamN);
         double n=double(result.dataSize);
-        result.AICc=n*log10(result.residSqrSum/n)+2.0*p+2.0*p*(p+1)/(n-p-1.0);
-        result.AICcWeighted=n*log10(result.residWeightSqrSum/n)+2.0*p+2.0*p*(p+1)/(n-p-1.0);
+        result.AICc=n*log(result.residSqrSum/n)+2.0*p+2.0*p*(p+1)/(n-p-1.0);
+        result.AICcWeighted=n*log(result.residWeightSqrSum/n)+2.0*p+2.0*p*(p+1)/(n-p-1.0);
         result.BIC=n*log(result.residSqrSum/n)+p*log(n);
         result.BICweighted=n*log(result.residWeightSqrSum/n)+p*log(n);
     }

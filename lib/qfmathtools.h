@@ -1528,4 +1528,5 @@ struct QFLIB_EXPORT QFFitStatistics {
   */
 QFLIB_EXPORT QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, double* fitFuncParams=NULL, double* fitFuncParamErrors=NULL);
 
+
 #endif // QFMATHTOOLS_H

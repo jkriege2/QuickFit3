@@ -33,6 +33,9 @@ class QFLIB_EXPORT QFRDRAnnotationTools : public QFRDRAnnotationInterface
         QFRDRAnnotationTools(QFRawDataRecord* rdr=NULL, bool saveAsVectors=true);
         virtual ~QFRDRAnnotationTools();
 
+        virtual void annotDelete(int i);
+        virtual void annotDeleteAll();
+
         virtual void annotSetRDR(QFRawDataRecord* rdr);
         int annotAdd(QFRDRAnnotationTypes type, const QString& label, int index);
         int annotAdd(QFRDRAnnotationTypes type, const QString& label, double x, double y=0, double z=0);

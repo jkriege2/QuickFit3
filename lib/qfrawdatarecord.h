@@ -966,8 +966,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsSet(const QFFitFitResultsStore& results, bool setGroupProps=true);
 
 
+        /** \brief store the given QFFitSTatistics as results */
         void resultsSetFitStatistics(const QFFitStatistics& result, const QString &evalID, const QString &prefix=QString("fitstat_"), const QString &group=QString("fit statistics"));
-
+        /** \brief returns a list of resultIDs and labels for the fit statistics parameters */
+        static void getStatisticsParams(QStringList* ids, QStringList* labels, QStringList* labelsHTML, const QString& prefix=QString("fitstat_"));
 
 
         /** \brief return a specified result  */

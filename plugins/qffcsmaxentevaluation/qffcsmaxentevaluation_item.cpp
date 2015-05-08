@@ -85,7 +85,7 @@ bool QFFCSMaxEntEvaluationItem::isApplicable(const QFRawDataRecord *record) cons
 }
 
 
-int QFFCSMaxEntEvaluationItem::getIndexMin(QFRawDataRecord *r) const {
+int QFFCSMaxEntEvaluationItem::getIndexMin(const QFRawDataRecord *r) const {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(r);
     if (data) {
         return -1;
@@ -93,7 +93,7 @@ int QFFCSMaxEntEvaluationItem::getIndexMin(QFRawDataRecord *r) const {
     return QFUsesResultsByIndexAndModelEvaluation::getIndexMin(r);
 }
 
-int QFFCSMaxEntEvaluationItem::getIndexMax(QFRawDataRecord *r) const {
+int QFFCSMaxEntEvaluationItem::getIndexMax(const QFRawDataRecord *r) const {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(r);
     if (data) {
         return data->getCorrelationRuns()-1;
@@ -102,7 +102,13 @@ int QFFCSMaxEntEvaluationItem::getIndexMax(QFRawDataRecord *r) const {
 }
 
 
-
+QString QFFCSMaxEntEvaluationItem::getIndexName(const QFRawDataRecord *rec, int index) const {
+    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(rec);
+    if (fcs) {
+        return fcs->getCorrelationRunName(index);
+    }
+    return QFUsesResultsByIndexAndModelEvaluation::getIndexName(rec, index);
+}
 
 
 

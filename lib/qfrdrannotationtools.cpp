@@ -34,6 +34,36 @@ QFRDRAnnotationTools::~QFRDRAnnotationTools()
 
 }
 
+void QFRDRAnnotationTools::annotDelete(int i)
+{
+    int annotation=annotGetCount();
+
+    if (idxannot_rdr && i>=0 && i<annotation) {
+        if (i+1<annotation) {
+            for (int j=i+1; j<annotation; j++) {
+                idxannot_rdr->resultsCopy(idxannot_evalid.arg(j-1), idxannot_evalid.arg(j));
+            }
+        }
+        idxannot_rdr->resultsClear(idxannot_evalid.arg(annotation-1));
+        idxannot_rdr->resultsSetInteger("annotations", "annotation_count", annotation-1);
+
+    }
+}
+
+void QFRDRAnnotationTools::annotDeleteAll()
+{
+    int annotation=annotGetCount();
+
+    if (idxannot_rdr) {
+        for (int j=0; j<annotation; j++) {
+            idxannot_rdr->resultsClear(idxannot_evalid.arg(j));
+        }
+
+        idxannot_rdr->resultsSetInteger("annotations", "annotation_count", 0);
+
+    }
+}
+
 void QFRDRAnnotationTools::annotSetRDR(QFRawDataRecord *rdr)
 {
     idxannot_rdr=rdr;

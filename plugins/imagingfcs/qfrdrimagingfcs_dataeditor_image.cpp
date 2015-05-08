@@ -281,6 +281,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     chkShowRDRAnnotation=new QCheckBox(tr("&annotation:"), this);
     chkShowRDRAnnotation->setChecked(false);
     cmbRDRAnnotation->setEnabled(false);
+    cmbRDRAnnotation->setContextMenuPolicy(Qt::ActionsContextMenu);
     connect(chkShowRDRAnnotation, SIGNAL(toggled(bool)), cmbRDRAnnotation, SLOT(setEnabled(bool)));
     topgrid->addWidget(chkShowRDRAnnotation, row, 0);
     topgrid->addWidget(cmbRDRAnnotation, row, 1);
@@ -1308,6 +1309,14 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actAnnotateModelComparison=new QAction(tr("annotate: Model comparison ..."), this);
     connect(actAnnotateModelComparison, SIGNAL(triggered()), this, SLOT(annotateModelComparison()));
 
+    actAnnotationDeleteCurrent=new QAction(tr("delete current annotation"), this);
+    connect(actAnnotationDeleteCurrent, SIGNAL(triggered()), this, SLOT(annotateDeleteCurrent()));
+
+    actAnnotationDeleteAll=new QAction(tr("delete all annotations"), this);
+    connect(actAnnotationDeleteAll, SIGNAL(triggered()), this, SLOT(annotateDeleteAll()));
+
+    cmbRDRAnnotation->addAction(actAnnotationDeleteCurrent);
+    cmbRDRAnnotation->addAction(actAnnotationDeleteAll);
 
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -5082,7 +5091,7 @@ void QFRDRImagingFCSImageEditor::readParameterImage(QFRawDataRecord *current, do
 #endif
 }
 
-bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index, QStringList* ids) {
+bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, const QString &evaluation, int index, QStringList* ids, bool getAlsoFitStat) {
     QString fitfunc="";
     bool isMatrixResults=false;
     //qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size();
@@ -5182,6 +5191,39 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
             values.append(params[i]);
             errors.append(errs[i]);
             fix.append(fixs[i]);
+        }
+    }
+
+    if (getAlsoFitStat) {
+        QStringList id, lab, labH;
+        QFRawDataRecord::getStatisticsParams(&id, &lab, &labH, QString("fitstat_"));
+        for (int i=0; i<id.size(); i++) {
+            if (id.value(i, "").size()>0) {
+                namelabels.append(labH.value(i, lab.value(i, id.value(i, ""))));
+                unitlabels.append("");
+                names.append(id[i]);
+                if (ids) ids->append(id[i]);
+                units.append("");
+                double p=0;
+                if (!isMatrixResults) {
+                    if (current->resultsExists(evaluation, id[i])) {
+                        p=current->resultsGetAsDouble(evaluation, id[i]);
+                    }
+                    if (!recheckedmatrix && current->resultsGet(evaluation, id[i]).getVectorMatrixItems()>1) {
+                        isMatrixResults=true;
+                        recheckedmatrix=recheckedmatrix;
+                    }
+                }
+                if (isMatrixResults){
+                    if (current->resultsExists(evaluation, id[i])) {
+                        p=current->resultsGetInNumberList(evaluation, id[i], index);
+                    }
+                }
+                values.append(p);
+                errors.append(0);
+
+                fix.append(false);
+            }
         }
     }
 
@@ -6430,6 +6472,29 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
     }
 }
 
+void QFRDRImagingFCSImageEditor::annotateDeleteCurrent()
+{
+
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (m) {
+        m->annotDelete(cmbRDRAnnotation->currentIndex());
+        fillAnnotationsCombo(cmbRDRAnnotation->currentIndex()-1);
+        annotationChanged();
+    }
+}
+
+void QFRDRImagingFCSImageEditor::annotateDeleteAll()
+{
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (m) {
+        m->annotDeleteAll();
+        fillAnnotationsCombo(-1);
+    }
+    annotationChanged();
+}
+
 
 void QFRDRImagingFCSImageEditor::saveData() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
@@ -7368,6 +7433,7 @@ void QFRDRImagingFCSImageEditor::annotationChanged(bool replot)
         if (sc<0) sc=pltOverview->getDatastore()->addCopiedColumn(ac.data(), ac.size(), QString("annotation%1_category").arg(i));
         else pltOverview->getDatastore()->getColumn(sc).copy(ac.data(), ac.size());
         plteOverviewAnnot->set_xColumn(sx);
+        plteOverviewAnnot->set_gridSymbolFractionSize(0.75);
         plteOverviewAnnot->set_yColumn(sy);
         if (cmbRDRAnnotationDrawMode->currentIndex()==0) {
             plteOverviewAnnot->set_colorColumn(sc);

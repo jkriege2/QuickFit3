@@ -25,6 +25,7 @@
 #include "programoptions.h"
 #include "qfpluginservices.h"
 #include "qftools.h"
+#include <QApplication>
 
 QFOverlayPlotDialog::QFOverlayPlotDialog(QWidget *parent) :
     QDialog(parent),
@@ -64,6 +65,7 @@ void QFOverlayPlotDialog::clearPlots()
 
 void QFOverlayPlotDialog::startAddingPlots()
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     ui->plot->set_doDrawing(false);
 }
 
@@ -113,6 +115,8 @@ void QFOverlayPlotDialog::endAddingPlots()
 {
     ui->plot->set_doDrawing(true);
     ui->plot->zoomToFit();
+    ui->plot->update_plot();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFOverlayPlotDialog::setLog(bool logX, bool logY)
@@ -152,8 +156,8 @@ void QFOverlayPlotDialog::updatePlot()
         JKQTPxyGraphErrors* eg=dynamic_cast<JKQTPxyGraphErrors*>(g);
         if (eg) {
             if (ui->chkErrors->isChecked()) {
-                eg->set_yErrorStyle(ui->cmbErrorStyleX->getErrorStyle());
-                eg->set_xErrorStyle(ui->cmbErrorStyleY->getErrorStyle());
+                eg->set_xErrorStyle(ui->cmbErrorStyleX->getErrorStyle());
+                eg->set_yErrorStyle(ui->cmbErrorStyleY->getErrorStyle());
             } else {
                 eg->set_yErrorStyle(JKQTPnoError);
                 eg->set_xErrorStyle(JKQTPnoError);

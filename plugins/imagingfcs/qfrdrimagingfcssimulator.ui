@@ -43,7 +43,26 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QEnhancedLineEdit" name="edtFilename"/>
+           <widget class="QEnhancedLineEdit" name="edtFilename">
+            <property name="toolTip">
+             <string>give a filename for the main output file (with extension &lt;tt&gt;.tif&lt;/tt&gt; or &lt;tt&gt;.tiff&lt;/tt&gt;) on the hard-disk.&lt;br&gt;
+You can use some special substrings to add information from the simulation into the filename:
+&lt;ul&gt;
+  &lt;li&gt;&lt;tt&gt;%counter%&lt;/tt&gt;: is increased, until a non-existent filename is found (prevents overwriting of old filenames)&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%type%&lt;/tt&gt;: simulation type&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%timestep%&lt;/tt&gt;: simulation timestep in &amp;mu;s&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%shift%&lt;/tt&gt;: shift between g/r foci&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%dvmode%&lt;/tt&gt;: DualView mode&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D1g%&lt;/tt&gt;: D1, green&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D1r%&lt;/tt&gt;: D1, red&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D1gr%&lt;/tt&gt;: D1, green-red&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D2g%&lt;/tt&gt;: D2, green&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D2r%&lt;/tt&gt;: D2, red&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D2gr%&lt;/tt&gt;: D2, green-red&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%flow%&lt;/tt&gt;: flow velocity&lt;/li&gt;
+&lt;/ul&gt;</string>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_2">
@@ -600,7 +619,7 @@
             <item row="4" column="0">
              <widget class="QLabel" name="label_31">
               <property name="text">
-               <string>diffusion only in bottom half:</string>
+               <string>present only for &lt;i&gt;y&gt;&lt;tt&gt;height&lt;/tt&gt;/2&lt;/i&gt;:</string>
               </property>
              </widget>
             </item>
@@ -827,7 +846,7 @@
             <item row="4" column="0">
              <widget class="QLabel" name="label_38">
               <property name="text">
-               <string>diffusion only in bottom half:</string>
+               <string>present only for &lt;i&gt;y&gt;&lt;tt&gt;height&lt;/tt&gt;/2&lt;/i&gt;:</string>
               </property>
              </widget>
             </item>
@@ -1006,7 +1025,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="chkFlowOnlyHalf">
               <property name="text">
-               <string>flow only in right half</string>
+               <string>flow only for &lt;i&gt;x&gt;&lt;tt&gt;width&lt;/tt&gt;/2&lt;/i&gt;:</string>
               </property>
              </widget>
             </item>

@@ -279,6 +279,8 @@ class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation {
 
         virtual int getIndexMin(const QFRawDataRecord* r) const;
         virtual int getIndexMax(const QFRawDataRecord* r) const;
+        /** \brief return a name for the given index */
+        virtual QString getIndexName(const QFRawDataRecord *rec, int index) const;
 
 
 
