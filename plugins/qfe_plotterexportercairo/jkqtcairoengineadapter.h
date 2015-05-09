@@ -31,10 +31,13 @@ class JKQTPCairoEngineAdapter : public JKQtBasePlotter::JKQTPPaintDeviceAdapter
 {
     public:
         enum Format {
-            formatPDF,
+            formatPDF14,
+            formatPDF15,
             formatPS,
-            formatEPS,
-            formatSVG
+            formatEPS2,
+            formatEPS3,
+            formatSVG11,
+			formatSVG12
         };
 
         JKQTPCairoEngineAdapter(Format format, bool exportText);

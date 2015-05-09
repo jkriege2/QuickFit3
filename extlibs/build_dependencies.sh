@@ -46,15 +46,19 @@ echo -e  "\n"
 
 
 #sh ../output/get_bit_depth.sh
-MORECFLAGS=" -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
+MORECFLAGS=" -mtune=generic -msse -msse2 -mmmx -mfpmath=sse"
+MORELDFLAGS=
 if [ $MAKE_COMPILEFORLOCAL == "y" ] ; then
-	MORECFLAGS=" -mtune=native -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
+	MORECFLAGS=" -mtune=native -msse -msse2 -mmmx -mfpmath=sse -funroll-loops -flto"
+	MORELDFLAGS=" -flto"
 fi
 if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
 	MORECFLAGS=" $MORECFLAGS -ftree-vectorize -ftree-vectorizer-verbose=1"
+	MORELDFLAGS=" -flto"
 fi
 if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
 	MORECFLAGS=" $MORECFLAGS -fopenmp"
+	MORELDFLAGS=" -flto"
 fi
 
 
@@ -143,7 +147,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		
 		MAKEFILE="Makefile.gcc"
 	else
-		./configure --static --prefix=${CURRENTDIR}/zlib  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}"
+		./configure --static --prefix=${CURRENTDIR}/zlib  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}" LDFLAGS="${MORELDFLAGS}"
 		MAKEFILE="Makefile"
 	fi
 	libOK=$?
@@ -266,7 +270,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	export LDFLAGS="${LDFLAGS} ${PICFLAGS} -lm"
         export CFLAGS="${CFLAGS} ${PICFLAGS} "
         export CPPFLAGS="${CPPFLAGS} ${PICFLAGS}"
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} -lm"
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -lm" 
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -316,7 +320,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
         export LDFLAGS="${LDFLAGS} ${PICFLAGS} "
         export CFLAGS="${CFLAGS} ${PICFLAGS} "
         export CPPFLAGS="${CPPFLAGS} ${PICFLAGS}"
-        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS}"
+        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -456,7 +460,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	tar xvf libpng-1.5.4.tar.gz -C ./build/
 	cd build/libpng-1.5.4
 	if [ -e ../../../zlib/lib/libz.a ] ; then
-		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng LDFLAGS=-L${CURRENTDIR}/zlib/lib CFLAGS=-I${CURRENTDIR}/zlib/include CXXFLAGS=-I${CURRENTDIR}/zlib/include/
+		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng LDFLAGS=-L${CURRENTDIR}/zlib/lib CFLAGS=-I${CURRENTDIR}/zlib/include CXXFLAGS=-I${CURRENTDIR}/zlib/include/ 
 	else
 		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng
 	fi
@@ -603,7 +607,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf gsl-1.16.tar.gz -C ./build/
 	cd build/gsl-1.16
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/gsl   CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/gsl   CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"  LDFLAGS="${MORELDFLAGS}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -633,7 +637,12 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 fi
 
-
+gsl_CFLAGS=
+gsl_LDDIRS=
+if [ -e ${CURRENTDIR}/gsl/lib/libgsl.a ] ; then
+	gsl_CFLAGS="-I${CURRENTDIR}/gsl/include"
+	gsl_LDDIRS="-L${CURRENTDIR}/gsl/lib"
+fi
 
 libusbOK=-5
 if [ "$ISMSYS" != "${string/Msys/}" ] ; then
@@ -842,8 +851,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir doc
 	mkdir include
 	mkdir include/Eigen
-	tar xvf ./eigen-3.2.0.tar.gz -C ./build/
-	cd build/eigen-eigen-ffa86ffb5570/
+	tar xvf ./eigen-3.2.4.tar.gz -C ./build/
+	cd build/eigen-3.2.4/
 	cp -r ./Eigen/* ../../include/Eigen
 	libOK=$?
 	cp -r ./doc/* ../../doc
@@ -864,6 +873,94 @@ fi
 
 
 
+
+libnloptOK=-1
+read -p "Do you want to build 'NLopt' (y/n)? " -n 1 INSTALL_ANSWER
+echo -e  "\n"
+if [ $INSTALL_ANSWER == "y" ] ; then
+	echo -e  "\n------------------------------------------------------------------------\n"\
+	"-- BUILDING: nlopt                                                     --\n"\
+	"------------------------------------------------------------------------\n\n"\
+
+	cd nlopt
+	mkdir build
+	tar xvf nlopt-2.4.2.tar.gz -C ./build/
+	cd build/nlopt-2.4.2
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/nlopt  --with-cxx --with-mthreads --without-guile --without-python --without-octave --without-matlab CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}" LDFLAGS="${MORELDFLAGS}"
+	libOK=$?
+	if [ $libOK -eq 0 ] ; then
+		make -j${MAKE_PARALLEL_BUILDS}
+		
+		libOK=$?
+		if [ $libOK -eq 0 ] ; then		
+			make -j${MAKE_PARALLEL_BUILDS} install
+			libOK=$?
+			if [ $libOK -ne 0 ] ; then		
+				libOK=-4
+			fi
+		else
+			libOK=-3
+		fi
+	else
+	    libOK=-2
+	fi
+	
+
+	cd ../../
+	if [ $KEEP_BUILD_DIR == "n" ] ; then
+		rm -rf build
+	fi
+	cd ${CURRENTDIR}
+	
+	libnloptOK=$libOK
+
+fi
+
+
+
+
+libOOLOK=-1
+read -p "Do you want to build 'OOL' (y/n)? " -n 1 INSTALL_ANSWER
+echo -e  "\n"
+if [ $INSTALL_ANSWER == "y" ] ; then
+	echo -e  "\n------------------------------------------------------------------------\n"\
+	"-- BUILDING: OOL                                                       --\n"\
+	"------------------------------------------------------------------------\n\n"\
+
+	cd ool
+	mkdir build
+	tar xvf ool-0.2.0.tar.gz -C ./build/
+	cd build/ool-0.2.0
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/ool  CFLAGS="${PICFLAGS} ${MORECFLAGS} ${gsl_CFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${gsl_LDDIRS}" LDFLAGS="${MORELDFLAGS}"
+	libOK=$?
+	if [ $libOK -eq 0 ] ; then
+		make -j${MAKE_PARALLEL_BUILDS}
+		
+		libOK=$?
+		if [ $libOK -eq 0 ] ; then		
+			make -j${MAKE_PARALLEL_BUILDS} install
+			libOK=$?
+			if [ $libOK -ne 0 ] ; then		
+				libOK=-4
+			fi
+		else
+			libOK=-3
+		fi
+	else
+	    libOK=-2
+	fi
+	
+
+	cd ../../
+	if [ $KEEP_BUILD_DIR == "n" ] ; then
+		rm -rf build
+	fi
+	cd ${CURRENTDIR}
+	
+	libOOLOK=$libOK
+
+fi
+
 cimgOK=-1
 read -p "Do you want to build 'cimg' (y/n)? " -n 1 INSTALL_ANSWER
 echo -e  "\n"
@@ -874,8 +971,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd cimg
 	mkdir build
-	tar xvf ./CImg-1.5.9.tar.bz2 -C ./build/
-	cd build/CImg-1.5.9/
+	tar xvf ./CImg-1.6.2.tar.bz2 -C ./build/
+	cd build/CImg-1.6.2/
 	cp -r * ../../
 	libOK=$?
 	if [ $libOK -ne 0 ] ; then		
@@ -911,7 +1008,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf pixman-0.32.6.tar.gz -C ./build/
 	cd build/pixman-0.32.6
-	./configure --enable-static --disable-shared --enable-libpng --disable-gtk --prefix=${CURRENTDIR}/pixman   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" LDFLAGS=" ${zlib_LDFLAGS}" PNG_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib" PNG_CFLAGS=" -I${CURRENTDIR}/libpng -I${CURRENTDIR}/libpng/include"
+	./configure --enable-static --disable-shared --enable-libpng --disable-gtk --prefix=${CURRENTDIR}/pixman   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" LDFLAGS=" ${zlib_LDFLAGS} ${MORELDFLAGS}" PNG_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib" PNG_CFLAGS=" -I${CURRENTDIR}/libpng -I${CURRENTDIR}/libpng/include"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -962,8 +1059,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	fi" > ./build/pkgconfigfake
 	chmod +x ./build/pkgconfigfake
 	
-	tar xvf cairo-1.14.0.tar.gz -C ./build/
-	cd build/cairo-1.14.0
+	tar xvf cairo-1.14.2.tar.gz -C ./build/
+	cd build/cairo-1.14.2
 	if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 	    cp ../../Makefile.in_hack ./Makefile.in
 		./configure --verbose --enable-static --disable-shared --disable-dependency-tracking --enable-gobject=no --enable-trace=no --enable-xcb-shm=no --enable-xlib=no --enable-xlib-xrender=no --enable-xcb=no --enable-egl=no --enable-glx=no --enable-wgl=no --enable-ft=no  --enable-fc=no --disable-xlib --without-x --disable-quartz-font --disable-quartz --disable-valgrind --prefix=${CURRENTDIR}/cairo   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}/pixman/include/pixman-1 " CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}pixman/include/pixman-1 " LDFLAGS=" ${zlib_LDFLAGS} -L${CURRENTDIR}/pixman/lib -lpixman-1 " png_REQUIRES=libpng png_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib " png_CFLAGS=" -I${CURRENTDIR}/libpng/include " pixman_CFLAGS=" -I${CURRENTDIR}pixman/include/pixman-1" pixman_LIBS=" -L${CURRENTDIR}/pixman/lib -lpixman-1" PKG_CONFIG="${CURRENTDIR}/cairo/build/pkgconfigfake" ax_cv_c_float_words_bigendian=no
@@ -1017,6 +1114,8 @@ print_result "libusb" $libusbOK
 print_result "libNIDAQmx" $libnidaqmxOK
 print_result "libAndor" $libandorOK
 print_result "eigen" $eigenOK
+print_result "nlopt" $libnloptOK
+print_result "OOL" $libOOLOK
 print_result "cimg" $cimgOK
 print_result "pixman" $libpixmanOK
 print_result "cairo" $libcairoOK
