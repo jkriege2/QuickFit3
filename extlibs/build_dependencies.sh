@@ -52,8 +52,8 @@ if [ $MAKE_COMPILEFORLOCAL == "y" ] ; then
 	MORECFLAGS=" -mtune=native -msse -msse2 -mmmx -mfpmath=sse"
 fi
 if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
-	MORECFLAGS=" $MORECFLAGS -ftree-vectorize -ftree-vectorizer-verbose=1 -funroll-loops -flto"
-	MORELDFLAGS=" $MORELDFLAGS -flto"
+	MORECFLAGS=" $MORECFLAGS -ftree-vectorize -ftree-vectorizer-verbose=1 -funroll-loops "
+	MORELDFLAGS=" $MORELDFLAGS "
 fi
 if [ $MAKE_USEOPENMP == "y" ] ; then
 	MORECFLAGS=" $MORECFLAGS -fopenmp"
