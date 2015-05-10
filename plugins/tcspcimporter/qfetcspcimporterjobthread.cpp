@@ -758,9 +758,9 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
             if (job.doFCS && fcs_lffilter) {
 
 
-                bool isNextSegment=t>=fcsNextSegmentValue;
-                bool isBeforeNextFCSInteral=t<fcsNextInterval;
-                bool isBeforeNextFCSCRInteral=t<fcsNextStoreInterval;
+                bool isNextSegment=(t>=fcsNextSegmentValue);
+                bool isBeforeNextFCSInteral=(t<fcsNextInterval);
+                bool isBeforeNextFCSCRInteral=(t<fcsNextStoreInterval);
 
                 if (bin_and_correlate) {
                     // binning photons and correlating data
@@ -845,7 +845,8 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
         if (t>nextReporterStep) {
             emit progressIncrement(1);
             nextReporterStep=nextReporterStep+range_duration/1000.0;
-            emit messageChanged(tr("running data processing [t=%1s, runtime: %2s] ...").arg(t).arg(range_duration));
+            emit messageChanged(tr("running data processing [t=%1s, meas. duration: %2s, file completed: %3%4] ...").arg(t).arg(range_duration).arg(reader->percentCompleted()).arg("%"));
+            //qDebug()<<t<<range_duration<<"  fcsNextSegmentValue="<<fcsNextSegmentValue<<"  segments="<<job.fcs_segments<< "  completed="<<reader->percentCompleted()<<"%";
         }
 
         done=(t>range_duration);
@@ -967,7 +968,7 @@ void QFETCSPCImporterJobThread::copyCorrelatorIntermediateResults(uint16_t fcs_s
     } else if (job.fcs_correlator==CORRELATOR_TTTR) {
         for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
              QPair<int, int> ccf=*i;
-             qDebug()<<ccf.first<<ccf.second<<fcs_segment<<arrivaltimes.size();
+             qDebug()<<ccf.first<<ccf.second<<fcs_segment<<arrivaltimes.size()<<arrivaltimes[ccf.first].size()<<arrivaltimes[ccf.second].size();
              uint64_t id=xyzAdressToUInt64(ccf.first, ccf.second, fcs_segment);
              uint32_t idc=xyAdressToUInt32(ccf.first, ccf.second);
 

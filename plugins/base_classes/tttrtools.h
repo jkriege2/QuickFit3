@@ -53,8 +53,8 @@ inline void TTTRcrosscorrelate(const TDATA *t, int64_t Nt, const TDATA *u, int64
     TCORR tStart=qMin(t[0],u[0]);
     TCORR tEnd = qMax(t[Nt-1],u[Nu-1]);
     TCORR T = tEnd - tStart; // total acquisition time
-    uint64_t *lk=qfMallocT<uint64_t>(ntau); // photon indices
-    uint64_t *mk=qfMallocT<uint64_t>(ntau); // photon indices
+    int64_t *lk=qfMallocT<int64_t>(ntau); // photon indices
+    int64_t *mk=qfMallocT<int64_t>(ntau); // photon indices
     TCORR *nt=qfMallocT<TCORR>(ntau); // photon count in channel t
     TCORR *nu=qfMallocT<TCORR>(ntau); // photon count in channel u
 
@@ -66,59 +66,72 @@ inline void TTTRcrosscorrelate(const TDATA *t, int64_t Nt, const TDATA *u, int64
         nt[k]=0;
         nu[k]=0;
     }
-    g[ntau-1]=1;
+    //g[ntau-1]=1;
 
+    //QFile fdbg("c:\\temp\\corr.txt");
+    //fdbg.open(QFile::WriteOnly|QFile::Text);
+    //QTextStream txt(&fdbg);
+
+    qDebug()<<"correlating";
 
     for(int64_t i=0;i<Nt;++i) {// loop over all photons in channel t
         const TCORR ti=t[i];
-        for(register uint k=0;k<ntau-1;++k) { // loop over bins
-            const TCORR tauk=tau[k];
-            const TCORR taukp1=tau[k+1];
+        for(register uint k=0;k<ntau;++k) { // loop over bins
+            //const TCORR tauk=tau[k];
+            //const TCORR taukp1=tau[k+1];
+            const TCORR tauk=(k>0)?tau[k-1]:0;
+            const TCORR taukp1=tau[k];
 
             const TCORR tauStart = ti + tauk;
             const TCORR tauEnd = ti + taukp1;
-            register int64_t l=lk[k];
-            while( (l<Nu-1) && tauStart>u[l]) { // start photon in bin k
+            int64_t l=lk[k];
+
+            //txt<<i<<k<<": ti="<<ti<<"\n";
+            //txt<<"    l="<<l<<" tauStart="<<tauStart<<" u[l-1]="<<u[l-1]<<")    u[l]="<<u[l]<<"\n";
+            while( (l<Nu-1) && u[l]<=tauStart /*!(u[l-1]<tauStart && tauStart<=u[l])*/) { // start photon in bin k
                 l++;
             }
 
-            register int64_t m=mk[k];
-            while( (m<Nu-1) && u[m]<tauEnd /*! (u[m-1] < tauEnd && tauEnd <= u[m])*/) { // end photon in bin k
+            int64_t m=mk[k];
+            //txt<<"    m="<<m<<" tauEnd="<<tauEnd<<"   u[l-1]="<<u[m-1]<<")    u[l]="<<u[m]<<"\n";
+            while( (m<Nu-1) && u[m]<tauEnd /*!(u[m-1]<tauEnd && tauEnd<=u[m])*/ ) { // end photon in bin k
                 m++;
             }
 
-            //if (l<Nu && m<Nu) {
+            //txt<<"    l="<<l<<" ("<<lk[k]<<") / "<<Nu-1<<"      m="<<m<<" ("<<mk[k]<<") / "<<Nu-1<<"\n";
+            //if (l<Nu-1 && m<Nu-1) {
                 lk[k] = l;
                 mk[k] = m;
-                g[k] = g[k] + TCORR(m-l);  // update correlogram
+                if (m-l>0 && l<Nu-1 && m<Nu-1) g[k] = g[k] + TCORR(m-l);  // update correlogram
             //}
         }
     }
 
     // Normalize
-
-    for(uint k=0;k<ntau-1;++k) { // loop over bins
+    qDebug()<<"normalizing: find factors";
+    for(uint k=0;k<ntau;++k) { // loop over bins
         int64_t i=0;
         while (i<Nu && u[i]-tStart<tau[k]) {
             i++;
         }
         nu[k]=Nu-i;
         i=Nt-1;
-        while (i>1 && u[i]-tStart>T-tau[k]) {
+        while (i>1 && t[i]-tStart>T-tau[k]) {
             i--;
         }
         nt[k]=i;
     }
 
-    /*for(int64_t i=0;i<Nu;++i) {// loop over all photons in channel u
-        for(int64_t k=0;k<ntau-1;++k) { // loop over bins
-            if((u[i]-tStart)>=tau[k]) ++nu[k];
-        }
-    }*/
-    for(uint k=0;k<ntau-1;++k) {
+
+    qDebug()<<"normalizing: apply factors";
+    for(uint k=0;k<ntau;++k) {
         // normalize by the number of photons for the lag times (symmetrically for u and t)
         // and the binwidth tau_{k+1} - tau_k (rectangular averaging).
-        g[k]=g[k]*(T-tau[k])/(tau[k+1]-tau[k])/(TCORR)nt[k]/(TCORR)nu[k];
+        TCORR o=g[k];
+        const TCORR taukm1=(k>0)?tau[k-1]:0;
+        const TCORR tauk=tau[k];
+        g[k]=g[k]*(T-tau[k])/(tauk-taukm1)/(TCORR)nt[k]/(TCORR)nu[k];
+        qDebug()<<k<<":"<<tau[k]<<T<<(tauk-taukm1)<<(TCORR)nt[k]<<(TCORR)nu[k]<<o<<"  => "<<g[k];
     }
 
     if (nt) qfFree(nt);

@@ -122,6 +122,7 @@
         <li>added fluorescence liftetime (TCSPC microtime) histogram preview</li>
         <li>added an option for time-gate/lifetime-filtered FCS/FCCS to the correlator [thanks to Martin Seefeld, Uni Heidelberg for providing test-datasets]</li>
         <li>bugfix: countrate is now saved in the correct units (kHz instead of Hz) in the correlator output file (before it was a factor 1000 too high!)</li>
+        <li>bugfix: fixed a small bug in the normalization of the TTTR correlator that could have an influence at low count rates</li>
     </ul></li>
 
     <li><b>cairo graph exporter plugin</b><ul>
