@@ -64,7 +64,7 @@ void QFExtensionCameraRadhard2::deinit() {
 	/* add code for cleanup here */
 }
 
-void QFExtensionCameraRadhard2::projectChanged(QFProject* oldProject, QFProject* project) {
+void QFExtensionCameraRadhard2::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
 	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
 	   But: possibly you could read config information from the project here
 	 */
@@ -133,7 +133,7 @@ bool QFExtensionCameraRadhard2::flashFPGA(QString bitfile, char fpga, QString& m
 }
 
 
-void QFExtensionCameraRadhard2::loadSettings(ProgramOptions* settingspo) {
+void QFExtensionCameraRadhard2::loadSettings(ProgramOptions* /*settingspo*/) {
     QSettings settings(services->getConfigFileDirectory()+"/plugins/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
     autoflashbitfile=settings.value("radhard2/autobitfile", autoflashbitfile).toString();
     bitfile=settings.value("radhard2/bitfile", bitfile).toString();
@@ -142,7 +142,7 @@ void QFExtensionCameraRadhard2::loadSettings(ProgramOptions* settingspo) {
     retryDelay=settings.value("radhard2/retryDelay", retryDelay).toInt();
 }
 
-void QFExtensionCameraRadhard2::storeSettings(ProgramOptions* settingspo) {
+void QFExtensionCameraRadhard2::storeSettings(ProgramOptions* /*settingspo*/) {
     QSettings settings(services->getConfigFileDirectory()+"/plugins/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
     settings.setValue("radhard2/autobitfile", autoflashbitfile);
     settings.setValue("radhard2/bitfile", bitfile);
@@ -165,12 +165,12 @@ void QFExtensionCameraRadhard2::useCameraSettings(unsigned int camera, const QSe
      }
 }
 
-bool QFExtensionCameraRadhard2::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
+bool QFExtensionCameraRadhard2::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString /*filenamePrefix*/) {
     useCameraSettings(camera, settings);
     return true;
 }
 
-void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
+void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int /*camera*/, QSettings& settings, QWidget* parent) {
 	/* open a dialog that configures the camera.
 
 	   usually you should display a modal QDialog descendent which writes back config when the user clicks OK
@@ -230,15 +230,15 @@ void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int camera, QS
     spDivider=NULL;
 }
 
-int QFExtensionCameraRadhard2::getCameraImageWidth(unsigned int camera) {
+int QFExtensionCameraRadhard2::getCameraImageWidth(unsigned int /*camera*/) {
     return 32;
 }
 
-int QFExtensionCameraRadhard2::getCameraImageHeight(unsigned int camera) {
+int QFExtensionCameraRadhard2::getCameraImageHeight(unsigned int /*camera*/) {
     return 32;
 }
 
-bool QFExtensionCameraRadhard2::isCameraConnected(unsigned int camera) {
+bool QFExtensionCameraRadhard2::isCameraConnected(unsigned int /*camera*/) {
     return conn;
 }
 
@@ -284,7 +284,7 @@ bool QFExtensionCameraRadhard2::acquireOnCamera(unsigned int camera, uint32_t* d
     return true;
 }
 
-bool QFExtensionCameraRadhard2::connectCameraDevice(unsigned int camera) {
+bool QFExtensionCameraRadhard2::connectCameraDevice(unsigned int /*camera*/) {
     conn=false;
     if (radhard2) delete radhard2;
 
@@ -319,14 +319,14 @@ bool QFExtensionCameraRadhard2::connectCameraDevice(unsigned int camera) {
     return conn;
 }
 
-void QFExtensionCameraRadhard2::disconnectCameraDevice(unsigned int camera) {
+void QFExtensionCameraRadhard2::disconnectCameraDevice(unsigned int /*camera*/) {
     if (radhard2) delete radhard2;
     radhard2=NULL;
     log_text(tr("disconnected\n"));
     conn = false;
 }
 
-double QFExtensionCameraRadhard2::getCameraExposureTime(unsigned int camera) {
+double QFExtensionCameraRadhard2::getCameraExposureTime(unsigned int /*camera*/) {
     return calcExposureTime(iterations, divider)/1.0e6;
 }
 
@@ -360,33 +360,33 @@ void QFExtensionCameraRadhard2::sendIterations() {
 }
 
 
-bool QFExtensionCameraRadhard2::startCameraAcquisition(unsigned int camera) {
+bool QFExtensionCameraRadhard2::startCameraAcquisition(unsigned int /*camera*/) {
     return false;
 }
 
-void QFExtensionCameraRadhard2::cancelCameraAcquisition(unsigned int camera) {
+void QFExtensionCameraRadhard2::cancelCameraAcquisition(unsigned int /*camera*/) {
 }
 
-bool QFExtensionCameraRadhard2::isCameraAcquisitionRunning(unsigned int camera) {
+bool QFExtensionCameraRadhard2::isCameraAcquisitionRunning(unsigned int /*camera*/) {
     return false;
 }
 
-void QFExtensionCameraRadhard2::getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
+void QFExtensionCameraRadhard2::getCameraAcquisitionDescription(unsigned int /*camera*/, QList<QFExtensionCamera::CameraAcquititonFileDescription>* /*files*/, QMap<QString, QVariant>* /*parameters*/) {
 }
 
-bool QFExtensionCameraRadhard2::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {
+bool QFExtensionCameraRadhard2::getCameraAcquisitionPreview(unsigned int /*camera*/, uint32_t* /*data*/) {
     return false;
 }
 
-int QFExtensionCameraRadhard2::getCameraAcquisitionProgress(unsigned int camera) {
+int QFExtensionCameraRadhard2::getCameraAcquisitionProgress(unsigned int /*camera*/) {
     return 0;
 }
 
-QString QFExtensionCameraRadhard2::getCameraName(unsigned int camera) {
+QString QFExtensionCameraRadhard2::getCameraName(unsigned int /*camera*/) {
     return QString("RadHard2");
 }
 
-QString QFExtensionCameraRadhard2::getCameraSensorName(unsigned int camera) {
+QString QFExtensionCameraRadhard2::getCameraSensorName(unsigned int /*camera*/) {
 	return QString("Radhard2");
 }
 void QFExtensionCameraRadhard2::log_text(QString message) {
@@ -405,11 +405,11 @@ void QFExtensionCameraRadhard2::log_error(QString message) {
 }
 
 
-double QFExtensionCameraRadhard2::getCameraPixelWidth(unsigned int camera) {
+double QFExtensionCameraRadhard2::getCameraPixelWidth(unsigned int /*camera*/) {
 	return 30;
 }
 
-double QFExtensionCameraRadhard2::getCameraPixelHeight(unsigned int camera) {
+double QFExtensionCameraRadhard2::getCameraPixelHeight(unsigned int /*camera*/) {
 	return 30;
 }
 
@@ -417,15 +417,15 @@ bool QFExtensionCameraRadhard2::isCameraSettingChangable(QFExtensionCamera::Came
     return false;
 }
 
-void QFExtensionCameraRadhard2::changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value)  {
+void QFExtensionCameraRadhard2::changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting /*which*/, QVariant /*value*/)  {
 
 }
 
-QVariant QFExtensionCameraRadhard2::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which)  {
+QVariant QFExtensionCameraRadhard2::getCameraSetting(QSettings& /*settings*/, QFExtensionCamera::CameraSetting /*which*/)  {
     return QVariant();
 }
 
-QVariant QFExtensionCameraRadhard2::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which)
+QVariant QFExtensionCameraRadhard2::getCameraCurrentSetting(int /*camera*/, QFExtensionCamera::CameraSetting /*which*/)
 {
     return QVariant();
 }

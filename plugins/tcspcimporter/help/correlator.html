@@ -2,7 +2,7 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <title>Imaging FCS Plugin: Image Correlators</title>
+  <title>$$local_plugin_name$$: FCS/FCCS Correlator</title>
       <link rel="contents" href="tcspcimporter.html">     
   </head>
   <body>
@@ -13,17 +13,26 @@
 This part of the plugin calculates auto- and crosscorrelation functions from the input data, thus allowing to perform Fluorescence (Cross) Correlation Spectroscopy, F(C)CS, analyses on TCSPC data.
 <a name="#options"><h2>Processing options</h2>
 For the FCS/FCCS functionality you may set several options:
-<ul>
-  <li><b>cut into segments</b>: This function allows to cut the input stream into N equally long segments that are correlated separately. Each of the segment's correlation function will be written to the project as one run and QuickFit may then calculate an average run + an error estimate for eac lag time.</li>
-  <li><b>channels</b>: Here a matrix with all available input channels will be shown. By activating any cell, the according auto- or cross-correlation function will be calculated and imported into  QuickFit.</li>
-  <li><b>correlator</b>: allows to select the algorithm used for correlating. A detailed description of the available algorithms can be found in <a href="#correlators">section "Correlators"</a>.</li>
-  <li><b>Correlator properties:</b> The correlators have to be parametrized, mostly setting their temporal resolution (minimum lag time &tau;<sub>min</sub>) and how the lags are distributed over time. Usually the latter is done semi-logarithmically, using the parameter S, P and m:<ol>
+<h3>cut into segments</h3>
+<p>This function allows to cut the input stream into N equally long segments that are correlated separately. Each of the segment's correlation function will be written to the project as one run and QuickFit may then calculate an average run + an error estimate for eac lag time.</p>
+<h3>channels</h3>
+<p>Here a matrix with all available input channels will be shown. By activating any cell, the according auto- or cross-correlation function will be calculated and imported into  QuickFit.</p>
+<h3>correlator</h3>
+<p>This allows to select the algorithm used for correlating. A detailed description of the available algorithms can be found in <a href="#correlators">section "Correlators"</a>.</p>
+<h3>Correlator properties</h3>
+<p>The correlators have to be parametrized, mostly setting their temporal resolution (minimum lag time &tau;<sub>min</sub>) and how the lags are distributed over time. Usually the latter is done semi-logarithmically, using the parameter S, P and m:<ol>
     <li>P correlation channels with lag times  &tau;<sub>min</sub>, 2 &tau;<sub>min</sub>, 3 &tau;<sub>min</sub>, ..., P &tau;<sub>min</sub> are used.</li>
     <li>Then &tau;<sub>min</sub> is multiplied by m and the next channels are: P&tau;<sub>min</sub>+m&tau;<sub>min</sub>, P&tau;<sub>min</sub>+2m&tau;<sub>min</sub>, ..., P&tau;<sub>min</sub>+Pm&tau;<sub>min</sub></li>
     <li>This scheme is repeated S times.</li>
   </ol>
-  </li>
-  <li><b>FCS countrate binning:</b> This plugin saves a binned countrate together with the correlation function. This is used to present a rough overview of the countrate during the experiment to the user. It has no influence on the data processing! Set this bining to an intermediate level such as 10-100ms, which will result an intermediate number of datapoints to the user. A finer resolution usually does not contain more information, but will slow down the display routines.</li>
+  </p>
+<a name="#lifetimefilter"><h3>Lifetime Filter</h3>
+<p>The FCS/FCCS correlator supports a filtering of the incident photons by the lifetime-information, encoded in the microtime of the TCSPC record. Currently these modes ar support: 
+<ol>
+    <li><b>time-gated FCS/FCCS:</b>$$ref:LAMB2000:Lamb D C, Schenk A, R&ouml;cker C, Scalfi-Happ C, Nienhaus G U  (2000) Sensitivity Enhancement in Fluorescence Correlation Spectroscopy of Multiple Species Using Time-Gated Detection. <i>Biophysical Journal</i> <b>79</b><b>:</b> 1129-1138 doi: 10.1016/S0006-3495(00)76366-1, PMCID: PMC1301008$$ The correlator will only take those photons into account, where the detected TCSPC microtime is within a given range that can be set in the table for each channel separately. You can use the <a href="livetimeview.html">Livfetime Preview Dialog</a> to set those ranges from a peek at the microtime histogram.</li>
+</ol></p>
+<h3>FCS countrate binning</h3>
+<p>This plugin saves a binned countrate together with the correlation function. This is used to present a rough overview of the countrate during the experiment to the user. It has no influence on the data processing! Set this bining to an intermediate level such as 10-100ms, which will result an intermediate number of datapoints to the user. A finer resolution usually does not contain more information, but will slow down the display routines.</p>
 </ul>
 
 

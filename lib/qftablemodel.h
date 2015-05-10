@@ -355,7 +355,7 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
             int c;
             int r_here;
             int c_here;
-            cellToCopy(int r, int c, int r_here, int c_here) {
+            inline cellToCopy(int r, int c, int r_here, int c_here) {
                 this->r=r;
                 this->c=c;
                 this->r_here=r_here;
@@ -389,6 +389,7 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
          * \return \c true on success and \c false on error (e.g. couldn't open file ...)
          */
         bool saveCSV(QTextStream& out, QString column_separator=QString(", "), char decimal_separator='.', QString header_start=QString("#!"), char format = 'g', int precision = 6, bool setCodecAndEncoding=true, QModelIndexList selection=QModelIndexList());
+        QString toCSV(QString column_separator=QString(", "), char decimal_separator='.', QString header_start=QString("#!"), char format = 'g', int precision = 6, bool setCodecAndEncoding=true, QModelIndexList selection=QModelIndexList());
         /** \brief read the contents in a Comma-Separated-Values file into the current model (if it is not readonly!)
          *
          * \return \c true on success and \c false on error (e.g. couldn't open file ...)
@@ -396,6 +397,7 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         bool readCSV(const QString& filename, char column_separator=',', char decimal_separator='.', QString header_start=QString("#!"), char comment_start='#');
         /** \brief read CSV from a QTextStream and write it into the table (may be resized) starting from ( \a start_row, \a start_col ) */
         bool readCSV(QTextStream& in, char column_separator=',', char decimal_separator='.', QString header_start=QString("#!"), char comment_start='#', int start_row=0, int start_col=0, bool clearTable=false);
+        bool fromCSV(const QString& in, char column_separator=',', char decimal_separator='.', QString header_start=QString("#!"), char comment_start='#', int start_row=0, int start_col=0, bool clearTable=false);
 
         QList<QList<QVariant> > getDataTable(QStringList& colNames, QStringList& rownames, QModelIndexList selection=QModelIndexList());
 

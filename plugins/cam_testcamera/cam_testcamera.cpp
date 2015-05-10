@@ -74,7 +74,7 @@ QFECamTestCamera::~QFECamTestCamera()
 void QFECamTestCamera::deinit() {
 }
 
-void QFECamTestCamera::projectChanged(QFProject* oldProject, QFProject* project) {
+void QFECamTestCamera::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
 }
 
 void QFECamTestCamera::initExtension() {
@@ -90,12 +90,12 @@ void QFECamTestCamera::initExtension() {
 
 }
 
-void QFECamTestCamera::loadSettings(ProgramOptions* settingspo) {
+void QFECamTestCamera::loadSettings(ProgramOptions* /*settingspo*/) {
     //QSettings& settings=*(settingspo->getQSettings());
 
 }
 
-void QFECamTestCamera::storeSettings(ProgramOptions* settingspo) {
+void QFECamTestCamera::storeSettings(ProgramOptions* /*settingspo*/) {
     //QSettings& settings=*(settingspo->getQSettings());
 
     /*settings.setValue("testdevice/width0", width[0]);
@@ -292,7 +292,7 @@ long Poisson(double m)
   return (x - 1);
 }
 
-bool QFECamTestCamera::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
+bool QFECamTestCamera::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* /*parameters*/) {
     //std::cout<<"capturing single frame to "<<data<<"   timestamp="<<timestamp<<std::endl;
     if (timestamp!=NULL) {
         //std::cout<<"difftime(startTime, time(0))="<<difftime(startTime, time(0))<<std::endl;
@@ -415,7 +415,7 @@ double QFECamTestCamera::getCameraExposureTime(unsigned int camera) {
     return 1e-3;
 }
 
-QString QFECamTestCamera::getCameraName(unsigned int camera) {
+QString QFECamTestCamera::getCameraName(unsigned int /*camera*/) {
     return QString("Test Camera");
 }
 
@@ -496,7 +496,7 @@ void QFECamTestCamera::getCameraAcquisitionDescription(unsigned int camera, QLis
     }
 }
 
-bool QFECamTestCamera::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {
+bool QFECamTestCamera::getCameraAcquisitionPreview(unsigned int /*camera*/, uint32_t* /*data*/) {
     return false;
 }
 
@@ -671,12 +671,12 @@ void QFECamTestCamera::seriesStep2() {
 }
 
 
-double QFECamTestCamera::getCameraPixelWidth(unsigned int camera) {
+double QFECamTestCamera::getCameraPixelWidth(unsigned int /*camera*/) {
     return 10;
 }
 
 
-double QFECamTestCamera::getCameraPixelHeight(unsigned int camera) {
+double QFECamTestCamera::getCameraPixelHeight(unsigned int /*camera*/) {
     return 10;
 }
 
@@ -694,7 +694,7 @@ QVariant QFECamTestCamera::getCameraSetting(QSettings& settings, QFExtensionCame
     return QVariant();
 }
 
-QVariant QFECamTestCamera::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which)
+QVariant QFECamTestCamera::getCameraCurrentSetting(int /*camera*/, QFExtensionCamera::CameraSetting which)
 {
     if (which==QFExtensionCamera::CamSetExposureTime) return 1;
     return QVariant();

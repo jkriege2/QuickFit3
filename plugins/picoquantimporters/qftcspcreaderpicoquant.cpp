@@ -44,6 +44,7 @@ QString QFTCSPCReaderPicoquant::formatName() const {
 }
 
 bool QFTCSPCReaderPicoquant::open(const QString &filename, const QString &parameters) {
+    Q_UNUSED(parameters)
     close();
     fileinfo.init(filename);
     tttrfile=fopen(filename.toLatin1().data(), "rb");
@@ -130,6 +131,7 @@ bool QFTCSPCReaderPicoquant::open(const QString &filename, const QString &parame
 
 bool QFTCSPCReaderPicoquant::isOpenParametersUsed(QString *optionsDescription) const
 {
+    Q_UNUSED(optionsDescription)
     return false;
 }
 

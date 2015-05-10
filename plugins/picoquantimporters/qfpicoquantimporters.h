@@ -46,7 +46,7 @@ class QFPicoQuantImporters : public QObject, public QFPluginImporters {
     public:
 
         /** Default constructor */
-        QFPicoQuantImporters(QObject* parent=NULL) {}
+        QFPicoQuantImporters(QObject* parent=NULL) {Q_UNUSED(parent)}
         /** Default destructor */
         virtual ~QFPicoQuantImporters() {}
 

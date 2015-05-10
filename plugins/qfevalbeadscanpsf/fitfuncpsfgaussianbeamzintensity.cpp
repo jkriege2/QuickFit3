@@ -45,25 +45,25 @@ double QFFitFunctionPSFGaussianBeamZIntensity::evaluate(double t, const double* 
 
 
 
-void QFFitFunctionPSFGaussianBeamZIntensity::calcParameter(double* data, double* error) const {
+void QFFitFunctionPSFGaussianBeamZIntensity::calcParameter(double* /*data*/, double* /*error*/) const {
 }
 
-bool QFFitFunctionPSFGaussianBeamZIntensity::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionPSFGaussianBeamZIntensity::isParameterVisible(int /*parameter*/, const double* /*data*/) const {
     return true;
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionPSFGaussianBeamZIntensity::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionPSFGaussianBeamZIntensity::getAdditionalPlotCount(const double* /*params*/) {
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionPSFGaussianBeamZIntensity::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionPSFGaussianBeamZIntensity::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
     return "";
 }
 
 
-bool QFFitFunctionPSFGaussianBeamZIntensity::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionPSFGaussianBeamZIntensity::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool* /*fix*/)
 {
 
 

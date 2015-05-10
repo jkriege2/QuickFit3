@@ -110,7 +110,7 @@ void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* plugin
     displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
     if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040SimpleCameraConfig::Inactive);
 }
-void QFESPIMB040SimpleCameraConfig::showEvent ( QShowEvent * event ) {
+void QFESPIMB040SimpleCameraConfig::showEvent ( QShowEvent * /*event*/ ) {
     stopTimer();
     startTimerSingleShot(true);
 }
@@ -128,7 +128,7 @@ void QFESPIMB040SimpleCameraConfig::stopTimer() {
     previewTimer->disconnect();
 }
 
-void QFESPIMB040SimpleCameraConfig::closeEvent ( QCloseEvent * event ) {
+void QFESPIMB040SimpleCameraConfig::closeEvent ( QCloseEvent * /*event*/ ) {
     stopPreview();
     stopTimer();
     //QApplication::processEvents();
@@ -700,7 +700,7 @@ void QFESPIMB040SimpleCameraConfig::resume() {
     }
 }
 
-void QFESPIMB040SimpleCameraConfig::previewCurrentIndexChanged(int index) {
+void QFESPIMB040SimpleCameraConfig::previewCurrentIndexChanged(int /*index*/) {
     emit previewConfigChanged();
     if (actStartStopPreview->isChecked()) { // just stop & resume, as this will load the new settings in the resume operation!
         stopPreview();

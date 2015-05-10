@@ -172,7 +172,7 @@ QStringList QFEvalBeadScanPSFEditor::getImageWriterIDList(QFPluginServices *plug
     return pluginservices->getExporterManager()->getExporters<QFExporterImageSeries*>();
 }
 
-void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
+void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* /*formerRecord*/, QFRawDataRecord* currentRecord) {
     // this slot is called when the user selects a new record in the raw data record list on the RHS of this widget in the evaluation dialog
     
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);

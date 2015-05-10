@@ -45,7 +45,8 @@ class QFSimpleTCSPCImporterPlugin : public QObject, public QFPluginImporters {
     public:
 
         /** Default constructor */
-        QFSimpleTCSPCImporterPlugin(QObject* parent=NULL) {}
+        QFSimpleTCSPCImporterPlugin(QObject* parent=NULL) {    Q_UNUSED(parent)
+}
         /** Default destructor */
         virtual ~QFSimpleTCSPCImporterPlugin() {}
 

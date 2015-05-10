@@ -107,6 +107,19 @@ struct TCSPCImporterJob {
     QSet<QPair<int, int> > fcs_correlate;
     QSet<int> countrate_channels;
 
+    struct FCSLifetimeFilter {
+        FCSLifetimeFilter() {
+            min_ns=0;
+            max_ns=1e6;
+        }
+
+        double min_ns;
+        double max_ns;
+    };
+
+    bool fcs_uselifetimefilter;
+    QList<FCSLifetimeFilter> fcs_lifetimefilter;
+
     QMap<QString, QVariant> props;
     QString comment;
 

@@ -1302,6 +1302,16 @@ bool QFTableModel::saveCSV(QTextStream &out, QString column_separator, char deci
     return true;
 }
 
+QString QFTableModel::toCSV(QString column_separator, char decimal_separator, QString header_start, char format, int precision, bool setCodecAndEncoding, QModelIndexList selection)
+{
+    QString str;
+    {
+        QTextStream txt(&str);
+        saveCSV(txt, column_separator,  decimal_separator,  header_start,  format,  precision,  setCodecAndEncoding,  selection);
+    }
+    return str;
+}
+
 
 bool QFTableModel::readCSV(const QString& filename, char column_separator, char decimal_separator, QString header_start, char comment_start) {
     // try output file
@@ -1312,7 +1322,14 @@ bool QFTableModel::readCSV(const QString& filename, char column_separator, char 
     return readCSV(in, column_separator,  decimal_separator,  header_start,  comment_start, 0, 0, true);
 }
 
-bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_separator, QString header_start, char comment_start, int start_row, int start_col, bool clearTable) {
+bool QFTableModel::fromCSV(const QString &in, char column_separator, char decimal_separator, QString header_start, char comment_start, int start_row, int start_col, bool clearTable) {
+    QString str=in;
+    QTextStream txt(&str);
+    return readCSV(txt, column_separator,  decimal_separator,  header_start,  comment_start,  start_row,  start_col,  clearTable);
+}
+
+bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_separator, QString header_start, char comment_start, int start_row, int start_col, bool clearTable)
+{
     startMultiUndo();
     bool oldEmit=doEmitSignals;
     doEmitSignals=false;

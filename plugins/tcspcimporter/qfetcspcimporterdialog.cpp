@@ -33,6 +33,8 @@
 
 #include <QDebug>
 #include "qmodernprogresswidget.h"
+#include "qfetcspcimporterlifetimeview.h"
+#include "qftabledelegate.h"
 
 #define UPDATE_TIMEOUT 250
 
@@ -72,6 +74,12 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     tmFCS->clear();
     tmFCS->setReadonly(true);
     ui->tvFCS->setModel(tmFCS);
+
+    tmFCSLifetimeFilter=new QFTableModel(ui->tvFCSLifetimeFilter);
+    tmFCSLifetimeFilter->setReadonly(false);
+    tmFCSLifetimeFilter->clear();
+    ui->tvFCSLifetimeFilter->setModel(tmFCSLifetimeFilter);
+    ui->tvFCSLifetimeFilter->setItemDelegate(new QFTableDelegate(ui->tvFCSLifetimeFilter));
 /*
 %counter% by the value of \a counter, if this value is >0, or by an empty string
           - \c %S% S parameter of the correlator
@@ -125,6 +133,14 @@ void  QFETCSPCImporterDialog::setEditControlsEnabled(bool enabled) {
     ui->labDetails->setEnabled(enabled);
     ui->spinRangeStart->setEnabled(enabled && !ui->chkFirstFrame->isChecked());
     ui->spinRangeEnd->setEnabled(enabled && !ui->chkLastFrame->isChecked());
+}
+
+void QFETCSPCImporterDialog::setLifetimeFilter(int ch, double min_ns, double max_ns)
+{
+    if (ch>=0 && ch<tmFCSLifetimeFilter->rowCount()) {
+        tmFCSLifetimeFilter->setCell(ch,0,min_ns);
+        tmFCSLifetimeFilter->setCell(ch,1,max_ns);
+    }
 }
 
 bool QFETCSPCImporterDialog::allThreadsDone() const  {
@@ -255,6 +271,7 @@ void QFETCSPCImporterDialog::on_cmbCorrelator_currentIndexChanged(int /*idx*/) {
     updateCorrelator();
 }
 
+
 void QFETCSPCImporterDialog::on_chkFirstFrame_clicked(bool checked) {
     ui->spinRangeStart->setEnabled(!checked);
     updateDuration();
@@ -314,10 +331,16 @@ void QFETCSPCImporterDialog::writeSettings() {
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/range_end", ui->spinRangeEnd->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkCountrate", ui->chkCountrate->isChecked());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkFCS", ui->chkFCS->isChecked());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkFCSLifetimeFilter", ui->chkFCSLifetimeFilter->isChecked());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/tmFCSLifetimeFilter", tmFCSLifetimeFilter->toCSV());
+    saveWidgetGeometry(*(options->getQSettings()), this, "tcspcimporter/dlg_correlate/window/");
 }
 
 void QFETCSPCImporterDialog::readSettings() {
     if (!options) return;
+
+    loadWidgetGeometry(*(options->getQSettings()), this, "tcspcimporter/dlg_correlate/window/");
+
     lastTCSPCFileDir=options->getQSettings()->value("tcspcimporter/dlg_correlate/last_imagefile_dir", lastTCSPCFileDir).toString();
     lastTCSPCFileFilter=options->getQSettings()->value("tcspcimporter/dlg_correlate/last_imagefile_filter", lastTCSPCFileFilter).toString();
 
@@ -336,6 +359,12 @@ void QFETCSPCImporterDialog::readSettings() {
     ui->spinRangeStart->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_start", ui->spinRangeStart->value()).toDouble());
     ui->chkCountrate->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/chkCountrate", ui->chkAddToProject->isChecked()).toBool());
     ui->chkFCS->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/chkFCS", ui->chkFCS->isChecked()).toBool());
+    ui->chkFCSLifetimeFilter->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/chkFCSLifetimeFilter", ui->chkFCSLifetimeFilter->isChecked()).toBool());
+    for (int r=0; r<tmFCSLifetimeFilter->rowCount(); r++) {
+        tmFCSLifetimeFilter->setCell(r, 0, 0);
+        tmFCSLifetimeFilter->setCell(r, 1, 100);
+    }
+    tmFCSLifetimeFilter->fromCSV(options->getQSettings()->value("tcspcimporter/dlg_correlate/tmFCSLifetimeFilter", "").toString());
 
 }
 
@@ -430,6 +459,23 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
         }
     }
 
+    job.fcs_uselifetimefilter=ui->chkFCSLifetimeFilter->isChecked();
+    job.fcs_lifetimefilter.clear();
+    if (job.fcs_uselifetimefilter) {
+        for (int i=0; i<channels; i++) {
+            TCSPCImporterJob::FCSLifetimeFilter fl;
+            if (i<tmFCSLifetimeFilter->rowCount() && tmFCSLifetimeFilter->columnCount()>=2) {
+                bool ok=false;
+                fl.min_ns=tmFCSLifetimeFilter->cell(i, 0).toDouble(&ok);
+                if (!ok) fl.min_ns=0;
+                ok=false;
+                fl.max_ns=tmFCSLifetimeFilter->cell(i, 1).toDouble(&ok);
+                if (!ok) fl.max_ns=0;
+            }
+            job.fcs_lifetimefilter.append(fl);
+        }
+    }
+
     //qDebug()<<job.filenameBackground;
     job.range_min=-1;
     if (!ui->chkFirstFrame->isChecked()) {
@@ -494,11 +540,61 @@ void QFETCSPCImporterDialog::updateDuration() {
     if (!ui->chkLastFrame->isChecked()) {
         stop=qMin(duration, ui->spinRangeEnd->value());
     }
-    ui->labRange->setText(tr("duration: %1s countrates: [ %2 ] kHz").arg(fabs(stop-start)).arg(countRateString));
+    ui->labRange->setText(tr("duration: %1s,    countrates: [ %2 ] kHz").arg(fabs(stop-start)).arg(countRateString));
     ui->labSegments->setText(tr("%1 seconds each").arg(fabs(stop-start)/double(ui->spinSegments->value())));
 }
 
 
+void QFETCSPCImporterDialog::on_btnPeekLifetime_clicked()
+{
+    QList<QVector<int16_t> > arrivaltimes;
+    QFTCSPCReader* reader=QFETCSPCImporterJobThread::getImporter(ui->cmbFileformat->currentIndex(), pluginServices);
+    if (reader) {
+        if (reader->open(ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text())) {
+            double duration=reader->measurementDuration();
+            double maxT=10;
+            int maxPhot=50000;
+            int channels=reader->inputChannels();
+
+            for (int c=0; c<channels; c++) {
+                QVector<int16_t> dummy;
+                arrivaltimes<<dummy;
+            }
+
+            int pcount=0;
+            double t=0;
+            double mtOffset=0;
+            double mtFactor=1;
+            //int maxMTC=0;
+            do {
+                QFTCSPCRecord p=reader->getCurrentRecord();
+                if (p.isPhoton) {
+                    pcount++;
+                    t=p.absoluteTime();
+                    if (/*p.input_channel>=0 &&*/ p.input_channel<arrivaltimes.size()) {
+                        arrivaltimes[p.input_channel].append(p.microtime_channel);
+                        //if (p.microtime_channel>maxMTC) maxMTC=p.microtime_channel;
+                        mtOffset=p.microtime_offset;
+                        mtFactor=p.microtime_deltaT;
+                    }
+                }
+            } while (reader->nextRecord() && pcount<maxPhot && t<maxT);
+
+            reader->close();
+            QFETCSPCImporterLifetimeView* dlg=new QFETCSPCImporterLifetimeView(this);
+
+            connect(dlg, SIGNAL(setLifetimeFilter(int,double,double)), this, SLOT(setLifetimeFilter(int,double,double)));
+            dlg->initArrialtimes(arrivaltimes, mtOffset, mtFactor);
+            dlg->setDescription(tr("photon lifetimes histogram for the first %1s (%2 photons), complete duration %3s").arg(t).arg(pcount).arg(duration));
+            if (dlg->exec()) {
+
+            }
+            dlg->close();
+            delete dlg;
+
+        }
+    }
+}
 
 void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
     QFTCSPCReader* reader=QFETCSPCImporterJobThread::getImporter(ui->cmbFileformat->currentIndex(), pluginServices);    
@@ -515,10 +611,15 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
                 ui->edtTCSPCFileParameter->setText(QInputDialog::getText(this, tr("TCSPC import parameter"), tr("Please specify the TCSPC import parameter\n%1:").arg(paramName)));
             }
         }
+        qDebug()<<"opening file: "<<ui->edtTCSPCFile->text();
         if (reader->open(ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text())) {
             duration=reader->measurementDuration();
+            qDebug()<<"  duration: "<<duration;
             channels=reader->inputChannels();
+            qDebug()<<"  channels: "<<channels;
             reader->close();
+            qDebug()<<"  file closed";
+
 
             ui->tabCR->setModel(NULL);
             //qDebug()<<channels<<tmCR->columnCount();
@@ -538,10 +639,27 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
                 }
             }
             while (tmCR->rowCount()>1) {
-                //tmCR->deleteRow(tmCR->rowCount()-1);
+                tmCR->deleteRow(tmCR->rowCount()-1);
             }
             tmCR->setReadonly(true);
             ui->tabCR->setModel(tmCR);
+
+            ui->tvFCSLifetimeFilter->setModel(NULL);
+            tmFCSLifetimeFilter->setColumnTitleCreate(0, tr("min. lifetime [ns]"));
+            tmFCSLifetimeFilter->setColumnTitleCreate(1, tr("max. lifetime [ns]"));
+            while (tmFCSLifetimeFilter->rowCount()<channels) {
+                int r=tmFCSLifetimeFilter->rowCount();
+                tmFCSLifetimeFilter->setRowTitleCreate(r, tr("channel %1:").arg(r+1));
+                tmFCSLifetimeFilter->setCellCreate(r, 0, 0.0);
+                tmFCSLifetimeFilter->setCellCreate(r, 1, 100.0);
+                qDebug()<<"    adding filter channel "<<r;
+            }
+
+            tmFCSLifetimeFilter->resize(qMin(tmFCSLifetimeFilter->rowCount(),channels), tmFCSLifetimeFilter->columnCount());
+
+
+            ui->tvFCSLifetimeFilter->setModel(tmFCSLifetimeFilter);
+            ui->tvFCSLifetimeFilter->resizeColumnsToContents();
 
             ui->tvFCS->setModel(NULL);
             tmFCS->setReadonly(false);
@@ -580,7 +698,7 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
             countRateString="";
             for (int i=0; i<channels; i++) {
                 if (countRateString.size()>0) countRateString=countRateString+"; ";
-                countRateString.append(QString::number(reader->avgCountRate(i)));
+                countRateString.append(QString::number(reader->avgCountRate(i)*1e-3));
             }
 
         }

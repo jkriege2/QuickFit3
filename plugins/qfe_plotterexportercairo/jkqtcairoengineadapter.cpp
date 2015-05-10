@@ -35,9 +35,10 @@ QString JKQTPCairoEngineAdapter::getFilter() const
     if (exportText) txt=QObject::tr("[editable text] ");
     else txt=QObject::tr("[text as polygons] ");
     switch(format) {
-        case formatEPS2: return QObject::tr("Cairo encapsuled PostScript 2 %1(*.eps)").arg(txt);
-        case formatEPS3: return QObject::tr("Cairo encapsuled PostScript 3 %1(*.eps)").arg(txt);
-        case formatPS: return QObject::tr("Cairo PostScript %1(*.ps)").arg(txt);
+        case formatEPS2: return QObject::tr("Cairo encapsuled PostScript, level 2 %1(*.eps)").arg(txt);
+        case formatEPS3: return QObject::tr("Cairo encapsuled PostScript, level 3 %1(*.eps)").arg(txt);
+        case formatPS2: return QObject::tr("Cairo PostScript, level 2 %1(*.ps)").arg(txt);
+        case formatPS3: return QObject::tr("Cairo PostScript, level 3 %1(*.ps)").arg(txt);
         case formatSVG11: return QObject::tr("Cairo SVG 1.1 %1(*.svg)").arg(txt);
         case formatSVG12: return QObject::tr("Cairo SVG 1.2 %1(*.svg)").arg(txt);
         case formatPDF14: return QObject::tr("Cairo PDF 1.4 %1(*.pdf)").arg(txt);
@@ -52,9 +53,10 @@ QString JKQTPCairoEngineAdapter::getFormatName() const
     if (exportText) txt=QObject::tr("[editable text] ");
     else txt=QObject::tr("[text as polygons] ");
     switch(format) {
-        case formatEPS2: return QObject::tr("Cairo encapsuled PostScript 2 %1").arg(txt);
-        case formatEPS3: return QObject::tr("Cairo encapsuled PostScript 3 %1").arg(txt);
-        case formatPS: return QObject::tr("Cairo PostScript %1").arg(txt);
+        case formatEPS2: return QObject::tr("Cairo encapsuled PostScript, level 2 %1").arg(txt);
+        case formatEPS3: return QObject::tr("Cairo encapsuled PostScript, level 3 %1").arg(txt);
+        case formatPS2: return QObject::tr("Cairo PostScript, level 2 %1").arg(txt);
+        case formatPS3: return QObject::tr("Cairo PostScript, level 2 %1").arg(txt);
         case formatSVG11: return QObject::tr("Cairo 1.1 SVG %1").arg(txt);
         case formatSVG12: return QObject::tr("Cairo 1.2 SVG %1").arg(txt);
         case formatPDF14: return QObject::tr("Cairo PDF 1.4 %1").arg(txt);
@@ -68,9 +70,10 @@ QString JKQTPCairoEngineAdapter::getFormatID() const
     QString txt="";
     if (exportText) txt=QString("_EditableText");
     switch(format) {
-        case formatEPS2: 
-		case formatEPS3: return QString("CairoEPS")+txt;
-        case formatPS: return QString("CairoPS")+txt;
+        case formatEPS2:  return QString("CairoEPS2")+txt;
+        case formatEPS3: return QString("CairoEPS3")+txt;
+        case formatPS2: return QString("CairoPS2")+txt;
+        case formatPS3: return QString("CairoPS3")+txt;
         case formatSVG11: return QString("CairoSVG11")+txt;
         case formatSVG12: return QString("CairoSVG12")+txt;
         case formatPDF14: return QString("CairoPDF14")+txt;
@@ -84,7 +87,8 @@ QStringList JKQTPCairoEngineAdapter::getFileExtension() const
     switch(format) {
         case formatEPS2: 
 		case formatEPS3: return QStringList("eps");
-        case formatPS: return QStringList("ps");
+        case formatPS2:
+        case formatPS3: return QStringList("ps");
         case formatSVG11: 
         case formatSVG12: return QStringList("svg");
         case formatPDF14: 
@@ -124,8 +128,11 @@ QPaintDevice *JKQTPCairoEngineAdapter::createPaintdevice(const QString &filename
         case formatEPS3:
             cairo=new QCairoPaintDevice(QSize(ceil(double(widthPix)/96.0*25.4), ceil(double(heightPix)/96.0*25.4)), filename, QCairoPaintDevice::cftEPS3, exportText);
             break;
-        case formatPS:
-            cairo=new QCairoPaintDevice(QSize(ceil(double(widthPix)/96.0*25.4), ceil(double(heightPix)/96.0*25.4)), filename, QCairoPaintDevice::cftPS, exportText);
+        case formatPS2:
+            cairo=new QCairoPaintDevice(QSize(ceil(double(widthPix)/96.0*25.4), ceil(double(heightPix)/96.0*25.4)), filename, QCairoPaintDevice::cftPS2, exportText);
+            break;
+        case formatPS3:
+            cairo=new QCairoPaintDevice(QSize(ceil(double(widthPix)/96.0*25.4), ceil(double(heightPix)/96.0*25.4)), filename, QCairoPaintDevice::cftPS3, exportText);
             break;
         case formatSVG11:
             cairo=new QCairoPaintDevice(QSize(ceil(double(widthPix)/96.0*25.4), ceil(double(heightPix)/96.0*25.4)), filename, QCairoPaintDevice::cftSVG11, exportText);
@@ -156,8 +163,11 @@ QPaintDevice *JKQTPCairoEngineAdapter::createPaintdeviceMM(const QString &filena
         case formatEPS3:
             cairo=new QCairoPaintDevice(QSizeF(ceil(double(widthMM)*1.05), ceil(double(heightMM)*1.05)), filename, QCairoPaintDevice::cftEPS3, exportText);
             break;
-        case formatPS:
-            cairo=new QCairoPaintDevice(QSizeF(ceil(double(widthMM)*1.05), ceil(double(heightMM)*1.05)), filename, QCairoPaintDevice::cftPS, exportText);
+        case formatPS2:
+            cairo=new QCairoPaintDevice(QSizeF(ceil(double(widthMM)*1.05), ceil(double(heightMM)*1.05)), filename, QCairoPaintDevice::cftPS2, exportText);
+            break;
+        case formatPS3:
+            cairo=new QCairoPaintDevice(QSizeF(ceil(double(widthMM)*1.05), ceil(double(heightMM)*1.05)), filename, QCairoPaintDevice::cftPS3, exportText);
             break;
         case formatSVG11:
             cairo=new QCairoPaintDevice(QSizeF(ceil(double(widthMM)*1.05), ceil(double(heightMM)*1.05)), filename, QCairoPaintDevice::cftSVG11, exportText);

@@ -57,6 +57,10 @@ struct QFLIB_EXPORT QFTCSPCRecord {
         return macrotime;//+(microtime_offset+double(microtime_channel)*microtime_deltaT)*1e-9;
     }
 
+    inline double microTimeNS() const {
+        return (microtime_offset+double(microtime_channel)*microtime_deltaT);
+    }
+
     explicit QFTCSPCRecord(uint16_t input_channel=0, double macrotime=0.0, int16_t microtime_channel=0, double microtime_offset=0.0, double microtime_deltaT=1e-9, bool isPhoton=true, uint8_t marker_type=0) ;
 };
 

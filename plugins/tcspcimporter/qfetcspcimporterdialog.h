@@ -30,6 +30,8 @@
 #include "qfpluginservices.h"
 #include <stdint.h>
 #include "qftablemodel.h"
+#include "stdint.h"
+#include "qfetcspcimporterlifetimeview.h"
 
 class QFETCSPCImporterJobThread; // forward
 class QFETCSPCImporterJobThreadAddFileProps;
@@ -75,6 +77,7 @@ public:
     void on_spinFCSTauMin_valueChanged(double val);
     void on_spinSegments_valueChanged(int val);
     void on_cmbCorrelator_currentIndexChanged(int idx);
+    void on_btnPeekLifetime_clicked();
 
     void updateProgress();
     void updateFromFile(bool readFrameCount=true);
@@ -84,6 +87,8 @@ public:
     void on_chkFirstFrame_clicked(bool checked);
     void on_chkLastFrame_clicked(bool checked);
     void setEditControlsEnabled(bool enabled);
+protected slots:
+    void setLifetimeFilter(int ch, double min_ns, double max_ns);
 protected:
     void done(int status);
     bool allThreadsDone() const;
@@ -101,6 +106,7 @@ private:
     QList<TCSPCImporterJob> jobs;
     QFTableModel* tmCR;
     QFTableModel* tmFCS;
+    QFTableModel* tmFCSLifetimeFilter;
     //QList<Job> jobsToAdd;
     QList<QFETCSPCImporterJobThreadAddFileProps > filesToAdd;
     QString countRateString;

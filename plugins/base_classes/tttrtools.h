@@ -77,12 +77,12 @@ inline void TTTRcrosscorrelate(const TDATA *t, int64_t Nt, const TDATA *u, int64
 
             const TCORR tauStart = ti + tauk;
             const TCORR tauEnd = ti + taukp1;
-            register uint64_t l=lk[k];
+            register int64_t l=lk[k];
             while( (l<Nu-1) && tauStart>u[l]) { // start photon in bin k
                 l++;
             }
 
-            register uint64_t m=mk[k];
+            register int64_t m=mk[k];
             while( (m<Nu-1) && u[m]<tauEnd /*! (u[m-1] < tauEnd && tauEnd <= u[m])*/) { // end photon in bin k
                 m++;
             }
@@ -98,7 +98,7 @@ inline void TTTRcrosscorrelate(const TDATA *t, int64_t Nt, const TDATA *u, int64
     // Normalize
 
     for(uint k=0;k<ntau-1;++k) { // loop over bins
-        uint64_t i=0;
+        int64_t i=0;
         while (i<Nu && u[i]-tStart<tau[k]) {
             i++;
         }

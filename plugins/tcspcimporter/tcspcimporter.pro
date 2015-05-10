@@ -39,18 +39,21 @@ HEADERS += qfetcspcimporter.h \
     qfetcspcimporterjobthread.h \
     qfetcspcimporterdialog.h \
     ../base_classes/qf3correlationdataformattool.h \
-    ../base_classes/tttrtools.h
+    ../base_classes/tttrtools.h \
+    qfetcspcimporterlifetimeview.h
 
 SOURCES += qfetcspcimporter.cpp \
     qfetcspcimporterthreadprogress.cpp \
     qfetcspcimporterjobthread.cpp \
     qfetcspcimporterdialog.cpp \
     ../base_classes/qf3correlationdataformattool.cpp \
-    ../base_classes/tttrtools.cpp
+    ../base_classes/tttrtools.cpp \
+    qfetcspcimporterlifetimeview.cpp
 
 FORMS = \
     qfetcspcimporterthreadprogress.ui \
-    qfetcspcimporterdialog.ui
+    qfetcspcimporterdialog.ui \
+    qfetcspcimporterlifetimeview.ui
 
 RESOURCES += qfetcspcimporter.qrc \
     ../../lib/lib.qrc

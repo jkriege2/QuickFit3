@@ -85,10 +85,16 @@ void QFEPlotterExporterCairo::initExtension() {
     JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPDF15, false));
     i++;
     adapters<<NULL;
-    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS, true));
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS2, true));
     i++;
     adapters<<NULL;
-    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS, false));
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS2, false));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS3, true));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS3, false));
     i++;
     adapters<<NULL;
     JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatEPS2, true));

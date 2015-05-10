@@ -44,25 +44,25 @@ double QFFitFunctionPSFGaussianBeamWidth::evaluate(double t, const double* data)
 
 
 
-void QFFitFunctionPSFGaussianBeamWidth::calcParameter(double* data, double* error) const {
+void QFFitFunctionPSFGaussianBeamWidth::calcParameter(double* /*data*/, double* /*error*/) const {
 }
 
-bool QFFitFunctionPSFGaussianBeamWidth::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionPSFGaussianBeamWidth::isParameterVisible(int /*parameter*/, const double* /*data*/) const {
     return true;
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionPSFGaussianBeamWidth::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionPSFGaussianBeamWidth::getAdditionalPlotCount(const double* /*params*/) {
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionPSFGaussianBeamWidth::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionPSFGaussianBeamWidth::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
     return "";
 }
 
 
-bool QFFitFunctionPSFGaussianBeamWidth::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionPSFGaussianBeamWidth::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

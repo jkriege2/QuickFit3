@@ -50,20 +50,20 @@ double QFFitFunctionPSFGaussian::evaluate(double t, const double* data) const {
     return offset+amplitude*exp(-2.0*sqr(t-position)/sqr(width));
 }
 
-void QFFitFunctionPSFGaussian::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionPSFGaussian::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
     for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
 
 }
 
-void QFFitFunctionPSFGaussian::calcParameter(double* data, double* error) const {
+void QFFitFunctionPSFGaussian::calcParameter(double* /*data*/, double* /*error*/) const {
 }
 
-bool QFFitFunctionPSFGaussian::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionPSFGaussian::isParameterVisible(int /*parameter*/, const double* /*data*/) const {
     return true;
 	// all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionPSFGaussian::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionPSFGaussian::getAdditionalPlotCount(const double* /*params*/) {
     return 0;
 	// we have one additional plot
 }

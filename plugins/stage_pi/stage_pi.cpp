@@ -83,7 +83,7 @@ void QFExtensionLinearStagePI::deinit() {
     }
 }
 
-void QFExtensionLinearStagePI::projectChanged(QFProject* oldProject, QFProject* project) {
+void QFExtensionLinearStagePI::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
 	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
 	   But: possibly you could read config information from the project here
 	 */
@@ -171,7 +171,7 @@ unsigned int QFExtensionLinearStagePI::getAxisCount() {
 	return axes.size();
 }
 
-void QFExtensionLinearStagePI::showSettingsDialog(unsigned int axis, QWidget* parent) {
+void QFExtensionLinearStagePI::showSettingsDialog(unsigned int /*axis*/, QWidget* parent) {
 
     bool globalIniWritable=QSettings(services->getGlobalConfigFileDirectory()+"/stage_pi863.ini", QSettings::IniFormat).isWritable();
 
@@ -331,12 +331,12 @@ bool QFExtensionLinearStagePI::checkComConnected() {
     return c;
 }
 
-bool QFExtensionLinearStagePI::isConnected(unsigned int axis) {
+bool QFExtensionLinearStagePI::isConnected(unsigned int /*axis*/) {
     QMutexLocker lock(mutexSerial);
     return com.isConnectionOpen();
 }
 
-void QFExtensionLinearStagePI::connectDevice(unsigned int axis) {
+void QFExtensionLinearStagePI::connectDevice(unsigned int /*axis*/) {
     QMutexLocker lock(mutexSerial);
     com.set_port(COMPort.toStdString());
     com.set_baudrate(COMPortSpeed);
@@ -380,7 +380,7 @@ void QFExtensionLinearStagePI::connectDevice(unsigned int axis) {
     }
 }
 
-void QFExtensionLinearStagePI::disconnectDevice(unsigned int axis) {
+void QFExtensionLinearStagePI::disconnectDevice(unsigned int /*axis*/) {
     QMutexLocker lock(mutexSerial);
     com.close();
     for (int i=0; i<axes.size(); i++) {
@@ -540,11 +540,11 @@ void QFExtensionLinearStagePI::move(unsigned int axis, double newPosition) {
 QString QFExtensionLinearStagePI::getStageName(unsigned int axis) const
 {
     QString n=tr("PI Mercury 863, axis %1").arg(axis);
-    if (axis>=0 && (int64_t)axis<axes.size()) n=axes[axis].label;
+    if (/*axis>=0 &&*/ (int64_t)axis<axes.size()) n=axes[axis].label;
     return n;
 }
 
-QFExtensionLinearStage::StageInfo QFExtensionLinearStagePI::getStageInfo(unsigned int axis) const
+QFExtensionLinearStage::StageInfo QFExtensionLinearStagePI::getStageInfo(unsigned int /*axis*/) const
 {
     QFExtensionLinearStage::StageInfo info;
     info.maxSpeed=maxVelocity;

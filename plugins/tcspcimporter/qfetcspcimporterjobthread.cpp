@@ -446,7 +446,8 @@ void QFETCSPCImporterJobThread::run() {
                         for (int i=0; i<clist.size(); i++) {
 
                             QList<QPair<int, int> > storeAutoA;
-                            QPair<int, int> p_acf=qMakePair<int,int>(i,i);
+                            //QPair<int, int> p_acf=qMakePair<int,int>(i,i);
+                            QPair<int, int> p_acf=qMakePair<int,int>(clist[i],clist[i]);
                             if (job.fcs_correlate.contains(p_acf)) {
                                 storeAutoA.append(p_acf);
                             }
@@ -457,9 +458,12 @@ void QFETCSPCImporterJobThread::run() {
                                     if (job.fcs_correlate.contains(p_acf)) {
                                         usedPairs.append(p_acf);
                                     }
-                                    QPair<int, int> p_ccf=qMakePair<int,int>(i,j);
-                                    QPair<int, int> p_fcc=qMakePair<int,int>(j,i);
-                                    QPair<int, int> p_jacf=qMakePair<int,int>(j,j);
+                                    //QPair<int, int> p_ccf=qMakePair<int,int>(i,j);
+                                    //QPair<int, int> p_fcc=qMakePair<int,int>(j,i);
+                                    //QPair<int, int> p_jacf=qMakePair<int,int>(j,j);
+                                    QPair<int, int> p_ccf=qMakePair<int,int>(clist[i],clist[j]);
+                                    QPair<int, int> p_fcc=qMakePair<int,int>(clist[j],clist[i]);
+                                    QPair<int, int> p_jacf=qMakePair<int,int>(clist[j],clist[j]);
                                     if (job.fcs_correlate.contains(p_ccf)) {
                                         storeCross.append(p_ccf);
                                         usedPairs.append(p_ccf);
@@ -535,7 +539,7 @@ void QFETCSPCImporterJobThread::run() {
                                     int c=store.store[acf].first;
                                     for (int r=0; r<job.fcs_segments; r++) {
                                         uint32_t id=xyAdressToUInt32(r, c);
-                                        tool.addCountrateEntry(fcs_crs[id].value(i, 0), r, acf);
+                                        tool.addCountrateEntry(fcs_crs[id].value(i, 0)*1e-3, r, acf);
                                     }
                                 }
                             }
@@ -556,12 +560,23 @@ void QFETCSPCImporterJobThread::run() {
                             //qDebug()<<tool.correlations.size()<<tool.correlations.value(0).size()<<tool.correlations.value(0).value(0).size();
                             tool.properties.unite(job.props);
 
+                            if (job.fcs_uselifetimefilter) {
+                                tool.properties["FCS_LIFETIMEFILTER_MODE"]=QString("SIMPLE_MICROTIME_RANGE");
+                                if (job.fcs_uselifetimefilter) {
+                                    for (int r=0; r<job.fcs_lifetimefilter.size(); r++) {
+                                        tool.properties[QString("FCS_LIFETIMEFILTER_CH%1_MIN").arg(r)]=job.fcs_lifetimefilter[r].min_ns;
+                                        tool.properties[QString("FCS_LIFETIMEFILTER_CH%1_MAX").arg(r)]=job.fcs_lifetimefilter[r].max_ns;
+                                    }
+                                }
+                            } else {
+                                tool.properties["FCS_LIFETIMEFILTER_MODE"]=QString("NONE");
+                            }
 
                             QString localFilename=outputFilenameBase+QString("_fcsdata%1.qf3acorr").arg(fid);
                             tool.saveFile(localFilename);
                             QFETCSPCImporterJobThreadAddFileProps fp(QStringList(localFilename), "QF3ASCIICORR", job.props);
                             fp.comment=job.comment;
-                            fp.group=QString("%1_fcsdata%2").arg(job.filename).arg(fid);
+                            fp.group=QString("%1_fcsdata%2").arg(outputFilenameBase).arg(fid);
                             fp.role="";
                             addFiles.append(fp);
                         }
@@ -607,6 +622,11 @@ void QFETCSPCImporterJobThread::run() {
                                     default: text<<"FCS: correlator type name        : unknown\n"; break;
                                 }
                                 text<<"FCS: smallest tau [s]            : "<<doubleToQString(job.fcs_taumin) << "\n";
+                                if (job.fcs_uselifetimefilter) {
+                                    for (int r=0; r<job.fcs_lifetimefilter.size(); r++) {
+                                        text<<"FCS: lifetime filter, ch. "<<r<<"      : "<<doubleToQString(job.fcs_lifetimefilter[r].min_ns) << " ... "<<doubleToQString(job.fcs_lifetimefilter[r].max_ns) << "\n";
+                                    }
+                                }
                                 text<<"FCS: count rate binning [s]      : "<<doubleToQString(job.fcs_crbinning) << "\n";
                                 for (int i=0; i<ccfFilenames.size(); i++) {
                                     if (!ccfFilenames[i].filename.isEmpty()) {
@@ -699,8 +719,9 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
     bool done=false;
     do {
         QFTCSPCRecord record=reader->getCurrentRecord();
-        const register double t=record.absoluteTime()-starttime;
-        const register int c=record.input_channel;
+        const  double t=record.absoluteTime()-starttime;
+        const  int c=record.input_channel;
+        const  double microt=record.microTimeNS();
         //qDebug()<<c<<t;
         if (record.isPhoton && t>=0 && t<=range_duration) {
             real_duration=t;
@@ -726,8 +747,17 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                 }
             }
 
+
+            // FCS lifetime filter
+            bool fcs_lffilter=true;
+            if (job.fcs_uselifetimefilter) {
+                const TCSPCImporterJob::FCSLifetimeFilter& f=job.fcs_lifetimefilter.value(c, TCSPCImporterJob::FCSLifetimeFilter());
+                fcs_lffilter=((f.min_ns<=microt)&&(microt<=f.max_ns));
+            }
             // PROCESS FCS
-            if (job.doFCS) {
+            if (job.doFCS && fcs_lffilter) {
+
+
                 bool isNextSegment=t>=fcsNextSegmentValue;
                 bool isBeforeNextFCSInteral=t<fcsNextInterval;
                 bool isBeforeNextFCSCRInteral=t<fcsNextStoreInterval;

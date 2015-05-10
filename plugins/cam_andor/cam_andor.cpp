@@ -470,7 +470,7 @@ bool QFExtensionCameraAndor::isCameraConnected(unsigned int camera) {
     return camConnected.contains(camera);
 }
 
-bool QFExtensionCameraAndor::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
+bool QFExtensionCameraAndor::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* /*timestamp*/, QMap<QString, QVariant>* parameters) {
     if (!isCameraConnected(camera)) return false;
 
     if (!selectCamera(camera)) return false;
@@ -531,7 +531,7 @@ bool QFExtensionCameraAndor::acquireOnCamera(unsigned int camera, uint32_t* data
 
 
 
-bool QFExtensionCameraAndor::acquireFullFrame(unsigned int camera, uint32_t* data, uint64_t* timestamp) {
+bool QFExtensionCameraAndor::acquireFullFrame(unsigned int camera, uint32_t* data, uint64_t* /*timestamp*/) {
     if (!isCameraConnected(camera)) return false;
 
     if (!selectCamera(camera)) return false;
@@ -1018,7 +1018,7 @@ void QFExtensionCameraAndor::getCameraAcquisitionDescription(unsigned int camera
 
 }
 
-bool QFExtensionCameraAndor::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {
+bool QFExtensionCameraAndor::getCameraAcquisitionPreview(unsigned int /*camera*/, uint32_t* /*data*/) {
     return false;
 }
 
@@ -1348,11 +1348,11 @@ unsigned int QFExtensionCameraAndor::getShutterCount()  {
     return getCameraCount();
 }
 
-void  QFExtensionCameraAndor::shutterConnect(unsigned int shutter) {
+void  QFExtensionCameraAndor::shutterConnect(unsigned int /*shutter*/) {
 
 }
 
-void  QFExtensionCameraAndor::shutterDisonnect(unsigned int shutter) {
+void  QFExtensionCameraAndor::shutterDisonnect(unsigned int /*shutter*/) {
 
 }
 
@@ -1394,7 +1394,7 @@ bool QFExtensionCameraAndor::isLastShutterActionFinished(unsigned int shutter) {
     return camGlobalSettings[shutter].lastShutterAction.elapsed()>150;
 }
 
-void QFExtensionCameraAndor::showShutterSettingsDialog(unsigned int axis, QWidget* parent) {
+void QFExtensionCameraAndor::showShutterSettingsDialog(unsigned int /*axis*/, QWidget* parent) {
     QMessageBox::information(parent, tr("Andor camera driver"), tr("there is no configuration dialog for the internal shutter!"));
 }
 
@@ -1407,7 +1407,7 @@ unsigned int QFExtensionCameraAndor::getMeasurementDeviceCount()
     return getCameraCount();
 }
 
-void QFExtensionCameraAndor::showMeasurementDeviceSettingsDialog(unsigned int measurementDevice, QWidget *parent) {
+void QFExtensionCameraAndor::showMeasurementDeviceSettingsDialog(unsigned int /*measurementDevice*/, QWidget *parent) {
     QMessageBox::information(parent, tr("Andor camera driver"), tr("there is no configuration dialog for the camera as measurement device!"));
 }
 
@@ -1416,12 +1416,12 @@ bool QFExtensionCameraAndor::isMeasurementDeviceConnected(unsigned int measureme
     return isCameraConnected(measurementDevice);
 }
 
-void QFExtensionCameraAndor::connectMeasurementDevice(unsigned int measurementDevice)
+void QFExtensionCameraAndor::connectMeasurementDevice(unsigned int /*measurementDevice*/)
 {
 
 }
 
-void QFExtensionCameraAndor::disconnectMeasurementDevice(unsigned int measurementDevice)
+void QFExtensionCameraAndor::disconnectMeasurementDevice(unsigned int /*measurementDevice*/)
 {
 }
 
@@ -1457,39 +1457,39 @@ QVariant QFExtensionCameraAndor::getMeasurementDeviceValue(unsigned int measurem
     return QVariant();
 }
 
-QString QFExtensionCameraAndor::getMeasurementDeviceValueName(unsigned int measurementDevice, unsigned int value)
+QString QFExtensionCameraAndor::getMeasurementDeviceValueName(unsigned int /*measurementDevice*/, unsigned int value)
 {
     if (value==0)  return tr("Temperature [C]");
     return QString();
 }
 
-QString QFExtensionCameraAndor::getMeasurementDeviceValueShortName(unsigned int measurementDevice, unsigned int value)
+QString QFExtensionCameraAndor::getMeasurementDeviceValueShortName(unsigned int /*measurementDevice*/, unsigned int value)
 {
     if (value==0) return QString("temperature_degC");
     return QString();
 }
 
-bool QFExtensionCameraAndor::isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value)
+bool QFExtensionCameraAndor::isMeasurementDeviceValueEditable(unsigned int /*measuremenDevice*/, unsigned int value)
 {
     return false;
 }
 
-void QFExtensionCameraAndor::setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant &data)
+void QFExtensionCameraAndor::setMeasurementDeviceValue(unsigned int /*measuremenDevice*/, unsigned int /*value*/, const QVariant &/*data*/)
 {
 
 }
 
-QVariant::Type QFExtensionCameraAndor::getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value)
+QVariant::Type QFExtensionCameraAndor::getMeasurementDeviceEditableValueType(unsigned int /*measuremenDevice*/, unsigned int /*value*/)
 {
     return QVariant::Invalid;
 }
 
-QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionCameraAndor::getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList *comboboxEntries)
+QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionCameraAndor::getMeasurementDeviceValueWidget(unsigned int /*measuremenDevice*/, unsigned int /*value*/, QStringList */*comboboxEntries*/)
 {
     return QFExtensionMeasurementAndControlDevice::mdDefault;
 }
 
-void QFExtensionCameraAndor::getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double &minimum, double &maximum)
+void QFExtensionCameraAndor::getMeasurementDeviceEditableValueRange(unsigned int /*measuremenDevice*/, unsigned int /*value*/, double &/*minimum*/, double &/*maximum*/)
 {
 
 }

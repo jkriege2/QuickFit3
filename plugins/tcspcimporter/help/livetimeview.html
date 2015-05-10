@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>$$local_plugin_name$$: Lifetime Preview</title>
+      <link rel="contents" href="tcspcimporter.html">     
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+    
+<h2>Lifetime Preview</h2>
+<p>This dialog allows the get a quick peek at the microtime histogram that can be extracted from the TCSPC input data. From this histogram, the fluorescence lifetimes of the different species in the measurement can be extracted. Also this dialog can be used to easily set the ranges for the <a href="correlator.html#lifetimefilter">lifetime filter for FCS/FCCS evaluation</a>.</p>
+<p>You can open this dialog by clicking the <b>"Peek Lifetime-Distribution"</b> button in the <b>Input</b> row of the <a href="tcspcimporter.html#usage">TCSPC Importer Dialog</a>. The tool will then read the start of your specified TCSPC file (i.e. either the first 50,000 photons or the first 10s, whichever happens first) and build a lifetime histogram from the microtime data stored in that file. Then the normalized histogram is displayed in the following dialog:
+<center><a name="livetimeview_pic000"><img src="./pic/livetimeview_pic000.png" border="1">
+</center>
+</p>
+<p>In addition to haveing a look at the microtime distribution, you can also use this dialog to define the lifetime ranges for the <a href="correlator.html#lifetimefilter">lifetime filter for FCS/FCCS evaluation</a>:
+<ol>
+    <li>activate the lifetime-range mode by checking the button <img src="./pic/livetimeview_pic001.png" border="1"> at the top-left. </li>
+<li>Then you can simply "draw" a range rectangle int the graph (keeping the left mouse-button pressed down, while dragging the mouse ofver the plot). The newly selected range will be displayed in the plot. </li>
+<li>If you are satisfied, you can right-click the plot and select one of the <b>use lifetime range for channel <i>X</i></b> menu entries to take the range over into the <a href="tcspcimporter.html#usage">TCSPC Importer Dialog</a>.
+    </li>
+</ol></p>
+
+
+<a name="#references"><h2>References</h2>
+<p>$$references$$</p>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

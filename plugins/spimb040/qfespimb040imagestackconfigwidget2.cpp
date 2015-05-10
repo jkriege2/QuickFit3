@@ -372,15 +372,15 @@ void QFESPIMB040ImageStackConfigWidget2::actGetCurrentAround_clicked() {
     //if (opticsSetup) opticsSetup->unlockStages();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_spinStart_valueChanged(double value) {
+void QFESPIMB040ImageStackConfigWidget2::on_spinStart_valueChanged(double /*value*/) {
     updateLabel();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_spinDelta_valueChanged(double value) {
+void QFESPIMB040ImageStackConfigWidget2::on_spinDelta_valueChanged(double /*value*/) {
     updateLabel();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_spinSteps_valueChanged(int value) {
+void QFESPIMB040ImageStackConfigWidget2::on_spinSteps_valueChanged(int /*value*/) {
     updateLabel();
 }
 
@@ -434,7 +434,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_btnConnect_clicked() {
     if (opticsSetup) opticsSetup->unlockStages();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_chkUse1_clicked(bool enabled) {
+void QFESPIMB040ImageStackConfigWidget2::on_chkUse1_clicked(bool /*enabled*/) {
     bool updt=updatesEnabled();
     bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
@@ -449,7 +449,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_chkUse1_clicked(bool enabled) {
     if (widVisible) setUpdatesEnabled(updt);
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_chkUse2_clicked(bool enabled) {
+void QFESPIMB040ImageStackConfigWidget2::on_chkUse2_clicked(bool /*enabled*/) {
     bool updt=updatesEnabled();
     bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
@@ -464,13 +464,13 @@ void QFESPIMB040ImageStackConfigWidget2::on_chkUse2_clicked(bool enabled) {
     if (widVisible) setUpdatesEnabled(updt);
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_chkStage2_clicked(bool enabled) {
+void QFESPIMB040ImageStackConfigWidget2::on_chkStage2_clicked(bool /*enabled*/) {
     ui->chkStage2->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->widStage2->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage2->isChecked());
     ui->chkStage3->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage2->isChecked());
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_chkStage3_clicked(bool enabled) {
+void QFESPIMB040ImageStackConfigWidget2::on_chkStage3_clicked(bool /*enabled*/) {
     ui->chkStage3->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage2->isChecked());
     ui->widStage3->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage3->isChecked());
 }
@@ -608,15 +608,15 @@ void QFESPIMB040ImageStackConfigWidget2::actGetCurrentAround2_clicked() {
     }
     //if (opticsSetup) opticsSetup->unlockStages();
 }
-void QFESPIMB040ImageStackConfigWidget2::on_spinStart2_valueChanged(double value) {
+void QFESPIMB040ImageStackConfigWidget2::on_spinStart2_valueChanged(double /*value*/) {
     updateLabel();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_spinDelta2_valueChanged(double value) {
+void QFESPIMB040ImageStackConfigWidget2::on_spinDelta2_valueChanged(double /*value*/) {
     updateLabel();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_spinSteps2_valueChanged(int value) {
+void QFESPIMB040ImageStackConfigWidget2::on_spinSteps2_valueChanged(int /*value*/) {
     updateLabel();
 }
 
@@ -737,15 +737,15 @@ void QFESPIMB040ImageStackConfigWidget2::actGetCurrentAround3_clicked() {
     //if (opticsSetup) opticsSetup->unlockStages();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_spinStart3_valueChanged(double value) {
+void QFESPIMB040ImageStackConfigWidget2::on_spinStart3_valueChanged(double /*value*/) {
     updateLabel();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_spinDelta3_valueChanged(double value) {
+void QFESPIMB040ImageStackConfigWidget2::on_spinDelta3_valueChanged(double /*value*/) {
     updateLabel();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_spinSteps3_valueChanged(int value) {
+void QFESPIMB040ImageStackConfigWidget2::on_spinSteps3_valueChanged(int /*value*/) {
     updateLabel();
 }
 

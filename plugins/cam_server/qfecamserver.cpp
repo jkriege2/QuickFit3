@@ -311,7 +311,7 @@ QVariant::Type QFECamServer::getMeasurementDeviceEditableValueType(unsigned int 
     return QVariant::Invalid;
 }
 
-QFExtensionMeasurementAndControlDevice::WidgetTypes QFECamServer::getMeasurementDeviceValueWidget(unsigned int measurementDevice, unsigned int value, QStringList *comboboxEntries)
+QFExtensionMeasurementAndControlDevice::WidgetTypes QFECamServer::getMeasurementDeviceValueWidget(unsigned int measurementDevice, unsigned int value, QStringList */*comboboxEntries*/)
 {
     if (/*measurementDevice>=0 &&*/ measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
         if (/*value>=0 &&*/ value<(long long)sources[measurementDevice].params.size()) {

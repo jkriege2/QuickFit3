@@ -1004,7 +1004,7 @@ void QFESPIMB040CameraView::imageMouseMoved(double x, double y) {
     }
 
     if (actMeasure->isChecked()) {
-        if ((xx>=0) && (xx<image.width()) && (yy>=0) && (yy<image.height())) {
+        if (/*(xx>=0) &&*/ (xx<image.width()) && /*(yy>=0) &&*/ (yy<image.height())) {
             QString s=QLocale::system().toString((qlonglong)image(xx,yy));
             if (mask(xx, yy)) {
                 s=s+tr(" <font color=\"red\">[broken pixel]</font>");
@@ -1019,7 +1019,7 @@ void QFESPIMB040CameraView::imageMouseMoved(double x, double y) {
             labCurrentPos->setText("");
         }
     } else {
-        if ((xx>=0) && (xx<image.width()) && (yy>=0) && (yy<image.height())) {
+        if (/*(xx>=0) &&*/ (xx<image.width()) && /*(yy>=0) &&*/ (yy<image.height())) {
             QString s=QLocale::system().toString((qlonglong)image(xx,yy));
             if (mask(xx, yy)) {
                 s=s+tr(" <font color=\"red\">[broken pixel]</font>");
@@ -1045,7 +1045,7 @@ void QFESPIMB040CameraView::imageMouseClicked(double x, double y) {
     };
 
     if (actMaskEdit->isChecked()) {
-        if ((xx>=0) && (xx<image.width()) && (yy>=0) && (yy<image.height())) {
+        if (/*(xx>=0) &&*/ (xx<image.width()) && /*(yy>=0) &&*/ (yy<image.height())) {
             mask(xx, yy)=!mask(xx, yy);
             maskEmpty=false;
         }
@@ -1061,7 +1061,7 @@ void QFESPIMB040CameraView::imageMouseClicked(double x, double y) {
         measureFirst = !measureFirst;
         redrawFrameRecalc();*/
     } else {
-        if ((xx>=0) && (xx<image.width()) && (yy>=0) && (yy<image.height())) {
+        if (/*(xx>=0) &&*/ (xx<image.width()) && /*(yy>=0) &&*/ (yy<image.height())) {
             pltDataMarginalXPixel=xx;
             pltDataMarginalYPixel=yy;
         }
@@ -1071,7 +1071,7 @@ void QFESPIMB040CameraView::imageMouseClicked(double x, double y) {
     imageMouseMoved(x,y);
 }
 
-void QFESPIMB040CameraView::imageMouseDragged(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers modifiers)
+void QFESPIMB040CameraView::imageMouseDragged(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers /*modifiers*/)
 {
     uint32_t xx=floor(x1);
     uint32_t yy=floor(y1);
@@ -1100,7 +1100,7 @@ void QFESPIMB040CameraView::imageMouseDragged(double x1, double y1, double x2, d
 }
 
 
-void QFESPIMB040CameraView::setCountsAutoscale(bool autoscale) {
+void QFESPIMB040CameraView::setCountsAutoscale(bool /*autoscale*/) {
     if (!chkCountsRangeAutoLow) return;
     if (chkCountsRangeAutoLow->isChecked()) {
         spinCountsLower->setEnabled(false);
@@ -1289,9 +1289,9 @@ void QFESPIMB040CameraView::prepareImage() {
         mask.assign(image.width(), image.height(), false);
     }
 
-    if (pltDataMarginalXPixel<0) pltDataMarginalXPixel=0;
+    //if (pltDataMarginalXPixel<0) pltDataMarginalXPixel=0;
     if (pltDataMarginalXPixel>=image.width()) pltDataMarginalXPixel=image.width()-1;
-    if (pltDataMarginalYPixel<0) pltDataMarginalYPixel=0;
+    //if (pltDataMarginalYPixel<0) pltDataMarginalYPixel=0;
     if (pltDataMarginalYPixel>=image.height()) pltDataMarginalYPixel=image.height()-1;
 
 
@@ -1864,7 +1864,7 @@ void QFESPIMB040CameraView::histogramMask() {
             mask.setAll(false);
         }
         uint32_t maxVal=d[N-1];
-        if (N-dlg->pixels()>=0) maxVal=d[N-dlg->pixels()];
+        if (int64_t(N)-dlg->pixels()>=0) maxVal=d[int64_t(N)-dlg->pixels()];
         for (long i=0; i<(long)N; i++) {
             if (image(i)>=maxVal) {
                 mask(i)=true;
@@ -2106,7 +2106,7 @@ void QFESPIMB040CameraView::deleteUserAction(QAction* action) {
     toolbar->removeAction(action);
 }
 
-void QFESPIMB040CameraView::histogramChecked(bool checked) {
+void QFESPIMB040CameraView::histogramChecked(bool /*checked*/) {
 }
 
 

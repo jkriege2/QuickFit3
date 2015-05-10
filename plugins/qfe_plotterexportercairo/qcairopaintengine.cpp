@@ -97,7 +97,7 @@ bool QCairoPaintEngine::begin(QPaintDevice *pd)
             surface = cairo_pdf_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
             cairo_pdf_surface_restrict_to_version(surface, CAIRO_PDF_VERSION_1_4);
         } else if (ft==QCairoPaintDevice::cftPDF15) {
-            q//Debug()<<  "Cairo-PDF1.5"<<s<<s.width()/25.4*72.0<<s.height()/25.4*72.0;
+            //Debug()<<  "Cairo-PDF1.5"<<s<<s.width()/25.4*72.0<<s.height()/25.4*72.0;
             surface = cairo_pdf_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
             cairo_pdf_surface_restrict_to_version(surface, CAIRO_PDF_VERSION_1_5);
         } else if (ft==QCairoPaintDevice::cftPS2) {

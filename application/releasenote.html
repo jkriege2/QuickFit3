@@ -118,6 +118,17 @@
         <li>added 3D/2D normal diffusion model for confocal TIR-FCS</li>
         <li>added 3D/2D normal diffusion model with variable moleculr brightnesses for confocal TIR-FCS</li>
     </ul></li>
+    <li><b>TCSPC importer</b><ul>
+        <li>added fluorescence liftetime (TCSPC microtime) histogram preview</li>
+        <li>added an option for time-gate/lifetime-filtered FCS/FCCS to the correlator [thanks to Martin Seefeld, Uni Heidelberg for providing test-datasets]</li>
+        <li>bugfix: countrate is now saved in the correct units (kHz instead of Hz) in the correlator output file (before it was a factor 1000 too high!)</li>
+    </ul></li>
+
+    <li><b>cairo graph exporter plugin</b><ul>
+        <li>added finer grained export options for different subformats (e.g. SVG 1.1&amp;1.2, PDF 1.4&amp;1.5, EPS2&amp;3)</li>
+        <li></li>
+    </ul></li>
+
     </li>
 
 
