@@ -8,6 +8,7 @@
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 $$note:This tutorial serves two purposes: It explains how to simulate an imaging FCS measurement with the <a href="simulation.html">imaging FCS simulator</a> that is part of the plugin and it explains how to perform model selection for imaging FCS data.$$
 
+$$note:This is work in progress and will be finished in one of the following version!$$
 
     <h2>Introduction</h2>
     <p>Often in an FCS evaluation, you are faced with the question: Which model should I choose and which one describes my data best? To solve this question, one generally uses two principles:
@@ -18,7 +19,7 @@ $$note:This tutorial serves two purposes: It explains how to simulate an imaging
 Several automated methods for this model seelction scheme have been proposed over the years.$$ref:LEVIN2004:Levin M K, Carson J H  (2004) Fluorescence correlation spectroscopy and quantitative cell biology. <i>Differentiation</i> <b>72</b><b>:</b> 1-10 doi: 10.1111/j.1432-0436.2004.07201002.x$$$$ref:BURNHA2002:Burnham K P, Anderson D R  (2002) Model Selection and Multimodel Inference ed. New York, London, Berlin: Springer$$ Recently, a very sofisticated framework based on Bayesian statistics has been proposed,$$ref:HE2012:He J, Guo S, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data I: Theory. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3871-3879 doi: 10.1021/ac2034369$$$$ref:GUO2012:Guo S, He J, Monnier N, Sun G, Wohland T, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data II: Application to Simulated and In Vitro Data. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3880-3888 doi: 10.1021/ac2034375 $$ but this requires a very softisticated estimate of the errors on the curreltion curve, which are currently not supported by QuickFit. A simpler version is based on statistical information criteria, such as the Akaike information criterion (AIC)$$ref:AKAIKE1974:Akaike H  (1974) A new look at the statistical model identification. <i>IEEE Transactions on Automatic Control</i> <b>19</b><b>:</b> 716-723$$$$ref:BURNHA2002:$$ or the Bayes information criterion (BIC)$$ref:SCHWARZ1978:Schwarz G  (1978) Estimating the Dimension of a Model. <i>The Annals of Statistics</i> <b>6</b><b>:</b> 461-464$$$$ref:BURNHA2002:$$. This tutorial will cover the latter method only. The information criteria are just a number (BIC or AICc) which is calculated from the fits and which encodes both, the goodnes of fit and also the number of parameters that were required to achieve it. Then you simply choose the model with the lowest values (at least for BIC and AICc). This tutorial will show you how this works on a synthetic dataset that we will simulate with the <a href="simulation.html">imaging FCS simulator</a> that is part of the <a href="$$plugin_info:help:imaging_fcs$$">imaging_fcs Plugin</a> in QuickFit $$version$$. Finally we will get a graph, that shows you where which model should be taken.
 </p>
 
-               
+
      
 <h2>Tutorial</h2>
 
