@@ -100,8 +100,11 @@
         <li>added overlay plots of the runs in a single RDR</li>
     </ul></li>
     <li><b>FCS MSD evaluation</b><ul>
+        <li><font color="red"><b>MAJOR BUGFIX:</b> Before this versions, all 2D-diffusion MSD models returned an MSD, which was a factor of 2/3 too high!</font> This was fixed now. See the documentation for the correct models. [Thanks to T. Wohland for pointing me to that]</li>
         <li>bugfix: correlation function range edits are now enabled/editable, when an unfitted record is selected.</li>
         <li>added overlay plots of the runs in a single RDR</li>
+        <li>bugfix: corrected the model equations in the online-help (there was a wxy^2 instead of a gamma^2wxy^2!)</li>
+        <li>added an offset G<sub>&infin;</sub> to all models</li>
     </ul></li>
     <li><b>Diffusion Coefficient Calculator</b><ul>
         <li>bugfix: D20W was not calculated correctly, when a D at arbitrary conditions with viscosity factor !=1 was given!</li>

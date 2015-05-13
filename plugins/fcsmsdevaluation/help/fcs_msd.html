@@ -5,110 +5,157 @@
   <title>FCS Mean Squared Displacement (MSD) Online-Help</title>
   </head>
   <body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		<h2>Introduction</h2>
-		Ths plugn implements methods to extract the mean squared displacement (MSD) from fluorescence correlation spectroscopy (FCS) data, as described in these references:
-		<ul>
-		  <li>Roman Shusterman, Sergey Alon, Tatyana Gavrinyov, Oleg Krichevsky (2003): <strong>"Monomer Dynamics in Double- and Single-Stranded DNA Polymers"</strong>, <i>Physical review Letters</i> <b>92</b>(4), DOI: 10.1103/PhysRevLett.92.048303</li>
-		</ul>
-		
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        <h2>Introduction</h2>
+        <p>Ths plugin implements methods to extract the mean squared displacement (MSD) from fluorescence correlation spectroscopy (FCS) data, as described in the references $$ref:SHUSTERMAN2004:Roman Shusterman, Sergey Alon, Tatyana Gavrinyov, Oleg Krichevsky (2004): <strong>"Monomer Dynamics in Double- and Single-Stranded DNA Polymers"</strong>, <i>Physical review Letters</i> <b>92</b>(4), DOI: 10.1103/PhysRevLett.92.048303$$ $$ref:SHUSTERMAN2008:Shusterman R, Gavrinyov T, Krichevsky O  (2008) Internal Dynamics of Superhelical DNA. <i>Physical review Letters</i> <b>100</b><b>:</b> 098102$$$$ref:PETROV2006:Petrov E P, Ohrt T, Winkler R G, Schwille P  (2006) Diffusion and Segmental Dynamics of Double-Stranded DNA. <i>Physical Review Letters</i> <b>97</b><b>:</b> 258101$$$$jankrieger_phdthesis_ref$$
 
-		<h2>The Mean Squared Displacement (MSD)</h2>
-		The MSD describes the motion of diffusin particles. Roughly it is the variance of the random motion and can be interpreted as the area a particle has wandered over during a time $$math:\tau$$. It is defined for the trajectory of a single particle (random walker) $$math:\vec{r}(t)$$ as:
-		$$bmath:\langle r^2(\tau)\rangle=\left\langle (\vec{r}(t)-\vec{r}(t+\tau) )^2\right\rangle$$
-		where the averaging $$math:\langle\cdot\rangle$$ is a time-average over the trajectory. If we observe several particles the time-average may be replaced by an ensemble or a combined ensemble and time average. In FCS the average is usually the last of these, as we observe several particles during the measurement.
-		
-		<center>
-		  <img src="./pic/random_walk.png"><br>
-		  <b>Fig 1:</b> Four trajectories of random walks with different diffusion coefficients that increase (red, green, blue, magenta) by a factor of five between two subsequent walks. The circles show the root mean squared displacement $$math:\sqrt{\langle r^2(T)\rangle}$$ of the particle from its origin, a measure of the area, the particle covers during the simulation time $$math:T$$.
-		</center>
-		
-		For normal diffusion the dependence of the MSD on the time $$math:\tau$$ is known:
-		$$bmath:\langle r^2(\tau)\rangle=2d\cdot D\cdot\tau$$
-		where $$math:d$$ is the dimensionality of the motion ($$math:d=3$$ for 3D, $$math:d=2$$ for 2D and $$math:d=1$$ for 1D motion) and $$math:D$$ is the diffusion coefficient. In some cases this dependence does not hold, e.g.:
-		  <ul>
-		    <li>Due to crowding the diffusion inside the cellular nucleus is hindered</li>
-			<li>If only one segment on a long polymer is labeled and observed, we will see a different MSD for small timescales, as it represents here the internal motion of the segment inside the polymer chain and not the overall motion of the whole molecule.</li>
-		  </ul>
-		For both cases the dependence of the MSD on time $$math:\tau$$ is "subdiffusive" and we have instead of above's relation:
-		$$bmath:\langle r^2(\tau)\rangle=\Gamma\cdot\tau^\alpha$$
-		Here $$math:\alpha$$ represents the anomality of the random walk for subdiffusive motion we find $$math:\alpha<1$$, for normal diffusion we have $$math:\alpha=1$$ and the case $$math:\alpha>1$$ is called super-diffusion.
-		<center>
-		  <img src="./pic/anomdiff3.png"><br>
-		  <b>Fig 2:</b> Examples for anomalous subdiffusion
-		</center>
-		<center>
-		  <img src="./pic/anomdiff2.png"><br>
-		  <b>Fig 3:</b> Examples for anomalous superdiffusion
-		</center>
-		
-		
-		<h2>The Plugin</h2>
-		In many cases it is possible to write down a model ACF $$math:g(\langle r^2(\tau)\rangle)$$ for a given mean squared displacement $$math:\langle r^2(\tau)\rangle$$. If so it should also be possible to regain the MSD $$math:\langle r^2(\tau)\rangle$$ from the measured ACF $$math:g_m(\tau)$$ by solving:
-		$$bmath:g(\langle r^2(\tau)\rangle)-g_m(\tau)=0$$
-		for the MSD $$math:\langle r^2(\tau)\rangle$$. This equation (for details on the model functions, see next section) can either be solved analytically for simple cases or numerically for more complex situations. This plugin does exactly that:<ol>
-		  <li>First the user has to select a valid range from the measured ACF on which the MSD should be extracted. Take special care to avoid regions with e.g. triplet contributions if the selected model does not account for them.</li>
-		  <li>Then several model parameters (e.g. focal sizes, correlation amplitudes/particle numbers) have to be determined indepentendly and supplied to the plugin as "fit parameters".</li>
-		  <li>Finally a click on "fit" will extract the MSD for the given settinsg from the data. The MSD will be displayed in a double-logarithmic plot, in which the diffusion laws $$math:\propto\tau^\alpha$$ will appear as straight lines with slopes depending on $$math:\alpha$$ only.</li>
-		  <li>It is possible to display up to three <strong>"theory curves"</strong> alongside the extracted MSD with parameters electable by the user. This is handy to compare the extracted MSD to known or expected dependencies. A button next to the input controls for each theory curve allows to obtain the parameters by a <a href="fit_msd.html">fit to the MSD curve</a>. This function fits the model $$bmath:\langle r^2(\tau)\rangle=P_i\cdot D_i\cdot\tau^{\alpha_i}$$ ($$math:P=6$$ for 3D-diffusion, $$math:P=4$$ for 2D-diffusion, $$math:P=2$$ for 1D-diffusion) to the MSD in a specified range of lag times $$math:\tau$$. In addition the intersection points between any two model i and i+1 are calculated: $$bmath:X_{i, i+1}=\left(\frac{P_iD_i}{P_{i+1}D_{i+1}}\right)^{1/(\alpha_{i+1}-\alpha_i)}$$</li>
-		  
-		  <li>From the MSD the plugin also calculates the local anomality <strong>"local &alpha;"</strong> and the local diffusion coefficient <strong>"local D"</strong> by cutting the MSD in several consecutive segments of "fit width" points. Then the model $$bmath:f(\tau)=6\cdot D\cdot\tau^\alpha$$ is fitted to each of these 
+        </p>
+
+        <h2>The Mean Squared Displacement (MSD)</h2>
+        
+        <p>
+            The MSD describes the motion of diffusin particles. Roughly it is the variance of the random motion and can be interpreted as the area a particle has wandered over during a time $$math:\tau$$. It is defined for the trajectory of a single particle (random walker) $$math:\vec{r}(t)$$ as:
+        $$bmath:\langle r^2(\tau)\rangle=\left\langle (\vec{r}(t)-\vec{r}(t+\tau) )^2\right\rangle$$
+        where the averaging $$math:\langle\cdot\rangle$$ is a time-average over the trajectory. If we observe several particles the time-average may be replaced by an ensemble or a combined ensemble and time average. In FCS the average is usually the last of these, as we observe several particles during the measurement.
+        
+        <center>
+          <img src="./pic/random_walk.png"><br>
+          <b>Fig 1:</b> Four trajectories of random walks with different diffusion coefficients that increase (red, green, blue, magenta) by a factor of five between two subsequent walks. The circles show the root mean squared displacement $$math:\sqrt{\langle r^2(T)\rangle}$$ of the particle from its origin, a measure of the area, the particle covers during the simulation time $$math:T$$.
+        </center>
+        
+        For normal diffusion the dependence of the MSD on the time $$math:\tau$$ is known:
+        $$bmath:\langle r^2(\tau)\rangle=2d\cdot D\cdot\tau$$
+        where $$math:d$$ is the dimensionality of the motion ($$math:d=3$$ for 3D, $$math:d=2$$ for 2D and $$math:d=1$$ for 1D motion) and $$math:D$$ is the diffusion coefficient. In some cases this dependence does not hold, e.g.:
+          <ul>
+            <li>Due to crowding the diffusion inside the cellular nucleus is hindered</li>
+            <li>If only one segment on a long polymer is labeled and observed, we will see a different MSD for small timescales, as it represents here the internal motion of the segment inside the polymer chain and not the overall motion of the whole molecule.</li>
+          </ul>
+        For both cases the dependence of the MSD on time $$math:\tau$$ is "subdiffusive" and we have instead of above's relation:
+        $$bmath:\langle r^2(\tau)\rangle=\Gamma\cdot\tau^\alpha$$
+        Here $$math:\alpha$$ represents the anomality of the random walk for subdiffusive motion we find $$math:\alpha<1$$, for normal diffusion we have $$math:\alpha=1$$ and the case $$math:\alpha>1$$ is called super-diffusion.
+        <center>
+          <img src="./pic/anomdiff3.png"><br>
+          <b>Fig 2:</b> Examples for anomalous subdiffusion
+        </center>
+        <center>
+          <img src="./pic/anomdiff2.png"><br>
+          <b>Fig 3:</b> Examples for anomalous superdiffusion
+        </center>
+        </p>
+        
+          
+        <h2>FCS-Theory with arbitrary MSD</h2>
+        <p>All model functions used by this plugin are based on a simple generalization of the usual FCS theory for an arbitrary MSD. Usually FCS model functions are derived from three ingredients:
+<ol>
+    <li>The definition of the ACF:$[ g(\tau)=\frac{\langle I(t)\Cdot I(t+\tau)\rangle}{\langle I(t)\rangle^2} ]$ where $(\langle\cdot\rangle)$ is a time-average.</li>
+    <li>A model for the intensity $(I(t))$ in that correlation function, which is expresed as an integral over the intensity of all particles in a focus volume, defined by the molecular detection efficiency function $(MDE(\vec{r}))$:
+$[ I(t)=\eta\iiint_{-\infty}^\infty MDE(\vec{r})\cdot\sum_i \mathrm{\delta}\left(\vec{r}-\vec{r}_i(t)\right) ]$
+where $(\eta)$ is the number of photons detected from a single fluorophore at the center of the MDE, $(\vec{r}_i(t))$ is the tracetory of the <i>i</i>-th particle and $(\mathrm{\delta}(\cdot))$ is the delta-distribution, which is 1 iff the argument is 0 and 0 otherwise.</li>
+    <li>An expression for the pair-correlation function of the trajectory or - equvalently - of the concentration correlation function or propagator $(P(\vec{r},\vec{r}',\tau))$ of the dynamics.</li>
+</ol>
+In standard FCS theory for normally diffusing particles with a diffusion coefficient $(D)$ (and MSD $(\langle r^2(\tau)\rangle(\tau)=6D\tau)$), the propagator is Gaussian:
+$[ P(\vec{r},\vec{r}',\tau)=\frac{1}{\left[2\pi\cdot 2D\tau\right]^{3/2}}\cdot\exp\left[-\frac{1}{2}\cdot\frac{(\vec{r}-\vec{r}')^2}{2D\tau}\right] ]$ 
+For an arbitrary MSD, this propagator has to be modified for <i>n</i>-dimensional diffusion: $$ref:SHUSTERMAN2004:$$ $$ref:SHUSTERMAN2008:$$$$jankrieger_phdthesis_ref$$
+$[ P(\vec{r},\vec{r}',\tau)=\frac{1}{\left[2\pi\cdot \mbox{MSD}(\tau)/n\right]^{3/2}}\cdot\exp\left[-\frac{1}{2}\cdot\frac{(\vec{r}-\vec{r}')^2}{\mbox{MSD}(\tau)/n}\right] ]$ 
+Then it can be used together with the two ingredients 1 and 2 to derive all model functions, given below.
+</p>
+        
+        <h2>The Plugin</h2>
+        
+        <p>
+            In many cases it is possible to write down a model ACF $$math:g(\langle r^2(\tau)\rangle)$$ for a given mean squared displacement $$math:\langle r^2(\tau)\rangle$$. If so it should also be possible to regain the MSD $$math:\langle r^2(\tau)\rangle$$ from the measured ACF $$math:g_m(\tau)$$ by solving:
+        $$bmath:g(\langle r^2(\tau)\rangle)-g_m(\tau)=0$$
+        for the MSD $$math:\langle r^2(\tau)\rangle$$. This equation (for details on the model functions, see next section) can either be solved analytically for simple cases or numerically for more complex situations. This plugin does not use a simple <a href="https://en.wikipedia.org/wiki/Root-finding_algorithm">root-finfing algorithm</a> to solve the given equation, but a least squares fit, which solves the equivalent least-squares (LS) problem:
+        $$bmath:\langle r^2(\tau)\rangle^\ast=\argmin_{\langle r^2(\tau)\rangle}\left|g(\langle r^2(\tau)\rangle)-g_m(\tau)\right|^2$$
+To solve this problem, a <a href="https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm">Levenberg-Marquardt least-squares fit</a> is used, which is implemented in the library <a href="copyright.html"><b>lmfit</b> by Joachim Wuttke</a>.
+ This plugin does exactly that:<ol>
+          <li>First the user has to select a valid range from the measured ACF on which the MSD should be extracted. Take special care to avoid regions with e.g. triplet contributions if the selected model does not account for them.</li>
+          <li>Then several model parameters (e.g. focal sizes, correlation amplitudes/particle numbers) have to be determined indepentendly and supplied to the plugin as "fit parameters".</li>
+          <li>Finally a click on "fit" will extract the MSD for the given settinsg from the data. The MSD will be displayed in a double-logarithmic plot, in which the diffusion laws $$math:\propto\tau^\alpha$$ will appear as straight lines with slopes depending on $$math:\alpha$$ only.</li>
+          <li>It is possible to display up to three <strong>"theory curves"</strong> alongside the extracted MSD with parameters electable by the user. This is handy to compare the extracted MSD to known or expected dependencies. A button next to the input controls for each theory curve allows to obtain the parameters by a <a href="fit_msd.html">fit to the MSD curve</a>. This function fits the model $$bmath:\langle r^2(\tau)\rangle=P_i\cdot D_i\cdot\tau^{\alpha_i}$$ ($$math:P=6$$ for 3D-diffusion, $$math:P=4$$ for 2D-diffusion, $$math:P=2$$ for 1D-diffusion) to the MSD in a specified range of lag times $$math:\tau$$. In addition the intersection points between any two model i and i+1 are calculated: $$bmath:X_{i, i+1}=\left(\frac{P_iD_i}{P_{i+1}D_{i+1}}\right)^{1/(\alpha_{i+1}-\alpha_i)}$$</li>
+          
+          <li>From the MSD the plugin also calculates the local anomality <strong>"local &alpha;"</strong> and the local diffusion coefficient <strong>"local D"</strong> by cutting the MSD in several consecutive segments of "fit width" points. Then the model $$bmath:f(\tau)=6\cdot D\cdot\tau^\alpha$$ is fitted to each of these 
                                                                  segments using the levenberg marquardt library <a href="copyright.html">lmfit by Joachim Wuttke</a>, a simple linear regression or a more rbust regression method (<a href="http://cnx.org/content/m45285/latest/">iteratively reweighted linear regression, IRLS</a>). The results of these fits are displayed below the MSD in a second plotting widget. $$startbox_note$$Note that the unit of $$math:D$$ is &mu;m<sup>2</sup>/s only,
                                                                   if $$math:\alpha=1$$. In any other case the unit is &mu;m<sup>2</sup>/s<sup>&alpha;</sup> and can no longer be interpreted a s a diffusion coefficient easily!$$endbox$$</li>
-		  <li>In addition to the MSD, and the "local &alpha;" the "local D", the plugin can also plot other transformations of the MSD:<ul>
-		    <li>$$math:\langle r^2(\tau)\rangle/(4\tau)$$</li>
-		    <li>$$math:\langle r^2(\tau)\rangle/(6\tau)$$</li>
-		    <li>$$math:\langle r^2(\tau)\rangle/(P_0D_0\tau)$$</li>
-		    <li>$$math:\langle r^2(\tau)\rangle/(P_1D_1\tau)$$</li>
-		    <li>$$math:\langle r^2(\tau)\rangle/(P_2D_2\tau)$$</li>
-		    <li>$$math:\langle r^2(\tau)\rangle/(P_3D_3\tau)$$</li>
-		    <li>$$math:\langle r^2(\tau)\rangle-(P_0D_0\tau)$$</li>
-		  </ul>These can be selected from the combobox above the lower-right plot.</li>
-		  <li>The plugin is able to calculate the average of the MSD and $$math:D(\tau), \alpha(\tau)$$ curves for you. To do so, use the menu entry "Results|<img src=":/copy.png"> copy runs-average of MSD". You will first be asked which runs to average over and which data to copy, then the average will be calculated and copied to the clipboard. Paste it into any spreadsheet/data evaluation program you want.</li>
-		</ol>
+          <li>In addition to the MSD, and the "local &alpha;" the "local D", the plugin can also plot other transformations of the MSD:<ul>
+            <li>$$math:\langle r^2(\tau)\rangle/(4\tau)$$</li>
+            <li>$$math:\langle r^2(\tau)\rangle/(6\tau)$$</li>
+            <li>$$math:\langle r^2(\tau)\rangle/(P_0D_0\tau)$$</li>
+            <li>$$math:\langle r^2(\tau)\rangle/(P_1D_1\tau)$$</li>
+            <li>$$math:\langle r^2(\tau)\rangle/(P_2D_2\tau)$$</li>
+            <li>$$math:\langle r^2(\tau)\rangle/(P_3D_3\tau)$$</li>
+            <li>$$math:\langle r^2(\tau)\rangle-(P_0D_0\tau)$$</li>
+          </ul>These can be selected from the combobox above the lower-right plot.</li>
+          <li>The plugin is able to calculate the average of the MSD and $$math:D(\tau), \alpha(\tau)$$ curves for you. To do so, use the menu entry "Results|<img src=":/copy.png"> copy runs-average of MSD". You will first be asked which runs to average over and which data to copy, then the average will be calculated and copied to the clipboard. Paste it into any spreadsheet/data evaluation program you want.</li>
+        </ol>
+        </p>
+      
 
-		<h2>Supported Models</h2>
-		This plugin supports several models from which the MSD is extracted:
-		<ol>
-		  <li><b>FCS: simple 2D model</b>: The confocal FCS model function for 2D diffusion is very simple: 
-		  $$bmath:g(\tau)=\frac{1}{N}\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1}$$
-			   Here $$math:w_{xy}$$ is the axial 1/e2 radius of the laser focus and $$math:N$$ is the particle number.<br>This model can easily be inverted to yield the MSD from the memasured ACF $$math:g_m(\tau)$$:
-			   $$bmath:\langle r^2(\tau)\rangle=\frac{3\cdot w_{xy}^2}{2}\cdot\left(\frac{1}{N\cdot g_m(\tau)}-1\right)$$
-			   So only the focal parameter $$math:w_{xy}$$ and the particle number $$math:N$$ have to be measured independently. The focus can be measured using a standard calibration solution (e.g. 20nM Alexa-488 in water). And the particle number $$math:N$$ can be extracted from a multi-component fit to the same measured ACF.
-		  </li>
-		  <li><b>FCS: simple 3D model</b>: The confocal FCS model function for 3D diffusion is very similar to the 2D case: 
-		  $$bmath:g(\tau)=\frac{1}{N}\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1/2}$$
-			   Here $$math:w_{xy}$$ is the axial 1/e2 radius of the laser focus, $$math:\gamma$$ is its axial ratio and $$math:N$$ is the particle number.<br>This model can not easily be inverted to find the MSD from the memasured ACF $$math:g_m(\tau)$$, so the inversion has to be done numerically using the Levenberg-Marquardt (LM) algorithm. The LM algorithm is then used to solve this equation for every pair $$math:\left(\tau_i, g_m(\tau_i)\right)$$ of estimates for different lag times of the ACF
-			   $$bmath:\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{1/2}-\frac{1}{N\cdot g_m(\tau)}=0$$
-			   Here the focal parameters $$math:w_{xy}$$ and  $$math:\gamma$$ and the particle number $$math:N$$ have to be measured independently. The focus can be measured using a standard calibration solution (e.g. 20nM Alexa-488 in water). And the particle number $$math:N$$ can be extracted from a multi-component fit to the same measured ACF. 
-			   <br>This plugin uses the LM library <a href="copyright.html">lmfit by Joachim Wuttke</a>.
-		  </li>
+        <h2>Supported Models</h2>
+        This plugin supports several models from which the MSD is extracted:
+          <h3>FCS: simple 2D model</h3>
+          <p>The confocal FCS model (i.e. a 3-dimensional, Gaussian MDE) function for 2D diffusion is very simple: 
+          $$bmath:g(\tau)=\frac{1}{N}\cdot\left(1+\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1}+G_\infty$$
+               Here $$math:w_{xy}$$ is the axial 1/e2 radius of the laser focus and $$math:N$$ is the particle number.<br>This model can easily be inverted to yield the MSD from the memasured ACF $$math:g_m(\tau)$$:
+               $$bmath:\langle r^2(\tau)\rangle=\frac{w_{xy}^2}{}\cdot\left(\frac{1}{N\cdot (g_m(\tau)-G_\infty)}-1\right)$$
+               So only the focal parameter $$math:w_{xy}$$ and the particle number $$math:N$$ have to be measured independently. The focus can be measured using a standard calibration solution (e.g. 20nM Alexa-488 in water). And the particle number $$math:N$$ can be extracted from a multi-component fit to the same measured ACF.
+$$warning:In older QuickFit versions (before SVN version 3960), there was a bug in this equation and the MSD that was calculated was a factor of 3/2 too large!$$
+          </p>
+          <h3>FCS: simple 3D model</h3>
+          <p>The confocal FCS model (i.e. a 3-dimensional, Gaussian MDE) function for 3D diffusion is very similar to the 2D case: 
+          $$bmath:g(\tau)=\frac{1}{N}\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{\gamma^2w_{xy}^2}\right)^{-1/2}+G_\infty$$
+               Here $$math:w_{xy}$$ is the axial 1/e2 radius of the laser focus, $$math:\gamma=w_z/w_{xy}$$ is its axial ratio and $$math:N$$ is the particle number.<br>This model can not easily be inverted to find the MSD from the memasured ACF $$math:g_m(\tau)$$, so the inversion has to be done numerically using the Levenberg-Marquardt (LM) algorithm. The LM algorithm is then used to solve this equation for every pair $$math:\left(\tau_i, g_m(\tau_i)\right)$$ of estimates for different lag times of the ACF
+               $$bmath:\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{\gamma^2w_{xy}^2}\right)^{1/2}-\frac{1}{N\cdot\left( g_m(\tau)-G_\infty\right)}=0$$
+               Here the focal parameters $$math:w_{xy}$$ and  $$math:\gamma$$ and the particle number $$math:N$$ have to be measured independently. The focus can be measured using a standard calibration solution (e.g. 20nM Alexa-488 in water). And the particle number $$math:N$$ can be extracted from a multi-component fit to the same measured ACF. 
+               <br>This plugin uses the LM library <a href="copyright.html">lmfit by Joachim Wuttke</a>.
+          </p>
                            
-		  <li><b>FCS: simple 2D model, with triplet correction</b>: This is the same model, as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\hat{g}(\tau)/X(\tau)$$) before calculating the MSD:
-		  $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)}{1-\theta_T}$$
-		  </li>
-		  <li><b>FCS: simple 3D model, with triplet correction</b>: This is the same model, as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\hat{g}(\tau)/X(\tau)$$) before calculating the MSD:
-		  $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)}{1-\theta_T}$$
-		  </li>
-		  
-		  <li>
-		  <b>SPIM-FCS: 3D Diffusion</b>: The model is given by:
-		        $$bmath:g(\tau)=\frac{1}{\sqrt{\pi}\cdot w_z\cdot a^2\cdot N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}}\right)+\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{\frac{2}{3}\langle r^2\rangle}{w_z^2}\right]^{-1/2}$$
-		$$bmath:V_{\text{eff}}=\frac{\sqrt{\pi}\cdot a^2w_z}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
-		  As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
-            $$math:w_{xy}$$ and $$math:w_z$$ are the 1/e<sup>2</sup> focus width and height , $$math:a$$ is the pixel size and $$math:N$$ is the particle number
-		  </li>
-		  
-		  <li>
-		  <b>camera TIR-FCS: 2D Diffusion</b>: The model is given by:
-		        $$bmath:g(\tau)=\frac{1}{ a^2\cdot N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}}\right)+\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\right)-1\right]\right]^2$$
-		$$bmath:V_{\text{eff}}=\frac{\cdot a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
-		  As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
-            $$math:w_{xy}$$ and $$math:w_z$$ are the 1/e<sup>2</sup> focus width and height , $$math:a$$ is the pixel size and $$math:N$$ is the particle number
-		  </li>
-		</ol>
-		
-		
-		<h2>Implementation Details</h2>
+          <h3>FCS: simple 2D model, with triplet correction</h3>
+          <p>This is the same model (i.e. a 3-dimensional, Gaussian MDE), as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\left(\hat{g}(\tau)-G_\infty\right)/X(\tau)$$) before calculating the MSD:
+          $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)}{1-\theta_T}$$
+          $$bmath:g(\tau)=\frac{1}{N}\cdot X(\tau)\cdot\left(1+\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1}+G_\infty$$
+$$warning:In older QuickFit versions (before SVN version 3960), there was a bug in this equation and the MSD that was calculated was a factor of 3/2 too large!$$
+          </p>
+          <h3>FCS: simple 3D model, with triplet correction</h3>
+          <p>This is the same model (i.e. a 3-dimensional, Gaussian MDE), as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\left(\hat{g}(\tau)-G_\infty\right)/X(\tau)$$) before calculating the MSD:
+          $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)}{1-\theta_T}$$
+          $$bmath:g(\tau)=\frac{1}{N}\cdot X(\tau)\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{\gamma^2w_{xy}^2}\right)^{-1/2}+G_\infty$$
+          </p>
+          
+          <h3>FCS: simple 3D model, with triplet&amp;dark-state correction</h3>
+          <p>This is the same model (i.e. a 3-dimensional, Gaussian MDE), as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\left(\hat{g}(\tau)-G_\infty\right)/X(\tau)$$) before calculating the MSD:
+          $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)-\theta_d+\theta_d\cdot\exp(-\tau/\tau_d)}{1-\theta_T-\theta_d}$$
+          $$bmath:g(\tau)=\frac{1}{N}\cdot X(\tau)\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{\gamma^2w_{xy}^2}\right)^{-1/2}+G_\infty$$
+          </p>
+          
+          <h3>FCS: simple 2D model, with triplet&amp;dark-state correction</h3>
+          <p>This is the same model (i.e. a 3-dimensional, Gaussian MDE), as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\left(\hat{g}(\tau)-G_\infty\right)/X(\tau)$$) before calculating the MSD:
+          $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)-\theta_d+\theta_d\cdot\exp(-\tau/\tau_d)}{1-\theta_T-\theta_d}$$
+          $$bmath:g(\tau)=\frac{1}{N}\cdot X(\tau)\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1}+G_\infty$$
+          </p>
+          
+          <h3>Camera-based SPIM-FCS: 3D Diffusion</h3>
+          <p>The model is given by (MDE: a 2-dimensional Gaussian PSF convolved with a square pixel of width <i>a</i>):$$jankrieger_phdthesis_ref$$
+                $$bmath:g(\tau)=\frac{1}{\sqrt{\pi}\cdot w_z\cdot a^2\cdot N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}}\right)+\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{\frac{2}{3}\langle r^2\rangle}{w_z^2}\right]^{-1/2}+G_\infty$$
+        $$bmath:V_{\text{eff}}=\frac{\sqrt{\pi}\cdot a^2w_z}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
+          As earlier $(G_\infty)$ describes an offset constant.
+            $$math:w_{xy}$$ and $$math:w_z$$ are the 1/e<sup>2</sup> focus width and height of the PSF, $$math:a$$ is the pixel size and $$math:N$$ is the particle number
+          </p>
+          
+          <h3>Camera-based TIR-FCS: 2D Diffusion</h3>
+          <p>The model is given by (MDE: a 3-dimensional Gaussian PSF convolved with a square pixel of width <i>a</i>):$$jankrieger_phdthesis_ref$$
+                $$bmath:g(\tau)=\frac{1}{ a^2\cdot N/A_{\text{eff}}}\cdot\frac{1}{a^2}\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{\langle r^2\rangle+w_{xy}^2}}\right)+\sqrt{\langle r^2\rangle+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{\langle r^2\rangle+w_{xy}^2}\right)-1\right]\right]^2+G_\infty$$
+        $$bmath:A_{\text{eff}}=\frac{\cdot a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
+          As earlier $(G_\infty)$ describes an offset constant.
+            $$math:w_{xy}$$ and $$math:w_z$$ are the 1/e<sup>2</sup> focus width and height of the PSF, $$math:a$$ is the pixel size and $$math:N$$ is the particle number.
+$$warning:In older QuickFit versions (before SVN version 3960), there was a bug in this equation and the MSD that was calculated was a factor of 3/2 too large!$$
+          </p>
+        
+<h2>References</h2>
+<p>
+    $$references$$
+</p>
+
+
   </body>
 </html>
