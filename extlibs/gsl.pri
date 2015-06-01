@@ -21,3 +21,6 @@
 
 INCLUDEPATH += $$PWD/gsl/include/
 LIBS += -L$$PWD/gsl/lib/ -lgsl -lgslcblas
+
+HEADERS += \
+    $$PWD/gsl_tools.h

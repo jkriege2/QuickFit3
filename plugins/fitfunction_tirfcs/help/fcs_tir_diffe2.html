@@ -1,41 +1,41 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>$$local_plugin_subname$$</title>
-	</head>
-	<body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		<p>This function implements a 1-component pure-diffusion model for data acquired with a camera in TIR illumination mode.$$ref:Sankaran2013:Sankaran, J.; Bag, N.; Kraut, R.S.; Wohland, T. Accuracy and precision in camera-based fluorescence correlation spectroscopy measurements, Anal. Chem. 85 (8) (2013) 3948-54. $$  $$ref:Sankaran2010:Sankaran, J.; Shi, X.; Ho, L.Y.; Stelzer, E.H.; Wohland, T. ImFCS: a software for imaging FCS data analysis and visualization, Opt Express, 18 (2010) 25468-25481$$
-		The fit function is defined as:
-        $$bmath:g(\tau)=G_\infty+\frac{1}{N/A_{\text{eff}}}\cdot\frac{1}{a^2}\cdot\sum_{i=1}^3\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2$$
-		$$bmath:A_{\text{eff}}=\frac{a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
-		The parameters are:
-		<blockquote><table border=1>
-		  <tr><th>var.</th><th>Parameter</th></tr>
-		  <tr><td><i>G<sub>&infin;</sub></i></td><td>constant offset</td></tr>
-		  <tr><td><i>N</i></td><td>particle number in the observation volume</td></tr>
-		  <tr><td><i>D<sub>i</sub></i></td><td><i>i</i>-th diffusion coefficient</td></tr>
-		  <tr><td><i>&rho;<sub>i</sub></i></td><td>fraction of <i>i</i>-th diffusing component</td></tr>
-		  <tr><td><i>a</i></td><td>width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification)</td></tr>
-		  <tr><td><i>w<sub>xy</sub></i></td><td>lateral radius of the point-spread function (PSF), 1/e<sup>2</sup>-radius</td></tr>
-		  <tr><td>$$math:I$$</td><td>average measured intensity in focus during measurement</td></tr>
-		  <tr><td>$$math:B$$</td><td>average background intenisty in focus during measurement</td></tr>
-		</table>  </blockquote>
-		For the fractions we have in addition:
-		<blockquote> <i>&rho;<sub>1</sub> = 1 - &rho;<sub>2</sub></i> - &rho;<sub>3</sub><br></i>
-		             <i>&Delta;&rho;<sub>1</sub> = &radic;<span style="border-top: 1px solid black">(&Delta;&rho;<sub>2</sub><sup>2</sup> + &Delta;&rho;<sub>3</sub><sup>2</sup>)</span></i>
-		</blockquote>
-		$$bmath:\Delta A_{eff}=0$$
-		$$bmath:\Delta C=\sqrt{\left(\frac{\Delta N}{A_{eff}}\right)^2+\left(\frac{\Delta A_{eff}\cdot N}{A_{eff}^2}\right)^2}$$
-		
-		For each component the mean squared displacement after a given time $$math:\tau_{MSD}$$ is calculated, as:
-		$$bmath:\mbox{MSD}_i(\tau_{MSD})=6\cdot D_i\cdot\tau_{MSD}.$$
-		Also the time, required for a particle to leave the effective area of the pixel is calculated:
-		$$bmath:\tau_i(MSD)=\frac{A_{eff}}{4\cdot D_i}.$$
-		
-		</p>
-		<h2>References</h2>
-		$$references$$
-	</body>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>$$local_plugin_subname$$</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        <p>This function implements a 1-component pure-diffusion model for data acquired with a camera in TIR illumination mode.$$ref:Sankaran2013:Sankaran, J.; Bag, N.; Kraut, R.S.; Wohland, T. Accuracy and precision in camera-based fluorescence correlation spectroscopy measurements, Anal. Chem. 85 (8) (2013) 3948-54. $$  $$ref:Sankaran2010:Sankaran, J.; Shi, X.; Ho, L.Y.; Stelzer, E.H.; Wohland, T. ImFCS: a software for imaging FCS data analysis and visualization, Opt Express, 18 (2010) 25468-25481$$
+        The fit function is defined as:
+        $$bmath:g(\tau)=G_\infty+\frac{1}{N/A_{\text{eff}}}\cdot\frac{1}{a^2}\cdot\sum_{i=1}^3\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\frac{\sqrt{4D_i\tau+w_{xy}^2}}{\sqrt{\pi}\cdot a}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2$$
+        $$bmath:A_{\text{eff}}=\frac{a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
+        The parameters are:
+        <blockquote><table border=1>
+          <tr><th>var.</th><th>Parameter</th></tr>
+          <tr><td><i>G<sub>&infin;</sub></i></td><td>constant offset</td></tr>
+          <tr><td><i>N</i></td><td>particle number in the observation volume</td></tr>
+          <tr><td><i>D<sub>i</sub></i></td><td><i>i</i>-th diffusion coefficient</td></tr>
+          <tr><td><i>&rho;<sub>i</sub></i></td><td>fraction of <i>i</i>-th diffusing component</td></tr>
+          <tr><td><i>a</i></td><td>width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification)</td></tr>
+          <tr><td><i>w<sub>xy</sub></i></td><td>lateral radius of the point-spread function (PSF), 1/e<sup>2</sup>-radius</td></tr>
+          <tr><td>$$math:I$$</td><td>average measured intensity in focus during measurement</td></tr>
+          <tr><td>$$math:B$$</td><td>average background intenisty in focus during measurement</td></tr>
+        </table>  </blockquote>
+        For the fractions we have in addition:
+        <blockquote> <i>&rho;<sub>1</sub> = 1 - &rho;<sub>2</sub></i> - &rho;<sub>3</sub><br></i>
+                     <i>&Delta;&rho;<sub>1</sub> = &radic;<span style="border-top: 1px solid black">(&Delta;&rho;<sub>2</sub><sup>2</sup> + &Delta;&rho;<sub>3</sub><sup>2</sup>)</span></i>
+        </blockquote>
+        $$bmath:\Delta A_{eff}=0$$
+        $$bmath:\Delta C=\sqrt{\left(\frac{\Delta N}{A_{eff}}\right)^2+\left(\frac{\Delta A_{eff}\cdot N}{A_{eff}^2}\right)^2}$$
+        
+        For each component the mean squared displacement after a given time $$math:\tau_{MSD}$$ is calculated, as:
+        $$bmath:\mbox{MSD}_i(\tau_{MSD})=6\cdot D_i\cdot\tau_{MSD}.$$
+        Also the time, required for a particle to leave the effective area of the pixel is calculated:
+        $$bmath:\tau_i(MSD)=\frac{A_{eff}}{4\cdot D_i}.$$
+        
+        </p>
+        <h2>References</h2>
+        $$references$$
+    </body>
 </html>

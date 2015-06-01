@@ -31,7 +31,8 @@ include(../plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 include(../../libquickfitwidgets.pri)
-include(../../extlibs/lmfit.pri)
+include(../../extlibs/lmfit5.pri)
+include(../../extlibs/gsl.pri)
 
 # Input
 HEADERS += qffcsmsdevaluation.h \
@@ -98,4 +99,5 @@ SRC_DISTRIBUTED.files = $$HEADERS \
                         $$RESOURCES \
                         $$TRANSLATIONS \
                         $$GPL3LICENSE
+
 

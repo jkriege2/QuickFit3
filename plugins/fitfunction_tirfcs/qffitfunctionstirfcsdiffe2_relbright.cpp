@@ -133,7 +133,7 @@ double QFFitFunctionsTIRFCSDiffE2Diffbright::evaluate(double t, const double* da
     }
 
     const double Veff=TIRFCS_newAeff(a, wxy);
-    const double pre=1.0/sqr(a);
+    const double pre=1.0;
     return offset+pre/(N/Veff*qfSqr(cnorm))*cfac*backfactor;
 }
 

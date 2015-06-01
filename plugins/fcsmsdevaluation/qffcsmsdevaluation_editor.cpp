@@ -402,6 +402,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     cmbFitType->addItems(QFFCSMSDEvaluationItem::getFitTypes());
     flAlgorithmParams->addRow(tr("fit type:"), cmbFitType);
 
+
     spinFitWidth=new QSpinBox(this);
     spinFitWidth->setRange(5, INT_MAX);
     spinFitWidth->setValue(10);
@@ -413,6 +414,15 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
 
 
 
+    cmbFitMethod=new QComboBox(this);
+    cmbFitMethod->addItem(tr("direct/least-squares fit"));
+    cmbFitMethod->addItem(tr("direct/root-finding (Brent's method)"));
+    cmbFitMethod->addItem(tr("direct/root-finding (Newton's method)"));
+    QLabel* l=new QLabel(tr("&Fit Method: "), this);
+    l->setBuddy(cmbFitMethod);
+    hblModel->addWidget(l);
+    hblModel->addWidget(cmbFitMethod);
+    hblModel->addStretch();
 
 
     cmbWeights=new QFFCSWeightingCombobox(this);
@@ -420,7 +430,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     cmbWeights->setEditable(false);
     cmbWeights->setMaximumWidth(150);
     cmbWeights->setMinimumWidth(150);
-    QLabel* l=new QLabel(tr("&Weight Model: "), this);
+    l=new QLabel(tr("&Weight Model: "), this);
     l->setBuddy(cmbWeights);
     hblModel->addWidget(l);
     hblModel->addWidget(cmbWeights);
@@ -749,6 +759,7 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
         disconnect(sliderDist, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersDistChanged(int, int, int, int)));
         disconnect(spinFitWidth, SIGNAL(valueChanged(int)),this,SLOT(fitWidthChanged(int)));
         disconnect(cmbFitType, SIGNAL(currentIndexChanged(int)),this,SLOT(fitTypeChanged(int)));
+        disconnect(cmbFitMethod, SIGNAL(currentIndexChanged(int)),this,SLOT(fitMethodChanged(int)));
         disconnect(chkFitRange, SIGNAL(toggled(bool)),this,SLOT(fitRangeChanged(bool)));
         //disconnect(edtNumIter, SIGNAL(valueChanged(int)),this,SLOT(NumIterChanged(int)));
     }
@@ -779,6 +790,8 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
 
         cmbFitType->setCurrentIndex(item->getFitType(item->getHighlightedRecord(), item->getCurrentIndex()));
         connect(cmbFitType, SIGNAL(currentIndexChanged(int)), this, SLOT(fitTypeChanged(int)));
+        cmbFitMethod->setCurrentIndex(item->getCurrentMSDMethod());
+        connect(cmbFitMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(fitMethodChanged(int)));
 
         spinFitWidth->setValue(item->getFitWidth(item->getHighlightedRecord(), item->getCurrentIndex()));
         connect(spinFitWidth, SIGNAL(valueChanged(int)), this, SLOT(fitWidthChanged(int)));
@@ -914,6 +927,7 @@ void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         //edtAlpha->setValue(eval->getAlpha());
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
         cmbFitType->setCurrentIndex(eval->getFitType(currentRecord, eval->getCurrentIndex()));
+        cmbFitType->setCurrentIndex(eval->getCurrentMSDMethod());
         spinFitWidth->setValue(eval->getFitWidth(currentRecord, eval->getCurrentIndex()));
         //edtNumIter->setRange(1,10000); //qMax(0,data->getCorrelationN())
         //edtNumIter->setValue(eval->getNumIter());
@@ -1457,6 +1471,7 @@ void QFFCSMSDEvaluationEditor::displayParameters() {
     dataEventsEnabled=false;
     spinFitWidth->setValue(eval->getFitWidth(eval->getHighlightedRecord(), eval->getCurrentIndex()));
     cmbFitType->setCurrentIndex(eval->getFitType(eval->getHighlightedRecord(), eval->getCurrentIndex()));
+    cmbFitMethod->setCurrentIndex(eval->getCurrentMSDMethod());
     chkFitRange->setChecked(eval->getFitRangeLimited(eval->getHighlightedRecord(), eval->getCurrentIndex()));
     //edtNumIter->setValue(eval->getNumIter());
     for (int i=0; i<MSDTHEORYCOUNT; i++)     {
@@ -2110,7 +2125,7 @@ void QFFCSMSDEvaluationEditor::fitCurrent() {
     dataEventsEnabled=false;
 
     // here we call doEvaluation to execute our evaluation for the current record only
-    eval->doFit(record, eval->getCurrentIndex(), eval->getCurrentModel(), getUserMin(record, eval->getCurrentIndex()), getUserMax(record, eval->getCurrentIndex()), 11, spinResidualHistogramBins->value());    
+    eval->doFit(record, eval->getCurrentIndex(), eval->getCurrentModel(), eval->getCurrentMSDMethod(), getUserMin(record, eval->getCurrentIndex()), getUserMax(record, eval->getCurrentIndex()), 11, spinResidualHistogramBins->value());
     dataEventsEnabled=oldde;
     eval->emitResultsChanged(record);
     record->emitResultsChanged();
@@ -2156,7 +2171,7 @@ void QFFCSMSDEvaluationEditor::fitRunsCurrent() {
             for (int idx=-1; idx<data->getCorrelationRuns(); idx++) {
                 dlgEvaluationProgress->setLabelText(tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx));
                 QApplication::processEvents();
-                eval->doFit(record, idx, eval->getCurrentModel(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
+                eval->doFit(record, idx, eval->getCurrentModel(), eval->getCurrentMSDMethod(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
                 QApplication::processEvents();
                 // check whether the user canceled this evaluation
                 if (dlgEvaluationProgress->wasCanceled()) break;
@@ -2209,7 +2224,7 @@ void QFFCSMSDEvaluationEditor::fitAll() {
                 dlgEvaluationProgress->setLabelText(tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx));
                 qDebug()<<tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx);
                 QApplication::processEvents();
-                eval->doFit(record, idx, eval->getCurrentModel(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
+                eval->doFit(record, idx, eval->getCurrentModel(), eval->getCurrentMSDMethod(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
                 QApplication::processEvents();
                 // check whether the user canceled this evaluation
                 if (dlgEvaluationProgress->wasCanceled()) break;
@@ -2264,7 +2279,7 @@ void QFFCSMSDEvaluationEditor::fitRunsAll() {
                 int idx=eval->getCurrentIndex();
                 dlgEvaluationProgress->setLabelText(tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx));
                 QApplication::processEvents();
-                eval->doFit(record, idx, eval->getCurrentModel(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
+                eval->doFit(record, idx, eval->getCurrentModel(), eval->getCurrentMSDMethod(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
                 QApplication::processEvents();
                 // check whether the user canceled this evaluation
                 if (dlgEvaluationProgress->wasCanceled()) break;
@@ -2653,6 +2668,22 @@ void QFFCSMSDEvaluationEditor::fitTypeChanged(int type)
     data->set_doEmitResultsChanged(rc);
     data->set_doEmitPropertiesChanged(pc);
     updateDistributionResults();
+}
+
+void QFFCSMSDEvaluationEditor::fitMethodChanged(int type)
+{
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+
+    bool rc=data->get_doEmitResultsChanged();
+    bool pc=data->get_doEmitPropertiesChanged();
+    data->set_doEmitResultsChanged(false);
+    data->set_doEmitPropertiesChanged(false);
+    if (data) data->setCurrentMSDMethod(type);
+    data->set_doEmitResultsChanged(rc);
+    data->set_doEmitPropertiesChanged(pc);
 }
 
 

@@ -124,7 +124,7 @@ double QFFitFunctionsTIRFCSDiffE2::evaluate(double t, const double* data) const 
     }
 
     const double Veff=TIRFCS_newAeff(a, wxy);
-    const double pre=1.0/sqr(a);
+    const double pre=1.0;
     return offset+pre/(N/Veff)*cfac*backfactor;
 }
 

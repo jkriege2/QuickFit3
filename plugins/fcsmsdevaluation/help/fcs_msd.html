@@ -47,7 +47,7 @@
         <h2>FCS-Theory with arbitrary MSD</h2>
         <p>All model functions used by this plugin are based on a simple generalization of the usual FCS theory for an arbitrary MSD. Usually FCS model functions are derived from three ingredients:
 <ol>
-    <li>The definition of the ACF:$[ g(\tau)=\frac{\langle I(t)\Cdot I(t+\tau)\rangle}{\langle I(t)\rangle^2} ]$ where $(\langle\cdot\rangle)$ is a time-average.</li>
+    <li>The definition of the ACF:$[ g(\tau)=\frac{\langle I(t)\cdot I(t+\tau)\rangle}{\langle I(t)\rangle^2} ]$ where $(\langle\cdot\rangle)$ is a time-average.</li>
     <li>A model for the intensity $(I(t))$ in that correlation function, which is expresed as an integral over the intensity of all particles in a focus volume, defined by the molecular detection efficiency function $(MDE(\vec{r}))$:
 $[ I(t)=\eta\iiint_{-\infty}^\infty MDE(\vec{r})\cdot\sum_i \mathrm{\delta}\left(\vec{r}-\vec{r}_i(t)\right) ]$
 where $(\eta)$ is the number of photons detected from a single fluorophore at the center of the MDE, $(\vec{r}_i(t))$ is the tracetory of the <i>i</i>-th particle and $(\mathrm{\delta}(\cdot))$ is the delta-distribution, which is 1 iff the argument is 0 and 0 otherwise.</li>
@@ -65,9 +65,12 @@ Then it can be used together with the two ingredients 1 and 2 to derive all mode
         <p>
             In many cases it is possible to write down a model ACF $$math:g(\langle r^2(\tau)\rangle)$$ for a given mean squared displacement $$math:\langle r^2(\tau)\rangle$$. If so it should also be possible to regain the MSD $$math:\langle r^2(\tau)\rangle$$ from the measured ACF $$math:g_m(\tau)$$ by solving:
         $$bmath:g(\langle r^2(\tau)\rangle)-g_m(\tau)=0$$
-        for the MSD $$math:\langle r^2(\tau)\rangle$$. This equation (for details on the model functions, see next section) can either be solved analytically for simple cases or numerically for more complex situations. This plugin does not use a simple <a href="https://en.wikipedia.org/wiki/Root-finding_algorithm">root-finfing algorithm</a> to solve the given equation, but a least squares fit, which solves the equivalent least-squares (LS) problem:
+        for the MSD $$math:\langle r^2(\tau)\rangle$$. This equation (for details on the model functions, see next section) can either be solved analytically for simple cases or numerically for more complex situations. This plugin either uses a simple <a href="https://en.wikipedia.org/wiki/Root-finding_algorithm">root-finfing algorithm</a> (either Newton's method or Brent's method, both implemented in the <a href="http://www.gnu.org/software/gsl/">GSL</a> library) to solve the given equation, or a least squares fit (a <a href="https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm">Levenberg-Marquardt fit</a>, implemented in the library <a href="copyright.html"><b>lmfit</b></a>), which solves the equivalent least-squares (LS) problem:
         $$bmath:\langle r^2(\tau)\rangle^\ast=\argmin_{\langle r^2(\tau)\rangle}\left|g(\langle r^2(\tau)\rangle)-g_m(\tau)\right|^2$$
-To solve this problem, a <a href="https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm">Levenberg-Marquardt least-squares fit</a> is used, which is implemented in the library <a href="copyright.html"><b>lmfit</b> by Joachim Wuttke</a>.
+Bith, the LS-fit and Newton's method use a numerically estimated derivative of the models given below.
+$$startbox_note$$
+The two root-finding methods should provide the more exact solution, but sometimes do not find a solution at all, especially for the SPIM- and TIRF-FCS model (see below). The LS-fit method seems to converge for all tested datasets so far, but does not guarantee a correct result, since the$(\left|g(\langle r^2(\tau)\rangle)-g_m(\tau)\right|^2)$ can also be larger than 0 and then does not describe a solution of the given equation. But so far this has not been a problem in any evaluation with this plugin!
+$$endbox$$
  This plugin does exactly that:<ol>
           <li>First the user has to select a valid range from the measured ACF on which the MSD should be extracted. Take special care to avoid regions with e.g. triplet contributions if the selected model does not account for them.</li>
           <li>Then several model parameters (e.g. focal sizes, correlation amplitudes/particle numbers) have to be determined indepentendly and supplied to the plugin as "fit parameters".</li>
@@ -89,6 +92,23 @@ To solve this problem, a <a href="https://en.wikipedia.org/wiki/Levenberg%E2%80%
           <li>The plugin is able to calculate the average of the MSD and $$math:D(\tau), \alpha(\tau)$$ curves for you. To do so, use the menu entry "Results|<img src=":/copy.png"> copy runs-average of MSD". You will first be asked which runs to average over and which data to copy, then the average will be calculated and copied to the clipboard. Paste it into any spreadsheet/data evaluation program you want.</li>
         </ol>
         </p>
+        
+        
+        <h2>Example Result</h2>
+        <p>The following images show a confocal FCS autocorrelation curve of Alexa-488 and the retrieved MSD together with a power-law fit, which proves normal diffusion and a correct diffusion coefficient for this dye in solution:
+<center><a name="fcs_msd_pic000"><img src="./pic/fcs_msd_pic000.png" border="1">
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="fcs_msd_pic001"><img src="./pic/fcs_msd_pic001.png" border="1">
+</center>
+
+The next pair of images shows the same plots, but from a sample of a super-coiled pUC18 plasmid (thanks to Tabea Elbel for the data!):
+<center><a name="fcs_msd_pic002"><img src="./pic/fcs_msd_pic002.png" border="1">
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="fcs_msd_pic003"><img src="./pic/fcs_msd_pic003.png" border="1">
+</center>
+In this MSD, two power-law fits are shown that mark the regimes of the slow and normal global motion of the polymer and of the fast and anomalous internal motion.
+
+</p>
+        
+        
       
 
         <h2>Supported Models</h2>
@@ -136,7 +156,7 @@ $$warning:In older QuickFit versions (before SVN version 3960), there was a bug 
           
           <h3>Camera-based SPIM-FCS: 3D Diffusion</h3>
           <p>The model is given by (MDE: a 2-dimensional Gaussian PSF convolved with a square pixel of width <i>a</i>):$$jankrieger_phdthesis_ref$$
-                $$bmath:g(\tau)=\frac{1}{\sqrt{\pi}\cdot w_z\cdot a^2\cdot N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}}\right)+\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{\frac{2}{3}\langle r^2\rangle}{w_z^2}\right]^{-1/2}+G_\infty$$
+                $$bmath:g(\tau)=\frac{1}{N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_z\cdot a^2}\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}}\right)+\frac{\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}}{\sqrt{\pi}\cdot a}\cdot\left[\exp\left(-\frac{a^2}{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{\frac{2}{3}\langle r^2\rangle}{w_z^2}\right]^{-1/2}+G_\infty$$
         $$bmath:V_{\text{eff}}=\frac{\sqrt{\pi}\cdot a^2w_z}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
           As earlier $(G_\infty)$ describes an offset constant.
             $$math:w_{xy}$$ and $$math:w_z$$ are the 1/e<sup>2</sup> focus width and height of the PSF, $$math:a$$ is the pixel size and $$math:N$$ is the particle number
@@ -144,7 +164,7 @@ $$warning:In older QuickFit versions (before SVN version 3960), there was a bug 
           
           <h3>Camera-based TIR-FCS: 2D Diffusion</h3>
           <p>The model is given by (MDE: a 3-dimensional Gaussian PSF convolved with a square pixel of width <i>a</i>):$$jankrieger_phdthesis_ref$$
-                $$bmath:g(\tau)=\frac{1}{ a^2\cdot N/A_{\text{eff}}}\cdot\frac{1}{a^2}\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{\langle r^2\rangle+w_{xy}^2}}\right)+\sqrt{\langle r^2\rangle+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{\langle r^2\rangle+w_{xy}^2}\right)-1\right]\right]^2+G_\infty$$
+                $$bmath:g(\tau)=\frac{1}{ N/A_{\text{eff}}}\cdot\frac{1}{a^2}\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{\langle r^2\rangle+w_{xy}^2}}\right)+\frac{\sqrt{\langle r^2\rangle+w_{xy}^2}}{\sqrt{\pi}\cdot a}\cdot\left[\exp\left(-\frac{a^2}{\langle r^2\rangle+w_{xy}^2}\right)-1\right]\right]^2+G_\infty$$
         $$bmath:A_{\text{eff}}=\frac{\cdot a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
           As earlier $(G_\infty)$ describes an offset constant.
             $$math:w_{xy}$$ and $$math:w_z$$ are the 1/e<sup>2</sup> focus width and height of the PSF, $$math:a$$ is the pixel size and $$math:N$$ is the particle number.

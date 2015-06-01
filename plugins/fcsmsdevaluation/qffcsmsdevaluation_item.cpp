@@ -25,15 +25,22 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfmathtools.h"
 #include "qffcstools.h"
 #include "imfcstools.h"
+#include "lmmin.h"
+#include "lmcurve.h"
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_deriv.h>
+#include <gsl/gsl_roots.h>
+#include <gsl/gsl_errno.h>
+#include "gsl_tools.h"
 
-
-#define sqr(x) ((x)*(x))
+#define sqr(x) qfSqr(x)
 
 QFFCSMSDEvaluationItem::QFFCSMSDEvaluationItem(QFProject* parent):
     QFUsesResultsByIndexAndModelEvaluation(parent, true, false)
 {
     currentIndex=-1;
     currentModel=1;
+    fitMethod=0;
 }
 
 QFFCSMSDEvaluationItem::~QFFCSMSDEvaluationItem() {
@@ -78,6 +85,7 @@ void QFFCSMSDEvaluationItem::intWriteData(QXmlStreamWriter& w) const {
     QFUsesResultsByIndexAndModelEvaluation::intWriteData(w);
     w.writeStartElement("msd_config");
     w.writeAttribute("current_weights", QString::number(m_weighting));
+    w.writeAttribute("current_fitmethod", QString::number(fitMethod));
     w.writeEndElement();
 
 }
@@ -87,6 +95,7 @@ void QFFCSMSDEvaluationItem::intReadData(QDomElement* e) {
 
     QDomElement e1=e->firstChildElement("msd_config");
     m_weighting=indexToWeight( e1.attribute("current_weights", "0").toInt());
+    fitMethod=indexToWeight( e1.attribute("current_fitmethod", QString::number(fitMethod)).toInt());
 
 
 }
@@ -179,6 +188,17 @@ int QFFCSMSDEvaluationItem::getFitType(QFRawDataRecord* record, int run) const
 void QFFCSMSDEvaluationItem::setFitType(int type, QFRawDataRecord* record, int run)
 {
     setFitValue(record, run, getCurrentModel(), QString("msd_fittype"), type);
+}
+
+int QFFCSMSDEvaluationItem::getCurrentMSDMethod() const
+{
+    return qBound(0,fitMethod,2);
+}
+
+void QFFCSMSDEvaluationItem::setCurrentMSDMethod(int method)
+{
+    fitMethod=qBound(0,method,2);
+    //qDebug()<<"new MSD method:"<<method;
 }
 
 
@@ -334,9 +354,10 @@ void QFFCSMSDEvaluationItem::calcMSDFit(double &alpha_out_param, bool fixAlpha, 
                 pout[0]=D_out;
                 lm_status_struct status;
                 lm_control_struct control = lm_control_double;
-                control.maxcall=500;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, dist.size(), distTau.data(), ldist.data(), QFFCSMSDEvaluationItemfMSD_lin, &control, &status );
+                control.patience=500;
+                control.verbosity = 0; // monitor status (+1) and parameters (+2)
+                lmcurve( n_par, pout, dist.size(), distTau.data(), ldist.data(), QFFCSMSDEvaluationItemfMSD_lin, &control, &status );
+                //lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status );
                 alpha_out=pout[1];
                 D_out=pout[0];
             } else if (fixAlpha && !fixD) {
@@ -346,9 +367,9 @@ void QFFCSMSDEvaluationItem::calcMSDFit(double &alpha_out_param, bool fixAlpha, 
                 QFFCSMSDEvaluationItemfMSD_alpha=alpha_out;
                 lm_status_struct status;
                 lm_control_struct control = lm_control_double;
-                control.maxcall=500;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, dist.size(), distTau.data(), ldist.data(), QFFCSMSDEvaluationItemfMSD_linfixalpha, &control, &status );
+                control.patience=500;
+                control.verbosity = 0; // monitor status (+1) and parameters (+2)
+                lmcurve( n_par, pout, dist.size(), distTau.data(), ldist.data(), QFFCSMSDEvaluationItemfMSD_linfixalpha, &control, &status );
                 D_out=pout[0];
             } else if (!fixAlpha && fixD) {
                 double pout[1];
@@ -357,9 +378,9 @@ void QFFCSMSDEvaluationItem::calcMSDFit(double &alpha_out_param, bool fixAlpha, 
                 QFFCSMSDEvaluationItemfMSD_D=D_out;
                 lm_status_struct status;
                 lm_control_struct control = lm_control_double;
-                control.maxcall=500;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, dist.size(), distTau.data(), ldist.data(), QFFCSMSDEvaluationItemfMSD_linfixD, &control, &status );
+                control.patience=500;
+                control.verbosity = 0; // monitor status (+1) and parameters (+2)
+                lmcurve( n_par, pout, dist.size(), distTau.data(), ldist.data(), QFFCSMSDEvaluationItemfMSD_linfixD, &control, &status );
                 alpha_out=pout[0];
             }
 
@@ -409,9 +430,9 @@ void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<doub
                     pout[0]=(d[0]-pout[1]*log(t[0]))/6.0;
                     lm_status_struct status;
                     lm_control_struct control = lm_control_double;
-                    control.maxcall=500;
-                    control.printflags = 0; // monitor status (+1) and parameters (+2)
-                    lmcurve_fit( n_par, pout, m_dat, t, d, QFFCSMSDEvaluationItemfMSD_lin, &control, &status );
+                    control.patience=500;
+                    control.verbosity = 0; // monitor status (+1) and parameters (+2)
+                    lmcurve( n_par, pout, m_dat, t, d, QFFCSMSDEvaluationItemfMSD_lin, &control, &status );
 
                     if (QFFloatIsOK(pout[0]) && QFFloatIsOK(pout[1])) {
                         taus_out.append(t[cnt/2]);
@@ -638,7 +659,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
             const double Veff=SPIMFCS_newVeff(a, wxy, wz);
             const double C=N_particle/Veff;
             const double sqpi=sqrt(M_PI);
-            const double pre=offset+1.0/(sqpi*wz*qfSqr(a)*C);
+            const double pre=1.0/(sqpi*wz*qfSqr(a)*C);
 
             int k=0;
             for (int32_t i=first; i<=last; i++) {
@@ -671,6 +692,8 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
                 modelEval[i]=offset+pre*qfSqr(sqfourdtw/(sqpi*a)*(exp(-qfSqr(a/sqfourdtw))-1.0)+erf(a/sqfourdtw));
                 k++;
             }
+
+
         } else if (model==6) { // simple 3D model with triplet+darkstate-correction
 
             // first we read the stored fit parameters:
@@ -962,12 +985,32 @@ void lmfit_msd_diff3d(const double *par, int /*m_dat*/, const void *data, double
     const double gamma2 = sqr(p->gamma);
     const double N = p->N;
     const double gmeasured = p->gmeasured;
-    const double x = par[0];
+    const double x = pow(10,par[0]);
 
     const double f1=1.0+2.0/3.0*x/wxy2;
     const double f2=1.0+2.0/3.0*x/wxy2/gamma2;
 
     *fvec = f1*sqrt(f2)-1.0/(N*gmeasured);
+}
+
+double gslrootfinding_msd_diff3d(double x, void* params) {
+    double fvec=NAN;
+    lmfit_msd_diff3d(&x, 1, params, &fvec, NULL);
+    return fvec;
+}
+double gslrootfinding_msd_diff3d_df(double x, void* params) {
+    gsl_function F;
+    double result, abserr;
+
+    F.function = &gslrootfinding_msd_diff3d;
+    F.params = params;
+    gsl_deriv_central (&F, x, 1e-10, &result, &abserr);
+    //qDebug()<<"df("<<x<<"): "<<result<<" err="<<abserr<<"   val="<<gslrootfinding_msd_diff3d(x, params);
+    return result;
+}
+void gslrootfinding_msd_diff3d_fdf(double x, void* params, double *y, double *dy) {
+    *y=gslrootfinding_msd_diff3d(x, params);
+    *dy=gslrootfinding_msd_diff3d_df(x, params);
 }
 
 
@@ -994,10 +1037,31 @@ void lmfit_msd_SPIMdiff3dall(const double *par, int /*m_dat*/, const void *data,
 
     const double gmeasured = p->gmeasured;
 
-    const double ms=par[0];
+    const double ms = pow(10,par[0]);
     const double fourdt=2.0/3.0*ms;
     const double sqfourdtw=sqrt(fourdt+wxy*wxy);
     *fvec = pre*qfSqr(sqfourdtw/(sqpi*a)*(exp(-qfSqr(a/sqfourdtw))-1.0)+erf(a/sqfourdtw))/sqrt(1.0+fourdt/qfSqr(wz))-gmeasured;
+}
+
+
+double gslrootfinding_msd_SPIMdiff3dall(double x, void* params) {
+    double fvec=NAN;
+    lmfit_msd_SPIMdiff3dall(&x, 1, params, &fvec, NULL);
+    return fvec;
+}
+double gslrootfinding_msd_SPIMdiff3dall_df(double x, void* params) {
+    gsl_function F;
+    double result, abserr;
+
+    F.function = &gslrootfinding_msd_SPIMdiff3dall;
+    F.params = params;
+    gsl_deriv_central (&F, x, 1e-10, &result, &abserr);
+    //qDebug()<<"SPIMdf("<<x<<"): "<<result<<" err="<<abserr<<"   val="<<gslrootfinding_msd_diff3d(x, params);
+    return result;
+}
+void gslrootfinding_msd_SPIMdiff3dall_fdf(double x, void* params, double *y, double *dy) {
+    *y=gslrootfinding_msd_SPIMdiff3dall(x, params);
+    *dy=gslrootfinding_msd_SPIMdiff3dall_df(x, params);
 }
 
 void lmfit_msd_TIRdiff3dall(const double *par, int /*m_dat*/, const void *data, double *fvec, int */*info*/) {
@@ -1015,13 +1079,33 @@ void lmfit_msd_TIRdiff3dall(const double *par, int /*m_dat*/, const void *data, 
 
     const double gmeasured = p->gmeasured;
 
-    const double ms=par[0];
-    const double fourdt=2.0/3.0*ms;
+    const double ms = pow(10,par[0]);
+    const double fourdt=ms;
     const double sqfourdtw=sqrt(fourdt+wxy*wxy);
     *fvec = pre*qfSqr(sqfourdtw/(sqpi*a)*(exp(-qfSqr(a/sqfourdtw))-1.0)+erf(a/sqfourdtw))-gmeasured;
 }
 
-void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model, int defaultMinDatarange, int defaultMaxDatarange, int runAvgWidth, int residualHistogramBins) {
+double gslrootfinding_msd_TIRdiff3dall(double x, void* params) {
+    double fvec=NAN;
+    lmfit_msd_TIRdiff3dall(&x, 1, params, &fvec, NULL);
+    return fvec;
+}
+double gslrootfinding_msd_TIRdiff3dall_df(double x, void* params) {
+    gsl_function F;
+    double result, abserr;
+
+    F.function = &gslrootfinding_msd_TIRdiff3dall;
+    F.params = params;
+    gsl_deriv_central (&F, x, 1e-10, &result, &abserr);
+    //qDebug()<<"df("<<x<<"): "<<result<<" err="<<abserr<<"   val="<<gslrootfinding_msd_diff3d(x, params);
+    return result;
+}
+void gslrootfinding_msd_TIRdiff3dall_fdf(double x, void* params, double *y, double *dy) {
+    *y=gslrootfinding_msd_TIRdiff3dall(x, params);
+    *dy=gslrootfinding_msd_TIRdiff3dall_df(x, params);
+}
+
+void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model, int method, int defaultMinDatarange, int defaultMaxDatarange, int runAvgWidth, int residualHistogramBins) {
     bool doEmit=record->isEmitResultsChangedEnabled();
     bool thisDoEmitResults=get_doEmitResultsChanged();
     bool thisDoEmitProps=get_doEmitResultsChanged();
@@ -1029,7 +1113,7 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
     set_doEmitPropertiesChanged(false);
     record->disableEmitResultsChanged();
 
-   // qDebug() << "START DEBUGGING 0: We enter the do fit Method with MODEL = " << model;
+   //qDebug() << "START DEBUGGING 0: We enter the do fit Method with MODEL = " << model;
 
 
 
@@ -1099,6 +1183,8 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
 
         QElapsedTimer time;
         time.start();
+        fitSuccess=true;
+        QString fitErrorMessage;
 
         /////////////////////////////////////////////////////////
         /// MSD Implementation ///////////////////////////////
@@ -1116,6 +1202,8 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
                 dist[i]=3.0*sqr(wxy)/2.0*(1.0/N_particle/meas_acf-1.0);
             }
         } else if ((model==1) || (model==3) || (model==6)) {
+            fitSuccess=false;
+            //qDebug()<<"using method "<<method;
             for (int i=0; i<Ndist; i++) {
                 distTaus[i]=taus[rangeMinDatarange+i];
                 double meas_acf=corrdata[rangeMinDatarange+i]-offset;
@@ -1131,47 +1219,127 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
                     //qDebug()<<t<<meas_acf<<fT<<tauT;
                 }
 
-                lm_status_struct status;
-                lm_control_struct control = lm_control_double;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-
+                // parameter vector and initial guess (from assumed 2D gaussian PSF
                 msd_diff3d_params d = {wxy, gamma, N_particle, meas_acf};
-                double r=3.0*sqr(wxy)/2.0*(1.0/N_particle/meas_acf-1.0);
+                double result_r2=3.0*sqr(wxy)/2.0*(1.0/N_particle/meas_acf-1.0);
                 if (msd.size()==Ndist && msd_tau.size()==Ndist && msd_tau[i]==distTaus[i]) {
-                    r=msd[i];
+                    result_r2=msd[i];
                 }
 
-                lmmin(1, &r, 1, &d, lmfit_msd_diff3d, &control, &status, NULL );
-                dist[i]=r;
+                result_r2=log10(result_r2);
+                if (method==0) {
+                    lm_status_struct status;
+                    lm_control_struct control = lm_control_double;
+                    control.verbosity = 0;
+                    lmmin(1, &result_r2, 1, &d, lmfit_msd_diff3d, &control, &status );
+
+                } else if (method==1) {
+                    gsl_function F;
+                    F.function = &gslrootfinding_msd_diff3d;
+                    F.params = &d;
+
+                    QString localFitErrorMessage;
+
+                    bool fitOK=gslFindRootDerivFree(result_r2, &F, -10, 10, gsl_root_fsolver_brent, 100, &localFitErrorMessage);
+                    fitSuccess=fitSuccess||QFFloatIsOK(result_r2);
+                    if (((!fitOK)||(!fitErrorMessage.isEmpty())) && !fitErrorMessage.contains(localFitErrorMessage)) {
+                        if (!fitErrorMessage.isEmpty()) fitErrorMessage.append("\n");
+                        fitErrorMessage.append(localFitErrorMessage);
+                    }
+
+                } else if (method==2) {
+                    gsl_function_fdf F;
+                    F.f = &gslrootfinding_msd_diff3d;
+                    F.df = &gslrootfinding_msd_diff3d_df;
+                    F.fdf = &gslrootfinding_msd_diff3d_fdf;
+                    F.params = &d;
+
+                    QString localFitErrorMessage;
+
+                    bool fitOK=gslFindRootWithDeriv(result_r2, &F, gsl_root_fdfsolver_newton, 100, &localFitErrorMessage);
+                    fitSuccess=fitSuccess||QFFloatIsOK(result_r2);
+                    if (((!fitOK)||(!fitErrorMessage.isEmpty())) && !fitErrorMessage.contains(localFitErrorMessage)) {
+                        if (!fitErrorMessage.isEmpty()) fitErrorMessage.append("\n");
+                        fitErrorMessage.append(localFitErrorMessage);
+                    }
+
+                }
+                dist[i]=pow(10,result_r2);
 
             }
         } else if ((model==4)||(model==5)) {
             for (int i=0; i<Ndist; i++) {
                 distTaus[i]=taus[rangeMinDatarange+i];
                 double meas_acf=corrdata[rangeMinDatarange+i]-offset;
-                const double tau=taus[rangeMinDatarange+i];
+                //const double tau=taus[rangeMinDatarange+i];
 
 
-                lm_status_struct status;
-                lm_control_struct control = lm_control_double;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
 
 
                 msd_diff3dspim_params d = {wxy, wz, N_particle, a_pixel, meas_acf};
-                double r=3.0*sqr(wxy)/2.0*(1.0/N_particle/meas_acf-1.0);
-                if (msd.size()==Ndist && msd_tau.size()==Ndist && msd_tau[i]==distTaus[i]) {
-                    r=msd[i];
-                }
+                double result_r2=3.0*sqr(wxy)/2.0*(1.0/N_particle/meas_acf-1.0);
+//                if (msd.size()==Ndist && msd_tau.size()==Ndist && msd_tau[i]==distTaus[i]) {
+//                    result_r2=msd[i];
+//                }
 
-                if (model==4) lmmin(1, &r, 1, &d, lmfit_msd_SPIMdiff3dall, &control, &status, NULL );
-                else if (model==5) lmmin(1, &r, 1, &d, lmfit_msd_TIRdiff3dall, &control, &status, NULL );
-                dist[i]=r;
+
+                double rr=result_r2;
+                result_r2=log10(result_r2);
+
+                if (method==0) {
+                    lm_status_struct status;
+                    lm_control_struct control = lm_control_double;
+                    control.verbosity = 0;
+                    if (model==4) lmmin(1, &result_r2, 1, &d, lmfit_msd_SPIMdiff3dall, &control, &status );
+                    else if (model==5) lmmin(1, &result_r2, 1, &d, lmfit_msd_TIRdiff3dall, &control, &status );
+                } else if (method==1) {
+                    gsl_function F;
+                    if (model==4) F.function = &gslrootfinding_msd_SPIMdiff3dall;
+                    else if (model==5) F.function = &gslrootfinding_msd_TIRdiff3dall;
+                    F.params = &d;
+                    QString localFitErrorMessage;
+
+                    bool fitOK=gslFindRootDerivFree(result_r2, &F, -10, 10, gsl_root_fsolver_brent, 100, &fitErrorMessage);
+                    fitSuccess=fitSuccess||QFFloatIsOK(result_r2);
+                    if (((!fitOK)||(!fitErrorMessage.isEmpty())) && !fitErrorMessage.contains(localFitErrorMessage)) {
+                        if (!fitErrorMessage.isEmpty()) fitErrorMessage.append("\n");
+                        fitErrorMessage.append(localFitErrorMessage);
+                    }
+
+
+
+                } else if (method==2) {
+                    gsl_function_fdf F;
+                    if (model==4) {
+                        F.f = &gslrootfinding_msd_SPIMdiff3dall;
+                        F.df = &gslrootfinding_msd_SPIMdiff3dall_df;
+                        F.fdf = &gslrootfinding_msd_SPIMdiff3dall_fdf;
+                    } else if (model==5) {
+                        F.f = &gslrootfinding_msd_TIRdiff3dall;
+                        F.df = &gslrootfinding_msd_TIRdiff3dall_df;
+                        F.fdf = &gslrootfinding_msd_TIRdiff3dall_fdf;
+                    }
+                    F.params = &d;
+                    QString localFitErrorMessage;
+
+                    bool fitOK=gslFindRootWithDeriv(result_r2, &F, gsl_root_fdfsolver_newton, 100, &fitErrorMessage);
+                    fitSuccess=fitSuccess||QFFloatIsOK(result_r2);
+                    if (((!fitOK)||(!fitErrorMessage.isEmpty())) && !fitErrorMessage.contains(localFitErrorMessage)) {
+                        if (!fitErrorMessage.isEmpty()) fitErrorMessage.append("\n");
+                        fitErrorMessage.append(localFitErrorMessage);
+                    }
+
+
+                }
+                dist[i]=pow(10,result_r2);
+                //qDebug()<<i<<rr<<dist[i];
+
 
             }
 
         }
 
-        fitSuccess=true;
+
         /////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////
 
@@ -1179,8 +1347,12 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
         double duration=double(time.elapsed())/1000.0;
 
         getProject()->getServices()->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(duration).arg(fitSuccess?tr("success"):tr("error")));
-        fitMessage=tr("MSD finished with %1").arg(fitSuccess?tr("success"):tr("an error"));
-        fitMessageHTML=tr("<b>MSD finished with %1</b>").arg(fitSuccess?tr("success"):tr("an error"));
+        fitMessage=tr("MSD-determination finished with %1").arg(fitSuccess?tr("success"):tr("an error"));
+        fitMessageHTML=tr("<b>MSD-determination finished with %1</b>").arg(fitSuccess?tr("success"):tr("an error"));
+        if (!fitSuccess && fitErrorMessage.size()>0) {
+            fitMessage+=(QString(": ")+fitErrorMessage);
+            fitMessageHTML+=(QString(": ")+qfHTMLEscape(fitErrorMessage));
+        }
 
         // now store the results:
         QString param;

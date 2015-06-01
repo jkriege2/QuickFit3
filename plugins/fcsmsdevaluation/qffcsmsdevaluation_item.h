@@ -73,7 +73,7 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services, QFEvaluationPropertyEditor *propEditor, QWidget *parent=NULL);
 
         /** \brief do the evaluation */
-        virtual void doFit(QFRawDataRecord* record, int index, int model, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, int runAvgWidth=11, int residualHistogramBins=25);
+        virtual void doFit(QFRawDataRecord* record, int index, int model, int method, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, int runAvgWidth=11, int residualHistogramBins=25);
 
         virtual int getIndexMin(const QFRawDataRecord* r) const;
         virtual int getIndexMax(const QFRawDataRecord* r) const;
@@ -150,9 +150,13 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         int getFitType(QFRawDataRecord* record, int run) const;
         void setFitType(int type, QFRawDataRecord* record, int run);
 
+        int getCurrentMSDMethod() const;
+        void setCurrentMSDMethod(int method);
 
         QString getIndexName(const QFRawDataRecord *rec, int index) const;
     protected:
+        int fitMethod;
+
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
         virtual bool isApplicable(const QFRawDataRecord* record) const;
