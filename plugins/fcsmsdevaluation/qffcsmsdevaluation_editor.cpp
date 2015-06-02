@@ -1583,11 +1583,16 @@ void QFFCSMSDEvaluationEditor::averageFirstFewLags() {
         progress.setMode(true, true);
         progress.setRange(0, applyTo.size());
 
+        QSet<QFRawDataRecord*> recs_used;
+
         for (int i=0; i<applyTo.size(); i++) {
             progress.setValue(i);
             data=applyTo[i].data;
             record=applyTo[i].record;
+            if (!recs_used.contains(record)) recs_used.insert(record);
             int run=applyTo[i].run;
+
+            record->disableEmitResultsChanged();
 
             data_start=getUserMin(record, run);
             data_end=getUserMax(record, run);
@@ -1623,7 +1628,14 @@ void QFFCSMSDEvaluationEditor::averageFirstFewLags() {
         }
 
         if (esigen) eval->set_doEmitResultsChanged(true);
+        QSetIterator<QFRawDataRecord*> it(recs_used);
+        while (it.hasNext()) {
+            QFRawDataRecord* rdr=it.next();
+            if (rdr) rdr->enableEmitResultsChanged();
+        }
     }
+
+
     delete dlg;
     widFitParams->updateWidgetValues();
     fitParamChanged();
@@ -1705,11 +1717,14 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
         bool sigen=true;
         eval->set_doEmitResultsChanged(false);
 
+        QSet<QFRawDataRecord*> recs_used;
+
         for (int i=0; i<applyTo.size(); i++) {
             progress.setValue(i);
             data=applyTo[i].data;
             record=applyTo[i].record;
             int run=applyTo[i].run;
+            recs_used.insert(record);
 
             double N=-1;
             double tauT=-1;
@@ -1724,6 +1739,7 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
 
             if (record)
             {
+                record->disableEmitResultsChanged();
                 sigen=record->isEmitResultsChangedEnabled();
                 record->disableEmitResultsChanged();
                 QStringList sl=record->resultsCalcNames("", "", evalGroup);
@@ -1864,7 +1880,14 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
         }
         if (esigen) eval->set_doEmitResultsChanged(true);
 
+
+        QSetIterator<QFRawDataRecord*> it(recs_used);
+        while (it.hasNext()) {
+            QFRawDataRecord* rdr=it.next();
+            if (rdr) rdr->enableEmitResultsChanged();
+        }
     }
+
 
     delete dlg;
     widFitParams->updateWidgetValues();
@@ -2117,7 +2140,7 @@ void QFFCSMSDEvaluationEditor::fitCurrent() {
 
     dlgEvaluationProgress->setRange(0,100);
     dlgEvaluationProgress->setValue(50);
-    dlgEvaluationProgress->open();
+    dlgEvaluationProgress->display();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
@@ -2135,7 +2158,7 @@ void QFFCSMSDEvaluationEditor::fitCurrent() {
     displayParameters();
     displayData();
     dlgEvaluationProgress->setValue(100);
-    dlgEvaluationProgress->close();
+    dlgEvaluationProgress->done();
 
     QApplication::restoreOverrideCursor();
 }
@@ -2152,7 +2175,7 @@ void QFFCSMSDEvaluationEditor::fitRunsCurrent() {
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     dlgEvaluationProgress->setRange(0,recs.size());
     dlgEvaluationProgress->setValue(0);
-    dlgEvaluationProgress->open();
+    dlgEvaluationProgress->display();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
@@ -2169,6 +2192,7 @@ void QFFCSMSDEvaluationEditor::fitRunsCurrent() {
 
             dlgEvaluationProgress->setRange(0,data->getCorrelationRuns());
             for (int idx=-1; idx<data->getCorrelationRuns(); idx++) {
+                //qDebug()<<"idx="<<idx;
                 dlgEvaluationProgress->setLabelText(tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx));
                 QApplication::processEvents();
                 eval->doFit(record, idx, eval->getCurrentModel(), eval->getCurrentMSDMethod(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
@@ -2184,7 +2208,7 @@ void QFFCSMSDEvaluationEditor::fitRunsCurrent() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged(record);
     dlgEvaluationProgress->setValue(recs.size());
-    dlgEvaluationProgress->close();
+    dlgEvaluationProgress->done();
     updateSliders();
     displayParameters();
     displayData();
@@ -2203,7 +2227,7 @@ void QFFCSMSDEvaluationEditor::fitAll() {
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     dlgEvaluationProgress->setRange(0,recs.size());
     dlgEvaluationProgress->setValue(0);
-    dlgEvaluationProgress->open();
+    dlgEvaluationProgress->display();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool oldde=dataEventsEnabled;
@@ -2239,7 +2263,7 @@ void QFFCSMSDEvaluationEditor::fitAll() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
-    dlgEvaluationProgress->close();
+    dlgEvaluationProgress->done();
     updateSliders();
     displayParameters();
     displayData();
@@ -2259,7 +2283,7 @@ void QFFCSMSDEvaluationEditor::fitRunsAll() {
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     dlgEvaluationProgress->setRange(0,recs.size());
     dlgEvaluationProgress->setValue(0);
-    dlgEvaluationProgress->open();
+    dlgEvaluationProgress->display();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool oldde=dataEventsEnabled;
@@ -2294,7 +2318,7 @@ void QFFCSMSDEvaluationEditor::fitRunsAll() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
-    dlgEvaluationProgress->close();
+    dlgEvaluationProgress->done();
     updateSliders();
     displayParameters();
     displayData();

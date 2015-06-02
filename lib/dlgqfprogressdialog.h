@@ -60,7 +60,9 @@ class QFLIB_EXPORT dlgQFProgressDialog : public QDialog
 
 
         /** \brief return \c true, if the user has canceled the fit procedure */
-        virtual bool isCanceled() { return m_canceled; }
+        inline virtual bool isCanceled() { return m_canceled; }
+        /** \brief return \c true, if the user has canceled the fit procedure */
+        inline virtual bool wasCanceled() { return isCanceled(); }
 
         /** \brief set the display delay in milliseconds */
         void setDisplayDelay(double delay_in_msecs) { m_displayDelay=delay_in_msecs; }
@@ -69,9 +71,9 @@ class QFLIB_EXPORT dlgQFProgressDialog : public QDialog
 
     public slots:
         /** \brief use this to display the widget */
-        void display();
+        virtual void display();
         /** \brief call when the dialog should be hidden */
-        void done();
+        virtual void done();
 
 
         /** \brief report a main message */
@@ -87,6 +89,15 @@ class QFLIB_EXPORT dlgQFProgressDialog : public QDialog
         virtual void setProgressFull();
         /** \brief increment the current progress */
         virtual void incProgress(int increment=1);
+
+        inline void setValue(int value) {
+            setProgress(value);
+        }
+
+        virtual void setRange(int min, int max);
+        inline void setLabelText(const QString& text) {
+            reportStatus(text);
+        }
 
 
 

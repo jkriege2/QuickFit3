@@ -35,9 +35,10 @@ QFFCSByIndexAndModelEvaluationEditor::QFFCSByIndexAndModelEvaluationEditor(QFPlu
     createWidgets();
 
     // create progress dialog for evaluation
-    dlgEvaluationProgress=new QProgressDialog(NULL);
+    dlgEvaluationProgress=new dlgQFProgressDialog(NULL);
     dlgEvaluationProgress->hide();
     dlgEvaluationProgress->setWindowModality(Qt::WindowModal);
+    dlgEvaluationProgress->setAllowCancel(true);
 
     // connect widgets
     //connect(ui->actEvaluateAll, SIGNAL(triggered()), this, SLOT(evaluateAll()));

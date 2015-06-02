@@ -26,6 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrawdatarecord.h"
 #include <QProgressDialog>
 #include <QTextDocument>
+#include <dlgqfprogressdialog.h>
 
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
@@ -254,7 +255,7 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
 
 
         /** \brief progress dialog used by the fits */
-        QProgressDialog* dlgEvaluationProgress;
+        dlgQFProgressDialog* dlgEvaluationProgress;
 
         /** \brief where did we save the last report */
         QString currentSaveDirectory;

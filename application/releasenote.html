@@ -32,6 +32,7 @@
     <li><b>QuickFit</b><ul>
       <li>plotter widgets:<ul>
         <li>every single image plot may be saved as a rendered image (PNG/JPEG/BMP/...) via the context-menu</li>
+        <li>improved autoscaling/zoom behaviour if data contains NANs</li>
       </ul></li>
       <li>expression parser:<ul>
         <li>added vector creation functions ones(), zeros(), linspace(), logspace(), vector() meshgrid2d_x(), meshgrid2d_y()</li>
@@ -98,6 +99,7 @@
         <li>bugfix: only run/index 0 was accessible, if more runs were available in an RDR, they were not displayed (thanks to Martin Wolff, Uni Potsdam)</li>
         <li>bugfix: MaxEnt parameters and data cuts are now enabled/editable, when an unfitted record is selected.</li>
         <li>added overlay plots of the runs in a single RDR</li>
+        <li>bugfix: If a fit was once canceled, all following fits were also canceled after the first run/file, until QuickFit was closed and reopened</li>
     </ul></li>
     <li><b>FCS MSD evaluation</b><ul>
         <li><font color="red"><b>MAJOR BUGFIX:</b> Before this versions, all 2D-diffusion MSD models returned an MSD, which was a factor of 2/3 too high!</font> This was fixed now. See the documentation for the correct models. [Thanks to T. Wohland for pointing me to that]</li>
@@ -105,6 +107,7 @@
         <li>added overlay plots of the runs in a single RDR</li>
         <li>bugfix: corrected the model equations in the online-help (there was a wxy^2 instead of a gamma^2wxy^2!)</li>
         <li>added an offset G<sub>&infin;</sub> to all models</li>
+        <li>bugfix: If a fit was once canceled, all following fits were also canceled after the first run/file, until QuickFit was closed and reopened</li>
     </ul></li>
     <li><b>Diffusion Coefficient Calculator</b><ul>
         <li>bugfix: D20W was not calculated correctly, when a D at arbitrary conditions with viscosity factor !=1 was given!</li>

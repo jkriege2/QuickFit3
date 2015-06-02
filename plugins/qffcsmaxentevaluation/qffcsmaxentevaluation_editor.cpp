@@ -1180,7 +1180,7 @@ void QFFCSMaxEntEvaluationEditor::fitCurrent() {
 
     dlgEvaluationProgress->setRange(0,100);
     dlgEvaluationProgress->setValue(50);
-    dlgEvaluationProgress->open();
+    dlgEvaluationProgress->display();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
@@ -1196,7 +1196,7 @@ void QFFCSMaxEntEvaluationEditor::fitCurrent() {
     displayParameters();
     displayData();
     dlgEvaluationProgress->setValue(100);
-    dlgEvaluationProgress->close();
+    dlgEvaluationProgress->done();
 
     QApplication::restoreOverrideCursor();
 }
@@ -1213,7 +1213,7 @@ void QFFCSMaxEntEvaluationEditor::fitRunsCurrent() {
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     dlgEvaluationProgress->setRange(0,recs.size());
     dlgEvaluationProgress->setValue(0);
-    dlgEvaluationProgress->open();
+    dlgEvaluationProgress->display();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
@@ -1245,7 +1245,7 @@ void QFFCSMaxEntEvaluationEditor::fitRunsCurrent() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged(record);
     dlgEvaluationProgress->setValue(recs.size());
-    dlgEvaluationProgress->close();
+    dlgEvaluationProgress->done();
     displayParameters();
     displayData();
     QApplication::restoreOverrideCursor();
@@ -1263,7 +1263,7 @@ void QFFCSMaxEntEvaluationEditor::fitAll() {
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     dlgEvaluationProgress->setRange(0,recs.size());
     dlgEvaluationProgress->setValue(0);
-    dlgEvaluationProgress->open();
+    dlgEvaluationProgress->display();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool oldde=dataEventsEnabled;
@@ -1297,7 +1297,7 @@ void QFFCSMaxEntEvaluationEditor::fitAll() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
-    dlgEvaluationProgress->close();
+    dlgEvaluationProgress->done();
     displayParameters();
     displayData();
     QApplication::restoreOverrideCursor();
@@ -1316,7 +1316,7 @@ void QFFCSMaxEntEvaluationEditor::fitRunsAll() {
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     dlgEvaluationProgress->setRange(0,recs.size());
     dlgEvaluationProgress->setValue(0);
-    dlgEvaluationProgress->open();
+    dlgEvaluationProgress->display();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool oldde=dataEventsEnabled;
@@ -1351,7 +1351,7 @@ void QFFCSMaxEntEvaluationEditor::fitRunsAll() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
-    dlgEvaluationProgress->close();
+    dlgEvaluationProgress->done();
     displayParameters();
     displayData();
     QApplication::restoreOverrideCursor();

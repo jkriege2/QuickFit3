@@ -78,7 +78,7 @@ void dlgQFProgressDialog::reportStatus(const QString& message) {
 }
 
 void dlgQFProgressDialog::setProgressMax(int max) {
-    ui->prgFit->setRange(0,max);
+    setRange(0,max);
 }
 
 void dlgQFProgressDialog::setProgress(int value) {
@@ -91,6 +91,11 @@ void dlgQFProgressDialog::setProgressFull() {
 
 void dlgQFProgressDialog::incProgress(int increment) {
     ui->prgFit->setValue(ui->prgFit->value()+increment);
+}
+
+void dlgQFProgressDialog::setRange(int min, int max)
+{
+    ui->prgFit->setRange(min,max);
 }
 
 
