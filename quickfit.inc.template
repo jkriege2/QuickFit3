@@ -28,6 +28,10 @@
 # activate special hardware drivers for the FFM!
 #QF3CONFIG+=ffmdrivers
 
+# if nlopt does not compile on your computer, use this switch
+QF3CONFIG+=nonlopt
+
+
 # uncomment, so QF3 doesn't use _aligned_malloc ... on windows
 #DEFINES += QF_DONT_USE_ALIGNED_MALLOC
 
