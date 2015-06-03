@@ -60,6 +60,17 @@
  */
 #define QFFloatIsOK(v) (std::isfinite(v) && (!std::isinf(v)) && (!std::isnan(v)))
 
+
+/*! \brief machine precision for double
+    \ingroup tools_math_stat
+ */
+#define QF_DBL_EPSILON        2.2204460492503131e-16
+/*! \brief square-root of the machine precision for double
+    \ingroup tools_math_stat
+ */
+#define QF_SQRT_DBL_EPSILON   1.4901161193847656e-08
+
+
 /*! \brief squares the argument
     \ingroup tools_math_stat
  */

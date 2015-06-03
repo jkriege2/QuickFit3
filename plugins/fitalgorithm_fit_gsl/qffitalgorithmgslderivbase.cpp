@@ -72,7 +72,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmGSLDerivativeBase::intFit(double* params
 
     int iter = 0;
     int maxIter = getParameter("max_iterations").toInt();
-    double gtol = getParameter("gtol").toInt();
+    double gtol = getParameter("gtol").toDouble();
     int status;
 
     ;

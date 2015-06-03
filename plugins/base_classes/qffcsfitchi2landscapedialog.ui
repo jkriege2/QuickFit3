@@ -53,10 +53,23 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="cmbParameterX"/>
+      <widget class="QComboBox" name="cmbParameterX">
+       <property name="maximumSize">
+        <size>
+         <width>350</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item row="0" column="2">
       <widget class="QComboBox" name="cmbModeX">
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <item>
         <property name="text">
          <string>lin</string>
@@ -70,10 +83,23 @@
       </widget>
      </item>
      <item row="0" column="3">
-      <widget class="QDoubleSpinBox" name="spinXMin"/>
+      <widget class="QDoubleSpinBox" name="spinXMin">
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item row="0" column="4">
       <widget class="QDoubleSpinBox" name="spinXMax">
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="value">
         <double>10.000000000000000</double>
        </property>
@@ -81,6 +107,12 @@
      </item>
      <item row="0" column="5">
       <widget class="QSpinBox" name="spinXPixels">
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="minimum">
         <number>10</number>
        </property>
@@ -100,10 +132,23 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QComboBox" name="cmbParameterY"/>
+      <widget class="QComboBox" name="cmbParameterY">
+       <property name="maximumSize">
+        <size>
+         <width>350</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item row="1" column="2">
       <widget class="QComboBox" name="cmbModeY">
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <item>
         <property name="text">
          <string>lin</string>
@@ -117,10 +162,23 @@
       </widget>
      </item>
      <item row="1" column="3">
-      <widget class="QDoubleSpinBox" name="spinYMin"/>
+      <widget class="QDoubleSpinBox" name="spinYMin">
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item row="1" column="4">
       <widget class="QDoubleSpinBox" name="spinYMax">
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="value">
         <double>10.000000000000000</double>
        </property>
@@ -128,6 +186,12 @@
      </item>
      <item row="1" column="5">
       <widget class="QSpinBox" name="spinYPixels">
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="minimum">
         <number>10</number>
        </property>

@@ -379,7 +379,7 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
                 tooltipstr=tooltips[tooltip].tooltip;
                 tooltipfn=tooltips[tooltip].tooltipfile;
             }
-            //qDebug()<<"show tooltip: "<<tooltip<<tooltips.value(tooltip);
+            //qDebug()<<"show tooltip: "<<tooltip<<tooltipstr<<tooltipfn;
             QToolTip::showText(QCursor::pos(), transformQF3HelpHTML(tooltipstr, tooltipfn), descriptionBrowser, QRect());
         } else if ((scheme=="open") || (scheme=="opendir") || (scheme=="openfile")){
             //QDir spd(searchPath);

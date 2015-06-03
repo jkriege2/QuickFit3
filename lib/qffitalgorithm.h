@@ -31,6 +31,7 @@
 #include "qfrawdatarecord.h"
 #include "qfproperties.h"
 #include "qffitfunctionnd.h"
+#include "qfmathtools.h"
 
 /*! \brief reporter interface for fitting algorithms
     \ingroup qf3lib_fitting
@@ -159,7 +160,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
              */
             virtual void evaluate(double* evalout, const double* params)=0;
 
-            /*! \brief function that evaluates the arbitrary function
+            /*! \brief function that evaluates the first derivatives \f$ J_{m,i}=\frac{\partial y_m}{\partial p_i}\ \ \ \ \ \ \text{with}\ \ \ \ \ \ \vec{y}=\vec{f}(x, \vec{p}) \f$ of the functor function
 
                 \param[out] evalout with size get_evalout()*get_paramcount() in the order
                             \f$ \left[ \frac{\partial f_1}{\partial p_1}, \frac{\partial f_1}{\partial p_2}, ..., \frac{\partial f_1}{\partial p_N}, \frac{\partial f_2}{\partial p_1}, \frac{\partial f_2}{\partial p_2}, ..., \frac{\partial f_2}{\partial p_N}, ..., \frac{\partial f_M}{\partial p_N} \right] \f$
@@ -177,6 +178,14 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
             /** \brief return dimension of function output vector \f$ M \f$ */
             inline uint64_t get_evalout() const { return m_evalout; };
+
+            /*! \brief  function that evaluates the first derivatives \f$ J_{m,i}=\frac{\partial y_m}{\partial p_i}\ \ \ \ \ \ \text{with}\ \ \ \ \ \ \vec{y}=\vec{f}(x, \vec{p}) \f$ of the functor function numerically, using the 5-point stencil method
+
+                \param[out] evalout with size get_evalout()*get_paramcount() in the order
+                            \f$ \left[ \frac{\partial f_1}{\partial p_1}, \frac{\partial f_1}{\partial p_2}, ..., \frac{\partial f_1}{\partial p_N}, \frac{\partial f_2}{\partial p_1}, \frac{\partial f_2}{\partial p_2}, ..., \frac{\partial f_2}{\partial p_N}, ..., \frac{\partial f_M}{\partial p_N} \right] \f$
+                \param params parameter vector with size get_paramcount()
+             */
+            virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON);
 
         protected:
             /** \brief size of function output \f$ M \f$ */

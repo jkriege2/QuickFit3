@@ -35,6 +35,51 @@ void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, const double* pa
     Q_UNUSED(params);
 }
 
+void QFFitAlgorithm::Functor::evaluateJacobianNum(double *evalout, const double *params, double h)
+{
+    int pcount=get_paramcount();
+    uint64_t outcount=get_evalout();
+    uint64_t i=0;
+    QVector<double> dat0=duplicateArrayV(params, pcount);
+    for (uint64_t io=0; io<outcount*pcount; io++) {
+        evalout[io]=0;
+    }
+
+    QVector<double> centerout(outcount, 0.0);
+    for (int ip=0; ip<pcount; ip++) {
+        QVector<double> dat=dat0;
+        dat[ip]=dat0[ip]+2.0*h;
+        evaluate(centerout.data(), dat.data());
+        for (uint64_t io=0; io<outcount; io++) {
+            evalout[ip*outcount+io]=evalout[ip*outcount+io]-centerout[io];
+        }
+
+        dat[ip]=dat0[ip]+h;
+        evaluate(centerout.data(), dat.data());
+        for (uint64_t io=0; io<outcount; io++) {
+            evalout[ip*outcount+io]=evalout[ip*outcount+io]+8.0*centerout[io];
+        }
+
+        dat[ip]=dat0[ip]-h;
+        evaluate(centerout.data(), dat.data());
+        for (uint64_t io=0; io<outcount; io++) {
+            evalout[ip*outcount+io]=evalout[ip*outcount+io]-8.0*centerout[io];
+        }
+
+        dat[ip]=dat0[ip]-2.0*h;
+        evaluate(centerout.data(), dat.data());
+        for (uint64_t io=0; io<outcount; io++) {
+            evalout[ip*outcount+io]=evalout[ip*outcount+io]+centerout[io];
+        }
+
+    }
+
+
+    for (uint64_t io=0; io<outcount*pcount; io++) {
+        evalout[io]=evalout[io]/(12.0*h);
+    }
+}
+
 
 
 void QFFitAlgorithm::FitResult::addNumber(QString resultName, double value, QString unit) {

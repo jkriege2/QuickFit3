@@ -172,22 +172,22 @@ class QFLIB_EXPORT QFFitFunction: public QFFitFunctionBase {
                  <a href="http://oregonstate.edu/instruct/ch490/lessons/lesson11.htm">http://oregonstate.edu/instruct/ch490/lessons/lesson11.htm</a>
                  <a href="http://en.wikipedia.org/wiki/Five-point_stencil">http://en.wikipedia.org/wiki/Five-point_stencil</a>
          */
-        void evaluateNumericalDerivatives(double* derivatives, double x, const double* parameters, double stepsize=30.0*sqrt(DBL_EPSILON)) const;
-        void evaluateNumericalDerivatives(QVector<double>& derivatives, double x, const QVector<double>& parameters, double stepsize=30.0*sqrt(DBL_EPSILON)) const {
+        void evaluateNumericalDerivatives(double* derivatives, double x, const double* parameters, double stepsize=10.0*QF_SQRT_DBL_EPSILON) const;
+        void evaluateNumericalDerivatives(QVector<double>& derivatives, double x, const QVector<double>& parameters, double stepsize=10.0*QF_SQRT_DBL_EPSILON) const {
             evaluateNumericalDerivatives(derivatives.data(), x, parameters.constData(), stepsize);
         }
-        void evaluateNumericalDerivatives(QVector<double>& derivatives, double x, const double* parameters, double stepsize=30.0*sqrt(DBL_EPSILON)) const {
+        void evaluateNumericalDerivatives(QVector<double>& derivatives, double x, const double* parameters, double stepsize=10.0*QF_SQRT_DBL_EPSILON) const {
             evaluateNumericalDerivatives(derivatives.data(), x, parameters, stepsize);
         }
-        QVector<double> evaluateNumericalDerivatives(double x, const QVector<double>& parameters, double stepsize=30.0*sqrt(DBL_EPSILON)) const {
+        QVector<double> evaluateNumericalDerivatives(double x, const QVector<double>& parameters, double stepsize=10.0*QF_SQRT_DBL_EPSILON) const {
             QVector<double> vec;
             vec.resize(m_parameters.size());
             evaluateNumericalDerivatives(vec.data(), x, parameters.constData(), stepsize);
             return vec;
         }
 
-        void evaluateNumericalParameterErrors(double* errors, double x, const double* parameters, double residualSigma2=1.0, double stepsize=30.0*sqrt(DBL_EPSILON)) const;
-        QVector<double> evaluateNumericalParameterErrors(double x, const QVector<double>& parameters, double residualSigma2=1.0, double stepsize=30.0*sqrt(DBL_EPSILON)) const {
+        void evaluateNumericalParameterErrors(double* errors, double x, const double* parameters, double residualSigma2=1.0, double stepsize=10.0*QF_SQRT_DBL_EPSILON) const;
+        QVector<double> evaluateNumericalParameterErrors(double x, const QVector<double>& parameters, double residualSigma2=1.0, double stepsize=10.0*QF_SQRT_DBL_EPSILON) const {
             QVector<double> vec;
             vec.resize(m_parameters.size());
             evaluateNumericalParameterErrors(vec.data(), x, parameters.constData(), residualSigma2, stepsize);
