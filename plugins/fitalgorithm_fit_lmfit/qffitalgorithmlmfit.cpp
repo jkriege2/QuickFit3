@@ -23,6 +23,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitalgorithmlmfitconfig.h"
 #include <cmath>
 #include "lmmin.h"
+#include "statistics_tools.h"
 
 struct QFFItAlgorithmGSL_evalData {
     QFFitAlgorithm::Functor* model;
@@ -96,6 +97,16 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFit::intFit(double* paramsOut, double*
 
     result.addNumber("error_sum", status.fnorm);
     result.addNumber("iterations", status.nfev);
+
+    QVector<double> J(model->get_evalout()*model->get_paramcount());
+    QVector<double> COV(model->get_paramcount()*model->get_paramcount());
+    model->evaluateJacobianNum(J.data(), paramsOut);
+    double chi2=status.fnorm;
+    statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
+
+    for (int i=0; i<model->get_paramcount(); i++) {
+        paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV.data(), model->get_paramcount(), chi2, model->get_evalout());
+    }
 
     if (status.outcome>=0) {
         result.fitOK=QString(lm_infmsg[status.outcome]).contains("success") || QString(lm_infmsg[status.outcome]).contains("converged");

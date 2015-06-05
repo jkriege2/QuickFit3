@@ -1642,6 +1642,31 @@ void QFFCSMSDEvaluationEditor::averageFirstFewLags() {
 
 }
 
+
+#define READ_VEC_PARAM(hasWz, wz, getWz, readParamWz) \
+    if (! hasWz && getWz && record->resultsExists(eval[ei], readParamWz)) { \
+        bool ok=false; \
+        double NN=NAN; \
+        bool hasIsLocal=record->resultsExists(eval[ei], readParamWz+isLocalAdd); \
+        QFRawDataRecord::evaluationResultType typ=record->resultsGetType(eval[ei], readParamWz); \
+        if ((typ==QFRawDataRecord::qfrdreNumberVector || typ==QFRawDataRecord::qfrdreNumberMatrix || \
+            typ==QFRawDataRecord::qfrdreNumberErrorVector || typ==QFRawDataRecord::qfrdreNumberErrorMatrix || \
+            typ==QFRawDataRecord::qfrdreIntegerVector || typ==QFRawDataRecord::qfrdreIntegerMatrix) \
+            && run>=0 && run<record->resultsGetVectorMatrixItems(eval[ei], readParamWz) \
+            && (!hasIsLocal || (hasIsLocal && record->resultsGetInBooleanList(eval[ei], readParamWz+isLocalAdd, run, false)))     \
+            )   \
+        { \
+            NN=record->resultsGetInNumberList(eval[ei], readParamWz, run, NAN); \
+            ok=QFFloatIsOK(NN); \
+        } \
+        if (ok && QFFloatIsOK(NN)) { \
+            wz=NN; \
+            hasWz=true; \
+        } \
+    } \
+
+
+
 void QFFCSMSDEvaluationEditor::getNFromFits()
 {
     /* EXECUTE AN EVALUATION FOR THE CURRENT RECORD ONLY */
@@ -1759,6 +1784,16 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
                     if (eval[ei].endsWith(runid)/* && (eval[ei].startsWith("imfcs_fit") || eval[ei].startsWith("fcs_fit"))*/) {
                         if (! hasN && dlg->getN() && record->resultsExists(eval[ei], readParamN)) {
                             bool ok=false;
+//                            double NN=NAN;
+//                            QFRawDataRecord::evaluationResultType typ=record->resultsGetType(eval[ei], readParamN);
+//                            if (typ==QFRawDataRecord::qfrdreNumberVector || typ==QFRawDataRecord::qfrdreNumberMatrix ||
+//                                typ==QFRawDataRecord::qfrdreNumberErrorVector || typ==QFRawDataRecord::qfrdreNumberErrorMatrix ||
+//                                typ==QFRawDataRecord::qfrdreIntegerVector || typ==QFRawDataRecord::qfrdreIntegerMatrix)  {
+//                                NN=record->resultsGetInNumberList(eval[ei], readParamN, run, NAN);
+//                                ok=QFFloatIsOK(NN);
+//                            } else {
+//                                NN=record->resultsGetAsDouble(eval[ei], readParamN, &ok);
+//                            }
                             double NN=record->resultsGetAsDouble(eval[ei], readParamN, &ok);
                             if (ok) {
                                 N=NN;
@@ -1829,6 +1864,18 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
                                 hasGamma=true;
                             }
                         }
+                    } else {
+                        QString isLocalAdd="_islocal";
+                        READ_VEC_PARAM(hasN, N, dlg->getN(), readParamN)
+                        READ_VEC_PARAM(hasTripT, tauT, dlg->getTriplet(), readParamTTau)
+                        READ_VEC_PARAM(hasTrip, thetaT, dlg->getTriplet(), readParamTF)
+                        READ_VEC_PARAM(hasDarkT, thetaT, dlg->getTriplet(), readParamDTau)
+                        READ_VEC_PARAM(hasDark, thetaT2, dlg->getTriplet(), readParamDF)
+                        READ_VEC_PARAM(hasWxy, wxy, dlg->getFocusParams(), readParamWxy)
+                        READ_VEC_PARAM(hasWz, wz, dlg->getFocusParams(), readParamWz)
+                        READ_VEC_PARAM(hasA, a, dlg->getFocusParams(), readParamA)
+                        READ_VEC_PARAM(hasGamma, gamma, dlg->getFocusParams(), readParamGamma)
+
                     }
                 }
             }

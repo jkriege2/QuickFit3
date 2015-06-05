@@ -184,6 +184,10 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 \param[out] evalout with size get_evalout()*get_paramcount() in the order
                             \f$ \left[ \frac{\partial f_1}{\partial p_1}, \frac{\partial f_1}{\partial p_2}, ..., \frac{\partial f_1}{\partial p_N}, \frac{\partial f_2}{\partial p_1}, \frac{\partial f_2}{\partial p_2}, ..., \frac{\partial f_2}{\partial p_N}, ..., \frac{\partial f_M}{\partial p_N} \right] \f$
                 \param params parameter vector with size get_paramcount()
+
+                \note If you derive a class from this class Functor, which should be used for weighted least-squares, you should also overwrite
+                      this function and scale each entry in the jacobian with \f$1/\sigma_i\f$ where \f$\sigma_i\f$ are the (inverse) weights (or errors)
+                      of the i-th datapoint in the dataset!
              */
             virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON);
 
@@ -272,6 +276,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
                 virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
                 virtual double getBootstrappingFraction() const;
+
+                virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON);
 
             protected:
 
@@ -399,6 +405,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
                 virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
                 virtual double getBootstrappingFraction() const;
+
+                virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON);
 
             protected:
 
@@ -539,6 +547,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
                 virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
                 virtual double getBootstrappingFraction() const;
+
+                virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON);
 
             protected:
 

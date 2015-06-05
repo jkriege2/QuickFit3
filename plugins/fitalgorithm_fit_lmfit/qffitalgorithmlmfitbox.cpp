@@ -23,6 +23,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitalgorithmlmfitconfig.h"
 #include <cmath>
 #include "lmmin.h"
+#include "statistics_tools.h"
 
 #define RANGE_MAXVAL (DBL_MAX/10.0)
 
@@ -136,34 +137,17 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
 
     }
 
-   /* if (!transformParams) {
-        lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status, NULL );
-    } else {
-        for (int i=0; i<paramCount; i++) {
-            const double mi=paramsMin[i];
-            const double ma=paramsMax[i];
-            const double pv=2.0*(paramsOut[i]-mi)/(ma-mi)-1.0;
-            if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
-                paramsOut[i]=atanh(pv);
-                if (pv>=1.0) paramsOut[i]=1e15;
-                if (pv<=-1.0) paramsOut[i]=-1e15;
-            }
-            qDebug()<<i<<": I"<<initialParams[i]<<"   V"<<paramsOut[i]<<" -> "<<pv<<"   "<<mi<<"..."<<ma<<"   ma-mi="<<ma-mi;
-        }
+    QVector<double> J(model->get_evalout()*model->get_paramcount());
+    QVector<double> COV(model->get_paramcount()*model->get_paramcount());
+    model->evaluateJacobianNum(J.data(), paramsOut);
+    double chi2=status.fnorm;
+    statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
 
-        lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status, NULL );
-        for (int i=0; i<paramCount; i++) {
-            const double mi=paramsMin[i];
-            const double ma=paramsMax[i];
-            if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
-                const double pv=tanh(paramsOut[i]);
-                paramsOut[i]=mi+(pv+1.0)*(ma-mi)/2.0;
-            }
-        }
-    }*/
+    for (int i=0; i<model->get_paramcount(); i++) {
+        paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV.data(), model->get_paramcount(), chi2, model->get_evalout());
+    }
 
-
-    result.addNumber("error_sum", status.fnorm);
+    result.addNumber("error_sum", chi2);
     result.addNumber("iterations", status.nfev);
 
     if (status.outcome>=0) {
@@ -207,4 +191,5 @@ bool QFFitAlgorithmLMFitBox::isThreadSafe() const
 {
     return true;
 }
+
 

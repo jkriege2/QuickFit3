@@ -1209,6 +1209,20 @@ double QFFitAlgorithm::FitFunctionFunctor::getBootstrappingFraction() const
     return m_bootstrapFraction;
 }
 
+void QFFitAlgorithm::FitFunctionFunctor::evaluateJacobianNum(double *evalout, const double *params, double h)
+{
+    Functor::evaluateJacobianNum(evalout, params, h);
+    if (m_dataWeight) {
+        for (uint64_t i=0; i<m_M; i++) {
+            if (m_dataWeight[i]>0){
+                for (int j=0; j<get_paramcount(); j++) {
+                    evalout[i*get_paramcount()+j] = evalout[i*get_paramcount()+j]/m_dataWeight[i];
+                }
+            }
+        }
+    }
+}
+
 QFFitAlgorithm::IRLSFunctorAdaptor::IRLSFunctorAdaptor(QFFitAlgorithm::FitFunctionFunctor *functor, double irls_parameter):
     Functor(functor->get_evalout())
 {
@@ -1489,6 +1503,20 @@ void QFFitAlgorithm::FitFunctionFunctor3D::setBootstrappingFraction(double fract
 double QFFitAlgorithm::FitFunctionFunctor3D::getBootstrappingFraction() const
 {
     return m_bootstrapFraction;
+}
+
+void QFFitAlgorithm::FitFunctionFunctor3D::evaluateJacobianNum(double *evalout, const double *params, double h)
+{
+    Functor::evaluateJacobianNum(evalout, params, h);
+    if (m_dataWeight) {
+        for (uint64_t i=0; i<m_M; i++) {
+            if (m_dataWeight[i]>0){
+                for (int j=0; j<get_paramcount(); j++) {
+                    evalout[i*get_paramcount()+j] = evalout[i*get_paramcount()+j]/m_dataWeight[i];
+                }
+            }
+        }
+    }
 }
 
 
@@ -1835,6 +1863,20 @@ void QFFitAlgorithm::FitFunctionFunctor2D::setBootstrappingFraction(double fract
 double QFFitAlgorithm::FitFunctionFunctor2D::getBootstrappingFraction() const
 {
     return m_bootstrapFraction;
+}
+
+void QFFitAlgorithm::FitFunctionFunctor2D::evaluateJacobianNum(double *evalout, const double *params, double h)
+{
+    Functor::evaluateJacobianNum(evalout, params, h);
+    if (m_dataWeight) {
+        for (uint64_t i=0; i<m_M; i++) {
+            if (m_dataWeight[i]>0){
+                for (int j=0; j<get_paramcount(); j++) {
+                    evalout[i*get_paramcount()+j] = evalout[i*get_paramcount()+j]/m_dataWeight[i];
+                }
+            }
+        }
+    }
 }
 
 

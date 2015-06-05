@@ -261,6 +261,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
          */
         void resultsChanged(const QString& evalName, const QString& resultName, bool removed);
+        void compoundsChanged(const QString& evalName, const QString& compoundName, bool removed);
         /** \brief emitted whenever the data in this object changes */
         void rawDataChanged();
         /** \brief emitted whenever the folder changes */
@@ -270,6 +271,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         virtual void emitPropertiesChanged(const QString& property=QString(""), bool visible=true);
         /** \brief this function emits a resultsChanged() signal. */
         virtual void emitResultsChanged(const QString& evalName=QString(""), const QString& resultName=QString(""), bool removed=false);
+        /** \brief this function emits a compoundsChanged() signal. */
+        virtual void emitCompoundsChanged(const QString& evalName=QString(""), const QString& compoundName=QString(""), bool removed=false);
         /** \brief this function emits a rawDataChanged() signal. */
         virtual void emitRawDataChanged();
         /** \brief disable emitting of rawDataChanged() signal*/
@@ -356,22 +359,22 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
     public:
         /** \brief this enum contains possible types of evaluation results */
         enum evaluationResultType {
-            qfrdreNumber,
-            qfrdreNumberError,
-            qfrdreNumberVector,
-            qfrdreNumberMatrix,
-            qfrdreNumberErrorVector,
-            qfrdreNumberErrorMatrix,
-            qfrdreInteger,
-            qfrdreIntegerVector,
-            qfrdreIntegerMatrix,
-            qfrdreString,
-            qfrdreStringVector,
-            qfrdreStringMatrix,
-            qfrdreBoolean,
-            qfrdreBooleanVector,
-            qfrdreBooleanMatrix,
-            qfrdreInvalid
+            qfrdreNumber,                   /*!< a single number (float)  */
+            qfrdreNumberError,              /*!< a single number + its error (float)  */
+            qfrdreNumberVector,             /*!< an arbitrarily sized vector of numbers (float)  */
+            qfrdreNumberMatrix,             /*!< an arbitrarily sized matrix of numbers (float)  */
+            qfrdreNumberErrorVector,        /*!< an arbitrarily sized vector of numbers+errors (float)  */
+            qfrdreNumberErrorMatrix,        /*!< an arbitrarily sized matrix of numbers+errors (float)  */
+            qfrdreInteger,                  /*!< a single integer number  */
+            qfrdreIntegerVector,            /*!< an arbitrarily sized vector of integer numbers  */
+            qfrdreIntegerMatrix,            /*!< an arbitrarily sized matrix of integer numbers  */
+            qfrdreString,                   /*!< a single string  */
+            qfrdreStringVector,             /*!< an arbitrarily sized vector of strings  */
+            qfrdreStringMatrix,             /*!< an arbitrarily sized matrix of strings  */
+            qfrdreBoolean,                  /*!< a single boolean value (true/false)  */
+            qfrdreBooleanVector,            /*!< an arbitrarily sized vector of boolean values  */
+            qfrdreBooleanMatrix,            /*!< an arbitrarily sized matrix of boolean values  */
+            qfrdreInvalid                   /*!< an invalid result (none of the above, i.e. no data contained in this result)  */
         };
 
         static QString evaluationResultType2String(evaluationResultType type);
@@ -428,6 +431,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
             QFLIB_EXPORT int getVectorMatrixItems() const;
             QFLIB_EXPORT bool isNumberType() const;
+            QFLIB_EXPORT bool isVectorMatrixType() const;
             QFLIB_EXPORT double getAsDouble() const;
             QFLIB_EXPORT QVector<double> getAsDoubleVector() const;
             QFLIB_EXPORT qfmpResult getAsMathParserResult() const;
@@ -565,6 +569,38 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                 this->sortPriority=pr;
             }
 
+        };
+
+        enum evaluationCompoundTypes {
+            qfrdrctGraph1D,
+            qfrdrctInvalid
+        };
+
+        /*! \brief this struct allows to combine evaluationResult records in the result set into compounds, such as graphs
+
+            These compound types are available:
+              - evaluationCompoundTypes::qfrdrctGraph1D: a 1D-graph, which combines two vector-of-number (optionally + error) results. Metadata may be:
+                  - \c logX , \c logY (boolean) for log-axis
+                  - \c labelX , \c labelY (string) axis labels
+                .
+            .
+         */
+        struct QFLIB_EXPORT evaluationCompoundResult {
+                inline evaluationCompoundResult() {
+                    type=qfrdrctInvalid;
+                    label="";
+                    metadata.clear();
+                    referencedResults.clear();
+                }
+
+                /** \brief type of the compond */
+                evaluationCompoundTypes type;
+                /** \brief list of results, referenced by this compound type, e.g. the x-axis and y-axis data of a graph */
+                QStringList referencedResults;
+                /** \brief an arbitrary set of metadata for the compound (e.g. axis labels, axis properties, ... */
+                QMap<QString, QVariant> metadata;
+                /** \brief label for the compond */
+                QString label;
         };
 
         struct QFLIB_EXPORT QFFitFitResultsStore {
@@ -1053,6 +1089,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief return a specified result as double vector (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
         QStringList resultsGetAsStringList(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
 
+        /** \brief return the number of entries in a result vector (of any vector/matrix type)  */
+        qlonglong resultsGetVectorMatrixItems(const QString& evalName, const QString& resultName) const;
+        /** \brief return the number of entries in a result vector (of any vector/matrix type)  */
+        bool resultsIsVectorMatrixType(const QString& evalName, const QString& resultName) const;
 
 
 
@@ -1156,9 +1196,38 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief return the description of an evaluation ID, returns evaluationName, if no description is set, if the evaluationName does not exist  */
         QString resultsGetEvaluationDescription(const QString& evaluationName) const;
 
+        /** \brief add/set a compound result */
+        void resultsCompoundSet(const QString& evaluationName, const QString& compoundName, evaluationCompoundTypes type, const QStringList& refs, const QString& label=QString(), const QMap<QString, QVariant>& metadata=QMap<QString,QVariant>());
+        /** \brief add/set a compound result */
+        void resultsCompoundSet(const QString& evaluationName, const QString& compoundName, const evaluationCompoundResult& comp);
+        /** \brief return the compound result */
+        evaluationCompoundResult resultsCompoundGet(const QString& evaluationName, const QString& compoundName) const;
+        /** \brief set a compound type */
+        void resultsCompoundSetType(const QString& evaluationName, const QString& compoundName, evaluationCompoundTypes type);
+        /** \brief return the compound result type */
+        evaluationCompoundTypes resultsCompoundGetType(const QString& evaluationName, const QString& compoundName) const;
+        /** \brief set a compound references */
+        void resultsCompoundSetReferences(const QString& evaluationName, const QString& compoundName, const QStringList& refs);
+        /** \brief return the compound result references */
+        QStringList resultsCompoundGetRefs(const QString& evaluationName, const QString& compoundName) const;
+        /** \brief set a compound label */
+        void resultsCompoundSetLabel(const QString& evaluationName, const QString& compoundName, const QString& label);
+        /** \brief return the compound result references */
+        QString resultsCompoundGetLabel(const QString& evaluationName, const QString& compoundName) const;
+        /** \brief set a compound metadata */
+        void resultsCompoundSetMetadata(const QString& evaluationName, const QString& compoundName, const QMap<QString, QVariant>& metadata);
+        /** \brief return the compound result references */
+        QMap<QString, QVariant> resultsCompoundGetMetadata(const QString& evaluationName, const QString& compoundName) const;
+        /** \brief return the compound result references */
+        QVariant resultsCompoundGetMetadata(const QString& evaluationName, const QString& compoundName, const QString& meta_id, const QVariant& defaultVal=QVariant()) const;
+        /** \brief add a compound metadata */
+        void resultsCompoundAddMetadata(const QString& evaluationName, const QString& compoundName, const QString& meta_id, const QVariant& meta_val);
+
 
         /** \brief get number of results for a specified evaluation */
         int resultsGetCount(const QString& evalName) const;
+        /** \brief get number of compounds for a specified evaluation */
+        int resultsCompoundGetCount(const QString& evalName) const;
         /** \brief get number of evaluations in this object */
         int resultsGetEvaluationCount() const;
         /** \brief get the i-th evaluation name */

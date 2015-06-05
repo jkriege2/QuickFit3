@@ -42,6 +42,8 @@ class QFRawDataRecordPrivate {
         typedef QMap<QString, QFRawDataRecord::evaluationResult> ResultsResultsType;
         typedef QMapIterator<QString, QFRawDataRecord::evaluationResult> ResultsResultsIterator;
 
+        typedef QMap<QString, QFRawDataRecord::evaluationCompoundResult> CompoundResultsResultsType;
+        typedef QMapIterator<QString, QFRawDataRecord::evaluationCompoundResult> CompoundResultsResultsIterator;
 
         /*! \brief this struct holds the metadata and also the data about an evaluationID */
         struct evaluationIDMetadata {
@@ -50,6 +52,7 @@ class QFRawDataRecordPrivate {
             int64_t groupIndex; /**< index of the results inside the evaluationID group set by \a group \b (optional) */
             QString description; /**< description of the metadata (human-readable version of the actual ID, \b optional )  */
             ResultsResultsType results; /**< the real results */
+            CompoundResultsResultsType compounds; /**< compounds and their metadata */
         };
 
         typedef QMap<QString, evaluationIDMetadata* > ResultsType;
@@ -703,13 +706,13 @@ qDebug()<<Q_FUNC_INFO<<"relock";
                 QString group=te.attribute("group");
                 int groupIndex=te.attribute("groupindex", "0").toInt();
                 QString description=te.attribute("description");
-                QDomElement re=te.firstChildElement("result");
                 dstore->results[en]=new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
                 dstore->results[en]->group=group;
                 dstore->results[en]->groupIndex=groupIndex;
                 dstore->results[en]->description=description;
                 QLocale loc=QLocale::c();
                 loc.setNumberOptions(QLocale::OmitGroupSeparator);
+                QDomElement re=te.firstChildElement("result");
                 while (!re.isNull()) {
                     QString n=re.attribute("name", "");
                     QString t=re.attribute("type", "invalid");
@@ -944,6 +947,37 @@ qDebug()<<Q_FUNC_INFO<<"relock";
                     }
                     if (!n.isEmpty() && !en.isEmpty()) dstore->results[en]->results.insert(n, r);
                     re=re.nextSiblingElement("result");
+                }
+
+
+
+
+
+                QDomElement cre=te.firstChildElement("compound");
+                while (!cre.isNull()) {
+                    QString n=cre.attribute("name", "");
+                    QString t=cre.attribute("type", "invalid");
+                    evaluationCompoundResult r;
+                    r.label=cre.attribute("label", "");
+
+                    if (t=="graph_1d") r.type=qfrdrctGraph1D;
+
+                    QDomElement crer=cre.firstChildElement("ref");
+                    while (!crer.isNull()) {
+                        r.referencedResults.append(crer.text());
+                        crer=crer.nextSiblingElement("ref");
+                    }
+
+                    QDomElement cremd=cre.firstChildElement("meta");
+                    while (!cremd.isNull()) {
+                        QString n=cremd.attribute("name");
+                        r.metadata.insert(n, readQVariant(cremd));
+                        cremd=cremd.nextSiblingElement("meta");
+                    }
+
+
+                    if (!n.isEmpty() && !en.isEmpty()) dstore->results[en]->compounds.insert(n, r);
+                    cre=cre.nextSiblingElement("compound");
                 }
 
                 te = te.nextSiblingElement("evaluation");
@@ -1301,6 +1335,41 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
                 //qDebug()<<"   writing property "<<rn<<"   in "<<saveTimer.elapsed()<<" ms";
                 w.writeEndElement();
             }
+            QFRawDataRecordPrivate::CompoundResultsResultsIterator  jc(i.value()->compounds);
+            //for (int j=0; j<i.value().size(); j++) {
+            while (jc.hasNext()) {
+                jc.next();
+                w.writeStartElement("compound");
+                QString rn=jc.key();
+
+                QElapsedTimer saveTimer;
+                saveTimer.start();
+                w.writeAttribute("name", rn);
+                const evaluationCompoundResult& r=jc.value();
+                if (!r.label.isEmpty()) w.writeAttribute("label", r.label);
+                switch(r.type) {
+                    case qfrdrctInvalid:
+                        w.writeAttribute("type", "invalid");
+                        break;
+                    case qfrdrctGraph1D:
+                        w.writeAttribute("type", "graph_1d");
+                        break;
+
+                }
+                for (int ii=0; ii<r.referencedResults.size(); ii++) {
+                    w.writeTextElement("ref", r.referencedResults[ii]);
+                }
+                QMapIterator<QString, QVariant> ii(r.metadata);
+                while (ii.hasNext()) {
+                    ii.next();
+                    w.writeStartElement("meta");
+                    w.writeAttribute("name", ii.key());
+                    writeQVariant(w, ii.value());
+                    w.writeEndElement();
+                }
+                //qDebug()<<"   writing property "<<rn<<"   in "<<saveTimer.elapsed()<<" ms";
+                w.writeEndElement();
+            }
             w.writeEndElement();
         }
         w.writeEndElement();
@@ -1539,7 +1608,20 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
     if (dstore->results.contains(evalName) && dstore->results.value(evalName)) return dstore->results.value(evalName)->results.size();
     return 0;
-};
+}
+
+int QFRawDataRecord::resultsCompoundGetCount(const QString &evalName) const
+{
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+ QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+    if (dstore->results.contains(evalName) && dstore->results.value(evalName)) return dstore->results.value(evalName)->compounds.size();
+    return 0;
+}
 
 int QFRawDataRecord::resultsGetEvaluationCount() const {
     
@@ -2890,6 +2972,323 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
     return "";
 }
 
+void QFRawDataRecord::resultsCompoundSet(const QString &evaluationName, const QString &compoundName, QFRawDataRecord::evaluationCompoundTypes type, const QStringList &refs, const QString &label, const QMap<QString, QVariant> &metadata)
+{
+
+    evaluationCompoundResult r;
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+    #endif
+     QFRDRWriteLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+     if (dstore->results.contains(evaluationName)) {
+         QFRawDataRecordPrivate::evaluationIDMetadata* evr=dstore->results[evaluationName];
+         if (evr->compounds.contains(compoundName)) {
+             r=evr->compounds[compoundName];
+         }
+     }
+     r.label=label;
+     r.metadata=metadata;
+     /*QMapIterator<QString,QVariant> im(metadata);
+     while (im.hasNext()) {
+         im.next();
+         r.metadata.insert(im.key(), im.value());
+     }*/
+     r.referencedResults=refs;
+     r.type=type;
+     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+     dstore->results[evaluationName]->compounds[compoundName]=r;
+
+     emitCompoundsChanged(evaluationName, compoundName, false);
+}
+
+void QFRawDataRecord::resultsCompoundSet(const QString &evaluationName, const QString &compoundName, const QFRawDataRecord::evaluationCompoundResult &comp)
+{
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+    #endif
+     QFRDRWriteLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+     dstore->results[evaluationName]->compounds[compoundName]=comp;
+
+     emitCompoundsChanged(evaluationName, compoundName, false);
+}
+
+QFRawDataRecord::evaluationCompoundResult QFRawDataRecord::resultsCompoundGet(const QString &evalName, const QString &compoundName) const
+{
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+    #endif
+     QFRDRReadLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+    evaluationCompoundResult r;
+    if (dstore->results.contains(evalName) && dstore->results.value(evalName)) {
+        const QFRawDataRecordPrivate::evaluationIDMetadata* emd=dstore->results.value(evalName);
+        if (emd->compounds.contains(compoundName)) {
+            return emd->compounds.value(compoundName);
+        }
+    }
+
+    return r;
+}
+
+void QFRawDataRecord::resultsCompoundSetType(const QString &evaluationName, const QString &compoundName, QFRawDataRecord::evaluationCompoundTypes type)
+{
+    evaluationCompoundResult r;
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+    #endif
+     QFRDRWriteLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+     if (dstore->results.contains(evaluationName)) {
+         QFRawDataRecordPrivate::evaluationIDMetadata* evr=dstore->results[evaluationName];
+         if (evr->compounds.contains(compoundName)) {
+             r=evr->compounds[compoundName];
+         }
+     }
+     //r.label=label;
+     //r.metadata=metadata;
+     /*QMapIterator<QString,QVariant> im(metadata);
+     while (im.hasNext()) {
+         im.next();
+         r.metadata.insert(im.key(), im.value());
+     }*/
+     //r.referencedResults=refs;
+     r.type=type;
+     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+     dstore->results[evaluationName]->compounds[compoundName]=r;
+
+     emitCompoundsChanged(evaluationName, compoundName, false);
+}
+
+QFRawDataRecord::evaluationCompoundTypes QFRawDataRecord::resultsCompoundGetType(const QString &evalName, const QString &compoundName) const
+{
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+    #endif
+     QFRDRReadLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+    if (dstore->results.contains(evalName) && dstore->results.value(evalName)) {
+        const QFRawDataRecordPrivate::evaluationIDMetadata* emd=dstore->results.value(evalName);
+        if (emd->compounds.contains(compoundName)) {
+            return emd->compounds.value(compoundName).type;
+        }
+    }
+
+    return qfrdrctInvalid;
+}
+
+void QFRawDataRecord::resultsCompoundSetReferences(const QString &evaluationName, const QString &compoundName, const QStringList &refs)
+{
+    evaluationCompoundResult r;
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+    #endif
+     QFRDRWriteLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+     if (dstore->results.contains(evaluationName)) {
+         QFRawDataRecordPrivate::evaluationIDMetadata* evr=dstore->results[evaluationName];
+         if (evr->compounds.contains(compoundName)) {
+             r=evr->compounds[compoundName];
+         }
+     }
+     //r.label=label;
+     //r.metadata=metadata;
+     /*QMapIterator<QString,QVariant> im(metadata);
+     while (im.hasNext()) {
+         im.next();
+         r.metadata.insert(im.key(), im.value());
+     }*/
+     r.referencedResults=refs;
+     //r.type=type;
+     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+     dstore->results[evaluationName]->compounds[compoundName]=r;
+
+     emitCompoundsChanged(evaluationName, compoundName, false);
+}
+
+QStringList QFRawDataRecord::resultsCompoundGetRefs(const QString &evalName, const QString &compoundName) const
+{
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+    #endif
+     QFRDRReadLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+    if (dstore->results.contains(evalName) && dstore->results.value(evalName)) {
+        const QFRawDataRecordPrivate::evaluationIDMetadata* emd=dstore->results.value(evalName);
+        if (emd->compounds.contains(compoundName)) {
+            return emd->compounds.value(compoundName).referencedResults;
+        }
+    }
+
+    return QStringList();
+}
+
+void QFRawDataRecord::resultsCompoundSetLabel(const QString &evaluationName, const QString &compoundName, const QString &label)
+{
+    evaluationCompoundResult r;
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+    #endif
+     QFRDRWriteLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+     if (dstore->results.contains(evaluationName)) {
+         QFRawDataRecordPrivate::evaluationIDMetadata* evr=dstore->results[evaluationName];
+         if (evr->compounds.contains(compoundName)) {
+             r=evr->compounds[compoundName];
+         }
+     }
+     r.label=label;
+     //r.metadata=metadata;
+     /*QMapIterator<QString,QVariant> im(metadata);
+     while (im.hasNext()) {
+         im.next();
+         r.metadata.insert(im.key(), im.value());
+     }*/
+     //r.referencedResults=refs;
+     //r.type=type;
+     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+     dstore->results[evaluationName]->compounds[compoundName]=r;
+
+     emitCompoundsChanged(evaluationName, compoundName, false);
+}
+
+QString QFRawDataRecord::resultsCompoundGetLabel(const QString &evalName, const QString &compoundName) const
+{
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+    #endif
+     QFRDRReadLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+    if (dstore->results.contains(evalName) && dstore->results.value(evalName)) {
+        const QFRawDataRecordPrivate::evaluationIDMetadata* emd=dstore->results.value(evalName);
+        if (emd->compounds.contains(compoundName)) {
+            return emd->compounds.value(compoundName).label;
+        }
+    }
+
+    return QString();
+}
+
+void QFRawDataRecord::resultsCompoundSetMetadata(const QString &evaluationName, const QString &compoundName, const QMap<QString, QVariant> &metadata)
+{
+    evaluationCompoundResult r;
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+    #endif
+     QFRDRWriteLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+     if (dstore->results.contains(evaluationName)) {
+         QFRawDataRecordPrivate::evaluationIDMetadata* evr=dstore->results[evaluationName];
+         if (evr->compounds.contains(compoundName)) {
+             r=evr->compounds[compoundName];
+         }
+     }
+     //r.label=label;
+     r.metadata=metadata;
+     /*QMapIterator<QString,QVariant> im(metadata);
+     while (im.hasNext()) {
+         im.next();
+         r.metadata.insert(im.key(), im.value());
+     }*/
+     //r.referencedResults=refs;
+     //r.type=type;
+     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+     dstore->results[evaluationName]->compounds[compoundName]=r;
+
+     emitCompoundsChanged(evaluationName, compoundName, false);
+}
+
+QMap<QString, QVariant> QFRawDataRecord::resultsCompoundGetMetadata(const QString &evalName, const QString &compoundName) const
+{
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+    #endif
+     QFRDRReadLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+    if (dstore->results.contains(evalName) && dstore->results.value(evalName)) {
+        const QFRawDataRecordPrivate::evaluationIDMetadata* emd=dstore->results.value(evalName);
+        if (emd->compounds.contains(compoundName)) {
+            return emd->compounds.value(compoundName).metadata;
+        }
+    }
+
+    return QMap<QString, QVariant>();
+}
+
+QVariant QFRawDataRecord::resultsCompoundGetMetadata(const QString &evalName, const QString &compoundName, const QString &meta_id, const QVariant &defaultVal) const
+{
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+    #endif
+     QFRDRReadLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+    if (dstore->results.contains(evalName) && dstore->results.value(evalName)) {
+        const QFRawDataRecordPrivate::evaluationIDMetadata* emd=dstore->results.value(evalName);
+        if (emd->compounds.contains(compoundName)) {
+            return emd->compounds.value(compoundName).metadata.value(meta_id, defaultVal);
+        }
+    }
+
+    return QVariant();
+}
+
+void QFRawDataRecord::resultsCompoundAddMetadata(const QString &evaluationName, const QString &compoundName, const QString &meta_id, const QVariant &meta_val)
+{
+    evaluationCompoundResult r;
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+    #endif
+     QFRDRWriteLocker locker(dstore->lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+     if (dstore->results.contains(evaluationName)) {
+         QFRawDataRecordPrivate::evaluationIDMetadata* evr=dstore->results[evaluationName];
+         if (evr->compounds.contains(compoundName)) {
+             r=evr->compounds[compoundName];
+         }
+     }
+     //r.label=label;
+     r.metadata.insert(meta_id, meta_val);
+     /*QMapIterator<QString,QVariant> im(metadata);
+     while (im.hasNext()) {
+         im.next();
+         r.metadata.insert(im.key(), im.value());
+     }*/
+     //r.referencedResults=refs;
+     //r.type=type;
+     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+     dstore->results[evaluationName]->compounds[compoundName]=r;
+
+     emitCompoundsChanged(evaluationName, compoundName, false);
+}
+
 void QFRawDataRecord::resultsSetBoolean(const QString& evaluationName, const QString& resultName, bool value) {
     { 
 #ifdef DEBUG_THREAN
@@ -3788,6 +4187,18 @@ QStringList QFRawDataRecord::resultsGetAsStringList(const QString &evalName, con
     return QStringList();
 }
 
+qlonglong QFRawDataRecord::resultsGetVectorMatrixItems(const QString &evalName, const QString &resultName) const
+{
+    const evaluationResult r=resultsGet(evalName, resultName);
+    return r.getVectorMatrixItems();
+}
+
+bool QFRawDataRecord::resultsIsVectorMatrixType(const QString &evalName, const QString &resultName) const
+{
+    const evaluationResult r=resultsGet(evalName, resultName);
+    return r.isVectorMatrixType();
+}
+
 QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QString &resultName, int position, bool alsoGetNonVec) const {
     const evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {
@@ -4161,14 +4572,25 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
 
-            QFRawDataRecordPrivate::ResultsResultsIterator i(dstore->results[oldEvalName]->results);
-            while (i.hasNext()) {
-                i.next();
-                if (!dstore->results.contains(newEvalName)) dstore->results[newEvalName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-                dstore->results[newEvalName]->results.insert(i.key(), i.value());
-            }
+             {
+                 QFRawDataRecordPrivate::ResultsResultsIterator i(dstore->results[oldEvalName]->results);
+                 while (i.hasNext()) {
+                     i.next();
+                     if (!dstore->results.contains(newEvalName)) dstore->results[newEvalName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+                     dstore->results[newEvalName]->results.insert(i.key(), i.value());
+                 }
+             }
+             {
+                QFRawDataRecordPrivate::CompoundResultsResultsIterator i(dstore->results[oldEvalName]->compounds);
+                while (i.hasNext()) {
+                    i.next();
+                    if (!dstore->results.contains(newEvalName)) dstore->results[newEvalName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+                    dstore->results[newEvalName]->compounds.insert(i.key(), i.value());
+                }
+             }
         }
         emitResultsChanged(newEvalName, "", false);
+        emitCompoundsChanged(newEvalName, "", false);
     }
 }
 
@@ -4749,6 +5171,14 @@ void QFRawDataRecord::emitResultsChanged(const QString& evalName, const QString&
     }
 }
 
+void QFRawDataRecord::emitCompoundsChanged(const QString &evalName, const QString &compoundName, bool removed)
+{
+    if (doEmitResultsChanged) {
+        //qDebug()<<"QFRawDataRecord ("<<name<<") emits resultsChanged()";
+        emit compoundsChanged(evalName, compoundName, removed);
+    }
+}
+
 void QFRawDataRecord::emitRawDataChanged() {
     //qDebug()<<"QFRawDataRecord ("<<name<<") emits rawDataChanged()";
     emit rawDataChanged();
@@ -5042,6 +5472,23 @@ bool QFRawDataRecord::evaluationResult::isNumberType() const
     return false;
 }
 
+bool QFRawDataRecord::evaluationResult::isVectorMatrixType() const
+{
+    switch (type) {
+        case QFRawDataRecord::qfrdreNumberVector:
+        case QFRawDataRecord::qfrdreNumberMatrix:
+        case QFRawDataRecord::qfrdreNumberErrorVector:
+        case QFRawDataRecord::qfrdreNumberErrorMatrix:
+        case QFRawDataRecord::qfrdreIntegerVector:
+        case QFRawDataRecord::qfrdreIntegerMatrix:
+        case QFRawDataRecord::qfrdreStringVector:
+        case QFRawDataRecord::qfrdreStringMatrix:
+            return true;
+        default:
+            return false;
+    }
+    return false;
+}
 double QFRawDataRecord::evaluationResult::getAsDouble() const
 {
     switch (type) {

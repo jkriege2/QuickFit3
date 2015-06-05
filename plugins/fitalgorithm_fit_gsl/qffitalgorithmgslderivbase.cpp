@@ -22,7 +22,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitalgorithmgslderivbase.h"
 #include "qffitalgorithmgslderivconfigdialog.h"
 #include "qffitalgorithmgsltools.h"
-
+#include "statistics_tools.h"
 #include <cmath>
 
 
@@ -146,6 +146,16 @@ QFFitAlgorithm::FitResult QFFitAlgorithmGSLDerivativeBase::intFit(double* params
     }
 
 
+
+    QVector<double> J(model->get_evalout()*model->get_paramcount());
+    QVector<double> COV(model->get_paramcount()*model->get_paramcount());
+    model->evaluateJacobianNum(J.data(), paramsOut);
+    double chi2=s->f;
+    statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
+
+    for (int i=0; i<model->get_paramcount(); i++) {
+        paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV.data(), model->get_paramcount(), chi2, model->get_evalout());
+    }
 
     gsl_multimin_fdfminimizer_free (s);
     gsl_vector_free (x);

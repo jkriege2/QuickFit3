@@ -4549,6 +4549,13 @@ static void getQFFitFunctionDescription(QFFitFunctionBase* ff, QString& autoplug
 QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QF3HelpReplacesList& more_replaces, bool insertTooltips, bool dontCreatePics, bool isMainHelp) {
 
 
+    QModernProgressDialog progress;
+    progress.setHasCancel(false);
+    progress.setLabelText(tr("rendering onine-help page ..."));
+    progress.setMode(true, false);
+    progress.openDelayed(1000);
+    progress.raise();
+
     QString result=removeHTMLComments(input_html);
     QString fileDir=QFileInfo(filename).absolutePath();
     QString basepath=QFileInfo(filename).absolutePath();
@@ -4657,6 +4664,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     bool foundPlugin=false;
     if (pluginList) {
         for (int i=0; i<pluginList->size(); i++) {
+            QApplication::processEvents();
             //qDebug()<<"*** "
             if (QDir(pluginList->at(i).directory)==basepath) { // we found the info for this directory
                 QString pid=pluginList->at(i).plugin->getID();
@@ -4780,6 +4788,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
     }
 
+    QApplication::processEvents();
+
     if (!foundPlugin) {
         fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\"qrc:/icon.png\">")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), QString("qrc:/icon.png")));
@@ -4797,6 +4807,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink_url"), QString("$$weblink$$")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink"), QObject::tr("<a href=\"$$weblink$$\">QuickFit Webpage</a>")));
     }
+
+
+    QApplication::processEvents();
 
     // handle replaces, also handles special commands, like $$list:...$$
     if (!result.isEmpty()) {
@@ -4829,6 +4842,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
 
             for (int ti=0; ti<ttids.size(); ti++){
+                QApplication::processEvents();
                 const QString key=ttids[ti];
                 const QString val=helpdata.autolinks.value(key);
                 QRegExp rxTT(QString("\\<\\s*(\\w\\w*)([^\\>]*)\\>[^\\<\\>]*[\\s\\,\\.\\(\\[\\;\\:\\-]+(%1)[\\s\\,\\.\\)\\]\\;\\:\\-]+.*\\<\\s*\\/\\s*([^\\>\\s]*)\\s*\\>").arg(key));
@@ -4868,6 +4882,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         bool replaced=true;
         int cnt=0;
         while (replaced && (cnt<15)) {
+            QApplication::processEvents();
             replaced=false;
             if (replaces) for (int i=0; i<replaces->size(); i++) {
                 if (result.contains(QString("$$")+(*replaces)[i].first+QString("$$"))) {
@@ -4875,18 +4890,21 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     result=result.replace(QString("$$")+(*replaces)[i].first+QString("$$"), (*replaces)[i].second);
                 }
             }
+            QApplication::processEvents();
             for (int i=0; i<fromHTML_replaces.size(); i++) {
                 if (result.contains(QString("$$")+fromHTML_replaces[i].first+QString("$$"))) {
                     replaced=true;
                     result=result.replace(QString("$$")+fromHTML_replaces[i].first+QString("$$"), fromHTML_replaces[i].second);
                 }
             }
+            QApplication::processEvents();
             for (int i=0; i<more_replaces.size(); i++) {
                 if (result.contains(QString("$$")+more_replaces[i].first+QString("$$"))){
                     replaced=true;
                     result=result.replace(QString("$$")+more_replaces[i].first+QString("$$"), more_replaces[i].second);
                 }
             }
+            QApplication::processEvents();
             for (int i=0; i<localreplaces.size(); i++) {
                 if (result.contains(QString("$$")+localreplaces[i].first+QString("$$"))) {
                     replaced=true;
@@ -4901,6 +4919,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             int count = 0;
             int pos = 0;
             while ((pos = rxList.indexIn(result, pos)) != -1) {
+                QApplication::processEvents();
                 bool replaced=false;
                 QString list=rxList.cap(1).toLower().trimmed();
                 QString filter=rxList.cap(2).trimmed();
@@ -5189,7 +5208,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         }
                     } else if (list=="colorpalettes") {
                         QString text="";
-                        QString item_template=QString("<tr><td><img alt=\"%1\" src=\"%2\"></td><td><b>%1</b></td></tr></li>\n");
+                        QString item_template=QString("<tr><td><img alt=\"%1\" src=\"%2\" width=\"128\" height=\"16\"></td><td><b>%1</b></td></tr></li>\n");
                         QStringList ttids=JKQTPimagePlot_getPredefinedPalettes();
                         for (int ti=0; ti<ttids.size(); ti++){
                             QString id=ttids[ti];
@@ -5246,6 +5265,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             count = 0;
             pos = 0;
             while ((pos = rxInsert.indexIn(result, pos)) != -1) {
+                QApplication::processEvents();
                 bool replaced=false;
                 QString command=rxInsert.cap(1).toLower().trimmed();
                 QString file=rxInsert.cap(2).trimmed();
@@ -5353,6 +5373,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             pos = 0;
             //qDebug()<<result.contains("$(")<<result;
             while ((pos = rxLaTeX.indexIn(result, pos)) != -1) {
+                QApplication::processEvents();
                 bool replaced=false;
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
                 QString latex="$"+rxLaTeX.cap(2).trimmed()+"$";
@@ -5382,10 +5403,11 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             //qDebug()()<<"FOUND IN CACHE!!! "<<texfilename;
 
                             QString rep="";
+                            QPixmap pix(texfilename);
                             if (command=="bmath" || command=="mathb") {
-                                rep= QString("<blockquote><img style=\"vertical-align: middle;\" src=\"%1\"></blockquote>").arg(texfilename);
+                                rep= QString("<blockquote><img style=\"vertical-align: middle;\" src=\"%1\" width=\"%2\" height=\"%3\" border=\"0\"></blockquote>").arg(texfilename).arg(pix.width()).arg(pix.height());
                             } else {
-                                rep= QString("<img style=\"vertical-align: middle;\" src=\"%1\">").arg(texfilename);
+                                rep= QString("<img style=\"vertical-align: middle;\" src=\"%1\" width=\"%2\" height=\"%3\" border=\"0\">").arg(texfilename).arg(pix.width()).arg(pix.height());
                             }
                             result=result.replace(rxLaTeX.cap(0), rep);
                             replaced=true;
@@ -5453,10 +5475,11 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                 QString rep="";
                                 if (QFile::exists(texfilename)) {
                                     mathParserHelpCache.insert(latexCacheID, texfilename);
+                                    QPixmap pix(texfilename);
                                     if (command=="bmath" || command=="mathb") {
-                                        rep= QString("<blockquote><img style=\"vertical-align: middle;\" src=\"%1\"></blockquote>").arg(texfilename);
+                                        rep= QString("<blockquote><img style=\"vertical-align: middle;\" src=\"%1\" width=\"%2\" height=\"%3\" border=\"0\"></blockquote>").arg(texfilename).arg(pix.width()).arg(pix.height());
                                     } else {
-                                        rep= QString("<img style=\"vertical-align: middle;\" src=\"%1\">").arg(texfilename);
+                                        rep= QString("<img style=\"vertical-align: middle;\" src=\"%1\" width=\"%2\" height=\"%3\" border=\"0\">").arg(texfilename).arg(pix.width()).arg(pix.height());
                                     }
                                 }
                                 result=result.replace(rxLaTeX.cap(0), rep);
@@ -5480,6 +5503,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             count = 0;
             pos = 0;
             while ((pos = rxPluginInfo.indexIn(result, pos)) != -1) {
+                QApplication::processEvents();
                 QString command=rxPluginInfo.cap(1).toLower().trimmed();
                 QString param1=rxPluginInfo.cap(2).toLower().trimmed();
                 QString param2=rxPluginInfo.cap(3).trimmed().toLower();
@@ -5599,21 +5623,6 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
 
-            // try and find DOIs in the text
-            QRegExp rxDOI("(doi)?[\\:]?\\s*(10\\.\\d{4}[\\d\\:\\.\\-\\_\\/a-z]+)[\\,\\;\\:\\.\\s\\n\\r\\t\\v\\)\\]\\}]+[\\s\\n\\r\\t\\v]", Qt::CaseInsensitive);
-            rxDOI.setMinimal(true);
-
-            count = 0;
-            pos = 0;
-            while ((pos = rxDOI.indexIn(result, pos)) != -1) {
-                QString rep=QString("<a href=\"http://dx.doi.org/%1\">%2</a>").arg(rxDOI.cap(1)).arg(rxDOI.cap(0));
-                result=result.replace(rxDOI.cap(0), rep);
-
-
-                ++count;
-                //pos += rep.size()-rxDOI.matchedLength();
-            }
-
 
             cnt++;
         }
@@ -5636,6 +5645,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             QList<ContentsEntry> contents;
             bool first=true;
             while ((pos = rxHeader.indexIn(result, pos)) != -1) {
+                QApplication::processEvents();
 
                 int level=rxHeader.cap(1).toInt();
                 QString text=rxHeader.cap(3);
@@ -5696,6 +5706,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             count = 0;
             pos = 0;
             while ((pos = rxHeader.indexIn(result, pos)) != -1) {
+                QApplication::processEvents();
 
                 int level=rxHeader.cap(1).toInt();
                 QString text=rxHeader.cap(3);
@@ -5761,6 +5772,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             count = 0;
             pos = 0;
             while ((pos = rxRef.indexIn(result, pos)) != -1) {
+                QApplication::processEvents();
 
                 QString inst=rxRef.cap(1).toLower();
                 QString ID=rxRef.cap(2).toLower();
@@ -5813,6 +5825,22 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
         }
 
+
+
+        // try and find DOIs in the text
+        QRegExp rxDOI("(doi)?[\\:]?\\s*(10\\.\\d{4}[\\d\\:\\.\\-\\_\\/a-z]+)[\\,\\;\\:\\.\\s\\n\\r\\t\\v\\)\\]\\}]+[\\s\\n\\r\\t\\v]", Qt::CaseInsensitive);
+        rxDOI.setMinimal(true);
+
+        count = 0;
+        pos = 0;
+        while ((pos = rxDOI.indexIn(result, pos)) != -1) {
+            QString rep=QString("<a href=\"http://dx.doi.org/%1\">%2</a>").arg(rxDOI.cap(1)).arg(rxDOI.cap(0));
+            result=result.replace(rxDOI.cap(0), rep);
+
+
+            ++count;
+            //pos += rep.size()-rxDOI.matchedLength();
+        }
 
         // remove all unreplaces $$name$$ sequences
         if (removeNonReplaced) {

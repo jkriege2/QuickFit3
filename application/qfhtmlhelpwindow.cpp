@@ -559,11 +559,20 @@ void QFHTMLHelpWindow::print() {
             if (cur.charFormat().isImageFormat()) {
                 QTextImageFormat itf=cur.charFormat().toImageFormat();
                 if (itf.isValid()) {
+                    //QUrl url(itf.name());
+                    QPixmap pix(itf.name());
+                    if (!pix.isNull()) ddc->addResource(QTextDocument::ImageResource, QUrl(itf.name()), QVariant(pix));
                     //qDebug()<<itf.name()<<itf.width()<<itf.height()<<ddc->textWidth();
-                    if (itf.width()>ddc->textWidth()*0.95) {
-                        double scale=double(ddc->textWidth())*0.85/itf.width();
-                        itf.setWidth(scale*itf.width());
-                        itf.setHeight(scale*itf.height());
+                    double w=itf.width();
+                    double h=itf.height();
+                    if ((w<=0 || h<=0) && pix.width()>0 && pix.height()>0) {
+                        w=pix.width();
+                        h=pix.height();
+                    }
+                    if (w>ddc->textWidth()*0.95) {
+                        double scale=double(ddc->textWidth())*0.85/w;
+                        itf.setWidth(scale*w);
+                        itf.setHeight(scale*h);
                         cur.setCharFormat(itf);
                     }
                     //qDebug()<<"  => "<<itf.width()<<itf.height()<<ddc->textWidth();
@@ -575,22 +584,7 @@ void QFHTMLHelpWindow::print() {
         }
 
 
-        /*QTextBlock b=ddc->firstBlock();
-        for (int i=0; i<ddc->blockCount(); i++) {
-            QTextFormat tf=b.charFormat();
-            if (tf.isImageFormat()) {
-                QTextImageFormat* itf=static_cast<QTextImageFormat*>(&tf);
-                if (itf) {
-                    qDebug()<<itf->width()<<ddc->textWidth();
-                    if (itf->width()>ddc->textWidth()*0.95) {
-                        itf->setWidth(double(ddc->textWidth())*0.85);
-                    }
-                    qDebug()<<"  => "<<itf->width()<<ddc->textWidth();
-                }
-            }
 
-            b=b.next();
-        }*/
 
         ddc->print(p);
 

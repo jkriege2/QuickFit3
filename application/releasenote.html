@@ -43,7 +43,8 @@
       </ul></li>
       <li>added Faddeeva Package to support real-valued Faddeeva-Function, which is required by some TIR-FCS fit modelss</li>
       <li>several dialogs now have a maximize+minimize button in their header</li>
-      <li></li>
+      <li>improved rendering of LaTeX expressions</li>
+      <li>bugfix: online-help: the DOI's in the help texts should be linked now again!</li>
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>
@@ -111,6 +112,7 @@
         <li>bugfix: corrected the model equations in the online-help (there was a wxy^2 instead of a gamma^2wxy^2!)</li>
         <li>added an offset G<sub>&infin;</sub> to all models</li>
         <li>bugfix: If a fit was once canceled, all following fits were also canceled after the first run/file, until QuickFit was closed and reopened</li>
+        <li>"get N from fit results" tool can now also read imagingFCS fit results (i.e. from results that are stored as vectors which are index by the run/index/pixel)</li>
     </ul></li>
     <li><b>Diffusion Coefficient Calculator</b><ul>
         <li>bugfix: D20W was not calculated correctly, when a D at arbitrary conditions with viscosity factor !=1 was given!</li>
@@ -137,6 +139,15 @@
 
     <li><b>cairo graph exporter plugin</b><ul>
         <li>added finer grained export options for different subformats (e.g. SVG 1.1&amp;1.2, PDF 1.4&amp;1.5, EPS2&amp;3)</li>
+        <li></li>
+    </ul></li>
+
+    <li><b>lmfit fit algorithm plugin</b><ul>
+        <li>some of the lmfit fit algorithms now estimate errors from the variance/covariance matrix of the fit (estimated numerically)</li>
+        <li></li>
+    </ul></li>
+    <li><b>GSL fit algorithm plugin</b><ul>
+        <li>some of the GSL fit algorithms now estimate errors from the variance/covariance matrix of the fit (estimated numerically)</li>
         <li></li>
     </ul></li>
 
