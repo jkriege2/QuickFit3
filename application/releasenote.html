@@ -45,6 +45,7 @@
       <li>several dialogs now have a maximize+minimize button in their header</li>
       <li>improved rendering of LaTeX expressions</li>
       <li>bugfix: online-help: the DOI's in the help texts should be linked now again!</li>
+      <li>added (optional) support for general objective function minimization to QFitAlgorithm (+ implementations in the NLopt and GSL fit algorithm plugins)</li>
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>
@@ -104,6 +105,7 @@
         <li>bugfix: MaxEnt parameters and data cuts are now enabled/editable, when an unfitted record is selected.</li>
         <li>added overlay plots of the runs in a single RDR</li>
         <li>bugfix: If a fit was once canceled, all following fits were also canceled after the first run/file, until QuickFit was closed and reopened</li>
+        <li>bugfix: the overviewplot of ACF+fit now should work</li>
     </ul></li>
     <li><b>FCS MSD evaluation</b><ul>
         <li><font color="red"><b>MAJOR BUGFIX:</b> Before this versions, all 2D-diffusion MSD models returned an MSD, which was a factor of 2/3 too high!</font> This was fixed now. See the documentation for the correct models. [Thanks to T. Wohland for pointing me to that]</li>

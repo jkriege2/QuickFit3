@@ -34,6 +34,7 @@ class QFWIDLIB_EXPORT QFFitAlgorithmComboBox : public QFEnhancedComboBox
         QString currentFitAlgorithmID() const;
         QFFitAlgorithm* createCurrentInstance() const;
         QAction* getHelpAction() const { return actHelp; }
+        void showOnlyFMin(bool en=true);
     signals:
 
     public slots:
@@ -42,6 +43,18 @@ class QFWIDLIB_EXPORT QFFitAlgorithmComboBox : public QFEnhancedComboBox
         void showHelpCurrent();
     protected:
         QAction* actHelp;
+        bool onlyFMin;
+
+};
+
+
+class QFWIDLIB_EXPORT QFFitAlgorithmFMinComboBox : public QFFitAlgorithmComboBox
+{
+        Q_OBJECT
+    public:
+        explicit QFFitAlgorithmFMinComboBox(QWidget *parent = 0);
+    protected:
+        void showOnlyFMin(bool en=true);
 
 };
 

@@ -739,6 +739,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
         }
         if (w) qfFree(w);
         item.name=rec->getName()+": "+data->getCorrelationRunName(index);
+        item.averageGroupIndex=0;
         if (option==2 || option==3) {
             item.name+=tr(", normalized");
 
@@ -756,6 +757,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
         if (option==1 || option==3) {
             item.xerrors.clear();
             item.yerrors.clear();
+            item.averageGroupIndex=1;
             item.y=acf;
             item.name=rec->getName()+": "+data->getCorrelationRunName(index)+tr(": fit");
             if (option==3) {

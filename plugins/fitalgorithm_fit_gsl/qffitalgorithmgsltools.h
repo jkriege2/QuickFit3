@@ -47,6 +47,19 @@ struct QFFItAlgorithmGSL_evalData {
 
 };
 
+struct QFFItAlgorithmGSLFMin_evalData {
+    QFFitAlgorithm::FunctorForFMin* model;
+    const double* paramsMin;
+    const double* paramsMax;
+    int pcount;
+
+    /** \brief pre-allocated memory of the size of the parameter vector */
+    gsl_vector * params;
+    /** \brief pre-allocated memory of the size of the parameter vector */
+    gsl_vector * params_ast;
+
+};
+
 double QFFitAlgorithmGSL_f (const gsl_vector *v, void *params);
 struct QFFitAlgorithmGSL_fForDerivData {
     gsl_vector *v;
@@ -57,6 +70,13 @@ struct QFFitAlgorithmGSL_fForDerivData {
 double QFFitAlgorithmGSL_fForDeriv (double x, void *params);
 void QFFitAlgorithmGSL_df (const gsl_vector *v, void *params, gsl_vector * g);
 void QFFitAlgorithmGSL_fdf (const gsl_vector *x, void *params, double *f, gsl_vector *df);
+
+
+double QFFitAlgorithmGSLFmin_f (const gsl_vector *v, void *params);
+double QFFitAlgorithmGSLFmin_fForDeriv (double x, void *params);
+void QFFitAlgorithmGSLFmin_df (const gsl_vector *v, void *params, gsl_vector * g);
+void QFFitAlgorithmGSLFmin_fdf (const gsl_vector *x, void *params, double *f, gsl_vector *df);
+
 
 gsl_vector* QFFitAlgorithmGSL_transformParams(const double* inputPrams, int N, const double* pmin, const double* pmax);
 void QFFitAlgorithmGSL_backTransformParams(double* outputPrams, int N, const gsl_vector* input, const double* pmin, const double* pmax);

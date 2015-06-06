@@ -415,7 +415,7 @@ QList<QFFitAlgorithm::FitResult> QFGlobalFitTool::fitLocal(const QList<double *>
             double* params=paramsOut[i];
             double* errors=paramErrorsOut[i];
             for (int c=0; c<m_repeatFit; c++) {
-                QFFitAlgorithm::FitResult r=m_algorithm->optimize(params, errors, localFunctors[i], params, localFunctors[i]->getModelParamsFix(), functor->getParamsMin(i), functor->getParamsMax(i));
+                QFFitAlgorithm::FitResult r=m_algorithm->lsqMinimize(params, errors, localFunctors[i], params, localFunctors[i]->getModelParamsFix(), functor->getParamsMin(i), functor->getParamsMax(i));
                 if (c==0) res.append(r);
                 else res[i]=r;
             }
@@ -486,11 +486,11 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
 
     if (minmax) {
         for (int i=0; i<m_repeatFit; i++) {
-            res=m_algorithm->optimize(params, errors, functor, params, fix, pmin, pmax);
+            res=m_algorithm->lsqMinimize(params, errors, functor, params, fix, pmin, pmax);
         }
     } else {
         for (int i=0; i<m_repeatFit; i++) {
-            res=m_algorithm->optimize(params, errors, functor, params, fix, NULL, NULL);
+            res=m_algorithm->lsqMinimize(params, errors, functor, params, fix, NULL, NULL);
         }
     }
 #ifdef DEBUG_GLOBALFIT

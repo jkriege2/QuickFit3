@@ -13,7 +13,13 @@ struct QFFItAlgorithmNLOpt_evalData {
 
 };
 
+struct QFFItAlgorithmFMinNLOpt_evalData {
+    QFFitAlgorithm::FunctorForFMin* model;
+
+};
+
 double QFFitAlgorithmNLOpt_f(unsigned int n, const double* x, double* grad, void *params);
+double QFFitAlgorithmNLOpt_fmin(unsigned int n, const double* x, double* grad, void *params);
 
 
 #endif // QFFITALGORITHMNLOPTTOOLS_H

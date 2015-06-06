@@ -26,6 +26,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 QFFitAlgorithmComboBox::QFFitAlgorithmComboBox(QWidget *parent) :
     QFEnhancedComboBox(parent)
 {
+    onlyFMin=false;
     updateFitAlgorithms();
     actHelp=new QAction(QIcon(":/lib/help/help.png"), tr("Fit algorithm help ..."), this);
     connect(actHelp, SIGNAL(triggered()), this, SLOT(showHelpCurrent()));
@@ -42,6 +43,12 @@ QFFitAlgorithm *QFFitAlgorithmComboBox::createCurrentInstance() const
     QFFitAlgorithmManager* manager=QFFitAlgorithmManager::getInstance();
     return manager->createAlgorithm(currentFitAlgorithmID());
 
+}
+
+void QFFitAlgorithmComboBox::showOnlyFMin(bool en)
+{
+    onlyFMin=en;
+    updateFitAlgorithms();
 }
 
 void QFFitAlgorithmComboBox::setCurrentAlgorithm(const QString &id)
@@ -72,15 +79,33 @@ void QFFitAlgorithmComboBox::updateFitAlgorithms()
     QStringList m_ids=manager->getIDList();
     for (int i=0; i<m_ids.size(); i++) {
         QFFitAlgorithm* a=manager->createAlgorithm(m_ids[i]);
-        if (a->isThreadSafe()) addItem(QIcon(":/lib/fitalg_icon_mt.png"), a->name() , m_ids[i]);
-        else addItem(QIcon(":/lib/fitalg_icon.png"), a->name() , m_ids[i]);
-        if (a->isDeprecated()) {
-            setItemData(i, QColor("grey"), Qt::TextColorRole);
-            setItemText(i, tr("[DEPRECATED]: %1").arg(itemText(i)));
+        if (a) {
+            if (!onlyFMin || (onlyFMin && a->get_implementsMinimize())) {
+                if (a->isThreadSafe()) addItem(QIcon(":/lib/fitalg_icon_mt.png"), a->name() , m_ids[i]);
+                else addItem(QIcon(":/lib/fitalg_icon.png"), a->name() , m_ids[i]);
+                if (a->isDeprecated()) {
+                    setItemData(i, QColor("grey"), Qt::TextColorRole);
+                    setItemText(i, tr("[DEPRECATED]: %1").arg(itemText(i)));
+                }
+            }
+            delete a;
         }
-        delete a;
     }
     model()->sort(0);
     if (widVisible) setUpdatesEnabled(upd);
 
+}
+
+
+QFFitAlgorithmFMinComboBox::QFFitAlgorithmFMinComboBox(QWidget *parent):
+    QFFitAlgorithmComboBox(parent)
+{
+    onlyFMin=true;
+    updateFitAlgorithms();
+}
+
+void QFFitAlgorithmFMinComboBox::showOnlyFMin(bool en)
+{
+    onlyFMin=true;
+    updateFitAlgorithms();
 }

@@ -47,23 +47,35 @@ class QFGetPlotdataInterface
     public:
         struct GetPlotDataItem {
             bool majorPlot;
+            /** \brief x-data for the plot */
             QVector<double> x;
+            /** \brief optional x-data-error for the plot */
             QVector<double> xerrors;
+            /** \brief y-data for the plot */
             QVector<double> y;
+            /** \brief y-data-error for the plot */
             QVector<double> yerrors;
+            /** \brief label of the plot */
             QString name;
+            /** \brief the overview plot tool may supply the option to average over all curves that have the same positive value in averageGroupIndex. A value of \c averageGroupIndex=-1 [default] disables this bhaviour. */
+            int averageGroupIndex;
 
 
             GetPlotDataItem() {
                 majorPlot=true;
                 name=QString();
+                averageGroupIndex=-1;
             }
         };
 
         struct GetPlotPlotOptions {
+            /** \brief should the x-axis be log.scaled? */
             bool logX;
+            /** \brief should the y-axis be log.scaled? */
             bool logY;
+            /** \brief x-axis label */
             QString xLabel;
+            /** \brief y-axis label */
             QString yLabel;
             GetPlotPlotOptions(const QString& xLabel=QString("X"), const QString& yLabel=QString("Y"), bool logX=false, bool logY=false) {
                 this->logX=logX;

@@ -149,12 +149,14 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
 
             if (option==0) {
                 QFGetPlotdataInterface::GetPlotDataItem item;
+                item.averageGroupIndex=0;
                 item.x=distTau;
                 item.y=dist;
                 item.name=QString("\\verb{%1: MSD}").arg(record->getName());
                 plotdata.append(item);
             } else if (option==1) {
                 QFGetPlotdataInterface::GetPlotDataItem item;
+                item.averageGroupIndex=1;
                 item.x=acftau;
                 item.y=acf;
                 if (weightsOK && weights) item.yerrors=arrayToVector(weights, N);
@@ -162,6 +164,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                 plotdata.append(item);
             } else if (option==2) {
                 QFGetPlotdataInterface::GetPlotDataItem item;
+                item.averageGroupIndex=2;
                 item.x=acftau;
                 item.y=acf;
                 if (weightsOK && weights) item.yerrors=arrayToVector(weights, N);
@@ -184,6 +187,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                         mored[i]=dist[i]/(6.0*distTau[i]);
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
+                    item.averageGroupIndex=10;
                     item.x=distTau;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(6\\tau)").arg(record->getName());
@@ -195,6 +199,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
                     item.x=distTau;
+                    item.averageGroupIndex=11;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(4\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -208,6 +213,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
                     item.x=distTau;
+                    item.averageGroupIndex=12;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_0\\cdot\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -220,6 +226,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
                     item.x=distTau;
+                    item.averageGroupIndex=13;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_1\\cdot\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -233,6 +240,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
                     item.x=distTau;
+                    item.averageGroupIndex=14;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_2\\cdot\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -245,6 +253,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
                     item.x=distTau;
+                    item.averageGroupIndex=15;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_3\\cdot\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -257,6 +266,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
                     item.x=distTau;
+                    item.averageGroupIndex=16;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle-P\\cdot D_0\\cdot\\tau").arg(record->getName());
                     plotdata.append(item);
@@ -264,12 +274,14 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                     QFGetPlotdataInterface::GetPlotDataItem item;
                     item.x=fitTau;
                     item.y=fitD;
+                    item.averageGroupIndex=17;
                     item.name=QString("\\verb{%1: local D}").arg(record->getName());
                     plotdata.append(item);
                 } else if (option==11) {
                     QFGetPlotdataInterface::GetPlotDataItem item;
                     item.x=fitTau;
                     item.y=fitA;
+                    item.averageGroupIndex=18;
                     item.name=QString("\\verb{%1: local \\alpha}").arg(record->getName());
                     plotdata.append(item);
                 }

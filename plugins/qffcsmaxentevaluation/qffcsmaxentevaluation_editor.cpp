@@ -139,21 +139,33 @@ void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index
                 QFGetPlotdataInterface::GetPlotDataItem item;
                 item.x=mem_tau;
                 item.y=mem_dist;
+                item.averageGroupIndex=0;
                 item.name=QString("\\verb{%1: p(\\tau_D})").arg(record->getName());
                 plotdata.append(item);
             } else if (option==1) {
                 QFGetPlotdataInterface::GetPlotDataItem item;
                 item.x=mem_D;
                 item.y=mem_dist;
+                item.averageGroupIndex=1;
                 item.name=QString("\\verb{%1: p(D)}").arg(record->getName());
                 plotdata.append(item);
-            } else if (option==2) {
+            } else if (option==2 || option==3) {
                 QFGetPlotdataInterface::GetPlotDataItem item;
                 item.x=arrayToVector(tauvals, N);
                 item.y=arrayToVector(corrdata, N);
+                item.averageGroupIndex=2;
                 if (weightsOK && weights) item.yerrors=arrayToVector(weights, N);
                 item.name=QString("\\verb{%1: ACF}").arg(record->getName());
                 plotdata.append(item);
+                if (option==3) {
+                    item.x=arrayToVector(tauvals, N);
+                    item.y=arrayToVector(modelVals, N);
+                    item.averageGroupIndex=3;
+                    item.yerrors.clear();
+                    item.xerrors.clear();
+                    item.name=QString("\\verb{%1: Model-Fit}").arg(record->getName());
+                    plotdata.append(item);
+                }
             }
 
             qfFree(weights);

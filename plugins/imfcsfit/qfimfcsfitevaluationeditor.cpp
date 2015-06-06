@@ -179,6 +179,7 @@ void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QL
             QFGetPlotdataInterface::GetPlotDataItem item;
             item.x=acftau;
             item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
+            item.averageGroupIndex=0;
             bool ok=true;
             double* w=eval->allocWeights(&ok, rec, index, -1, -1, true);
             if (ok && w) {
@@ -203,6 +204,7 @@ void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QL
             if (option==1 || option==3) {
                 item.xerrors.clear();
                 item.yerrors.clear();
+                item.averageGroupIndex=1;
                 item.y=acf;
                 item.name=rec->getName()+": "+data->getCorrelationRunName(index)+tr(": fit");
                 if (option==3) {

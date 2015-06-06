@@ -62,7 +62,7 @@ class QFLIB_EXPORT QFFitAlgorithmReporter {
         virtual bool isCanceled() { return false; };
 };
 
-/*! \brief describes a virtual base class fitting algorithms that are applied to QFFitFunction objects.
+/*! \brief describes a virtual base class for (least-squares) fitting algorithms that are applied to QFFitFunction objects. It also supports an interface for more general minimization algorithms.
     \ingroup qf3lib_fitting
 
     When implementing a fitting algorithm you will have to implement this:
@@ -82,11 +82,31 @@ class QFLIB_EXPORT QFFitAlgorithmReporter {
 
 
     This class provides interfaces to data fitting and optimization:
-      - fit() is used to solve a data fitting problem with an objective function provided by a QFFitFunction and a set of measurements
+      - QFFitAlgorithm::fit() is used to solve a data fitting problem with an objective function provided by a QFFitFunction and a set of measurements
         \f$ (x_i,y_i)_{i=1..M} \f$ :
             \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{m=1}^M\left\|\frac{y_m-f_m(x_m, \vec{p})}{\sigma_m}\right\| \f]
+      - QFFitAlgorithm::fit2D() is used to solve a 2D data fitting problem with an objective function provided by a QFFitFunction2D and a set of measurements
+        \f$ (x_i,y_i,f_i)_{i=1..M} \f$ :
+            \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{m=1}^M\left\|\frac{f_m-f_m(x_m,y_m, \vec{p})}{\sigma_m}\right\| \f]
+      - QFFitAlgorithm::fit3D() is used to solve a 3D data fitting problem with an objective function provided by a QFFitFunction3D and a set of measurements
+        \f$ (x_i,y_i,z_i,f_i)_{i=1..M} \f$ :
+            \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{m=1}^M\left\|\frac{f_m-f_m(x_m,y_m,z_m, \vec{p})}{\sigma_m}\right\| \f]
+      - QFFitAlgorithm::lsqMinimize() is used to minimize the norm (usually L2, i.e. least-squares) of a vector-values objective function \f$ \vec{f}(\vec{p})\f$ :
+            \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\left\|\vec{f}(\vec{p})\right\|\underset{=}{L^2\text{-norm}}\min\limits_{\vec{p}}\sum\limits_{m=1}^M \left|f_m(\vec{p})\right|^2 \f]
+        The model function is implemented by a class of basetype QFFitAlgorithm::Functor.
     .
-    All interfaces are internally mapped to the protected function intFit().
+    All these interfaces are internally mapped to the protected function intFit().
+
+    In addition, this class allows to also represent general minimization algorithms. This can be useful if you use a general minimization
+    algorithm for least-squares fitting. Such an algorithm solves the problem:
+      \f[ \vec{p}^\ast=\min\limits_{\vec{p}}f(\vec{p}) \f]
+    If you algorithm may be used in this way, you can also implement the function intMinimize() and get_implementsMinimize(). The latter
+    function indicates whether an implementation of intMinimize() exists and if so should return \c true (the default implementation
+    returns \c false ). The 1-dimensional objective function \f$ f(\vec{p}) \f$ has to be implemented as a subclass of QFFitAlgorithm::FunctorForFMin.
+
+    This class provides the following high-level functions to perform minimization:
+      - fmin() acepts the objective function as a pointer to QFFitAlgorithm::FunctorForFMin
+    .
 
     If you want to execute the fit in a separate thread, you may use QFFitAlgoruthmThreadedFit. You may use
     setReporter() to set a QFFitAlgorithmReporter (e.g. dlgQFFitAlgorithmProgressDialog) implementation used
@@ -120,7 +140,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
          */
         class QFLIB_EXPORT FunctorBootstrapInterface {
             public:
-                virtual ~FunctorBootstrapInterface() {}
+                inline virtual ~FunctorBootstrapInterface() {}
                 /** \brief prepares a new selection of data for bootstrapping
                  *
                  * \note if you only want to reapply the current selection and not select new data, call reapplyBootstrapselection() instead.
@@ -136,6 +156,9 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
                 virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true)=0;
         };
+
+    public:
+
         /*! \brief functor base class that may be used to optimize arbitrary functions
 
             This functor allows to evaluate arbitrary vector-valued functions
@@ -151,7 +174,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
         public:
             explicit Functor(int Mevalout) { m_evalout=Mevalout; }
 
-            virtual  ~Functor() {};
+            inline virtual  ~Functor() {}
 
             /*! \brief function that evaluates the arbitrary function
 
@@ -174,10 +197,10 @@ class QFLIB_EXPORT QFFitAlgorithm {
             virtual int get_paramcount() const=0;
 
             /** \brief return \c true if the jacobian is implemented */
-            virtual bool get_implementsJacobian() const { return false; };
+            inline virtual bool get_implementsJacobian() const { return false; }
 
             /** \brief return dimension of function output vector \f$ M \f$ */
-            inline uint64_t get_evalout() const { return m_evalout; };
+            inline uint64_t get_evalout() const { return m_evalout; }
 
             /*! \brief  function that evaluates the first derivatives \f$ J_{m,i}=\frac{\partial y_m}{\partial p_i}\ \ \ \ \ \ \text{with}\ \ \ \ \ \ \vec{y}=\vec{f}(x, \vec{p}) \f$ of the functor function numerically, using the 5-point stencil method
 
@@ -195,9 +218,10 @@ class QFLIB_EXPORT QFFitAlgorithm {
             /** \brief size of function output \f$ M \f$ */
             uint64_t m_evalout;
 
-            Functor() { m_evalout=1; };
+            inline Functor() { m_evalout=1; }
         };
 
+    public:
 
         /*! \brief base class for QFFitAlgorthm::Functor classes that let the user fit a dataset \f$(x_m,y_m,\sigma_m)\f$ to a 1D-function
 
@@ -316,6 +340,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 QList<uint64_t> bootstrapIDs;
         };
 
+    public:
 
 
         /*! \brief base class for QFFitAlgorthm::Functor classes that let the user fit a dataset \f$(x_m,y_m,f_m,\sigma_m)\f$ to a 1D-function
@@ -453,6 +478,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 QList<uint64_t> bootstrapIDs;
         };
 
+    public:
 
         /*! \brief base class for QFFitAlgorthm::Functor classes that let the user fit a dataset \f$(x_m,y_m,z_m,f_m,\sigma_m)\f$ to a 1D-function
 
@@ -600,6 +626,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
         };
 
 
+    public:
 
 
         /*! \brief adaptor class that uses a FitFunctionFunctor to implement iteratively reweighted least squares
@@ -683,6 +710,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 const double* oldWeights;
         };
 
+    public:
 
         /*! \brief this is a special functor which is used for data fitting to objective functions declared by QFFitFunction
 
@@ -805,6 +833,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
 
 
+    public:
 
 
 
@@ -929,7 +958,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
 
 
-
+    public:
 
         /*! \brief this is a special functor which is used for data fitting to objective functions declared by QFFitFunction
 
@@ -1048,10 +1077,10 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 bool fitLogY;
         };
 
+    protected:
 
 
-
-        /*! \brief this is a special functor which is used for data fitting to objective functions declared by QFFitFunction
+        /*! \brief this is a special \b internal functor which is used for data fitting to objective functions declared by QFFitFunction
 
             The Functor declares a nD function \f$ \vec{f}(\vec{p}), \vec{p}\in\mathbb{R}^N \f$ .
 
@@ -1096,10 +1125,10 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 virtual void evaluateJacobian(double* evalout, const double* params);
 
                 /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
-                virtual bool get_implementsJacobian() const { return m_model->get_implementsJacobian(); }
+                inline virtual bool get_implementsJacobian() const { return m_model->get_implementsJacobian(); }
 
                 /** \brief return the number of parameters \f$ Q \f$ in \f$ \vec{q}=m(\vec{p}) \f$ */
-                virtual int get_paramcount() const { return m_paramCount; }
+                inline virtual int get_paramcount() const { return m_paramCount; }
             protected:
 
 
@@ -1117,9 +1146,12 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 double* m_modelParams;
         };
 
+    protected:
+
+        /*! \brief this \b internal functor extends FitQFOptimizeFunctionFunctor with bootstrapping functionality */
         class QFLIB_EXPORT FitQFOptimizeFunctionBootstrapFunctor: public FitQFOptimizeFunctionFunctor, public FunctorBootstrapInterface {
             public:
-                virtual ~FitQFOptimizeFunctionBootstrapFunctor(){};
+                inline virtual ~FitQFOptimizeFunctionBootstrapFunctor() {}
                 explicit FitQFOptimizeFunctionBootstrapFunctor(Functor* model, const double* currentParams, const bool* fixParams) ;
 
                 /** \brief prepares a new selection of data for bootstrapping
@@ -1139,6 +1171,198 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
                 FunctorBootstrapInterface* getModelAsBootstrap() const;
         };
+
+
+    public:
+
+
+        /*! \brief functor base class for fmin() and variants thereof that allow to model a 1-dimensional objective functio that shall be minimized
+
+            This functor allows to evaluate arbitrary 1-dimensional function
+              \f[ f(\vec{p})\in\mathbb{R}, \vec{p}\in\mathbb{R}^N. \f]
+            For some data fitting/optimization algorithms we also have to know the jacobian of the model function, i.e.
+              \f[ J_{i}=\frac{\partial f}{\partial p_i} \f]
+            This function is implemented in evaluateJacobian(). As it is impossible to calculate the jacobian analytically for
+            some functions, or because the implementor didn't do it, there is the function get_implementsJacobian() which tells
+            whether the jacobian was implemented or not.
+
+         */
+        class QFLIB_EXPORT FunctorForFMin {
+        public:
+            inline explicit FunctorForFMin() {  }
+
+            inline virtual  ~FunctorForFMin() {}
+
+            /*! \brief function that evaluates the arbitrary function
+
+                \param[out] evalout with size get_evalout()
+                \param params parameter vector with size get_paramcount()
+             */
+            virtual double evaluate(const double* params)=0;
+
+            /*! \brief function that evaluates the first derivatives \f$ J_{i}=\frac{\partial f}{\partial p_i} \f$ of the functor function
+
+                \param[out] evalout with size get_paramcount() in the order
+                            \f$ \left[ \frac{\partial f}{\partial p_1}, \frac{\partial f}{\partial p_2}, ..., \frac{\partial f}{\partial p_N}  \right]\f$
+                \param params parameter vector with size get_paramcount()
+
+                \note This is only implemented if get_implementsJacobian() returns true
+             */
+            virtual void evaluateJacobian(double* evalout, const double* params);
+
+            /** \brief return the number of parameters \f$ N \f$ */
+            virtual int get_paramcount() const=0;
+
+            /** \brief return \c true if the jacobian is implemented */
+            inline virtual bool get_implementsJacobian() const { return false; }
+
+
+            /*! \brief  function that evaluates the first derivatives \f$ J_{i}=\frac{\partial f}{\partial p_i} \f$ of the functor function numerically, using the 5-point stencil method
+
+                \param[out] evalout with size get_paramcount() in the order
+                            \f$ \left[ \frac{\partial f}{\partial p_1}, \frac{\partial f}{\partial p_2}, ..., \frac{\partial f}{\partial p_N} \right] \f$
+                \param params parameter vector with size get_paramcount()
+
+             */
+            virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON);
+
+        };
+
+        /** \brief a general function that may be used to represent an objective function for fmin(). The parameters are ( \a params, \a userData ). */
+        typedef double (*FMinFunctionP)(const double*, void*);
+        /** \brief a general function that may be used to represent an objective function for fmin(). The parameters are ( \a dfdp_out, \a params, \a userData ).*/
+        typedef void (*FMinFunctionDerivP)(double*, const double*, void*);
+
+        /** \brief a general function that may be used to represent an objective function for fmin(). The parameters are ( \a params ). */
+        typedef double (*FMinFunctionNoUserDataP)(const double*);
+        /** \brief a general function that may be used to represent an objective function for fmin(). The parameters are ( \a dfdp_out, \a params ).*/
+        typedef void (*FMinFunctionNoUserDataDerivP)(double*, const double*);
+
+        /*! \brief an implementation of FunctorForFMin that calls C-functions as objective functions
+
+            \note you can supply user data (as a void*) which is handed over to the function if it is supplied and if
+         */
+        class QFLIB_EXPORT FunctorForFMinFromCFunc: public FunctorForFMin {
+            public:
+                explicit FunctorForFMinFromCFunc(int Nparams, FMinFunctionP* F);
+                explicit FunctorForFMinFromCFunc(int Nparams, FMinFunctionP* F, FMinFunctionDerivP* dFdp);
+                explicit FunctorForFMinFromCFunc(int Nparams, FMinFunctionNoUserDataP* F);
+                explicit FunctorForFMinFromCFunc(int Nparams, FMinFunctionNoUserDataP* F, FMinFunctionNoUserDataDerivP* dFdp);
+
+
+                inline virtual  ~FunctorForFMinFromCFunc() {}
+
+                /*! \brief function that evaluates the arbitrary function
+
+                    \param[out] evalout with size get_evalout()
+                    \param params parameter vector with size get_paramcount()
+                 */
+                virtual double evaluate(const double* params);
+
+                /*! \brief function that evaluates the first derivatives \f$ J_{i}=\frac{\partial f}{\partial p_i} \f$ of the functor function
+
+                    \param[out] evalout with size get_paramcount() in the order
+                                \f$ \left[ \frac{\partial f}{\partial p_1}, \frac{\partial f}{\partial p_2}, ..., \frac{\partial f}{\partial p_N}  \right]\f$
+                    \param params parameter vector with size get_paramcount()
+
+                    \note This is only implemented if get_implementsJacobian() returns true
+                 */
+                virtual void evaluateJacobian(double* evalout, const double* params);
+
+                /** \brief return the number of parameters \f$ N \f$ */
+                virtual int get_paramcount() const;
+
+                /** \brief return \c true if the jacobian is implemented */
+                virtual bool get_implementsJacobian() const;
+
+                void setUserData(void* userData);
+                void* getUserData() const;
+
+            protected:
+                FMinFunctionP* F;
+                FMinFunctionDerivP* dFdp;
+                FMinFunctionNoUserDataP* FnoUser;
+                FMinFunctionNoUserDataDerivP* dFdpNoUser;
+                int Nparams;
+                void* m_userData;
+        };
+    protected:
+
+        /*! \brief this is a special \b internal functor which is used for objective function minimization in fmin() when parameters are fixed.
+
+            It adapts another FunctorForFMin for use with fixed parameters, i.e. it represents an interface with a reduced parameter set to the minimization
+            algorithm and an interface with the full parameters to the functor.
+
+            The Functor declares a 1D function \f$ f(\vec{p})\in\mathbb{R}, \vec{p}\in\mathbb{R}^N \f$ .
+
+            As Functor may contain parameters \f$ p_n, n=1..N \f$ that are no fitting parameters (e.g. because they are fixed) we have to do parameter reordering.
+            So the fitting algorithm is presented with a modified parameter vector \f$ \vec{q}\in\mathbb{R}^Q \f$ with \f$ Q<N \f$ . The mapping is done using a
+             function \f$ m(\cdot) \f$ with \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ and
+            \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ which is defined below, so this Functor finally calculates:
+                \f[ g_m(\vec{q})=\frac{y_m-f(x_m; m(\vec{q}))}{\sigma_m} \f]
+            Afterwards you may call evaluate() to calculate \f$ \vec{g}(\vec{q}) \f$ .
+        */
+        class QFLIB_EXPORT FunctorForFMinFixAdaptor: public FunctorForFMin {
+            public:
+                /*! \brief constructor, initializes the functor
+                    \param model Functor object used to evaluate \f$ f(x; \vec{p}) \f$
+                    \param params parameter count for model
+                    \param currentParams the initial parameters. You will have to give the values of ALL non-fit parameters in this vector!
+                    \param fixParams \c true if a parameter is fixed by the user
+                */
+                explicit FunctorForFMinFixAdaptor(FunctorForFMin* model, const double* currentParams, const bool* fixParams) ;
+
+                virtual ~FunctorForFMinFixAdaptor();
+
+                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
+                           The result is a NEW array created by calling \c calloc()
+                */
+                double* createMappedArrayForFunctor(const double* modelData);
+
+                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
+                           This function only copies those entries that are present in \a functorData.
+                */
+                void mapArrayFromModelToFunctor(double* functorData, const double* modelData);
+
+                /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
+                           and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
+                */
+                void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
+
+                /** \brief evaluate the function \f$ g(\vec{q}) \f$ */
+                virtual double evaluate(const double* params);
+
+                /** \brief evaluate the functions jacobian \f$ J_{n}(\vec{q})=\frac{\partial g(\vec{q})}{\partial q_n} \f$ */
+                virtual void evaluateJacobian(double* evalout, const double* params);
+
+                /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
+                inline virtual bool get_implementsJacobian() const { return m_model->get_implementsJacobian(); }
+
+                /** \brief return the number of parameters \f$ Q \f$ in \f$ \vec{q}=m(\vec{p}) \f$ */
+                inline virtual int get_paramcount() const { return m_paramCount; }
+            protected:
+
+
+                /** \brief  QFFitFunction object used to evaluate \f$ f(x; \vec{p}) \f$ */
+                FunctorForFMin* m_model;
+                /** \brief number of parameters in m_model */
+                int m_N;
+                /** \brief number of real (non-fixed) parameters, \c m_paramCount<=m_N */
+                int m_paramCount;
+                /** \brief maps from function parameter index to model parameter index (size m_N) */
+                int* functorFromModel;
+                /** \brief maps from functor parameter index to model parameter index (size m_paramCount) */
+                int* modelFromFunctor;
+                /** \brief copy of the current model parameter vector (size m_N) */
+                double* m_modelParams;
+                /** \brief copy of the currently fixed model parameters (size m_N) */
+                bool* m_fixParams;
+        };
+
+
+
+
+    public:
 
 
         /** \brief this struct is used to return the fit result */
@@ -1176,7 +1400,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
             QString  getAsString(QString resultName);
         };
 
-
+    public:
 
         /** \brief class construtor */
         QFFitAlgorithm();
@@ -1263,6 +1487,33 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
 
         /*! \brief this wrapper routine allows to use the fitting algorithm for 3D data fitting with a given model function \f$ f(x,y,z; \vec{p}) \f$ encoded in \a model
+                   and a set of measurements \f$ (x_i, y_i, f_i \sigma_i) \f$ where \f$ \sigma_i \f$ are the weights for the measurements. Then this routine solves the problem:
+                   \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{i=1}^M\left\|\frac{f_i-f(x_i,y_i; \vec{p})}{\sigma_i}\right\| \f$
+
+            \param[out] paramsOut The optimal parameter vector is written into this array
+            \param[out] paramErrorsOut The optimal parameter error vector is written into this array
+            \param dataX \f$ x_i\f$ -value of the data
+            \param dataY \f$ y_i\f$ -values of the data
+            \param dataF \f$ f_i\f$ -values of the data
+            \param dataWeight weights \f$ w_i\f$
+            \param N number of datapoints (i.e. size of the arrays dataX, dataY and dataWeights
+            \param model the model function to use
+            \param initialParams initial values for the parameters
+            \param fixParams which parameters to fix (if \c NULL, no parameters are fixed)
+            \param paramsMin lower parameter bound
+            \param paramsMax upper parameter bound
+            \param fitLogY if this is \c true, this function solves the logarithmized problem \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{i=1}^M\left\|\frac{\log(y_i)-\log(f(x_i; \vec{p}))}{\log(\sigma_i)}\right\| \f$
+            \return a FitResult object describing the fit result
+
+            \note If the bootstrapping mode is activated (see setErrorEstimateModeFit() ) then this function will first do the actual fit with the full input data vector
+                  (of which the parameters are returned). Then it will perform a given number of bootstrapping repeats, where the fit is repeated with the result of the
+                  first fit as initial parameters (distorted by a small fraction), but only for a subset of the input data. Then, from the results of these fits, a standard
+                  deviation for each parameter is calculated and returned as error estimate. <b>Note, that this routine will require significantly more time, than a simple fit!</b>
+        */
+        FitResult fit2D(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataF, const double* dataWeight, uint64_t N, QFFitFunction2D *model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL, bool fitLogY=false);
+
+
+        /*! \brief this wrapper routine allows to use the fitting algorithm for 3D data fitting with a given model function \f$ f(x,y,z; \vec{p}) \f$ encoded in \a model
                    and a set of measurements \f$ (x_i, y_i, z_i, f_i \sigma_i) \f$ where \f$ \sigma_i \f$ are the weights for the measurements. Then this routine solves the problem:
                    \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{i=1}^M\left\|\frac{f_i-f(x_i,y_i,z_i; \vec{p})}{\sigma_i}\right\| \f$
 
@@ -1270,8 +1521,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
             \param[out] paramErrorsOut The optimal parameter error vector is written into this array
             \param dataX \f$ x_i\f$ -value of the data
             \param dataY \f$ y_i\f$ -values of the data
-            \param dataZ \f$ y_i\f$ -values of the data
-            \param dataF \f$ y_i\f$ -values of the data
+            \param dataZ \f$ z_i\f$ -values of the data
+            \param dataF \f$ f_i\f$ -values of the data
             \param dataWeight weights \f$ w_i\f$
             \param N number of datapoints (i.e. size of the arrays dataX, dataY and dataWeights
             \param model the model function to use
@@ -1290,13 +1541,12 @@ class QFLIB_EXPORT QFFitAlgorithm {
         FitResult fit3D(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataZ, const double* dataF, const double* dataWeight, uint64_t N, QFFitFunction3D *model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL, bool fitLogY=false);
 
 
-        /*! \brief this wrapper routine allows to use the fitting algorithm for a general optimization problem with a given model function \f$ f(\vec{p}) \f$ encoded in \a model.
-                   This routine solves the problem:
+        /*! \brief this wrapper routine allows to use the fitting algorithm for a general least-squares minimization problem which is defined by a vector-valued model function \f$ \vec{f}(\vec{p}) \f$ encoded in \a model.
+                   The norm (usually the L2-norm, i.e. least-squares fit) if \f$ \vec{f}(\vec{p})\f$ is then minimized by this function. This routine solves the problem:
                    \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\|\vec{f}(\vec{p})\| \f$
 
             \param[out] paramsOut The optimal parameter vector is written into this array
             \param[out] paramErrorsOut The optimal parameter error vector is written into this array
-            \param N number of datapoints (i.e. size of the arrays dataX, dataY and dataWeights
             \param model the model function to use
             \param initialParams initial values for the parameters
             \param fixParams which parameters to fix (if \c NULL, no parameters are fixed)
@@ -1304,8 +1554,60 @@ class QFLIB_EXPORT QFFitAlgorithm {
             \param paramsMax upper parameter bound
             \return a FitResult object describing the fit result
         */
-        FitResult optimize(double* paramsOut, double* paramErrorsOut, Functor* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL);
+        FitResult lsqMinimize(double* paramsOut, double* paramErrorsOut, Functor* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL);
 
+
+        /*! \brief high-level interface to the intMinimize() if it is implemented (check get_implementsMinimize() ). It allows to find a parameterset \f$\vec{p}\f$
+                   that minimized the objective function \f$ f(\vec{p})\f$ provided by \a model, i.e. it solves the problem:
+                       \f$ \vec{p}^\ast=\min\limits_{\vec{p}}f(\vec{p}) \f$
+
+            \param[out] paramsOut The optimal parameter vector is written into this array
+            \param model the model function to use
+            \param initialParams initial values for the parameters
+            \param fixParams which parameters to fix (if \c NULL, no parameters are fixed)
+            \param paramsMin lower parameter bound
+            \param paramsMax upper parameter bound
+            \return a FitResult object describing the fit result
+        */
+        FitResult fmin(double* paramsOut, FunctorForFMin* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL);
+
+
+
+        /*! \brief high-level interface to the intMinimize() if it is implemented (check get_implementsMinimize() ). It allows to find a parameterset \f$\vec{p}\f$
+                   that minimized the objective function \f$ f(\vec{p})\f$ provided by \a model, i.e. it solves the problem:
+                       \f$ \vec{p}^\ast=\min\limits_{\vec{p}}f(\vec{p}) \f$
+
+            \param[out] paramsOut The optimal parameter vector is written into this array
+            \param model the model function to use
+            \param Nparams number of parameters of the model
+            \param initialParams initial values for the parameters
+            \param dFdp \b optional: the derivatives of the objective function
+            \param fixParams which parameters to fix (if \c NULL, no parameters are fixed)
+            \param paramsMin lower parameter bound
+            \param paramsMax upper parameter bound
+            \param userData a pointer (to user-suppplied data) simply handed over to model and dFdp
+            \return a FitResult object describing the fit result
+        */
+        FitResult fmin(double* paramsOut, FMinFunctionP* model, int Nparams, const double* initialParams, FMinFunctionDerivP* dFdp=NULL, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL, void* userData=NULL);
+
+
+
+        /*! \brief high-level interface to the intMinimize() if it is implemented (check get_implementsMinimize() ). It allows to find a parameterset \f$\vec{p}\f$
+                   that minimized the objective function \f$ f(\vec{p})\f$ provided by \a model, i.e. it solves the problem:
+                       \f$ \vec{p}^\ast=\min\limits_{\vec{p}}f(\vec{p}) \f$
+
+            \param[out] paramsOut The optimal parameter vector is written into this array
+            \param model the model function to use
+            \param Nparams number of parameters of the model
+            \param initialParams initial values for the parameters
+            \param dFdp \b optional: the derivatives of the objective function
+            \param fixParams which parameters to fix (if \c NULL, no parameters are fixed)
+            \param paramsMin lower parameter bound
+            \param paramsMax upper parameter bound
+            \param userData a pointer (to user-suppplied data) simply handed over to model and dFdp
+            \return a FitResult object describing the fit result
+        */
+        FitResult fmin(double* paramsOut, FMinFunctionNoUserDataP* model, int Nparams, const double* initialParams, FMinFunctionNoUserDataDerivP* dFdp=NULL, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL, void* userData=NULL);
 
         /*! \brief display a modal configuration dialog for you fit algorithm
             \return \c true if the user clicked "OK"
@@ -1315,7 +1617,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
         virtual bool displayConfig();
 
         /** \brief tell the class to use the specified reporter widget */
-        void setReporter(QFFitAlgorithmReporter* reporter) {
+        inline void setReporter(QFFitAlgorithmReporter* reporter) {
             m_reporter=reporter;
         }
 
@@ -1351,6 +1653,12 @@ class QFLIB_EXPORT QFFitAlgorithm {
         /** \brief return \c true, if the user has canceled the fit procedure */
         bool isCanceled() { if (m_reporter) return m_reporter->isCanceled(); else return false; }
 
+    public:
+        /** \brief indicates whether this object implements the method intMinimize() and you may therefore also call fmin()
+         *
+         * \note overwrite this function (and return \c true) if you implement intMinimize()
+         */
+        inline virtual bool get_implementsMinimize() { return false; }
     protected:
         /*! \brief this routine implements the fitting itself
 
@@ -1371,6 +1679,20 @@ class QFLIB_EXPORT QFFitAlgorithm {
             \f$ (x_m, y_m, \sigma_m) \f$ is a measurement vector with weights \f$ \sigma_m \f$ .
         */
         virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, Functor* model, const double* paramsMin, const double* paramsMax)=0;
+        /*! \brief this routine implements objective function minimization
+
+            \param[out] paramsOut The optimal parameter vector is written into this array
+            \param initialParams initial values for the parameters
+            \param model the model function to minimize
+            \param paramsMin lower parameter bound
+            \param paramsMax upper parameter bound
+            \return a FitResult object describing the fit result
+
+
+            This method uses the nested FunctorForFMin class to solve a problem of the form
+                \f[ \vec{p}^\ast=\min\limits_{\vec{p} f(\vec{p}) \f]
+        */
+        virtual FitResult intMinimize(double* paramsOut, const double* initialParams, FunctorForFMin* model, const double* paramsMin, const double* paramsMax);
     public:
         /** \brief return a name for the algorithm */
         virtual QString name() const=0;

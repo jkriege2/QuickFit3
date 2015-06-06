@@ -34,3 +34,24 @@ double QFFitAlgorithmNLOpt_f(unsigned int n, const double* x, double* grad, void
 
     return result;
 }
+
+
+double QFFitAlgorithmNLOpt_fmin(unsigned int n, const double *x, double *grad, void *params)
+{
+    QFFItAlgorithmFMinNLOpt_evalData *p = (QFFItAlgorithmFMinNLOpt_evalData *)params;
+
+
+    double result=0.0;
+
+    // evaluate fit function out =  f(p)
+    result=p->model->evaluate( x);
+
+
+
+    if (grad) {
+        QVector<double> derivout(p->model->get_paramcount());
+        if (p->model->get_implementsJacobian()) p->model->evaluateJacobian(derivout.data(), x);
+        else p->model->evaluateJacobianNum(derivout.data(), x);
+    }
+    return result;
+}
