@@ -1,0 +1,10 @@
+export CC=/usr/local/bin/gcc-4.7
+export CXX=/usr/local/bin/g++-4.7
+export CPP=/usr/local/bin/cpp-4.7
+export LD=/usr/local/bin/gcc-4.7
+alias c++=/usr/local/bin/c++-4.7
+alias g++=/usr/local/bin/g++-4.7
+alias gcc=/usr/local/bin/gcc-4.7
+alias cpp=/usr/local/bin/cpp-4.7
+alias ld=/usr/local/bin/gcc-4.7
+alias cc=/usr/local/bin/gcc-4.7
