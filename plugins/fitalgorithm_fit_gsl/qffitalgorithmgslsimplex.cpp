@@ -22,7 +22,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitalgorithmgslsimplex.h"
 #include "qffitalgorithmgslsimplexconfigdialog.h"
 #include "qffitalgorithmgsltools.h"
-
+#include "statistics_tools.h"
 #include <cmath>
 
 
@@ -125,6 +125,18 @@ QFFitAlgorithm::FitResult QFFitAlgorithmGSLSimplex::intFit(double* paramsOut, do
         if (par<paramsMin[i]) paramsOut[i]=paramsMin[i];
     }*/
     QFFitAlgorithmGSL_backTransformParams(paramsOut, paramCount, s->x, paramsMin, paramsMax);
+
+    QVector<double> J(model->get_evalout()*model->get_paramcount());
+    QVector<double> COV(model->get_paramcount()*model->get_paramcount());
+    model->evaluateJacobianNum(J.data(), paramsOut);
+    double chi2=s->fval;
+    if (QFFitAlgorithm::functorHasWeights(model)) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
+    else statisticsGetFitProblemVarCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount(), chi2);
+
+    for (int i=0; i<model->get_paramcount(); i++) {
+        paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV.data(), model->get_paramcount());
+    }
+
 
     result.addNumber("error_sum", s->fval);
     result.addNumber("iterations", iter);

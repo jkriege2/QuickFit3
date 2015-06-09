@@ -340,6 +340,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 QList<uint64_t> bootstrapIDs;
         };
 
+
+
     public:
 
 
@@ -625,7 +627,12 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 QList<uint64_t> bootstrapIDs;
         };
 
-
+        /** \brief returns \c true, if the given functor is a weighted least-squares functor, i.e. represents the problem \f$ (m(x_i,\vec{p})-f_i)/\sigma_i\f$
+         *
+         * This is checked by first casting the functor to FitFunctionFunctor, FitFunctionFunctor2D or FitFunctionFunctor3D and then
+         * checking whether the weights have been set properly.
+         */
+        static bool functorHasWeights(const Functor* f);
     public:
 
 

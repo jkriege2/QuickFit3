@@ -1,0 +1,217 @@
+%% Based on a TeXnicCenter-Template by Gyorgy SZEIDL.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+%
+\documentclass[a4paper,notitlepage]{article}
+%
+%----------------------------------------------------------
+% This is a sample document for the AMS LaTeX Article Class
+% Class options
+%        -- Point size:  8pt, 9pt, 10pt (default), 11pt, 12pt
+%        -- Paper size:  letterpaper(default), a4paper
+%        -- Orientation: portrait(default), landscape
+%        -- Print size:  oneside, twoside(default)
+%        -- Quality:     final(default), draft
+%        -- Title page:  notitlepage, titlepage(default)
+%        -- Start chapter on left:
+%                        openright(default), openany
+%        -- Columns:     onecolumn(default), twocolumn
+%        -- Omit extra math features:
+%                        nomath
+%        -- AMSfonts:    noamsfonts
+%        -- PSAMSFonts  (fewer AMSfonts sizes):
+%                        psamsfonts
+%        -- Equation numbering:
+%                        leqno(default), reqno (equation numbers are on the right side)
+%        -- Equation centering:
+%                        centertags(default), tbtags
+%        -- Displayed equations (centered is the default):
+%                        fleqn (equations start at the same distance from the right side)
+%        -- Electronic journal:
+%                        e-only
+%------------------------------------------------------------
+% For instance the command
+%          \documentclass[a4paper,12pt,reqno]{amsart}
+% ensures that the paper size is a4, fonts are typeset at the size 12p
+% and the equation numbers are on the right side
+%
+\usepackage{amsmath}%
+\usepackage{amsfonts}%
+\usepackage{amssymb}%
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{doi}
+\usepackage[numbers]{natbib}
+\usepackage{dsfont}
+
+\DeclareMathOperator*{\argmin}{arg\:min\ }
+\DeclareMathOperator*{\argmax}{arg\:max\ }
+\DeclareMathOperator{\Var}{Var}
+\newcommand{\mat}[1]{\mathrm{\mathbf{#1}}}
+
+\begin{document}
+\title{Bayesian Model Selection (for FCS)}
+\author{Jan Krieger}
+\date{\today}
+\maketitle
+\tableofcontents
+
+\section{Standard FCS data-fitting}
+\subsection{Least-Squares Fit}
+In standard FCS-Fitting the following least-squares problem is solved:
+\begin{equation}\label{eq:fcs_fit_problem}
+  \vec{\beta}_{M_g}^\ast=\argmin\limits_{\vec{\beta}}\underbrace{\sum\limits_{i=1}^n\left|\frac{g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i}{\hat{\sigma}_i}\right|^2}_{=:\chi^2(\vec{\beta})},
+\end{equation}
+where $g(\tau;\vec{\beta})$ is the fit model (later also denoted as $M_g$ to enumerate different models) and $\vec{\beta}\in\mathbb{R}^k$ are the $k$ parameters of the model function. The measurement consists of $n$ value-pairs $(\hat{\tau}_i,\hat{g}_i)$ and errors for each datapoint $\hat{\sigma}_i$ that are used to weight the fits.
+
+\subsection{Least-Squares Fit Algorithms (Basics)}
+The least-squares fit problem \eqref{eq:fcs_fit_problem} can be formulated in a more compact form by writing the objective function $\chi^2(\vec{p})$ in the following way:
+\begin{multline}\label{eq:fcs_fit_problem_forfit}
+  \vec{\beta}_{M_g}^\ast=\argmin\limits_{\vec{\beta}}\chi^2(\vec{\beta})=\\
+  =\argmin\limits_{\vec{\beta}}\left\|\vec{F}(\vec{\beta})\right\|_2^2=\argmin\limits_{\vec{\beta}}\sum\limits_{i=1}^n\bigl[f_i(\beta_1,\beta_2,...,\beta_k)\bigr]^2
+\end{multline}
+
+Most numerical fit algorithms, that solve this problem, start from an initial guess $\vec{\beta}_0$ and then find the best-fit parameters by proceeding along the steepest descent of $\chi^2$. This is done in an iterative way by solving this linearized problem in each step (Gauss-Newton iteration, probably with additional conditioning, such as in the LM-fit):
+\begin{equation}\label{eq:fcs_fit_problem_linearization}
+  \vec{\beta}_{i+1}=\vec{\beta}_{i}+\vec{\delta}_{i+1}=\vec{\beta}_{i}+\argmin\limits_{\vec{\delta}}\left\|\vec{F}(\vec{\beta}_i)+\mat{J}(\vec{\beta}_i)\vec{\delta}\right\|_2^2.
+\end{equation}
+Here $\mat{J}(\vec{\beta})$ is the jacobi matrix, i.e. the matrix of first derivatives:
+\begin{equation}\label{eq:fit_jacobi}
+    J_{\nu,\kappa}(\vec{\beta})=\left.\frac{\partial f_\nu}{\partial p_\kappa}\right|_{\vec{\beta}}=\frac{1}{\hat{\sigma}_\nu}\cdot\left.\frac{\partial g(\hat{\tau}_\nu;\vec{\beta})}{\partial p_\kappa}\right|_{\vec{\beta}}
+\end{equation}
+
+The problem \eqref{eq:fcs_fit_problem_linearization} is a linear system of equations, which can be solved as follows by normal equations, which follow from requiring that the gradient of $\chi^2$ equals zero:
+\begin{align}
+  \vec{F}(\vec{\beta}_i)+\mat{J}(\vec{\beta}_i)\vec{\delta}&\overset{!}{=}0&&\Leftrightarrow&-\mat{J}(\vec{\beta}_i)^\mathrm{T}\vec{F}(\vec{\beta}_i)&\overset{!}{=}\left[\mat{J}(\vec{\beta}_i)^\mathrm{T}\mat{J}(\vec{\beta}_i)\right]\vec{\delta}\notag\\
+  &&&\Leftrightarrow&\vec{\delta}&=-\left[\mat{J}(\vec{\beta}_i)^\mathrm{T}\mat{J}(\vec{\beta}_i)\right]^{-1}\mat{J}(\vec{\beta}_i)^\mathrm{T}\vec{F}(\vec{\beta}_i)\label{eq:fcs_fit_problem_linearization_solution}
+\end{align}
+
+\subsection{Fit parameter errors/variance-covariance matrix}
+The next question that arises is, how accurate do we know the parameters in the best-fit parameter vector $\vec{\beta}^\ast$? 
+To solve this problem, we look again at the least squares problem \eqref{eq:fcs_fit_problem} and write it in terms of data vectors $\hat{\vec{g}}=[\hat{g}_1,\hat{g}_2,...]^\mathrm{T}$ and a vector-valued fit function $\vec{g}(\vec{\beta})=[g(\hat{\tau}_1;\vec{\beta}), g(\hat{\tau}_2;\vec{\beta}),...]^\mathrm{T}$. If we omit the weights $\hat{\sigma}_i$, we can write for the ideal case of a perfect fit:
+\begin{equation}\label{eq:varcov_dervation1}
+   \hat{\vec{g}}=\vec{g}(\vec{\beta}) 
+\end{equation}
+Now we have small changes $\vec{\epsilon}$ of the data around the ideal values $\hat{\vec{g}}$. Since these fluctuations are small, it should be possible to account for them by a first-order Taylor approximation of the fit function $\vec{g}(\vec{\beta})$ and therefore a small (linear) variation of the best fit parameters $\vec{\beta}$:
+\begin{equation}\label{eq:varcov_dervation2}
+   \hat{\vec{g}}+\vec{\epsilon}=\vec{g}(\vec{\beta})+\mat{J}\delta\vec{\beta} 
+\end{equation}
+Using \eqref{eq:varcov_dervation1} this can be rewritten and solved for $\delta\vec{\beta}$ with the same method as in \eqref{eq:fcs_fit_problem_linearization_solution} (only now written in a short form):
+\begin{equation}\label{eq:varcov_dervation3}
+   \vec{\epsilon}=\mat{J}\delta\vec{\beta} \ \ \ \ \ \Rightarrow\ \ \ \ \ \delta\vec{\beta}=\left[\mat{J}^\mathrm{T}\mat{J}\right]^{-1}\mat{J}^\mathrm{T}\vec{\epsilon}\equiv \mat{C}\vec{\epsilon}
+\end{equation}
+
+  
+These findings can now be used to calculate an approximation for the variance of the ideal parameters:
+\begin{align}\label{eq:varcov_dervation4}
+    \Var(\vec{\beta})&=\Var(\delta\vec{\beta})=\Var\left(\mat{C}\vec{\epsilon}\right)=\mat{C}^\mathrm{T}\Var(\vec{\epsilon})\mat{C}=\notag\\
+    &=\frac{\chi^2}{n-k}\cdot\left(\left[\mat{J}^\mathrm{T}\mat{J}\right]^{-1}\mat{J}^\mathrm{T}\right)\left(\mat{J}\left[\mat{J}^\mathrm{T}\mat{J}\right]^{-1}\right)=\notag\\
+    &=\frac{\chi^2}{n-k}\cdot\left[\mat{J}^\mathrm{T}\mat{J}\right]^{-1}\underbrace{\mat{J}^\mathrm{T}\mat{J}\left[\mat{J}^\mathrm{T}\mat{J}\right]^{-1}}_{=\mathds{1}}=\frac{\chi^2}{n-k}\cdot\left[\mat{J}^\mathrm{T}\mat{J}\right]^{-1}
+\end{align}
+From the first to the second line we estimate the variance of the data variation as the variance of the residulas $\Var(\vec{\epsilon})=(\chi^2/(n-k))\cdot \mathds{1}$. 
+
+So finally we can define the covariance matrix of the non-linear least-squares problem as:
+\begin{equation}\label{eq:varcov_noerrors}
+   \mat{\Sigma}=\left[\mat{J}^\mathrm{T}\mat{J}\right]^{-1}
+\end{equation}
+and the standard error of a parameter as
+\begin{equation}\label{eq:stderr_noerrors}
+   \mbox{err}(\beta_i)=\sqrt{\frac{\chi^2}{n-k}\cdot\mat{\Sigma}_{ii}}.
+\end{equation}
+
+
+
+
+
+
+
+
+\subsection{Likelihood function}
+The likelihood function for the problem \eqref{eq:fcs_fit_problem} can be written exactly, if we assume independent errors $\hat{\sigma}_i$ for each measured point $(\hat{\tau}_i, \hat{g}_i)$ on the ACF and a Gaussian error distribution:
+\begin{equation}\label{eq:fcs_gauss_errors}
+  p(\hat{g}_i|M_g,\vec{\beta})=\frac{1}{\sqrt{2\pi}\cdot\hat{\sigma}_i}\cdot\exp\left[-\frac{1}{2}\cdot\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}\right].
+\end{equation}
+This $p(\hat{\tau}_i,\hat{g}_i|M_g,\vec{\beta})$ is the conditional probability to measure the value $\hat{g}_i$ of the ACF at the (given) lag-time $\hat{\tau}_i$, given the specific FCS model function $M_g$ and the parameter vector $\vec{\beta}$. Equation \eqref{eq:fcs_gauss_errors} can then be used to derive the likelihood function for this problem, which is basically the net probability to obtain the complete set $i=1..n$ of measurements, given again the model $M_g$ and the parameter vector $\vec{\beta}$:
+\begin{multline}\label{eq:fcs_likelihood_simple}
+  p(\hat{\vec{g}}|M_g,\vec{\beta})=\prod\limits_{i=1}^np(\hat{g}_i|M_g,\vec{\beta})=\\
+  =\frac{1}{(2\pi)^{n/2}}\cdot\frac{1}{\prod\limits_i\hat{\sigma}_i}\cdot\exp\left[-\sum\limits_{i=1}^n\frac{1}{2}\cdot\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}\right].
+\end{multline}
+If the errors are not independent, then they are no longer described by the $\hat{\sigma}_i$, but by an $n\times n$ covariance matrix $\hat{\mat{C}}$ that has to be determined from the measurement, or from theoretical considerations. The likelihood is then given by:
+\begin{multline}\label{eq:fcs_likelihood_covmatrix}
+  p(\hat{\vec{g}}|M_g,\vec{\beta})=\prod\limits_{i=1}^np(\hat{g}_i|M_g,\vec{\beta})=\\
+  =\frac{1}{(2\pi)^{n/2}}\cdot\frac{1}{\sqrt{\det(\hat{\mat{C}})}}\cdot\exp\left[-\frac{1}{2}\cdot\bigl[\hat{\vec{g}}-\vec{g}(\hat{\vec{\tau}}; \vec{\beta})\bigr]^\mathrm{T}\hat{\mat{C}}^{-1} \bigl[\hat{\vec{g}}-\vec{g}(\hat{\vec{\tau}}, \hat{\vec{g}}; \vec{\beta})\bigr]\right].
+\end{multline}
+Note: Here the single measurements $i$ have been combined into vector, e.g. $\hat{\vec{g}}=\left[\hat{g}_1, \hat{g}_2, ..., \hat{g}_n\right]^\mathrm{T}$. The model is then also vector-valued with $\vec{g}(\hat{\vec{\tau}}; \vec{\beta})=\left[g(\hat{\tau}_1;\vec{\beta}), g(\hat{\tau}_2;\vec{\beta}), ..., g(\hat{\tau}_n;\vec{\beta})\right]^\mathrm{T}$
+
+Then the least-squares problem \eqref{eq:fcs_fit_problem} can also be written as a maximum-likelihood estimate (MLE):
+\begin{equation}\label{eq:fcs_fit_problem_maxlikelihood}
+  \vec{\beta}_{M_g}^\ast=\argmax\limits_{\vec{\beta}}p(\hat{\vec{g}}|M_g,\vec{\beta}).
+\end{equation}
+Introducing the log-likelihood $\ln \bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]$, this can be rewritten in terms of sums, not products and allows to remove the exponential functions:
+\begin{multline*}
+  \vec{\beta}_{M_g}^\ast=\argmax\limits_{\vec{\beta}}p(\hat{\vec{g}}|M_g,\vec{\beta})=\argmax\limits_{\vec{\beta}}\ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]=\\
+    =\argmax\limits_{\vec{\beta}}\left\{-\frac{n}{2}\cdot\ln(2\pi)-\sum\limits_i\ln\left[\hat{\sigma}_i\right]-\frac{1}{2}\cdot\sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}\right\}=\\
+    =\argmin\limits_{\vec{\beta}}\left\{\frac{n}{2}\cdot\ln(2\pi)+\sum\limits_i\ln\left[\hat{\sigma}_i\right]+\frac{1}{2}\cdot\sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}\right\}=\\
+    =\argmin\limits_{\vec{\beta}} \sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}
+\end{multline*}
+In the last line, constant term and factors (that do not depend on $\vec{\beta}$) were omitted and the problem was reduced again to \eqref{eq:fcs_fit_problem}, so the simple least-squares solution equals the maximum likelihood estimator (MLE) of $\vec{\beta}$!
+
+\section{Model Selection}
+So solving the least-squares (or equivalently the MLE) problem gives an estimate of the parameter vector $\vec{\beta}$ for a given model $M_g$ that describes the given measured data best in a least-squares sense (note this is usually not outlier-robust!). This procedure can be repeated for any model $M_g$, and will result in a best-fit parameter vector $\vec{\beta}_{M_g}^\ast$ for each of these models, but the question remains: Which model should be taken, especially when the model selection is not obvious from external assumption or knowledge about the sample. In these cases a statistical model selection should be done. 
+
+\subsection{$\chi^2$ model selection criterion}
+The simplest model selection is based on the $\chi^2$ criterion, which is simply defined as the sum of squared deviations (sometimes also called residual sum of squares, RSS):
+\begin{equation}\label{eq:chi2_rss}
+  \chi^2(\vec{\beta},M_g)=\mbox{RSS}(\vec{\beta},M_g)=\sum\limits_{i=1}^n\left|\frac{g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i}{\hat{\sigma}_i}\right|^2
+\end{equation}
+With this criterion, the decision rule is:
+\begin{center}
+  \bfseries Use the model that has the lowest $\chi^2(\vec{\beta},M_g)$, \\i.e. is closest to the measured data.
+\end{center}
+Unfortunately this simple model is not ideal, as a more complex model $M_g$ (i.e. with more parameters in $\vec{\beta}$ often also has a lower $\chi^2$-value, since the added model complexity allows to describe more of the noise on the data.
+
+\subsection{Other model selection criteria}
+To overcome these problems, other model selection criteria \cite{BURNHA2002} have been proposed, e.g. the Akaike's information criterion (AIC, \cite{AKAIKE1974,BURNHA2002}):
+\begin{align}
+  \mbox{AIC}(\vec{\beta},M_g)&=-2\ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]+2k, \label{eq:aic}\\
+  \mbox{AICc}(\vec{\beta},M_g)&=\mbox{AIC}(\vec{\beta},M_g)+\frac{2k\cdot(k+1)}{n-k-1}\ \ \ \text{(corrected for small $n$)} \label{eq:aicc}
+\end{align}
+or the Bayesian information criterion (BIC, also known as Schwarz's criterion, \cite{SCHWAR1978,BURNHA2002}):
+\begin{equation}\label{eq:bic}
+  \mbox{BIC}(\vec{\beta},M_g)=-2\ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]+k\cdot\ln [n]
+\end{equation}
+For both criteria, the model selection rule is:
+\begin{center}
+  \bfseries Use the model that has the smallest (often most negative) value of AIC or BIC.
+\end{center}
+Since both criteria include the number of parameters $k$, they also obey (to some extent) the principle of parsimony (or Occam's razor), which states that one should use the model that best describes the data \underline{and} has the lowest number of parameters/is the simplest.
+
+For any practical purposes, both criteria can be estimated also from the $\chi^2$, but only up to a fixed additive constant, which only depends on the dataset $(\hat{\tau}_i, \hat{g}_i, \hat{\sigma}_i)$ and therefore does not play a role for the selection process. This can be seen, if we write the log-likelihood, assuming Gaussian errors as follows:
+\begin{multline}\label{eq:simple_loglikelihood}
+  \ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]=\underbrace{-\frac{n}{2}\cdot\ln(2\pi)-\sum\limits_i\ln\left[\hat{\sigma}_i\right]}_{=\text{const}}-\frac{1}{2}\cdot\sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}=\\
+  =\text{const}-\frac{\chi^2}{2}
+\end{multline}
+So we get:
+\begin{equation}\label{eq:aic_bic_chi2}
+  \mbox{AIC}(\vec{\beta},M_g)=\chi^2+2k\ \ \ \ \ \text{and}\ \ \ \ \ \mbox{BIC}(\vec{\beta},M_g)=\chi^2+k\cdot\ln [n]
+\end{equation}
+If all $\hat{\sigma}_i=\sigma$ are equal  (i.e. a non-weighted fit), then the estimations in \eqref{eq:simple_loglikelihood} change \cite{BURNHA2002}:
+\begin{multline}\label{eq:simple_loglikelihood_equalvar}
+  \ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]=\-\frac{n}{2}\cdot\ln(2\pi)-\sum\limits_i\ln\left[\sigma\right]-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i}{\sigma}\right)^2=\\
+  =-\frac{n}{2}\cdot\ln(2\pi)-\frac{n}{2}\cdot\ln\left[\sigma^2\right]-\frac{1}{2\sigma^2}\cdot\underbrace{\sum\limits_{i=1}^n\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}_{=\chi^2}=\\
+  =\text{const}-\frac{n}{2}\cdot\ln\left[\frac{\chi^2}{n}\right]
+\end{multline}
+Here, in the last step we used the estimator $\chi^2/n$ for the sample variance $\sigma^2$. Then the last term is also constant and the AIC and BIC become:
+\begin{equation}\label{eq:aic_bic_chi2_equalsigma}
+  \mbox{AIC}(\vec{\beta},M_g)=n\cdot\ln\left[\frac{\chi^2}{n}\right]+2k\ \ \ \ \ \text{and}\ \ \ \ \ \mbox{BIC}(\vec{\beta},M_g)=n\cdot\ln\left[\frac{\chi^2}{n}\right]+k\cdot\ln [n]
+\end{equation}
+
+
+\subsection{Bayesian model selection}
+
+
+
+\bibliographystyle{plainnat}
+\bibliography{bayesian_fit}
+\end{document}

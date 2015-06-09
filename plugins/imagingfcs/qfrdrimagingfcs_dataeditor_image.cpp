@@ -3832,7 +3832,7 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
 #endif
 
     // try to evaluate the fit function. If it succeeds, add plots and store the parameters & description to the display model!
-    if (plotFit && evaluateFitFunction(m, m->getCorrelationT(), corr, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, resultID, i)) {
+    if (plotFit && evaluateFitFunction(m, m->getCorrelationT(), corr, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, resultID, i, NULL, true)) {
         double* acf=m->getCorrelationRun(i);
         for (int nn=0; nn< m->getCorrelationN(); nn++) {
             resid[nn]=corr[nn]-acf[nn];
@@ -3980,7 +3980,7 @@ void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_
                 }
 
 
-                if (evaluateFitFunction(m, m->getCorrelationT(), corr1, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, resultID, i)) {
+                if (evaluateFitFunction(m, m->getCorrelationT(), corr1, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, resultID, i, NULL, true)) {
                     if (Nfit==0) {
                         for (int jj=0; jj<fix.size(); jj++) {
                             gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);
@@ -5569,7 +5569,7 @@ void QFRDRImagingFCSImageEditor::getCurrentResultNamesAndLabels(QStringList& nam
             }
 
 
-            evaluateFitFunction(current, m->getCorrelationT(), corr1, m->getCorrelationN(), names, labels, values, errors, fix, units, unitlabels, resultID, i);
+            evaluateFitFunction(current, m->getCorrelationT(), corr1, m->getCorrelationN(), names, labels, values, errors, fix, units, unitlabels, resultID, i, NULL, true);
             break;
         }
     }
@@ -5852,7 +5852,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                     //if (d.Nfit==0) qDebug()<<recsi<<curRec->getName()<<"\n:"<<resultID<<evalFound <<hasFitFunction<<names<<evalGroup<<evals;
 
                                     QStringList tmpn, tmpi;
-                                    if (evaluateFitFunction(curRec, NULL, NULL, m->getCorrelationN(), tmpn, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i, &tmpi)) {
+                                    if (evaluateFitFunction(curRec, NULL, NULL, m->getCorrelationN(), tmpn, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i, &tmpi, true)) {
                                         if (d.Nfit==0) {
                                             for (int jj=0; jj<fix.size(); jj++) {
                                                 d.gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);
@@ -6377,7 +6377,7 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                 grpnames.prepend(g);
             }
 
-            qDebug()<<"\n\n"<<grps<<"\n\n"<<grpnames<<"\n\n";
+            //qDebug()<<"\n\n"<<grps<<"\n\n"<<grpnames<<"\n\n";
 
             for (int i=0; i<recs.size(); i++) {
                 QFRDRImagingFCSData* mr=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
@@ -7392,7 +7392,7 @@ void QFRDRImagingFCSImageEditor::annotationChanged(bool replot)
     plteOverviewAnnot->set_visible(false);
     QFRDRAnnotationInterface *annotations=dynamic_cast<QFRDRAnnotationInterface *>(current);
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    qDebug()<<"annotationChanged: "<<chkShowRDRAnnotation->isChecked()<<cmbRDRAnnotation->currentIndex()<<annotations<<m;
+    //qDebug()<<"annotationChanged: "<<chkShowRDRAnnotation->isChecked()<<cmbRDRAnnotation->currentIndex()<<annotations<<m;
 
     if (m) {
         m->setQFProperty(QString("imfcs_imed_anotcol"), cmbRDRAnnotationColor->currentColor().name(), false, false);
@@ -7410,7 +7410,7 @@ void QFRDRImagingFCSImageEditor::annotationChanged(bool replot)
         QVector<bool> aset;
         adat=annotations->annotGetValues(i);
         aset=annotations->annotGetValuesSet(i);
-        qDebug()<<adat<<"\n\n"<<aset<<"\n\n";
+        //qDebug()<<adat<<"\n\n"<<aset<<"\n\n";
         int j=0;
         for (int y=0; y<m->getImageFromRunsHeight(); y++) {
             for (int x=0; x<m->getImageFromRunsWidth(); x++) {
@@ -7418,7 +7418,7 @@ void QFRDRImagingFCSImageEditor::annotationChanged(bool replot)
                     ax<<(double(x)-0.5);
                     ay<<(double(y)-0.5);
                     ac<<adat.value(j, 0);
-                    qDebug()<<j<<": "<<x<<y<<adat.value(j, 0);
+                    //qDebug()<<j<<": "<<x<<y<<adat.value(j, 0);
                 }
                 j++;
             }
@@ -7466,9 +7466,9 @@ void QFRDRImagingFCSImageEditor::fillAnnotationsCombo(int nextItem)
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
     if (m) {
-        qDebug()<<"\n\nget annotations: count="<<m->annotGetCount();
+        //qDebug()<<"\n\nget annotations: count="<<m->annotGetCount();
         for (int ai=0; ai<m->annotGetCount(); ai++) {
-            qDebug()<<ai<<": "<<m->annotGetLabel(ai);
+            //qDebug()<<ai<<": "<<m->annotGetLabel(ai);
             cmbRDRAnnotation->addItem(m->annotGetLabel(ai));
         }
     }
@@ -7655,10 +7655,10 @@ void QFRDRImagingFCSImageEditor::setBackground(QFRawDataRecord *current, bool *m
             m->setQFProperty(QString("BACKGROUND_STD%1").arg(seti+1), sqrt(ovrVar)/m->getFrameTime());
             m->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(seti+1), ovrAvg);
             m->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(seti+1), sqrt(ovrVar));
-            qDebug()<<m->getRole()<<": "<<i<<seti<<m->overviewImagesSwapped();
+            //qDebug()<<m->getRole()<<": "<<i<<seti<<m->overviewImagesSwapped();
             if ((m->overviewImagesSwapped() && ((m->getRole().toLower()=="acf0" && i==1)||(m->getRole().toLower()=="acf1" && i==0))) ||
              ((!m->overviewImagesSwapped()) && ((m->getRole().toLower()=="acf0" && i==0)||(m->getRole().toLower()=="acf1" && i==1)))) {
-                qDebug()<<"  !!! set main !!!";
+                //qDebug()<<"  !!! set main !!!";
                 m->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
                 m->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
                 m->setQFProperty(QString("BACKGROUND_DIRECT"), ovrAvg);

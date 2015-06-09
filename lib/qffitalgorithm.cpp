@@ -388,6 +388,24 @@ QVector<double> QFFitAlgorithm::FitQFFitFunctionFunctor::backtransfromParameters
 
 
 
+bool QFFitAlgorithm::functorHasWeights(const QFFitAlgorithm::Functor *f)
+{
+    {
+        const QFFitAlgorithm::FitFunctionFunctor* ff=dynamic_cast<const QFFitAlgorithm::FitFunctionFunctor*>(f);
+        if (ff ) return (ff->getDataWeight()!=NULL);
+    }
+    {
+        const QFFitAlgorithm::FitFunctionFunctor2D* ff=dynamic_cast<const QFFitAlgorithm::FitFunctionFunctor2D*>(f);
+        if (ff ) return (ff->getDataWeight()!=NULL);
+    }
+    {
+        const QFFitAlgorithm::FitFunctionFunctor3D* ff=dynamic_cast<const QFFitAlgorithm::FitFunctionFunctor3D*>(f);
+        if (ff ) return (ff->getDataWeight()!=NULL);
+    }
+
+    return false;
+}
+
 QFFitAlgorithm::QFFitAlgorithm()
 {
     m_bootstrapFraction=0.6;

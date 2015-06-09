@@ -36,6 +36,14 @@ class QFFitAlgorithmInst_A1: public QFFitAlgorithm {
         /** \copydoc QFFitAlgorithm::intFit() */
         virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, Functor* model, const double* paramsMin, const double* paramsMax);
 
+	// if your least-squares fit algorithm is derived from a general optimization algorithm, you can also implement the following two functions
+	// so the general optimization algorithm, which solves   p=min_p f(p)   can be used by QF3 plugins:
+    //protected:
+    //    /** \copydoc QFFitAlgorithm::intMinimize() */
+    //    virtual FitResult intMinimize(double* paramsOut, const double* initialParams, FunctorForFMin* model, const double* paramsMin, const double* paramsMax);
+    //public:
+    //    /** \copydoc QFFitAlgorithm::get_implementsMinimize() */
+    //    inline virtual bool get_implementsMinimize() { return true; }
 
     public:
         /** \brief class constructor */

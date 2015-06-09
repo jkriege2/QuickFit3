@@ -4,7 +4,7 @@
 #include <cmath>
 #include <nlopt.h>
 #include "qfmathtools.h"
-
+#include "statistics_tools.h"
 
 
 
@@ -86,6 +86,18 @@ QFFitAlgorithm::FitResult QFFitAlgorithmNLOptBASE::intFit(double* paramsOut, dou
 
     result.addNumber("error_sum", minf);
     result.addString("nlopt_fit_algorihtm", nlopt_algorithm_name(nlopt_alg));
+
+
+    QVector<double> J(model->get_evalout()*model->get_paramcount());
+    QVector<double> COV(model->get_paramcount()*model->get_paramcount());
+    model->evaluateJacobianNum(J.data(), paramsOut);
+    double chi2=minf;
+    if (QFFitAlgorithm::functorHasWeights(model)) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
+    else statisticsGetFitProblemVarCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount(), chi2);
+
+    for (int i=0; i<model->get_paramcount(); i++) {
+        paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV.data(), model->get_paramcount());
+    }
 
     result.fitOK=ok;
     result.message=QObject::tr("error %1 during optimization ").arg(int(algres));
