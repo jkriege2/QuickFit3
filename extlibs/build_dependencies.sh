@@ -37,7 +37,7 @@ read -p "Do you want to build keep the build directories (y/n)? " -n 1 KEEP_BUIL
 echo -e  "\n"
 read -p "How many parallel builds do you want to use in make (1/2/3/...)? " -n 1  MAKE_PARALLEL_BUILDS
 echo -e  "\n"
-read -p "Do you want to use more agressive optimizations for the built libraries (y/n)? " -n 1  MAKE_AGRESSIVEOPTIMIZATIONS
+read -p "Do you want to use more agressive optimizations for the built libraries (y/n/M)? M: no optimizations, use on MacOSX) " -n 1  MAKE_AGRESSIVEOPTIMIZATIONS
 echo -e  "\n"
 read -p "Do you want to optimize libraries for your local machine? (y/n)? " -n 1  MAKE_COMPILEFORLOCAL
 echo -e  "\n"
@@ -55,6 +55,13 @@ if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
 	MORECFLAGS=" $MORECFLAGS -ftree-vectorize -ftree-vectorizer-verbose=1 -funroll-loops "
 	MORELDFLAGS=" $MORELDFLAGS "
 fi
+
+
+if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "M" ] ; then
+        MORECFLAGS=    
+        MORELDFLAGS= 
+fi
+
 if [ $MAKE_USEOPENMP == "y" ] ; then
 	MORECFLAGS=" $MORECFLAGS -fopenmp"
 	MORELDFLAGS=" $MORELDFLAGS -fopenmp"
