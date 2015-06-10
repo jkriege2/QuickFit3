@@ -445,6 +445,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         void setProjectSortOrderActions(int order);
 
         void editGroupAndRole();
+
+        void prepareLibFitFunctions();
+
     private:
         bool clipboardContainsProjectXML() const;
 
@@ -531,6 +534,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QAction* helpAct;
         QAction* helpCitingAct;
         QAction* actExportRDR;
+        QAction* actPrepareLibFitFunctions;
         QList<QAction*> helpActList;
 
         QMenu* menuProjectSort;

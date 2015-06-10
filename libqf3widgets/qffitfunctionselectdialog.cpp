@@ -144,7 +144,7 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
     ui->lstModels->setModel(&filterModel);
     ui->lstModels->expandAll();
     //model->sort(0);
-    model->sort();
+    model->sortTree();
     if (widVisible) setUpdatesEnabled(upd);
     ui->lstModels->expandAll();
     ui->lstModels->setCurrentIndex(idx);//model->index(idx, 0));
@@ -207,7 +207,7 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
         ui->lstModels->setModel(&filterModel);
         ui->lstModels->expandAll();
         //model->sort(0);
-        model->sort();
+        model->sortTree();
         if (widVisible) setUpdatesEnabled(upd);
         ui->lstModels->expandAll();
         ui->lstModels->setCurrentIndex(idx);//model->index(idx, 0));

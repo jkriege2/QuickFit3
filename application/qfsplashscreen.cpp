@@ -21,6 +21,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qfsplashscreen.h"
 #include <QPainter>
+#include <QDebug>
 QFSplashScreen::QFSplashScreen(const QPixmap &pixmap, Qt::WindowFlags f) :
     QSplashScreen(pixmap, f)
 {
@@ -79,17 +80,34 @@ void QFSplashScreen::activateProgress(bool enabled)
 
 void QFSplashScreen::drawContents(QPainter *painter)
 {
+    int iii=0;
+    //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
     QSplashScreen::drawContents(painter);
+    //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
     if (m_progress) {
         painter->save();
+        //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
         painter->setPen(QColor(Qt::transparent));
+        //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
+        //qDebug()<<m_pvalue<<m_pmin<<m_pmax;
+        //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
         painter->fillRect(width()-m_progressMargin-m_progressWidth, m_progressMargin, m_progressWidth, m_progressHeight, m_progressBackground);
-        int w=qMin(m_progressWidth, (m_progressWidth*(m_pvalue-m_pmin))/(m_pmax-m_pmin));
+        //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
+        int w=0;
+        if (m_pmax-m_pmin!=0.0) w=qBound(0, (m_progressWidth*(m_pvalue-m_pmin))/(m_pmax-m_pmin), m_progressWidth);
+        //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
+        //qDebug()<<w;
         painter->fillRect(width()-m_progressMargin-m_progressWidth, m_progressMargin, w, m_progressHeight, m_progressColor);
+        //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
+
         painter->setPen(m_progressBorder);
+        //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
         painter->setBrush(QColor(Qt::transparent));
+        //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
         painter->drawRect(width()-m_progressMargin-m_progressWidth, m_progressMargin, m_progressWidth, m_progressHeight);
+        //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
         painter->restore();
+        //qDebug()<<"QFSplashScreen::drawContents "<<(iii++);
     }
 }
 

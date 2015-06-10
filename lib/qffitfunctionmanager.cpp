@@ -102,11 +102,13 @@ void QFFitFunctionManager::reloadLibraryFitFunctions()
     QDir bd(QApplication::applicationDirPath());
     freeLibraryFitFunctions();
 
-    for (int d=0; d<3; d++ ) {
+    for (int d=0; d<5; d++ ) {
         QString userffDir;
         if (d==0) userffDir=bd.absolutePath()+"/sdk/sdk_fitfunctions";
         if (d==1) userffDir=bd.absolutePath()+"/sdk_fitfunctions";
         if (d==2) userffDir=QFPluginServices::getInstance()->getAssetsDirectory()+"/sdk_fitfunctions/";
+        if (d==3) userffDir=QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/sdk_fitfunctions/";
+        if (d==4) userffDir=ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions/").toString();
         QDir dir(userffDir);
         emit showLongMessage(tr("searching in directory '%1' for fit functions in shared libraries:").arg(userffDir));
         if (dir.exists()) {

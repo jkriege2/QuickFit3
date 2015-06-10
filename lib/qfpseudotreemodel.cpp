@@ -315,7 +315,7 @@ static bool QFPseudoTreeModelItem_lessthan(const QFPseudoTreeModelItem*s1, const
     return false;
 }
 
-void QFPseudoTreeModel::sort()
+void QFPseudoTreeModel::sortTree()
 {
     beginResetModel();
     m_folders.sort();

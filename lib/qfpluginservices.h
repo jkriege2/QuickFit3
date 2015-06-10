@@ -43,7 +43,7 @@ class QFRawDataRecord;
 class QFRawDataPropertyEditor;
 class QFProject;
 class QFMathParser;
-class qfmpResult;
+struct qfmpResult;
 class QFEvaluationItemFactory;
 class QFRawDataRecordFactory;
 

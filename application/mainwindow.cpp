@@ -1909,7 +1909,8 @@ void MainWindow::createActions() {
     actPerformanceTest=new QAction(tr("test QFProject performance"), this);
     connect(actPerformanceTest, SIGNAL(triggered()), this, SLOT(projectPerformanceTest()));
 
-
+    actPrepareLibFitFunctions=new QAction(tr("Prepare Computer For Dynamic User Fit Function Libraries ..."), this);
+    connect(actPrepareLibFitFunctions, SIGNAL(triggered()), this, SLOT(prepareLibFitFunctions()));
 }
 
 void MainWindow::createMenus() {
@@ -1972,6 +1973,7 @@ void MainWindow::createMenus() {
     extensionMenu=menuBar()->addMenu(tr("&Extensions"));
     toolsMenu=menuBar()->addMenu(tr("&Tools"));
     toolsMenu->addAction(actUserFitfunctionsEditor);
+    toolsMenu->addAction(actPrepareLibFitFunctions);
     projectToolsMenu=toolsMenu->addMenu(tr("&Project Tools"));
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actRDRReplace);
@@ -4375,6 +4377,29 @@ void MainWindow::editGroupAndRole()
         DlgEditGroupAndRole* dlg=new DlgEditGroupAndRole(project, this);
         dlg->exec();
         delete dlg;
+    }
+}
+
+void MainWindow::prepareLibFitFunctions()
+{
+    QDir bd(QApplication::applicationDirPath());
+    QString target=ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions/").toString();
+    QStringList searchdirs;
+    searchdirs<<bd.absolutePath()+"/sdk/sdk_fitfunctions";
+    searchdirs<<bd.absolutePath()+"/sdk_fitfunctions";
+    searchdirs<<QFPluginServices::getInstance()->getAssetsDirectory()+"/sdk_fitfunctions/";
+    searchdirs<<QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/sdk_fitfunctions/";
+    searchdirs<<target;
+    if (QMessageBox::information(this, tr("library fit functions"), tr("This function creates a directory\n   %1\non your computer, where an SDK for user fit functions will be stored.\nThese fit functions are defined in C/C++ and compiled into a dynamic library that is loaded by QF3 from one of these directories:\n  - %2\n\nFinally QF3 will show an explorer/finder/... for this directory!").arg(target).arg(searchdirs.join("\n  - ")), QMessageBox::Ok|QMessageBox::Cancel, QMessageBox::Ok)==QMessageBox::Ok) {
+    QDir dsource(ProgramOptions::getInstance()->getApplicationDirectory()+"/sdk/sdk_fitfunctions/");
+
+        QStringList files=dsource.entryList(QDir::Files);
+        dsource.mkpath(target);
+        for (int i=0; i<files.size(); i++) {
+            QFile::copy(dsource.absoluteFilePath(files[i]), target+"/"+files[i]);
+        }
+
+        QDesktopServices::openUrl( QUrl(target+"/") );
     }
 }
 

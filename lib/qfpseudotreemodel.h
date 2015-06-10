@@ -61,7 +61,7 @@ class QFLIB_EXPORT QFPseudoTreeModel : public QAbstractListModel
 
         void clear();
 
-        void sort();
+        void sortTree();
 
     protected:
         QStringList m_folders;

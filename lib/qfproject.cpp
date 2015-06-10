@@ -2024,7 +2024,9 @@ void QFProject::resetError() const
     errorDesc="";
 }
 
-void QFProject::emitPropertiesChanged() {
+void QFProject::emitPropertiesChanged(const QString &property, bool visible) {
+    Q_UNUSED(property)
+    Q_UNUSED(visible)
     //qDebug()<<"QFProject emit propertiesChanged()";
     QFProjectReadLocker locker(p->lock);
     if (m_signalsEnabled) emit propertiesChanged();

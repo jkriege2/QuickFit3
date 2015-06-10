@@ -617,13 +617,14 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
          */
         static QString ensureUniqueFilename(const QString& inFilename, const QString& newFilename, QList<QFProject::FileCopyList> *filecopylist, bool addToList=false) ;
         static int fileCopyListConatins(const QString &inFilename, const QString& outFile, const QList<FileCopyList> *filecopylist) ;
-    protected:
+     protected:
         /** \brief set the internal error flag and description */
         void setError(const QString& description) const;
         /** \brief set the internal error flag and description */
         void setError(const QString& description) ;
+
         /** \copydoc QFProperties::emitPropertiesChanged() */
-        virtual void emitPropertiesChanged();
+        virtual void emitPropertiesChanged(const QString& property=QString(""), bool visible=true);
 
         virtual void emitStructureChanged();
         /** \copybrief QFProperties::setPropertiesError() */

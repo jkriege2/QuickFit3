@@ -148,7 +148,7 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
             delete it.value();
         }
     }
-    m_model->sort();
+    m_model->sortTree();
     //model()->sort(0);
     //setUpdatesEnabled(upd);
 }
@@ -182,7 +182,7 @@ void QFFitFunctionComboBox::updateFitFunctions(const QStringList &availableFF)
             }
         }
         //model()->sort(0);
-        m_model->sort();
+        m_model->sortTree();
         //setUpdatesEnabled(upd);
     }
 }

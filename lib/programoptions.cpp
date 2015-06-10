@@ -66,8 +66,9 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
         QDir aappDir(appDir);
         if (aappDir.dirName() == "MacOS") {
             aappDir.cdUp();
-            aappDir.cdUp();
-            aappDir.cdUp();
+            //aappDir.cdUp();
+            //aappDir.cdUp();
+            aappDir.cd("SharedSupport");
         }
         appDir=	aappDir.absolutePath();
     #endif
@@ -77,7 +78,10 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     examplesDir=appDir+"/examples/";
     pluginsDir=appDir+"/plugins/";
 
-    #ifdef __WINDOWS__
+    #ifdef Q_OS_MAC
+    //assetsDir=appDir+"/quickfit3.app/Contents/SharedSupport/assets/";
+    //examplesDir=appDir+"/quickfit3.app/Contents/SharedSupport/examples/";
+    pluginsDir=appDir+"/../PlugIns/";
     #endif
 
     #if defined(__LINUX__) || defined(Q_OS_MAC)
@@ -199,7 +203,7 @@ void ProgramOptions::readSettings() {
     emit styleChanged(style);
     stylesheet=settings->value("quickfit/stylesheet", stylesheet).toString();
     if (app) {
-        QString fn=QString(appDir+"/stylesheets/%1.qss").arg(stylesheet);
+        QString fn=QString(assetsDir+"/stylesheets/%1.qss").arg(stylesheet);
         //std::cout<<"loading stylesheet '"<<fn.toStdString()<<"' ... ";
         QFile f(fn);
         if (f.open(QFile::ReadOnly)) {
@@ -251,8 +255,11 @@ QString ProgramOptions::getApplicationDirectory() const {
 
 QString ProgramOptions::getSourceDirectory() const
 {
+#ifdef Q_OS_MAC
+    return appDir+"/quickfit3.app/Contents/SharedSupport/sources/";
+#else
     return appDir+"/source/";
-
+#endif
 }
 
 QString ProgramOptions::getHomeQFDirectory() const

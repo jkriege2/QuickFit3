@@ -73,6 +73,14 @@ int main(int argc, char * argv[])
     QCoreApplication::addLibraryPath("./qtplugins");
     QCoreApplication::addLibraryPath(QFileInfo(argv[0]).absolutePath()+"/qtplugins");
 #endif
+#ifdef Q_OS_MAC
+    qDebug()<<"lib paths:"<<QCoreApplication::libraryPaths();
+    QStringList macoslibpaths;
+    macoslibpaths<<"../QtPlugIns";
+    macoslibpaths<<(QFileInfo(argv[0]).absolutePath()+"/../QtPlugIns");
+    QCoreApplication::setLibraryPaths(macoslibpaths);
+    qDebug()<<"lib paths:"<<QCoreApplication::libraryPaths();
+#endif
 
     Q_INIT_RESOURCE(quickfit3);
     int res=0;

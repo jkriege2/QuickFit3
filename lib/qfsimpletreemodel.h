@@ -61,7 +61,7 @@ public:
 
      void clear();
 
-     void sort();
+     void sortTree();
 
  private:
      void setupModelData(const QStringList &lines, QFSimpleTreeModelItem *parent);

@@ -106,7 +106,7 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
 #endif
  }
 
- void QFSimpleTreeModel::sort()
+ void QFSimpleTreeModel::sortTree()
  {
      beginResetModel();
      if (rootItem) rootItem->sort();
