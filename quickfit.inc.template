@@ -29,7 +29,10 @@
 #QF3CONFIG+=ffmdrivers
 
 # if nlopt does not compile on your computer, use this switch
-QF3CONFIG+=nonlopt
+#QF3CONFIG+=nonlopt
+
+# if pixman/cairo does not compile on your computer, use this switch
+#QF3CONFIG+=nocairo
 
 
 # uncomment, so QF3 doesn't use _aligned_malloc ... on windows

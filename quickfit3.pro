@@ -172,9 +172,11 @@ SUBDIRS += plg_qfe_plotterexporterlatex
 plg_qfe_plotterexporterlatex.subdir=./plugins/qfe_plotterexporterlatex
 plg_qfe_plotterexporterlatex.depends = lib libqf3widgets
 
-SUBDIRS += plg_qfe_plotterexportercairo
-plg_qfe_plotterexportercairo.subdir=./plugins/qfe_plotterexportercairo
-plg_qfe_plotterexportercairo.depends = lib libqf3widgets
+!contains(QF3CONFIG, nocairo) {
+    SUBDIRS += plg_qfe_plotterexportercairo
+    plg_qfe_plotterexportercairo.subdir=./plugins/qfe_plotterexportercairo
+    plg_qfe_plotterexportercairo.depends = lib libqf3widgets
+}
 
 SUBDIRS += plg_numberandbrightness
 plg_numberandbrightness.subdir=./plugins/numberandbrightness
