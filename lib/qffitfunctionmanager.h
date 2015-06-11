@@ -155,6 +155,8 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         void init();
         bool registerPlugin(const QString &filename_in, QObject *plugin, QFPluginHelpData &helpdata);
         void finalizePluginSearch();
+
+        static QStringList getUserFitFunctionSearchDirectories(bool for_libs=false);
     public slots:
         void reloadUserFitFunctions();
 

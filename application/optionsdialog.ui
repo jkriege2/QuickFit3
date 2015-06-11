@@ -711,7 +711,8 @@ p, li { white-space: pre-wrap; }
               </font>
              </property>
              <property name="text">
-              <string>user fitfunctions folder:</string>
+              <string>user fitfunctions folder
+(for parsed and library functions):</string>
              </property>
             </widget>
            </item>
@@ -807,8 +808,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>cmbLanguage</tabstop>
  </tabstops>
  <resources>
-  <include location="quickfit3.qrc"/>
   <include location="../lib/lib.qrc"/>
+  <include location="quickfit3.qrc"/>
   <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>

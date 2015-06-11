@@ -390,6 +390,8 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
 
     htmlReplaceList.append(qMakePair(QString("qf_css_mainfile"), readFile(settings->getMainHelpDirectory()+"/qf3style.css")));
     htmlReplaceList.append(qMakePair(QString("qf_css_mainfile_block"), QString("<style>\n$$qf_css_mainfile$$\n</style>\n")));
+    htmlReplaceList.append(qMakePair(QString("fitfunc_lib_searchdirs_list"), QString("<ol><li><tt>%1</tt></li></ol>\n").arg(QFFitFunctionManager::getUserFitFunctionSearchDirectories(true).join("</tt></li><li><tt>"))));
+    htmlReplaceList.append(qMakePair(QString("fitfunc_parser_searchdirs_list"), QString("<ol><li><tt>%1</tt></li></ol>\n").arg(QFFitFunctionManager::getUserFitFunctionSearchDirectories(false).join("</tt></li><li><tt>"))));
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.start"),
          tr("$$DEFAULTREF$$</font>\n$$local_plugin_autodescription$$\n<a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
@@ -1909,7 +1911,7 @@ void MainWindow::createActions() {
     actPerformanceTest=new QAction(tr("test QFProject performance"), this);
     connect(actPerformanceTest, SIGNAL(triggered()), this, SLOT(projectPerformanceTest()));
 
-    actPrepareLibFitFunctions=new QAction(tr("Prepare Computer For Dynamic User Fit Function Libraries ..."), this);
+    actPrepareLibFitFunctions=new QAction(tr("Copy SDK For Dynamic User Fit Function Libraries ..."), this);
     connect(actPrepareLibFitFunctions, SIGNAL(triggered()), this, SLOT(prepareLibFitFunctions()));
 }
 
@@ -4382,14 +4384,10 @@ void MainWindow::editGroupAndRole()
 
 void MainWindow::prepareLibFitFunctions()
 {
-    QDir bd(QApplication::applicationDirPath());
+    //QDir bd(QApplication::applicationDirPath());
     QString target=ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions/").toString();
-    QStringList searchdirs;
-    searchdirs<<bd.absolutePath()+"/sdk/sdk_fitfunctions";
-    searchdirs<<bd.absolutePath()+"/sdk_fitfunctions";
-    searchdirs<<QFPluginServices::getInstance()->getAssetsDirectory()+"/sdk_fitfunctions/";
-    searchdirs<<QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/sdk_fitfunctions/";
-    searchdirs<<target;
+    QStringList searchdirs=QFFitFunctionManager::getUserFitFunctionSearchDirectories(true);
+
     if (QMessageBox::information(this, tr("library fit functions"), tr("This function creates a directory\n   %1\non your computer, where an SDK for user fit functions will be stored.\nThese fit functions are defined in C/C++ and compiled into a dynamic library that is loaded by QF3 from one of these directories:\n  - %2\n\nFinally QF3 will show an explorer/finder/... for this directory!").arg(target).arg(searchdirs.join("\n  - ")), QMessageBox::Ok|QMessageBox::Cancel, QMessageBox::Ok)==QMessageBox::Ok) {
     QDir dsource(ProgramOptions::getInstance()->getApplicationDirectory()+"/sdk/sdk_fitfunctions/");
 

@@ -49,11 +49,13 @@ void QFFitFunctionManager::reloadUserFitFunctions()
 
     QMap<QString, QString> userFF;
 
-    for (int d=0; d<3; d++ ) {
-        QString userffDir;
-        if (d==0) userffDir=QFPluginServices::getInstance()->getAssetsDirectory()+"/userfitfunctions/";
-        if (d==1) userffDir=QFPluginServices::getInstance()->getConfigFileDirectory()+"/userfitfunctions/";
-        if (d==2) userffDir=ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions/").toString();
+    QStringList dirs=getUserFitFunctionSearchDirectories(true);
+
+    for (int d=0; d<dirs.size(); d++ ) {
+        QString userffDir=dirs[d];
+//        if (d==0) userffDir=QFPluginServices::getInstance()->getAssetsDirectory()+"/userfitfunctions/";
+//        if (d==1) userffDir=QFPluginServices::getInstance()->getConfigFileDirectory()+"/userfitfunctions/";
+//        if (d==2) userffDir=ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions/").toString();
         QDir dir(userffDir);
         emit showLongMessage(tr("searching in directory '%1' for user fit functions:").arg(userffDir));
         if (dir.exists()) {
@@ -99,16 +101,19 @@ void QFFitFunctionManager::reloadLibraryFitFunctions()
     //QMutexLocker locker(mutex);
 
     QMap<QString, QLibrary*> userFF;
-    QDir bd(QApplication::applicationDirPath());
+    //QDir bd(QApplication::applicationDirPath());
     freeLibraryFitFunctions();
 
-    for (int d=0; d<5; d++ ) {
-        QString userffDir;
-        if (d==0) userffDir=bd.absolutePath()+"/sdk/sdk_fitfunctions";
+    QStringList dirs=getUserFitFunctionSearchDirectories(true);
+
+    for (int d=0; d<dirs.size(); d++ ) {
+        QString userffDir=dirs[d];
+        /*if (d==0) userffDir=bd.absolutePath()+"/sdk/sdk_fitfunctions";
         if (d==1) userffDir=bd.absolutePath()+"/sdk_fitfunctions";
         if (d==2) userffDir=QFPluginServices::getInstance()->getAssetsDirectory()+"/sdk_fitfunctions/";
         if (d==3) userffDir=QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/sdk_fitfunctions/";
-        if (d==4) userffDir=ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions/").toString();
+        if (d==4) userffDir=ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions/").toString();*/
+
         QDir dir(userffDir);
         emit showLongMessage(tr("searching in directory '%1' for fit functions in shared libraries:").arg(userffDir));
         if (dir.exists()) {
@@ -220,12 +225,32 @@ bool QFFitFunctionManager::registerPlugin(const QString& filename_in, QObject *p
 
 void QFFitFunctionManager::finalizePluginSearch()
 {
+
+
     reloadUserFitFunctions();
     reloadLibraryFitFunctions();
 }
 
 
+QStringList QFFitFunctionManager::getUserFitFunctionSearchDirectories(bool for_libs)
+{
+    QStringList res;
+    if (for_libs) {
+        QDir bd(QApplication::applicationDirPath());
+        res<<bd.absolutePath()+"/sdk/sdk_fitfunctions";
+        res<<bd.absolutePath()+"/sdk_fitfunctions";
+        res<<QFPluginServices::getInstance()->getAssetsDirectory()+"/sdk_fitfunctions/";
+        res<<QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/sdk_fitfunctions/";
+        res<<ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions/").toString();
 
+    } else {
+        res<<QFPluginServices::getInstance()->getAssetsDirectory()+"/userfitfunctions/";
+        res<<QFPluginServices::getInstance()->getConfigFileDirectory()+"/userfitfunctions/";
+        res<<ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions/").toString();
+
+    }
+    return res;
+}
 
 
 QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start) const {

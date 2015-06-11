@@ -44,6 +44,8 @@
 \usepackage{doi}
 \usepackage[numbers]{natbib}
 \usepackage{dsfont}
+\usepackage[left=2cm,right=1.5cm,top=1.5cm,bottom=1.5cm]{geometry}
+
 
 \DeclareMathOperator*{\argmin}{arg\:min\ }
 \DeclareMathOperator*{\argmax}{arg\:max\ }
@@ -67,10 +69,10 @@ where $g(\tau;\vec{\beta})$ is the fit model (later also denoted as $M_g$ to enu
 
 \subsection{Least-Squares Fit Algorithms (Basics)}
 The least-squares fit problem \eqref{eq:fcs_fit_problem} can be formulated in a more compact form by writing the objective function $\chi^2(\vec{p})$ in the following way:
-\begin{multline}\label{eq:fcs_fit_problem_forfit}
-  \vec{\beta}_{M_g}^\ast=\argmin\limits_{\vec{\beta}}\chi^2(\vec{\beta})=\\
+\begin{equation}\label{eq:fcs_fit_problem_forfit}
+  \vec{\beta}_{M_g}^\ast=\argmin\limits_{\vec{\beta}}\chi^2(\vec{\beta})%=\\
   =\argmin\limits_{\vec{\beta}}\left\|\vec{F}(\vec{\beta})\right\|_2^2=\argmin\limits_{\vec{\beta}}\sum\limits_{i=1}^n\bigl[f_i(\beta_1,\beta_2,...,\beta_k)\bigr]^2
-\end{multline}
+\end{equation}
 
 Most numerical fit algorithms, that solve this problem, start from an initial guess $\vec{\beta}_0$ and then find the best-fit parameters by proceeding along the steepest descent of $\chi^2$. This is done in an iterative way by solving this linearized problem in each step (Gauss-Newton iteration, probably with additional conditioning, such as in the LM-fit):
 \begin{equation}\label{eq:fcs_fit_problem_linearization}
@@ -133,15 +135,15 @@ The likelihood function for the problem \eqref{eq:fcs_fit_problem} can be writte
   p(\hat{g}_i|M_g,\vec{\beta})=\frac{1}{\sqrt{2\pi}\cdot\hat{\sigma}_i}\cdot\exp\left[-\frac{1}{2}\cdot\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}\right].
 \end{equation}
 This $p(\hat{\tau}_i,\hat{g}_i|M_g,\vec{\beta})$ is the conditional probability to measure the value $\hat{g}_i$ of the ACF at the (given) lag-time $\hat{\tau}_i$, given the specific FCS model function $M_g$ and the parameter vector $\vec{\beta}$. Equation \eqref{eq:fcs_gauss_errors} can then be used to derive the likelihood function for this problem, which is basically the net probability to obtain the complete set $i=1..n$ of measurements, given again the model $M_g$ and the parameter vector $\vec{\beta}$:
-\begin{multline}\label{eq:fcs_likelihood_simple}
-  p(\hat{\vec{g}}|M_g,\vec{\beta})=\prod\limits_{i=1}^np(\hat{g}_i|M_g,\vec{\beta})=\\
+\begin{equation}\label{eq:fcs_likelihood_simple}
+  p(\hat{\vec{g}}|M_g,\vec{\beta})=\prod\limits_{i=1}^np(\hat{g}_i|M_g,\vec{\beta})%=\\
   =\frac{1}{(2\pi)^{n/2}}\cdot\frac{1}{\prod\limits_i\hat{\sigma}_i}\cdot\exp\left[-\sum\limits_{i=1}^n\frac{1}{2}\cdot\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}\right].
-\end{multline}
+\end{equation}
 If the errors are not independent, then they are no longer described by the $\hat{\sigma}_i$, but by an $n\times n$ covariance matrix $\hat{\mat{C}}$ that has to be determined from the measurement, or from theoretical considerations. The likelihood is then given by:
-\begin{multline}\label{eq:fcs_likelihood_covmatrix}
-  p(\hat{\vec{g}}|M_g,\vec{\beta})=\prod\limits_{i=1}^np(\hat{g}_i|M_g,\vec{\beta})=\\
+\begin{equation}\label{eq:fcs_likelihood_covmatrix}
+  p(\hat{\vec{g}}|M_g,\vec{\beta})=\prod\limits_{i=1}^np(\hat{g}_i|M_g,\vec{\beta})%=\\
   =\frac{1}{(2\pi)^{n/2}}\cdot\frac{1}{\sqrt{\det(\hat{\mat{C}})}}\cdot\exp\left[-\frac{1}{2}\cdot\bigl[\hat{\vec{g}}-\vec{g}(\hat{\vec{\tau}}; \vec{\beta})\bigr]^\mathrm{T}\hat{\mat{C}}^{-1} \bigl[\hat{\vec{g}}-\vec{g}(\hat{\vec{\tau}}, \hat{\vec{g}}; \vec{\beta})\bigr]\right].
-\end{multline}
+\end{equation}
 Note: Here the single measurements $i$ have been combined into vector, e.g. $\hat{\vec{g}}=\left[\hat{g}_1, \hat{g}_2, ..., \hat{g}_n\right]^\mathrm{T}$. The model is then also vector-valued with $\vec{g}(\hat{\vec{\tau}}; \vec{\beta})=\left[g(\hat{\tau}_1;\vec{\beta}), g(\hat{\tau}_2;\vec{\beta}), ..., g(\hat{\tau}_n;\vec{\beta})\right]^\mathrm{T}$
 
 Then the least-squares problem \eqref{eq:fcs_fit_problem} can also be written as a maximum-likelihood estimate (MLE):
@@ -149,12 +151,12 @@ Then the least-squares problem \eqref{eq:fcs_fit_problem} can also be written as
   \vec{\beta}_{M_g}^\ast=\argmax\limits_{\vec{\beta}}p(\hat{\vec{g}}|M_g,\vec{\beta}).
 \end{equation}
 Introducing the log-likelihood $\ln \bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]$, this can be rewritten in terms of sums, not products and allows to remove the exponential functions:
-\begin{multline*}
-  \vec{\beta}_{M_g}^\ast=\argmax\limits_{\vec{\beta}}p(\hat{\vec{g}}|M_g,\vec{\beta})=\argmax\limits_{\vec{\beta}}\ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]=\\
-    =\argmax\limits_{\vec{\beta}}\left\{-\frac{n}{2}\cdot\ln(2\pi)-\sum\limits_i\ln\left[\hat{\sigma}_i\right]-\frac{1}{2}\cdot\sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}\right\}=\\
-    =\argmin\limits_{\vec{\beta}}\left\{\frac{n}{2}\cdot\ln(2\pi)+\sum\limits_i\ln\left[\hat{\sigma}_i\right]+\frac{1}{2}\cdot\sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}\right\}=\\
-    =\argmin\limits_{\vec{\beta}} \sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}
-\end{multline*}
+\begin{align*}
+  \vec{\beta}_{M_g}^\ast&=\argmax\limits_{\vec{\beta}}p(\hat{\vec{g}}|M_g,\vec{\beta})=\argmax\limits_{\vec{\beta}}\ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]=\\
+    &=\argmax\limits_{\vec{\beta}}\left\{-\frac{n}{2}\cdot\ln(2\pi)-\sum\limits_i\ln\left[\hat{\sigma}_i\right]-\frac{1}{2}\cdot\sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}\right\}=\\
+    &=\argmin\limits_{\vec{\beta}}\left\{\frac{n}{2}\cdot\ln(2\pi)+\sum\limits_i\ln\left[\hat{\sigma}_i\right]+\frac{1}{2}\cdot\sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}\right\}=\\
+    &=\argmin\limits_{\vec{\beta}} \sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}
+\end{align*}
 In the last line, constant term and factors (that do not depend on $\vec{\beta}$) were omitted and the problem was reduced again to \eqref{eq:fcs_fit_problem}, so the simple least-squares solution equals the maximum likelihood estimator (MLE) of $\vec{\beta}$!
 
 \section{Model Selection}
@@ -188,20 +190,20 @@ For both criteria, the model selection rule is:
 Since both criteria include the number of parameters $k$, they also obey (to some extent) the principle of parsimony (or Occam's razor), which states that one should use the model that best describes the data \underline{and} has the lowest number of parameters/is the simplest.
 
 For any practical purposes, both criteria can be estimated also from the $\chi^2$, but only up to a fixed additive constant, which only depends on the dataset $(\hat{\tau}_i, \hat{g}_i, \hat{\sigma}_i)$ and therefore does not play a role for the selection process. This can be seen, if we write the log-likelihood, assuming Gaussian errors as follows:
-\begin{multline}\label{eq:simple_loglikelihood}
-  \ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]=\underbrace{-\frac{n}{2}\cdot\ln(2\pi)-\sum\limits_i\ln\left[\hat{\sigma}_i\right]}_{=\text{const}}-\frac{1}{2}\cdot\sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}=\\
+\begin{equation}\label{eq:simple_loglikelihood}
+  \ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]=\underbrace{-\frac{n}{2}\cdot\ln(2\pi)-\sum\limits_i\ln\left[\hat{\sigma}_i\right]}_{=\text{const}}-\frac{1}{2}\cdot\sum\limits_{i=1}^n\frac{\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}{\hat{\sigma}_i^2}%=\\
   =\text{const}-\frac{\chi^2}{2}
-\end{multline}
+\end{equation}
 So we get:
 \begin{equation}\label{eq:aic_bic_chi2}
   \mbox{AIC}(\vec{\beta},M_g)=\chi^2+2k\ \ \ \ \ \text{and}\ \ \ \ \ \mbox{BIC}(\vec{\beta},M_g)=\chi^2+k\cdot\ln [n]
 \end{equation}
 If all $\hat{\sigma}_i=\sigma$ are equal  (i.e. a non-weighted fit), then the estimations in \eqref{eq:simple_loglikelihood} change \cite{BURNHA2002}:
-\begin{multline}\label{eq:simple_loglikelihood_equalvar}
-  \ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]=\-\frac{n}{2}\cdot\ln(2\pi)-\sum\limits_i\ln\left[\sigma\right]-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i}{\sigma}\right)^2=\\
-  =-\frac{n}{2}\cdot\ln(2\pi)-\frac{n}{2}\cdot\ln\left[\sigma^2\right]-\frac{1}{2\sigma^2}\cdot\underbrace{\sum\limits_{i=1}^n\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}_{=\chi^2}=\\
-  =\text{const}-\frac{n}{2}\cdot\ln\left[\frac{\chi^2}{n}\right]
-\end{multline}
+\begin{align}\label{eq:simple_loglikelihood_equalvar}
+  \ln\bigl[p(\hat{\vec{g}}|M_g,\vec{\beta})\bigr]&=\-\frac{n}{2}\cdot\ln(2\pi)-\sum\limits_i\ln\left[\sigma\right]-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i}{\sigma}\right)^2=\\
+  &=-\frac{n}{2}\cdot\ln(2\pi)-\frac{n}{2}\cdot\ln\left[\sigma^2\right]-\frac{1}{2\sigma^2}\cdot\underbrace{\sum\limits_{i=1}^n\left(g(\hat{\tau}_i;\vec{\beta})-\hat{g}_i\right)^2}_{=\chi^2}=\\
+  &=\text{const}-\frac{n}{2}\cdot\ln\left[\frac{\chi^2}{n}\right]
+\end{align}
 Here, in the last step we used the estimator $\chi^2/n$ for the sample variance $\sigma^2$. Then the last term is also constant and the AIC and BIC become:
 \begin{equation}\label{eq:aic_bic_chi2_equalsigma}
   \mbox{AIC}(\vec{\beta},M_g)=n\cdot\ln\left[\frac{\chi^2}{n}\right]+2k\ \ \ \ \ \text{and}\ \ \ \ \ \mbox{BIC}(\vec{\beta},M_g)=n\cdot\ln\left[\frac{\chi^2}{n}\right]+k\cdot\ln [n]
@@ -209,9 +211,36 @@ Here, in the last step we used the estimator $\chi^2/n$ for the sample variance 
 
 
 \subsection{Bayesian model selection}
+Another framework for model selection \cite{HE2012,GUO2012} is based in the Bayes theorem, thus the name ``Bayesian model selection''. The Bayes theorem can be used to calculate the probability $p(M_g|\hat{\vec{g}})$ for a specific model $M_g$, given a measurement $(\hat{\vec{\tau}}, \hat{\vec{g}}, \hat{\vec{\sigma}})$:
+\begin{equation}\label{eq:bayes_theorem}
+    p(M_g|\hat{\vec{g}})=\frac{p(\hat{\vec{g}}|M_g)\cdot p(M_g)}{p(\hat{\vec{g}})}.
+\end{equation}
+Here $p(M_g)$ is the prior (probability) of a model $M_g$, which allows to insert any prior/external information into the selection problem. The probability $p(\hat{\vec{g}})$ is mostly a normalization constant, as no statement about the absolute probability of a given dataset can easily be done. Finally $p(\hat{\vec{g}}|M_g)$ is the conditional probability of obtaining the measurement $\hat{\vec{g}}$, given the specified model $M_g$. As will be shown later. This can be calculated from the likelihood function \eqref{eq:fcs_likelihood_simple}. 
+
+In the special case of model selection, we often do not want to put any prior information into the problem, as we cannot say which model is more likely, a priori. Therefore we will assume a flat prior $p(M_g)$ here. As said above, the probability of the data $p(\hat{\vec{g}})$ is treated as a normalization constant, thus we can simplify \eqref{eq:bayes_theorem} to:
+\begin{equation}\label{eq:bayes_theorem_simplified}
+    p(M_g|\hat{\vec{g}})\propto p(\hat{\vec{g}}|M_g).
+\end{equation}
+We will then calculate only the probability $p(\hat{\vec{g}}|M_g)$ for each model $M_g$. Then the decision rule is simple:
+\begin{center}
+  Choose the model $M_g$ with the highest (non-normalized) probability $p(\hat{\vec{g}}|M_g)$.
+\end{center}
+From the $p(\hat{\vec{g}}|M_g)$, it is also possible to calculate absolute model probabilities, by normalizing the $p(\hat{\vec{g}}|M_g)$ as follows:
+\begin{equation}\label{eq:bayes_modelprob_normalized}
+    p_\text{norm}(M_g|\hat{\vec{g}})= \frac{p(\hat{\vec{g}}|M_g)}{\sum\limits_i p(\hat{\vec{g}}|M_i)},\ \ \ \ \ \text{i.e.}\ \ \ \ \sum\limits_g p_\text{norm}(M_g|\hat{\vec{g}})=1.
+\end{equation}
+
+So finally we are left with the problem of calculating $p(\hat{\vec{g}}|M_g)$. Following  \cite{HE2012} this can be done from the likelihood function $p(\hat{\vec{g}}|M_g,\vec{\beta})$ by ``integrating out'' or ``marginalizing'' the parameter vector $\vec{\beta}$:
+\begin{equation}\label{eq:bayes_propfromlikelihood}
+    p(\hat{\vec{g}}|M_g,\vec{\beta})=\int\limits_{\vec{\beta}} p(\hat{\vec{g}}|M_g,\vec{\beta})\cdot p(\vec{\beta}|M_g)\ \mathrm{d}\vec{\beta}
+\end{equation}
+Here again the probability $p(\vec{\beta}|M_g)$ is the prior probability distribution of the parameters, which we also assume to be uniform, since we do not have any a priori information on the parameters. This integral can then be 
 
 
 
+
+
+\newpage
 \bibliographystyle{plainnat}
 \bibliography{bayesian_fit}
 \end{document}

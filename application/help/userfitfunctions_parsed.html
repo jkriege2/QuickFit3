@@ -17,6 +17,8 @@ $$math:f(x;\vec{p})$$ depending on one "running" variable $$math:x$$ and a vecto
 of parameters $$math:\vec{p}$$ is implemented.
 </p> 
 
+<p>QuickFit $$version$$ will search for such libraries in the following paths. the last of these paths can also be set in the Settings dialog (<tt> File | Settings</tt>):
+$$fitfunc_parser_searchdirs_list$$</p>
 
 <h2>Defining Fit Functions</h2>
 <h3>User Fit Function Editor</h3>
@@ -51,7 +53,7 @@ This editor allows to create user-defined fitting functions:
                 <li><tt>dls_<i>XXX</i></tt>: Dynamic light scattering fit functions</li>
                 <li><tt>lightsheet_<i>XXX</i></tt>: Fit functions for cuts through a light sheet</li>
               </ul>
-			  It is advisable to add a second prefix to the fit function name, which identifies yourself or your institute/group/cooperation, sich as <tt>fcs_dkfz_<i>XXX</i></tt>, as this helps to further reduce double-namings, as you will only have to make sure, that you yourself didn't give the same name twice.$$
+              It is advisable to add a second prefix to the fit function name, which identifies yourself or your institute/group/cooperation, sich as <tt>fcs_dkfz_<i>XXX</i></tt>, as this helps to further reduce double-namings, as you will only have to make sure, that you yourself didn't give the same name twice.$$
               $$note:Also note, that the fit function name needs to be unique, so if you can't find you function in QF, you might want to change its ID.$$
               In the example above, this is a general fit function with the name <tt>general_parabola</tt></li>
             <li><b>Name/Description:</b> A human readable description for the fit function. This name will be displayed in QuickFit's user interface. In the example above, the name is <code>General: Parabola</code></li>
@@ -89,7 +91,7 @@ This editor allows to create user-defined fitting functions:
                   <li><b>increment:</b> Some widgets allow to change the parameter with +/- buttons. This is the increment used for these buttons.</li>
               </ul>
             </li>
-			<li><b>preview:</b> Here you can set a plot range and the axis-scaling for a preview plot of the function you entered. A click on <b>update preview ...</b> will open a new window (if none exists yet) with the fit function plot using the initial parameters.</li>
+            <li><b>preview:</b> Here you can set a plot range and the axis-scaling for a preview plot of the function you entered. A click on <b>update preview ...</b> will open a new window (if none exists yet) with the fit function plot using the initial parameters.</li>
         </ul>
        </li>
        <li>When you finished editing the fit function, you have to savethe changes, by clicking on the <b>SAVE</b>-button. A click on <b>Cancel</b> will discard all changes. $$note:The fit function list and all according widgets/buttons will stay disabled, until you hit Save or Cancel. The same goes or the button that closes the edtor window!$$</li>
