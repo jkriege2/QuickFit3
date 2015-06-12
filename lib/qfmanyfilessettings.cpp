@@ -23,6 +23,7 @@
 #include <QStringList>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QDebug>
 
 QFManyFilesSettings::QFManyFilesSettings(QObject *parent):
     QObject(parent)
@@ -60,13 +61,16 @@ QSettings *QFManyFilesSettings::getSettings(int level)
 QVariant QFManyFilesSettings::value(const QString &key, const QVariant &defaultValue, int* level) const
 {
     for (int i=settings.size()-1; i>=0; i--) {
+        //qDebug()<<"    "<<i<<" checking "<<settings[i]<<((settings[i])?settings[i]->fileName():QString("---"))<<"  for "<<key;
         if (settings[i]) {
             if (settings[i]->contains(key)) {
+                //qDebug()<<"    "<<i<<" found!";
                 if (level) *level=i;
                 return settings[i]->value(key, defaultValue);
             }
         }
     }
+    //qDebug()<<"     not found! ... returning default!";
     return defaultValue;
 }
 

@@ -147,7 +147,7 @@ void SpectrumManager::loadLaserlinesDatabase(const QString &ininame, const QStri
     laserlinesTree->clear();
     QStringList groups=set.childGroups();
     for (int i=0; i<groups.size(); i++) {
-        QString gn=groups[i].toLower();
+        QString gn=groups[i];//.toLower();
         if (!gn.isEmpty() && gn.size()>0) {
             QString laser=set.value(gn+"/laser", "").toString();
             if (laser.isEmpty()) laser=QObject::tr("other lasers");
@@ -179,7 +179,7 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
 
     QStringList groups=set.childGroups();
     for (int i=0; i<groups.size(); i++) {
-        QString gn=groups[i].toLower();
+        QString gn=groups[i];//.toLower();
         QString gns=gn;
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
@@ -250,15 +250,17 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
     QFManyFilesSettings set;
     if (directories.size()>0) {
         for (int i=0; i<directories.size(); i++) {
+            //qDebug()<<"adding INI: "<<QDir(directories[i]).absoluteFilePath(ininame);
             set.addSettings(new QSettings(QDir(directories[i]).absoluteFilePath(ininame), QSettings::IniFormat), true);
         }
     } else {
+        //qDebug()<<"adding INI_else: "<<ininame;
         set.addSettings(new QSettings(ininame, QSettings::IniFormat), true);
     }
 
     QStringList groups=set.childGroups();
     for (int i=0; i<groups.size(); i++) {
-        QString gn=groups[i].toLower();
+        QString gn=groups[i];//.toLower();
         QString gns=gn;
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
@@ -277,9 +279,11 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
             bool fnSepWL;
             int level=-1;
             read<<"spectrum"<<"spectrum_id"<<"spectrum_separatewavelengths"<<"spectrum_reference";
-            fn=set.value(gn+"spectrum", "", &level).toString();
-            if (fn.size()>0 && level>=0) fn=QFileInfo(set.getSettings(level)->fileName()).absoluteDir().absoluteFilePath(fn);
             fnID=set.value(gn+"spectrum_id", 0).toInt();
+            fn=set.value(gn+"spectrum", "", &level).toString();
+            //qDebug()<<level<<"spectrum "<<d.name<<d.folder<<d.manufacturer<<": "<<fn;
+            if (fn.size()>0 && level>=0 && set.getSettings(level)) fn=QFileInfo(set.getSettings(level)->fileName()).absoluteDir().absoluteFilePath(fn);
+            //qDebug()<<level<<"spectrum "<<d.name<<": "<<fn<<set.getSettings(level)->fileName();
             fnSepWL=set.value(gn+"spectrum_separatewavelengths", false).toBool();
             if (QFile::exists(fn)) {
                 d.spectrum=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_reference", d.reference).toString(), false);
@@ -313,7 +317,7 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
 
     QStringList groups=set.childGroups();
     for (int i=0; i<groups.size(); i++) {
-        QString gn=groups[i].toLower();
+        QString gn=groups[i];//.toLower();
         QString gns=gn;
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
@@ -371,7 +375,7 @@ void SpectrumManager::loadDetectorDatabase(const QString &ininame, const QString
 
     QStringList groups=set.childGroups();
     for (int i=0; i<groups.size(); i++) {
-        QString gn=groups[i].toLower();
+        QString gn=groups[i];//.toLower();
         QString gns=gn;
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
