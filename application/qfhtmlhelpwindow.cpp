@@ -360,6 +360,7 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
     QString linkstr=link.toString();
     QString scheme=link.scheme().toLower();
 
+
     if (linkstr.startsWith("#")) {
 #ifdef QF3_USE_WEBKIT
         descriptionBrowser->page()->currentFrame()->scrollToAnchor(linkstr.right(linkstr.size()-1));
@@ -381,7 +382,7 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
             }
             //qDebug()<<"show tooltip: "<<tooltip<<tooltipstr<<tooltipfn;
             QToolTip::showText(QCursor::pos(), transformQF3HelpHTML(tooltipstr, tooltipfn), descriptionBrowser, QRect());
-        } else if ((scheme=="open") || (scheme=="opendir") || (scheme=="openfile")){
+        } else if ((scheme=="open") || (scheme=="opendir") || (scheme=="openfile") || (linkstr.toLower().endsWith(".pdf")) || (linkstr.toLower().endsWith(".zip")) || (linkstr.toLower().endsWith(".ps"))){
             //QDir spd(searchPath);
             //QString filenamen=link.toString(QUrl::RemoveScheme|QUrl::StripTrailingSlash);
             //QString filename=QFileInfo(QUrl("file:"+filenamen).toLocalFile()).absoluteFilePath();
@@ -398,7 +399,7 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
                 url=QUrl(url.toString().replace(rx, QString("file:///%1:/").arg(rx.cap(1))), QUrl::TolerantMode);
             }
 #endif
-            //qDebug()<<"open linked file: "<<url;
+            qDebug()<<"open linked file: "<<url<<link;
             //qDebug()<<
             QDesktopServices::openUrl(url);
         } else {

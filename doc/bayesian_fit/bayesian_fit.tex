@@ -90,6 +90,7 @@ The problem \eqref{eq:fcs_fit_problem_linearization} is a linear system of equat
 \end{align}
 
 \subsection{Fit parameter errors/variance-covariance matrix}
+\label{sec:varcovmatrix}
 The next question that arises is, how accurate do we know the parameters in the best-fit parameter vector $\vec{\beta}^\ast$? 
 To solve this problem, we look again at the least squares problem \eqref{eq:fcs_fit_problem} and write it in terms of data vectors $\hat{\vec{g}}=[\hat{g}_1,\hat{g}_2,...]^\mathrm{T}$ and a vector-valued fit function $\vec{g}(\vec{\beta})=[g(\hat{\tau}_1;\vec{\beta}), g(\hat{\tau}_2;\vec{\beta}),...]^\mathrm{T}$. If we omit the weights $\hat{\sigma}_i$, we can write for the ideal case of a perfect fit:
 \begin{equation}\label{eq:varcov_dervation1}
@@ -234,9 +235,27 @@ So finally we are left with the problem of calculating $p(\hat{\vec{g}}|M_g)$. F
 \begin{equation}\label{eq:bayes_propfromlikelihood}
     p(\hat{\vec{g}}|M_g,\vec{\beta})=\int\limits_{\vec{\beta}} p(\hat{\vec{g}}|M_g,\vec{\beta})\cdot p(\vec{\beta}|M_g)\ \mathrm{d}\vec{\beta}
 \end{equation}
-Here again the probability $p(\vec{\beta}|M_g)$ is the prior probability distribution of the parameters, which we also assume to be uniform, since we do not have any a priori information on the parameters. This integral can then be 
-
-
+Here again the probability $p(\vec{\beta}|M_g)$ is the prior probability distribution of the parameters, which we also assume to be uniform, since we do not have any a priori information on the parameters. If the solution of this integral is not possible analytically -- which is often the case, as the fit functions are complex and the parameter space is high-dimensional -- it can be solved either numerically, with Monte Carlo integration, or in the Laplace approximation\cite{KASS1995}\footnote{The Laplace approximation is a method that allows to approximate the value of integrals of the form \[\int h(x)\cdot \exp\left(M\cdot f(x)\right)\;\mathrm{d}x,\] $M$ is a large number, $f(x)$ is a twice-differentiable function that has a strong peak at a position $x^\ast$ (e.g. a Gaussian distribution) and $h(x)$ is a smooth function. Then Laplace derived that \cite{Lauritzen_laplace}:
+\[\int h(x)\cdot \exp\left(M\cdot f(x)\right)\;\mathrm{d}x \ \ \ \ \approx\ \ \ \  \mathrm{e}^{-M\cdot g(x^\ast)}\cdot h(x^\ast)\cdot\sqrt{\frac{2\pi}{M\cdot f''(x^\ast)}}\cdot\left[1+\mathcal{O}(1/M)\right]\] Here $f''(x)$ is the second derivative of the function $f(\cdot)$. A simple application of this approximation is Stirling's approximation formula for the $\Gamma(\cdot)$ function. }.
+With Laplace's approximation and the assumption of Gaussian errors as in \eqref{eq:fcs_likelihood_simple} or \eqref{eq:fcs_likelihood_covmatrix} the marginalized probability of a given model $M_g$ is:
+\begin{equation}\label{eq:bayes_marginprob_laplace}
+    p(\hat{\vec{g}}|M_g,\vec{\beta})=(2\pi)^{k/2}\cdot\sqrt{\det(\mat{\Sigma}_\text{Bayes})}\cdot p(\hat{\vec{g}}|M_g,\vec{\beta}^\ast_\text{Bayes})\cdot p(\vec{\beta}^\ast_\text{Bayes}|M_g).
+\end{equation}
+Here again $p(\vec{\beta}^\ast_\text{Bayes}|M_g)$ is the prior probability of the parameters, at the ideal solution $\vec{\beta}^\ast_\text{Bayes}$ of the Bayesian fit problem (cf. also \eqref{eq:fcs_fit_problem_maxlikelihood}):
+\begin{equation}\label{eq:fcs_fit_problem_maxBayeslikelihood}
+  \vec{\beta}_{Bayes}^\ast=\argmax\limits_{\vec{\beta}}p(\hat{\vec{g}}|M_g,\vec{\beta})\cdot p(\vec{\beta}|M_g)=\argmax\limits_{\vec{\beta}}\ln\left[p(\hat{\vec{g}}|M_g,\vec{\beta})\cdot p(\vec{\beta}|M_g)\right],
+\end{equation}
+and 
+\begin{equation}\label{eq:fcs_fit_problem_invbayeshessian}
+  \mat{\Sigma}_\text{Bayes}=\left\{-\vec{\nabla}\vec{\nabla}\ln\left[p(\hat{\vec{g}}|M_g,\vec{\beta})\cdot p(\vec{\beta}|M_g)\right]_{\vec{\beta}=\vec{\beta}_{Bayes}^\ast}\right\}^{-1}
+\end{equation}
+is the inverse Hessian matrix, or variance-covariance matrix of the Bayesian fit problem \eqref{eq:fcs_fit_problem_maxBayeslikelihood}. As already done at several occasions above, we can now again take the priors to be flat. Then the Bayes fit problem \eqref{eq:fcs_fit_problem_maxBayeslikelihood} equals the simple maximum likelihood fit \eqref{eq:fcs_fit_problem_maxlikelihood} or (equivalently) the least-squares fit problem \eqref{eq:fcs_fit_problem}. Then $\vec{\beta}_{Bayes}^\ast$ is given by the solution to those problems and $\mat{\Sigma}_\text{Bayes}$ can be estimated by the variance-covariance matrices from section~\ref{sec:varcovmatrix}, i.e. equation~\eqref{eq:varcov_noerrors}. In this approximation, 
+equation \eqref{eq:bayes_marginprob_laplace} then simplifies to:
+\begin{multline}\label{eq:bayes_marginprob_laplace_flatprior}
+    p(\hat{\vec{g}}|M_g,\vec{\beta})\approx(2\pi)^{k/2}\cdot\sqrt{\det(\mat{\Sigma})}\cdot \exp\left\{-\frac{n\cdot\ln(2\pi)}{2}-\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}=\\
+    =\exp\left\{\frac{k}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right] -\frac{n\cdot\ln(2\pi)}{2}-\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}=\\
+    =\exp\left\{\frac{k}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right] -\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}\cdot\exp\left\{-\frac{n\cdot\ln(2\pi)}{2}\right\}.
+\end{multline}
 
 
 
