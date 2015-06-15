@@ -29,7 +29,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 
 #define LOG_PREFIX "[SPADMeasurement]: "
@@ -62,7 +62,7 @@ void QFExtensionB040SPADMeasurement::deinit() {
     }
 }
 
-void QFExtensionB040SPADMeasurement::projectChanged(QFProject* oldProject, QFProject* project) {
+void QFExtensionB040SPADMeasurement::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
 
 }
 
@@ -145,13 +145,13 @@ unsigned int QFExtensionB040SPADMeasurement::getMeasurementDeviceCount()
 
 QString QFExtensionB040SPADMeasurement::getMeasurementDeviceName(unsigned int measuremenDevice)
 {
-    if (measuremenDevice>=0 && measuremenDevice<(uint64_t)devices.size()) {
+    if (measuremenDevice<(uint64_t)devices.size()) {
         return devices[measuremenDevice].label;
     }
     return QString();
 }
 
-void QFExtensionB040SPADMeasurement::showMeasurementDeviceSettingsDialog(unsigned int measuremenDevice, QWidget *parent)
+void QFExtensionB040SPADMeasurement::showMeasurementDeviceSettingsDialog(unsigned int /*measuremenDevice*/, QWidget *parent)
 {
     QString ini1=services->getGlobalConfigFileDirectory()+QString("/meas_spadmeasurement.ini");
     QString ini2=services->getConfigFileDirectory()+QString("/meas_spadmeasurement.ini");
@@ -162,7 +162,7 @@ void QFExtensionB040SPADMeasurement::showMeasurementDeviceSettingsDialog(unsigne
 
 bool QFExtensionB040SPADMeasurement::isMeasurementDeviceConnected(unsigned int measuremenDevice)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if ( measuremenDevice>=getMeasurementDeviceCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);
@@ -172,7 +172,7 @@ bool QFExtensionB040SPADMeasurement::isMeasurementDeviceConnected(unsigned int m
 
 void QFExtensionB040SPADMeasurement::connectMeasurementDevice(unsigned int measuremenDevice)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return;
+    if ( measuremenDevice>=getMeasurementDeviceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);
@@ -202,7 +202,7 @@ void QFExtensionB040SPADMeasurement::connectMeasurementDevice(unsigned int measu
 
 void QFExtensionB040SPADMeasurement::disconnectMeasurementDevice(unsigned int measuremenDevice)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return;
+    if ( measuremenDevice>=getMeasurementDeviceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);
@@ -226,7 +226,7 @@ void QFExtensionB040SPADMeasurement::setMeasurementDeviceLogging(QFPluginLogServ
 
 QVariant QFExtensionB040SPADMeasurement::getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return QVariant();
+    if ( measuremenDevice>=getMeasurementDeviceCount()) return QVariant();
     JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     QF3SimpleB040SerialProtocolHandler* serial=devices[measuremenDevice].serial;
     if (!com) return QVariant();
@@ -236,7 +236,7 @@ QVariant QFExtensionB040SPADMeasurement::getMeasurementDeviceValue(unsigned int 
 
 
     bool ok=false;
-    if (value>=0 && value<3) {
+    if ( value<3) {
         QString rs=serial->queryCommand(QString("U%1").arg(value));
         double r=(rs.toDouble(&ok)/100.0-devices[measuremenDevice].voltage_offset[value])*devices[measuremenDevice].voltage_factor[value];
         if (ok&&r<1000) return round(r*100.0)/100.0;
@@ -263,7 +263,7 @@ QVariant QFExtensionB040SPADMeasurement::getMeasurementDeviceValue(unsigned int 
 
 void QFExtensionB040SPADMeasurement::setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant &data)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return ;
+    if ( measuremenDevice>=getMeasurementDeviceCount()) return ;
     JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     QF3SimpleB040SerialProtocolHandler* serial=devices[measuremenDevice].serial;
     if (!com) return ;
@@ -278,15 +278,15 @@ void QFExtensionB040SPADMeasurement::setMeasurementDeviceValue(unsigned int meas
     return ;
 }
 
-unsigned int QFExtensionB040SPADMeasurement::getMeasurementDeviceValueCount(unsigned int measuremenDevice)
+unsigned int QFExtensionB040SPADMeasurement::getMeasurementDeviceValueCount(unsigned int /*measuremenDevice*/)
 {
     return 13;
 }
 
 QString QFExtensionB040SPADMeasurement::getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice>=0 && measuremenDevice<(uint64_t)devices.size()) {
-        if (value>=0 && value<8) return devices[measuremenDevice].valuelabels.value(value, QString("PARAMETER%1").arg(value));
+    if (measuremenDevice<(uint64_t)devices.size()) {
+        if ( value<8) return devices[measuremenDevice].valuelabels.value(value, QString("PARAMETER%1").arg(value));
         switch (value) {
             case 8: return tr("relay 1");
             case 9: return tr("relay 2");
@@ -301,8 +301,8 @@ QString QFExtensionB040SPADMeasurement::getMeasurementDeviceValueName(unsigned i
 
 QString QFExtensionB040SPADMeasurement::getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice>=0 && measuremenDevice<(uint64_t)devices.size()) {
-        if (value>=0 && value<8) return devices[measuremenDevice].valueids.value(value, QString("PARAMETER%1").arg(value));
+    if (measuremenDevice<(uint64_t)devices.size()) {
+        if ( value<8) return devices[measuremenDevice].valueids.value(value, QString("PARAMETER%1").arg(value));
         switch (value) {
             case 8: return tr("RELAY1");
             case 9: return tr("RELAY2");
@@ -315,30 +315,30 @@ QString QFExtensionB040SPADMeasurement::getMeasurementDeviceValueShortName(unsig
     return "";
 }
 
-bool QFExtensionB040SPADMeasurement::isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value)
+bool QFExtensionB040SPADMeasurement::isMeasurementDeviceValueEditable(unsigned int /*measuremenDevice*/, unsigned int value)
 {
-    return value==12;
+    return (value==12);
 }
 
-QVariant::Type QFExtensionB040SPADMeasurement::getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value)
+QVariant::Type QFExtensionB040SPADMeasurement::getMeasurementDeviceEditableValueType(unsigned int /*measuremenDevice*/, unsigned int value)
 {
-    if (value>=0 && value<8) return QVariant::Double;
+    if ( value<8) return QVariant::Double;
     if (value>=8 && value<13) return QVariant::Bool;
 
     return QVariant::Invalid;
 
 }
 
-QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionB040SPADMeasurement::getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList *comboboxEntries)
+QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionB040SPADMeasurement::getMeasurementDeviceValueWidget(unsigned int /*measuremenDevice*/, unsigned int value, QStringList */*comboboxEntries*/)
 {
-    if (value>=0 && value<8) return QFExtensionMeasurementAndControlDevice::mdLabel;
+    if ( value<8) return QFExtensionMeasurementAndControlDevice::mdLabel;
     if (value>=8 && value<13) return QFExtensionMeasurementAndControlDevice::mdCheckBox;
 
     return QFExtensionMeasurementAndControlDevice::mdDefault;
 
 }
 
-void QFExtensionB040SPADMeasurement::getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double &minimum, double &maximum)
+void QFExtensionB040SPADMeasurement::getMeasurementDeviceEditableValueRange(unsigned int /*measuremenDevice*/, unsigned int /*value*/, double &/*minimum*/, double &/*maximum*/)
 {
 
 }

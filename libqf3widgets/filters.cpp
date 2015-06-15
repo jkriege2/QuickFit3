@@ -128,7 +128,7 @@ QF3FilterCombobox::~QF3FilterCombobox() {
 
 }
 
-void QF3FilterCombobox::currentFilterChanged(int idx) {
+void QF3FilterCombobox::currentFilterChanged(int /*idx*/) {
     int iD=cmbFilters->currentIndex()-1;
     if (iD>=0 && iD<filters.size()) labFilterDescription->setText(tr(""));
     else labFilterDescription->setText("");

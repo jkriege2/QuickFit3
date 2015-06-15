@@ -253,7 +253,7 @@ void QCairoPaintEngine::drawTiledPixmap(const QRectF &r, const QPixmap &pixmap, 
     }
 }
 
-void QCairoPaintEngine::drawImage(const QRectF &r, const QImage &pm, const QRectF &sr, Qt::ImageConversionFlags flags)
+void QCairoPaintEngine::drawImage(const QRectF &r, const QImage &pm, const QRectF &sr, Qt::ImageConversionFlags /*flags*/)
 {
    //qDebug()<<"drawImage r="<<r<<" sr="<<sr;
     double              w, h;

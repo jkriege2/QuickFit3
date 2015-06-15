@@ -21,7 +21,7 @@
 #ifndef QFGETPLOTDATAINTERFACE_H
 #define QFGETPLOTDATAINTERFACE_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 
 /*! \brief interface for returning data for a plot
     \ingroup qf3lib_tools

@@ -28,7 +28,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 
 #define LOG_PREFIX "[FilterWheelTMCL]: "
@@ -167,7 +167,7 @@ unsigned int QFExtensionTMCLFilterChanger::getFilterChangerCount() {
 
 
 void QFExtensionTMCLFilterChanger::filterChangerConnect(unsigned int filterChanger) {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return;
+    if (filterChanger>=getFilterChangerCount()) return;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     QF3TMCLProtocolHandler* tmcl=wheels[filterChanger].tmcl;
     if (!com) return;
@@ -198,7 +198,7 @@ void QFExtensionTMCLFilterChanger::filterChangerConnect(unsigned int filterChang
 }
 
 void QFExtensionTMCLFilterChanger::filterChangerDisonnect(unsigned int filterChanger) {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return;
+    if (filterChanger>=getFilterChangerCount()) return;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return;
     com->close();
@@ -212,7 +212,7 @@ void QFExtensionTMCLFilterChanger::setFilterChangerLogging(QFPluginLogService *l
 
 
 bool QFExtensionTMCLFilterChanger::isFilterChangerConnected(unsigned int filterChanger) {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return false;
+    if (filterChanger>=getFilterChangerCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return false;
     bool res= com->isConnectionOpen();
@@ -222,12 +222,12 @@ bool QFExtensionTMCLFilterChanger::isFilterChangerConnected(unsigned int filterC
 }
 
 unsigned int QFExtensionTMCLFilterChanger::getFilterChangerFilterCount(unsigned int filterChanger) {
-     if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return 0;
+     if (filterChanger>=getFilterChangerCount()) return 0;
      return wheels[filterChanger].filters;
 }
 
 void QFExtensionTMCLFilterChanger::setFilterChangerFilter(unsigned int filterChanger, unsigned int filter) {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return ;
+    if (filterChanger>=getFilterChangerCount()) return ;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     QF3TMCLProtocolHandler* tmcl=wheels[filterChanger].tmcl;
     if (!com || !tmcl) return;
@@ -266,12 +266,12 @@ void QFExtensionTMCLFilterChanger::setFilterChangerFilter(unsigned int filterCha
 }
 
 unsigned int QFExtensionTMCLFilterChanger::getFilterChangerCurrentFilter(unsigned int filterChanger) {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return 0;
+    if (filterChanger>=getFilterChangerCount()) return 0;
     return wheels[filterChanger].currentFilter;
 }
 
 bool QFExtensionTMCLFilterChanger::isLastFilterChangerActionFinished(unsigned int filterChanger) {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return true;
+    if (filterChanger>=getFilterChangerCount()) return true;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     QF3TMCLProtocolHandler* tmcl=wheels[filterChanger].tmcl;
     if (!com || !tmcl) return true;
@@ -290,12 +290,12 @@ bool QFExtensionTMCLFilterChanger::isLastFilterChangerActionFinished(unsigned in
 }
 
 QString QFExtensionTMCLFilterChanger::getFilterChangerDescription(unsigned int filterChanger) {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return "";
+    if (filterChanger>=getFilterChangerCount()) return "";
     return tr("TMCL controller filter wheel");
 }
 
 QString QFExtensionTMCLFilterChanger::getFilterChangerShortName(unsigned int filterChanger) {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return "";
+    if (filterChanger>=getFilterChangerCount()) return "";
     return tr("TMCL filter wheel");
 }
 
@@ -328,7 +328,7 @@ void QFExtensionTMCLFilterChanger::realignFW() {
 
 
 bool QFExtensionTMCLFilterChanger::TMCLRealignFW(int filterChanger) {
-    if (filterChanger<0 || filterChanger>=(int64_t)getFilterChangerCount()) return false;
+    if (filterChanger>=(int64_t)getFilterChangerCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     QF3TMCLProtocolHandler* tmcl=wheels[filterChanger].tmcl;
     if (!com) return false;

@@ -27,7 +27,7 @@ Copyright (c) 2008-2014 Jan Buchholz, German Cancer Research Center
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 #include <QDebug>
 #include "cam_rh2v2.h"

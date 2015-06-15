@@ -23,7 +23,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFEXTENSIONREPORTINGTOOL_H
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include "qfpluginservices.h"
 #include <stdint.h>
 #include <QVariant>

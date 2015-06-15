@@ -22,7 +22,7 @@
 #include "qfhtmlhelptools.h"
 #include "qffitfunctionmanager.h"
 #include <QDir>
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <QPluginLoader>
 #include "qffitfunctionparsed.h"
 #include "qflibraryfitfunction.h"

@@ -27,7 +27,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QtGui>
 #endif
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 #include "videocapture.h"
 #include "syscamconfigdialog.h"

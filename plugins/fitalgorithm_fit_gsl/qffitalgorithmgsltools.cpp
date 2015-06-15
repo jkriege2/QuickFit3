@@ -137,7 +137,7 @@ void QFFitAlgorithmGSL_fdf (const gsl_vector *x, void *params, double *f, gsl_ve
   QFFitAlgorithmGSL_df(x, params, df);
 }
 
-gsl_vector* QFFitAlgorithmGSL_transformParams(const double* paramsOut, int N, const double* paramsMin, const double* paramsMax) {
+gsl_vector* QFFitAlgorithmGSL_transformParams(const double* paramsOut, int N, const double* /*paramsMin*/, const double* /*paramsMax*/) {
     gsl_vector* res=gsl_vector_alloc(N);
     /*if (paramsMin&&paramsMax) {
         for (int i=0; i<N; i++) {

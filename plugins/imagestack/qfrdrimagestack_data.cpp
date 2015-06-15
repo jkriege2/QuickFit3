@@ -171,7 +171,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                         getProject()->getServices()->log_text(tr("    * loading image stack %1/%2 (file: '%3', %5x%6, channels: %4) ...\n").arg(stack+1).arg(stacks.size()).arg(files[f]).arg(stacks[stack].channels).arg(stacks[stack].width).arg(stacks[stack].height));
                         bool ok=true;
                         for (int filechannel=0; filechannel<stacks[stack].channels; filechannel++) {
-                            if (ok=ok&&loadImageFile(stacks[stack], files[f], QFRDRImageStackData::lmReadData, filechannel, qfihAny, filechannel)) {
+                            if ((ok=(ok&&loadImageFile(stacks[stack], files[f], QFRDRImageStackData::lmReadData, filechannel, qfihAny, filechannel)))) {
 
                             } else {
                                 setError(tr("error loading channel %3/%4 image stack %1 (file: '%2')\n").arg(stacks.size()).arg(files[f]).arg(filechannel).arg(stacks[stack].channels-1));

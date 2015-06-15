@@ -22,7 +22,7 @@
 #ifndef QFRDRIMFCSCORRELATORREMOTE_H
 #define QFRDRIMFCSCORRELATORREMOTE_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <stdint.h>
 
 /*! \brief allows to remotely control an imFCS correltor plugin

@@ -23,7 +23,7 @@
 #ifndef QFRDRCOUNTRATESINTERFACE_H
 #define QFRDRCOUNTRATESINTERFACE_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 
 /*! \brief interface for a set of countrates
     \ingroup qf3rdrdp_fcs

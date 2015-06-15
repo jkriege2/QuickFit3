@@ -29,7 +29,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 
 #define LOG_PREFIX "[ResHeaterArd]: "
@@ -62,7 +62,7 @@ void QFExtensionB040ResistorHeater::deinit() {
     }
 }
 
-void QFExtensionB040ResistorHeater::projectChanged(QFProject* oldProject, QFProject* project) {
+void QFExtensionB040ResistorHeater::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
 
 }
 
@@ -129,13 +129,13 @@ unsigned int QFExtensionB040ResistorHeater::getMeasurementDeviceCount()
 
 QString QFExtensionB040ResistorHeater::getMeasurementDeviceName(unsigned int measuremenDevice)
 {
-    if (measuremenDevice>=0 && (long long)measuremenDevice<devices.size()) {
+    if ((long long)measuremenDevice<devices.size()) {
         return devices[measuremenDevice].label;
     }
     return QString();
 }
 
-void QFExtensionB040ResistorHeater::showMeasurementDeviceSettingsDialog(unsigned int measuremenDevice, QWidget *parent)
+void QFExtensionB040ResistorHeater::showMeasurementDeviceSettingsDialog(unsigned int /*measuremenDevice*/, QWidget *parent)
 {
     QString ini1=services->getGlobalConfigFileDirectory()+QString("/meas_b040resheater.ini");
     QString ini2=services->getConfigFileDirectory()+QString("/meas_b040resheater.ini");
@@ -146,7 +146,7 @@ void QFExtensionB040ResistorHeater::showMeasurementDeviceSettingsDialog(unsigned
 
 bool QFExtensionB040ResistorHeater::isMeasurementDeviceConnected(unsigned int measuremenDevice)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if ( measuremenDevice>=getMeasurementDeviceCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);
@@ -156,7 +156,7 @@ bool QFExtensionB040ResistorHeater::isMeasurementDeviceConnected(unsigned int me
 
 void QFExtensionB040ResistorHeater::connectMeasurementDevice(unsigned int measuremenDevice)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return;
+    if ( measuremenDevice>=getMeasurementDeviceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);
@@ -186,7 +186,7 @@ void QFExtensionB040ResistorHeater::connectMeasurementDevice(unsigned int measur
 
 void QFExtensionB040ResistorHeater::disconnectMeasurementDevice(unsigned int measuremenDevice)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return;
+    if ( measuremenDevice>=getMeasurementDeviceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);
@@ -210,7 +210,7 @@ void QFExtensionB040ResistorHeater::setMeasurementDeviceLogging(QFPluginLogServi
 
 QVariant QFExtensionB040ResistorHeater::getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return QVariant();
+    if ( measuremenDevice>=getMeasurementDeviceCount()) return QVariant();
     JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     QF3SimpleB040SerialProtocolHandler* serial=devices[measuremenDevice].serial;
     if (!com) return QVariant();
@@ -244,7 +244,7 @@ QVariant QFExtensionB040ResistorHeater::getMeasurementDeviceValue(unsigned int m
 
 void QFExtensionB040ResistorHeater::setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant &data)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return ;
+    if ( measuremenDevice>=getMeasurementDeviceCount()) return ;
     JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     QF3SimpleB040SerialProtocolHandler* serial=devices[measuremenDevice].serial;
     if (!com) return ;
@@ -267,12 +267,12 @@ void QFExtensionB040ResistorHeater::setMeasurementDeviceValue(unsigned int measu
     return ;
 }
 
-unsigned int QFExtensionB040ResistorHeater::getMeasurementDeviceValueCount(unsigned int measuremenDevice)
+unsigned int QFExtensionB040ResistorHeater::getMeasurementDeviceValueCount(unsigned int /*measuremenDevice*/)
 {
     return 5;
 }
 
-QString QFExtensionB040ResistorHeater::getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value)
+QString QFExtensionB040ResistorHeater::getMeasurementDeviceValueName(unsigned int /*measuremenDevice*/, unsigned int value)
 {
     switch (value) {
         case 0: return tr("temperature 0");
@@ -284,7 +284,7 @@ QString QFExtensionB040ResistorHeater::getMeasurementDeviceValueName(unsigned in
     }
 }
 
-QString QFExtensionB040ResistorHeater::getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)
+QString QFExtensionB040ResistorHeater::getMeasurementDeviceValueShortName(unsigned int /*measuremenDevice*/, unsigned int value)
 {
     switch (value) {
         case 0: return tr("TEMP0");
@@ -296,12 +296,12 @@ QString QFExtensionB040ResistorHeater::getMeasurementDeviceValueShortName(unsign
     }
 }
 
-bool QFExtensionB040ResistorHeater::isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value)
+bool QFExtensionB040ResistorHeater::isMeasurementDeviceValueEditable(unsigned int /*measuremenDevice*/, unsigned int value)
 {
     return (value==2 || value==3) ;
 }
 
-QVariant::Type QFExtensionB040ResistorHeater::getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value)
+QVariant::Type QFExtensionB040ResistorHeater::getMeasurementDeviceEditableValueType(unsigned int /*measuremenDevice*/, unsigned int value)
 {
     switch (value) {
         case 0: return QVariant::Double;
@@ -316,7 +316,7 @@ QVariant::Type QFExtensionB040ResistorHeater::getMeasurementDeviceEditableValueT
 
 }
 
-QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionB040ResistorHeater::getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList *comboboxEntries)
+QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionB040ResistorHeater::getMeasurementDeviceValueWidget(unsigned int /*measuremenDevice*/, unsigned int value, QStringList */*comboboxEntries*/)
 {
     switch (value) {
         case 0: return QFExtensionMeasurementAndControlDevice::mdDoubleEdit;
@@ -331,7 +331,7 @@ QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionB040ResistorHeate
 
 }
 
-void QFExtensionB040ResistorHeater::getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double &minimum, double &maximum)
+void QFExtensionB040ResistorHeater::getMeasurementDeviceEditableValueRange(unsigned int /*measuremenDevice*/, unsigned int value, double &minimum, double &maximum)
 {
     switch (value) {
         case 0: minimum=-100; maximum=200; break;

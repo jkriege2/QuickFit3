@@ -36,7 +36,7 @@ double QFFitAlgorithmNLOpt_f(unsigned int n, const double* x, double* grad, void
 }
 
 
-double QFFitAlgorithmNLOpt_fmin(unsigned int n, const double *x, double *grad, void *params)
+double QFFitAlgorithmNLOpt_fmin(unsigned int /*n*/, const double *x, double *grad, void *params)
 {
     QFFItAlgorithmFMinNLOpt_evalData *p = (QFFItAlgorithmFMinNLOpt_evalData *)params;
 

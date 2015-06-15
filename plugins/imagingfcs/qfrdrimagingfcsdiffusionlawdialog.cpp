@@ -581,10 +581,10 @@ void QFRDRImagingFCSDiffusionLawDialog::recalcPlot()
                 ui->plotter->getYAxis()->set_axisLabel(QString("\\frac{\\verb{%3}}{\\verb{%2}}  [(%6)/(%5)]").arg(ui->cmbParameter1->currentText()).arg(ui->cmbParameter2->currentText()).arg(ui->cmbParameter3->currentText()).arg(unit1).arg(unit2).arg(unit3));
             } else if (ui->cmbMode->currentIndex()==5) {
                 ui->plotter->getXAxis()->set_axisLabel(QString("\\left(\\verb{%1}\\right)^2  [(%2)^2]").arg(ui->cmbParameter1->currentText()).arg(unit1));
-                ui->plotter->getYAxis()->set_axisLabel(QString("\\frac{\left(\\verb{%3}\\right)^2}{\\verb{%2}}  [(%6)^2/(%5)]").arg(ui->cmbParameter1->currentText()).arg(ui->cmbParameter2->currentText()).arg(ui->cmbParameter3->currentText()).arg(unit1).arg(unit2).arg(unit3));
+                ui->plotter->getYAxis()->set_axisLabel(QString("\\frac{\\left(\\verb{%3}\\right)^2}{\\verb{%2}}  [(%6)^2/(%5)]").arg(ui->cmbParameter1->currentText()).arg(ui->cmbParameter2->currentText()).arg(ui->cmbParameter3->currentText()).arg(unit1).arg(unit2).arg(unit3));
             } else if (ui->cmbMode->currentIndex()==6) {
                 ui->plotter->getYAxis()->set_axisLabel(QString("\\left(\\verb{%1}\\right)^2  [(%2)^2]").arg(ui->cmbParameter1->currentText()).arg(unit1));
-                ui->plotter->getXAxis()->set_axisLabel(QString("\\frac{\left(\\verb{%1}\\right)^2}{\\verb{%2}}  [(%4)^2/(%5)]").arg(ui->cmbParameter1->currentText()).arg(ui->cmbParameter2->currentText()).arg(ui->cmbParameter3->currentText()).arg(unit1).arg(unit2).arg(unit3));
+                ui->plotter->getXAxis()->set_axisLabel(QString("\\frac{\\left(\\verb{%1}\\right)^2}{\\verb{%2}}  [(%4)^2/(%5)]").arg(ui->cmbParameter1->currentText()).arg(ui->cmbParameter2->currentText()).arg(ui->cmbParameter3->currentText()).arg(unit1).arg(unit2).arg(unit3));
             } else if (ui->cmbMode->currentIndex()==7) {
                 ui->plotter->getYAxis()->set_axisLabel(QString("\\left(\\verb{%1}\\right)^2 [(%2)^2]").arg(ui->cmbParameter1->currentText()).arg(unit1));
                 ui->plotter->getXAxis()->set_axisLabel(QString("\\verb{%1} [%2]").arg(ui->cmbParameter2->currentText()).arg(unit2));

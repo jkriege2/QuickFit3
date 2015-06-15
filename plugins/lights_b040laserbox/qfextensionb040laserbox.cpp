@@ -29,7 +29,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 
 #define LIGHTSOURCE_ACTION_DURATION 1

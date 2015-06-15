@@ -81,7 +81,7 @@ void QFUsesResultsByIndexAndModelEvaluation::setCurrentModel(int model) {
 
 
 
-int QFUsesResultsByIndexAndModelEvaluation::getModelCount(QFRawDataRecord *r, int /*index*/) const {
+int QFUsesResultsByIndexAndModelEvaluation::getModelCount(QFRawDataRecord */*r*/, int /*index*/) const {
     return 0;
 
 }

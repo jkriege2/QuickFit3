@@ -929,7 +929,7 @@ void QFRDROverviewImageDisplay::updateSelectionArrays() {
             plteOverviewSize=siz;
             plteOverviewSelectedData=(bool*)qfRealloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
         }
-        for (register int i=0; i<siz; i++) {
+        for ( int i=0; i<siz; i++) {
             plteOverviewSelectedData[i]=selected.contains(i);
         }
     } else {

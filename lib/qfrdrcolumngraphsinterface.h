@@ -22,7 +22,7 @@
 #ifndef QFRDRCOLUMNGRAPHINTERFACE_H
 #define QFRDRCOLUMNGRAPHINTERFACE_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <QColor>
 #include <QVariant>
 

@@ -313,7 +313,7 @@ void QFImagePlotter::initImFCSPlotter()
     overlayCmb=NULL;
     current=NULL;
     plteImageData=NULL;
-    plteImageSize=NULL;
+    plteImageSize=0;
     plteImageWidth=0;
     plteImageHeight=0;
 

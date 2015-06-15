@@ -61,7 +61,7 @@ void QFCompleterFromFile::setFilename(QString val) {
     }
 }
 
-void QFCompleterFromFile::modelDataChanged ( const QModelIndex & topLeft, const QModelIndex & bottomRight ) {
+void QFCompleterFromFile::modelDataChanged ( const QModelIndex & /*topLeft*/, const QModelIndex & /*bottomRight*/ ) {
     //std::cout<<"model changed\n";
     if (m_filename.size()>0) {
         QDir().mkpath(QFileInfo(m_filename).absolutePath());
@@ -86,7 +86,7 @@ void QFCompleterFromFile::modelDataChanged ( const QModelIndex & topLeft, const 
     }
 }
 
-void QFCompleterFromFile::modelRowChanged ( const QModelIndex & parent, int start, int end ) {
+void QFCompleterFromFile::modelRowChanged ( const QModelIndex & /*parent*/, int /*start*/, int /*end*/ ) {
     modelDataChanged(QModelIndex(), QModelIndex());
 }
 

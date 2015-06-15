@@ -35,7 +35,7 @@ struct QFFItAlgorithmGSL_evalData {
     int pcount;
 };
 
-void lmfit_evalboxtanh(const double *par, int m_dat, const void *data, double *fvec, int *info) {
+void lmfit_evalboxlimits(const double *par, int /*m_dat*/, const void *data, double *fvec, int */*info*/) {
     QFFItAlgorithmGSL_evalData* edata=(QFFItAlgorithmGSL_evalData*)data;
     if ( edata->paramsMin && edata->paramsMax ) {
         /*double* p=edata->p;
@@ -72,6 +72,7 @@ void lmfit_evalboxtanh(const double *par, int m_dat, const void *data, double *f
         edata->model->evaluate(fvec, par);
     }
 }
+
 
 QFFitAlgorithmLMFitBox::QFFitAlgorithmLMFitBox() {
     // set default parameter values
@@ -112,7 +113,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
 
     bool transformParams=paramsMin&&paramsMax;
 
-    lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status );
+    lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxlimits, &control, &status );
     if (paramsMin && paramsMax) {
         bool atbound=false;
         for (int i=0; i<paramCount; i++) {
@@ -127,7 +128,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
             } else paramsOut[i]=qBound(mi, paramsOut[i], ma);
         }
         if (atbound) {
-            lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status );
+            lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxlimits, &control, &status );
             for (int i=0; i<paramCount; i++) {
                 const double mi=paramsMin[i];
                 const double ma=paramsMax[i];

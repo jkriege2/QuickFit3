@@ -36,7 +36,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "andorglobalcamerasettingswidget.h"
 #include "flowlayout.h"
 #include <unistd.h>
-#include <QtPlugin>
+#include "qfplugin.h"
 #include "andortools.h"
 #include "qfextensionshutter.h"
 #include "qfextensionmeasurementdevice.h"

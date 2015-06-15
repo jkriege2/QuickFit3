@@ -23,7 +23,7 @@
 #define QFPLUGINFITFUNCTION_H
 
 #include "lib_imexport.h"
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <QString>
 #include <QStringList>
 #include <QObject>

@@ -29,7 +29,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 #include "qfertresultcalculator.h"
 #include "jkmathparser.h"

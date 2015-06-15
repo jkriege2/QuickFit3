@@ -22,7 +22,7 @@
 #ifndef QFRDRSIMPLECOUNTRATEINTERFACE_H
 #define QFRDRSIMPLECOUNTRATEINTERFACE_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 
 /*! \brief interface for simple count rate information
     \ingroup qf3rdrdp_fcs

@@ -24,7 +24,7 @@
 
 #include "lib_imexport.h"
 #include <QObject>
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <QString>
 #include <QStringList>
 #include <QMap>

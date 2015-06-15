@@ -30,7 +30,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 #include "qfpluginservices.h"
 #include "qfmathparser.h"

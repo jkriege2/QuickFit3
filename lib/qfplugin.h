@@ -26,6 +26,7 @@
 #include "qflib_version.h"
 #include <QIcon>
 #include <QString>
+#include <QtPlugin>
 
 class QFPluginEvaluationItem; // forward
 class QFPluginRawDataRecord; // forward

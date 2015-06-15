@@ -464,12 +464,12 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
         maskTools->setMaskEditing(true);
         maskTools->setEditingMode(0);
         if (selection&&ar) {
-            double var, vara;
+            double var=0, vara=0;
             double avg=statisticsAverageVarianceMasked(var, selection, ar, width*height, true);
             double avga=statisticsAverageVariance(vara, ar, width*height);
             selectiontextA=tr("<b>A <small>[sel/all]</small>:</b> (%3&plusmn;%4) / (%1&plusmn;%2)").arg(avga).arg(sqrt(vara)).arg(avg).arg(sqrt(var));
         } else if (ar) {
-            double vara;
+            double vara=0;
             double avga=statisticsAverageVariance(vara, ar, width*height);
             selectiontextA=tr("<b>A <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
         }
@@ -488,12 +488,12 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             image->set_palette(cmbColorbar->colorPalette());
 
             if (selection&&ir) {
-                double var, vara;
+                double var=0, vara=0;
                 double avg=statisticsAverageVarianceMasked(var, selection, ir, width*height, true);
                 double avga=statisticsAverageVariance(vara, ir, width*height);
                 selectiontextD=tr("<b>D <small>[sel/all]</small>:</b> (%3&plusmn;%4) / (%1&plusmn;%2)").arg(avga).arg(sqrt(vara)).arg(avg).arg(sqrt(var));
             } else if (ir) {
-                double vara;
+                double vara=0;
                 double avga=statisticsAverageVariance(vara, ir, width*height);
                 selectiontextD=tr("<b>D <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
             }
@@ -540,34 +540,34 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             imageRGB->set_modifierMode(cmbModifierMode->getModifierMode());
 
             if (selection&&ir) {
-                double var, vara;
+                double var=0, vara=0;
                 double avg=statisticsAverageVarianceMasked(var, selection, ir, width*height, true);
                 double avga=statisticsAverageVariance(vara, ir, width*height);
                 selectiontextD=tr("<b>R <small>[sel/all]</small>:</b> (%3&plusmn;%4) / (%1&plusmn;%2)").arg(avga).arg(sqrt(vara)).arg(avg).arg(sqrt(var));
             } else if (ir) {
-                double vara;
+                double vara=0;
                 double avga=statisticsAverageVariance(vara, ir, width*height);
                 selectiontextD=tr("<b>R <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
             }
             if (!selectiontextD.isEmpty()) selectiontextD+="<br>";
             if (selection&&ig) {
-                double var, vara;
+                double var=0, vara=0;
                 double avg=statisticsAverageVarianceMasked(var, selection, ig, width*height, true);
                 double avga=statisticsAverageVariance(vara, ig, width*height);
                 selectiontextD+=tr("<b>G <small>[sel/all]</small>:</b> (%3&plusmn;%4) / (%1&plusmn;%2)").arg(avga).arg(sqrt(vara)).arg(avg).arg(sqrt(var));
             } else if (ig) {
-                double vara;
+                double vara=0;
                 double avga=statisticsAverageVariance(vara, ig, width*height);
                 selectiontextD+=tr("<b>G <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
             }
             if (!selectiontextD.isEmpty()) selectiontextD+="<br>";
             if (selection&&ib) {
-                double var, vara;
+                double var=0, vara=0;
                 double avg=statisticsAverageVarianceMasked(var, selection, ib, width*height, true);
                 double avga=statisticsAverageVariance(vara, ib, width*height);
                 selectiontextD+=tr("<b>B <small>[sel/all]</small>:</b> (%3&plusmn;%4) / (%1&plusmn;%2)").arg(avga).arg(sqrt(vara)).arg(avg).arg(sqrt(var));
             } else if (ib) {
-                double vara;
+                double vara=0;
                 double avga=statisticsAverageVariance(vara, ib, width*height);
                 selectiontextD+=tr("<b>B <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
             }

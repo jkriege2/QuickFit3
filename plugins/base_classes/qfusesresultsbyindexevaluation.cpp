@@ -165,15 +165,15 @@ int QFUsesResultsByIndexEvaluation::getCurrentIndex() const {
     return currentIndex;
 }
 
-int QFUsesResultsByIndexEvaluation::getIndexMin(const QFRawDataRecord *r) const {
+int QFUsesResultsByIndexEvaluation::getIndexMin(const QFRawDataRecord */*r*/) const {
     return 0;
 }
 
-int QFUsesResultsByIndexEvaluation::getIndexMax(const QFRawDataRecord *r) const {
+int QFUsesResultsByIndexEvaluation::getIndexMax(const QFRawDataRecord */*r*/) const {
     return 0;
 }
 
-QString QFUsesResultsByIndexEvaluation::getIndexName(const QFRawDataRecord *rec, int index) const
+QString QFUsesResultsByIndexEvaluation::getIndexName(const QFRawDataRecord */*rec*/, int index) const
 {
     return QString::number(index);
 }

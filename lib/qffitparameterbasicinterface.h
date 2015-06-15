@@ -23,7 +23,7 @@
 #define QFFITPARAMETERBASICINTERFACE_H
 
 #include <QString>
-#include <QtPlugin>
+#include "qfplugin.h"
 #include "lib_imexport.h"
 
 class QFRawDataRecord; // forward

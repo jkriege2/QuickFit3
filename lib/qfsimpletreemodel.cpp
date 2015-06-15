@@ -145,7 +145,7 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
      }
  }
 
- QVariant QFSimpleTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+ QVariant QFSimpleTreeModel::headerData(int /*section*/, Qt::Orientation orientation, int role) const
  {
      if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
          return rootItem->data(role);

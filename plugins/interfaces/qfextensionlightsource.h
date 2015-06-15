@@ -23,7 +23,7 @@
 #define QFEXTENSIONLIGHTSOURCE_H
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <QWidget>
 #include <QSettings>
 #include "qfpluginservices.h"

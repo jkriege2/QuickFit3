@@ -61,22 +61,22 @@ QVariant QFRDRPhotonCountsDataEditorChannelsModel::data(const QModelIndex &index
 
 
 
-Qt::ItemFlags QFRDRPhotonCountsDataEditorChannelsModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QFRDRPhotonCountsDataEditorChannelsModel::flags(const QModelIndex &/*index*/) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-QVariant QFRDRPhotonCountsDataEditorChannelsModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QFRDRPhotonCountsDataEditorChannelsModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const {
     return QVariant();
 }
 
-int QFRDRPhotonCountsDataEditorChannelsModel::rowCount(const QModelIndex &parent) const {
+int QFRDRPhotonCountsDataEditorChannelsModel::rowCount(const QModelIndex &/*parent*/) const {
     if (!current) return 0;
     QFRDRPhotonCountsInterface* m=qobject_cast<QFRDRPhotonCountsInterface*>(current);
     if (m) return 1+m->getPhotonCountsChannels();
     return 1;
 }
 
-int QFRDRPhotonCountsDataEditorChannelsModel::columnCount(const QModelIndex &parent) const {
+int QFRDRPhotonCountsDataEditorChannelsModel::columnCount(const QModelIndex &/*parent*/) const {
     return 1;
 }
 
@@ -264,7 +264,7 @@ void QFRDRPhotonCountsDataEditor::connectWidgets(QFRawDataRecord* current, QFRaw
 
 }
 
-void QFRDRPhotonCountsDataEditor::replotData(int dummy) {
+void QFRDRPhotonCountsDataEditor::replotData(int /*dummy*/) {
     //std::cout<<"repainting ...";
     JKQTPdatastore* ds=plotterBinned->getDatastore();
     QFRDRPhotonCountsData* m=qobject_cast<QFRDRPhotonCountsData*>(current);
@@ -339,17 +339,17 @@ void QFRDRPhotonCountsDataEditor::replotDetail() {
     plotterBinned->update_overlays();
 }
 
-void QFRDRPhotonCountsDataEditor::selectionChanged(const QModelIndex &current, const QModelIndex &previous) {
+void QFRDRPhotonCountsDataEditor::selectionChanged(const QModelIndex &/*current*/, const QModelIndex &/*previous*/) {
     replotData();
     replotDetail();
 }
 
-void QFRDRPhotonCountsDataEditor::selectionChanged(const QItemSelection &current, const QItemSelection &previous) {
+void QFRDRPhotonCountsDataEditor::selectionChanged(const QItemSelection &/*current*/, const QItemSelection &/*previous*/) {
     replotData();
     replotDetail();
 }
 
-void QFRDRPhotonCountsDataEditor::runsModeChanged(int c) {
+void QFRDRPhotonCountsDataEditor::runsModeChanged(int/* c*/) {
     lstRunsSelect->setEnabled(cmbRunDisplay->currentIndex()>0);
     replotData();
 
@@ -371,7 +371,7 @@ void QFRDRPhotonCountsDataEditor::detailWidthChanged(double width) {
     replotDetail();
 }
 
-void QFRDRPhotonCountsDataEditor::detailPosChanged(int pos) {
+void QFRDRPhotonCountsDataEditor::detailPosChanged(int /*pos*/) {
     replotDetail();
 }
 

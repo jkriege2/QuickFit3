@@ -18,7 +18,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 /*!
     \defgroup qf3ext_b040_ffmcontrol QFExtension implementation

@@ -54,12 +54,9 @@ double QFFitFunctionLightsheetSlit::evaluate(double t, const double* data) const
     return offset+amplitude*s*s;
 }
 
-void QFFitFunctionLightsheetSlit::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
 
-}
 
-bool QFFitFunctionLightsheetSlit::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionLightsheetSlit::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {
@@ -82,8 +79,6 @@ bool QFFitFunctionLightsheetSlit::estimateInitial(double *params, const double *
     return true;
 }
 
-void QFFitFunctionLightsheetSlit::calcParameter(double* data, double* error) const {
-}
 
 bool QFFitFunctionLightsheetSlit::isParameterVisible(int parameter, const double* data) const {
 

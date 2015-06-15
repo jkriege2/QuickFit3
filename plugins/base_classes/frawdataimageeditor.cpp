@@ -776,7 +776,7 @@ void FRawDataImageEditor::updateCorrelation(QFParameterCorrelationView *corrView
     if (!dv) {
         if ((plteImageSize>=0) && (plteImageSize<=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
             if (excludeExcluded) {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && !msel->leaveoutRun(i) && (!dv || (dv && !indexIsDualView2(i)))) {
                         if (data1) datac1[datasize]=data1[i];
                         if (data2) datac2[datasize]=data2[i];
@@ -790,7 +790,7 @@ void FRawDataImageEditor::updateCorrelation(QFParameterCorrelationView *corrView
                     }
                 }
             } else  {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && (!dv || (dv && !indexIsDualView2(i)))) {
                         if (data1) datac1[datasize]=data1[i];
                         if (data2) datac2[datasize]=data2[i];
@@ -924,7 +924,7 @@ void FRawDataImageEditor::replotImage()
 
 }
 
-void FRawDataImageEditor::replotSelection(bool replot)
+void FRawDataImageEditor::replotSelection(bool /*replot*/)
 {
 
 }
@@ -999,17 +999,17 @@ void FRawDataImageEditor::invertMask()
 
 }
 
-void FRawDataImageEditor::slidersChanged(int userMin, int userMax, int min, int max)
+void FRawDataImageEditor::slidersChanged(int /*userMin*/, int /*userMax*/, int /*min*/, int /*max*/)
 {
 
 }
 
-void FRawDataImageEditor::imageClicked(double x, double y, Qt::KeyboardModifiers modifiers)
+void FRawDataImageEditor::imageClicked(double /*x*/, double /*y*/, Qt::KeyboardModifiers /*modifiers*/)
 {
 
 }
 
-void FRawDataImageEditor::imageScribbled(double x, double y, Qt::KeyboardModifiers modifiers, bool first, bool last)
+void FRawDataImageEditor::imageScribbled(double /*x*/, double /*y*/, Qt::KeyboardModifiers /*modifiers*/, bool /*first*/, bool /*last*/)
 {
 
 }
@@ -1104,12 +1104,12 @@ void FRawDataImageEditor::loadImageSettings()
 
 }
 
-void FRawDataImageEditor::imageZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender)
+void FRawDataImageEditor::imageZoomChangedLocally(double /*newxmin*/, double /*newxmax*/, double /*newymin*/, double /*newymax*/, JKQtPlotter */*sender*/)
 {
 
 }
 
-void FRawDataImageEditor::resultsChanged(const QString &evalName, const QString &resultName, bool deleted)
+void FRawDataImageEditor::resultsChanged(const QString &/*evalName*/, const QString &/*resultName*/, bool /*deleted*/)
 {
 
 }
@@ -1154,7 +1154,7 @@ void FRawDataImageEditor::updateSelectionCombobox()
 
 }
 
-void FRawDataImageEditor::selectedSelectionInCombo(int index)
+void FRawDataImageEditor::selectedSelectionInCombo(int /*index*/)
 {
 
 }
@@ -1187,7 +1187,7 @@ void FRawDataImageEditor::copyMaskToAll()
 
 
 
-void FRawDataImageEditor::createReportDoc(QTextDocument *document)
+void FRawDataImageEditor::createReportDoc(QTextDocument */*document*/)
 {
 
 }
@@ -2350,7 +2350,7 @@ void FRawDataImageEditor::createWidgets()
 
 
 
-bool FRawDataImageEditor::indexIsDualView2(int32_t sel)
+bool FRawDataImageEditor::indexIsDualView2(int32_t /*sel*/)
 {
     /*QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (!m) return false;
@@ -2359,22 +2359,22 @@ bool FRawDataImageEditor::indexIsDualView2(int32_t sel)
 
 }
 
-void FRawDataImageEditor::selectedInsert(int idx)
+void FRawDataImageEditor::selectedInsert(int /*idx*/)
 {
 
 }
 
-void FRawDataImageEditor::selectedRemove(int idx)
+void FRawDataImageEditor::selectedRemove(int /*idx*/)
 {
 
 }
 
-void FRawDataImageEditor::excludeByImage(double *imageIn)
+void FRawDataImageEditor::excludeByImage(double */*imageIn*/)
 {
 
 }
 
-void FRawDataImageEditor::getCurrentResultNamesAndLabels(QStringList &names, QStringList &labels)
+void FRawDataImageEditor::getCurrentResultNamesAndLabels(QStringList &/*names*/, QStringList &/*labels*/)
 {
 
 }

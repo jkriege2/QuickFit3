@@ -29,7 +29,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 #include "dlgpololumaestrotester.h"
 
@@ -72,7 +72,7 @@ void QFExtensionServoPololuMaestro::deinit() {
     }
 }
 
-void QFExtensionServoPololuMaestro::projectChanged(QFProject* oldProject, QFProject* project) {
+void QFExtensionServoPololuMaestro::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
 
 }
 
@@ -159,7 +159,7 @@ unsigned int QFExtensionServoPololuMaestro::getShutterCount() {
 }
 
 void QFExtensionServoPololuMaestro::shutterConnect(unsigned int shutter) {
-    if (shutter<0 || shutter>=getShutterCount()) return;
+    if (shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
@@ -179,7 +179,7 @@ void QFExtensionServoPololuMaestro::shutterConnect(unsigned int shutter) {
 }
 
 void QFExtensionServoPololuMaestro::shutterDisonnect(unsigned int shutter) {
-    if (shutter<0 || shutter>=getShutterCount()) return;
+    if (shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
@@ -188,7 +188,7 @@ void QFExtensionServoPololuMaestro::shutterDisonnect(unsigned int shutter) {
 }
 
 bool QFExtensionServoPololuMaestro::isShutterConnected(unsigned int shutter) {
-    if (shutter<0 || shutter>=getShutterCount()) return false;
+    if (shutter>=getShutterCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
@@ -197,7 +197,7 @@ bool QFExtensionServoPololuMaestro::isShutterConnected(unsigned int shutter) {
 }
 
 bool QFExtensionServoPololuMaestro::isShutterOpen(unsigned int shutter)  {
-    if (shutter<0 || shutter>=getShutterCount()) return false;
+    if (shutter>=getShutterCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
@@ -211,7 +211,7 @@ bool QFExtensionServoPololuMaestro::isShutterOpen(unsigned int shutter)  {
 }
 
 void QFExtensionServoPololuMaestro::setShutterState(unsigned int shutter, bool opened) {
-    if (shutter<0 || shutter>=getShutterCount()) return;
+    if (shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return ;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
@@ -233,22 +233,22 @@ void QFExtensionServoPololuMaestro::setShutterState(unsigned int shutter, bool o
 }
 
 bool QFExtensionServoPololuMaestro::isLastShutterActionFinished(unsigned int shutter) {
-    if (shutter<0 || shutter>=getShutterCount()) return true;
+    if (shutter>=getShutterCount()) return true;
     return shutters[shutter].lastAction.elapsed()>shutters[shutter].operation_duration;
 }
 
 QString QFExtensionServoPololuMaestro::getShutterDescription(unsigned int shutter)  {
-    if (shutter<0 || shutter>=getShutterCount()) return getDescription();
+    if (shutter>=getShutterCount()) return getDescription();
     return shutters[shutter].description;
 }
 
 QString QFExtensionServoPololuMaestro::getShutterShortName(unsigned int shutter)  {
-    if (shutter<0 || shutter>=getShutterCount()) return getName();
+    if (shutter>=getShutterCount()) return getName();
     return shutters[shutter].label;
 }
 
 
-void QFExtensionServoPololuMaestro::showShutterSettingsDialog(unsigned int shutter, QWidget* parent) {
+void QFExtensionServoPololuMaestro::showShutterSettingsDialog(unsigned int /*shutter*/, QWidget* parent) {
 /*
     bool globalIniWritable=QSettings(services->getGlobalConfigFileDirectory()+"/servo_pololu_maestro.ini", QSettings::IniFormat).isWritable();
 
@@ -332,7 +332,7 @@ unsigned int QFExtensionServoPololuMaestro::getFilterChangerCount()
 
 void QFExtensionServoPololuMaestro::filterChangerConnect(unsigned int filterChanger)
 {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return;
+    if (filterChanger>=getFilterChangerCount()) return;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(wheels[filterChanger].port);
@@ -354,7 +354,7 @@ void QFExtensionServoPololuMaestro::filterChangerConnect(unsigned int filterChan
 
 void QFExtensionServoPololuMaestro::filterChangerDisonnect(unsigned int filterChanger)
 {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return;
+    if (filterChanger>=getFilterChangerCount()) return;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(wheels[filterChanger].port);
@@ -369,7 +369,7 @@ void QFExtensionServoPololuMaestro::setFilterChangerLogging(QFPluginLogService *
 
 bool QFExtensionServoPololuMaestro::isFilterChangerConnected(unsigned int filterChanger)
 {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return false;
+    if (filterChanger>=getFilterChangerCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(wheels[filterChanger].port);
@@ -378,13 +378,13 @@ bool QFExtensionServoPololuMaestro::isFilterChangerConnected(unsigned int filter
 
 unsigned int QFExtensionServoPololuMaestro::getFilterChangerFilterCount(unsigned int filterChanger)
 {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return 0;
+    if (filterChanger>=getFilterChangerCount()) return 0;
     return wheels[filterChanger].targets.size();
 }
 
 void QFExtensionServoPololuMaestro::setFilterChangerFilter(unsigned int filterChanger, unsigned int filter)
 {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return;
+    if (filterChanger>=getFilterChangerCount()) return;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(wheels[filterChanger].port);
@@ -398,26 +398,26 @@ void QFExtensionServoPololuMaestro::setFilterChangerFilter(unsigned int filterCh
 
 unsigned int QFExtensionServoPololuMaestro::getFilterChangerCurrentFilter(unsigned int filterChanger)
 {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return 0;
+    if (filterChanger>=getFilterChangerCount()) return 0;
     return wheels[filterChanger].currentFilter;
 }
 
 bool QFExtensionServoPololuMaestro::isLastFilterChangerActionFinished(unsigned int filterChanger)
 {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return true;
+    if (filterChanger>=getFilterChangerCount()) return true;
     return wheels[filterChanger].lastAction.elapsed()>wheels[filterChanger].operation_duration;
 
 }
 
 QString QFExtensionServoPololuMaestro::getFilterChangerDescription(unsigned int filterChanger)
 {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return "";
+    if (filterChanger>=getFilterChangerCount()) return "";
     return wheels[filterChanger].description;
 }
 
 QString QFExtensionServoPololuMaestro::getFilterChangerShortName(unsigned int filterChanger)
 {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return "";
+    if (filterChanger>=getFilterChangerCount()) return "";
     return wheels[filterChanger].label;
 }
 

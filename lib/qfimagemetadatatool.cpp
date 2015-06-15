@@ -202,7 +202,7 @@ bool qfimdtGetTinyTIFFMetaData(QMap<QString, QVariant> &data, const QByteArray &
 }
 
 
-QByteArray qfimdtBuildImageJMetaData(int frames, double deltaX, double deltaY, double deltaZ, const QString &axisunit, const QString &comment)
+QByteArray qfimdtBuildImageJMetaData(int frames, double /*deltaX*/, double /*deltaY*/, double deltaZ, const QString &axisunit, const QString &/*comment*/)
 {
     QByteArray res="ImageJ=1.48v";
     if (frames>0) res+=QString("\nframes=%1").arg(frames).toLatin1();

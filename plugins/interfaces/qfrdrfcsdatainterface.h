@@ -22,7 +22,7 @@
 #ifndef QFRDRFCSDATAINTERFACE_H
 #define QFRDRFCSDATAINTERFACE_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 
 /*! \brief represents a common data interface to access FCS correlation curves
     \ingroup qf3rdrdp_fcs

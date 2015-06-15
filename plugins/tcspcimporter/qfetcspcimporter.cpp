@@ -29,7 +29,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 #include "qfetcspcimporterdialog.h"
 #include "qmodernprogresswidget.h"

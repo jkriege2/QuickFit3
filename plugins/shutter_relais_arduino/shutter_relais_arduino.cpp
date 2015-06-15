@@ -29,7 +29,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 
 #define LOG_PREFIX "[ShutRelaisArd]: "
@@ -64,7 +64,7 @@ void QFExtensionShutterShuterArduino::deinit() {
     }
 }
 
-void QFExtensionShutterShuterArduino::projectChanged(QFProject* oldProject, QFProject* project) {
+void QFExtensionShutterShuterArduino::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
 
 }
 
@@ -117,7 +117,7 @@ unsigned int QFExtensionShutterShuterArduino::getShutterCount() {
 }
 
 void QFExtensionShutterShuterArduino::shutterConnect(unsigned int shutter) {
-    if (shutter<0 || shutter>=getShutterCount()) return;
+    if (shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
@@ -144,7 +144,7 @@ void QFExtensionShutterShuterArduino::shutterConnect(unsigned int shutter) {
 }
 
 void QFExtensionShutterShuterArduino::shutterDisonnect(unsigned int shutter) {
-    if (shutter<0 || shutter>=getShutterCount()) return;
+    if (shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
@@ -153,7 +153,7 @@ void QFExtensionShutterShuterArduino::shutterDisonnect(unsigned int shutter) {
 }
 
 bool QFExtensionShutterShuterArduino::isShutterConnected(unsigned int shutter) {
-    if (shutter<0 || shutter>=getShutterCount()) return false;
+    if (shutter>=getShutterCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
@@ -162,7 +162,7 @@ bool QFExtensionShutterShuterArduino::isShutterConnected(unsigned int shutter) {
 }
 
 bool QFExtensionShutterShuterArduino::isShutterOpen(unsigned int shutter)  {
-    if (shutter<0 || shutter>=getShutterCount()) return false;
+    if (shutter>=getShutterCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
@@ -175,7 +175,7 @@ bool QFExtensionShutterShuterArduino::isShutterOpen(unsigned int shutter)  {
 }
 
 void QFExtensionShutterShuterArduino::setShutterState(unsigned int shutter, bool opened) {
-    if (shutter<0 || shutter>=getShutterCount()) return;
+    if (shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return ;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
@@ -194,22 +194,22 @@ void QFExtensionShutterShuterArduino::setShutterState(unsigned int shutter, bool
 }
 
 bool QFExtensionShutterShuterArduino::isLastShutterActionFinished(unsigned int shutter) {
-    if (shutter<0 || shutter>=getShutterCount()) return true;
+    if (shutter>=getShutterCount()) return true;
     return shutters[shutter].lastAction.elapsed()>shutters[shutter].shutter_operation_duration;
 }
 
 QString QFExtensionShutterShuterArduino::getShutterDescription(unsigned int shutter)  {
-    if (shutter<0 || shutter>=getShutterCount()) return getDescription();
+    if (shutter>=getShutterCount()) return getDescription();
     return shutters[shutter].description;
 }
 
 QString QFExtensionShutterShuterArduino::getShutterShortName(unsigned int shutter)  {
-    if (shutter<0 || shutter>=getShutterCount()) return getName();
+    if (shutter>=getShutterCount()) return getName();
     return shutters[shutter].label;
 }
 
 
-void QFExtensionShutterShuterArduino::showShutterSettingsDialog(unsigned int shutter, QWidget* parent) {
+void QFExtensionShutterShuterArduino::showShutterSettingsDialog(unsigned int /*shutter*/, QWidget* parent) {
 /*
     bool globalIniWritable=QSettings(services->getGlobalConfigFileDirectory()+"/shutter_relais_arduino.ini", QSettings::IniFormat).isWritable();
 

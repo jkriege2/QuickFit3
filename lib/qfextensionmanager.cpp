@@ -22,7 +22,7 @@
 #include "qfhtmlhelptools.h"
 #include "qfextensionmanager.h"
 #include <QPluginLoader>
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <QDir>
 #include "qfextension.h"
 #include "qfpluginservices.h"

@@ -50,13 +50,6 @@ double QFFitFunctionLightsheetGaussian::evaluate(double t, const double* data) c
     return offset+amplitude*exp(-2.0*sqr(t-position)/sqr(width));
 }
 
-void QFFitFunctionLightsheetGaussian::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
-
-}
-
-void QFFitFunctionLightsheetGaussian::calcParameter(double* data, double* error) const {
-}
 
 bool QFFitFunctionLightsheetGaussian::isParameterVisible(int parameter, const double* data) const {
 
@@ -81,7 +74,7 @@ QString QFFitFunctionLightsheetGaussian::transformParametersForAdditionalPlot(in
     return "";
 }
 
-bool QFFitFunctionLightsheetGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionLightsheetGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

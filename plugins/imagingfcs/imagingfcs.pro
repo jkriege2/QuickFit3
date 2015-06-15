@@ -71,7 +71,6 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcssimulationthread.h \
     ../../extlibs/MersenneTwister.h \
     ../base_classes/qfrdrrunselectiontools.h \
-    ../base_classes/frawdataimageeditor.h \
     ../base_classes/qfrdrimagecopydataselectdialog.h \
     ../base_classes/qfoverlaystylecombobox.h \
     ../base_classes/qfimageplotter.h \
@@ -85,6 +84,7 @@ HEADERS += qfrdrimagingfcs.h \
     ../../../../../LIB/trunk/correlator_multitau.h \
     qfrdrimagingfcs_parserfunctions.h \
     qfrdrimagingfcsdiffusionlawdialog.h
+#    ../base_classes/frawdataimageeditor.h \
 
 
 
@@ -114,7 +114,6 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcssimulationthread.cpp \
     ../base_classes/qffcstools.cpp \
     ../base_classes/qfrdrrunselectiontools.cpp \
-    ../base_classes/frawdataimageeditor.cpp \
     ../base_classes/qfrdrimagecopydataselectdialog.cpp \
     ../base_classes/qfoverlaystylecombobox.cpp \
     ../base_classes/qfimageplotter.cpp \
@@ -124,6 +123,7 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcspostprocessbinningdialog.cpp \
     qfrdrimagingfcs_parserfunctions.cpp \
     qfrdrimagingfcsdiffusionlawdialog.cpp
+#    ../base_classes/frawdataimageeditor.cpp \
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \

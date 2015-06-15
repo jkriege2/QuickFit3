@@ -22,7 +22,7 @@
 #ifndef QFRDRIMAGETORUNINTERFACE_H
 #define QFRDRIMAGETORUNINTERFACE_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <stdint.h>
 
 /*! \brief represents a common data interface that allows to operate on image data (x,y) that is represented by an indexed list ("runs")

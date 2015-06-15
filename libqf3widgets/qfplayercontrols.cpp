@@ -43,10 +43,10 @@ QFPLayerControls::QFPLayerControls(QWidget *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTriggered()));
 }
 
-void QFPLayerControls::storeSettings(QSettings &settings, QString prefix) const {
+void QFPLayerControls::storeSettings(QSettings &/*settings*/, QString /*prefix*/) const {
 }
 
-void QFPLayerControls::readSettings(QSettings &settings, QString prefix) {
+void QFPLayerControls::readSettings(QSettings &/*settings*/, QString /*prefix*/) {
 }
 
 void QFPLayerControls::setSingleShot(bool singleShot) {
@@ -198,10 +198,12 @@ void QFPLayerControls::createActions() {
 void QFPLayerControls::hideEvent(QHideEvent *event) {
     lastPlaying=actPlayPause->isChecked();
     pause();
+    QWidget::hideEvent(event);
 }
 
 void QFPLayerControls::showEvent(QShowEvent *event) {
     if (lastPlaying) play();
+    QWidget::showEvent(event);
 }
 
 void QFPLayerControls::play() {

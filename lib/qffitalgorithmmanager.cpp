@@ -21,7 +21,7 @@
 
 #include "qfhtmlhelptools.h"
 #include "qffitalgorithmmanager.h"
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <QPluginLoader>
 #include <QDir>
 #include "qfpluginfitalgorithm.h"

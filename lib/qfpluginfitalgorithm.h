@@ -22,7 +22,7 @@
 #ifndef QFPLUGINFITALGORITHM_H
 #define QFPLUGINFITALGORITHM_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include "lib_imexport.h"
 #include <QString>
 #include <QStringList>

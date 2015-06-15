@@ -23,7 +23,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFRDRPHOTONCOUNTSINTERFACE_H
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 
 /*! \brief interface for photon count rates (from a set of channels)
     \ingroup qf3rdrdp_photoncounts

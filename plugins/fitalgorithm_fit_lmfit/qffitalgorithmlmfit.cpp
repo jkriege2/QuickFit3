@@ -33,7 +33,7 @@ struct QFFItAlgorithmGSL_evalData {
     int pcount;
 };
 
-void lmfit_eval(const double *par, int m_dat, const void *data, double *fvec, int *info) {
+void lmfit_eval(const double *par, int /*m_dat*/, const void *data, double *fvec, int */*info*/) {
     QFFItAlgorithmGSL_evalData* edata=(QFFItAlgorithmGSL_evalData*)data;
     double* p=edata->p;
    /* if ( edata->paramsMin && edata->paramsMax) {

@@ -1353,7 +1353,7 @@ void QFRDRNumberAndBrightnessDataEditor::updateCorrSelection()
     QApplication::restoreOverrideCursor();
 }
 
-void QFRDRNumberAndBrightnessDataEditor::correlationRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers)
+void QFRDRNumberAndBrightnessDataEditor::correlationRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers /*modifiers*/)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     connectAllWidgets(false);

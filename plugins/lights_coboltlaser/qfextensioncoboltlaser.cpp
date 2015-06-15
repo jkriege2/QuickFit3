@@ -29,7 +29,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 
 #define LIGHTSOURCE_ACTION_DURATION 1
@@ -150,7 +150,7 @@ unsigned int QFExtensionCoboltLaser::getLightSourceCount() {
 }
 
 void QFExtensionCoboltLaser::lightSourceConnect(unsigned int lightSource) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return;
+    if (lightSource>=getLightSourceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return;
@@ -203,7 +203,7 @@ void QFExtensionCoboltLaser::lightSourceConnect(unsigned int lightSource) {
 }
 
 void QFExtensionCoboltLaser::lightSourceDisonnect(unsigned int lightSource) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return;
+    if (lightSource>=getLightSourceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return;
 
@@ -217,7 +217,7 @@ void QFExtensionCoboltLaser::setLightSourceLogging(QFPluginLogService *logServic
 }
 
 bool QFExtensionCoboltLaser::isLightSourceConnected(unsigned int lightSource) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return false;
+    if (lightSource>=getLightSourceCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -226,31 +226,31 @@ bool QFExtensionCoboltLaser::isLightSourceConnected(unsigned int lightSource) {
 }
 
 unsigned int QFExtensionCoboltLaser::getLightSourceLineCount(unsigned int lightSource) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return 0;
+    if (lightSource>=getLightSourceCount()) return 0;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return 0;
     return 1;
 }
 
-QString QFExtensionCoboltLaser::getLightSourceLineDescription(unsigned int lightSource, unsigned int wavelengthLine) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return "";
+QString QFExtensionCoboltLaser::getLightSourceLineDescription(unsigned int lightSource, unsigned int /*wavelengthLine*/) {
+    if (lightSource>=getLightSourceCount()) return "";
     return tr("%1nm").arg(sources[lightSource].wavelength);//.arg(wavelengthLine+1);
 }
 
-void QFExtensionCoboltLaser::getLightSourceLinePowerRange(unsigned int lightSource, unsigned int wavelengthLine, double &minimum, double &maximum) {
+void QFExtensionCoboltLaser::getLightSourceLinePowerRange(unsigned int lightSource, unsigned int /*wavelengthLine*/, double &minimum, double &maximum) {
     minimum=maximum=0;
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return;
+    if (lightSource>=getLightSourceCount()) return;
     minimum=0;
     //qDebug()<<"POWER_MAX = "<<serial->queryCommand("PMAX_POWER");
     maximum=sources[lightSource].max_power;
 }
 
-QString QFExtensionCoboltLaser::getLightSourceLinePowerUnit(unsigned int lightSource, unsigned int wavelengthLine) {
+QString QFExtensionCoboltLaser::getLightSourceLinePowerUnit(unsigned int /*lightSource*/, unsigned int /*wavelengthLine*/) {
     return tr("mW");
 }
 
-void QFExtensionCoboltLaser::setLightSourcePower(unsigned int lightSource, unsigned int wavelengthLine, double power) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return;
+void QFExtensionCoboltLaser::setLightSourcePower(unsigned int lightSource, unsigned int /*wavelengthLine*/, double power) {
+    if (lightSource>=getLightSourceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
@@ -268,8 +268,8 @@ void QFExtensionCoboltLaser::setLightSourcePower(unsigned int lightSource, unsig
     sources[lightSource].setPower=power;
 }
 
-double QFExtensionCoboltLaser::getLightSourceCurrentSetPower(unsigned int lightSource, unsigned int wavelengthLine) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return 0;
+double QFExtensionCoboltLaser::getLightSourceCurrentSetPower(unsigned int lightSource, unsigned int /*wavelengthLine*/) {
+    if (lightSource>=getLightSourceCount()) return 0;
     return sources[lightSource].setPower;
     /*JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
@@ -279,8 +279,8 @@ double QFExtensionCoboltLaser::getLightSourceCurrentSetPower(unsigned int lightS
     return serial->queryCommand("p?").toDouble();*/
 }
 
-double QFExtensionCoboltLaser::getLightSourceCurrentMeasuredPower(unsigned int lightSource, unsigned int wavelengthLine) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return 0;
+double QFExtensionCoboltLaser::getLightSourceCurrentMeasuredPower(unsigned int lightSource, unsigned int /*wavelengthLine*/) {
+    if (lightSource>=getLightSourceCount()) return 0;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return 0;
@@ -290,8 +290,8 @@ double QFExtensionCoboltLaser::getLightSourceCurrentMeasuredPower(unsigned int l
 
 }
 
-void QFExtensionCoboltLaser::setLightSourceLineEnabled(unsigned int lightSource, unsigned int wavelengthLine, bool enabled) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return ;
+void QFExtensionCoboltLaser::setLightSourceLineEnabled(unsigned int lightSource, unsigned int /*wavelengthLine*/, bool enabled) {
+    if (lightSource>=getLightSourceCount()) return ;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
@@ -303,13 +303,13 @@ void QFExtensionCoboltLaser::setLightSourceLineEnabled(unsigned int lightSource,
     sources[lightSource].line_enabled=enabled;
 }
 
-bool QFExtensionCoboltLaser::getLightSourceLineEnabled(unsigned int lightSource, unsigned int wavelengthLine) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return false;
+bool QFExtensionCoboltLaser::getLightSourceLineEnabled(unsigned int lightSource, unsigned int /*wavelengthLine*/) {
+    if (lightSource>=getLightSourceCount()) return false;
     return sources[lightSource].line_enabled;
 }
 
 bool QFExtensionCoboltLaser::isLastLightSourceActionFinished(unsigned int lightSource) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return false;
+    if (lightSource>=getLightSourceCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return false;
@@ -319,7 +319,7 @@ bool QFExtensionCoboltLaser::isLastLightSourceActionFinished(unsigned int lightS
 }
 
 QString QFExtensionCoboltLaser::getLightSourceDescription(unsigned int lightSource) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return "";
+    if (lightSource>=getLightSourceCount()) return "";
 
     QString d=tr("Cobolt Laser %1 sn.%2 (maxPower=%3mW, wavelength=%4nm, opHours=%5)")
               .arg(coboltLaserType2HumanReadableString(sources[lightSource].type))
@@ -332,7 +332,7 @@ QString QFExtensionCoboltLaser::getLightSourceDescription(unsigned int lightSour
 }
 
 QString QFExtensionCoboltLaser::getLightSourceShortName(unsigned int lightSource) {
-    if (lightSource<0 || lightSource>=getLightSourceCount()) return "";
+    if (lightSource>=getLightSourceCount()) return "";
     return sources[lightSource].label;
 }
 
@@ -423,7 +423,7 @@ double QFExtensionCoboltLaser::decodeWavelengthAndLasername(const QString &wl)
     return 0;
 }
 
-void QFExtensionCoboltLaser::showLightSourceSettingsDialog(unsigned int lightSource, QWidget *parent) {
+void QFExtensionCoboltLaser::showLightSourceSettingsDialog(unsigned int /*lightSource*/, QWidget *parent) {
     QString ini1=services->getGlobalConfigFileDirectory()+QString("/")+GLOBAL_CONFIGFILE;
     QString ini2=services->getConfigFileDirectory()+QString("/")+GLOBAL_CONFIGFILE;
     QString ini3=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/")+GLOBAL_CONFIGFILE;
@@ -471,7 +471,7 @@ QString QFExtensionCoboltLaser::getMeasurementDeviceName(unsigned int measuremen
 
 unsigned int QFExtensionCoboltLaser::getMeasurementDeviceValueCount(unsigned int measuremenDevice)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if (measuremenDevice>=getMeasurementDeviceCount()) return false;
     int cnt=2;
     if (sources[measuremenDevice].type==cltMLD6) {
         cnt += 0;
@@ -481,7 +481,7 @@ unsigned int QFExtensionCoboltLaser::getMeasurementDeviceValueCount(unsigned int
 
 QString QFExtensionCoboltLaser::getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if (measuremenDevice>=getMeasurementDeviceCount()) return false;
     if (value==0) return tr("measured power [mW]");
     if (value==1) return tr("drive current [mA]");
     if (sources[measuremenDevice].type==cltMLD6) {
@@ -492,7 +492,7 @@ QString QFExtensionCoboltLaser::getMeasurementDeviceValueName(unsigned int measu
 
 QString QFExtensionCoboltLaser::getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if (measuremenDevice>=getMeasurementDeviceCount()) return false;
     if (value==0) return tr("measured_power_mW");
     if (value==1) return tr("drive_current_mA");
     if (sources[measuremenDevice].type==cltMLD6) {
@@ -503,7 +503,7 @@ QString QFExtensionCoboltLaser::getMeasurementDeviceValueShortName(unsigned int 
 }
 QVariant QFExtensionCoboltLaser::getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if (measuremenDevice>=getMeasurementDeviceCount()) return false;
     if (value==0) return getLightSourceCurrentMeasuredPower(measuremenDevice, 0);
 
     JKSerialConnection* com=ports.getCOMPort(sources[measuremenDevice].port);
@@ -520,26 +520,26 @@ QVariant QFExtensionCoboltLaser::getMeasurementDeviceValue(unsigned int measurem
 }
 
 
-bool QFExtensionCoboltLaser::isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value)
+bool QFExtensionCoboltLaser::isMeasurementDeviceValueEditable(unsigned int /*measuremenDevice*/, unsigned int /*value*/)
 {
     return false;
 }
 
-void QFExtensionCoboltLaser::setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant &data)
+void QFExtensionCoboltLaser::setMeasurementDeviceValue(unsigned int /*measuremenDevice*/, unsigned int /*value*/, const QVariant &/*data*/)
 {
 }
 
-QVariant::Type QFExtensionCoboltLaser::getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value)
+QVariant::Type QFExtensionCoboltLaser::getMeasurementDeviceEditableValueType(unsigned int /*measuremenDevice*/, unsigned int /*value*/)
 {
     return QVariant::String;
 }
 
-QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionCoboltLaser::getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList *comboboxEntries)
+QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionCoboltLaser::getMeasurementDeviceValueWidget(unsigned int /*measuremenDevice*/, unsigned int /*value*/, QStringList */*comboboxEntries*/)
 {
     return QFExtensionMeasurementAndControlDevice::mdDefault;
 }
 
-void QFExtensionCoboltLaser::getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double &minimum, double &maximum)
+void QFExtensionCoboltLaser::getMeasurementDeviceEditableValueRange(unsigned int /*measuremenDevice*/, unsigned int /*value*/, double &/*minimum*/, double &/*maximum*/)
 {
 }
 

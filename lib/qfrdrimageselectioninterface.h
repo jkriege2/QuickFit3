@@ -22,7 +22,7 @@
 #ifndef QFRDRIMAGESELECTIONINTERFACE_H
 #define QFRDRIMAGESELECTIONINTERFACE_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <QString>
 #include <QSet>
 

@@ -25,7 +25,7 @@
 
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <stdint.h>
 #include <QString>
 #include <QList>

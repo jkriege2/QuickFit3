@@ -21,7 +21,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <limits>
 #include <qDebug>
 #include "qfextension.h"

@@ -31,8 +31,7 @@
 #include "qftools.h"
 
 void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, const double* params) {
-    Q_UNUSED(evalout);
-    Q_UNUSED(params);
+    evaluateJacobianNum(evalout, params);
 }
 
 void QFFitAlgorithm::Functor::evaluateJacobianNum(double *evalout, const double *params, double h)

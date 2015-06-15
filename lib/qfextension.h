@@ -28,7 +28,7 @@
 #include <QWidget>
 #include <QString>
 #include "qfproject.h"
-#include <QtPlugin>
+#include "qfplugin.h"
 #include "qfplugin.h"
 
 /** \brief virtual interface class for all QuickFit 3 extension plugins

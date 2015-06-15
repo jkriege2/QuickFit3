@@ -67,7 +67,7 @@ QFRawDataEditor *QFRDRPhotonCountsData::createEditor(QFPluginServices *services,
     return NULL;
 }
 
-void QFRDRPhotonCountsData::exportData(const QString& format, const QString& filename)const  {
+void QFRDRPhotonCountsData::exportData(const QString& /*format*/, const QString& /*filename*/)const  {
 	// here you may export the data of the record into the specified format (see getExportFiletypes() )
     // THIS IS OPTIONAL
 }
@@ -82,7 +82,7 @@ int QFRDRPhotonCountsData::getPhotonCountsChannels()
 }
 
 
-void QFRDRPhotonCountsData::intWriteData(QXmlStreamWriter& w) const {
+void QFRDRPhotonCountsData::intWriteData(QXmlStreamWriter& /*w*/) const {
 	// write data to the project XML file using the QXmlStreamWriter
     /*        
 	w.writeStartElement("mytag");
@@ -91,7 +91,7 @@ void QFRDRPhotonCountsData::intWriteData(QXmlStreamWriter& w) const {
     */
 }
 
-void QFRDRPhotonCountsData::intReadData(QDomElement* e) {
+void QFRDRPhotonCountsData::intReadData(QDomElement* /*e*/) {
 
     autoCalcRateN=getProperty("AUTO_BINNED_RATE_N", autoCalcRateN).toInt();
 

@@ -118,7 +118,7 @@ class QFImageReaderRAW: public QFImporterImageSeries
         /** \brief move on to the next frame in the file. return \c false if no further image exists */
         inline virtual bool nextFrame() {
             if (rawFile) {
-                if (rawFile->read((char*)currentFrame, width*height*channels*uint64_t(sizeof(T)))==width*height*channels*uint64_t(sizeof(T))) {
+                if ((uint64_t)rawFile->read((char*)currentFrame, width*height*channels*uint64_t(sizeof(T)))==width*height*channels*uint64_t(sizeof(T))) {
                     frame++;
                     return true;
                 }

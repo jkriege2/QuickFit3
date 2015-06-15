@@ -1694,17 +1694,17 @@ double QFFitResultsEvaluation::getFitMax(const QString& id, const QFRawDataRecor
     return res;
 }
 
-bool QFFitResultsEvaluation::overrideFitFunctionPreset(const QFRawDataRecord *r, QString paramName, double &value) const
+bool QFFitResultsEvaluation::overrideFitFunctionPreset(const QFRawDataRecord */*r*/, QString /*paramName*/, double &/*value*/) const
 {
     return false;
 }
 
-bool QFFitResultsEvaluation::overrideFitFunctionPresetError(const QFRawDataRecord *r, QString paramName, double &value) const
+bool QFFitResultsEvaluation::overrideFitFunctionPresetError(const QFRawDataRecord */*r*/, QString /*paramName*/, double &/*value*/) const
 {
     return false;
 }
 
-bool QFFitResultsEvaluation::overrideFitFunctionPresetFix(const QFRawDataRecord *r, QString paramName, bool &value) const
+bool QFFitResultsEvaluation::overrideFitFunctionPresetFix(const QFRawDataRecord */*r*/, QString /*paramName*/, bool &/*value*/) const
 {
     return false;
 }

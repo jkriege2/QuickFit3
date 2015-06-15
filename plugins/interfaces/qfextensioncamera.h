@@ -22,7 +22,7 @@
 #ifndef QFEXTENSIONCAMERA_H
 #define QFEXTENSIONCAMERA_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <QWidget>
 #include <QSettings>
 #include "qfpluginservices.h"

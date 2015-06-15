@@ -37,12 +37,12 @@ QFFitAlgorithmLevmar::QFFitAlgorithmLevmar() {
 
 }
 
-void levmarfitfunc(double* p, double* x, int m, int n, void* data) {
+void levmarfitfunc(double* p, double* x, int /*m*/, int /*n*/, void* data) {
     QFFitAlgorithm::Functor* adata=(QFFitAlgorithm::Functor*)data;
     adata->evaluate(x, p);
 }
 
-void levmarfitjac(double *p, double *j, int m, int n, void *data) {
+void levmarfitjac(double *p, double *j, int /*m*/, int /*n*/, void *data) {
     QFFitAlgorithm::Functor* adata=(QFFitAlgorithm::Functor*)data;
     adata->evaluateJacobian(j, p);
 }

@@ -50,10 +50,7 @@ double QFFitFunctionLightsheetGaussianVar::evaluate(double t, const double* data
     return offset+amplitude*exp(-0.5*sqr(t-position)/sqr(width));
 }
 
-void QFFitFunctionLightsheetGaussianVar::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
 
-}
 
 bool QFFitFunctionLightsheetGaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {

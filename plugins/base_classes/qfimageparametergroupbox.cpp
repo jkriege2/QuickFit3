@@ -248,7 +248,7 @@ void QFImageParameterGroupBox::setColorPalette(JKQTPMathImageColorPalette palett
     cmbColorbar->setColorPalette(palette);
 }
 
-void QFImageParameterGroupBox::saveConfig(QFRawDataRecord *current, const QString &egroup, const QString &param, const QString &imageID)
+void QFImageParameterGroupBox::saveConfig(QFRawDataRecord *current, const QString &/*egroup*/, const QString &param, const QString &imageID)
 {
     current->setQFProperty(QString("imfcs_imed_colorbar_%1_%2").arg(param).arg(imageID), cmbColorbar->currentIndex(), false, false);
     current->setQFProperty(QString("imfcs_imed_style_%1_%2").arg(param).arg(imageID), cmbImageStyle->currentIndex(), false, false);

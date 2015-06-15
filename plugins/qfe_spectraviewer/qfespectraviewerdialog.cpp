@@ -1420,14 +1420,14 @@ void QFESpectraViewerDialog::on_cmbLaserLine_currentIndexChanged(int i)
     }
 }
 
-void QFESpectraViewerDialog::on_spinLaserCentral_valueChanged(double value)
+void QFESpectraViewerDialog::on_spinLaserCentral_valueChanged(double /*value*/)
 {
     QPointF pnt=QPointF(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value());
     //ui->cmbLaserLine->setCurrentFromModelData(pnt);
     //ui->cmbLaserLine->setCurrentIndex(findLaserLineIndex(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value()));
 }
 
-void QFESpectraViewerDialog::on_spinLaserLinewidth_valueChanged(double value)
+void QFESpectraViewerDialog::on_spinLaserLinewidth_valueChanged(double /*value*/)
 {
     QPointF pnt=QPointF(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value());
     //ui->cmbLaserLine->setCurrentFromModelData(pnt);

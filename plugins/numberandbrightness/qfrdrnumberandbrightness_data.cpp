@@ -79,7 +79,7 @@ QFRawDataEditor *QFRDRNumberAndBrightnessData::createEditor(QFPluginServices *se
     return NULL;
 }
 
-void QFRDRNumberAndBrightnessData::exportData(const QString& format, const QString& filename)const  {
+void QFRDRNumberAndBrightnessData::exportData(const QString& /*format*/, const QString& /*filename*/)const  {
 	// here you may export the data of the record into the specified format (see getExportFiletypes() )
     // THIS IS OPTIONAL
 }
@@ -777,7 +777,7 @@ bool *QFRDRNumberAndBrightnessData::loadImageSelection(int selection) const
     return selections.value(selection, QFRDRNumberAndBrightnessData::ImageSelection()).selection;
 }
 
-void QFRDRNumberAndBrightnessData::addImageSelection(const bool *selection, const QString &name, bool overwriteIfSameNameExists)
+void QFRDRNumberAndBrightnessData::addImageSelection(const bool *selection, const QString &name, bool /*overwriteIfSameNameExists*/)
 {
     QFRDRNumberAndBrightnessData::ImageSelection s;
     s.name=name;

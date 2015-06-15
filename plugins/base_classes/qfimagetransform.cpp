@@ -21,7 +21,8 @@
 
 #include "qfimagetransform.h"
 
-QFImageTransformWidget::QFImageTransformWidget(QWidget *parent)
+QFImageTransformWidget::QFImageTransformWidget(QWidget *parent):
+    QWidget(parent)
 {
     QGridLayout* lay=new QGridLayout();
     setLayout(lay);
@@ -145,7 +146,7 @@ void QFImageTransformWidget::save(const QString &filename)
 
 }
 
-void QFImageTransformWidget::emitPropsChanged(QFImageTransformItemWidget *widget)
+void QFImageTransformWidget::emitPropsChanged(QFImageTransformItemWidget */*widget*/)
 {
     emit propertiesChanged();
 }
@@ -271,12 +272,12 @@ bool QFImageTransformItemWidget::transform(const QVector<double> &input, int wid
 }
 
 
-void QFImageTransformItemWidget::readSettings(QSettings &settings, const QString &prefix)
+void QFImageTransformItemWidget::readSettings(QSettings &/*settings*/, const QString &/*prefix*/)
 {
 
 }
 
-void QFImageTransformItemWidget::writeSettings(QSettings &settings, const QString &prefix) const
+void QFImageTransformItemWidget::writeSettings(QSettings &/*settings*/, const QString &/*prefix*/) const
 {
 
 }
@@ -519,7 +520,7 @@ QFITWAverageDir::QFITWAverageDir(int dir, bool samesize, QWidget *parent):
     if (dir==1 && !samesize) setTitle(tr("average Y"));
 }
 
-void QFITWAverageDir::readSettings(QSettings &settings, const QString &prefix)
+void QFITWAverageDir::readSettings(QSettings &/*settings*/, const QString &/*prefix*/)
 {
 
 }

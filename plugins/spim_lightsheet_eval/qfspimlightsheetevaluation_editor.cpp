@@ -354,7 +354,7 @@ void QFSPIMLightsheetEvaluationEditor::on_cmbOrientation_currentIndexChanged(int
     displayPreview();
 }
 
-void QFSPIMLightsheetEvaluationEditor::on_cmbModel_currentIndexChanged(int index)
+void QFSPIMLightsheetEvaluationEditor::on_cmbModel_currentIndexChanged(int /*index*/)
 {
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -369,7 +369,7 @@ void QFSPIMLightsheetEvaluationEditor::on_cmbModel_currentIndexChanged(int index
     displayPreview();
 }
 
-void QFSPIMLightsheetEvaluationEditor::on_cmbAlgorithm_currentIndexChanged(int index)
+void QFSPIMLightsheetEvaluationEditor::on_cmbAlgorithm_currentIndexChanged(int /*index*/)
 {
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -586,7 +586,7 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
 }
 
 
-void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button) {
+void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, double y, Qt::KeyboardModifiers /*modifiers*/, Qt::MouseButton /*button*/) {
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);

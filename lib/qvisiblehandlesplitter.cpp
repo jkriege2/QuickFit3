@@ -87,11 +87,13 @@ void QVisibleGripSplitterHandle::paintEvent(QPaintEvent *event)
 void QVisibleGripSplitterHandle::leaveEvent(QEvent* event) {
     m_inside=false;
     repaint();
+    QSplitterHandle::leaveEvent(event);
 }
 
 void QVisibleGripSplitterHandle::enterEvent(QEvent* event) {
     m_inside=true;
     repaint();
+    QSplitterHandle::enterEvent(event);
 }
 
 

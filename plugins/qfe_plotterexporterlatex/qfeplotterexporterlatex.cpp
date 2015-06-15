@@ -29,7 +29,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 #include "jkqtplatexengineadapter.h"
 #ifdef HAS_EMF_ENGINE

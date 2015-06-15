@@ -72,11 +72,11 @@ QString QFFitResultsByIndexEvaluation::getEvaluationResultID(int currentIndex, c
     return getEvaluationResultID(getFitFunctionID(r), currentIndex);
 }
 
-bool QFFitResultsByIndexEvaluation::hasSpecial(const QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error) const {
+bool QFFitResultsByIndexEvaluation::hasSpecial(const QFRawDataRecord */*r*/, int /*index*/, const QString &/*paramid*/, double &/*value*/, double &/*error*/) const {
     return false;
 }
 
-void QFFitResultsByIndexEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYvalues, const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange)
+void QFFitResultsByIndexEvaluation::calcChi2Landscape(double */*chi2Landscape*/, int /*paramXFile*/, int /*paramXID*/, const QVector<double> &/*paramXValues*/, int /*paramYFile*/, int /*paramYID*/, const QVector<double> &/*paramYvalues*/, const QList<QFRawDataRecord *> &/*records*/, int /*run*/, int /*defaultMinDatarange*/, int /*defaultMaxDatarange*/)
 {
 }
 
@@ -263,7 +263,7 @@ int QFFitResultsByIndexEvaluation::getCurrentIndex() const {
     return index;
 }
 
-QString QFFitResultsByIndexEvaluation::getIndexName(const QFRawDataRecord *rec, int index) const {
+QString QFFitResultsByIndexEvaluation::getIndexName(const QFRawDataRecord */*rec*/, int index) const {
     return QString::number(index);
 }
 

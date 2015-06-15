@@ -102,12 +102,12 @@ Qt::ItemFlags QFPseudoTreeModel::flags(const QModelIndex &index) const
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-QVariant QFPseudoTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QFPseudoTreeModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
 {
     return QVariant();
 }
 
-QModelIndex QFPseudoTreeModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex QFPseudoTreeModel::index(int row, int /*column*/, const QModelIndex &/*parent*/) const
 {
     QFPseudoTreeModelItem *childItem = NULL;
     int r=0;
@@ -183,12 +183,12 @@ QModelIndex QFPseudoTreeModel::index(QVariant data, int role) const
     }
 }
 
-QModelIndex QFPseudoTreeModel::parent(const QModelIndex &index) const
+QModelIndex QFPseudoTreeModel::parent(const QModelIndex &/*index*/) const
 {
     return QModelIndex();
 }
 
-int QFPseudoTreeModel::rowCount(const QModelIndex &parent) const
+int QFPseudoTreeModel::rowCount(const QModelIndex &/*parent*/) const
 {
     int rows=m_folders.size();
     QMapIterator<QString, QList<QFPseudoTreeModelItem*> > it(m_items);
@@ -199,7 +199,7 @@ int QFPseudoTreeModel::rowCount(const QModelIndex &parent) const
     return rows;
 }
 
-int QFPseudoTreeModel::columnCount(const QModelIndex &parent) const
+int QFPseudoTreeModel::columnCount(const QModelIndex &/*parent*/) const
 {
     return 1;
 }
@@ -207,7 +207,7 @@ int QFPseudoTreeModel::columnCount(const QModelIndex &parent) const
 QFPseudoTreeModelItem *QFPseudoTreeModel::itemForIndex(const QModelIndex &index) const
 {
     if (!index.isValid()) return NULL;
-    if (index.internalPointer()>=0) return static_cast<QFPseudoTreeModelItem*>(index.internalPointer());
+    if (index.internalPointer()!=0) return static_cast<QFPseudoTreeModelItem*>(index.internalPointer());
     return NULL;
 }
 

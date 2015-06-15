@@ -16,7 +16,7 @@
 #endif
 
 
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 #include "scancontroller.h"
 #include "nidaq6602.h"

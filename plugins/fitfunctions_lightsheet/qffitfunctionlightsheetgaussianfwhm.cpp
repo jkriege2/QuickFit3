@@ -50,10 +50,6 @@ double QFFitFunctionLightsheetGaussianFWHM::evaluate(double t, const double* dat
     return offset+amplitude*exp(-log(2.0)*4.0*sqr(t-position)/sqr(width));
 }
 
-void QFFitFunctionLightsheetGaussianFWHM::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
-
-}
 
 void QFFitFunctionLightsheetGaussianFWHM::calcParameter(double* data, double* error) const {
 }

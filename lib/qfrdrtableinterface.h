@@ -22,7 +22,7 @@
 #ifndef QFRDRTABLEINTERFACE_H
 #define QFRDRTABLEINTERFACE_H
 
-#include <QtPlugin>
+#include "qfplugin.h"
 
 /*! \brief interface for data tables
     \ingroup qf3rdrdp_fcs

@@ -28,7 +28,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #endif
 
 #include "qfediffusioncoefficientcalculator_parserfunctions.h"
-#include <QtPlugin>
+#include "qfplugin.h"
 #include <iostream>
 #include "dlgcalcdiffcoeff.h"
 #include "optionswidget.h"
@@ -192,7 +192,7 @@ QString QFEDiffusionCoefficientCalculator::getViscosityModelFunction(int index, 
     return QString("???");
 }
 
-double QFEDiffusionCoefficientCalculator::getSolutionDensity(int solution, double temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
+double QFEDiffusionCoefficientCalculator::getSolutionDensity(int solution, double /*temperature_K*/, QList<QFEDiffusionCoefficientCalculator::Component> /*components*/) {
     if (solution==0) {
     }
     return 0;

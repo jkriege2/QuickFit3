@@ -38,6 +38,7 @@ void QFEnhancedLabel::leaveEvent(QEvent *event)
     QFont f=font();
     f.setUnderline(false);
     setFont(f);
+    QLabel::leaveEvent(event);
 }
 
 void QFEnhancedLabel::enterEvent(QEvent *event)
@@ -45,4 +46,5 @@ void QFEnhancedLabel::enterEvent(QEvent *event)
     QFont f=font();
     f.setUnderline(true);
     setFont(f);
+    QLabel::enterEvent(event);
 }

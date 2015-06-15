@@ -27,7 +27,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFSIMPLEFITPARAMETERINTERFACE_H
 
 #include <QString>
-#include <QtPlugin>
+#include "qfplugin.h"
 #include "libwid_imexport.h"
 
 /*! \brief generic interface that allows to access values of fit parameters, even simpler than QFFitParameterBasicInterface
