@@ -249,12 +249,19 @@ and
 \begin{equation}\label{eq:fcs_fit_problem_invbayeshessian}
   \mat{\Sigma}_\text{Bayes}=\left\{-\vec{\nabla}\vec{\nabla}\ln\left[p(\hat{\vec{g}}|M_g,\vec{\beta})\cdot p(\vec{\beta}|M_g)\right]_{\vec{\beta}=\vec{\beta}_{Bayes}^\ast}\right\}^{-1}
 \end{equation}
-is the inverse Hessian matrix, or variance-covariance matrix of the Bayesian fit problem \eqref{eq:fcs_fit_problem_maxBayeslikelihood}. As already done at several occasions above, we can now again take the priors to be flat. Then the Bayes fit problem \eqref{eq:fcs_fit_problem_maxBayeslikelihood} equals the simple maximum likelihood fit \eqref{eq:fcs_fit_problem_maxlikelihood} or (equivalently) the least-squares fit problem \eqref{eq:fcs_fit_problem}. Then $\vec{\beta}_{Bayes}^\ast$ is given by the solution to those problems and $\mat{\Sigma}_\text{Bayes}$ can be estimated by the variance-covariance matrices from section~\ref{sec:varcovmatrix}, i.e. equation~\eqref{eq:varcov_noerrors}. In this approximation, 
+is the inverse Hessian matrix, or variance-covariance matrix of the Bayesian fit problem \eqref{eq:fcs_fit_problem_maxBayeslikelihood}. 
+
+As already done at several occasions above, we can now again take the priors to be a uniform distribution:
+\begin{equation}\label{eq:fcs_fit_bayes_flatparamprior}
+  p(\vec{\beta}|M_g)=\left(\frac{1}{\beta_\text{max}-\beta_\text{min}}\right)^k\cdot\begin{cases}1&\exists i: \beta_\text{min}\leq \beta_i\leq \beta_\text{max}\\0&\text{else}\end{cases}.
+\end{equation}
+This distribution is a $k$-dimensional cube that should contain all possible parameter vectors, i.e. $\beta_\text{min}$ should be smaller than the smallest fit possible parameter value $\beta_i$ and $\beta_\text{max}$ should be larger than the largest possible value of any $\beta_i$.
+Then the Bayes fit problem \eqref{eq:fcs_fit_problem_maxBayeslikelihood} equals the simple maximum likelihood fit \eqref{eq:fcs_fit_problem_maxlikelihood} or (equivalently) the least-squares fit problem \eqref{eq:fcs_fit_problem}. Then $\vec{\beta}_{Bayes}^\ast$ is given by the solution to those problems and $\mat{\Sigma}_\text{Bayes}$ can be estimated by the variance-covariance matrices from section~\ref{sec:varcovmatrix}, i.e. equation~\eqref{eq:varcov_noerrors}. In this approximation, 
 equation \eqref{eq:bayes_marginprob_laplace} then simplifies to:
 \begin{multline}\label{eq:bayes_marginprob_laplace_flatprior}
-    p(\hat{\vec{g}}|M_g,\vec{\beta})\approx(2\pi)^{k/2}\cdot\sqrt{\det(\mat{\Sigma})}\cdot \exp\left\{-\frac{n\cdot\ln(2\pi)}{2}-\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}=\\
-    =\exp\left\{\frac{k}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right] -\frac{n\cdot\ln(2\pi)}{2}-\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}=\\
-    =\exp\left\{\frac{k}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right] -\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}\cdot\exp\left\{-\frac{n\cdot\ln(2\pi)}{2}\right\}.
+    p(\hat{\vec{g}}|M_g,\vec{\beta})\approx(2\pi)^{k/2}\cdot\sqrt{\det(\mat{\Sigma})}\cdot \exp\left\{-\frac{n\cdot\ln(2\pi)}{2}-\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}\cdot \overbrace{\left(\frac{1}{\beta_\text{max}-\beta_\text{min}}\right)^k}^{=p(\vec{\beta}^\ast_\text{Bayes}|M_g)}=\\
+    =\exp\left\{\frac{k}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right] -\frac{n\cdot\ln(2\pi)}{2}-\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2-k\cdot\ln(\beta_\text{max}-\beta_\text{min})\right\}=\\
+		=\exp\left\{\frac{k}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right] -\ln\left[(\beta_\text{max}-\beta_\text{min})^k\cdot\prod\limits_{i=1}^n\hat{\sigma}_i\right]-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}\cdot\\\cdot\exp\left\{-\frac{n\cdot\ln(2\pi)}{2}\right\}.
 \end{multline}
 
 
