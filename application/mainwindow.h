@@ -71,11 +71,14 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfexportermanager.h"
 #include "qfsplashscreen.h"
 
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void myMessageOutputQt5(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 #else
 void myMessageOutput(QtMsgType type, const char *msg);
 #endif
+
+class JKTetrisMainWindow;
 
 /*! \brief main widget for QuickFit
     \ingroup qf3app
@@ -448,6 +451,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
 
         void prepareLibFitFunctions();
 
+        void entertainMe();
+
     private:
         bool clipboardContainsProjectXML() const;
 
@@ -487,6 +492,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         //QMap<QString, QFFAQData> faqs;
 
         QFPluginHelpData helpdata;
+
+        QPointer<JKTetrisMainWindow> tetris;
 
 
         QList<QFPluginOptionsDialogInterface*> pluginOptionDialogs;
@@ -553,6 +560,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QAction* actCheckUpdate;
         QAction* helpWelcomeScreenAct;
         QAction* actEditGroupAndRole;
+        QAction* actEntertain;
 
 
         QAction* actUserFitfunctionsEditor;

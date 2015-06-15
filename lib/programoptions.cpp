@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QNetworkProxy>
 #include "qftools.h"
+#include <QtGlobal>
 #ifndef __WINDOWS__
 # if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
 #  define __WINDOWS__
@@ -158,6 +159,22 @@ void ProgramOptions::readSettings() {
             settings= new QSettings(iniFilename, QSettings::IniFormat, this);
         }
     }
+
+    if (!settings->contains("quickfit/native_file_dialog")) {
+    #ifdef Q_OS_UNIX
+        settings->setValue("quickfit/native_file_dialog", false);
+    #else
+        settings->setValue("quickfit/native_file_dialog", true);
+    #endif
+
+    #ifdef Q_OS_MAC
+        settings->setValue("quickfit/native_file_dialog", true);
+    #endif
+    }
+
+
+
+
     maxThreads=settings->value("quickfit/max_threads", maxThreads).toInt();
     autosave=settings->value("quickfit/autosave", autosave).toInt();
     currentRawDataDir=settings->value("quickfit/current_raw_data_dir", currentRawDataDir).toString();

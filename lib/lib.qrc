@@ -1,17 +1,17 @@
 <RCC>
     <qresource prefix="/">
-    <file alias="pdf.png">../images/16x16/pdf.png</file>
-    <file alias="make.png">../images/16x16/make.png</file>
-    <file alias="video.png">../images/16x16/video.png</file>
-    <file alias="zip.png">../images/16x16/zip.png</file>
-    <file alias="source.png">../images/16x16/source.png</file>
-    <file alias="source_c.png">../images/16x16/source_c.png</file>
-    <file alias="source_cpp.png">../images/16x16/source_cpp.png</file>
-    <file alias="source_h.png">../images/16x16/source_h.png</file>
-    <file alias="binary.png">../images/16x16/binary.png</file>
-    <file alias="doc.png">../images/16x16/doc.png</file>
-    <file alias="tar.png">../images/16x16/tar.png</file>
-    <file alias="lib/print.png">../images/16x16/document_print.png</file>
+        <file alias="pdf.png">../images/16x16/pdf.png</file>
+        <file alias="make.png">../images/16x16/make.png</file>
+        <file alias="video.png">../images/16x16/video.png</file>
+        <file alias="zip.png">../images/16x16/zip.png</file>
+        <file alias="source.png">../images/16x16/source.png</file>
+        <file alias="source_c.png">../images/16x16/source_c.png</file>
+        <file alias="source_cpp.png">../images/16x16/source_cpp.png</file>
+        <file alias="source_h.png">../images/16x16/source_h.png</file>
+        <file alias="binary.png">../images/16x16/binary.png</file>
+        <file alias="doc.png">../images/16x16/doc.png</file>
+        <file alias="tar.png">../images/16x16/tar.png</file>
+        <file alias="lib/print.png">../images/16x16/document_print.png</file>
         <file alias="lib/save16.png">../images/16x16/filesave.png</file>
         <file alias="lib/savedata_flipped.png">icons/savedata.png</file>
         <file alias="lib/refresh16.png">../images/16x16/reload.png</file>
@@ -35,6 +35,7 @@
         <file alias="lib/file_opendir.png">icons/fileselect.png</file>
         <file alias="lib/file_openfile.png">icons/fileselect.png</file>
         <file alias="lib/file_open.png">icons/fileselect.png</file>
+        <file alias="tetris.png">icons/tetris.png</file>
     </qresource>
     <qresource prefix="/lib/help">
         <file alias="tooltip.png">icons/tooltip.png</file>

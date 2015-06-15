@@ -171,7 +171,7 @@ int main(int argc, char * argv[])
 
     // clean up some internal stores ...
     //qDebug()<<"free LUTs";
-    JKQTPimagePlot_freeLUTs(global_jkqtpimagetools_lutstore);
+
     // clean up some internal stores ...
     //qDebug()<<"cleanup resource";
     Q_CLEANUP_RESOURCE(quickfit3);

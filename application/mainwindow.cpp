@@ -48,6 +48,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "dlgeditgroupandrole.h"
 #include "qfexporterimageseries.h"
 #include <QLibraryInfo>
+#include "jktetrismainwindow.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -460,6 +461,10 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
 
 MainWindow::~MainWindow() {
 
+    if (tetris) {
+        tetris->close();
+        delete tetris;
+    }
     //std::cout<<"deleting MainWindow\n";
     if (project) delete project;
     project=NULL;
@@ -650,7 +655,15 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         }
         ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoSVNVersion());
         event->accept();
+
+        if (tetris) {
+            tetris->close();
+            delete tetris;
+        }
+
         //qDebug()<<"main: exiting application";
+        QApplication::closeAllWindows();
+        JKQTPimagePlot_freeLUTs(global_jkqtpimagetools_lutstore);
         QApplication::exit();
     } else {
         //qDebug()<<"main: ingoring close event";
@@ -1777,6 +1790,8 @@ void MainWindow::createActions() {
 
     helpAct=new QAction(QIcon(":/help.png"), tr("&Help"), this);
     connect(helpAct, SIGNAL(triggered()), this, SLOT(displayHelp()));
+    actEntertain=new QAction(QIcon(":/tetris.png"), tr("&Entertain Me ..."), this);
+    connect(actEntertain, SIGNAL(triggered()), this, SLOT(entertainMe()));
 
     helpCopyrightAct=new QAction(QIcon(":/help_copyright.png"), tr("QuickFit &Copyright"), this);
     connect(helpCopyrightAct, SIGNAL(triggered()), this, SLOT(displayHelpCopyright()));
@@ -1805,6 +1820,7 @@ void MainWindow::createActions() {
     helpActList.append(helpCopyrightAct);
     helpActList.append(helpPluginAct);
     helpActList.append(helpCitingAct);
+    helpActList.append(actEntertain);
     helpActList.append(helpFAQAct);
     helpActList.append(helpTutorialsAct);
     helpActList.append(helpPluginCopyrightAct);
@@ -2024,6 +2040,7 @@ void MainWindow::createMenus() {
     helpMenu->addAction(helpAct);
     helpMenu->addAction(helpCopyrightAct);
     helpMenu->addAction(helpCitingAct);
+    helpMenu->addAction(actEntertain);
     helpMenu->addSeparator();
     helpMenu->addAction(helpFAQAct);
     helpMenu->addSeparator();
@@ -4399,6 +4416,12 @@ void MainWindow::prepareLibFitFunctions()
 
         QDesktopServices::openUrl( QUrl(target+"/") );
     }
+}
+
+void MainWindow::entertainMe()
+{
+    if (!tetris) tetris=new JKTetrisMainWindow();
+    tetris->show();
 }
 
 bool MainWindow::clipboardContainsProjectXML() const

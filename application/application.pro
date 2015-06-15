@@ -74,7 +74,10 @@ HEADERS += mainwindow.h \
     dlgwelcomescreen.h \
     qfgroupandrolemodel.h \
     dlgeditgroupandrole.h \
-    qfsplashscreen.h
+    qfsplashscreen.h \
+    jktetrisframe.h \
+    jktetrismainwindow.h \
+    jktetrispiece.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -96,7 +99,10 @@ SOURCES += main.cpp \
     dlgwelcomescreen.cpp \
     qfgroupandrolemodel.cpp \
     dlgeditgroupandrole.cpp \
-    qfsplashscreen.cpp
+    qfsplashscreen.cpp \
+    jktetrisframe.cpp \
+    jktetrismainwindow.cpp \
+    jktetrispiece.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \
@@ -113,7 +119,8 @@ FORMS =    optionsdialog.ui \
     dlgsetrdrpropertybyexpression.ui \
     dlgsetrdrpropertybyexpressioneditor.ui \
     dlgwelcomescreen.ui \
-    dlgeditgroupandrole.ui
+    dlgeditgroupandrole.ui \
+    jktetrismainwindow.ui
 
 RESOURCES += quickfit3.qrc \
              ../extlibs/xits.qrc

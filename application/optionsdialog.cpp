@@ -144,6 +144,11 @@ void OptionsDialog::open(ProgramOptions* options) {
     spinHelpFontsize->setValue(options->getConfigValue("quickfit/help_pointsize", 11).toInt());
     spinMath->setValue(options->getConfigValue("quickfit/math_pointsize", 14).toInt());
     cmbHelpFont->setCurrentFont(QFont(options->getConfigValue("quickfit/help_font", font().family()).toString()));
+
+    cmbFileDialog->setCurrentIndex(0);
+    if (!ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+        cmbFileDialog->setCurrentIndex(1);
+    }
     on_spinMath_valueChanged(spinMath->value());
     updateFontExample();
 
@@ -202,6 +207,7 @@ void OptionsDialog::open(ProgramOptions* options) {
             QDir dir(edtGlobalSettings->text());
             if (!dir.exists()) dir.mkpath(dir.absolutePath());
         }
+        options->setConfigValue("quickfit/native_file_dialog", (cmbFileDialog->currentIndex()==0));
 
         for (int i=0; i<m_plugins.size(); i++) {
             m_plugins[i]->writeSettings(options);

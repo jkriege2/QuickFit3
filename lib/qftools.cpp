@@ -759,11 +759,14 @@ QStringList deescapifyList(const QString& text) {
 }
 
 QString	qfGetExistingDirectory ( QWidget * parent, const QString & caption, const QString & dir, QFileDialog::Options options ) {
-#ifdef Q_OS_UNIX
-    return QFileDialog::getExistingDirectory(parent, caption, dir, QFileDialog::DontUseNativeDialog|options);
-#else
-    return QFileDialog::getExistingDirectory(parent, caption, dir, options);
-#endif
+    QFileDialog::Options opt=options;
+
+    if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+        opt=options;
+    } else {
+        opt=options|QFileDialog::DontUseNativeDialog;
+    }
+    return QFileDialog::getExistingDirectory(parent, caption, dir, opt);
 }
 
 
@@ -839,40 +842,59 @@ QString qfGetSaveFileNameSet (const QString& setPrefix,  QWidget * parent , cons
 
 
 QString	qfGetOpenFileName ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options ) {
-#ifdef Q_OS_UNIX
-    return QFileDialog::getOpenFileName(parent, caption, dir, filter, selectedFilter, QFileDialog::DontUseNativeDialog|options);
-#else
-    return QFileDialog::getOpenFileName(parent, caption, dir, filter, selectedFilter, options);
-#endif
+    QFileDialog::Options opt=options;
+
+    if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+        opt=options;
+    } else {
+        opt=options|QFileDialog::DontUseNativeDialog;
+    }
+
+
+    return QFileDialog::getOpenFileName(parent, caption, dir, filter, selectedFilter, opt);
 }
 
 QStringList	qfGetOpenFileNames ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options ) {
-#ifdef Q_OS_UNIX
-    return QFileDialog::getOpenFileNames(parent, caption, dir, filter, selectedFilter, QFileDialog::DontUseNativeDialog|options);
-#else
-    return QFileDialog::getOpenFileNames(parent, caption, dir, filter, selectedFilter, options);
-#endif
+    QFileDialog::Options opt=options;
+
+    if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+        opt=options;
+    } else {
+        opt=options|QFileDialog::DontUseNativeDialog;
+    }
+
+    return QFileDialog::getOpenFileNames(parent, caption, dir, filter, selectedFilter, opt);
 }
 
 QString	qfGetSaveFileName ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options )  {
     QString s="";
     QString selF="";
     if (selectedFilter) selF=*selectedFilter;
-#ifdef Q_OS_UNIX
-    s= QFileDialog::getSaveFileName(parent, caption, dir, filter, &selF, QFileDialog::DontUseNativeDialog|options);
-    // this regexp recognizes the first file extension in filters like "Name File (*.cpw *.abc);; Filename 2 (*.txt)" then the first
-    // extension is appended to the filename, if it does not already contain a suffix
-    QRegExp rx(".*\\(\\*\\.(\\S+).*\\)\\w*[;;.]*", Qt::CaseInsensitive);
-    rx.setMinimal(true);
-    if (rx.indexIn(selF, 0)!=-1) {
-        QString ext=rx.cap(1);
-        if (QFileInfo(s).suffix().isEmpty()) {
-            s=s+"."+ext;
+
+    QFileDialog::Options opt=options;
+
+    if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+        opt=options;
+    } else {
+        opt=options|QFileDialog::DontUseNativeDialog;
+    }
+
+    s= QFileDialog::getSaveFileName(parent, caption, dir, filter, &selF, opt);
+
+    if (!ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+        // this regexp recognizes the first file extension in filters like "Name File (*.cpw *.abc);; Filename 2 (*.txt)" then the first
+        // extension is appended to the filename, if it does not already contain a suffix
+        QRegExp rx(".*\\(\\*\\.(\\S+).*\\)\\w*[;;.]*", Qt::CaseInsensitive);
+        rx.setMinimal(true);
+        if (rx.indexIn(selF, 0)!=-1) {
+            QString ext=rx.cap(1);
+            if (QFileInfo(s).suffix().isEmpty()) {
+                s=s+"."+ext;
+            }
         }
     }
-#else
-    s= QFileDialog::getSaveFileName(parent, caption, dir, filter, &selF, options);
-#endif
+
+
     if (selectedFilter) *selectedFilter=selF;
     return s;
 }

@@ -74,7 +74,7 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
          * \param parent pointer to the parent object
          * \param app the application this object manages the properties for
          */
-        ProgramOptions( QString ini=QString(""), QObject * parent = 0, QApplication* app=NULL);
+        explicit ProgramOptions( QString ini=QString(""), QObject * parent = 0, QApplication* app=NULL);
 
         /** \brief Default destructor */
         virtual ~ProgramOptions();
