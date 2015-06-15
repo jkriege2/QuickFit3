@@ -177,18 +177,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmNLOptBASE::intMinimize(double *paramsOut
 
     bool needslocal=( (nlopt_alg==NLOPT_AUGLAG) || (nlopt_alg==NLOPT_AUGLAG_EQ) || (nlopt_alg==NLOPT_G_MLSL) || (nlopt_alg==NLOPT_G_MLSL_LDS) );
 
-    if (needslocal) {
-        core_solver = nlopt_create(NLOPT_LD_LBFGS, paramCount); /* algorithm and dimensionality */
-        nlopt_set_lower_bounds(core_solver, paramsMin);
-        nlopt_set_upper_bounds(core_solver, paramsMax);
-        nlopt_set_min_objective(core_solver, QFFitAlgorithmNLOpt_fmin, &d);
-        nlopt_set_xtol_rel(core_solver, getParameter("xtol").toDouble());
-        nlopt_set_ftol_rel(core_solver, getParameter("ftol").toDouble());
-        nlopt_set_maxeval(core_solver, getParameter("max_evals").toInt());
-        nlopt_set_maxtime(core_solver, getParameter("max_time").toDouble());
-        //nlopt_set_initial_step1(core_solver, getParameter("stepsize").toDouble());
-        //nlopt_set_initial_step(core_solver, NULL);//getParameter("stepsize").toDouble());
-    }
+
 
 
 
@@ -202,7 +191,20 @@ QFFitAlgorithm::FitResult QFFitAlgorithmNLOptBASE::intMinimize(double *paramsOut
     nlopt_set_maxeval(opt, getParameter("max_evals").toInt());
     nlopt_set_maxtime(opt, getParameter("max_time").toDouble());
     nlopt_set_initial_step1(opt, getParameter("stepsize").toDouble());
-    if (needslocal) nlopt_set_local_optimizer(opt, core_solver);
+
+    if (needslocal) {
+        core_solver = nlopt_create(NLOPT_LD_LBFGS, paramCount); /* algorithm and dimensionality */
+        nlopt_set_lower_bounds(core_solver, paramsMin);
+        nlopt_set_upper_bounds(core_solver, paramsMax);
+        nlopt_set_min_objective(core_solver, QFFitAlgorithmNLOpt_fmin, &d);
+        nlopt_set_xtol_rel(core_solver, getParameter("xtol").toDouble());
+        nlopt_set_ftol_rel(core_solver, getParameter("ftol").toDouble());
+        nlopt_set_maxeval(core_solver, getParameter("max_evals").toInt());
+        nlopt_set_maxtime(core_solver, getParameter("max_time").toDouble());
+        //nlopt_set_initial_step1(core_solver, getParameter("stepsize").toDouble());
+        //nlopt_set_initial_step(core_solver, NULL);//getParameter("stepsize").toDouble());
+        nlopt_set_local_optimizer(opt, core_solver);
+    }
 
 
     double minf=0; /* the minimum objective value, upon return */

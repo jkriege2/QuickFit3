@@ -156,7 +156,9 @@ Q_DECLARE_INTERFACE(QFPlugin,
 
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#  undef Q_EXPORT_PLUGIN2
+#  ifdef Q_EXPORT_PLUGIN2
+#    undef Q_EXPORT_PLUGIN2
+#  endif
 #  define Q_EXPORT_PLUGIN2(a, b)
 #endif
 
