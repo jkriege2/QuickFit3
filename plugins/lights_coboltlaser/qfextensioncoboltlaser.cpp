@@ -481,7 +481,7 @@ unsigned int QFExtensionCoboltLaser::getMeasurementDeviceValueCount(unsigned int
 
 QString QFExtensionCoboltLaser::getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if (measuremenDevice>=getMeasurementDeviceCount()) return QString();
     if (value==0) return tr("measured power [mW]");
     if (value==1) return tr("drive current [mA]");
     if (sources[measuremenDevice].type==cltMLD6) {
@@ -492,7 +492,7 @@ QString QFExtensionCoboltLaser::getMeasurementDeviceValueName(unsigned int measu
 
 QString QFExtensionCoboltLaser::getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if (measuremenDevice>=getMeasurementDeviceCount()) return QString();
     if (value==0) return tr("measured_power_mW");
     if (value==1) return tr("drive_current_mA");
     if (sources[measuremenDevice].type==cltMLD6) {
