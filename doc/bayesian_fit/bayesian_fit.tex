@@ -50,6 +50,7 @@
 \DeclareMathOperator*{\argmin}{arg\:min\ }
 \DeclareMathOperator*{\argmax}{arg\:max\ }
 \DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Tr}{Tr}
 \newcommand{\mat}[1]{\mathrm{\mathbf{#1}}}
 
 \begin{document}
@@ -252,17 +253,23 @@ and
 is the inverse Hessian matrix, or variance-covariance matrix of the Bayesian fit problem \eqref{eq:fcs_fit_problem_maxBayeslikelihood}. 
 
 As already done at several occasions above, we can now again take the priors to be a uniform distribution:
-\begin{equation}\label{eq:fcs_fit_bayes_flatparamprior}
-  p(\vec{\beta}|M_g)=\left(\frac{1}{\beta_\text{max}-\beta_\text{min}}\right)^k\cdot\begin{cases}1&\exists i: \beta_\text{min}\leq \beta_i\leq \beta_\text{max}\\0&\text{else}\end{cases}.
-\end{equation}
-This distribution is a $k$-dimensional cube that should contain all possible parameter vectors, i.e. $\beta_\text{min}$ should be smaller than the smallest fit possible parameter value $\beta_i$ and $\beta_\text{max}$ should be larger than the largest possible value of any $\beta_i$.
+\begin{multline}\label{eq:fcs_fit_bayes_flatparamprior}
+  p(\vec{\beta}|M_g)=\frac{1}{\prod_{i=1}^k\left[2\cdot \gamma_p\cdot\sqrt{\mat{\Sigma}_{ii}}\right]}\cdot\begin{cases}1&\exists i: |\beta_i-\beta_i^\ast|\leq \gamma_p\cdot\sqrt{\mat{\Sigma}_{ii}}\\0&\text{else}\end{cases}=\\
+	=\frac{1}{(2\cdot \gamma_p)^k\cdot\prod_{i=1}^k\sqrt{\mat{\Sigma}_{ii}}}\cdot\begin{cases}1&\exists i: |\beta_i-\beta_i^\ast|\leq \gamma_p\cdot\sqrt{\mat{\Sigma}_{ii}}\\0&\text{else}\end{cases}.
+\end{multline}
+This distribution is a $k$-dimensional cube around the ideal estimate $\vec{\beta}^\ast$. The size of the box in each direction is $\gamma_p\cdot\sqrt{\mat{\Sigma}_{ii}}$, where $\gamma_p$ is a fixed factor (in \cite{GUO2012} chosen to be $\gamma_p=200$) and $\sqrt{\mat{\Sigma}_{ii}}$ estimates the estimation/fit uncertainty of parameter $i$.
+
 Then the Bayes fit problem \eqref{eq:fcs_fit_problem_maxBayeslikelihood} equals the simple maximum likelihood fit \eqref{eq:fcs_fit_problem_maxlikelihood} or (equivalently) the least-squares fit problem \eqref{eq:fcs_fit_problem}. Then $\vec{\beta}_{Bayes}^\ast$ is given by the solution to those problems and $\mat{\Sigma}_\text{Bayes}$ can be estimated by the variance-covariance matrices from section~\ref{sec:varcovmatrix}, i.e. equation~\eqref{eq:varcov_noerrors}. In this approximation, 
 equation \eqref{eq:bayes_marginprob_laplace} then simplifies to:
 \begin{multline}\label{eq:bayes_marginprob_laplace_flatprior}
-    p(\hat{\vec{g}}|M_g,\vec{\beta})\approx(2\pi)^{k/2}\cdot\sqrt{\det(\mat{\Sigma})}\cdot \exp\left\{-\frac{n\cdot\ln(2\pi)}{2}-\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}\cdot \overbrace{\left(\frac{1}{\beta_\text{max}-\beta_\text{min}}\right)^k}^{=p(\vec{\beta}^\ast_\text{Bayes}|M_g)}=\\
-    =\exp\left\{\frac{k}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right] -\frac{n\cdot\ln(2\pi)}{2}-\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2-k\cdot\ln(\beta_\text{max}-\beta_\text{min})\right\}=\\
-		=\exp\left\{\frac{k}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right] -\ln\left[(\beta_\text{max}-\beta_\text{min})^k\cdot\prod\limits_{i=1}^n\hat{\sigma}_i\right]-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}\cdot\\\cdot\exp\left\{-\frac{n\cdot\ln(2\pi)}{2}\right\}.
+    p(\hat{\vec{g}}|M_g,\vec{\beta})\approx(2\pi)^{k/2}\cdot\sqrt{\det(\mat{\Sigma})}\cdot \exp\left\{-\frac{n\cdot\ln(2\pi)}{2}-\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2\right\}\cdot \overbrace{\frac{1}{(2\cdot \gamma_p)^k\cdot\prod_i\sqrt{\mat{\Sigma}_{ii}}}}^{=p(\vec{\beta}^\ast_\text{Bayes}|M_g)}=\\
+    =\exp\left\{\frac{k}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right] -\frac{n\cdot\ln(2\pi)}{2}-\sum\limits_{i=1}^n\ln(\hat{\sigma}_i)-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2+\ln\left[ (2\cdot \gamma_p)^k\cdot\prod_{i=1}^k\sqrt{\mat{\Sigma}_{ii}} \right]\right\}
 \end{multline}
+For any practical purpose in model \underline{comparison}, one can remove terms from this probability that only depend on the data and not on the model or the number of model parameters. Then the equation above simplifies to:
+\begin{multline}\label{eq:bayes_marginprob_laplace_flatprior_simple}
+    p(\hat{\vec{g}}|M_g,\vec{\beta})\approx \exp\left\{\frac{k}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right]-\frac{1}{2}\cdot\sum\limits_{i=1}^n\left(\frac{g(\hat{\tau}_i;\vec{\beta}^\ast)-\hat{g}_i}{\hat{\sigma}_i}\right)^2+\ln\left[ (2\cdot \gamma_p)^k\cdot\prod_{i=1}^k\sqrt{\mat{\Sigma}_{ii}} \right]\right\}
+\end{multline}
+This is possible, because these terms would be the same in all evaluations of $p(\hat{\vec{g}}|M_g,\vec{\beta})$ for any model $M_g$. therefore they would be remove when normalizing the model probabilities anyways! Since these terms are often big, it is numerically better to not have them in the estimate in the first place! 
 
 
 
