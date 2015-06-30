@@ -65,13 +65,27 @@ void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double&
     baseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
     //backgroundfile="";
     int fcnt=set.value("files/count", 0).toInt();
+    bool foundBack=false;
+    QString secondBack="";
     for (int f=0; f<fcnt; f++) {
         QString fn=QFileInfo(set.fileName()).dir().absoluteFilePath(set.value("files/name"+QString::number(f), "").toString());
         QString ft=set.value("files/type"+QString::number(f), "").toString();
         QString fd=set.value("files/description"+QString::number(f), "").toString();
-        if (!ft.toLower().simplified().contains("CSV") && fd.toLower().simplified().contains("background") && (fd.toLower().simplified().contains("image") && (fd.toLower().simplified().contains("series") || fd.toLower().simplified().contains("acquisition")))) {
+        if (    !ft.toLower().simplified().contains("CSV")
+                && fd.toLower().simplified().contains("background")
+                && ((fd.toLower().simplified().contains("image") && (fd.toLower().simplified().contains("series") || fd.toLower().simplified().contains("acquisition")))
+                    || ft.toLower().simplified().contains("tif")
+                    || ft.toLower().simplified().contains("image"))
+                ) {
             backgroundfile=fn;
+            foundBack=true;
+        } else if (!ft.toLower().simplified().contains("CSV") && fd.toLower().simplified().contains("background") ) {
+            secondBack=fn;
+            //foundBack=true;
         }
+    }
+    if (!foundBack && !secondBack.isEmpty()) {
+        backgroundfile=secondBack;
     }
 }
 

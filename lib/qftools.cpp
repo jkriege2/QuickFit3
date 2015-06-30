@@ -1763,3 +1763,18 @@ void qfSaveReport(QTextDocument* doc, const QString& title, const QString& prefi
     }
     doc->setDocumentMargin(oldMargin);
 }
+
+QString qfSecondsDurationToHMSString(double seconds) {
+    int64_t runHours=floor(seconds/3600.0);
+    int64_t runMins=floor((seconds-(double)runHours*3600.0)/60.0);
+    int64_t runSecs=ceil((seconds-(double)runHours*3600.0-(double)runMins*60.0));
+
+    return QString("%1:%2:%3").arg(runHours,2,10,QLatin1Char('0')).arg(runMins,2,10,QLatin1Char('0')).arg(runSecs,2,10,QLatin1Char('0'));
+}
+
+QString qfSecondsDurationToMSString(double seconds) {
+    int64_t runMins=floor((seconds)/60.0);
+    int64_t runSecs=ceil((seconds-(double)runMins*60.0));
+
+    return QString("%1:%2").arg(runMins,2,10,QLatin1Char('0')).arg(runSecs,2,10,QLatin1Char('0'));
+}

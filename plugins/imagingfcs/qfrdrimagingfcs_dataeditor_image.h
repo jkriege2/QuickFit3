@@ -64,6 +64,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfselectrdrdialog.h"
 #include "datatools.h"
 #include "colorcombobox.h"
+#include "qfselectionlistdialog.h"
 
 class QFRDRImagingFCSData; // forward
 class QFRDRImagingFCSDiffusionLawDialog;//forward
@@ -300,6 +301,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void startFCSDiffusionLawPlot();
         /** \brief store a fit model comparison as annotation */
         void annotateModelComparison();
+        void onAnnotateParamChanged();
+        void onAnnotateParamModeChanged();
 
         void annotateDeleteCurrent();
         void annotateDeleteAll();
@@ -348,6 +351,11 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         int connectParameterWidgetsCounter;
         int connectImageWidgetsCounter;
         bool reactOnRedrawCalls;
+
+        QPointer<QFEnhancedComboBox> cmbAnnotateDlgParameter;
+        QPointer<QFEnhancedComboBox> cmbAnnotateDlgMode;
+        QPointer<QCheckBox> chkAnnotateDlgCalcModelProb;
+        QPointer<QFSelectionListDialog> dlgAnnotateDlg;
 
         /** \brief indicates whether the overview plot is visible */
         QCheckBox* chkOverviewVisible;
@@ -591,8 +599,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
 
         /** \brief create a parameter image with the given evalGroup and fitParam */
-        void readParameterImage(double* image, uint32_t width, uint32_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR=true, const QString& otherRDRRole=QString(""), const QString& otherRDRevalGroup=QString(""));
-        void readParameterImage(QFRawDataRecord* current, double* image, uint32_t width, uint32_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR=true, const QString& otherRDRRole=QString(""), const QString& otherRDRevalGroup=QString(""));
+        void readParameterImage(double* image, uint32_t width, uint32_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR=true, const QString& otherRDRRole=QString(""), const QString& otherRDRevalGroup=QString(""),  QString* usedEvalOut=NULL);
+        void readParameterImage(QFRawDataRecord* current, double* image, uint32_t width, uint32_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR=true, const QString& otherRDRRole=QString(""), const QString& otherRDRevalGroup=QString(""), QString *usedEvalOut=NULL);
 
         /** \brief apply the given transformation to the image */
         void transformImage(double *image, uint32_t width, uint32_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam);

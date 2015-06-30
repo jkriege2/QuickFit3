@@ -50,11 +50,11 @@ QFEValColocalizationItem::~QFEValColocalizationItem() {
 }
 
 
-void QFEValColocalizationItem::intWriteData(QXmlStreamWriter& w) {
+void QFEValColocalizationItem::intWriteData(QXmlStreamWriter& /*w*/) {
     /* store global evaluation parameters / initial values or anything else to the project tree here */
 }
 
-void QFEValColocalizationItem::intReadData(QDomElement* e) {
+void QFEValColocalizationItem::intReadData(QDomElement* /*e*/) {
     /* read back anything you've written in intWriteData() in this function */
 }
 
@@ -83,7 +83,7 @@ QString QFEValColocalizationItem::getEvaluationResultID(int stack, int ch1, int 
     else return QString("%1_%2_stack%3_ch%4_ch%5").arg(getType()).arg(getID()).arg(stack).arg(ch1).arg(ch2);
 }
 
-void QFEValColocalizationItem::doEvaluation(QFRawDataRecord *record, int frame, int channel1, int channel2, QProgressDialog *dlgEvaluationProgress) {
+void QFEValColocalizationItem::doEvaluation(QFRawDataRecord *record, int /*frame*/, int /*channel1*/, int /*channel2*/, QProgressDialog *dlgEvaluationProgress) {
     QApplication::processEvents();
     if (dlgEvaluationProgress&& dlgEvaluationProgress->wasCanceled()) return; // canceled by user ?
     

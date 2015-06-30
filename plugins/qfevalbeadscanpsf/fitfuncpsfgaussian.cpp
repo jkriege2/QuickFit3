@@ -50,10 +50,6 @@ double QFFitFunctionPSFGaussian::evaluate(double t, const double* data) const {
     return offset+amplitude*exp(-2.0*sqr(t-position)/sqr(width));
 }
 
-void QFFitFunctionPSFGaussian::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
-
-}
 
 void QFFitFunctionPSFGaussian::calcParameter(double* /*data*/, double* /*error*/) const {
 }
@@ -68,11 +64,11 @@ unsigned int QFFitFunctionPSFGaussian::getAdditionalPlotCount(const double* /*pa
 	// we have one additional plot
 }
 
-QString QFFitFunctionPSFGaussian::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionPSFGaussian::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
     return "";
 }
 
-bool QFFitFunctionPSFGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionPSFGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

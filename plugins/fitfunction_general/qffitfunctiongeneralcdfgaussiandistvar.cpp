@@ -39,10 +39,6 @@ double QFFitFunctionGeneralCDFGaussianDistVar::evaluate(double t, const double* 
     return 0.5*(1.0+erf((t-position)/sqrt(2.0*qfSqr(width))));
 }
 
-void QFFitFunctionGeneralCDFGaussianDistVar::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
-
-}
 
 void QFFitFunctionGeneralCDFGaussianDistVar::calcParameter(double* /*data*/, double* /*error*/) const {
 }

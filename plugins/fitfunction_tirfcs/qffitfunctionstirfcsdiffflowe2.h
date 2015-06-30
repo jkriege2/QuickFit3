@@ -34,13 +34,13 @@ class QFFitFunctionsTIRFCSDiffFlowE2: public QFFitFunction {
         QFFitFunctionsTIRFCSDiffFlowE2();
         virtual ~QFFitFunctionsTIRFCSDiffFlowE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("TIR-FCS: 2D Diffusion+Flow (rect. pixel, 1/e^2 radii)"); }
+        virtual QString name() const { return QString("TIR-FCS: 2D Normal Diffusion+Flow (rect. pixel, 1/e^2 radii)"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_tir_diff_flowe2"); }
         /*! \copydoc QFFitFunction::category()   */
-        virtual QString category() const { return QObject::tr("TIR-FCS"); }
+        virtual QString category() const { return QObject::tr("TIR-FCS (camera)"); }
 
 
         /*! \copydoc QFFitFunction::evaluate()   */

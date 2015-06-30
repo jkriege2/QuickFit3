@@ -3367,7 +3367,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 
 }
 
-void QFRawDataRecord::resultsSetFitStatistics(const QFFitStatistics &result, const QString &evalID, const QString &prefix, const QString &group)
+void QFRawDataRecord::resultsSetFitStatistics(const QFBasicFitStatistics &result, const QString &evalID, const QString &prefix, const QString &group)
 {
 
     QString param;
@@ -3398,6 +3398,10 @@ void QFRawDataRecord::resultsSetFitStatistics(const QFFitStatistics &result, con
     resultsSetInteger(evalID, param=prefix+"fitparams", result.fitparamN);
     resultsSetGroup(evalID, param, group);
     resultsSetLabel(evalID, param, tr("fit params"));
+
+    resultsSetInteger(evalID, param=prefix+"det_cov", result.detCOV);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("det(fit cov matrix)"));
 
     resultsSetInteger(evalID, param=prefix+"datapoints", result.dataSize);
     resultsSetGroup(evalID, param, group);
@@ -3442,6 +3446,18 @@ void QFRawDataRecord::resultsSetFitStatistics(const QFFitStatistics &result, con
     resultsSetNumber(evalID, param=prefix+"max_rel_param_error", result.maxRelParamError);
     resultsSetGroup(evalID, param, group);
     resultsSetLabel(evalID, param, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
+
+    resultsSetNumber(evalID, param=prefix+"bayes_model_probability", result.bayesProbability);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("Bayes model probability"), tr("p<sub>Bayes</sub>(model|data)"));
+
+    resultsSetNumber(evalID, param=prefix+"bayes_model_probability_log10", result.bayesProbabilityLog10);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("log10 Bayes model probability"), tr("log<sub>10</sub>(p<sub>Bayes</sub>(model|data))"));
+
+    resultsSetNumber(evalID, param=prefix+"bayes_model_probability_paramrangesize", result.bayesProbabilityParamRangeSize);
+    resultsSetGroup(evalID, param, group);
+    resultsSetLabel(evalID, param, tr("parameter range size for Bayes model probability"),  tr("param_range<sub>Bayes</sub>"));
 
     resultsSetNumber(evalID, param=prefix+"tss", result.TSS);
     resultsSetGroup(evalID, param, group);
@@ -3525,6 +3541,10 @@ void QFRawDataRecord::getStatisticsParams(QStringList *ids, QStringList *labels,
     if (ids) (*ids)<<prefix+"tss";
     if (labels) (*labels)<<tr("total sum of squares");
     if (labelsHTML) (*labelsHTML)<<tr("TSS &chi;<sup>2</sup>");
+
+    if (ids) (*ids)<<prefix+"bayes_model_probability";
+    if (labels) (*labels)<<tr("Bayes model probability");
+    if (labelsHTML) (*labelsHTML)<<tr("p<sub>Bayes</sub>(model|data)");
 }
 
 QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& evalName, const QString& resultName) const

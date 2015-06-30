@@ -117,7 +117,7 @@ bool QFCompleterTextEditNumberBar::event(QEvent *event) {
     return QWidget::event(event);
 }
 
-void QFCompleterTextEditNumberBar::paintEvent(QPaintEvent *event) {
+void QFCompleterTextEditNumberBar::paintEvent(QPaintEvent */*event*/) {
     QTextDocument* doc=editor->document();
     QAbstractTextDocumentLayout *layout = doc->documentLayout();
     qreal yPosition=editor->verticalScrollBar()->value();
@@ -354,7 +354,7 @@ void QFCompleterTextEditWidget::cursorChanged() {
     std::cout<<"viewport()->width() = "<<viewport()->width()<<std::endl;*/
 }
 
-void QFCompleterTextEditWidget::processTab(QKeyEvent *e) {
+void QFCompleterTextEditWidget::processTab(QKeyEvent */*e*/) {
     QTextCursor c(textCursor());
     if (c.selectionStart() == c.selectionEnd()) {
         c.insertText(tabToSpaces()); // no selection: simply insert tab spaces

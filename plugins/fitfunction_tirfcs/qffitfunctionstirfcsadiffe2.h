@@ -40,7 +40,7 @@ class QFFitFunctionsTIRFCSADiffE2: public QFFitFunction {
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_tir_adiffe2"); }
         /*! \copydoc QFFitFunction::category()   */
-        virtual QString category() const { return QObject::tr("TIR-FCS"); }
+        virtual QString category() const { return QObject::tr("TIR-FCS (camera)"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

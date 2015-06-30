@@ -467,10 +467,12 @@ void QFRDRImageToRunPreview::moveColorbarsAuto()
 
 void QFRDRImageToRunPreview::setCurrentRun(int runIn, bool replotAlways)
 {
+
     int run=runIn;
     if (run<runmin) run=runmin;
     if (run>runmax) run=runmax;
     if (run==currentRun && !replotAlways) return;
+    //qDebug()<<"QFRDRImageToRunPreview::setCurrentRun("<<run<<")";
     currentRun=run;
     if (runSelectWidget) {
         disconnect(spinRun, SIGNAL(valueChanged(int)), this, SLOT(setCurrentRun(int)));
@@ -484,6 +486,7 @@ void QFRDRImageToRunPreview::setCurrentRun(int runIn, bool replotAlways)
     if (rrRecord) {
         emit currentPixelChanged(rrRecord->runToX(run), rrRecord->runToY(run));
     }
+    //qDebug()<<"QFRDRImageToRunPreview::setCurrentRun("<<run<<") ... done";
 }
 
 void QFRDRImageToRunPreview::setCurrentPixel(int x, int y)

@@ -41,6 +41,18 @@ void QFEnhancedComboBox::setCurrentFromModelData(const QVariant &data, int role)
     setCurrentData(data, role);
 }
 
+void QFEnhancedComboBox::findAndSelectText(const QString &text)
+{
+    findAndSelectText(text, currentIndex());
+}
+
+void QFEnhancedComboBox::findAndSelectText(const QString &text, int defaultIdx)
+{
+    int idx=findText(text);
+    if (idx>=0) setCurrentIndex(idx);
+    else setCurrentIndex(defaultIdx);
+}
+
 void QFEnhancedComboBox::selectIndex(const QModelIndex &index)
 {
     setCurrentIndex(index.row());

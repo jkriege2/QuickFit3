@@ -143,7 +143,7 @@ void QFEValColocalizationEditor::writeSettings() {
     if (!settings) return;
 }
 
-void QFEValColocalizationEditor::userRangeChanged(double xmin, double xmax, double ymin, double ymax)
+void QFEValColocalizationEditor::userRangeChanged(double /*xmin*/, double /*xmax*/, double /*ymin*/, double /*ymax*/)
 {
     displayData();
 }

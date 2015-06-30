@@ -376,12 +376,13 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
             QString tooltip=link.toString(QUrl::RemoveScheme);
             QString tooltipfn="";
             QString tooltipstr=tr("<i>no tooltip available</i>");
+            QString ttshort=QString("_tooltip")+cleanStringForFilename(tooltip, 50, true, true);
             if (tooltips.contains(tooltip)) {
                 tooltipstr=tooltips[tooltip].tooltip;
                 tooltipfn=tooltips[tooltip].tooltipfile;
             }
             //qDebug()<<"show tooltip: "<<tooltip<<tooltipstr<<tooltipfn;
-            QToolTip::showText(QCursor::pos(), transformQF3HelpHTML(tooltipstr, tooltipfn), descriptionBrowser, QRect());
+            QToolTip::showText(QCursor::pos(), transformQF3HelpHTML(tooltipstr, tooltipfn, true, QFHelpReplacesList(), false, false, false, ttshort), descriptionBrowser, QRect());
         } else if ((scheme=="open") || (scheme=="opendir") || (scheme=="openfile") || (linkstr.toLower().endsWith(".pdf")) || (linkstr.toLower().endsWith(".zip")) || (linkstr.toLower().endsWith(".ps"))){
             //QDir spd(searchPath);
             //QString filenamen=link.toString(QUrl::RemoveScheme|QUrl::StripTrailingSlash);

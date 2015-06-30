@@ -110,17 +110,17 @@ echo -e "\n\ndetermining bit depth:"
 BITDEPTH=`./quickfit3.exe --getbits`
 echo -e "\n   bit depth: ${BITDEPTH}\n\n"
 
-INSTALLER_BASENAME=quickfit3_32bit${SPECIALS}_${SVNVER}
+INSTALLER_BASENAME=quickfit3_win32${SPECIALS}_${SVNVER}
 INSTALLER_INSTDIR="\$PROGRAMFILES32"
-ZIPFILE=quickfit3_32bit${SPECIALS}_${SVNVER}.zip
-ZIPFILESPIM=quickfit3_32bit${SPECIALS}_spimplugins_${SVNVER}.zip
-ZIPFILESPECIAL=quickfit3_32bit${SPECIALS}_special_${SVNVER}.zip
+ZIPFILE=quickfit3_win32${SPECIALS}_${SVNVER}.zip
+ZIPFILESPIM=quickfit3_win32${SPECIALS}_spimplugins_${SVNVER}.zip
+ZIPFILESPECIAL=quickfit3_win32${SPECIALS}_special_${SVNVER}.zip
 if [ "${BITDEPTH}" == "64" ]; then
 	INSTALLER_INSTDIR="\$PROGRAMFILES64"
-	INSTALLER_BASENAME=quickfit3_64bit${SPECIALS}_${SVNVER}
-	ZIPFILE=quickfit3_64bit${SPECIALS}_${SVNVER}.zip
-	ZIPFILESPIM=quickfit3_64bit${SPECIALS}_spimplugins_${SVNVER}.zip
-	ZIPFILESPECIAL=quickfit3_64bit${SPECIALS}_special_${SVNVER}.zip
+	INSTALLER_BASENAME=quickfit3_win64${SPECIALS}_${SVNVER}
+	ZIPFILE=quickfit3_win64${SPECIALS}_${SVNVER}.zip
+	ZIPFILESPIM=quickfit3_win64${SPECIALS}_spimplugins_${SVNVER}.zip
+	ZIPFILESPECIAL=quickfit3_win64${SPECIALS}_special_${SVNVER}.zip
 fi
 SPIMPLUGINS=" cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino filterc_test cam_systemcam filterc_tmcl lights_b040laserbox lights_pccsled lights_coboltlaser stage_pi863_2 meas_b040resheater lights_coboltlaser servo_pololu_maestro shutter_relais_arduino"
 SPECIALPLUGINS=""

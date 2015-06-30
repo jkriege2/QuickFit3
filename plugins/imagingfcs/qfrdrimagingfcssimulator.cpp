@@ -36,7 +36,7 @@ QFRDRImagingFCSSimulator::QFRDRImagingFCSSimulator(QWidget *parent) :
     readSettings();
     ui->groupBox->setVisible(false);
     sim=new QFRDRImagingFCSSimulationThread(this);
-    connect(sim, SIGNAL(progress(int)), ui->progressBar, SLOT(setValue(int)));
+    connect(sim, SIGNAL(progress(int)), this, SLOT(updateSimStatus(int)));
     connect(sim, SIGNAL(statusMessage(QString)), ui->labProgress, SLOT(setText(QString)));
     connect(sim, SIGNAL(finished()), this, SLOT(threadFinished()));
     ui->edtFilename->addInsertContextMenuEntry(tr("insert %counter%"), QString("%counter%"));
@@ -212,6 +212,7 @@ void QFRDRImagingFCSSimulator::on_btnRun_clicked()
         sim->set_brightnessR2(ui->spinBrigthnessR_2->value());
 
         sim->start();
+        timeSimStart=QDateTime::currentDateTime();
         writeSettings();
         setState(dsRunning);
     } else if (dstate==dsFinished) { writeSettings(); setState(dsParameterInput); accept(); }
@@ -238,6 +239,21 @@ void QFRDRImagingFCSSimulator::threadFinished()
     }
     lastSimFile=sim->get_filename();
     accept();
+}
+
+void QFRDRImagingFCSSimulator::updateSimStatus(int status)
+{
+    ui->progressBar->setValue(status);
+
+    double runtime=timeSimStart.msecsTo(QDateTime::currentDateTime())/1000.0;
+
+
+    double finished=double(status)/double(ui->progressBar->maximum()-ui->progressBar->minimum());
+    double toend=1.0-finished;
+    double timeperone=runtime/finished;
+    double eta=toend*timeperone;
+
+    ui->labSimTime->setText(tr("runtime: %1 (ETA: %2)").arg(qfSecondsDurationToHMSString(runtime)).arg(qfSecondsDurationToHMSString(eta)));
 }
 
 void QFRDRImagingFCSSimulator::setState(QFRDRImagingFCSSimulator::DialogState new_dstate)

@@ -32,7 +32,7 @@ QFFitAlgorithmThreadedFit::~QFFitAlgorithmThreadedFit()
     //dtor
 }
 
-void QFFitAlgorithmThreadedFit::init(QFFitAlgorithm* algorithm, double* paramsOut, double* paramErrorsOut, double* dataX, double* dataY, double* dataWeight, uint64_t N, QFFitFunction* model, double* initialParams, bool* fixParams, double* paramsMin, double* paramsMax, int repeats, bool fitLogY) {
+void QFFitAlgorithmThreadedFit::init(QFFitAlgorithm* algorithm, double* paramsOut, double* paramErrorsOut, double* dataX, double* dataY, double* dataWeight, uint64_t N, QFFitFunction* model, double* initialParams, bool* fixParams, double* paramsMin, double* paramsMax, int repeats, bool fitLogY, QVector<double> *COV) {
     this->algorithm=algorithm;
     this->paramsOut=paramsOut;
     this->paramErrorsOut=paramErrorsOut;
@@ -47,13 +47,14 @@ void QFFitAlgorithmThreadedFit::init(QFFitAlgorithm* algorithm, double* paramsOu
     this->paramsMax=paramsMax;
     this->repeats=repeats;
     this->fitLogY=fitLogY;
+    this->COV=COV;
 };
 
 void QFFitAlgorithmThreadedFit::run() {
     QTime tstart=QTime::currentTime();
     double* init=duplicateArray(initialParams, model->paramCount());
     for (int i=0; i<repeats; i++) {
-        result=algorithm->fit(paramsOut, paramErrorsOut, dataX, dataY, dataWeight, N, model, init, fixParams, paramsMin, paramsMax, fitLogY);
+        result=algorithm->fit(paramsOut, paramErrorsOut, dataX, dataY, dataWeight, N, model, init, fixParams, paramsMin, paramsMax, fitLogY, NULL, COV);
         copyArray(init, paramsOut, model->paramCount());
     }
     qfFree(init);

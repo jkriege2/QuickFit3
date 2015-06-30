@@ -23,6 +23,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFRDRIMAGINGFCSSIMULATOR_H
 
 #include <QDialog>
+#include <QDateTime>
 #include "qfrdrimagingfcssimulationthread.h"
 
 namespace Ui {
@@ -45,6 +46,7 @@ class QFRDRImagingFCSSimulator : public QDialog
         void on_btnRun_clicked();
         void on_btnCancel_clicked();
         void threadFinished();
+        void updateSimStatus(int status);
     private:
         Ui::QFRDRImagingFCSSimulator *ui;
 
@@ -61,6 +63,7 @@ class QFRDRImagingFCSSimulator : public QDialog
         QString lastSimFile;
 
         QFRDRImagingFCSSimulationThread* sim;
+        QDateTime timeSimStart;
 };
 
 #endif // QFRDRIMAGINGFCSSIMULATOR_H

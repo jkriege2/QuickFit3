@@ -265,15 +265,15 @@ void QFESPIMB040DeviceParamStackConfigWidget::on_btnAcquire_clicked() {
     performStack();
 }
 
-void QFESPIMB040DeviceParamStackConfigWidget::on_spinStart_valueChanged(double value) {
+void QFESPIMB040DeviceParamStackConfigWidget::on_spinStart_valueChanged(double /*value*/) {
     updateLabel();
 }
 
-void QFESPIMB040DeviceParamStackConfigWidget::on_spinEnd_valueChanged(double value) {
+void QFESPIMB040DeviceParamStackConfigWidget::on_spinEnd_valueChanged(double /*value*/) {
     updateLabel();
 }
 
-void QFESPIMB040DeviceParamStackConfigWidget::on_spinDelta_valueChanged(double value) {
+void QFESPIMB040DeviceParamStackConfigWidget::on_spinDelta_valueChanged(double /*value*/) {
     updateLabel();
 }
 
@@ -292,21 +292,21 @@ void QFESPIMB040DeviceParamStackConfigWidget::updateLabel() {
     ui->labScan->setText(tr("%1 steps%2").arg(l.size()).arg(s));
 }
 
-void QFESPIMB040DeviceParamStackConfigWidget::on_chkUse1_clicked(bool enabled) {
+void QFESPIMB040DeviceParamStackConfigWidget::on_chkUse1_clicked(bool /*enabled*/) {
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->widScanParam1->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->edtPrefix1->setEnabled(ui->chkUse1->isChecked());
     ui->cmbCam1Settings->setEnabled(ui->chkUse1->isChecked());
 }
 
-void QFESPIMB040DeviceParamStackConfigWidget::on_chkUse2_clicked(bool enabled) {
+void QFESPIMB040DeviceParamStackConfigWidget::on_chkUse2_clicked(bool /*enabled*/) {
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->widScanParam1->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->edtPrefix2->setEnabled(ui->chkUse2->isChecked());
     ui->cmbCam2Settings->setEnabled(ui->chkUse2->isChecked());
 }
 
-void QFESPIMB040DeviceParamStackConfigWidget::on_cmbMode_currentIndexChanged(int index) {
+void QFESPIMB040DeviceParamStackConfigWidget::on_cmbMode_currentIndexChanged(int /*index*/) {
     updateLabel();
 }
 

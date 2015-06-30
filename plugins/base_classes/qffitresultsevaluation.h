@@ -936,6 +936,7 @@ public:
     virtual void resetDefaultFitFix(QFRawDataRecord *r, const QString &resultID, const QString &id);
 
     virtual void setFitResultFitStatistics(QFRawDataRecord *record, const QString &index, const QFFitStatistics &result, const QString &prefix, const QString &group);
+    virtual void getFitResultFitStatistics(QFRawDataRecord *record, const QString &index, QFFitStatistics &result, const QString &prefix) const;
 
 signals:
 

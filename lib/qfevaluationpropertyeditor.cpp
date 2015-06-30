@@ -106,7 +106,9 @@ void QFEvaluationRawDataModelProxy::selectionChanged(QList<QPointer<QFRawDataRec
     //std::cout<<"QFEvaluationRawDataModelProxy::selectionChanged()\n";
     invalidateFilter();
     //qDebug()<<rowCount()<<editor;
-    if (editor && (rowCount()<=0)) editor->close();
+    if (editor && (rowCount()<=0)) {
+        editor->closeBecauseNoRDRs();
+    }
 }
 
 
@@ -413,7 +415,7 @@ void QFEvaluationPropertyEditor::deselectCurrent() {
         if (next.isValid()) {
             p->lstRawData->selectionModel()->setCurrentIndex(next, QItemSelectionModel::SelectCurrent);
         } else {
-            close();
+            closeBecauseNoRDRs();
         }
     }
 }
@@ -467,6 +469,13 @@ void QFEvaluationPropertyEditor::sendEditorCommand(const QString &command, const
     if (getEditor()) {
         getEditor()->sendEditorCommand(command, param1, param2, param3, param4, param5);
     }
+}
+
+void QFEvaluationPropertyEditor::closeBecauseNoRDRs()
+{
+    hide();
+    QMessageBox::information(NULL, tr("QF3 Evaluation Editor Closed ..."), tr("QuickFit 3.0 closed an evaluation editor window, because no applicable raw data records (RDRs) were found in the current project.\n\nAdd RDRs to the project, that this evaluation is applicable to, before opening the evaluation editor!"), QMessageBox::Ok, QMessageBox::Ok);
+    close();
 }
 
 

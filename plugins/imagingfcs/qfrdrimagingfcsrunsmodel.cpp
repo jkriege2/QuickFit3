@@ -63,21 +63,21 @@ QVariant QFRDRImagingFCSRunsModel::data(const QModelIndex &index, int role) cons
     return QVariant();
 }
 
-Qt::ItemFlags QFRDRImagingFCSRunsModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QFRDRImagingFCSRunsModel::flags(const QModelIndex &/*index*/) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-QVariant QFRDRImagingFCSRunsModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QFRDRImagingFCSRunsModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const {
     return QVariant();
 }
 
-int QFRDRImagingFCSRunsModel::rowCount(const QModelIndex &parent) const {
+int QFRDRImagingFCSRunsModel::rowCount(const QModelIndex &/*parent*/) const {
     if (!current) return 0;
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) return 1+m->getCorrelationRuns();
     return 1;
 }
 
-int QFRDRImagingFCSRunsModel::columnCount(const QModelIndex &parent) const {
+int QFRDRImagingFCSRunsModel::columnCount(const QModelIndex &/*parent*/) const {
     return 1;
 }

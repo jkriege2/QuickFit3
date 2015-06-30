@@ -78,6 +78,13 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultSto
     fitresult.resultsSetIntegerAndBool( param=prefix+"fitparams",  result.fitparamN, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("fit params"));
 
+    fitresult.resultsSetIntegerAndBool( param=prefix+"det_cov",  result.detCOV, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("det(fit cov matrix)"));
+
+
+
+
+
     fitresult.resultsSetIntegerAndBool( param=prefix+"datapoints",  result.dataSize, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("datapoints"));
 
@@ -95,6 +102,13 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultSto
 
 
 
+    fitresult.resultsSetNumberAndBool( param=prefix+"bayes_model_probability_paramrangesize",  result.bayesProbabilityParamRangeSize, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("Bayes model probability"), tr("p<sub>Bayes</sub>(model|data)"));
+
+    fitresult.resultsSetNumberAndBool( param=prefix+"bayes_model_probability",  result.bayesProbability, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("parameter range size for Bayes model probability"), tr("param_range<sub>Bayes</sub>"));
+    fitresult.resultsSetNumberAndBool( param=prefix+"bayes_model_probability_log10",  result.bayesProbabilityLog10, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
+    fitresult.resultsSetGroupAndLabels( param, group, tr("log10 Bayes model probability"), tr("log<sub>10</sub>(p<sub>Bayes</sub>(model|data))"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"r2_weighted",  result.RsquaredWeighted, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("weighted R squared"), tr("R<sup>2</sup> (weighted)"));
@@ -103,17 +117,17 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultSto
     fitresult.resultsSetGroupAndLabels( param, group, tr("weighted adjusted R squared"), tr("R<sup>2</sup><sub>adjusted</sub> (weighted)"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"aicc",  result.AICc, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("Akaike's information criterion (AICc)"), tr("AICc"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("Akaike's information criterion"), tr("AICc"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"aicc_weighted",  result.AICcWeighted, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Akaike's information criterion (weighted AICc)"), tr("AICc (weighted)"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Akaike's information criterion"), tr("AICc (weighted)"));
 
 
     fitresult.resultsSetNumberAndBool( param=prefix+"bic",  result.BIC, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("Bayesian information criterion (BIC)"), tr("BIC"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("Bayesian information criterion"), tr("BIC"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"bic_weighted",  result.BICweighted, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Bayesian information criterion (weighted BIC)"), tr("BIC (weighted)"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Bayesian information criterion"), tr("BIC (weighted)"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"max_rel_param_error",  result.maxRelParamError, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
@@ -140,6 +154,9 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInVector(QF
         record->resultsSetInNumberListAndBool(evalID, param=prefix+"residstddev", run, fit_stat.residStdDev, QString(""), getParamNameLocalStore(param),  true);
         record->resultsSetGroupAndLabels(evalID, param, group, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
 
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"det_cov", run, fit_stat.residStdDev, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("det(fit cov matrix)"));
+
         record->resultsSetInNumberListAndBool(evalID, param=prefix+"residstddev_weighted", run, fit_stat.residWeightStdDev, QString(""), getParamNameLocalStore(param),  true);
         record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
 
@@ -157,6 +174,35 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInVector(QF
 
         record->resultsSetInNumberListAndBool(evalID, param=prefix+"tss", run, fit_stat.TSS, QString(""), getParamNameLocalStore(param),  true);
         record->resultsSetGroupAndLabels(evalID, param, group, tr("total sum of squares"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"bayes_model_probability_paramrangesize", run, fit_stat.bayesProbabilityParamRangeSize, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("Bayes model probability"), tr("p<sub>Bayes</sub>(model|data)"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"bayes_model_probability_log10", run, fit_stat.bayesProbabilityLog10, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("log10 Bayes model probability"), tr("log<sub>10</sub>(p<sub>Bayes</sub>(model|data))"));
+
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"bayes_model_probability", run, fit_stat.bayesProbability, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("parameter range size for Bayes model probability"), tr("param_range<sub>Bayes</sub>"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"r2_weighted", run, fit_stat.RsquaredWeighted, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted R squared"), tr("R<sup>2</sup> (weighted)"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"aicc", run, fit_stat.AICc, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("Akaike's information criterion"), tr("AICc"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"aicc_weighted", run, fit_stat.AICcWeighted, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted Akaike's information criterion"), tr("AICc (weighted)"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"bic", run, fit_stat.BIC, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("Bayesian information criterion"), tr("BIC"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"bic_weighted", run, fit_stat.BICweighted, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted Bayesian information criterion"), tr("BIC (weighted)"));
+
+        record->resultsSetInNumberListAndBool(evalID, param=prefix+"max_rel_param_error", run, fit_stat.maxRelParamError, QString(""), getParamNameLocalStore(param),  true);
+        record->resultsSetGroupAndLabels(evalID, param, group, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
+
     }
 }
 

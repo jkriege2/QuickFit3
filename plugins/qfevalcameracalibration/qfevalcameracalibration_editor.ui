@@ -115,7 +115,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="widget" native="true">
+     <widget class="QWidget" name="mainWidget" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -370,15 +370,12 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFPlotter</class>
-   <extends>QWidget</extends>
-   <header>qfplotter.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFRDRComboBox</class>
    <extends>QComboBox</extends>
    <header>qfrdrcombobox.h</header>
+   <slots>
+    <signal>currentRDRChanged(QFRawDataRecord*)</signal>
+   </slots>
   </customwidget>
   <customwidget>
    <class>QEnhancedTableView</class>
@@ -389,6 +386,12 @@
    <class>QVisibleHandleSplitter</class>
    <extends>QSplitter</extends>
    <header>qvisiblehandlesplitter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

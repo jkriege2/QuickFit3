@@ -430,13 +430,13 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
 QString QFFCSMaxEntEvaluationItem::getModelName(int model) const {
     switch(model)
     {
-        case 0: return tr("FCS: 3D diffusion with Triplet");
-        case 1: return tr("FCS: 3D diffusion with 2 blinking components");
-        case 2: return tr("FCS: 2D diffusion with 2 blinking components");
+        case 0: return tr("FCS: 3D Normal Diffusion with Triplet");
+        case 1: return tr("FCS: 3D Normal Diffusion with 2 blinking components");
+        case 2: return tr("FCS: 2D Normal Diffusion with 2 blinking components");
         case 3: return tr("Dynamic Light Scattering");
-        case 4: return tr("FCS Blinking with 3D diffusion");
-        case 5: return tr("camera SPIM-FCS 3D");
-        case 6: return tr("camera TIR-FCS 2D");
+        case 4: return tr("FCS Blinking with 3D Normal Diffusion");
+        case 5: return tr("camera SPIM-FCS 3D Normal Diffusion");
+        case 6: return tr("camera TIR-FCS 2D Normal Diffusion");
     }
     /*
     if (model==0) return tr("FCS: 3D diffusion with Triplet");

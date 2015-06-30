@@ -41,15 +41,19 @@
         <li>added vector creation functions ones(), zeros(), linspace(), logspace(), vector() meshgrid2d_x(), meshgrid2d_y()</li>
         <li>added function for real-values Faddeeva function used in TIR-FCS fit models: faddeeva_real()</li>
       </ul></li>
+      <li>online-help:<ul>
+      <li>bugfix: the DOI's in the help texts should be linked now again!</li>
+      <li>bugfix: in some cases the equations in a tooltip were displayed wrong (mixed up with old renderings!)</li>
+      </ul></li>
       <li>QF 3 now compiles with Qt 5.4 on MacOS X!</li>
       <li>added Faddeeva Package to support real-valued Faddeeva-Function, which is required by some TIR-FCS fit modelss</li>
       <li>several dialogs now have a maximize+minimize button in their header</li>
       <li>improved rendering of LaTeX expressions</li>
-      <li>bugfix: online-help: the DOI's in the help texts should be linked now again!</li>
       <li>added (optional) support for general objective function minimization to QFitAlgorithm (+ implementations in the NLopt and GSL fit algorithm plugins)</li>
       <li>added menu entry "Tools | Copy SDK For Dynamic User Fit Function Libraries ..." which copies the SDK for user fit functions in a dynamic library into a folder on your computer.</li>
       <li>added option to settings dialog that allows to choose between native and Qt/QuickFit-specific file-open dialogs</li>
-      <li>added easter-egg</li>
+      <li>added easter-egg (have fun finding it ;-)</li>
+      <li>added an error message/dialog, when an evaluation editor window does not open after a project-tree double-click, because no applicable RDRs were found in the project.</li>
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>
@@ -57,7 +61,7 @@
         <li>added support for reading PicoQuant exported ASCII FCS correlation curves (*.dat files) [thanks to Martin Seefeld, Uni Heidelberg]</li>
     </ul></li>
     <li><b>FCS fit</b><ul>
-        <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error</li>
+        <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
         <li>improved documentation of fit statistics</li>
         <li>added tutorial for model selection</li>
         <li>bugfix: the "show key" checkbox works now</li>
@@ -65,21 +69,19 @@
         <li></li>
     </ul></li>
     <li><b>imaging FCS fit</b><ul>
-        <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error</li>
+        <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
         <li>improved documentation of fit statistics</li>
         <li>bugfix: the "show key" checkbox works now</li>
-        <li>added model comparison function to "imagingFCS Tools" men, entry "Annotate Model Comparison"</li>
-        <li>added display options for annotations of the imFCS RDR</li>
         <li>added overlay plots of the runs in a single RDR</li>
     </ul></li>
     <li><b>FCCS fit</b><ul>
-        <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error</li>
+        <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
         <li>improved documentation of fit statistics</li>
         <li></li>
         <li></li>
     </ul></li>
     <li><b>imaging FCCS fit</b><ul>
-        <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error</li>
+        <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
         <li>improved documentation of fit statistics</li>
         <li></li>
         <li></li>
@@ -92,9 +94,12 @@
             <li>flow can be limited to the right-half of the simulation plane</li>
             <li>more automatic string-replaces in the output filename</li>
             <li>Now should use tinytiff-reader automatically for correlation</li>
+            <li>added runtime and ETA displays to simulator progress</li>
             <li></li>
         </ul></li>
-        <li></li>
+        <li>bugfix: correlator didn't recognize background image series from imFCS simulator.</li>
+        <li>added display options for annotations of the imFCS RDR</li>
+        <li>added model comparison function to "imagingFCS Tools" menu, entry "Annotate Model Comparison", which can also calculate model probability maps from (non-normalized) Bayesian model probabilities</li>
     </ul></li>
 
     <li><b>number and brightness</b><ul>
@@ -127,7 +132,7 @@
     </ul></li>
     <li><b>SPIM-FCS fit models</b><ul>
         <li>added model for SPIM-FCS autocorrelation with diffusion and flow</li>
-        <li></li>
+        <li>added 2-color FCCS model for 3D anomalous diffusion</li>
     </ul></li>
     <li><b>TIR-FCS fit models</b><ul>
     <li><font color="red"><b>MAJOR BUGFIX:</b> The TIR-FCS fit models with square-pixels had an additional factor 1/a<sup>2</sup>, which was wrong in the code (NOT IN THE DOCUMENTATION!). This is fixed now!</li>

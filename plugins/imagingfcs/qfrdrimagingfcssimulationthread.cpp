@@ -146,10 +146,10 @@ void QFRDRImagingFCSSimulationThread::run()
     config.setValue("files/count", 2);
     config.setValue("files/name0", QFileInfo(filename).fileName());
     config.setValue("files/type0", "TIFF16");
-    config.setValue("files/description0", tr("simulation result"));
+    config.setValue("files/description0", tr("simulation result (image series)"));
     config.setValue("files/name1", QFileInfo(filenameBackground).fileName());
     config.setValue("files/type1", "TIFF16");
-    config.setValue("files/description1", tr("background"));
+    config.setValue("files/description1", tr("background image series"));
 
     config.setValue("simulation/type", tr("2D random walk simulation"));
     config.setValue("simulation/DG", DG);
@@ -236,25 +236,25 @@ void QFRDRImagingFCSSimulationThread::run()
         emit statusMessage(tr("running simulation ..."));
         if (!canceled) {
             for (currentFrame=0; currentFrame<frames; currentFrame++) {
-                for (int i=0; i<framesize; i++) {
+                for (register int i=0; i<framesize; i++) {
                     frame[i]=0;
                 }
 
                 //memset(frame, 0, framesize*sizeof(uint16_t));
                 propagateWalkers(wg, DG,onlyHalf_DG);
-                for (int i=0; i<wg.size(); i++) {
+                for (register int i=0; i<wg.size(); i++) {
                     //if (i==0) qDebug()<<wg[i].x<<", "<<wg[i].y;
-                    for (int y=0; y<height; y++) {
-                        for (int x=0; x<width; x++) {
+                    for (register int y=0; y<height; y++) {
+                        for (register int x=0; x<width; x++) {
                             frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wg[i].x-double(x)*pixel_size)+sqr(wg[i].y-double(y)*pixel_size))/sqr(psf_size_g));
                         }
                     }
                 }
                 propagateWalkers(wg2, DG2,onlyHalf_DG2);
-                for (int i=0; i<wg2.size(); i++) {
+                for (register int i=0; i<wg2.size(); i++) {
                     //if (i==0) qDebug()<<wg[i].x<<", "<<wg[i].y;
-                    for (int y=0; y<height; y++) {
-                        for (int x=0; x<width; x++) {
+                    for (register int y=0; y<height; y++) {
+                        for (register int x=0; x<width; x++) {
                             frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG2*exp(-2.0*(sqr(wg2[i].x-double(x)*pixel_size)+sqr(wg2[i].y-double(y)*pixel_size))/sqr(psf_size_g));
                         }
                     }
@@ -262,16 +262,16 @@ void QFRDRImagingFCSSimulationThread::run()
                 if (dualView) {
                     propagateWalkers(wr, DR,onlyHalf_DR);
                     propagateWalkers(wrg, DRG,onlyHalf_DRG);
-                    for (int i=0; i<wr.size(); i++) {
-                        for (int y=0; y<height; y++) {
-                            for (int x=0; x<width; x++) {
+                    for (register int i=0; i<wr.size(); i++) {
+                        for (register int y=0; y<height; y++) {
+                            for (register int x=0; x<width; x++) {
                                 frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wr[i].x-double(x)*pixel_size-deltax)+sqr(wr[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
                             }
                         }
                     }
-                    for (int i=0; i<wrg.size(); i++) {
-                        for (int y=0; y<height; y++) {
-                            for (int x=0; x<width; x++) {
+                    for (register int i=0; i<wrg.size(); i++) {
+                        for (register int y=0; y<height; y++) {
+                            for (register int x=0; x<width; x++) {
                                 frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size-deltax)+sqr(wrg[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
                                 frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size-deltax)+sqr(wrg[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_g));
                             }
@@ -279,32 +279,40 @@ void QFRDRImagingFCSSimulationThread::run()
                     }
                     propagateWalkers(wr2, DR2,onlyHalf_DR2);
                     propagateWalkers(wrg2, DRG2,onlyHalf_DRG2);
-                    for (int i=0; i<wr2.size(); i++) {
-                        for (int y=0; y<height; y++) {
-                            for (int x=0; x<width; x++) {
+                    for (register int i=0; i<wr2.size(); i++) {
+                        for (register int y=0; y<height; y++) {
+                            for (register int x=0; x<width; x++) {
                                 frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR2*exp(-2.0*(sqr(wr2[i].x-double(x)*pixel_size-deltax)+sqr(wr2[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
                             }
                         }
                     }
-                    for (int i=0; i<wrg2.size(); i++) {
-                        for (int y=0; y<height; y++) {
-                            for (int x=0; x<width; x++) {
+                    for (register int i=0; i<wrg2.size(); i++) {
+                        for (register int y=0; y<height; y++) {
+                            for (register int x=0; x<width; x++) {
                                 frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR2*exp(-2.0*(sqr(wrg2[i].x-double(x)*pixel_size-deltax)+sqr(wrg2[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
                                 frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG2*exp(-2.0*(sqr(wrg2[i].x-double(x)*pixel_size-deltax)+sqr(wrg2[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_g));
                             }
                         }
                     }
                     if (crosstalk>0) {
-                        for (int y=0; y<height; y++) {
-                            for (int x=0; x<width; x++) {
+                        for (register int y=0; y<height; y++) {
+                            for (register int x=0; x<width; x++) {
                                 frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+crosstalk*frame[y*realwidth+x];
                             }
                         }
                     }
                 }
 
-                for (int i=0; i<framesize; i++) {
-                    frame[i]=frame[i]+round(rng.randNorm(background, backgroundNoise*backgroundNoise));
+                const double nvar=backgroundNoise*backgroundNoise;
+                if (nvar<=0) {
+                    const uint16_t rback=round(background);
+                    for (int i=0; i<framesize; i++) {
+                        frame[i]=frame[i]+rback;
+                    }
+                } else {
+                    for (int i=0; i<framesize; i++) {
+                        frame[i]=frame[i]+round(rng.randNorm(background, nvar));
+                    }
                 }
 
 
@@ -340,12 +348,15 @@ QVector<QFRDRImagingFCSSimulationThread::WalkerData> QFRDRImagingFCSSimulationTh
 
 void QFRDRImagingFCSSimulationThread::propagateWalkers(QVector<QFRDRImagingFCSSimulationThread::WalkerData> &walkersv, double D, bool onlyHalfImage)
 {
-    for (int i=0; i<walkersv.size(); i++) {
-        QFRDRImagingFCSSimulationThread::WalkerData d=walkersv[i];
+    const double vxfactor=VX*frametime*1.0e-6;
+    const double vyfactor=VY*frametime*1.0e-6;
+    const double Dfactor=sqrt(2.0*D*frametime*1.0e-6);
+    for (register int i=0; i<walkersv.size(); i++) {
+        QFRDRImagingFCSSimulationThread::WalkerData& d=walkersv[i];
 
         register double v=(FlowEeverywhere || (d.x>double(width)*pixel_size/2.0))?1.0:0.0;
-        register double dx=d.x+rng.randNorm(0.0, 1.0)*sqrt(2.0*D*frametime*1.0e-6)+v*VX*frametime*1.0e-6;
-        register double dy=d.y+rng.randNorm(0.0, 1.0)*sqrt(2.0*D*frametime*1.0e-6)+v*VY*frametime*1.0e-6;
+        register double dx=d.x+rng.randNorm(0.0, 1.0)*Dfactor+v*vxfactor;
+        register double dy=d.y+rng.randNorm(0.0, 1.0)*Dfactor+v*vyfactor;
 
 
         if (dx<-4.0*pixel_size) dx=double(width+3)*pixel_size;
@@ -361,6 +372,6 @@ void QFRDRImagingFCSSimulationThread::propagateWalkers(QVector<QFRDRImagingFCSSi
         d.x=dx;
         d.y=dy;
 
-        walkersv[i]=d;
+        //walkersv[i]=d;
     }
 }

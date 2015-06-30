@@ -61,7 +61,7 @@ QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEdi
 
 
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMultiThreaded, bool multiThreadPriority) {
+void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMultiThreaded, bool /*multiThreadPriority*/) {
 
 
 
@@ -1004,14 +1004,14 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
     //setUpdatesEnabled(updEn);
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::slidersChanged(int userMin, int userMax, int min, int max) {
+void QFFitResultsByIndexEvaluationEditorWithWidgets::slidersChanged(int userMin, int userMax, int /*min*/, int /*max*/) {
     if (!dataEventsEnabled) return;
     if (!current->getHighlightedRecord()) return;
     setUserMinMax(userMin, userMax);
     replotData();
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender) {
+void QFFitResultsByIndexEvaluationEditorWithWidgets::zoomChangedLocally(double newxmin, double newxmax, double /*newymin*/, double /*newymax*/, JKQtPlotter *sender) {
     if (!dataEventsEnabled) return;
     if (sender==pltData) {
         pltResiduals->setX(newxmin, newxmax);
@@ -1069,7 +1069,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::runChanged(int run)
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
 
-    //qDebug()<<"runChanged";
+    //qDebug()<<"QFFitResultsByIndexEvaluationEditorWithWidgets::runChanged("<<run<<")";
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QTime t;
 
@@ -1106,10 +1106,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::runChanged(int run)
     ////qDebug()<<t.elapsed()<<" ms";
     t.start();
     QApplication::restoreOverrideCursor();
-    ////qDebug()<<"runChanged ... done";
+    //qDebug()<<"QFFitResultsByIndexEvaluationEditorWithWidgets::runChanged("<<run<<") ... done";
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::modelChanged(int model)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::modelChanged(int /*model*/)
 {
     if (!dataEventsEnabled) return;
     if (!current) return;
@@ -1123,7 +1123,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::modelChanged(int model)
     QApplication::restoreOverrideCursor();
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::algorithmChanged(int model)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::algorithmChanged(int /*model*/)
 {
     if (!dataEventsEnabled) return;
     if (!current) return;
@@ -1140,7 +1140,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::algorithmChanged(int model)
     QApplication::restoreOverrideCursor();
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::chkXLogScaleToggled(bool checked) {
+void QFFitResultsByIndexEvaluationEditorWithWidgets::chkXLogScaleToggled(bool /*checked*/) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     current->setQFProperty("plot_taulog", chkXLogScale->isChecked(), false, false);
@@ -1148,7 +1148,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::chkXLogScaleToggled(bool ch
     QApplication::restoreOverrideCursor();
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::chkGridToggled(bool checked)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::chkGridToggled(bool /*checked*/)
 {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1158,7 +1158,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::chkGridToggled(bool checked
     QApplication::restoreOverrideCursor();
 
 }
-void QFFitResultsByIndexEvaluationEditorWithWidgets::chkKeyToggled(bool checked)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::chkKeyToggled(bool /*checked*/)
 {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1168,7 +1168,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::chkKeyToggled(bool checked)
     QApplication::restoreOverrideCursor();
 
 }
-void QFFitResultsByIndexEvaluationEditorWithWidgets::plotStyleChanged(int style)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::plotStyleChanged(int /*style*/)
 {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1178,7 +1178,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::plotStyleChanged(int style)
     QApplication::restoreOverrideCursor();
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::errorStyleChanged(int style)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::errorStyleChanged(int /*style*/)
 {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1188,7 +1188,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::errorStyleChanged(int style
     QApplication::restoreOverrideCursor();
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::residualStyleChanged(int style)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::residualStyleChanged(int /*style*/)
 {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1198,7 +1198,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::residualStyleChanged(int st
     QApplication::restoreOverrideCursor();
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::chkWeightedResidualsToggled(bool checked)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::chkWeightedResidualsToggled(bool /*checked*/)
 {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1208,7 +1208,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::chkWeightedResidualsToggled
     QApplication::restoreOverrideCursor();
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::residualHistogramBinsChanged(int bins)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::residualHistogramBinsChanged(int /*bins*/)
 {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));

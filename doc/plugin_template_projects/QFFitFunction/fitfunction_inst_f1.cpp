@@ -43,7 +43,9 @@ double QFFitAlgorithmInst_F1::evaluate(double t, const double* data) const {
 }
 
 void QFFitAlgorithmInst_F1::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
+    // if not implemeted: comment out, or set QFFitFunction::evaluateDerivatives(derivatives, t, data);
+	
+	for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
 
     const double p1=data[PARAM1];
 

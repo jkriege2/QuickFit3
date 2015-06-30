@@ -38,7 +38,7 @@ class QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorACFR: public QFFitFunction {
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_tir_fw_2dadiffxy2coloracfr"); }
         /*! \copydoc QFFitFunction::category()   */
-        virtual QString category() const { return QObject::tr("2-color TIR-FCCS"); }
+        virtual QString category() const { return QObject::tr("2-color TIR-FCCS (camera)"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

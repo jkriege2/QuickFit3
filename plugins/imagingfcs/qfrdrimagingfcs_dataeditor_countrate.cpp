@@ -260,11 +260,11 @@ void QFRDRImagingFCSDataEditorCountrate::connectWidgets(QFRawDataRecord* current
 
 };
 
-void QFRDRImagingFCSDataEditorCountrate::selectionChanged(const QModelIndex & current, const QModelIndex & previous ) {
+void QFRDRImagingFCSDataEditorCountrate::selectionChanged(const QModelIndex & /*current*/, const QModelIndex & /*previous*/ ) {
     replotData();
 }
 
-void QFRDRImagingFCSDataEditorCountrate::selectionChanged(const QItemSelection & current, const QItemSelection & previous ) {
+void QFRDRImagingFCSDataEditorCountrate::selectionChanged(const QItemSelection & /*current*/, const QItemSelection & /*previous*/ ) {
     replotData();
 }
 
@@ -285,7 +285,7 @@ void QFRDRImagingFCSDataEditorCountrate::previewClicked(double x, double y, Qt::
     replotOverview();
 }
 
-void QFRDRImagingFCSDataEditorCountrate::runsModeChanged(int c) {
+void QFRDRImagingFCSDataEditorCountrate::runsModeChanged(int /*c*/) {
     labRunOptions->setEnabled(true);
     cmbRunStyle->setEnabled(true);
     cmbRunErrorStyle->setEnabled(true);
@@ -399,7 +399,7 @@ void QFRDRImagingFCSDataEditorCountrate::replotOverview() {
     //qDebug()<<"replotOverview ... DONE";
 }
 
-void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
+void QFRDRImagingFCSDataEditorCountrate::replotData(int /*dummy*/) {
     //qDebug()<<"replot";
     JKQTPdatastore* ds=plotter->getDatastore();
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);

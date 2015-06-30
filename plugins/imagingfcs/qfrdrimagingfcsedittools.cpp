@@ -39,7 +39,7 @@ void QFRDRImagingFCSEditTools::registerToMenu(QMenu *menu)
     menu->addAction(actExcludeSegments);
 }
 
-void QFRDRImagingFCSEditTools::registerToToolbar(QToolBar *menu)
+void QFRDRImagingFCSEditTools::registerToToolbar(QToolBar */*menu*/)
 {
 }
 

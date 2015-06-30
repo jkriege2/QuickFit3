@@ -45,11 +45,11 @@ QFEvalBeadScanPSFItem::~QFEvalBeadScanPSFItem() {
 }
 
 
-void QFEvalBeadScanPSFItem::intWriteData(QXmlStreamWriter& w) {
+void QFEvalBeadScanPSFItem::intWriteData(QXmlStreamWriter& /*w*/) {
     /* store global evaluation parameters / initial values or anything else to the project tree here */
 }
 
-void QFEvalBeadScanPSFItem::intReadData(QDomElement* e) {
+void QFEvalBeadScanPSFItem::intReadData(QDomElement* /*e*/) {
     /* read back anything you've written in intWriteData() in this function */
 }
 

@@ -1249,7 +1249,7 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationCSV(const QString &file
     return ok;
 }
 
-bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N_in, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps, double segmentLengthSeconds) {
+bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N_in, uint32_t width, uint32_t height, double **corrSegments, QString& /*error*/, int progress_steps, double segmentLengthSeconds) {
     QFile f(filename);
 
     uint32_t N=N_in;
@@ -1802,7 +1802,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
 
 
-void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<MultiTauCorrelator<double, double>* >& ccfjk, QList<correlatorjb<double, double>* >& ccfjb, float* frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frame, uint64_t segment_frames, double *ccf_tau, double *ccf, double *ccf_std, uint64_t ccf_N) {
+void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<MultiTauCorrelator<double, double>* >& ccfjk, QList<correlatorjb<double, double>* >& ccfjb, float* frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frame, uint64_t segment_frames, double */*ccf_tau*/, double *ccf, double *ccf_std, uint64_t ccf_N) {
     if (job.correlator==CORRELATOR_MTAUALLMON) {
         uint32_t i=0;
         for (register uint32_t y=0; y<frame_height; y++) {
@@ -1884,7 +1884,7 @@ void QFRDRImagingFCSCorrelationJobThread::average_ccfs(double** acf, double** ac
     }
 }
 
-void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<double, double> *> &acfjk, QList<correlatorjb<double, double> *> &acfjb, double **acf, double **acf_std, double **acf_t, uint32_t& acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments) {
+void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<double, double> *> &acfjk, QList<correlatorjb<double, double> *> &acfjb, double **acf, double **acf_std, double **acf_t, uint32_t& acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t /*segments*/) {
     if (job.correlator==CORRELATOR_MTAUALLMON) {
         for (register uint32_t i=0; i<frame_width*frame_height; i++) {
             acfjk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
@@ -3307,7 +3307,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
 
 }
 
-QFRDRImagingFCSCorrelationJobThread::Fileinfo::Fileinfo(const QString &filename, const QString &role, int internalDualViewMode, int dualViewID, bool isNandB, const QString& group)
+QFRDRImagingFCSCorrelationJobThread::Fileinfo::Fileinfo(const QString &filename, const QString &role, int internalDualViewMode, int dualViewID, bool /*isNandB*/, const QString& group)
 {
     this->filename=filename;
     this->filenameVar="";

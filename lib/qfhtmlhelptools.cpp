@@ -52,19 +52,19 @@ QString removeHTML(const QString& data) {
      return data1;
 }
 
-QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText, bool removeNonReplaced, const QFHelpReplacesList& more_replaces, bool insertTooltips, bool dontCreatePics, bool isMainHelp) {
+QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText, bool removeNonReplaced, const QFHelpReplacesList& more_replaces, bool insertTooltips, bool dontCreatePics, bool isMainHelp, const QString& texfilenameaddition) {
     QFile f(filename);
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QTextStream in(&f);
         in.setCodec(QTextCodec::codecForName("UTF-8"));
-        return transformQF3HelpHTML(in.readAll(), filename, removeNonReplaced, more_replaces, insertTooltips, dontCreatePics, isMainHelp);
+        return transformQF3HelpHTML(in.readAll(), filename, removeNonReplaced, more_replaces, insertTooltips, dontCreatePics, isMainHelp, texfilenameaddition);
     } else {
-        return transformQF3HelpHTML(defaultText, filename, removeNonReplaced, more_replaces, insertTooltips, dontCreatePics, isMainHelp);
+        return transformQF3HelpHTML(defaultText, filename, removeNonReplaced, more_replaces, insertTooltips, dontCreatePics, isMainHelp, texfilenameaddition);
     }
 }
 
-QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QList<QPair<QString, QString> >& more_replaces, bool insertTooltips, bool dontCreatePics, bool isMainHelp) {
-    return QFPluginServices::getInstance()->transformQF3HelpHTML(input_html, filename, removeNonReplaced, more_replaces, insertTooltips,  dontCreatePics, isMainHelp);
+QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QList<QPair<QString, QString> >& more_replaces, bool insertTooltips, bool dontCreatePics, bool isMainHelp, const QString& texfilenameaddition) {
+    return QFPluginServices::getInstance()->transformQF3HelpHTML(input_html, filename, removeNonReplaced, more_replaces, insertTooltips,  dontCreatePics, isMainHelp, texfilenameaddition);
 }
 
 struct QFHTMLEntity {

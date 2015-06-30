@@ -38,7 +38,7 @@ class QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR: public QFFitFunction {
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_spim_fw_2csepdiff2coloracfr"); }
         /*! \copydoc QFFitFunction::category()   */
-        virtual QString category() const { return QObject::tr("2-color SPIM-FCCS"); }
+        virtual QString category() const { return QObject::tr("2-color SPIM-FCCS (camera)"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

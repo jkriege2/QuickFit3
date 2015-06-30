@@ -62,7 +62,7 @@ void QFFitMultiQFFitFunctionFunctor::addTerm(QFFitFunction *model, const double 
     recalculateInternals();
 }
 
-void QFFitMultiQFFitFunctionFunctor::evaluate(double *evalout, const double *params) {
+void QFFitMultiQFFitFunctionFunctor::evaluate(double *evalout, const double *params) const {
     int outCnt=0;
     for (int i=0; i<subFunctors.size(); i++) {
         double* eout=&(evalout[outCnt]);
@@ -82,7 +82,23 @@ void QFFitMultiQFFitFunctionFunctor::evaluate(double *evalout, const double *par
     //if (m_evalout!=outCnt) qDebug()<<"QFFitMultiQFFitFunctionFunctor::evaluate:   m_evalout="<<m_evalout<<"   outCnt="<<outCnt;
 }
 
-void QFFitMultiQFFitFunctionFunctor::evaluateJacobian(double */*evalout*/, const double */*params*/) {
+void QFFitMultiQFFitFunctionFunctor::evaluateJacobian(double *evalout, const double *params) const {
+    int outCnt=0;
+    for (int i=0; i<subFunctors.size(); i++) {
+        double* eout=&(evalout[outCnt]);
+        QFFitAlgorithm::FitQFFitFunctionFunctor* f=subFunctors[i].f;
+        int pcount=f->get_paramcount();
+        double* pin=(double*)qfMalloc(pcount*sizeof(double));
+
+        for (int p=0; p<pcount; p++) {
+            pin[p]=params[subFunctors[i].mapToLocal[p]];
+        }
+
+        f->evaluateJacobian(eout, pin);
+        qfFree(pin);
+
+        outCnt+=(subFunctors[i].f->get_evalout()*pcount);
+    }
 }
 
 bool QFFitMultiQFFitFunctionFunctor::get_implementsJacobian() const
@@ -370,7 +386,7 @@ void QFGlobalFitTool::createLocalFitFunctors()
         const double* dataW=functor->getSubFunctor(i)->getDataWeight();
         uint64_t dataN=functor->getSubFunctor(i)->getDataPoints();
         const double* param=functor->getSubFunctor(i)->getModelParams();
-        bool* fixParams=functor->getSubFunctor(i)->getModelParamsFix();
+         bool* fixParams=functor->getSubFunctor(i)->getModelParamsFix();
 
         int freeParams=0;
         for (int p=0; p<ff->paramCount(); p++) {

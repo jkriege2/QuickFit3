@@ -25,14 +25,15 @@
 #include "qftools.h"
 #include <complex>
 #include "Faddeeva.hh"
+#include "statistics_tools.h"
 
-double qfTanc( double x ) {
+double qfTanc(  double x ) {
     if (x==0) return 1;
     return tan(x)/x;
 }
 
 
-double qfSinc( double x )
+double qfSinc(  double x )
 {
     static double const    taylor_0_bound = 3*DBL_MIN ;
     static double const    taylor_2_bound = sqrt(taylor_0_bound);
@@ -66,7 +67,7 @@ double qfSinc( double x )
 }
 
 
-double qfFaddeevaRealW(double xi) {
+double qfFaddeevaRealW( double xi) {
     std::complex<double> d(0,xi);
     std::complex<double> w=Faddeeva::w(d);
     return w.real();
@@ -120,7 +121,9 @@ double roundWithError(double value, double error, int addSignifcant)  {
 }
 
 
-QFFitStatistics::QFFitStatistics() {
+QFFitStatistics::QFFitStatistics():
+    QFBasicFitStatistics()
+{
     runAvgStart=0;
     maxRelParamError=0;
     AICc=0;
@@ -146,6 +149,8 @@ QFFitStatistics::QFFitStatistics() {
     residWeightSum=0;
     gSum=0;
     gSqrSum=0;
+    bayesProbability=NAN;
+    bayesProbabilityLog10=NAN;
 
 
     rmin=0;
@@ -172,6 +177,7 @@ QFFitStatistics::QFFitStatistics() {
 }
 
 void QFFitStatistics::free() {
+    QFBasicFitStatistics::free();
 
     /*if (fitfunc) { std::free(fitfunc); fitfunc=NULL; }
     if (residuals) { std::free(residuals); residuals=NULL; }
@@ -185,79 +191,20 @@ void QFFitStatistics::free() {
     if (resWCorrelation) {std::free(resWCorrelation); resWCorrelation=NULL; }*/
 }
 
+QString QFFitStatistics::getHTMLExplanation() const
+{
+    return QFBasicFitStatistics::getHTMLExplanation();
+}
+
 QString QFFitStatistics::getAsHTMLTable(bool addExplanation, bool includeR2) const
 {
-    QString txtFit;
-    txtFit+=QString("<table border=\"0\" width=\"95%\">");
-    //txtFit+=QString("<tr><td align=\"right\"></td><td align=\"left\"></td><td align=\"right\"></td><td align=\"left\"></td></tr>");
-    txtFit+=QString("<tr>"
-                    "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
-                    "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                    "</tr>").arg(residSqrSum).arg(residWeightSqrSum);
-    txtFit+=QString("<tr>"
-                    "<td align=\"right\" valign=\"bottom\">&lang;E&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
-                    "<td align=\"right\" valign=\"bottom\"> &lang;E&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                    "</tr>").arg(residAverage).arg(residWeightAverage);
-    txtFit+=QString("<tr>"
-                    "<td align=\"right\" valign=\"bottom\">&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
-                    "<td align=\"right\" valign=\"bottom\"> &radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                    "</tr>").arg(residStdDev).arg(residWeightStdDev);
-    txtFit+=QString("<tr>"
-                    "<td align=\"right\" valign=\"bottom\">NP =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                    "<td></td>"
-                    "<td align=\"right\" valign=\"bottom\">NR =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                    "</tr>").arg(fitparamN).arg(dataSize);
-    txtFit+=QString("<tr>"
-                    "<td align=\"right\" valign=\"bottom\">DF =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                    "<td></td>"
-                    "<td align=\"right\" valign=\"bottom\">TSS =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                    "</tr>").arg(degFreedom).arg(TSS);
-    if (includeR2){
-        txtFit+=QString("<tr>"
-                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                        "<td></td>"
-                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                        "</tr>").arg(Rsquared).arg(RsquaredWeighted);
-        txtFit+=QString("<tr>"
-                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup><sub>adjusted</sub> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                        "<td></td>"
-                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup><sub>adjusted</sub> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                        "</tr>").arg(AdjustedRsquared).arg(AdjustedRsquaredWeighted);
-    }
-    txtFit+=QString("<tr>"
-                    "<td align=\"right\" valign=\"bottom\">AICc =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                    "<td></td>"
-                    "<td align=\"right\" valign=\"bottom\">AICc (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                    "</tr>").arg(AICc).arg(AICcWeighted);
-    txtFit+=QString("<tr>"
-                    "<td align=\"right\" valign=\"bottom\">BIC =</td><td align=\"left\" valign=\"bottom\">%1</td>"
-                    "<td></td>"
-                    "<td align=\"right\" valign=\"bottom\">BIC (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                    "</tr>").arg(BIC).arg(BICweighted);
-
-    if (maxRelParamError>0.0) {
-        txtFit+=QString("<tr>"
-                        "<td align=\"right\" valign=\"bottom\"></td><td align=\"left\" valign=\"bottom\"></td>"
-                        "<td></td>"
-                        "<td align=\"right\" valign=\"bottom\">max<sub>P</sub>(&sigma;<sub>P</sub>/|P|) =</td><td align=\"left\" valign=\"bottom\">%1%2</td>"
-                        "</tr>").arg(maxRelParamError*100.0).arg("%");
-    }
-    txtFit+=QString("</table>");
-
-    if (addExplanation) {
-        txtFit+=QString("<br><font size=\"-1\"><i>Legend:</i>: &chi;<sup>2</sup>: sum error square, &lang;E&rang;: residual average, &radic;&lang;E2&rang;: residual stddev., <br>NP: number of fit parameters, NR: number of residuals, <br>DF: degrees of freedom, R<sup>2</sup>: coefficient of determination, <br>R<sup>2</sup><sub>adjusted</sub>: adjusted coefficient of determination, TSS: total sum of squares, max<sub>P</sub>(&sigma;<sub>P</sub>/|P|): maximum relative parameter error<br>AICc: Akaike's infromation criterion, BIC: Bayes information criterion</font>");
-    }
-
-    return txtFit;
+    return QFBasicFitStatistics::getAsHTMLTable(addExplanation, includeR2);
 }
 
 
 
 
-QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, double* fitFuncParams, double* fitFuncParamErrors) {
+QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, const double* fitFuncParams, const double* fitFuncParamErrors, const QVector<double>& COV, double paramrange_size) {
     datacut_max=qBound((long)datacut_min, (long)datacut_max, (long)N-1);
     QFFitStatistics result;
 
@@ -283,6 +230,27 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
     result.dataSize=datacut_max-datacut_min;
     result.degFreedom=result.dataSize-result.fitparamN-1;
 
+    double detCOV=NAN;
+    double COVSqrtDiagProd=NAN;
+    //double COVDiagProd=NAN;
+    if (COV.size()>0) {
+        COVSqrtDiagProd=1.0;
+        //COVDiagProd=1.0;
+        int n=floor(sqrt(COV.size()));
+        detCOV=linalgMatrixDeterminant(COV.constData(), n);
+        QVector<double> sigmas;
+        for (int i=0; i<n; i++) {
+            COVSqrtDiagProd=COVSqrtDiagProd*sqrt(COV[i*n+i]);
+            //COVDiagProd=COVDiagProd*COV[i*n+i];
+            sigmas<<sqrt(COV[i*n+i]);
+        }
+        //qDebug()<<"COV=\n"<<linalgMatrixToString(COV.data(), n,n).c_str();
+        //qDebug()<<"SIGMAS="<<sigmas;
+        //qDebug()<<"  detCOV="<<detCOV<<"  COVSqrtDiagProd="<<COVSqrtDiagProd<</*"   COVDiagProd="<<COVDiagProd<<*/"  n="<<n<<"  paramCount="<<paramCount;
+    }
+    result.detCOV=detCOV;
+
+
     /////////////////////////////////////////////////////////////////////////////////
     // calculate model function values, residuals and residual parameters/statistics
     /////////////////////////////////////////////////////////////////////////////////
@@ -298,7 +266,26 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
     result.rmax=0;       // max of residuals
     result.rminw=0;      // min of weighted residuals
     result.rmaxw=0;      // max of weighted residuals
+    result.weightSum=0; // weight sum (for normalization)
     bool hfirst=true;
+    bool hasWeights=(weights!=NULL);
+    bool allWeightsOne=true;
+    bool allWeightsEqual=true;
+    //double prodsigma=1.0;
+    //double sumlogsigma=0;
+    if (!weights) {
+        //prodsigma=pow(1.0/double(datacut_max-datacut_min), datacut_max-datacut_min);
+        //sumlogsigma=log(1.0/double(datacut_max-datacut_min))*double(datacut_max-datacut_min);
+        result.weightSum=1;
+    } else {
+        for (int i=0; i<N; i++) {
+            if ((i>=datacut_min)&&(i<=datacut_max)) {
+                result.weightSum=result.weightSum+weights[i];
+                allWeightsOne=allWeightsOne&&(weights[i]==1.0);
+                allWeightsEqual=allWeightsEqual&&(weights[i]==weights[datacut_min]);
+            }
+        }
+    }
 
     for (int i=0; i<N; i++) {
         double value=model[i];
@@ -307,13 +294,19 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
         double res=result.residuals[i];
         if (weights) {
             result.residuals_weighted[i]=res/weights[i];
-            if (fabs(weights[i])<1000*DBL_MIN) result.residuals_weighted[i]=0;
+
+            if (fabs(weights[i])<1000.0*DBL_MIN) {
+                result.residuals_weighted[i]=0;
+            }
+
         } else {
-            result.residuals_weighted[i]=res;            
+            result.residuals_weighted[i]=res;
         }
         //std::cout<<"weights["<<i<<"]="<<weights[i]<<"\n";
         double resw=result.residuals_weighted[i];
         if ((i>=datacut_min)&&(i<=datacut_max)) {
+
+
             result.residSqrSum+=res*res;
             result.residWeightSqrSum+=resw*resw;
             result.residSum+=res;
@@ -351,6 +344,7 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
         }
     }
 
+
     result.residAverage=result.residSum/(double)result.dataSize;
     result.residWeightAverage=result.residWeightSum/(double)result.dataSize;
     result.residStdDev=sqrt(result.residSqrSum/(double)result.dataSize-result.residSum*result.residSum/(double)result.dataSize/(double)result.dataSize);
@@ -363,8 +357,8 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
     result.AdjustedRsquaredWeighted=1.0-result.residWeightSqrSum/(double(result.dataSize-result.fitparamN))/(result.TSS/(double(result.dataSize-1)));
 
     {
-        double p=double(result.fitparamN);
-        double n=double(result.dataSize);
+        const double p=double(result.fitparamN);
+        const double n=double(result.dataSize);
         result.AICc=n*log(result.residSqrSum/n)+2.0*p+2.0*p*(p+1)/(n-p-1.0);
         result.AICcWeighted=n*log(result.residWeightSqrSum/n)+2.0*p+2.0*p*(p+1)/(n-p-1.0);
         result.BIC=n*log(result.residSqrSum/n)+p*log(n);
@@ -373,6 +367,26 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
 
     result.residHistBinWidth=(result.rmax-result.rmin)/(double)residualHistogramBins;
     result.residHistWBinWidth=(result.rmaxw-result.rminw)/(double)residualHistogramBins;
+    //if (QFFloatIsOK(detCOV)) result.detCOV=detCOV;
+    if (QFFloatIsOK(paramrange_size)) result.bayesProbabilityParamRangeSize=paramrange_size;
+
+    if (QFFloatIsOK(paramrange_size) && QFFloatIsOK(detCOV)){
+        const double k=double(result.fitparamN);
+        const double n=double(result.dataSize);
+        const double chi2=result.residWeightSqrSum;
+        const double ln2pi=log(2.0*M_PI);
+
+        result.bayesProbabilityLog10= (0.5*k*ln2pi + 0.5*log(detCOV) - 0.5*chi2 - log(pow(2.0*paramrange_size, k)*COVSqrtDiagProd))/log(10.0) ;
+
+        result.bayesProbability=pow(10.0, result.bayesProbabilityLog10 );
+
+        //qDebug()<<"  calc Bayes prob: k="<<k<<" n="<<n<<" chi2="<<chi2<<" ln2pi="<<ln2pi<<" detCOV="<<detCOV<<" ln(detCOV)="<<log(detCOV)<<" COVSqrtDiagProd="<<COVSqrtDiagProd<<" paramrange_size="<<paramrange_size;
+        //qDebug()<<"    -> "<<(0.5*k*ln2pi) << (0.5*log(detCOV)) << (- 0.5*chi2 ) << (- log(pow(2.0*paramrange_size, k)*COVSqrtDiagProd));
+        //qDebug()<<"    => "<<result.bayesProbability<<"  = 10^"<<result.bayesProbabilityLog10;
+    } else {
+        //qDebug()<<"  nocalcBayes paramrange_size="<<paramrange_size<<" detCOV="<<detCOV;
+    }
+
 
     /////////////////////////////////////////////////////////////////////////////////
     // calculate residual histogram
@@ -436,3 +450,150 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
     return result;
 }
 
+
+
+
+
+
+QFBasicFitStatistics calculateBasicFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, const double* fitFuncParams, const double* fitFuncParamErrors, const QVector<double>& COV, double paramrange_size) {
+    QFFitStatistics result=calculateFitStatistics(N, tauvals, model, corrdata, weights, datacut_min, datacut_max, paramCount, 11, 11, fitFuncParams, fitFuncParamErrors, COV, paramrange_size);
+    return result;
+}
+
+
+
+QFBasicFitStatistics::QFBasicFitStatistics()
+{
+    maxRelParamError=0;
+    AICc=0;
+    AICcWeighted=0;
+    BIC=0;
+    BICweighted=0;
+    RsquaredWeighted=0;
+    AdjustedRsquaredWeighted=0;
+    fitparamN=0;
+    dataSize=0;
+    degFreedom=0;
+    residSqrSum=0;
+    residWeightSqrSum=0;
+    residSum=0;
+    residWeightSum=0;
+    gSum=0;
+    gSqrSum=0;
+    bayesProbability=NAN;
+    bayesProbabilityParamRangeSize=NAN;
+    detCOV=NAN;
+
+
+    rmin=0;
+    rmax=0;
+    rminw=0;
+    rmaxw=0;
+    residAverage=0;
+    residWeightAverage=0;
+    residStdDev=0;
+    residWeightStdDev=0;
+    TSS=0;
+    Rsquared=0;
+    AdjustedRsquared=0;
+
+}
+
+void QFBasicFitStatistics::free()
+{
+
+}
+
+QString QFBasicFitStatistics::getHTMLExplanation() const
+{
+    return QString("<font size=\"-1\"><i>Legend:</i>: &chi;<sup>2</sup>: sum error square, &lang;E&rang;: residual average, &radic;&lang;E2&rang;: residual stddev., det(COV): determinant of fit var-covariance matrix,<br>NP: number of fit parameters, NR: number of residuals, <br>DF: degrees of freedom, R<sup>2</sup>: coefficient of determination, <br>R<sup>2</sup><sub>adjusted</sub>: adjusted coefficient of determination, TSS: total sum of squares, max<sub>P</sub>(&sigma;<sub>P</sub>/|P|): maximum relative parameter error<br>AICc: Akaike's infromation criterion, BIC: Bayes information criterion, p<sub>Bayes</sub>(model|data): Bayes model probability</font>");
+}
+
+QString QFBasicFitStatistics::getAsHTMLTable(bool addExplanation, bool includeR2) const
+{
+    QString txtFit;
+    txtFit+=QString("<table border=\"0\" width=\"95%\">");
+    //txtFit+=QString("<tr><td align=\"right\"></td><td align=\"left\"></td><td align=\"right\"></td><td align=\"left\"></td></tr>");
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                    "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(residSqrSum).arg(residWeightSqrSum);
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">&lang;E&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                    "<td align=\"right\" valign=\"bottom\"> &lang;E&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(residAverage).arg(residWeightAverage);
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                    "<td align=\"right\" valign=\"bottom\"> &radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(residStdDev).arg(residWeightStdDev);
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">NP =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                    "<td align=\"right\" valign=\"bottom\">NR =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(fitparamN).arg(dataSize);
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">DF =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                    "<td align=\"right\" valign=\"bottom\">TSS =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(degFreedom).arg(TSS);
+    if (includeR2){
+        txtFit+=QString("<tr>"
+                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                        "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                        "</tr>").arg(Rsquared).arg(RsquaredWeighted);
+        txtFit+=QString("<tr>"
+                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup><sub>adjusted</sub> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                        "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                        "<td align=\"right\" valign=\"bottom\">R<sup>2</sup><sub>adjusted</sub> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                        "</tr>").arg(AdjustedRsquared).arg(AdjustedRsquaredWeighted);
+    }
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">AICc =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+                    "<td align=\"right\" valign=\"bottom\">AICc (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(AICc).arg(AICcWeighted);
+    txtFit+=QString("<tr>"
+                    "<td align=\"right\" valign=\"bottom\">BIC =</td><td align=\"left\" valign=\"bottom\">%1</td>"
+                    "<td></td>"
+                    "<td align=\"right\" valign=\"bottom\">BIC (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
+                    "</tr>").arg(BIC).arg(BICweighted);
+
+
+    if (maxRelParamError>0.0/* && (bayesProbability<0.0 || !QFFloatIsOK(bayesProbability))*/) {
+        txtFit+=QString("<tr>"
+                        "<td align=\"right\" valign=\"bottom\"></td><td align=\"left\" valign=\"bottom\"></td>"
+                        "<td></td>"
+                        "<td align=\"right\" valign=\"bottom\">max<sub>P</sub>(&sigma;<sub>P</sub>/|P|) =</td><td align=\"left\" valign=\"bottom\">%1%2</td>"
+                        "</tr>").arg(maxRelParamError*100.0).arg("%");
+    }
+
+    QString btxt="";
+    if (QFFloatIsOK(detCOV)) {
+        btxt+=QString("<td align=\"right\" valign=\"bottom\">det(COV) =</td><td align=\"left\" valign=\"bottom\">%1</td>")
+                .arg(detCOV);
+    }
+    if (QFFloatIsOK(detCOV) && (bayesProbability>=0.0 || bayesProbabilityLog10>=0)) {
+        btxt+=QString("<td></td>");
+    } else if (QFFloatIsOK(detCOV)) {
+        btxt+=QString("<td></td><td></td><td></td>");
+    }
+    if (bayesProbability>=0.0 || bayesProbabilityLog10>=0) {
+        btxt+=QString("<td align=\"right\" valign=\"bottom\">p<sub>Bayes</sub>(model|data) =</td><td align=\"left\" valign=\"bottom\">%1 ( = 10<sup><font size=\"+2\">%2</font></sup>)</td>")
+                .arg(bayesProbability).arg(bayesProbabilityLog10);
+    }
+    if (btxt.size()>0) {
+        txtFit+=QString("<tr>%1</tr>").arg(btxt);
+    }
+    txtFit+=QString("</table>");
+
+    if (addExplanation) {
+        txtFit.append(QString("<br><br>")+getHTMLExplanation());
+    }
+
+    //qDebug()<<maxRelParamError<<bayesProbability<<"\n"<<txtFit<<"\n\n\n";
+    return txtFit;
+}

@@ -45,10 +45,6 @@ double QFFitFunctionGeneralGaussianDistVar::evaluate(double t, const double* dat
     return offset+amplitude*0.5*(1.0+erf((t-position)/sqrt(2.0*qfSqr(width))));
 }
 
-void QFFitFunctionGeneralGaussianDistVar::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
-
-}
 
 void QFFitFunctionGeneralGaussianDistVar::calcParameter(double* /*data*/, double* /*error*/) const {
 }

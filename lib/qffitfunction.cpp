@@ -25,9 +25,17 @@
 #include <cmath>
 #include "qftools.h"
 #include "statistics_tools.h"
+#include "qffitalgorithm.h"
+#include "qffitfunctionmanager.h"
 
 
-
+QFFitFunction *QFFitFunction::duplicate() const
+{
+    if (QFFitFunctionManager::getInstance()) {
+        return QFFitFunctionManager::getInstance()->createFunction(id());
+    }
+    return NULL;
+}
 
 QVector<double> QFFitFunction::multiEvaluate(const QVector<double> &x, const double *parameters) const
 {
@@ -115,10 +123,11 @@ void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, c
 
 
 
-QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins) const {
+QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, const QVector<double> &COV, double paramrange_size) const {
     int fitparamN=0;
     const int pcount=paramCount();
     QVector<double> fitp, fitpe;
+
     for (int i=0; i<pcount; i++) {
         if (isParameterVisible(i, fullParams) && (!paramsFix[i]) && getDescription(i).fit) {
             fitparamN++;
@@ -132,11 +141,49 @@ QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, 
     /*for (int i=0; i<N; i++) {
         model[i]=evaluate(tauvals[i], fullParams);
     }*/
+    QVector<double> COVV=COV;
+
+
+    if (COVV.size()<=0) {
+        int M=datacut_max-datacut_min;
+        const double * x=&(tauvals[datacut_min]);
+        const double * y=&(corrdata[datacut_min]);
+        const double * w=&(weights[datacut_min]);
+
+        bool allWeightsOne=true;
+        bool allWeightsEqual=true;
+        for (int i=0; i<M; i++) {
+            allWeightsOne=allWeightsOne&&(w[i]==1.0);
+            allWeightsEqual=allWeightsEqual&&(w[i]==w[0]);
+        }
+
+        QFFitFunction* ff=duplicate();
+        if (ff) {
+            qDebug()<<"("<<x[0]<<y[0]<<w[0]<<")   "<<"("<<x[1]<<y[1]<<w[1]<<")   "<<"("<<x[2]<<y[2]<<w[2]<<")   ";
+            QFFitAlgorithm::FitQFFitFunctionFunctor fm(ff, fullParams, paramsFix, x, y, w, M);
+            double* pmapped=fm.createMappedArrayForFunctor(fullParams);
+
+
+            QVector<double> J(fm.get_evalout()*fm.get_paramcount());
+            COVV=QVector<double>(fm.get_paramcount()*fm.get_paramcount());
+            fm.evaluateJacobian(J.data(), pmapped);
+            double chi2=fm.calculateChi2(pmapped);
+            //if (allWeightsOne) chi2=chi2*qfSqr(double(M));
+            if (QFFitAlgorithm::functorHasWeights(&fm) && !allWeightsOne) statisticsGetFitProblemCovMatrix(COVV.data(), J.data(), fm.get_evalout(), fm.get_paramcount());
+            else statisticsGetFitProblemVarCovMatrix(COVV.data(), J.data(), fm.get_evalout(), fm.get_paramcount(), chi2);
+
+            qfFree(pmapped);
+
+            qDebug()<<"estimated COV: "<<COVV<<"  chi2="<<chi2<<"  hasWeights="<<QFFitAlgorithm::functorHasWeights(&fm)<<"  allWeightsOne="<<allWeightsOne<<"  allWeightsEqual="<<allWeightsEqual;
+        }
+        if (ff) delete ff;
+    }
+
 
     if (fitp.data() && fitpe.data()) {
-        return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins, fitp.data(), fitpe.data());
+        return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins, fitp.data(), fitpe.data(), COVV, paramrange_size);
     } else {
-        return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins);
+        return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins, NULL, NULL, COVV, paramrange_size);
     }
 }
 

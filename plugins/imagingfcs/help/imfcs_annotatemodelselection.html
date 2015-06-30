@@ -2,15 +2,26 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title>Imaging FCS Plugin: Annotate Model Selection</title>
-	  <link rel="contents" href="imaging_fcs.html">   
+    <title>Imaging FCS Plugin: Annotate Model Selection</title>
+      <link rel="contents" href="imaging_fcs.html">   
   </head>
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-	<p>This dialog allows to perform a model selection, e.g. based on chi<sup>2</sup> or the Akaike information criterion (AIC) (see the <a href="$$mainhelpdir$$/fit_statistics.html"> fit statistics help page</a> for further information). You can reach it via the menu entry <b>"Imaging FCS Tools | Annotate Model COparison"</b> within them imaging FCS RDR-editor. This tool takes the fit results of several (user-selectable) <u>different fits</u> for the <u>same RDR</u>. From each evaluation result set, the tool reads the selected parameter, that should be used for the model comparison (e.g. the chi<sup>2</sup> or the Akaike information criterion). Then it creates a fit result, which contains a single array, which contains a number for every pixel, that indicates, which model should be used according to the selected criterion. You can also select, how a criterion wins (largest or smallest value in the combobox "mode"). Finally you can select to apply this analysis to several RDRs. Then a second dialog will open, that asks you to select the files to analyze. $$note:If several RDRs are evaluated, the same parameter/selected results are evaluated in each of these records.$$</p>
-	<p>The results are displayed as annotations in the imagingFCS editor.</p>
-
-	</body>
+    <p>This dialog allows to perform a model selection, e.g. based on chi<sup>2</sup> or the Akaike information criterion (AIC) (see the <a href="$$mainhelpdir$$/fit_statistics.html"> fit statistics help page</a> for further information). You can reach it via the menu entry <b>"Imaging FCS Tools | Annotate Model COparison"</b> within them imaging FCS RDR-editor. This tool takes the fit results of several (user-selectable) <u>different fits</u> for the <u>same RDR</u>. From each evaluation result set, the tool reads the selected parameter, that should be used for the model comparison (e.g. the chi<sup>2</sup> or the Akaike information criterion). Then it creates a fit result, which contains a single array, which contains a number for every pixel, that indicates, which model should be used according to the selected criterion. You can also select, how a criterion wins (largest or smallest value in the combobox "mode"). Finally you can select to apply this analysis to several RDRs. Then a second dialog will open, that asks you to select the files to analyze. $$note:If several RDRs are evaluated, the same parameter/selected results are evaluated in each of these records.$$</p>
+    <p>You can also use Bayesian model probabilities (see <a href="$$mainhelpdir$$/fit_statistics.html"> fit statistics help page</a> for further information) to select a model. In that case, you can activate a checkbox <b>calculate normalized model probabilities</b>, which will cause QuickFit to create a map of the normalized Bayesian model probabilities (normalized to the set of fits that you selected). These are stored like fit parameters, but with the name <i>model comparison: ...</i> and can be displayed as other fit parameter maps in the <a href="imfcs_ui.html#parameterimage">imFCS RDR editor</a>:
+<center><a name="imfcs_annotatemodelselection_pic000"><img src="./pic/imfcs_annotatemodelselection_pic000.png" border="1">
+</center>
+</p>
+    <p>The results are displayed as <a href="imfcs_ui.html#annotations">annotations</a> in the imagingFCS editor:
+<center><a name="imfcs_annotatemodelselection_pic001"><img src="./pic/imfcs_annotatemodelselection_pic001.png" border="1">
+<br><a name="imfcs_annotatemodelselection_pic002"><img src="./pic/imfcs_annotatemodelselection_pic002.png" border="1">
+<br><a name="imfcs_annotatemodelselection_pic003"><img src="./pic/imfcs_annotatemodelselection_pic003.png" border="1">
+</center>
+</p>
+$$startbox_see$$
+See <a href="$$mainhelpdir$$/fit_statistics.html">the help page on fit statistics</a> for details on model selection parameters.
+$$endbox$$
+    </body>
 </html>
 
 

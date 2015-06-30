@@ -84,8 +84,6 @@ bool QFFitFunctionGeneralModHill5P::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralModHill5P::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
-}
 
 bool QFFitFunctionGeneralModHill5P::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {

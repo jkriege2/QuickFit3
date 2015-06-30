@@ -46,7 +46,7 @@ class QFFitFunctionsSPIMFCSADiff: public QFFitFunction {
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_adiff"); }
         /*! \copydoc QFFitFunction::category()   */
-        virtual QString category() const { return QObject::tr("SPIM-FCS"); }
+        virtual QString category() const { return QObject::tr("SPIM-FCS (camera)"); }
 
         virtual bool isDeprecated() const { return true; }
 

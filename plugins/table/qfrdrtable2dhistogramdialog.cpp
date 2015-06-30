@@ -281,45 +281,45 @@ void QFRDRTable2DHistogramDialog::updateHistograms(bool estimateBinWidth)
 
 }
 
-void QFRDRTable2DHistogramDialog::on_edtRangeMax_valueChanged(double value)
+void QFRDRTable2DHistogramDialog::on_edtRangeMax_valueChanged(double /*value*/)
 {
     if (!ui->chkRangeMax->isChecked())   updateHistograms();
 }
 
-void QFRDRTable2DHistogramDialog::on_edtRangeMin_valueChanged(double value)
+void QFRDRTable2DHistogramDialog::on_edtRangeMin_valueChanged(double /*value*/)
 {
     if (!ui->chkRangeMin->isChecked())   updateHistograms();
 }
 
-void QFRDRTable2DHistogramDialog::on_edtBinWidth_valueChanged(double value)
+void QFRDRTable2DHistogramDialog::on_edtBinWidth_valueChanged(double /*value*/)
 {
     if (!ui->chkAutoBinWidth->isChecked())   updateHistograms();
 }
 
-void QFRDRTable2DHistogramDialog::on_spinBins_valueChanged(int value)
+void QFRDRTable2DHistogramDialog::on_spinBins_valueChanged(int /*value*/)
 {
     if (ui->chkAutoBinWidth->isChecked()) updateHistograms();
 }
 
-void QFRDRTable2DHistogramDialog::on_edtRangeMaxY_valueChanged(double value)
+void QFRDRTable2DHistogramDialog::on_edtRangeMaxY_valueChanged(double /*value*/)
 {
     if (!ui->chkRangeMaxY->isChecked())   updateHistograms();
 
 }
 
-void QFRDRTable2DHistogramDialog::on_edtRangeMinY_valueChanged(double value)
+void QFRDRTable2DHistogramDialog::on_edtRangeMinY_valueChanged(double /*value*/)
 {
     if (!ui->chkRangeMinY->isChecked())   updateHistograms();
 
 }
 
-void QFRDRTable2DHistogramDialog::on_edtBinWidthY_valueChanged(double value)
+void QFRDRTable2DHistogramDialog::on_edtBinWidthY_valueChanged(double /*value*/)
 {
     if (!ui->chkAutoBinWidthY->isChecked())   updateHistograms();
 
 }
 
-void QFRDRTable2DHistogramDialog::on_spinBinsY_valueChanged(int value)
+void QFRDRTable2DHistogramDialog::on_spinBinsY_valueChanged(int /*value*/)
 {
     if (ui->chkAutoBinWidthY->isChecked()) updateHistograms();
 

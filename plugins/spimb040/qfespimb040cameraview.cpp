@@ -187,6 +187,7 @@ QFESPIMB040CameraView::~QFESPIMB040CameraView()
 
 void QFESPIMB040CameraView::hideEvent(QHideEvent * event) {
     if (m_stopresume) m_stopresume->stop();
+    QWidget::hideEvent(event);
 }
 
 void QFESPIMB040CameraView::setPixelSize(double pixelWidth, double pixelHeight) {

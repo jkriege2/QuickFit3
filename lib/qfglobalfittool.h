@@ -95,10 +95,10 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
 
 
         /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
-        virtual void evaluate(double* evalout, const double* params);
+        virtual void evaluate(double* evalout, const double* params) const;
 
         /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
-        virtual void evaluateJacobian(double* evalout, const double* params);
+        virtual void evaluateJacobian(double* evalout, const double* params) const;
 
         /** \brief returns \c true if all models implement theor jacobians analytically and therefore evaluateJacobian() may be used */
         virtual bool get_implementsJacobian() const;
@@ -130,11 +130,11 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
         int getLinkID(int dataTermID, int parameterID);
         /** \brief returns the number of sub functors */
         inline int getSubFunctorCount() const { return subFunctors.size(); }
-        inline QFFitFunction* getModel(int idx) const { return subFunctors[idx].f->getModel(); }
+        inline  QFFitFunction* getModel(int idx) const { return subFunctors[idx].f->getModel(); }
         inline double* getParamsMin(int idx) const { return subFunctors[idx].paramsMin; }
         inline double* getParamsMax(int idx) const { return subFunctors[idx].paramsMax; }
         inline bool* getParamsFix(int idx) const { return subFunctors[idx].paramsFix; }
-        inline QFFitAlgorithm::FitQFFitFunctionFunctor* getSubFunctor(int idx) const { return subFunctors[idx].f; }
+        inline  QFFitAlgorithm::FitQFFitFunctionFunctor* getSubFunctor(int idx) const { return subFunctors[idx].f; }
         inline int getLinkedPrameterCount() const { return m_linkedParamsCount; }
         inline int mapSubFunctorToGlobal(int functor, int parameter) const { return subFunctors[functor].mapToLocal[parameter]; }
 

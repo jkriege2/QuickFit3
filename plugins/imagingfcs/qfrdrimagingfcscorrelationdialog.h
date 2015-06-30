@@ -73,7 +73,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void on_btnSelectImageFileNoCount_clicked();
         void on_btnSelectBackgroundFile_clicked();
         void on_btnAddJob_clicked();
-        void on_btnAddSeriesJob_clicked(const QString& parameter=QString(""), double start=-1, double end=-1, double inc=-1);
+        void onAddSeriesJobClicked(const QString& parameter=QString(""), double start=-1, double end=-1, double inc=-1);
         void on_btnAddBin12Job_clicked();
         void on_btnLoad_clicked();
         void on_btnLoadNoCount_clicked();
@@ -81,8 +81,8 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void on_spinP_valueChanged(int val);
         void on_spinS_valueChanged(int val);
         void on_spinM_valueChanged(int val);
-        void on_spinDecay_valueChanged(double val);
-        void on_spinDecay2_valueChanged(double val);
+        //void on_spinDecay_valueChanged(double val);
+        //void on_spinDecay2_valueChanged(double val);
         void on_cmbCorrelator_currentIndexChanged(int idx);
         void on_cmbBackground_currentIndexChanged(int idx);
         void on_cmbBleachType_currentIndexChanged(int idx);

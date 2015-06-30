@@ -148,6 +148,9 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QPointer<QFEvaluationEditor> getEditor() const;
         /** \brief send the given command string to all edtor tabs */
         void sendEditorCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
+    public slots:
+        /** \brief closes this editor window and displays a message, that now applicable RDRs are available in the project! */
+        void closeBecauseNoRDRs();
     private:
         QPointer<QFEvaluationPropertyEditorPrivate> p;
     protected:

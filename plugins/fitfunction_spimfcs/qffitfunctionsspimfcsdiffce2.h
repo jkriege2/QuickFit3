@@ -42,9 +42,9 @@ class QFFitFunctionsSPIMFCSDiffCE2: public QFFitFunction {
         QFFitFunctionsSPIMFCSDiffCE2();
         virtual ~QFFitFunctionsSPIMFCSDiffCE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: 3D Diffusion: c, D as parameters (rect. pixel, 1/e^2 radii)"); }
+        virtual QString name() const { return QString("SPIM-FCS: 3D Normal Diffusion: c, D as parameters (rect. pixel, 1/e^2 radii)"); }
         /*! \copydoc QFFitFunction::category()   */
-        virtual QString category() const { return QObject::tr("SPIM-FCS"); }
+        virtual QString category() const { return QObject::tr("SPIM-FCS (camera)"); }
 
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_diffce2"); }

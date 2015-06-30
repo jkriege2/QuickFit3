@@ -39,7 +39,7 @@ class QFTablePluginModel : public QFTableModel
 
 
 
-
+/*
 class QFTablePluginExpressionsModel : public QAbstractTableModel
 {
         Q_OBJECT
@@ -78,5 +78,5 @@ class QFTablePluginExpressionsModelDelegate : public QStyledItemDelegate {
     protected slots:
     protected:
 
-};
+};*/
 #endif // QFTABLEPLUGINMODEL_H

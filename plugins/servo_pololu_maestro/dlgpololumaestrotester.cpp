@@ -119,7 +119,7 @@ void DlgPololuMaestroTester::on_btnConnect_clicked(bool checked)
     }
 }
 
-void DlgPololuMaestroTester::on_cmbBaudrate_currentIndexChanged(int index)
+void DlgPololuMaestroTester::on_cmbBaudrate_currentIndexChanged(int /*index*/)
 {
     if (com.isConnectionOpen()) {
         com.close();

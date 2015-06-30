@@ -104,7 +104,7 @@ QFFitAlgorithmFMinComboBox::QFFitAlgorithmFMinComboBox(QWidget *parent):
     updateFitAlgorithms();
 }
 
-void QFFitAlgorithmFMinComboBox::showOnlyFMin(bool en)
+void QFFitAlgorithmFMinComboBox::showOnlyFMin(bool /*en*/)
 {
     onlyFMin=true;
     updateFitAlgorithms();

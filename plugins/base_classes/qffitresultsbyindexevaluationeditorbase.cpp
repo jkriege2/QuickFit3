@@ -37,12 +37,12 @@ QFFitResultsByIndexEvaluationEditorBase::QFFitResultsByIndexEvaluationEditorBase
     menuOverlays->addAction(actOverlayPlotRuns);
 }
 
-void QFFitResultsByIndexEvaluationEditorBase::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option, const QString &optionName)
+void QFFitResultsByIndexEvaluationEditorBase::getPlotData(QFRawDataRecord */*rec*/, int /*index*/, QList<QFGetPlotdataInterface::GetPlotDataItem> &/*data*/, int /*option*/, const QString &/*optionName*/)
 {
 
 }
 
-bool QFFitResultsByIndexEvaluationEditorBase::getPlotDataSpecs(QStringList *optionNames, QList<QFGetPlotdataInterface::GetPlotPlotOptions> *listPlotOptions)
+bool QFFitResultsByIndexEvaluationEditorBase::getPlotDataSpecs(QStringList */*optionNames*/, QList<QFGetPlotdataInterface::GetPlotPlotOptions> */*listPlotOptions*/)
 {
     return false;
 }

@@ -52,7 +52,7 @@ double QFFitFunctionLightsheetGaussianVar::evaluate(double t, const double* data
 
 
 
-bool QFFitFunctionLightsheetGaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionLightsheetGaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {
@@ -75,8 +75,6 @@ bool QFFitFunctionLightsheetGaussianVar::estimateInitial(double *params, const d
     return true;
 }
 
-void QFFitFunctionLightsheetGaussianVar::calcParameter(double* data, double* error) const {
-}
 
 bool QFFitFunctionLightsheetGaussianVar::isParameterVisible(int parameter, const double* data) const {
 

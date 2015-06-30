@@ -74,58 +74,62 @@
 /*! \brief squares the argument
     \ingroup tools_math_stat
  */
-inline double qfSqr(double x) { return x*x; }
-inline float qfSqr(float x) { return x*x; }
+inline double qfSqr(const double& x) { return x*x; }
+inline float qfSqr(const float& x) { return x*x; }
+inline double qfSqrNR( double x) { return x*x; }
+inline float qfSqrNR( float x) { return x*x; }
 
 /*! \brief takes the argument to the third power
     \ingroup tools_math_stat
  */
-inline double qfCube(double x) { return x*x*x; }
-inline float qfCube(float x) { return x*x*x; }
+inline double qfCube(const double& x) { return x*x*x; }
+inline float qfCube(const float& x) { return x*x*x; }
+inline double qfCubeNR( double x) { return x*x*x; }
+inline float qfCubeNR( float x) { return x*x*x; }
 
 /*! \brief takes the argument to the fourth power
     \ingroup tools_math_stat
  */
-inline double qfPow4(double x) { double x2=x*x; return x2*x2; }
-inline float qfPow4(float x) { float x2=x*x; return x2*x2; }
+inline double qfPow4(const double& x) { double x2=x*x; return x2*x2; }
+inline float qfPow4(const float& x) { float x2=x*x; return x2*x2; }
 
 /*! \brief takes the argument to the fifth power
     \ingroup tools_math_stat
  */
-inline double qfPow5(double x) { double x2=x*x; return x2*x2*x; }
-inline float qfPow5(float x) { float x2=x*x; return x2*x2*x; }
+inline double qfPow5(const double& x) { double x2=x*x; return x2*x2*x; }
+inline float qfPow5(const float& x) { float x2=x*x; return x2*x2*x; }
 
 /** \brief sinc function \f$ \mbox{sinc}(x)=\frac{\sin(x)}{x} \f$
     \ingroup tools_math_stat
 */
-QFLIB_EXPORT double qfSinc(double x);
+QFLIB_EXPORT double qfSinc( double x);
 /** \brief sinc function \f$ \mbox{tanc}(x)=\frac{\tan(x)}{x} \f$
     \ingroup tools_math_stat
 */
-QFLIB_EXPORT double qfTanc(double x);
+QFLIB_EXPORT double qfTanc( double x);
 
 /** \brief 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
     \ingroup tools_math_stat
  */
-inline double qfGaussSqrtE(double x, double sigma) {
+inline double qfGaussSqrtE( double x,  double sigma) {
     return exp(-0.5*x*x/(sigma*sigma));
 }
 /** \brief 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma=1)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
     \ingroup tools_math_stat
  */
-inline double qfGaussSqrtE(double x) {
+inline double qfGaussSqrtE( double x) {
     return qfGaussSqrtE(x, 1);
 }
 /** \brief normalized 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\frac{1}{w\cdot\sqrt{2\pi}}\cdot\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
     \ingroup tools_math_stat
  */
-inline double qfGaussNormSqrtE(double x, double sigma){
+inline double qfGaussNormSqrtE( double x,  double sigma){
     return exp(-0.5*x*x/(sigma*sigma))/(sigma*sqrt(2.0*M_PI));
 }
 /** \brief normalized 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma=1)=\frac{1}{w\cdot\sqrt{2\pi}}\cdot\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
     \ingroup tools_math_stat
  */
-inline double qfGaussNormSqrtE(double x){
+inline double qfGaussNormSqrtE( double x){
     return qfGaussNormSqrtE(x,1);
 }
 /** \brief 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$ with \f$ g(w,w)=1/e^2 \f$
@@ -243,7 +247,7 @@ inline double qfCauchy(double x, double A, double fwhm, double center) {
 
     \f[ w(\mathrm{i}\xi)=\exp(\xi^2)\cdot\mbox{erfc}(\xi) \f]
  */
-QFLIB_EXPORT double qfFaddeevaRealW(double xi);
+QFLIB_EXPORT double qfFaddeevaRealW( double xi);
 
 /** \brief calculate the error propagation for <code>factorA*a+factorB*b</code> or <code>factorA*a-factorB*b</code> with errors \a ea and \a eb
     \ingroup tools_math_stat
@@ -251,7 +255,7 @@ QFLIB_EXPORT double qfFaddeevaRealW(double xi);
     \f[ f=\alpha a\pm\beta b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
  */
-inline double qfErrorSumMinus(double /*a*/, double ea, double /*b*/, double eb, double factorA=1.0, double factorB=1.0) {
+inline double qfErrorSumMinus(const double& /*a*/, const double& ea, const double& /*b*/, const double& eb, const double& factorA=1.0, const double& factorB=1.0) {
     return sqrt(qfSqr(factorA*ea)+qfSqr(factorB*eb));
 }
 
@@ -261,7 +265,7 @@ inline double qfErrorSumMinus(double /*a*/, double ea, double /*b*/, double eb, 
     \f[ f=\alpha a+\beta b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
  */
-inline double qfErrorAdd(double /*a*/, double ea, double /*b*/, double eb) {
+inline double qfErrorAdd(const double& /*a*/, const double& ea, const double& /*b*/, const double& eb) {
     return sqrt(qfSqr(ea)+qfSqr(eb));
 }
 
@@ -271,7 +275,7 @@ inline double qfErrorAdd(double /*a*/, double ea, double /*b*/, double eb) {
     \f[ f=\alpha a-\beta b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
  */
-inline double qfErrorSub(double /*a*/, double ea, double /*b*/, double eb) {
+inline double qfErrorSub(const double& /*a*/, const double& ea, const double& /*b*/, const double& eb) {
     return sqrt(qfSqr(ea)+qfSqr(eb));
 }
 
@@ -281,7 +285,7 @@ inline double qfErrorSub(double /*a*/, double ea, double /*b*/, double eb) {
     \f[ f=a\cdot b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot a\right)^2} \f]
  */
-inline double qfErrorMul(double a, double ea, double b, double eb) {
+inline double qfErrorMul(const double& a, const double& ea, const double& b, const double& eb) {
     return sqrt(qfSqr(ea*b)+qfSqr(eb*a));
 }
 
@@ -291,7 +295,7 @@ inline double qfErrorMul(double a, double ea, double b, double eb) {
     \f[ f=a\cdot b\bcdot c \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot a\right)^2} \f]
  */
-inline double qfErrorMul(double a, double ea, double b, double eb, double c, double ec) {
+inline double qfErrorMul(const double& a, const double& ea, const double& b, const double& eb, const double& c, const double& ec) {
     return sqrt(qfSqr(ea*b*c)+qfSqr(eb*a*c)+qfSqr(ec*b*a));
 }
 
@@ -301,7 +305,7 @@ inline double qfErrorMul(double a, double ea, double b, double eb, double c, dou
     \f[ f=a\cdot b\bcdot c+d\Cdot e\cdot f \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot a\right)^2} \f]
  */
-inline double qfErrorMulAdd(double a, double ea, double b, double eb, double c, double ec, double d, double ed, double e, double ee, double f, double ef) {
+inline double qfErrorMulAdd(const double& a, const double& ea, const double& b, const double& eb, const double& c, const double& ec, const double& d, const double& ed, const double& e, const double& ee, const double& f, const double& ef) {
     return sqrt(qfSqr(ea*b*c)+qfSqr(eb*a*c)+qfSqr(ec*a*b)+qfSqr(ed*e*f)+qfSqr(ee*d*f)+qfSqr(ef*d*e));
 }
 
@@ -310,7 +314,7 @@ inline double qfErrorMulAdd(double a, double ea, double b, double eb, double c, 
     \f[ f=\frac{a}{b} \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot\frac{1}{b^2}\right)^2} \f]
  */
-inline double qfErrorDiv(double a, double ea, double b, double eb) {
+inline double qfErrorDiv(const double& a, const double& ea, const double& b, const double& eb) {
     return sqrt(qfSqr(ea*b)+qfSqr(eb*a/b/b));
 }
 
@@ -319,7 +323,7 @@ inline double qfErrorDiv(double a, double ea, double b, double eb) {
     \f[ f=a^{\beta b} \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot a^{\beta b-1}\right)^2+\left(\Delta b\cdot a^{\beta b}\beta\cdot\log(a)\right)^2} \f]
  */
-inline double qfErrorPow(double a, double ea, double b, double eb, double factorB=1.0) {
+inline double qfErrorPow(const double& a, const double& ea, const double& b, const double& eb, const double& factorB=1.0) {
     return sqrt(qfSqr(ea*pow(a, factorB*b-1.0))+qfSqr(eb*pow(a, factorB*b)*factorB*log(a)));
 }
 
@@ -1453,29 +1457,21 @@ inline double roundError(double error, double addSignifcant) {
 }
 
 
-/** \brief used as result type for the function calcFitStatistics()
+/** \brief used as result type for the function calcBAsicFitStatistics()
  *  \ingroup tools_math_stat
  */
-struct QFLIB_EXPORT QFFitStatistics {
+struct QFLIB_EXPORT QFBasicFitStatistics {
     public:
         /** \brief default constructor/initializor: initialize all with 0/\c NULL */
-        QFFitStatistics();
+        QFBasicFitStatistics();
 
         /** \brief free all heap memory allocated in this struct */
-        void free();
+        virtual void free();
 
-        QString getAsHTMLTable(bool addExplanation=true, bool includeR2=true) const;
+        virtual QString getHTMLExplanation() const;
+        virtual QString getAsHTMLTable(bool addExplanation=true, bool includeR2=true) const;
 
 
-        int runAvgStart;   /**<  */
-        QVector<double> fitfunc;   /**< evaluated fit function */
-        QVector<double> residuals;   /**< residuals */
-        QVector<double> residuals_weighted;   /**< weighted residuals */
-        int runAvgMaxN;   /**< entries in running average vectors */
-        int runAvgN;   /**< number of items averaged for running averages */
-        QVector<double> tau_runavg;   /**< lag-times for running averages of residuals */
-        QVector<double> residuals_runavg;   /**< running average of residuals */
-        QVector<double> residuals_runavg_weighted;   /**< running average of weighted residuals */
         int fitparamN;   /**< number of fit parameters */
         int dataSize;   /**< number of datapoints */
         int degFreedom;   /**< degrees of freedom */
@@ -1485,7 +1481,9 @@ struct QFLIB_EXPORT QFFitStatistics {
         double residWeightSum;     /**<  sum of weightedresiduals */
         double gSum;               /**<  sum of measured values */
         double gSqrSum;            /**<  sum of squared measured values */
+        double weightSum;          /**<  sum of all weights (for normalizations */
 
+        double detCOV;             /**<  determinant of fit variance/covariance matrix */
 
         double rmin;       /**<  min of residuals */
         double rmax;       /**<  max of residuals */
@@ -1505,6 +1503,37 @@ struct QFLIB_EXPORT QFFitStatistics {
         double AICcWeighted; /**< Akaike's information riterion (AICc) calculated from the weighted residuals, corrected for small datasize */
         double BIC; /**< Bayesian information riterion (BIC, also: Schwarz criterion), corrected for finite datasize */
         double BICweighted; /**< Bayesian information riterion (BIC, also: Schwarz criterion) calculated from the weighted residuals, corrected for finite datasize */
+
+        double bayesProbability; /**< Bayesian model probability (see \c QuickFit3/doc/bayesian_fit/bayesian_fit.pdf for details */
+        double bayesProbabilityLog10; /**< log10(bayesProbability) */
+        double bayesProbabilityParamRangeSize; /**< parameter range size \f$ \beta_{max}-\beta_{min}\f$ for Bayesian model probability (see \c QuickFit3/doc/bayesian_fit/bayesian_fit.pdf for details */
+
+};
+
+/** \brief used as result type for the function calcFitStatistics()
+ *  \ingroup tools_math_stat
+ */
+struct QFLIB_EXPORT QFFitStatistics: public QFBasicFitStatistics {
+    public:
+        /** \brief default constructor/initializor: initialize all with 0/\c NULL */
+        QFFitStatistics();
+
+        /** \brief free all heap memory allocated in this struct */
+        void free();
+
+        virtual QString getHTMLExplanation() const;
+        virtual QString getAsHTMLTable(bool addExplanation=true, bool includeR2=true) const;
+
+
+        int runAvgStart;   /**<  */
+        QVector<double> fitfunc;   /**< evaluated fit function */
+        QVector<double> residuals;   /**< residuals */
+        QVector<double> residuals_weighted;   /**< weighted residuals */
+        int runAvgMaxN;   /**< entries in running average vectors */
+        int runAvgN;   /**< number of items averaged for running averages */
+        QVector<double> tau_runavg;   /**< lag-times for running averages of residuals */
+        QVector<double> residuals_runavg;   /**< running average of residuals */
+        QVector<double> residuals_runavg_weighted;   /**< running average of weighted residuals */
 
         double residHistBinWidth;   /**< histogram bin width of residual histogram  */
         double residHistWBinWidth;   /**< histogram bin width of weighted residual histogram */
@@ -1534,10 +1563,34 @@ struct QFLIB_EXPORT QFFitStatistics {
     \param residualHistogramBins bins in the residual histogram
     \param fitFuncParams fit result: parameter values (optional, paramCount entries)
     \param fitFuncParamErrors fit result: parameter values (optional, paramCount entries)
+    \param COV fit covariance-matrix (square-matrix, needed for some statistics parameters (give empty vector is not known!)
+    \param paramrange_size an estimate of the maximal parameter value (i.e. all fit parameters have to be in the range -paramrange_size...paramrange_size. If this is not supplied, a bayesian model probability cannot be calculated!
 
     \note the arrays in the resulting struct are allocated using \c qfMalloc(), so you will have to free them using \c qfFree() !!!
   */
-QFLIB_EXPORT QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, double* fitFuncParams=NULL, double* fitFuncParamErrors=NULL);
+QFLIB_EXPORT QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, const double* fitFuncParams=NULL, const double* fitFuncParamErrors=NULL, const QVector<double>& COV=QVector<double>(), double paramrange_size=200);
+
+/*! \brief calculate fit statistics for the given measurement dataset, using this fit function with the given parameters
+
+    \return a wide set of fit statistics in a struct of type FitStatistics
+    \param N number of datapoints in corrdata and weights
+    \param tauvals input data set x (the values f(x) are given in corrdata)
+    \param corrdata model function evaluated for \a tauvals
+    \param corrdata measurement dataset f(x)
+    \param weights weights for the input dataset
+    \param datacut_min first data point to use
+    \param datacut_max last datapoint to use
+    \param fullParams parameter vector
+    \param errors errors of the fit parameters in fullParams
+    \param paramsFix which parameters are fixed
+    \param fitFuncParams fit result: parameter values (optional, paramCount entries)
+    \param fitFuncParamErrors fit result: parameter values (optional, paramCount entries)
+    \param COV fit covariance-matrix (square-matrix, needed for some statistics parameters (give empty vector is not known!)
+    \param paramrange_size an estimate of the maximal parameter value (i.e. all fit parameters have to be in the range -paramrange_size...paramrange_size. If this is not supplied, a bayesian model probability cannot be calculated!
+
+    \note the arrays in the resulting struct are allocated using \c qfMalloc(), so you will have to free them using \c qfFree() !!!
+  */
+QFLIB_EXPORT QFBasicFitStatistics calculateBasicFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, const double* fitFuncParams=NULL, const double* fitFuncParamErrors=NULL, const QVector<double>& COV=QVector<double>(), double paramrange_size=200);
 
 
 #endif // QFMATHTOOLS_H

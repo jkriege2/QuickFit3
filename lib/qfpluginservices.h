@@ -287,7 +287,7 @@ class QFLIB_EXPORT QFPluginServices {
               -
             .
          */
-        virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false, bool isMainHelp=false)=0;
+        virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false, bool isMainHelp=false, const QString& texfilenameaddition=QString())=0;
 
 
         /** \brief add a substring to the further reading list in the onine-help

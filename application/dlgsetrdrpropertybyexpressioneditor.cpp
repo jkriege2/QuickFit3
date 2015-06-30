@@ -104,7 +104,7 @@ void DlgSetRDRPropertyByExpressionEditor::setProject(QFProject *project)
     }
 }
 
-void DlgSetRDRPropertyByExpressionEditor::setID(const QString &id)
+void DlgSetRDRPropertyByExpressionEditor::setID(const QString &/*id*/)
 {
     ui->labID->setText(""); //id);
 }

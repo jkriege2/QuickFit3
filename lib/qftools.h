@@ -1850,6 +1850,19 @@ QFLIB_EXPORT QString qfGetLargestCommonStart(const QStringList& data, const QStr
  */
 QFLIB_EXPORT QString qfGetLargestCommonEnd(const QStringList& data, const QString& defaultResult=QString());
 
+/*! \brief convert a period in seconds inot a string of the format \c HH:MM:SS
+    \ingroup qf3lib_tools
+
+
+ */
+QFLIB_EXPORT QString qfSecondsDurationToHMSString(double seconds);
+
+/*! \brief convert a period in seconds inot a string of the format \c MM:SS
+    \ingroup qf3lib_tools
+
+
+ */
+QFLIB_EXPORT QString qfSecondsDurationToMSString(double seconds);
 
 
 class QFLIB_EXPORT QFProgressMinorProgress {

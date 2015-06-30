@@ -43,7 +43,7 @@ class QFFitFunctionsSPIMFCSADiffE2: public QFFitFunction {
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_adiffe2"); }
         /*! \copydoc QFFitFunction::category()   */
-        virtual QString category() const { return QObject::tr("SPIM-FCS"); }
+        virtual QString category() const { return QObject::tr("SPIM-FCS (camera)"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

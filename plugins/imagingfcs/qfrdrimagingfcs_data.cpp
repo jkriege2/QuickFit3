@@ -289,13 +289,13 @@ void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) const {
 
     if ((l.size()>0&&maskGetWidth()>0 && maskGetHeight()>0 && getCorrelationRuns()>0) || (!maskTemp.isEmpty())) {
         w.writeStartElement("leaveout");
-        qDebug()<<maskGetWidth()<< maskGetHeight()<< getCorrelationRuns()<<"\n"<<l<<"\n"<<maskTemp;
+        //qDebug()<<maskGetWidth()<< maskGetHeight()<< getCorrelationRuns()<<"\n"<<l<<"\n"<<maskTemp;
         if (maskGetWidth()>0 && maskGetHeight()>0 && getCorrelationRuns()>0) {
             w.writeAttribute("list", l);
-            qDebug()<<"   -> write "<<l;
+            //qDebug()<<"   -> write "<<l;
         } else {
             w.writeAttribute("list", maskTemp);
-            qDebug()<<"   -> write "<<maskTemp;
+            //qDebug()<<"   -> write "<<maskTemp;
         }
         w.writeEndElement();
     }

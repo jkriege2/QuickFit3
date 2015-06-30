@@ -2090,7 +2090,7 @@ void MainWindow::insertRawData() {
     QVariant id=sender()->property("call_id");
     if (id.isValid() && project) {
         int pc=project->getRawDataCount()+project->getEvaluationCount();
-        std::cout<<"pc="<<pc<<std::endl;
+        //std::cout<<"pc="<<pc<<std::endl;
         getRawDataRecordFactory()->createRecord(id.toString(), project);
         if ((pc<=0)&&(project->getRawDataCount()+project->getEvaluationCount()>0)) saveProject();
     }
@@ -4592,7 +4592,7 @@ static void getQFFitFunctionDescription(QFFitFunctionBase* ff, QString& autoplug
 
 
 
-QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QF3HelpReplacesList& more_replaces, bool insertTooltips, bool dontCreatePics, bool isMainHelp) {
+QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QF3HelpReplacesList& more_replaces, bool insertTooltips, bool dontCreatePics, bool isMainHelp, const QString &texfilenameaddition) {
 
 
     QModernProgressDialog progress;
@@ -5259,7 +5259,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         for (int ti=0; ti<ttids.size(); ti++){
                             QString id=ttids[ti];
                             QImage pix=JKQTPMathImageGetPaletteImage(ti, 128,16);
-                            QString palfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_pal"+QString::number(ti)+".png";
+                            QString palfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+texfilenameaddition+"_pal"+QString::number(ti)+".png";
                             //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
                             pix.save(palfilename);
                             text+=item_template.arg(id).arg(palfilename);
@@ -5509,7 +5509,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                 mathParser.draw(*p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0.1*size.height()), size), false);
                                 p->end();
                                 delete p;
-                                QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";
+                                QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+texfilenameaddition+"_tex"+QString::number(count)+".png";
                                 //qDebug()()<<"latex-render: "<<latex<<"\n    size = "<<pix->size()<<"  output = "<<texfilename;
                                 *pix=cropTopBottom(cropLeftRight(*pix));
                                 //qDebug()()<<"latex-render:   => "<<pix->size();

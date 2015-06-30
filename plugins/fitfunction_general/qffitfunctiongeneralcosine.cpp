@@ -78,8 +78,6 @@ bool QFFitFunctionGeneralCosine::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralCosine::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
-}
 
 bool QFFitFunctionGeneralCosine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {

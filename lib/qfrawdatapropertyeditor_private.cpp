@@ -1358,9 +1358,9 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
         disconnect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeRowsToContents()));
 
         disconnect(edtFilterResults, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setResultFilter(QString)));
-        disconnect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setResultFilterUsesRegExp(bool)));
+        disconnect(chkFilterResultsRegExp, SIGNAL(toggled(bool)), current->resultsGetModel(), SLOT(setResultFilterUsesRegExp(bool)));
         disconnect(edtFilterEvaluation, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setEvaluationFilter(QString)));
-        disconnect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setEvaluationFilterUsesRegExp(bool)));
+        disconnect(chkFilterEvaluationRegExp, SIGNAL(toggled(bool)), current->resultsGetModel(), SLOT(setEvaluationFilterUsesRegExp(bool)));
         disconnect(edtFilterResultsNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setResultFilterNot(QString)));
         disconnect(edtFilterEvaluationNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setEvaluationFilterNot(QString)));
         disconnect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));
@@ -1482,9 +1482,9 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
         connect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeColumnsToContents()));
         connect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeRowsToContents()));
         connect(edtFilterResults, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setResultFilter(QString)));
-        connect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setResultFilterUsesRegExp(bool)));
+        connect(chkFilterResultsRegExp, SIGNAL(toggled(bool)), current->resultsGetModel(), SLOT(setResultFilterUsesRegExp(bool)));
         connect(edtFilterEvaluation, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setEvaluationFilter(QString)));
-        connect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setEvaluationFilterUsesRegExp(bool)));
+        connect(chkFilterEvaluationRegExp, SIGNAL(toggled(bool)), current->resultsGetModel(), SLOT(setEvaluationFilterUsesRegExp(bool)));
         connect(edtFilterResultsNot, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setResultFilterNot(QString)));
         connect(edtFilterEvaluationNot, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setEvaluationFilterNot(QString)));
         connect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));

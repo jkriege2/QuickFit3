@@ -39,10 +39,6 @@ double QFFitFunctionGeneralCDFCauchy::evaluate(double x, const double* data) con
     return atan((x-position)/width)/M_PI+0.5;
 }
 
-void QFFitFunctionGeneralCDFCauchy::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
-
-}
 
 void QFFitFunctionGeneralCDFCauchy::calcParameter(double* /*data*/, double* /*error*/) const {
 }

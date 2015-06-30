@@ -76,8 +76,6 @@ bool QFFitFunctionGeneralLogNormal::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralLogNormal::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
-}
 
 bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {

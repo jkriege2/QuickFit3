@@ -67,7 +67,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
     int c=0;
     if (i==c++) {
         res.groupLabel=menulabel;
-        res.menuEntryLabel=tr("... 2D diffusion+flow, ACF + 4 neighbors");
+        res.menuEntryLabel=tr("... 2D Normal Diffusion+Flow, ACF + 4 neighbors");
         res.models<<"fccs_2f_diff2dflowfccs_2f_diff2dflow"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff2dflow";
         res.roles<<"acf";
         res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
@@ -80,7 +80,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
 
     } else if (i==c++) {
         res.groupLabel=menulabel;
-        res.menuEntryLabel=tr("... 3D diffusion+flow, ACF + 4 neighbors");
+        res.menuEntryLabel=tr("... 3D Normal Diffusion+Flow, ACF + 4 neighbors");
         res.models<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow";
         res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
@@ -93,7 +93,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
 
     } else if (i==c++) {
         res.groupLabel=menulabel;
-        res.menuEntryLabel=tr("... 3D diffusion ACF + 4 neighbors, afterpulsing, wxy/wz un-fixed");
+        res.menuEntryLabel=tr("... 3D Normal Diffusion ACF + 4 neighbors, afterpulsing, wxy/wz un-fixed");
         res.models<<"fcs_diff_d_wz_afterpulse"<<"fccs_2f_diff3d_wz"<<"fccs_2f_diff3d_wz"<<"fccs_2f_diff3d_wz"<<"fccs_2f_diff3d_wz";
         res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);

@@ -774,11 +774,19 @@ void QFImFCSFitEvaluationEditor::updateFitFunctions() {
                 bool* paramsFix=eval->allocFillFix(record, eval->getCurrentIndex());
                 ffunc->calcParameter(fullParams, errors);
 
+                //double detCOV=eval->getFitValue(record, eval->getEvaluationResultID(eval->getCurrentIndex(), record), "fitstat_det_cov");
+                double prange_width=eval->getFitValue(record, eval->getEvaluationResultID(eval->getCurrentIndex(), record), "fitstat_bayes_model_probability_paramrangesize");
+                qDebug()<<"read old:   "<<eval->getCurrentIndex()<<eval->getEvaluationResultID(eval->getCurrentIndex(), record);//<<detCOV<<prange_width;
+                if (!QFFloatIsOK(prange_width) || fabs(prange_width)<1000.0*DBL_MIN || fabs(prange_width)>1e36) {
+                    prange_width=200;
+                }
+
                 /////////////////////////////////////////////////////////////////////////////////
                 // calculate fit statistics
                 /////////////////////////////////////////////////////////////////////////////////
                 record->disableEmitResultsChanged();
-                QFFitStatistics fitResults=eval->calcFitStatistics(eval->hasFit(record, run), ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run);
+                QFFitStatistics fitResults=eval->calcFitStatistics(eval->hasFit(record, run), ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run, "fitstat_", tr("fit statistics"), QVector<double>(), prange_width);
+
                 record->enableEmitResultsChanged();
 
 
@@ -936,7 +944,7 @@ void QFImFCSFitEvaluationEditor::updateFitFunctions() {
                     txtFit+=txtFit+tr("<div style=\"border-style:solid\"><b>Fit Result Message:</b><center>not fit yet</center></div><br>");
                 }
                 txtFit+=QString("<b>%1</b><center>").arg(tr("Fit Statistics:"));
-                txtFit+=QString("<table border=\"0\" width=\"95%\">");
+                //txtFit+=QString("<table border=\"0\" width=\"95%\">");
 
                 txtFit+=fitResults.getAsHTMLTable();
 

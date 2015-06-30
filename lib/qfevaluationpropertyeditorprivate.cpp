@@ -741,7 +741,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     connect(chkFilterFilesRegExp, SIGNAL(toggled(bool)), this, SLOT(storeSettings()));
     chkFilterFilesRegExp->setChecked(false);
     tbResultsFilter->addWidget(chkFilterFilesRegExp);
-    connect(chkFilterFilesRegExp, SIGNAL(clicked(bool)), d->resultsModel, SLOT(setFilesFilterUsesRegExp(bool)));
+    connect(chkFilterFilesRegExp, SIGNAL(toggled(bool)), d->resultsModel, SLOT(setFilesFilterUsesRegExp(bool)));
     edtFilterFiles->setToolTip(tr("use this to filter the contents of the results table<br><br>"
                                        "Simply enter a filter string and the table will only display those"
                                        "rows where the raw data record name contains a match to the filter string."
@@ -782,7 +782,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     chkFilterResultsRegExp=new QCheckBox(tr("RegExp"), d);
     chkFilterResultsRegExp->setChecked(false);
     tbResultsFilter->addWidget(chkFilterResultsRegExp);
-    connect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), d->resultsModel, SLOT(setResultFilterUsesRegExp(bool)));
+    connect(chkFilterResultsRegExp, SIGNAL(toggled(bool)), d->resultsModel, SLOT(setResultFilterUsesRegExp(bool)));
     edtFilterResultsNot->setToolTip(tr("use this to filter the contents of the results table<br><br>"
                                        "Simply enter a filter string and the table will only display those"
                                        "columns where the result name contains NO match to the filter string."
@@ -934,7 +934,9 @@ void QFEvaluationPropertyEditorPrivate::selectionChanged(const QModelIndex& inde
             //std::cout<<"!!!   QFEvaluationPropertyEditorPrivate::selectionChanged() with NULL new record\n";
         }
 
-        if (lstRawData->model()->rowCount()<=0) d->close();
+        if (lstRawData->model()->rowCount()<=0) {
+            d->closeBecauseNoRDRs();
+        }
     }
 }
 
@@ -1228,7 +1230,9 @@ void QFEvaluationPropertyEditorPrivate::recordAboutToBeDeleted(QFRawDataRecord* 
                     cnt++;
                 }
             }
-            if (cnt<=0) d->close();
+            if (cnt<=0) {
+                d->closeBecauseNoRDRs();
+            }
         }
     }
 }

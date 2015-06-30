@@ -56,19 +56,24 @@ QFRDRTableColumnValuesDialog::~QFRDRTableColumnValuesDialog()
 
 void QFRDRTableColumnValuesDialog::updatePreview()
 {
-    QString p=0;
+    QString p="";
     QList<double> l=getValues();
-    for (int i=0; i<qMin(10, l.size()); i++) {
+    int lsize=l.size();
+    if (lsize<0) lsize=0;
+    for (int i=0; i<qMin(10, lsize); i++) {
         if (!p.isEmpty()) p.append("; ");
         p.append(QLocale::system().toString(l[i]));
     }
     if (l.size()>10) {
         p.append(" ... ");
         bool ok=false;
-        for (int i=qMax(l.size()-5, qMin(10, l.size())); i<l.size(); i++) {
-            if (ok) p.append("; ");
-            ok=true;
-            p.append(QLocale::system().toString(l[i]));
+        int i0=l.size()-5;
+        for (int i=qMax(i0, qMin(10, lsize)); i<l.size(); i++) {
+            if (i>=0 && i<l.size()) {
+                if (ok) p.append("; ");
+                ok=true;
+                p.append(QLocale::system().toString(l[i]));
+            }
         }
     }
 

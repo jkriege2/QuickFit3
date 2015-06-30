@@ -595,6 +595,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFunction
         double* paramsMin=allocFillParametersMin(record, ffunc);
         double* paramsMax=allocFillParametersMax(record, ffunc);
         bool* paramsFix=allocFillFix(record, run, ffunc);
+        QVector<double> COV;
         locker.unlock();
 
 
@@ -629,8 +630,9 @@ void QFFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFunction
                 tstart.start();
                 double* init=duplicateArray(initialparams, ffunc->paramCount());
                 QFFitAlgorithm::FitResult result;
+
                 for (int rep=0; rep<fitrepeats; rep++) {
-                    result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, init, paramsFix, paramsMin, paramsMax);
+                    result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, init, paramsFix, paramsMin, paramsMax, false, NULL, &COV);
                     copyArray(init, params, ffunc->paramCount());
                 }
                 qfFree(init);
@@ -803,7 +805,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFunction
 
 
                 {
-                    QFFitStatistics result= ffunc->calcFitStatistics(N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25);
+                    QFFitStatistics result= ffunc->calcFitStatistics(N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25, COV);
                     record->resultsSetFitStatistics(result, evalID, "fitstat_", tr("fit statistics"));
                     result.free();
                 }

@@ -61,7 +61,6 @@ class QFFitFunctionGeneralCDFGaussianDistVar: public QFFitFunction {
         virtual bool get_implementsDerivatives();
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
-        virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
         bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL);
 };
 

@@ -34,12 +34,12 @@ class QFFitFunctionsSPIMFCCSDiffFlow: public QFFitFunction {
         QFFitFunctionsSPIMFCCSDiffFlow();
         virtual ~QFFitFunctionsSPIMFCCSDiffFlow() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("2-pixel SPIM-FCCS: 3D Diffusion+Flow (rect. pixel, 1/sqrt(e) radii)"); };
+        virtual QString name() const { return QString("2-pixel SPIM-FCCS: 3D Normal Diffusion+Flow (rect. pixel, 1/sqrt(e) radii)"); };
 
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_spim_diffflow"); };
         /*! \copydoc QFFitFunction::category()   */
-        virtual QString category() const { return QObject::tr("2-pixel SPIM-FCCS"); }
+        virtual QString category() const { return QObject::tr("2-pixel SPIM-FCCS (camera)"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

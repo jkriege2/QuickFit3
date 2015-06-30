@@ -178,19 +178,19 @@ void dlgEstimateFocalVolume::on_buttonBox_accepted() {
     calc_from_D();
 }
 
-void dlgEstimateFocalVolume::on_spinC_valueChanged(double d) {
+void dlgEstimateFocalVolume::on_spinC_valueChanged(double /*d*/) {
     calc_from_C();
 }
 
-void dlgEstimateFocalVolume::on_spinCError_valueChanged(double d) {
+void dlgEstimateFocalVolume::on_spinCError_valueChanged(double /*d*/) {
     calc_from_C();
 }
 
-void dlgEstimateFocalVolume::on_spinD_valueChanged(double d) {
+void dlgEstimateFocalVolume::on_spinD_valueChanged(double /*d*/) {
     calc_from_D();
 }
 
-void dlgEstimateFocalVolume::on_spinDError_valueChanged(double d) {
+void dlgEstimateFocalVolume::on_spinDError_valueChanged(double /*d*/) {
     calc_from_D();
 }
 

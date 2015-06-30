@@ -77,8 +77,6 @@ bool QFFitFunctionGeneralHill::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralHill::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
-}
 
 bool QFFitFunctionGeneralHill::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {

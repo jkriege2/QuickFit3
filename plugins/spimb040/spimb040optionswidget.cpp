@@ -90,7 +90,7 @@ void SPIMB040OptionsWidget::on_cmbStyle_currentIndexChanged( const QString & tex
     emit styleChanged(getStyle(), getStylesheet());
 }
 
-void SPIMB040OptionsWidget::on_cmbStyle_highlighted( const QString & text ) {
+void SPIMB040OptionsWidget::on_cmbStyle_highlighted( const QString & /*text*/ ) {
     //on_cmbStyle_currentIndexChanged(text);
 }
 

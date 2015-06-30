@@ -80,6 +80,12 @@ class QFLIB_EXPORT QFFitFunction: public QFFitFunctionBase {
     public:
         virtual ~QFFitFunction() {}
 
+        /*! \brief create a new instance of the same type as the current fit function
+
+            This function will create a new instance using \c new ... so you'll have to delete the return value with \c delete . If an error occcurs, the function returns \c NULL
+          */
+        QFFitFunction* duplicate() const;
+
 
         /*! \brief evaluate the fitting function \f$ f(x, \vec{p}) \f$ at the position \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$
             \param x position \f$ x \f$ where to evaluate the fit function
@@ -210,10 +216,12 @@ class QFLIB_EXPORT QFFitFunction: public QFFitFunctionBase {
             \param paramsFix which parameters are fixed
             \param runAvgWidth width of the averaging in the running averge
             \param residualHistogramBins bins in the residual histogram
+            \param COV the variance/covariance matrix from the fit, if empty it is estimated from the provided data!
+            \param paramrange_size an estimate of the maximal parameter value (i.e. all fit parameters have to be in the range -paramrange_size...paramrange_size. If this is not supplied, a bayesian model probability cannot be calculated!
 
             \note the arrays in the resulting struct are allocated using \c qfMalloc(), so you will have to free them using \c qfFree() !!!
           */
-        QFFitStatistics calcFitStatistics(long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins) const;
+        QFFitStatistics calcFitStatistics(long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, const QVector<double>& COV=QVector<double>(), double paramrange_size=200) const;
 
 };
 

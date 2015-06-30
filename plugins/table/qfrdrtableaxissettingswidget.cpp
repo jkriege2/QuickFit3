@@ -168,11 +168,11 @@ bool QFRDRTableAxisSettingsWidget::getLogX() const
 }
 
 
-void QFRDRTableAxisSettingsWidget::readSettings(QSettings &settings, const QString &prefix)
+void QFRDRTableAxisSettingsWidget::readSettings(QSettings &/*settings*/, const QString &/*prefix*/)
 {
 }
 
-void QFRDRTableAxisSettingsWidget::writeSettings(QSettings &settings, const QString &prefix)
+void QFRDRTableAxisSettingsWidget::writeSettings(QSettings &/*settings*/, const QString &/*prefix*/)
 {
 }
 
@@ -260,7 +260,7 @@ QString QFRDRTableAxisSettingsWidget::getlabel() const
     return ui->edtXLabel->text();
 }
 
-void QFRDRTableAxisSettingsWidget::setRecord(QFRDRTable *record, int graph)
+void QFRDRTableAxisSettingsWidget::setRecord(QFRDRTable *record, int /*graph*/)
 {
     if (current) {
         disconnect(current->model(), SIGNAL(modelReset()), this, SLOT(updateComboboxes()));

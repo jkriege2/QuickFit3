@@ -29,9 +29,9 @@ echo -e "\n\ndetermining bit depth:"
 BITDEPTH=`./quickfit3.app/Contents/MacOs/quickfit3 --getbits`
 echo -e "\n   bit depth: ${BITDEPTH}\n\n"
 
-ZIPFILE=quickfit3_${BITDEPTH}bit_${SVNVER}.zip
+ZIPFILE=quickfit3_macx${BITDEPTH}_${SVNVER}.zip
 
-DMGFILE=quickfit3_${BITDEPTH}bit_${SVNVER}.dmg
+DMGFILE=quickfit3_macx${BITDEPTH}_${SVNVER}.dmg
 
 
 echo "--- make install of QuickFit 3 ---"

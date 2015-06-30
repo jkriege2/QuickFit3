@@ -1,3 +1,24 @@
+/*
+Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
+
+    last modification: $LastChangedDate: 2015-02-13 16:56:45 +0100 (Fr, 13 Feb 2015) $  (revision $Rev: 3827 $)
+
+    This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
+
+    This software is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License (LGPL) as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License (LGPL) for more details.
+
+    You should have received a copy of the GNU Lesser General Public License (LGPL)
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "jktetrisframe.h"
 #include <QDebug>
 #include <QApplication>
@@ -66,6 +87,29 @@ int JKTetrisFrame::getLevel() const
     return level;
 }
 
+int JKTetrisFrame::getBoardWidth() const
+{
+    return boardWidth;
+}
+
+int JKTetrisFrame::getBoardHeight() const
+{
+    return boardHeight;
+}
+
+QSize JKTetrisFrame::getTileSize() const
+{
+    return tileSize;
+}
+
+void JKTetrisFrame::setTileSize(QSize size)
+{
+    tileSize=size;
+    setMinimumSize(minimumSizeHint());
+    setMaximumHeight(minimumSizeHint().height());
+    repaint();
+}
+
 void JKTetrisFrame::setNextPieceLabel(QLabel *label)
 {
     labNextPiece=label;
@@ -89,8 +133,8 @@ void JKTetrisFrame::setLinesRemovedLabel(QLabel *label)
 int JKTetrisFrame::getInterval()
 {
     int factor=1;
-    if (fastDown) factor=10;
-    if (dropping) factor=20;
+    if (fastDown) factor=12;
+    if (dropping) factor=25;
     return qBound(1, 1750 / ((1 + level)*factor), 1000);
 }
 
@@ -120,6 +164,7 @@ void JKTetrisFrame::pause(bool enabled)
     if (!enabled) {
         running=true;
         timer->start();
+        setFocus();
         //emit pauseEnabled(true);
     } else {
         timer->stop();
@@ -304,7 +349,7 @@ bool JKTetrisFrame::removeLines(int removed)
     removed=removed%2;
     int score1=removed;
 
-    score=score+score4*80+score2*30+score1*10;
+    score=score+score4*1600+score2*400+score1*100;
     if (linesRemoved>10) {
         linesRemoved=linesRemoved-10;
         level++;

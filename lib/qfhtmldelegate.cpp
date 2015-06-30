@@ -167,7 +167,7 @@ QString QFHTMLDelegate::calcDisplayedText(const QModelIndex &index, const QStyle
     } else if (data.type()==QVariant::String) {
         return data.toString();
     } else if (data.type()==QVariant::Double) {
-        return QLocale::system().toString(data.toDouble(),'g', 6);
+        return QLocale::system().toString(data.toDouble(),'g', 5);
     } else if (data.type()==QVariant::UInt || data.type()==QVariant::ULongLong) {
         return QLocale::system().toString(data.toULongLong());
     } else if (data.type()==QVariant::Int || data.type()==QVariant::LongLong) {
@@ -285,28 +285,33 @@ void QFHTMLDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
 QSize QFHTMLDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
     //qDebug()<<" QFHTMLDelegate::sizeHint()";
     QVariant data=index.data(Qt::DisplayRole).toString();
+    //QVariant check=index.data(Qt::CheckStateRole);
 
     bool isHTML=false;
     QPoint offset(0,0);
     QString text=calcDisplayedText(index, option, offset, isHTML);
 
+    /*int addWidth=0;
+    if (check.isValid()) {
+        addWidth=option.rect.height();
+    }*/
 
     if (isHTML) {
         QTextDocument doc;
         doc.setHtml(data.toString());
-        return doc.size().toSize();
+        return doc.size().toSize()+QSize(offset.x(),offset.y());
     } else if (multiline_edits.contains(index.column()) && !text.isEmpty()){
         QVariant fv=index.data(Qt::FontRole);
         QFont f=option.font;
         if (fv.isValid()) f=fv.value<QFont>();
         QFontMetrics fm(f);
-        return fm.size(0, text);
+        return fm.size(0, text)+QSize(offset.x(),offset.y());
     } else if (!text.isEmpty()){
         QVariant fv=index.data(Qt::FontRole);
         QFont f=option.font;
         if (fv.isValid()) f=fv.value<QFont>();
         QFontMetrics fm(f);
-        return fm.size(Qt::TextSingleLine, text);
+        return fm.size(Qt::TextSingleLine, text)+QSize(offset.x(),offset.y());
     } else if (data.type()==QVariant::String || data.type()==QVariant::StringList) {
         return QSize(0,0);
     } else if (!data.isValid() || data.isNull()) {

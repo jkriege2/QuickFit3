@@ -4721,7 +4721,9 @@ void QFRDRImagingFCSImageEditor::fillParameterSet(bool replot) {
         // fill the list of available fit result groups
         QStringList egroups=current->resultsCalcEvalGroups();
         for (int i=0; i<egroups.size(); i++) {
-            cmbResultGroup->addItem(QString("%1").arg(current->resultsGetLabelForEvaluationGroup(egroups[i])), egroups[i]);
+            if (!egroups[i].startsWith("annotation_metadata")){
+                cmbResultGroup->addItem(QString("%1").arg(current->resultsGetLabelForEvaluationGroup(egroups[i])), egroups[i]);
+            }
         }
         int d=cmbResultGroup->findData(current->getProperty("imfcs_imed_evalgroup", "").toString());
         if (d>=0) cmbResultGroup->setCurrentIndex(d);
@@ -4732,7 +4734,9 @@ void QFRDRImagingFCSImageEditor::fillParameterSet(bool replot) {
             if (cur) {
                 egroups=cur->resultsCalcEvalGroups();
                 for (int i=0; i<egroups.size(); i++) {
-                    cmbOtherFilesResultGroup->addItem(QString("%1").arg(cur->resultsGetLabelForEvaluationGroup(egroups[i])), egroups[i]);
+                    if (!egroups[i].startsWith("annotation_metadata")){
+                        cmbOtherFilesResultGroup->addItem(QString("%1").arg(cur->resultsGetLabelForEvaluationGroup(egroups[i])), egroups[i]);
+                    }
                 }
 
                 int d=cmbOtherFilesResultGroup->findData(cur->getProperty("imfcs_imed_otherfileevalgroup", "").toString());
@@ -5000,15 +5004,15 @@ void QFRDRImagingFCSImageEditor::transformImage(double* image, uint32_t width, u
 
 
 
-void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint32_t width, uint32_t height, QString evalGroupIn, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR, const QString& otherRDRRole, const QString& otherRDRevalGroup)
+void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint32_t width, uint32_t height, QString evalGroupIn, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR, const QString& otherRDRRole, const QString& otherRDRevalGroup,  QString *usedEvalOut)
 {
-    readParameterImage(current, image,  width,  height,  evalGroupIn,  fitParam,  tranFitParam,  thisRDR, otherRDRRole, otherRDRevalGroup)    ;
+    readParameterImage(current, image,  width,  height,  evalGroupIn,  fitParam,  tranFitParam,  thisRDR, otherRDRRole, otherRDRevalGroup, usedEvalOut)    ;
 }
 
-void QFRDRImagingFCSImageEditor::readParameterImage(QFRawDataRecord *current, double *image, uint32_t width, uint32_t height, QString evalGroupIn, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR, const QString &otherRDRRole, const QString &otherRDRevalGroup)
+void QFRDRImagingFCSImageEditor::readParameterImage(QFRawDataRecord *current, double *image, uint32_t width, uint32_t height, QString evalGroupIn, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR, const QString &otherRDRRole, const QString &otherRDRevalGroup,  QString *usedEvalOut)
 {
     uint32_t arraysize=width*height;
-    //qDebug()<<"readParameterImage("<<image<<gof_image<<width<<height<<evalGroup;
+
     if (image) {
         for (register uint32_t i=0; i<arraysize; i++) {
             image[i]=NAN;
@@ -5027,6 +5031,8 @@ void QFRDRImagingFCSImageEditor::readParameterImage(QFRawDataRecord *current, do
             qDebug()<<"      "<<m->getRole();*/
         }
     }
+
+    //qDebug()<<"readParameterImage(size="<<width<<height<<"  evalGroupIn="<<evalGroupIn<<"  evalGroup="<<evalGroup<<"  fitParam="<<fitParam<<"  usedEvalOut="<<usedEvalOut<<")";
 
     if ( (!m) || evalGroup.isEmpty() || fitParam.isEmpty() ) return;
 
@@ -5068,6 +5074,11 @@ void QFRDRImagingFCSImageEditor::readParameterImage(QFRawDataRecord *current, do
                 int y=m->runToY(i);
                 image[y*width+x]=dvec[i];
             }
+        }
+        //qDebug()<<"  usedEvalOut="<<usedEvalOut;
+        if (usedEvalOut) {
+            (*usedEvalOut)=usedEval;
+            //qDebug()<<"  return usedEval="<<usedEval<<(*usedEvalOut);
         }
     }
 
@@ -6306,49 +6317,79 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
     if (m) {
-        QFSelectionListDialog* dlg=new QFSelectionListDialog(this);
+        dlgAnnotateDlg=new QFSelectionListDialog(this);
         QSettings* settings=ProgramOptions::getInstance()->getQSettings();
         QString prefix="imfcsimageeditor/annotateModelComparison/";
-        dlg->setHelpPage(QFPluginServices::getInstance()->getPluginHelpDirectory(current->getType())+"/imfcs_annotatemodelselection.html");
+        dlgAnnotateDlg->setHelpPage(QFPluginServices::getInstance()->getPluginHelpDirectory(current->getType())+"/imfcs_annotatemodelselection.html");
 
         int idx=-1;
-        QComboBox* cmbParameter=new QComboBox(dlg);
+        cmbAnnotateDlgParameter=new QFEnhancedComboBox(dlgAnnotateDlg);
         for (int i=0; i<this->cmbParameter->count(); i++) {
             QString label=this->cmbParameter->itemText(i);
             if (!label.contains(", fix") && !label.contains("_fix") && !label.contains(", islocal") && !label.contains("_islocal")) {
-                cmbParameter->addItem(label, this->cmbParameter->itemData(i));
+                cmbAnnotateDlgParameter->addItem(label, this->cmbParameter->itemData(i));
                 label=label.toLower().simplified();
                 if (idx<0 && (label.contains("akaike") || label.contains("aic"))) {
-                    idx=cmbParameter->count()-1;
+                    idx=cmbAnnotateDlgParameter->count()-1;
                 }
             }
         }
-        cmbParameter->setCurrentIndex(idx);
-        dlg->addWidget(tr("parameter for comparison:"), cmbParameter);
+        cmbAnnotateDlgParameter->setCurrentIndex(idx);
+        dlgAnnotateDlg->addWidget(tr("parameter for comparison:"), cmbAnnotateDlgParameter);
 
-        QComboBox* cmbMode=new QComboBox(dlg);
-        cmbMode->addItem(tr("prefer model with smallest value (e.g. AIC, chi^2 ...)"));
-        cmbMode->addItem(tr("prefer model with largest value"));
-        cmbMode->setCurrentIndex(0);
-        dlg->addWidget(tr("comparison mode:"), cmbMode);
+        cmbAnnotateDlgMode=new QFEnhancedComboBox(dlgAnnotateDlg);
+        cmbAnnotateDlgMode->addItem(tr("prefer model with smallest value (e.g. AIC, chi^2 ...)"));
+        cmbAnnotateDlgMode->addItem(tr("prefer model with largest value (e.g. Bayes probability)"));
+        cmbAnnotateDlgMode->setCurrentIndex(0);
 
-        QCheckBox* chkAnnotateMoreRDRs=new QCheckBox("", dlg);
+        dlgAnnotateDlg->addWidget(tr("comparison mode:"), cmbAnnotateDlgMode);
+
+        QCheckBox* chkAnnotateMoreRDRs=new QCheckBox("", dlgAnnotateDlg);
         chkAnnotateMoreRDRs->setChecked(settings->value(prefix+"chkAnnotateMoreRDRs", false).toBool());
-        dlg->addWidget(tr("annotate several RDRs:"), chkAnnotateMoreRDRs);
+        dlgAnnotateDlg->addWidget(tr("annotate several RDRs:"), chkAnnotateMoreRDRs);
 
-        QComboBox* cmbInvisible=new QComboBox(dlg);
-        dlg->addWidget(tr("invisible evaluation:"), cmbInvisible);
+        QFEnhancedComboBox* cmbInvisible=new QFEnhancedComboBox(dlgAnnotateDlg);
+        dlgAnnotateDlg->addWidget(tr("invisible evaluation:"), cmbInvisible);
+
+        chkAnnotateDlgCalcModelProb=new QCheckBox("   (for model pobabilities only!!!)", dlgAnnotateDlg);
+        chkAnnotateDlgCalcModelProb->setChecked(settings->value(prefix+"chkAnnotateDlgCalcModelProb", false).toBool());
+        dlgAnnotateDlg->addWidget(tr("calculate normalized model probabilities:"), chkAnnotateDlgCalcModelProb);
+
 
         QStringList singlelabels, singlenames;
         for (int c=0; c<cmbResultGroup->count(); c++) {
-            singlelabels.append(cmbResultGroup->itemText(c));
-            singlenames.append(cmbResultGroup->itemData(c).toString());
-            cmbInvisible->addItem(cmbResultGroup->itemText(c));
+            QString t=cmbResultGroup->itemText(c);
+            QString d=cmbResultGroup->itemData(c).toString();
+            if (!t.isEmpty() && !(t.contains("annotation") && t.contains("metadata"))) {
+                singlelabels.append(t);
+                singlenames.append(d);
+                cmbInvisible->addItem(t);
+            }
         }
         cmbInvisible->setCurrentIndex(0);
 
-        dlg->init(singlelabels, singlenames, (*settings), prefix+"selections/");
-        if (dlg->exec()) {
+
+        cmbInvisible->findAndSelectText(settings->value(prefix+"cmbInvisible", cmbInvisible->currentText()).toString());
+        cmbAnnotateDlgParameter->findAndSelectText(settings->value(prefix+"cmbAnnotateDlgParameter", cmbAnnotateDlgParameter->currentText()).toString());
+        cmbAnnotateDlgMode->findAndSelectText(settings->value(prefix+"cmbAnnotateDlgMode", cmbAnnotateDlgMode->currentText()).toString());
+
+        dlgAnnotateDlg->init(singlelabels, singlenames, (*settings), prefix+"selections/");
+        connect(cmbAnnotateDlgMode, SIGNAL(currentIndexChanged(int)), this, SLOT(onAnnotateParamModeChanged()));
+        connect(cmbAnnotateDlgParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(onAnnotateParamChanged()));
+
+        if (dlgAnnotateDlg->exec()) {
+
+            dlgAnnotateDlg->writeList((*settings), prefix+"selections/");
+            settings->setValue(prefix+"cmbInvisible", cmbInvisible->currentText());
+            settings->setValue(prefix+"cmbAnnotateDlgParameter", cmbAnnotateDlgParameter->currentText());
+            settings->setValue(prefix+"cmbAnnotateDlgMode", cmbAnnotateDlgMode->currentText());
+
+            settings->setValue(prefix+"chkAnnotateDlgCalcModelProb", chkAnnotateDlgCalcModelProb->isChecked());
+            settings->setValue(prefix+"chkAnnotateMoreRDRs", chkAnnotateMoreRDRs->isChecked());
+
+
+            bool doBayesNormProb=(cmbAnnotateDlgParameter->currentData().toString().toLower().endsWith("bayes_model_probability") && chkAnnotateDlgCalcModelProb->isChecked());
+            qDebug()<<cmbAnnotateDlgParameter->currentData().toString()<<chkAnnotateDlgCalcModelProb->isChecked()<<doBayesNormProb;
             QList<QPointer<QFRawDataRecord> > recs;
 
 
@@ -6366,8 +6407,8 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                 recs.append(current);
             }
 
-            QStringList grps=dlg->getSelectedDataStrings();
-            QStringList grpnames=dlg->getSelectedTexts();
+            QStringList grps=dlgAnnotateDlg->getSelectedDataStrings();
+            QStringList grpnames=dlgAnnotateDlg->getSelectedTexts();
             if (cmbInvisible->currentIndex()>0 && cmbInvisible->currentIndex()<grps.size()) {
                 QString  g=grps[cmbInvisible->currentIndex()];
                 grps.removeAt(cmbInvisible->currentIndex());
@@ -6379,11 +6420,11 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
 
             //qDebug()<<"\n\n"<<grps<<"\n\n"<<grpnames<<"\n\n";
 
-            for (int i=0; i<recs.size(); i++) {
-                QFRDRImagingFCSData* mr=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
+            for (int rr=0; rr<recs.size(); rr++) {
+                QFRDRImagingFCSData* mr=qobject_cast<QFRDRImagingFCSData*>(recs[rr]);
                 QString sma=tr("smallest");
-                if (cmbMode->currentIndex()==1) sma=tr("largest");
-                QString comment=tr("imFCS model comparison by %1 %2").arg(sma).arg(cmbParameter->currentText());
+                if (cmbAnnotateDlgMode->currentIndex()==1) sma=tr("largest");
+                QString comment=tr("imFCS model comparison by %1 %2").arg(sma).arg(cmbAnnotateDlgParameter->currentText());
                 QString label=comment;
                 comment=comment+QString(":\n");
                 if (mr) {
@@ -6397,13 +6438,32 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                     }
                     //QList<QVector<double> > dats;
                     //int symbCnt=2;
+                    QStringList gnames;
+                    for (int j=0; j<grps.size(); j++) {
+                        gnames<<grpnames.value(j, "???");
+                    }
+                    QString gnamesStart=qfGetLargestCommonStart(gnames);
+                    QString gnamesEnd=qfGetLargestCommonEnd(gnames);
+                    QRegExp rx("\\#.*\\\"([^\\\"]*)\\\".*");
+                    rx.setCaseSensitivity(Qt::CaseInsensitive);
+                    for (int i=0; i<gnames.size(); i++) {
+                        if (rx.indexIn(gnames[i])>=0) {
+                            gnames[i]=rx.cap(1);
+                        } else {
+                            gnames[i]=gnames[i].right(gnames[i].size()-gnamesStart.size());
+                            gnames[i]=gnames[i].left(gnames[i].size()-gnamesEnd.size());
+                        }
+                    }
+                    QList<QVector<double> > mprob;
+                    QStringList evalIDS;
+
                     for (int j=0; j<grps.size(); j++) {
                         int fitID=j+1;//symbCnt;
                         //if (j==cmbInvisible->currentIndex()) fitID=0;
                         //else symbCnt+=2;
                         //if (symbCnt>19) symbCnt=3;
                         QVector<double> dat;
-                        if (cmbMode->currentIndex()==0) {
+                        if (cmbAnnotateDlgMode->currentIndex()==0) {
                             for (int p=0; p<w*h; p++) {
                                 dat<<DBL_MAX;
                             }
@@ -6412,7 +6472,11 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                                 dat<<-DBL_MAX;
                             }
                         }
-                        readParameterImage(recs[i], dat.data(), w, h, grps[j], cmbParameter->currentData().toString(), itNone);
+                        QString evalID="";
+                        //qDebug()<<"### calling readParameterImage(): "<<grps[j]<<cmbAnnotateDlgParameter->currentData().toString();
+                        readParameterImage(recs[rr], dat.data(), w, h, grps[j], cmbAnnotateDlgParameter->currentData().toString(), itNone, true, QString(), QString(), &evalID);
+                        evalIDS<<evalID;
+                        //qDebug()<<"### after calling readParameterImage(): "<< grps[j]<<cmbAnnotateDlgParameter->currentData().toString()<<evalID<<dat;
                         //dats<<dat;
                         for (int p=0; p<w*h; p++) {
                             if (result[p]<0) {
@@ -6420,32 +6484,37 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                                     smallest[p]=dat[p];
                                     result[p]=fitID;
                                 }
-                            } else if (dat[p]!=DBL_MAX && dat[p]!=-DBL_MAX && QFFloatIsOK(dat[p]) && ((dat[p]<smallest[p] && cmbMode->currentIndex()==0) || (dat[p]>smallest[p] && cmbMode->currentIndex()==1))) {
+                            } else if (dat[p]!=DBL_MAX && dat[p]!=-DBL_MAX && QFFloatIsOK(dat[p]) && ((dat[p]<smallest[p] && cmbAnnotateDlgMode->currentIndex()==0) || (dat[p]>smallest[p] && cmbAnnotateDlgMode->currentIndex()==1))) {
                                 smallest[p]=dat[p];
                                 result[p]=fitID;
                             }
                         }
+
+                        if (doBayesNormProb) {
+                            mprob.append(dat);
+                        }
+
                         switch (fitID) {
                             //case 0:
-                            case 1: comment+=tr("%2/none: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 2: comment+=tr("%2/x: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 3: comment+=tr("%2/+: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 4: comment+=tr("%2/o: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 5: comment+=tr("%2/filled-o: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 6: comment+=tr("%2/rect: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 7: comment+=tr("%2/filled-rect: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 8: comment+=tr("%2/^: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 9: comment+=tr("%2/filled-^: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 10: comment+=tr("%2/v: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 11: comment+=tr("%2/filled-v: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 12: comment+=tr("%2/diamond: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 13: comment+=tr("%2/filled-diamond: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 14: comment+=tr("%2/star: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 15: comment+=tr("%2/filled-star: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 16: comment+=tr("%2/pent: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 17: comment+=tr("%2/filled-pent: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 18: comment+=tr("%2/*: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
-                            case 19: comment+=tr("%2/target: %1\n").arg(grpnames.value(j, "???")).arg(fitID); break;
+                            case 1: comment+=tr("%2/none: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 2: comment+=tr("%2/x: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 3: comment+=tr("%2/+: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 4: comment+=tr("%2/o: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 5: comment+=tr("%2/filled-o: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 6: comment+=tr("%2/rect: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 7: comment+=tr("%2/filled-rect: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 8: comment+=tr("%2/^: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 9: comment+=tr("%2/filled-^: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 10: comment+=tr("%2/v: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 11: comment+=tr("%2/filled-v: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 12: comment+=tr("%2/diamond: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 13: comment+=tr("%2/filled-diamond: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 14: comment+=tr("%2/star: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 15: comment+=tr("%2/filled-star: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 16: comment+=tr("%2/pent: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 17: comment+=tr("%2/filled-pent: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 18: comment+=tr("%2/*: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
+                            case 19: comment+=tr("%2/target: %1\n").arg(gnames.value(j, "???")).arg(fitID); break;
 
                             default: break;
                         }
@@ -6458,6 +6527,37 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                         //qDebug()<<p<<": "<<result[p];
                         if (result[p]>1) mr->annotAddValue(annot, p, result[p]);
                     }
+
+                    if (doBayesNormProb) {
+                        QString eid=QString("imfcs_modelcomp_norm_prob___%1").arg(gnames.join("___"));
+                        QString elabel=tr("ImFCS model comparison: norm. prob. (%1)").arg(gnames.join("; "));
+                        bool dataOK=true;
+                        int dsize=0;
+                        for (int i=0; i<mprob.size(); i++) {
+                            if (i==0) {
+                                dsize=mprob[i].size();
+                            } else {
+                                dataOK=dataOK&&(dsize==mprob[i].size());
+                            }
+                        }
+                        if (dataOK) {
+                            for (int j=0; j<dsize; j++) {
+                                double sum=0;
+                                for (int i=0; i<mprob.size(); i++) {
+                                    sum += mprob[i].at(j);
+                                }
+                                for (int i=0; i<mprob.size(); i++) {
+                                     mprob[i].operator[](j)= mprob[i].at(j)/sum;
+                                }
+                            }
+
+                            for (int i=0; i<mprob.size(); i++) {
+                                mr->resultsSetNumberList(evalIDS[i], eid, mprob[i]);
+                                mr->resultsSetGroupAndLabels(evalIDS[i], eid, tr("model comparison"), elabel);
+                                //qDebug()<<"eid="<<evalIDS[i]<<"\n    rid="<<eid<<"\n    elabel="<<elabel;
+                            }
+                        }
+                    }
                     mr->enableEmitResultsChanged(true);
 
 
@@ -6468,8 +6568,35 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
 
             annotationChanged();
         }
-        delete dlg;
+        delete dlgAnnotateDlg;
     }
+}
+
+void QFRDRImagingFCSImageEditor::onAnnotateParamChanged()
+{
+    QString p=cmbAnnotateDlgParameter->currentData().toString().toLower();
+    bool isBayes=(p.endsWith("bayes_model_probability")||p.endsWith("bayes_model_probability_log10"));
+    bool isSmallerParam=(p.contains("r2")||p.contains("tss")||p.contains("aic")||p.contains("bic")||p.contains("max_rel_param_error"));
+    chkAnnotateDlgCalcModelProb->setEnabled(isBayes
+                                            || cmbAnnotateDlgParameter->currentText().toLower().contains(tr("probability"))
+                                            || cmbAnnotateDlgParameter->currentText().toLower().contains(tr("prob."))
+                                            );
+
+    if (isBayes && cmbAnnotateDlgMode->currentIndex()!=1) {
+        if (QMessageBox::question(dlgAnnotateDlg, tr("Change annotation parameter mode?"), tr("you selected a parameter for which the mode should be \"largest\". Change?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+            cmbAnnotateDlgMode->setCurrentIndex(1);
+        }
+    }
+    if (isSmallerParam && cmbAnnotateDlgMode->currentIndex()!=1) {
+        if (QMessageBox::question(dlgAnnotateDlg, tr("Change annotation parameter mode?"), tr("you selected a parameter for which the mode should be \"smallest\". Change?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+            cmbAnnotateDlgMode->setCurrentIndex(0);
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::onAnnotateParamModeChanged()
+{
+
 }
 
 void QFRDRImagingFCSImageEditor::annotateDeleteCurrent()
@@ -7415,8 +7542,8 @@ void QFRDRImagingFCSImageEditor::annotationChanged(bool replot)
         for (int y=0; y<m->getImageFromRunsHeight(); y++) {
             for (int x=0; x<m->getImageFromRunsWidth(); x++) {
                 if (j<adat.size() && aset.value(j, false) && (adat.value(j, 0)>0)) {
-                    ax<<(double(x)-0.5);
-                    ay<<(double(y)-0.5);
+                    ax<<(double(x)+0.5);
+                    ay<<(double(y)+0.5);
                     ac<<adat.value(j, 0);
                     //qDebug()<<j<<": "<<x<<y<<adat.value(j, 0);
                 }

@@ -40,6 +40,8 @@ class QFLIB_EXPORT QFEnhancedComboBox : public QComboBox
 
         virtual QVariant getCurrentIndexData(int role) const;
         virtual void setCurrentFromModelData(const QVariant& data, int role=Qt::UserRole) ;
+        virtual void findAndSelectText(const QString& text);
+        virtual void findAndSelectText(const QString& text, int defaultIdx);
 
     public slots:
         virtual void selectIndex(const QModelIndex&index);

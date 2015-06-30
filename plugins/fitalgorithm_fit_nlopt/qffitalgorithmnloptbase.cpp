@@ -38,7 +38,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmNLOptBASE::intFit(double* paramsOut, dou
 
     QFFItAlgorithmNLOpt_evalData d;
     d.model=model;
-    nlopt_opt opt, core_solver;
+    nlopt_opt opt=NULL, core_solver=NULL;
 
     bool needslocal=( (nlopt_alg==NLOPT_AUGLAG) || (nlopt_alg==NLOPT_AUGLAG_EQ) || (nlopt_alg==NLOPT_G_MLSL) || (nlopt_alg==NLOPT_G_MLSL_LDS) );
 
@@ -90,10 +90,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithmNLOptBASE::intFit(double* paramsOut, dou
 
     QVector<double> J(model->get_evalout()*model->get_paramcount());
     QVector<double> COV(model->get_paramcount()*model->get_paramcount());
-    model->evaluateJacobianNum(J.data(), paramsOut);
+    model->evaluateJacobian(J.data(), paramsOut);
     double chi2=minf;
-    if (QFFitAlgorithm::functorHasWeights(model)) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
+    if (QFFitAlgorithm::functorHasWeights(model) && !QFFitAlgorithm::functorAllWeightsOne(model)) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
     else statisticsGetFitProblemVarCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount(), chi2);
+
+    result.addNumberMatrix("covariance_matrix", COV.data(), model->get_paramcount(), model->get_paramcount());
 
     for (int i=0; i<model->get_paramcount(); i++) {
         paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV.data(), model->get_paramcount());
@@ -173,7 +175,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmNLOptBASE::intMinimize(double *paramsOut
 
     QFFItAlgorithmFMinNLOpt_evalData d;
     d.model=model;
-    nlopt_opt opt, core_solver;
+    nlopt_opt opt=NULL, core_solver=NULL;
 
     bool needslocal=( (nlopt_alg==NLOPT_AUGLAG) || (nlopt_alg==NLOPT_AUGLAG_EQ) || (nlopt_alg==NLOPT_G_MLSL) || (nlopt_alg==NLOPT_G_MLSL_LDS) );
 
@@ -276,7 +278,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmNLOptBASE::intMinimize(double *paramsOut
 
 
     nlopt_destroy(opt);
-    if (needslocal) nlopt_destroy(core_solver);
+    if (needslocal && core_solver) nlopt_destroy(core_solver);
 
 
     return result;

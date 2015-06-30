@@ -116,12 +116,12 @@ QVariant QFGroupAndRoleModel::headerData(int section, Qt::Orientation orientatio
     return QVariant();
 }
 
-int QFGroupAndRoleModel::rowCount(const QModelIndex &parent) const
+int QFGroupAndRoleModel::rowCount(const QModelIndex &/*parent*/) const
 {
     return project->getRawDataCount();
 }
 
-int QFGroupAndRoleModel::columnCount(const QModelIndex &parent) const
+int QFGroupAndRoleModel::columnCount(const QModelIndex &/*parent*/) const
 {
     return 4;
 }
@@ -196,7 +196,7 @@ QFGroupAndRoleDelegate::QFGroupAndRoleDelegate(QFProject *project, QObject *pare
     this->project=project;
 }
 
-QWidget *QFGroupAndRoleDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget *QFGroupAndRoleDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/, const QModelIndex &index) const
 {
     int col=index.column();
     int row=index.row();

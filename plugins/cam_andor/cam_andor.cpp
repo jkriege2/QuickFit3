@@ -1083,7 +1083,7 @@ QString QFExtensionCameraAndor::getCameraInfo(int camera, bool showHeadModel, bo
     }
 }
 
-void QFExtensionCameraAndor::readCameraProperties(int camera, QFExtensionCameraAndor::CameraInfo& info) {
+void QFExtensionCameraAndor::readCameraProperties(int /*camera*/, QFExtensionCameraAndor::CameraInfo& info) {
 
     CHECK_NO_RETURN(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
   #ifdef MAX_PATH
@@ -1469,7 +1469,7 @@ QString QFExtensionCameraAndor::getMeasurementDeviceValueShortName(unsigned int 
     return QString();
 }
 
-bool QFExtensionCameraAndor::isMeasurementDeviceValueEditable(unsigned int /*measuremenDevice*/, unsigned int value)
+bool QFExtensionCameraAndor::isMeasurementDeviceValueEditable(unsigned int /*measuremenDevice*/, unsigned int /*value*/)
 {
     return false;
 }

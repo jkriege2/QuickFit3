@@ -110,8 +110,6 @@ bool QFFitFunctionGeneralPolynomCentered::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralPolynomCentered::evaluateDerivatives(double* /*derivatives*/, double/* t*/, const double* /*data*/) const {
-}
 
 bool QFFitFunctionGeneralPolynomCentered::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {

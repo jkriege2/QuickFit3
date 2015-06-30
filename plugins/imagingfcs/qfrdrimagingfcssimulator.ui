@@ -1025,7 +1025,14 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="chkFlowOnlyHalf">
               <property name="text">
-               <string>flow only for &lt;i&gt;x&gt;&lt;tt&gt;width&lt;/tt&gt;/2&lt;/i&gt;:</string>
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_39">
+              <property name="text">
+               <string>flow only for &lt;i&gt;x&amp;gt;&lt;tt&gt;width&lt;/tt&gt;/2&lt;/i&gt;:</string>
               </property>
              </widget>
             </item>
@@ -1143,15 +1150,22 @@ p, li { white-space: pre-wrap; }
      <property name="title">
       <string> Simulation Progress </string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
+     <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,0">
+      <item row="0" column="0">
        <widget class="QLabel" name="labProgress">
         <property name="text">
          <string/>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="labSimTime">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
        <widget class="QProgressBar" name="progressBar">
         <property name="value">
          <number>0</number>

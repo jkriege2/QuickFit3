@@ -38,7 +38,7 @@ typedef struct {
 
 
 void lmcurve_evaluate2( const double *par, int m_dat, const void *data,
-                       double *fvec, int *info )
+                       double *fvec, int */*info*/ )
 {
     int i;
     for ( i = 0; i < m_dat; i++ )

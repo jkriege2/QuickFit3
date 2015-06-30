@@ -255,7 +255,7 @@ void QFFitResultsEvaluationEditorBase::loadCurrentFitResults()
 /////////////////////////////////////////////////////////////////////
 
 
-void QFFitResultsEvaluationEditorBase::createReportDoc(QTextDocument* document) {
+void QFFitResultsEvaluationEditorBase::createReportDoc(QTextDocument* /*document*/) {
 
 }
 
@@ -402,7 +402,7 @@ int QFFitResultsEvaluationEditorBase::getUserMax(QFRawDataRecord* rec, int defau
     return rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
 }
 
-void QFFitResultsEvaluationEditorBase::connectDefaultWidgets(QFEvaluationItem *current, QFEvaluationItem *old, bool updatePlots)
+void QFFitResultsEvaluationEditorBase::connectDefaultWidgets(QFEvaluationItem */*current*/, QFEvaluationItem */*old*/, bool /*updatePlots*/)
 {
 
 }

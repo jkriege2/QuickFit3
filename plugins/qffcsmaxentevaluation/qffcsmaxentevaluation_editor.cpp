@@ -1856,7 +1856,7 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
     table->cellAt(1, 1).firstCursorPosition().insertText(tr("%1 ... %2 / %3 ... %4").arg(datacut->get_userMin()).arg(datacut->get_userMax()).arg(datacut->get_min()).arg(datacut->get_max()), fText);
     table->cellAt(2, 0).firstCursorPosition().insertText(tr("physical model: "), fTextBold);
     //table->cellAt(2, 1).firstCursorPosition().insertText(ffunc->name(), fText);
-    table->cellAt(2, 1).firstCursorPosition().insertText("FCS 3D Diffusion with triplet", fText);
+    table->cellAt(2, 1).firstCursorPosition().insertText("FCS 3D Normal Diffusion with triplet", fText);
     table->cellAt(2, 2).firstCursorPosition().insertText(tr("data weighting:"), fTextBold);
     table->cellAt(2, 3).firstCursorPosition().insertText(cmbWeights->currentText(), fText);
     cursor.movePosition(QTextCursor::End);

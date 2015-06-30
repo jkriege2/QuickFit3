@@ -71,7 +71,10 @@ HEADERS += qfpfitfunctionsspimfcs.h \
 qffitfunctionsspimfcsdiffe2_newveff_relbright.h \
     qffitfunctionsspimfccsdiffflowce2_newVeff_2.h \
     qffitfunctionsspimfccsdiffce2_newVeff.h \
-    qffitfunctionsspimfcsdiffflowce2_newVeff.h
+    qffitfunctionsspimfcsdiffflowce2_newVeff.h \
+    qffitfunctionsspimfccsfw2csepadiff2coloracfg.h \
+    qffitfunctionsspimfccsfw2csepadiff2coloracfr.h \
+    qffitfunctionsspimfccsfw2csepadiff2colorccf.h
 
 
 SOURCES += qfpfitfunctionsspimfcs.cpp\
@@ -115,7 +118,10 @@ SOURCES += qfpfitfunctionsspimfcs.cpp\
 qffitfunctionsspimfcsdiffe2_newveff_relbright.cpp \
     qffitfunctionsspimfccsdiffflowce2_newVeff_2.cpp \
     qffitfunctionsspimfccsdiffce2_newVeff.cpp \
-    qffitfunctionsspimfcsdiffflowce2_newVeff.cpp
+    qffitfunctionsspimfcsdiffflowce2_newVeff.cpp \
+    qffitfunctionsspimfccsfw2csepadiff2coloracfg.cpp \
+    qffitfunctionsspimfccsfw2csepadiff2coloracfr.cpp \
+    qffitfunctionsspimfccsfw2csepadiff2colorccf.cpp
 
 FORMS =
 

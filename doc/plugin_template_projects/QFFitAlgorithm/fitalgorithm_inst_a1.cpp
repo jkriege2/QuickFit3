@@ -56,7 +56,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmInst_A1::intFit(double* paramsOut, doubl
 	QVector<double> J(model->get_evalout()*model->get_paramcount());
     QVector<double> COV(model->get_paramcount()*model->get_paramcount());
     model->evaluateJacobianNum(J.data(), paramsOut);
-    if (QFFitAlgorithm::functorHasWeights(model)) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
+    if (QFFitAlgorithm::functorHasWeights(model) && !QFFitAlgorithm::functorAllWeightsOne(model)) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
     else statisticsGetFitProblemVarCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount(), chi2);
 
 	// calculate errors from var-cov-matrox

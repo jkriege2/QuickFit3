@@ -49,10 +49,6 @@ double QFFitFunctionGeneralSkewGaussianVar::evaluate(double t, const double* dat
     return offset+amplitude*exp(-0.5*qfSqr(x))*(1+erf(alpha*x/sqrt(2)));
 }
 
-void QFFitFunctionGeneralSkewGaussianVar::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
-
-}
 
 void QFFitFunctionGeneralSkewGaussianVar::calcParameter(double* /*data*/, double* /*error*/) const {
 }

@@ -78,6 +78,9 @@ int QFRDRAnnotationTools::annotAdd(QFRDRAnnotationInterface::QFRDRAnnotationType
         idxannot_rdr->resultsSetString(idxannot_evalid.arg(annotation), QString("label"), label);
         idxannot_rdr->resultsSetInteger(idxannot_evalid.arg(annotation), QString("index"), index);
         idxannot_rdr->resultsSetInteger("annotations", "annotation_count", annotation+1);
+        idxannot_rdr->resultsSetEvaluationGroup(idxannot_evalid.arg(annotation),QString("annotation_metadata #%1").arg(annotation));
+        idxannot_rdr->resultsSetEvaluationGroup("annotations",QString("annotation_metadata"));
+
     }
 
     return annotation;
@@ -91,6 +94,9 @@ int QFRDRAnnotationTools::annotAdd(QFRDRAnnotationInterface::QFRDRAnnotationType
         idxannot_rdr->resultsSetString(idxannot_evalid.arg(annotation), QString("type"), QFRDRAnnotationTypesToString(type));
         idxannot_rdr->resultsSetString(idxannot_evalid.arg(annotation), QString("label"), label);
         idxannot_rdr->resultsSetInteger("annotations", "annotation_count", annotation+1);
+        idxannot_rdr->resultsSetEvaluationGroup(idxannot_evalid.arg(annotation),QString("annotation_metadata #%1").arg(annotation));
+        idxannot_rdr->resultsSetEvaluationGroup("annotations",QString("annotation_metadata"));
+
     }
 
     return annotation;
@@ -107,6 +113,8 @@ int QFRDRAnnotationTools::annotAdd(QFRDRAnnotationInterface::QFRDRAnnotationType
         idxannot_rdr->resultsSetNumberList(idxannot_evalid.arg(annotation), QString("position_y"), constructQVectorFromItems(y));
         idxannot_rdr->resultsSetNumberList(idxannot_evalid.arg(annotation), QString("position_z"), constructQVectorFromItems(z));
         idxannot_rdr->resultsSetInteger("annotations", "annotation_count", annotation+1);
+        idxannot_rdr->resultsSetEvaluationGroup(idxannot_evalid.arg(annotation),QString("annotation_metadata #%1").arg(annotation));
+        idxannot_rdr->resultsSetEvaluationGroup("annotations",QString("annotation_metadata"));
     }
 
     return annotation;}

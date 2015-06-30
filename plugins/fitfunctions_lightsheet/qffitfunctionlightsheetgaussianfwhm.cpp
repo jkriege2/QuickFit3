@@ -51,8 +51,6 @@ double QFFitFunctionLightsheetGaussianFWHM::evaluate(double t, const double* dat
 }
 
 
-void QFFitFunctionLightsheetGaussianFWHM::calcParameter(double* data, double* error) const {
-}
 
 bool QFFitFunctionLightsheetGaussianFWHM::isParameterVisible(int parameter, const double* data) const {
 
@@ -77,7 +75,7 @@ QString QFFitFunctionLightsheetGaussianFWHM::transformParametersForAdditionalPlo
     return "";
 }
 
-bool QFFitFunctionLightsheetGaussianFWHM::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionLightsheetGaussianFWHM::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

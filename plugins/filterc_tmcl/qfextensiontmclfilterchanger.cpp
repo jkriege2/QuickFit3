@@ -299,7 +299,7 @@ QString QFExtensionTMCLFilterChanger::getFilterChangerShortName(unsigned int fil
     return tr("TMCL filter wheel");
 }
 
-void QFExtensionTMCLFilterChanger::showFilterChangerSettingsDialog(unsigned int filterChanger, QWidget *parent) {
+void QFExtensionTMCLFilterChanger::showFilterChangerSettingsDialog(unsigned int /*filterChanger*/, QWidget */*parent*/) {
 }
 
 

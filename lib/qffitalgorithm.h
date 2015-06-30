@@ -181,7 +181,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 \param[out] evalout with size get_evalout()
                 \param params parameter vector with size get_paramcount()
              */
-            virtual void evaluate(double* evalout, const double* params)=0;
+            virtual void evaluate(double* evalout, const double* params) const=0;
 
             /*! \brief function that evaluates the first derivatives \f$ J_{m,i}=\frac{\partial y_m}{\partial p_i}\ \ \ \ \ \ \text{with}\ \ \ \ \ \ \vec{y}=\vec{f}(x, \vec{p}) \f$ of the functor function
 
@@ -191,7 +191,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
                 \note This is only implemented if get_implementsJacobian() returns true
              */
-            virtual void evaluateJacobian(double* evalout, const double* params);
+            virtual void evaluateJacobian(double* evalout, const double* params) const;
 
             /** \brief return the number of parameters \f$ N \f$ */
             virtual int get_paramcount() const=0;
@@ -212,7 +212,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                       this function and scale each entry in the jacobian with \f$1/\sigma_i\f$ where \f$\sigma_i\f$ are the (inverse) weights (or errors)
                       of the i-th datapoint in the dataset!
              */
-            virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON);
+            virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON) const;
 
         protected:
             /** \brief size of function output \f$ M \f$ */
@@ -301,7 +301,10 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
                 virtual double getBootstrappingFraction() const;
 
-                virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON);
+                virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON) const;
+
+                /** \brief calculate the \f$ \chi^2=\sum\limits_i\left(\frac{y_i-f(x_i)}{\sigma_i}\right)^2 */
+                double calculateChi2(const double *params) const;
 
             protected:
 
@@ -433,7 +436,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
                 virtual double getBootstrappingFraction() const;
 
-                virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON);
+                virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON) const;
 
             protected:
 
@@ -576,7 +579,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
                 virtual double getBootstrappingFraction() const;
 
-                virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON);
+                virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON) const;
 
             protected:
 
@@ -633,6 +636,10 @@ class QFLIB_EXPORT QFFitAlgorithm {
          * checking whether the weights have been set properly.
          */
         static bool functorHasWeights(const Functor* f);
+
+        static bool functorAllWeightsOne(const Functor* f);
+
+        static const double* functorGetWeights(const Functor* f, uint64_t *N=NULL);
     public:
 
 
@@ -672,7 +679,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
             public:
                 /*! \brief constructor, initializes the functor
                 */
-                explicit IRLSFunctorAdaptor(FitFunctionFunctor* functor, double irls_parameter=1.1) ;
+                explicit IRLSFunctorAdaptor( FitFunctionFunctor* functor, double irls_parameter=1.1) ;
 
                 virtual ~IRLSFunctorAdaptor() ;
 
@@ -682,7 +689,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                     \param[out] evalout with size get_evalout()
                     \param params parameter vector with size get_paramcount()
                  */
-                virtual void evaluate(double* evalout, const double* params);
+                virtual void evaluate(double* evalout, const double* params) const;
 
                 /*! \brief function that evaluates the arbitrary function
 
@@ -692,7 +699,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
                     \note This is only implemented if get_implementsJacobian() returns true
                  */
-                virtual void evaluateJacobian(double* evalout, const double* params);
+                virtual void evaluateJacobian(double* evalout, const double* params) const;
 
                 /** \brief return the number of parameters \f$ N \f$ */
                 virtual int get_paramcount() const;
@@ -754,29 +761,29 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            The result is a NEW array created by calling \c calloc()
                 */
-                double* createMappedArrayForFunctor(const double* modelData);
+                double* createMappedArrayForFunctor(const double* modelData) const;
 
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            This function only copies those entries that are present in \a functorData.
                 */
-                void mapArrayFromModelToFunctor(double* functorData, const double* modelData);
+                void mapArrayFromModelToFunctor(double* functorData, const double* modelData) const;
 
                 /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
                            and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
                 */
-                void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
+                void mapArrayFromFunctorToModel(double* modelData, const double* functorData) const;
 
                 /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$
                 */
-                inline int mapFromFunctorToModel(int functorIndex){
+                inline int mapFromFunctorToModel(int functorIndex) const{
                     return modelFromFunctor[functorIndex];
                 }
 
                 /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
-                virtual void evaluate(double* evalout, const double* params);
+                virtual void evaluate(double* evalout, const double* params) const;
 
                 /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
-                virtual void evaluateJacobian(double* evalout, const double* params);
+                virtual void evaluateJacobian(double* evalout, const double* params) const;
 
                 /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
                 virtual bool get_implementsJacobian() const { return m_model->get_implementsDerivatives(); }
@@ -788,9 +795,9 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 QFFitFunction* getModel() const { return m_model; }
 
                 /** \brief return a pointer to the stored initial fit parameters */
-                double* getModelParams() const { return m_modelParams; }
+                const double* getModelParams() const { return m_modelParams; }
                 /** \brief return a pointer to an array indicating which parameters are fixed */
-                bool* getModelParamsFix() const { return m_modelparamsFix; }
+                 bool* getModelParamsFix() const { return m_modelparamsFix; }
                 /** \brief return the number of to the stored initial fit parameters */
                 int getModelParamsCount() const { return m_model->paramCount(); }
 
@@ -804,13 +811,13 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 }
 
                 /** \brief transform fit parameters */
-                void transfromParameters(double* params);
+                void transfromParameters(double* params) const;
                 /** \brief backtransform fit parameters */
-                void backtransfromParameters(double* params);
+                void backtransfromParameters(double* params) const;
                 /** \brief transform fit parameters */
-                QVector<double> transfromParametersCopy(const double* params);
+                QVector<double> transfromParametersCopy(const double* params) const;
                 /** \brief backtransform fit parameters */
-                QVector<double> backtransfromParametersCopy(const double* params);
+                QVector<double> backtransfromParametersCopy(const double* params) const;
             protected:
 
 
@@ -877,29 +884,29 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            The result is a NEW array created by calling \c calloc()
                 */
-                double* createMappedArrayForFunctor(const double* modelData);
+                double* createMappedArrayForFunctor(const double* modelData) const;
 
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            This function only copies those entries that are present in \a functorData.
                 */
-                void mapArrayFromModelToFunctor(double* functorData, const double* modelData);
+                void mapArrayFromModelToFunctor(double* functorData, const double* modelData) const;
 
                 /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
                            and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
                 */
-                void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
+                void mapArrayFromFunctorToModel(double* modelData, const double* functorData) const;
 
                 /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$
                 */
-                inline int mapFromFunctorToModel(int functorIndex){
+                inline int mapFromFunctorToModel(int functorIndex) const{
                     return modelFromFunctor[functorIndex];
                 }
 
                 /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
-                virtual void evaluate(double* evalout, const double* params);
+                virtual void evaluate(double* evalout, const double* params) const;
 
                 /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
-                virtual void evaluateJacobian(double* evalout, const double* params);
+                virtual void evaluateJacobian(double* evalout, const double* params) const;
 
                 /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
                 inline virtual bool get_implementsJacobian() const { return false; }
@@ -927,13 +934,13 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 }
 
                 /** \brief transform fit parameters */
-                void transfromParameters(double* params);
+                void transfromParameters(double* params) const;
                 /** \brief backtransform fit parameters */
-                void backtransfromParameters(double* params);
+                void backtransfromParameters(double* params) const;
                 /** \brief transform fit parameters */
-                QVector<double> transfromParametersCopy(const double* params);
+                QVector<double> transfromParametersCopy(const double* params) const;
                 /** \brief backtransform fit parameters */
-                QVector<double> backtransfromParametersCopy(const double* params);
+                QVector<double> backtransfromParametersCopy(const double* params) const;
             protected:
 
 
@@ -1000,29 +1007,29 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            The result is a NEW array created by calling \c calloc()
                 */
-                double* createMappedArrayForFunctor(const double* modelData);
+                double* createMappedArrayForFunctor(const double* modelData) const;
 
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            This function only copies those entries that are present in \a functorData.
                 */
-                void mapArrayFromModelToFunctor(double* functorData, const double* modelData);
+                void mapArrayFromModelToFunctor(double* functorData, const double* modelData) const;
 
                 /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
                            and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
                 */
-                void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
+                void mapArrayFromFunctorToModel(double* modelData, const double* functorData) const;
 
                 /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$
                 */
-                inline int mapFromFunctorToModel(int functorIndex){
+                inline int mapFromFunctorToModel(int functorIndex) const{
                     return modelFromFunctor[functorIndex];
                 }
 
                 /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
-                virtual void evaluate(double* evalout, const double* params);
+                virtual void evaluate(double* evalout, const double* params) const;
 
                 /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
-                virtual void evaluateJacobian(double* evalout, const double* params);
+                virtual void evaluateJacobian(double* evalout, const double* params) const;
 
                 /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
                 inline virtual bool get_implementsJacobian() const { return false; }
@@ -1050,13 +1057,13 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 }
 
                 /** \brief transform fit parameters */
-                void transfromParameters(double* params);
+                void transfromParameters(double* params) const;
                 /** \brief backtransform fit parameters */
-                void backtransfromParameters(double* params);
+                void backtransfromParameters(double* params) const;
                 /** \brief transform fit parameters */
-                QVector<double> transfromParametersCopy(const double* params);
+                QVector<double> transfromParametersCopy(const double* params) const;
                 /** \brief backtransform fit parameters */
-                QVector<double> backtransfromParametersCopy(const double* params);
+                QVector<double> backtransfromParametersCopy(const double* params) const;
             protected:
 
 
@@ -1113,29 +1120,32 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            The result is a NEW array created by calling \c calloc()
                 */
-                double* createMappedArrayForFunctor(const double* modelData);
+                double* createMappedArrayForFunctor(const double* modelData) const;
 
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            This function only copies those entries that are present in \a functorData.
                 */
-                void mapArrayFromModelToFunctor(double* functorData, const double* modelData);
+                void mapArrayFromModelToFunctor(double* functorData, const double* modelData) const;
 
                 /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
                            and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
                 */
-                void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
+                void mapArrayFromFunctorToModel(double* modelData, const double* functorData) const;
 
                 /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
-                virtual void evaluate(double* evalout, const double* params);
+                virtual void evaluate(double* evalout, const double* params) const;
 
                 /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
-                virtual void evaluateJacobian(double* evalout, const double* params);
+                virtual void evaluateJacobian(double* evalout, const double* params) const;
 
                 /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
                 inline virtual bool get_implementsJacobian() const { return m_model->get_implementsJacobian(); }
 
                 /** \brief return the number of parameters \f$ Q \f$ in \f$ \vec{q}=m(\vec{p}) \f$ */
                 inline virtual int get_paramcount() const { return m_paramCount; }
+
+                /** \brief return the underlying functor */
+                inline virtual Functor* get_model() const { return m_model; }
             protected:
 
 
@@ -1176,7 +1186,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
                 virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
 
-                FunctorBootstrapInterface* getModelAsBootstrap() const;
+                FunctorBootstrapInterface *getModelAsBootstrap() const;
         };
 
 
@@ -1483,6 +1493,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
             \param paramsMin lower parameter bound
             \param paramsMax upper parameter bound
             \param fitLogY if this is \c true, this function solves the logarithmized problem \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{i=1}^M\left\|\frac{\log(y_i)-\log(f(x_i; \vec{p}))}{\log(\sigma_i)}\right\| \f$
+            \param[out] chi2 If a pointer is given, the chi^2 is stored into the given memory location
+            \param[out] cov_matrix This function may return the variance/covariance matrix of the problem in this parameter (if a pointer is given!). This is a square matrix, of size \c NC*NC, where \c NC is the number of actual fit parameters (i.e. parameters thatare fit parameters and NOT fixed and visible!). The order of the parameters is the same as in the result vector, but with the non-fit parameters left out!!!
             \return a FitResult object describing the fit result
 
             \note If the bootstrapping mode is activated (see setErrorEstimateModeFit() ) then this function will first do the actual fit with the full input data vector
@@ -1490,7 +1502,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                   first fit as initial parameters (distorted by a small fraction), but only for a subset of the input data. Then, from the results of these fits, a standard
                   deviation for each parameter is calculated and returned as error estimate. <b>Note, that this routine will require significantly more time, than a simple fit!</b>
         */
-        FitResult fit(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataWeight, uint64_t N, QFFitFunction* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL, bool fitLogY=false);
+        FitResult fit(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataWeight, uint64_t N, QFFitFunction* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL, bool fitLogY=false, double *chi2=NULL, QVector<double>* cov_matrix=NULL);
 
 
         /*! \brief this wrapper routine allows to use the fitting algorithm for 3D data fitting with a given model function \f$ f(x,y,z; \vec{p}) \f$ encoded in \a model

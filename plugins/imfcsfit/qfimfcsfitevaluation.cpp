@@ -312,6 +312,8 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
             QString iparams="";
             QString oparams="";
             QString orparams="";
+            QVector<double> COV;
+            double paramrange_size=qBound(1e-10,getProperty("FITSTAT_PARAMRANGE_SIZE", 200).toDouble(),1e10);
             int fitparamcount=0;
             for (int i=0; i<ffunc->paramCount(); i++) {
                 if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
@@ -333,7 +335,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                         dlgFitProgress->reportStatus(tr("fitting ..."));
                         dlgFitProgress->setProgressMax(100);
                         dlgFitProgress->setProgress(0);
-                        doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax, fitrepeats);
+                        doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax, fitrepeats, false, &COV);
                         doFitThread->start(QThread::HighPriority);
                         QTime t;
                         t.start();
@@ -352,7 +354,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                         OK=!dlgFitProgress->isCanceled();
                     }
                 } else {
-                    doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax, fitrepeats);
+                    doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax, fitrepeats, false, &COV);
                     doFitThread->start(QThread::HighPriority);
                     QTime t;
                     t.start();
@@ -536,7 +538,8 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
 
                     {
-                        QFFitStatistics fit_stat=calcFitStatistics(true, ffunc, N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25, record, run);
+                        QFFitStatistics fit_stat=calcFitStatistics(true, ffunc, N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25, record, run, QString("fitstat_"), QString("fit statistics"), /*COV*/ QVector<double>(), paramrange_size);
+                        //qDebug()<<COV<<paramrange_size<<fit_stat.bayesProbability<<log10(fit_stat.bayesProbability);
                         fit_stat.free();
                     }
 
@@ -580,15 +583,26 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
 
 
-QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run) {
-    QFFitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins);
+QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run, const QString &prefix, const QString &pgroup, const QVector<double> &COV, double paramrange_size) {
+    //qDebug()<<"QFImFCSFitEvaluation::calcFitStatistics()  COV="<<COV<<" paramrange_size="<<paramrange_size;
+    QFFitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, COV, paramrange_size);
+
+    QString eid= getEvaluationResultID(run, record);
+    double oldchi2=getFitValue(record, eid, prefix+"chisquared");
+    double oldchi2w=getFitValue(record, eid, prefix+"chisquared_weighted");
+
+    if (oldchi2 ==result.residSqrSum && oldchi2w==result.residWeightSqrSum) {
+        //qDebug()<<" read fit results!\n pBayes was="<<result.bayesProbability;
+        getFitResultFitStatistics(record, eid, result, prefix);
+        //qDebug()<<" read fit results!\n now pBayes="<<result.bayesProbability;
+    }
 
     if (record) {
         if (storeAsResults) {
-            QString param="";
-            QString eid= getEvaluationResultID(run, record);
+            //QString param="";
+            //QString eid= getEvaluationResultID(run, record);
 
-            setFitResultFitStatistics(record, eid, result, "fitstat_", tr("fit statistics"));
+            setFitResultFitStatistics(record, eid, result, prefix, pgroup);
 
 
         }
@@ -779,6 +793,8 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm* falg, QFFitFuncti
         QVector<double> paramsMin=allocVecFillParametersMin(record, ffunc);
         QVector<double> paramsMax=allocVecFillParametersMax(record, ffunc);
         QVector<bool> paramsFix=allocVecFillFix(record, run, ffunc);
+        QVector<double> COV;
+        double paramrange_size=qBound(1e-10,getProperty("FITSTAT_PARAMRANGE_SIZE", 200).toDouble(),1e10);
         locker.unlock();
 
 
@@ -814,7 +830,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm* falg, QFFitFuncti
                 QVector<double> init=initialparams;
                 QFFitAlgorithm::FitResult result;
                 for (int rep=0; rep<fitrepeats; rep++) {
-                    result=falg->fit(params.data(), errors.data(), &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, init.data(), paramsFix.data(), paramsMin.data(), paramsMax.data());
+                    result=falg->fit(params.data(), errors.data(), &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, init.data(), paramsFix.data(), paramsMin.data(), paramsMax.data(), false, NULL, &COV);
                     init=params;
                 }
                 //qfFree(init);
@@ -1028,7 +1044,9 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm* falg, QFFitFuncti
 
 
                 {
-                    QFFitStatistics result= ffunc->calcFitStatistics(N, taudata, corrdata, weights, cut_low, cut_up, params.data(), errors.data(), paramsFix.data(), 11, 25);
+                    QFFitStatistics result= ffunc->calcFitStatistics(N, taudata, corrdata, weights, cut_low, cut_up, params.data(), errors.data(), paramsFix.data(), 11, 25, /*COV*/ QVector<double>(), paramrange_size);
+
+                    //qDebug()<<COV<<paramrange_size<<result.bayesProbability;
 
                     setFitResultFitStatisticsInVector(record, evalID, run, result, "result", tr("fit statistics"));
 
@@ -1073,6 +1091,9 @@ void QFImFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitRe
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFitFunction* ffunc=createFitFunction();
     QFFitAlgorithm* falg=createFitAlgorithm();
+    QVector<double> COV;
+    double paramrange_size=qBound(1e-10,getProperty("FITSTAT_PARAMRANGE_SIZE", 200).toDouble(),1e10);
+
 
     if ((!ffunc)||(!data)||(!falg)) {
         if (ffunc) delete ffunc;
@@ -1186,7 +1207,7 @@ void QFImFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitRe
                 double* init=duplicateArray(initialparams, ffunc->paramCount());
                 QFFitAlgorithm::FitResult result;
                 for (int rep=0; rep<fitrepeats; rep++) {
-                    result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, init, paramsFix, paramsMin, paramsMax);
+                    result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, init, paramsFix, paramsMin, paramsMax, false, NULL, &COV);
                     copyArray(init, params, ffunc->paramCount());
                 }
                 qfFree(init);
@@ -1351,7 +1372,8 @@ void QFImFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitRe
 
 
                 {
-                    QFFitStatistics result= ffunc->calcFitStatistics(N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25);
+                    QFFitStatistics result= ffunc->calcFitStatistics(N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25, /*COV*/ QVector<double>(), paramrange_size);
+                    //qDebug()<<COV<<paramrange_size<<result.bayesProbability;
 
                     setFitResultFitStatisticsInResultStore(fitresult, result, tr("fit statistics"), "fitstat_");
 

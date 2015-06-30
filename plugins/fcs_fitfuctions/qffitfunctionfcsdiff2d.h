@@ -81,7 +81,7 @@ class QFFitFunctionFCSDiff2D: public QFFitFunction {
         /*! \copydoc QFFitFunction::category()   */
         virtual QString category() const {
             if (!isTIRF) return QObject::tr("Confocal FCS");
-            else return QObject::tr("TIR-FCS");
+            else return QObject::tr("Confocal TIR-FCS");
         }
 
         /*! \copydoc QFFitFunction::evaluate()   */

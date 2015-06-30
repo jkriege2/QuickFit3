@@ -11,6 +11,8 @@
 
 <h2>Introduction</h2>
 
+$$startbox_see$$A detailed introduction to least-squares fitting can be found in <img src=":/pdf.png"> <a href="file:///$$assetsdir$$help_pdf/bayesian_fit.pdf">A general Introduction to different methods of datafitting</a>$$endbox$$
+
      <p>QuickFit outputs a variety of fit statistics, that allow to evaluate the goodnes of fit (GoF). All of these parameters are 
 calculated for the range of $(K=k_1-k_0+1)$ datapoints $( (\tilde{\tau}_k, \tilde{g}_k, \tilde{\sigma}_k),\ \ k\in [k_0 .. k_1] )$ (here given for the example of FCS/FCCS fitting, where $(\tilde{\tau}_k, \tilde{g}_k)$ are the points in the fitted correlation curve and $(\tilde{\sigma}_k)$ are the uncertainties/errors of the curve, which are used for fit weighting). </p>
 
@@ -148,11 +150,32 @@ The following table shows the AICc, BIC and RSS for three different fits to the 
   </tr>
 </table></center>
 
-	As can be seen, the 2- and 3-component model are equal, when looking at the RSS, but the 2-component model should be favored over the 3-components, based on the BIC (or AICc). This is due to the larger (+2) number of parameters in that model, which are penalized by the BIC.
+    As can be seen, the 2- and 3-component model are equal, when looking at the RSS, but the 2-component model should be favored over the 3-components, based on the BIC (or AICc). This is due to the larger (+2) number of parameters in that model, which are penalized by the BIC.
 $$endbox$$
 </p>
 
+<h3>Bayes Model probability</h3>
+<p>Bayesian statistics allows to calculate probabilities for different fit models on the same dataset directly. This is detailed e.g. in the reference $$ref:HE2012:He J, Guo S, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data I: Theory. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3871-3879, doi: 10.1021/ac2034369$$. In the Laplace approximation and assuming non-correlated errors on the data, the non-normalized Bayes model probability is calculated by QuickFit $$version$$ as: 
+$[ p(\tilde{\vec{g}}|M_g,\vec{\beta})\approx \exp\left\{\frac{\mbox{NP}}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right]-\frac{1}{2}\cdot\sum\limits_{k=1}^\mbox{NR}\left(\frac{g(\tilde{\tau}_k;\vec{\beta}^\ast)-\tilde{g}_k}{\tilde{\sigma}_k}\right)^2+\ln\left[ (2\cdot \gamma_p)^\mbox{NP}\cdot\prod_{i=1}^\mbox{NP}\sqrt{\mat{\Sigma}_{ii}} \right]\right\}. ]$
+Here, $(\mbox{NP})$ si the number of fit parameters, $(\mbox{NR})$ the number of datapoints, $(\vec{\beta}^\ast)$ is the best-fit parameter vector (in a least-squares sense), $(\mat{\Sigma})$ is the variance-covariance matrix (see below) of the least-squares fit problem and $(\gamma_p)$ is a fixed factor for the (flat) prior probability, which is currently choosen to be $(\gamma_p=200)$ $$ref:HE2012:$$. 
+</p>
+<p>
+The number $(p(\tilde{\vec{g}}|M_g,\vec{\beta}))$ in itself does not have an interpretable meaning for a single model, but if several models $(M_g)$ are fitted to the same dataset, the probabilities $(p(\tilde{\vec{g}}|M_g,\vec{\beta}))$ for all these models can be normalized and the result can be interpreted directly as probabilitiy for the given model, given a certain dataset:
+$[ p_\text{norm}(M_g|\tilde{\vec{g}})= \frac{p(\tilde{\vec{g}}|M_g)}{\sum\limits_i p(\tilde{\vec{g}}|M_i)},\ \ \ \ \ \text{i.e.}\ \ \ \ \sum\limits_g p_\text{norm}(M_g|\tilde{\vec{g}})=1. ]$
+Dues to this normalization, several factors that would appear in $(p(\tilde{\vec{g}}|M_g,\vec{\beta}))$, but only depend on the data, not on the model can be removed from the actually used equation, which makes its evaluation faster and numerically better conditioned (see the PDF, referenced below for more details!).
+</p>
 
+$$startbox_see$$A detailed introduction to least-squares fitting and Bayesian model selection can be found in <img src=":/pdf.png"> <a href="file:///$$assetsdir$$help_pdf/bayesian_fit.pdf">A general Introduction to different methods of datafitting</a> and in Ref.$$ref:HE2012:$$$$endbox$$
+
+<h3>Variance-Covariance Matrix (and determinant!)</h3>
+<p>For some fit-statistics, the variance-covariance matrix of the fit problem is required. It is defined as:
+$[ \mat{\Sigma}=\left(\mat{J}^\mathrm{T}\mat{J}\right)^{-1},\ \ \ \ \ \ \ \ \ \ (*) ]$ 
+where the matrix $(\mat{J})$ is the Jacobian of the (weighted) least-squares problem (usually evaluated with numerical derivatives) for the dataset $( (\tilde{\tau}_k,\tilde{g}_k,\tilde{\sigma}_k)_k)$ and the model $(g(\tau,\vec{\beta}))$, which is parametrized by a parameter vector $(\vec{\beta}\in\mathbb{R}^p)$: 
+$[ \mat{J}_{ij}=\frac{1}{\tilde{\sigma}_i}\cdot\frac{\partial g(\tilde{\tau}_i,\vec{\beta})}{\partial \beta_j} \ \ \ \text{with}\ \ \ \ \vec{\beta}=\argmax_\vec{\beta}\ \sum\limits_{i=1}^N\left(\frac{\tilde{g}_k-g(\tilde{\tau}_k,\vec{\beta})}{\tilde{\sigma}_k}\right)^2=\argmax_\vec{\beta}\ \chi^2.]$ 
+For a non-weighted least-squares problem (i.e. $(\tilde{\sigma}_k=1\ \forall\ k)$), the variance-covariance matrix (*) is given instead by:
+$[ \mat{\Sigma}=\frac{\chi^2}{\mbox{NR}-\mbox{NP}}\cdot\left(\mat{J}^\mathrm{T}\mat{J}\right)^{-1}, ]$ 
+where $(\mbox{NR})$ is the number of datapoints, $(\mbox{NP})$ the number of fit parameters and $(\chi^2)$ the residual sum of squares (RSS, see above). </p>
+$$startbox_see$$A detailed introduction to least-squares fitting and Bayesian model selection can be found in <img src=":/pdf.png"> <a href="file:///$$assetsdir$$help_pdf/bayesian_fit.pdf">A general Introduction to different methods of datafitting</a> and in Ref.$$ref:HE2012:$$<br><br>This matrix can also be used to estimate the parameter errors of a least-squares fit, which is detailed in the help-page on <a href="fit_errorestimation.html">Error Estimation Methods</a>$$endbox$$
 
 <h3>Residual Correlation Function</h3>
 <p>Finally also the <b>residual correlation function $(\hat{\gamma}(k))$</b>,

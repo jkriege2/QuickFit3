@@ -170,7 +170,7 @@ QString QFExtensionTestFilterChanger::getFilterChangerShortName(unsigned int fil
     return tr("CH2");
 }
 
-void QFExtensionTestFilterChanger::showFilterChangerSettingsDialog(unsigned int filterChanger, QWidget *parent) {
+void QFExtensionTestFilterChanger::showFilterChangerSettingsDialog(unsigned int filterChanger, QWidget */*parent*/) {
     if (filterChanger>1) return;
 }
 

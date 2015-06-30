@@ -179,12 +179,12 @@ QStringList UserFitFunctionModel::getIDs() const
     return res;
 }
 
-int UserFitFunctionModel::rowCount(const QModelIndex &parent) const
+int UserFitFunctionModel::rowCount(const QModelIndex &/*parent*/) const
 {
     return items.size();
 }
 
-int UserFitFunctionModel::columnCount(const QModelIndex &parent) const
+int UserFitFunctionModel::columnCount(const QModelIndex &/*parent*/) const
 {
     return 16;
 }

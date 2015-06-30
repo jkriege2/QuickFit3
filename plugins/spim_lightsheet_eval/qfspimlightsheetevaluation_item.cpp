@@ -52,11 +52,11 @@ QFSPIMLightsheetEvaluationItem::~QFSPIMLightsheetEvaluationItem() {
 }
 
 
-void QFSPIMLightsheetEvaluationItem::intWriteData(QXmlStreamWriter& w) const {
+void QFSPIMLightsheetEvaluationItem::intWriteData(QXmlStreamWriter&/* w*/) const {
     /* store global evaluation parameters / initial values or anything else to the project tree here */
 }
 
-void QFSPIMLightsheetEvaluationItem::intReadData(QDomElement* e) {
+void QFSPIMLightsheetEvaluationItem::intReadData(QDomElement* /*e*/) {
     /* read back anything you've written in intWriteData() in this function */
 }
 

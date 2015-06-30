@@ -37,6 +37,17 @@ OptionsDialog::OptionsDialog(QWidget* parent):
     btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtGlobalSettings, edtGlobalSettings);
     edtGlobalSettings->addButton(btn);
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
+
+    label_9->setVisible(false);
+    label_10->setVisible(false);
+    label_11->setVisible(false);
+
+    chkChildWindowsStayOnTop->setVisible(false);
+    chkHelpWindowsStayOnTop->setVisible(false);
+    chkProjectWindowsStayOnTop->setVisible(false);
+
+    connect(cmbStyle, SIGNAL(currentIndexChanged(QString)), this, SLOT(styleChanged(QString)));
+    connect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(stylesheetChanged(QString)));
 }
 
 OptionsDialog::~OptionsDialog()
@@ -44,7 +55,7 @@ OptionsDialog::~OptionsDialog()
     //dtor
 }
 
-void OptionsDialog::on_cmbStylesheet_currentIndexChanged( const QString & text ) {
+void OptionsDialog::stylesheetChanged( const QString & text ) {
     //qDebug()<<"setTyleSheet("<<text<<")";
     QString fn=QString(m_options->getAssetsDirectory()+"/stylesheets/%1.qss").arg(text);
     QFile f(fn);
@@ -58,11 +69,11 @@ void OptionsDialog::on_cmbStylesheet_currentIndexChanged( const QString & text )
     this->setStyleSheet(qss);
 }
 
-void OptionsDialog::on_cmbStylesheet_highlighted( const QString & /*text*/ ) {
-    //on_cmbStylesheet_currentIndexChanged(text);
-}
+//void OptionsDialog::on_cmbStylesheet_highlighted( const QString & /*text*/ ) {
+//    //on_cmbStylesheet_currentIndexChanged(text);
+//}
 
-void OptionsDialog::on_cmbStyle_currentIndexChanged( const QString & text ) {
+void OptionsDialog::styleChanged( const QString & text ) {
 //        QStyle* s=QStyleFactory::create(text);
 //        if (s!=NULL) this->setStyle(s);
 
@@ -71,9 +82,9 @@ void OptionsDialog::on_cmbStyle_currentIndexChanged( const QString & text ) {
     QApplication::setPalette(QApplication::style()->standardPalette());
 }
 
-void OptionsDialog::on_cmbStyle_highlighted( const QString & text ) {
-    on_cmbStyle_currentIndexChanged(text);
-}
+//void OptionsDialog::on_cmbStyle_highlighted( const QString & text ) {
+//    on_cmbStyle_currentIndexChanged(text);
+//}
 
 void OptionsDialog::on_btnHelp_clicked()
 {
@@ -101,6 +112,9 @@ void OptionsDialog::updateFontExample()
 
 
 void OptionsDialog::open(ProgramOptions* options) {
+    disconnect(cmbStyle, SIGNAL(currentIndexChanged(QString)), this, SLOT(styleChanged(QString)));
+    disconnect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(stylesheetChanged(QString)));
+
     spnMaxThreads->setRange(1,100);
     spnMaxThreads->setValue(options->getMaxThreads());
     m_options=options;
@@ -122,9 +136,11 @@ void OptionsDialog::open(ProgramOptions* options) {
         }
     }
     cmbLanguage->setCurrentIndex( cmbLanguage->findText(options->getLanguageID()));
+
     cmbStyle->addItems(QStyleFactory::keys());
     cmbStyle->setCurrentIndex(cmbStyle->findText(options->getStyle(), Qt::MatchContains));
     spinAutosave->setValue(options->getAutosave());
+    //chkAskSaveNewProject->setChecked(options->getUserSaveAfterFirstEdit());
     chkChildWindowsStayOnTop->setChecked(options->getChildWindowsStayOnTop());
     chkUserSaveAfterFirstEdit->setChecked(options->getUserSaveAfterFirstEdit());
     chkProjectWindowsStayOnTop->setChecked(options->getProjectWindowsStayOnTop());
@@ -158,15 +174,18 @@ void OptionsDialog::open(ProgramOptions* options) {
     filters.clear();
     filters << "*.qss";
 
-    disconnect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_cmbStylesheet_currentIndexChanged(QString)));
     cmbStylesheet->clear();
     sl=qfDirListFilesRecursive(dir, filters);//dir.entryList(filters, QDir::Files);
     for (int i=0; i<sl.size(); i++) {
         cmbStylesheet->addItem(sl[i].remove(".qss", Qt::CaseInsensitive));
     }
     cmbStylesheet->setCurrentIndex( cmbStylesheet->findText(options->getStylesheet()));
-    on_cmbStylesheet_currentIndexChanged( cmbStylesheet->currentText() );
-    connect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_cmbStylesheet_currentIndexChanged(QString)));
+
+    connect(cmbStyle, SIGNAL(currentIndexChanged(QString)), this, SLOT(styleChanged(QString)));
+    connect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(stylesheetChanged(QString)));
+
+    stylesheetChanged( cmbStylesheet->currentText() );
+    styleChanged(cmbStyle->currentText());
 
     for (int i=0; i<m_plugins.size(); i++) {
         m_plugins[i]->readSettings(options);
@@ -195,6 +214,8 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setConfigValue("quickfit/help_pointsize", spinHelpFontsize->value());
         options->setConfigValue("quickfit/help_font", cmbHelpFont->currentFont().family());
         options->setConfigValue("quickfit/windowheadermode", cmbWindowHeader->currentIndex());
+        //options->setUserSaveAfterFirstEdit(chkAskSaveNewProject->isChecked());
+
         {
             QDir dir(edtUserFitFunctions->text());
             if (!dir.exists()) dir.mkpath(dir.absolutePath());

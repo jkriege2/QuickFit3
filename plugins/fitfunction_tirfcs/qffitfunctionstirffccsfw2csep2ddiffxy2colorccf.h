@@ -34,11 +34,11 @@ class QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorCCF: public QFFitFunction {
         QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorCCF();
         virtual ~QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorCCF() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("2-color TIR-FCCS: 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel (rect. pixel, 1/e^2 radii), CCF"); }
+        virtual QString name() const { return QString("2-color TIR-FCCS: 2-comp. 2D Normal Diffusion (xy), species A+B+AB, c per species, D1/D2 per channel (rect. pixel, 1/e^2 radii), CCF"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_tir_fw_2csep2ddiffxy2colorccf"); }
         /*! \copydoc QFFitFunction::category()   */
-        virtual QString category() const { return QObject::tr("2-color TIR-FCCS"); }
+        virtual QString category() const { return QObject::tr("2-color TIR-FCCS (camera)"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

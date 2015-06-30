@@ -2,15 +2,21 @@
 #include "picoquant_ptu_tools.h"
 #include <wchar.h>
 #include "qftools.h"
+#include <stdint.h>
 const int EpochDiff = 25569; // days between 30/12/1899 and 01/01/1970
 const int SecsInDay = 86400; // number of seconds in a day
+
+union TgPTUTagHeadValue {
+    int64_t integ;
+    double dbl;
+};
 
 // A Tag entry
 struct TgPTUTagHead{
   char Ident[32];     // Identifier of the tag
   int Idx;            // Index for multiple tags or -1
-  unsigned int Typ;  // Type of tag ty..... see const section
-  long long TagValue; // Value of tag.
+  uint32_t Typ;  // Type of tag ty..... see const section
+  TgPTUTagHeadValue TagValue; // Value of tag.
 } PTUTagHead;
 
 time_t TDateTime_TimeT(double Convertee)
@@ -92,34 +98,34 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
               //fprintf(fpout, "<empty Tag>");
               break;
           case tyBool8:
-              tagData=bool(PTUTagHead.TagValue);
+              tagData=bool(PTUTagHead.TagValue.integ);
               break;
           case tyInt8:
-              tagData=int(PTUTagHead.TagValue);
+              tagData=int(PTUTagHead.TagValue.integ);
               // get some Values we need to analyse records
               if (strcmp(PTUTagHead.Ident, TTTRTagNumRecords)==0) // Number of records
-                          NumRecords = PTUTagHead.TagValue;
+                          NumRecords = PTUTagHead.TagValue.integ;
               if (strcmp(PTUTagHead.Ident, TTTRTagTTTRRecType)==0) // TTTR RecordType
-                          RecordType = PTUTagHead.TagValue;
+                          RecordType = PTUTagHead.TagValue.integ;
               break;
           case tyBitSet64:
-              tagData=PTUTagHead.TagValue;
+              tagData=PTUTagHead.TagValue.integ;
               break;
           case tyColor8:
-              tagData=PTUTagHead.TagValue;
+              tagData=PTUTagHead.TagValue.integ;
               break;
           case tyFloat8:
-              tagData=*((double*)&(PTUTagHead.TagValue));
+              tagData=PTUTagHead.TagValue.dbl;
               if (strcmp(PTUTagHead.Ident, TTTRTagRes)==0) // Resolution for TCSPC-Decay
-                      Resolution = *((double*)&(PTUTagHead.TagValue));
+                      Resolution = PTUTagHead.TagValue.dbl;
               if (strcmp(PTUTagHead.Ident, TTTRTagGlobRes)==0) // Global resolution for timetag
-                      GlobRes = *((double*)&(PTUTagHead.TagValue)); // in ns
+                      GlobRes = PTUTagHead.TagValue.dbl; // in ns
               break;
           case tyFloat8Array: {
-              double* buf=(double*)qfMalloc(PTUTagHead.TagValue);
-              fread(buf, PTUTagHead.TagValue, 1, fpin);
+              double* buf=(double*)qfMalloc(PTUTagHead.TagValue.integ);
+              fread(buf, PTUTagHead.TagValue.integ, 1, fpin);
               QVariantList vl;
-              for ( long long i=0; i<PTUTagHead.TagValue/(int)sizeof(double); i++) {
+              for ( long long i=0; i<PTUTagHead.TagValue.integ/(int)sizeof(double); i++) {
                   vl<<buf[i];
               }
               tagData=vl;
@@ -129,14 +135,14 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
           } break;
           case tyTDateTime:
               time_t CreateTime;
-              CreateTime = TDateTime_TimeT(*((double*)&(PTUTagHead.TagValue)));
+              CreateTime = TDateTime_TimeT(PTUTagHead.TagValue.dbl);
               tagData=QDateTime::fromTime_t(CreateTime);
               //fprintf(fpout, "%s", asctime(gmtime(&CreateTime)), "\0");
               break;
           case tyAnsiString:
-              AnsiBuffer = (char*)qfCalloc((size_t)PTUTagHead.TagValue,1);
-              Result = fread(AnsiBuffer, 1, (size_t)PTUTagHead.TagValue, fpin);
-              if (Result!= PTUTagHead.TagValue) {
+              AnsiBuffer = (char*)qfCalloc((size_t)PTUTagHead.TagValue.integ,1);
+              Result = fread(AnsiBuffer, 1, (size_t)PTUTagHead.TagValue.integ, fpin);
+              if (Result!= PTUTagHead.TagValue.integ) {
                   error=QObject::tr("Incomplete File.");
                   qfFree(AnsiBuffer);
                   return false;
@@ -145,9 +151,9 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
               qfFree(AnsiBuffer);
               break;
           case tyWideString:
-              WideBuffer = (WCHAR*)qfCalloc((size_t)PTUTagHead.TagValue,1);
-              Result = fread(WideBuffer, 1, (size_t)PTUTagHead.TagValue, fpin);
-              if (Result!= PTUTagHead.TagValue) {
+              WideBuffer = (WCHAR*)qfCalloc((size_t)PTUTagHead.TagValue.integ,1);
+              Result = fread(WideBuffer, 1, (size_t)PTUTagHead.TagValue.integ, fpin);
+              if (Result!= PTUTagHead.TagValue.integ) {
                   error=QObject::tr("Incomplete File.");
                   qfFree(WideBuffer);
                   return false;
@@ -159,7 +165,7 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
           case tyBinaryBlob:{
                   //fprintf(fpout, "<Binary Blob contains %d Bytes>", PTUTagHead.TagValue);
                   // only seek the Data, if one needs the data, it can be loaded here
-                  QByteArray buf(PTUTagHead.TagValue, '\0');
+                  QByteArray buf(PTUTagHead.TagValue.integ, '\0');
                   fread(buf.data(), buf.size(), 1, fpin);
                   tagData=buf;
                   //        fseek(fpin, (long)PTUTagHead.TagValue, SEEK_CUR);

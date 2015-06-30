@@ -26,7 +26,7 @@ class QFFitFunctionLightsheetGaussianFWHM: public QFFitFunction {
         virtual double evaluate(double t, const double* parameters) const;
 
         /*! \copydoc QFFitFunction::calcParameter()   */
-        virtual void calcParameter(double* parameterValues, double* error=NULL) const;
+        //virtual void calcParameter(double* parameterValues, double* error=NULL) const;
 
         /*! \copydoc QFFitFunction::isParameterVisible()   */
         virtual bool isParameterVisible(int parameter, const double* parameterValues) const;

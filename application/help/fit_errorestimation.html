@@ -6,15 +6,25 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-     <p>QuickFit provides internal means to estimate the parameter errors during a fit:
-	 <ul>
-	   <li><strong>By the fit algorithm:</strong> In this mode, the errors are estimated by the fit algorithm directly. This is implemented only in some fit algorithms, such as <a href="$$plugin_info:help:fit_levmar$$">LevMar Plugin</a></li>
-	   <li><strong>Bootstrapping</strong> is a statistical method, which allows to estimate errors for the parameters in a parameter fit, even if no assumptions about the distribution of the fit parameters can be made, or if a fit algorithm does not provide estimates of the parameter errors. <br>The method first fits the full dataset <i>(x_i, y_i), i=1...N</i> of input data to obtain the fit parameters. Then the fit is repeated <i>M</i> (usually around 20, parameter: REPEATS) times, where each time a new subset of <i>N&times;FRACTION&lt;N</i> datapoints is selected randomly from the full dataset. Also the start parameters for each fit are slightly distorted (parameter DISTORTION). Finally the standard deviation of the fit results is calculated for each parameter from the <i>M</i> fits.
-	   $$note:Although this method gives good estimates for the fit parameter errors, it requires a significant amount of time, due to the repeted fits.$$</li>
-	 </ul>
-	 </p>
+     <p>QuickFit provides internal means to estimate the parameter errors during a fit: </p>
+     <h3>By the fit algorithm:</h3> 
+     <p>In this mode, the errors are estimated by the fit algorithm directly. This is implemented only in some fit algorithms, such as <a href="$$plugin_info:help:fit_levmar$$">LevMar Plugin</a>. Many fit algorithms estimate the variance-covariance matrix $(\math{\Sigma})$ of the least-squares fit problem and use that to estimate the fit parameter error. The variance-covariance matrix is defined as 
+$[ \mat{\Sigma}=\left(\mat{J}^\mathrm{T}\mat{J}\right)^{-1},\ \ \ \ \ \ \ \ \ \ (*) ]$ 
+where the matrix $(\mat{J})$ is the Jacobian of the (weighted) least-squares problem (usually evaluated with numerical derivatives) for the dataset $( (\tau_i,\hat{g}_i,\sigma_i)_i)$ and the model $(g(\tau,\vec{\beta}))$, which is parametrized by a parameter vector $(\vec{\beta}\in\mathbb{R}^p)$: 
+$[ \mat{J}_{ij}=\frac{1}{\sigma_i}\cdot\frac{\partial g(\tau_i,\vec{\beta})}{\partial \beta_j} \ \ \ \text{with}\ \ \ \ \vec{\beta}=\argmax_\vec{\beta}\ \sum\limits_{i=1}^N\left(\frac{\hat{g}_i-g(\tau_i,\vec{\beta})}{\sigma_i}\right)^2=\argmax_\vec{\beta}\ \chi^2.]$ 
+For a non-weighted least-squares problem (i.e. $(\sigma_i=1\ \forall\ i)$), the variance-covariance matrix (*) is given instead by:
+$[ \mat{\Sigma}=\frac{\chi^2}{N-p}\cdot\left(\mat{J}^\mathrm{T}\mat{J}\right)^{-1}, ]$ 
+where $(N)$ is the number of datapoints, $(p)$ the number of fit parameters and $(\chi^2)$ the residual sum of squares (see above). In both cases, the error of a parameter $(\beta_i)$ is finally calculated as: 
+$[\mbox{err}(\beta_i)=\sqrt{\mat{\Sigma}_{ii}}]$ 
+</p><p>
+$$startbox_see$$A detailed introduction to least-squares fitting can be found in <img src=":/pdf.png"> <a href="file:///$$assetsdir$$help_pdf/bayesian_fit.pdf">A general Introduction to different methods of datafitting</a>$$endbox$$</p>
+       <h3>Bootstrapping</h3> 
+       <p>is a statistical method, which allows to estimate errors for the parameters in a parameter fit, even if no assumptions about the distribution of the fit parameters can be made, or if a fit algorithm does not provide estimates of the parameter errors. <br>The method first fits the full dataset <i>(x_i, y_i), i=1...N</i> of input data to obtain the fit parameters. Then the fit is repeated <i>M</i> (usually around 20, parameter: REPEATS) times, where each time a new subset of <i>N&times;FRACTION&lt;N</i> datapoints is selected randomly from the full dataset. Also the start parameters for each fit are slightly distorted (parameter DISTORTION). Finally the standard deviation of the fit results is calculated for each parameter from the <i>M</i> fits.
+       $$note:Although this method gives good estimates for the fit parameter errors, it requires a significant amount of time, due to the repeted fits.$$
+     </p>
+    
 
-	 
+     
   </body>
 </html>
 

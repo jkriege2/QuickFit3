@@ -154,6 +154,7 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     connect(ui->spinStatistics, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     connect(ui->spinBackStatistics, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     connect(ui->spinVideoFrames, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
+    connect(ui->btnAddSeriesJob, SIGNAL(clicked()), this, SLOT(onAddSeriesJobClicked()));
     if (opt) readSettings();
     filesToAdd.clear();
     setEditControlsEnabled(false);
@@ -489,26 +490,26 @@ void QFRDRImagingFCSCorrelationDialog::setProject(QFProject* project) {
     this->project=project;
 }
 
-void QFRDRImagingFCSCorrelationDialog::on_spinP_valueChanged(int val) {
+void QFRDRImagingFCSCorrelationDialog::on_spinP_valueChanged(int /*val*/) {
     updateCorrelator(true);
 }
 
-void QFRDRImagingFCSCorrelationDialog::on_spinS_valueChanged(int val) {
+void QFRDRImagingFCSCorrelationDialog::on_spinS_valueChanged(int /*val*/) {
     updateCorrelator();
 }
 
-void QFRDRImagingFCSCorrelationDialog::on_spinM_valueChanged(int val) {
+void QFRDRImagingFCSCorrelationDialog::on_spinM_valueChanged(int /*val*/) {
     updateCorrelator(true);
 }
 
-void QFRDRImagingFCSCorrelationDialog::on_spinDecay_valueChanged(double val) {
-    updateBleach();
-}
+//void QFRDRImagingFCSCorrelationDialog::on_spinDecay_valueChanged(double /*val*/) {
+//    updateBleach();
+//}
 
-void QFRDRImagingFCSCorrelationDialog::on_spinDecay2_valueChanged(double val) {
-    updateBleach();
-}
-void QFRDRImagingFCSCorrelationDialog::on_cmbCorrelator_currentIndexChanged(int idx) {
+//void QFRDRImagingFCSCorrelationDialog::on_spinDecay2_valueChanged(double /*val*/) {
+//    updateBleach();
+//}
+void QFRDRImagingFCSCorrelationDialog::on_cmbCorrelator_currentIndexChanged(int /*idx*/) {
     updateCorrelator(true);
 }
 
@@ -520,7 +521,7 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbBackground_currentIndexChanged(int 
     ui->btnSelectBackgroundFile->setEnabled(idx>2);
 }
 
-void QFRDRImagingFCSCorrelationDialog::on_cmbBleachType_currentIndexChanged(int idx) {
+void QFRDRImagingFCSCorrelationDialog::on_cmbBleachType_currentIndexChanged(int /*idx*/) {
     //ui->widBleach->setEnabled(ui->cmbBleachType->currentIndex()>=2);
 }
 
@@ -554,7 +555,7 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int in
     ui->chkSeparateColorChannels->setVisible(false);
 }
 
-void QFRDRImagingFCSCorrelationDialog::on_chkSeparateColorChannels_toggled(bool value)
+void QFRDRImagingFCSCorrelationDialog::on_chkSeparateColorChannels_toggled(bool /*value*/)
 {
     on_cmbDualView_currentIndexChanged(ui->cmbDualView->currentIndex());
 }
@@ -814,14 +815,20 @@ void QFRDRImagingFCSCorrelationDialog::updateProgress() {
         ////////////////////////////////////////////////////////////////////////////////////
         int max=1;
         int p=0;
+        bool allDone=true;
         for (int i=0; i<jobs.size(); i++) {
             if (jobs[i].progress) {
                 max=max+jobs[i].progress->getRangeMax()-jobs[i].progress->getRangeMin();
                 p=p+jobs[i].progress->getProgress();
+                allDone=allDone&&jobs[i].progress->isDone();
             }
         }
         ui->progressBar->setRange(0,max);
         ui->progressBar->setValue(p);
+
+        if (allDone) {
+            ui->progressBar->setValue(ui->progressBar->maximum());
+        }
 
 
         ////////////////////////////////////////////////////////////////////////////////////
@@ -951,7 +958,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob(int biningForFCCS) {
     return job;
 }
 
-void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool ignoreDualView) {
+void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool /*ignoreDualView*/) {
     IMFCSJob job=jobin;
     job.progress=new QFRDRImagingFCSThreadProgress(this);
     job.thread=new QFRDRImagingFCSCorrelationJobThread(pluginServices, this);
@@ -1058,7 +1065,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     }
 }
 
-void QFRDRImagingFCSCorrelationDialog::on_btnAddSeriesJob_clicked(const QString &parameter, double start, double end, double inc) {
+void QFRDRImagingFCSCorrelationDialog::onAddSeriesJobClicked(const QString &parameter, double start, double end, double inc) {
     IMFCSJob job=initJob();
     bool ok=true;
     if (job.use_cropping && job.dualViewMode>0) {
@@ -1506,7 +1513,7 @@ void QFRDRImagingFCSCorrelationDialog::clickAddJob()
 
 void QFRDRImagingFCSCorrelationDialog::clickAddJobSeries(const QString &parameter, double start, double end, double inc)
 {
-    on_btnAddSeriesJob_clicked(parameter, start, end, inc);
+    onAddSeriesJobClicked(parameter, start, end, inc);
 }
 
 

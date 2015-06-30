@@ -100,10 +100,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFit::intFit(double* paramsOut, double*
 
     QVector<double> J(model->get_evalout()*model->get_paramcount());
     QVector<double> COV(model->get_paramcount()*model->get_paramcount());
-    model->evaluateJacobianNum(J.data(), paramsOut);
+    model->evaluateJacobian(J.data(), paramsOut);
     double chi2=status.fnorm;
-    if (QFFitAlgorithm::functorHasWeights(model)) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
+    if (QFFitAlgorithm::functorHasWeights(model) && !QFFitAlgorithm::functorAllWeightsOne(model)) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
     else statisticsGetFitProblemVarCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount(), chi2);
+
+    result.addNumberMatrix("covariance_matrix", COV.data(), model->get_paramcount(), model->get_paramcount());
 
     for (int i=0; i<model->get_paramcount(); i++) {
         paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV.data(), model->get_paramcount());

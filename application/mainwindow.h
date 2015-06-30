@@ -266,7 +266,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         };
 
         /** \copydoc QFPluginServices::transformQF3HelpHTML() */
-        virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false, bool isMainHelp=false);
+        virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false, bool isMainHelp=false, const QString& texfilenameaddition=QString());
 
         /** \brief return the assets directory  of the online help for the given plugin ID */
         virtual QString getPluginAssetsDirectory(const QString& pluginID);

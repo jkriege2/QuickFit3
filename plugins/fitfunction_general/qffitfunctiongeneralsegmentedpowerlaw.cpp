@@ -127,8 +127,6 @@ bool QFFitFunctionGeneralSegmentedPowerLaw::get_implementsDerivatives()
     return false;
 }
 
-void QFFitFunctionGeneralSegmentedPowerLaw::evaluateDerivatives(double* /*derivatives*/, double /*t*/, const double* /*data*/) const {
-}
 
 bool QFFitFunctionGeneralSegmentedPowerLaw::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
 {

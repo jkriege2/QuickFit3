@@ -49,10 +49,10 @@ class OptionsDialog : public QDialog, public Ui::OptionsDlg {
 
         void setPlugins(const QList<QFPluginOptionsDialogInterface*>& plugins);
     protected slots:
-        void on_cmbStylesheet_currentIndexChanged( const QString & text );
-        void on_cmbStylesheet_highlighted( const QString & text );
-        void on_cmbStyle_currentIndexChanged( const QString & text );
-        void on_cmbStyle_highlighted( const QString & text );
+        void stylesheetChanged( const QString & text );
+        //void on_cmbStylesheet_highlighted( const QString & text );
+        void styleChanged( const QString & text );
+        //void on_cmbStyle_highlighted( const QString & text );
         void on_btnHelp_clicked();
         void on_listWidget_currentRowChanged(int currentRow );
         void on_spinMath_valueChanged(int value);

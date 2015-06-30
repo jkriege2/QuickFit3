@@ -1426,6 +1426,11 @@ void QFFitResultsEvaluation::setFitResultFitStatistics(QFRawDataRecord *record, 
     setFitResultGroupNoParamTransform(record, evalID, param, group);
     setFitResultLabelNoParamTransform(record, evalID, param, tr("fit params"));
 
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"det_cov", result.detCOV, "");
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("det(fit cov matrix)"));
+
+
     setFitResultValueNoParamTransform(record, evalID, param=prefix+"datapoints", result.dataSize, "");
     setFitResultGroupNoParamTransform(record, evalID, param, group);
     setFitResultLabelNoParamTransform(record, evalID, param, tr("datapoints"));
@@ -1447,7 +1452,17 @@ void QFFitResultsEvaluation::setFitResultFitStatistics(QFRawDataRecord *record, 
     setFitResultLabelNoParamTransform(record, evalID, param, tr("total sum of squares"));
 
 
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"bayes_model_probability_paramrangesize", result.bayesProbabilityParamRangeSize);
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("parameter range size for Bayes model probability"), tr("param_range<sub>Bayes</sub>"));
 
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"bayes_model_probability", result.bayesProbability);
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("Bayes model probability"), tr("p<sub>Bayes</sub>(model|data)"));
+
+    setFitResultValueNoParamTransform(record, evalID, param=prefix+"bayes_model_probability_log10", result.bayesProbabilityLog10);
+    setFitResultGroupNoParamTransform(record, evalID, param, group);
+    setFitResultLabelNoParamTransform(record, evalID, param, tr("log10 Bayes model probability"), tr("log<sub>10</sub>(p<sub>Bayes</sub>(model|data))"));
 
     setFitResultValueNoParamTransform(record, evalID, param=prefix+"r2_weighted", result.RsquaredWeighted, "");
     setFitResultGroupNoParamTransform(record, evalID, param, group);
@@ -1476,6 +1491,87 @@ void QFFitResultsEvaluation::setFitResultFitStatistics(QFRawDataRecord *record, 
     setFitResultValueNoParamTransform(record, evalID, param=prefix+"max_rel_param_error", result.maxRelParamError, "");
     setFitResultGroupNoParamTransform(record, evalID, param, group);
     setFitResultLabelNoParamTransform(record, evalID, param, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
+
+}
+
+void QFFitResultsEvaluation::getFitResultFitStatistics(QFRawDataRecord *record, const QString &evalID, QFFitStatistics &result, const QString &prefix) const
+{
+    QString param="";
+    double d;
+    bool ok;
+    int index=getIndexFromEvaluationResultID(evalID);
+    d=record->resultsGetAsDouble(evalID, param=prefix+"chisquared", index, &ok, true);
+    if (ok) result.residSqrSum=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"chisquared_weighted", index, &ok, true);
+    if (ok) result.residWeightSqrSum=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"residavg", index, &ok, true);
+    if (ok) result.residAverage=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"residavg_weighted", index, &ok, true);
+    if (ok) result.residWeightAverage=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"residstddev", index, &ok, true);
+    if (ok) result.residStdDev=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"residstddev_weighted", index, &ok, true);
+    if (ok) result.residWeightStdDev=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"det_cov", index, &ok, true);
+    if (ok) result.detCOV=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"fitparams", index, &ok, true);
+    if (ok) result.fitparamN=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"datapoints", index, &ok, true);
+    if (ok) result.dataSize=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"dof", index, &ok, true);
+    if (ok) result.degFreedom=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"r2", index, &ok, true);
+    if (ok) result.Rsquared=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"adjusted_r2", index, &ok, true);
+    if (ok) result.AdjustedRsquared=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"tss", index, &ok, true);
+    if (ok) result.TSS=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"bayes_model_probability_paramrangesize", index, &ok, true);
+    if (ok) result.bayesProbabilityParamRangeSize=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"bayes_model_probability", index, &ok, true);
+    qDebug()<<" read bayes: "<<d<<ok<<getFitValue(prefix+"bayes_model_probability", record)<<param;
+    if (ok) result.bayesProbability=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"bayes_model_probability_log10", index, &ok, true);
+    qDebug()<<" read bayes: "<<d<<ok<<getFitValue(prefix+"bayes_model_probability_log10", record)<<param;
+    if (ok) result.bayesProbabilityLog10=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"r2_weighted", index, &ok, true);
+    if (ok) result.RsquaredWeighted=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"adjusted_r2_weighted", index, &ok, true);
+    if (ok) result.AdjustedRsquaredWeighted=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"aicc", index, &ok, true);
+    if (ok) result.AICc=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"aicc_weighted", index, &ok, true);
+    if (ok) result.AICcWeighted=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"bic", index, &ok, true);
+    if (ok) result.BIC=d;
+
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"bic_weighted", index, &ok, true);
+    if (ok) result.BICweighted=d;
+
+    d=record->resultsGetAsDouble(evalID, param=prefix+"max_rel_param_error", index, &ok, true);
+    if (ok) result.maxRelParamError=d;
+
 
 }
 

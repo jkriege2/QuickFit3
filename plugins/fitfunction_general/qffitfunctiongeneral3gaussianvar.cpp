@@ -55,13 +55,7 @@ double QFFitFunctionGeneral3GaussianVar::evaluate(double t, const double* data) 
                              +data[PARAM_AMPLITUDE3]*exp(-0.5*qfSqr(t-data[PARAM_POSITION3])/qfSqr(data[PARAM_WIDTH3]));
 }
 
-void QFFitFunctionGeneral3GaussianVar::evaluateDerivatives(double* derivatives, double /*t*/, const double* /*data*/) const {
-    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
 
-}
-
-void QFFitFunctionGeneral3GaussianVar::calcParameter(double* /*data*/, double* /*error*/) const {
-}
 
 bool QFFitFunctionGeneral3GaussianVar::isParameterVisible(int parameter, const double* data) const {
 

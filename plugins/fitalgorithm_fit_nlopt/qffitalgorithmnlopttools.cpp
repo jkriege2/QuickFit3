@@ -19,7 +19,7 @@ double QFFitAlgorithmNLOpt_f(unsigned int n, const double* x, double* grad, void
 
     if (grad) {
         QVector<double> derivout(p->model->get_evalout()*p->model->get_paramcount());
-        p->model->evaluateJacobianNum(derivout.data(), x);
+        p->model->evaluateJacobian(derivout.data(), x);
         for (unsigned int i=0; i<n; i++) {
             grad[i]=0;
             for (register int j=0; j<out.size();j++) {

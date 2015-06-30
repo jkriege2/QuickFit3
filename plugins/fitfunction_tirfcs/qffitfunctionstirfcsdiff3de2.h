@@ -34,7 +34,7 @@ class QFFitFunctionsTIRFCSDiff3DE2: public QFFitFunction {
         QFFitFunctionsTIRFCSDiff3DE2();
         virtual ~QFFitFunctionsTIRFCSDiff3DE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("Confocal TIR-FCS: 3D+2D Diffusion (Gaussian, 1/e^2 radii)"); }
+        virtual QString name() const { return QString("Confocal TIR-FCS: 3D+2D Normal Diffusion (Gaussian, 1/e^2 radii)"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */

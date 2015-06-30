@@ -413,11 +413,11 @@ double QFExtensionCameraRadhard2::getCameraPixelHeight(unsigned int /*camera*/) 
 	return 30;
 }
 
-bool QFExtensionCameraRadhard2::isCameraSettingChangable(QFExtensionCamera::CameraSetting which)   {
+bool QFExtensionCameraRadhard2::isCameraSettingChangable(QFExtensionCamera::CameraSetting /*which*/)   {
     return false;
 }
 
-void QFExtensionCameraRadhard2::changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting /*which*/, QVariant /*value*/)  {
+void QFExtensionCameraRadhard2::changeCameraSetting(QSettings& /*settings*/, QFExtensionCamera::CameraSetting /*which*/, QVariant /*value*/)  {
 
 }
 

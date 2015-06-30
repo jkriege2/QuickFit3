@@ -126,7 +126,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("exp", QFMathParser_DefaultLib::fExp, NULL, exp);
     p->addFunction("sqrt", QFMathParser_DefaultLib::fSqrt, NULL, sqrt);
     p->addFunction("cbrt", QFMathParser_DefaultLib::fCbrt, NULL, cbrt);
-    p->addFunction("sqr", QFMathParser_DefaultLib::fSqr, NULL, qfSqr);
+    p->addFunction("sqr", QFMathParser_DefaultLib::fSqr, NULL, qfSqrNR);
     p->addFunction("abs", QFMathParser_DefaultLib::fAbs, NULL, fabs);
     p->addFunction("erf", QFMathParser_DefaultLib::fErf, NULL, erf);
     p->addFunction("erfc", QFMathParser_DefaultLib::fErfc, NULL, erfc);

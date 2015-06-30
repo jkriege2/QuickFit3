@@ -130,6 +130,7 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
 
 
         using QFFitResultsByIndexEvaluation::setFitResultFitStatistics;
+        using QFFitResultsByIndexEvaluation::getFitResultFitStatistics;
         using QFFitResultsByIndexEvaluation::setFitResultValuesVisibleWithGroupAndLabel;
         using QFFitResultsByIndexEvaluation::hasFit;
         using QFFitResultsByIndexEvaluation::setFitResultValue;
