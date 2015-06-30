@@ -5874,18 +5874,19 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
         // try and find DOIs in the text
-        QRegExp rxDOI("(doi)?[\\:]?\\s*(10\\.\\d{4}[\\d\\:\\.\\-\\_\\/a-z]+)[\\,\\;\\:\\.\\s\\n\\r\\t\\v\\)\\]\\}]+[\\s\\n\\r\\t\\v]", Qt::CaseInsensitive);
+        QRegExp rxDOI("(doi)?[\\:]?\\s*(10\\.\\d{4}[\\d\\:\\.\\-\\_\\/a-z]+)[\\,\\;\\:\\.\\s\\n\\r\\t\\v\\)\\]\\}\\<\\>]+[\\s\\n\\r\\t\\v]", Qt::CaseInsensitive);
         rxDOI.setMinimal(true);
 
         count = 0;
         pos = 0;
         while ((pos = rxDOI.indexIn(result, pos)) != -1) {
-            QString rep=QString("<a href=\"http://dx.doi.org/%1\">%2</a>").arg(rxDOI.cap(1)).arg(rxDOI.cap(0));
-            result=result.replace(rxDOI.cap(0), rep);
+            QString rep=QString("<a href=\"http://dx.doi.org/%1\">%2</a>").arg(rxDOI.cap(2)).arg(rxDOI.cap(0));
+            result=result.replace(rxDOI.cap(2), rep);
 
 
             ++count;
-            //pos += rep.size()-rxDOI.matchedLength();
+            pos += rep.size()-rxDOI.matchedLength();
+            if (count>100) break;
         }
 
         // remove all unreplaces $$name$$ sequences
