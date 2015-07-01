@@ -7,7 +7,9 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-     <p>This tutorial will explain how you can compare different fit models and choose the most appropriate one for a given measurement.</p>
+     <p>This tutorial will explain how you can compare different fit models and choose the most appropriate one for a given measurement.</p>     
+$$startbox_see$$See <img src=":/pdf.png"> <a href="file:///$$assetsdir$$help_pdf/bayesian_fit.pdf">A general Introduction to different methods of datafitting</a> for a detailed introduction to least-squares fitting and model selection, as well as the help page <a href="$$mainhelpdir$$fit_statistics.html">on fit statistics</a> for further information and definitions.$$endbox$$
+
      <h2>Experiment Description</h2>
      <p>For this tutorial, we will use some test datasets provided together with QuickFit (in the directory <tt>$$local_plugin_assets$$</tt>):
      <ol>
@@ -16,6 +18,7 @@
      We will perform different fits to the data and see, which one fits best. The model, that we will choose is the standrad confocal FCS model: <a href="$$fitfunction:help:fcs_diff$$">$$fitfunction:name:fcs_diff$$</a>, but we will configure it to contain 1, 2 or 3 diffusing species and a triplet fraction.
      </p>
      <p></p>
+
      <p></p>
      <h2>Loading FCS data</h2>
      <p>First we need to load the FCS curves to do so, we rely on the plugin '<a href="$$plugin_info:help:fcs$$">FCS</a>' which is by default part of QuickFit. 
@@ -190,7 +193,9 @@ Summarizing you can use the methods presented in here to select a fit model, whi
 </li>
 </ol></p>
 
-
+$$startbox_note$$
+In this tutorial, we used the Akaike information criterion (AIC) for model selection. Another possible criterion is the Bayes information criterion (BIC), which is also calculated by QuickFit and will give comparable results. <br><br>In Ref.$$ref:HE2012:He J, Guo S, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data I: Theory. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3871-3879, doi: 10.1021/ac2034369$$, the authors describe a more advanced model selection scheme, based on calculating Bayesian model probabilities for each model, given the measured dataset. If you want to perform such an analysis, this is possible with the same steps, as mentioned above. Now you will have to look at the fit statistics parameter <b>Bayes model probability p<sub>Bayes</sub>(model|data) (<tt>bayes_model_probability</tt>)</b>. Note however, that these raw numbers p<sub>Bayes</sub>(model|data), calculated by the fit, are NOT yet the final model probabilities, but only proportional to them. You will have to normalize them by the sum over the p<sub>Bayes</sub>(model|data) for all models that you want to compare. <br>See <img src=":/pdf.png"> <a href="file:///$$assetsdir$$help_pdf/bayesian_fit.pdf">A general Introduction to different methods of datafitting</a> for a detailed introduction to least-squares fitting and model selection, as well as the help page <a href="$$mainhelpdir$$fit_statistics.html">on fit statistics</a> for further information and definitions.
+$$endbox$$
 
 
 <h2>References</h2>

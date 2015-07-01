@@ -80,7 +80,10 @@ Ideally this parameter should reach $(R^2=1)$ for a very good fit and will have 
 $$endbox$$
 </p>
 
+<h3>Maximum Relative Parameter Error</h3>
+<p>One often finds that more complex fit functions also fit a given dataset better, i.e. yield a smaller $(\chi^2)$. But those complex models are very prone to overfitting the data. Therefore it is essential to also take the principle of parsimony into account. A simple way to do this is the fit statistics parameter "Maximum Relative Parameter Error" $(\max(\sigma_i/|\beta_i|))$, for which the fit parameter error $(\sigma_i)$ of each fit parameter $(i)$ is calculated (e.g. using the variance-covariance matrix of the fit) and divided by the (absolute value of) the parameter value $(\beta_i)$ itself. This then yields the relative fit parameter error. The more parameters a model has, the more likely it is that one or some of them are not well defined, which leads to a large error and $(\sigma_i/|\beta_i|\gg0)$. Therefore this parameter can be used to evaluate models for their well-determinedness of the parameters and consequently roughly for their tendency to overfit the given data. Note however that this parameter does not give reliable values if any of the fit parameters has a value $(\beta_i\approx0)$! In those cases, it is better to also look at the AICc and/or BIC, or even perform Bayes model selection!
 
+</p>
 
 
 <h3>Akaike's Information criterion (AICc)</h3>
