@@ -7,6 +7,9 @@
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 $$note:This tutorial serves two purposes: It explains how to simulate an imaging FCS measurement with the <a href="simulation.html">imaging FCS simulator</a> that is part of the plugin and it explains how to perform model selection for imaging FCS data.$$
+$$startbox_see$$
+A detailed introduction to least-squares fitting and the fit statistics used for model selection, as well as Bayesian model selection can be found in <img src=":/pdf.png"> <a href="file:///$$assetsdir$$help_pdf/bayesian_fit.pdf">A general Introduction to different methods of datafitting</a>. Also see <a href="$$mainhelpdir$$/fit_statistics.html">the help page on fit statistics</a>.
+$$endbox$$
 
 $$note:This is work in progress and will be finished in one of the following version!$$
 
@@ -16,7 +19,13 @@ $$note:This is work in progress and will be finished in one of the following ver
     <li>Take the model that best describes you data (i.e. that has the smallest deviation from the measured curve, or smalles $(\chi^2)$ fit statistics)</li>
     <li>Take the best fitting model which has the lowest number of fit parameters, i.e. the <a href="https://en.wikipedia.org/wiki/Occam%27s_razor">"principle of parsimony"</a></li>
 </ol>
-Several automated methods for this model seelction scheme have been proposed over the years.$$ref:LEVIN2004:Levin M K, Carson J H  (2004) Fluorescence correlation spectroscopy and quantitative cell biology. <i>Differentiation</i> <b>72</b><b>:</b> 1-10 doi: 10.1111/j.1432-0436.2004.07201002.x$$$$ref:BURNHA2002:Burnham K P, Anderson D R  (2002) Model Selection and Multimodel Inference ed. New York, London, Berlin: Springer$$ Recently, a very sofisticated framework based on Bayesian statistics has been proposed,$$ref:HE2012:He J, Guo S, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data I: Theory. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3871-3879 doi: 10.1021/ac2034369$$$$ref:GUO2012:Guo S, He J, Monnier N, Sun G, Wohland T, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data II: Application to Simulated and In Vitro Data. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3880-3888 doi: 10.1021/ac2034375 $$ but this requires a very softisticated estimate of the errors on the curreltion curve, which are currently not supported by QuickFit. A simpler version is based on statistical information criteria, such as the Akaike information criterion (AIC)$$ref:AKAIKE1974:Akaike H  (1974) A new look at the statistical model identification. <i>IEEE Transactions on Automatic Control</i> <b>19</b><b>:</b> 716-723$$$$ref:BURNHA2002:$$ or the Bayes information criterion (BIC)$$ref:SCHWARZ1978:Schwarz G  (1978) Estimating the Dimension of a Model. <i>The Annals of Statistics</i> <b>6</b><b>:</b> 461-464$$$$ref:BURNHA2002:$$. This tutorial will cover the latter method only. The information criteria are just a number (BIC or AICc) which is calculated from the fits and which encodes both, the goodnes of fit and also the number of parameters that were required to achieve it. Then you simply choose the model with the lowest values (at least for BIC and AICc). This tutorial will show you how this works on a synthetic dataset that we will simulate with the <a href="simulation.html">imaging FCS simulator</a> that is part of the <a href="$$plugin_info:help:imaging_fcs$$">imaging_fcs Plugin</a> in QuickFit $$version$$. Finally we will get a graph, that shows you where which model should be taken.
+Several automated methods for this model seelction scheme have been proposed over the years.
+<ul>
+    <li>See Refs. $$ref:LEVIN2004:Levin M K, Carson J H  (2004) Fluorescence correlation spectroscopy and quantitative cell biology. <i>Differentiation</i> <b>72</b><b>:</b> 1-10 doi: 10.1111/j.1432-0436.2004.07201002.x$$$$ref:BURNHA2002:Burnham K P, Anderson D R  (2002) Model Selection and Multimodel Inference ed. New York, London, Berlin: Springer$$ for an introduction to model selection. The "simple" method in these references is based on statistical information criteria, such as the Akaike information criterion (AIC)$$ref:AKAIKE1974:Akaike H  (1974) A new look at the statistical model identification. <i>IEEE Transactions on Automatic Control</i> <b>19</b><b>:</b> 716-723$$$$ref:BURNHA2002:$$ or the Bayes information criterion (BIC)$$ref:SCHWARZ1978:Schwarz G  (1978) Estimating the Dimension of a Model. <i>The Annals of Statistics</i> <b>6</b><b>:</b> 461-464$$$$ref:BURNHA2002:$$. The information criteria (BIC or AICc) are just a number which is calculated from the fits and which encodes both, the goodnes of fit and also the number of parameters that were required to achieve it. Then you simply choose the model with the lowest values (for BIC and AICc) of the criterion. </li>
+   <li>Recently, also a very sofisticated framework based on Bayesian statistics has been proposed,$$ref:HE2012:He J, Guo S, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data I: Theory. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3871-3879 doi: 10.1021/ac2034369$$$$ref:GUO2012:Guo S, He J, Monnier N, Sun G, Wohland T, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data II: Application to Simulated and In Vitro Data. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3880-3888 doi: 10.1021/ac2034375 $$. In Bayesian model selection, </li>
+
+</ul> 
+This tutorial will cover the simple AIC/BIC-based method, as well as Bayesian model selection. It will show you how this works on a synthetic dataset that we will simulate with the <a href="simulation.html">imaging FCS simulator</a> that is part of the <a href="$$plugin_info:help:imaging_fcs$$">imaging_fcs Plugin</a> in QuickFit $$version$$. Finally we will end up with a graph, that shows you where which model should be taken.
 </p>
 
 
@@ -24,14 +33,14 @@ Several automated methods for this model seelction scheme have been proposed ove
 <h2>Tutorial</h2>
 
 
-<h3>Simulation of a sythetic dataset</h3>
+<h3>Simulation of a Sythetic Dataset</h3>
 <p></p>
 
 
 
 
 
-<h3>Fitting the dataset with different models</h3>
+<h3>Fitting the Dataset with Different Models</h3>
 <p></p>
 
 
@@ -39,7 +48,11 @@ Several automated methods for this model seelction scheme have been proposed ove
 
 
 
-<h3>Model selection</h3>
+<h3>Model Selection with AIC/BIC</h3>
+<p></p>
+
+
+<h3>Bayesian Model Selection</h3>
 <p></p>
 
   </body>

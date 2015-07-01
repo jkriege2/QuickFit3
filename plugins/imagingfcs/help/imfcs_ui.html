@@ -13,30 +13,37 @@
   
   
   
-    <a name="parameterimage"><h2>Parameter Image</h2>  
+    <a name="parameterimage"><h2>Tab "Parameter Image"</h2>  
     <h3>Overview of Parameter Image Tab</h3>    
+    <h4>Basic Functionality: Parameter Images, Correlation Functions, Fit Results</h4>
      <center><a name="imfcs_ui_pic004"><img src="./pic/imfcs_ui_pic004.png" border="1">
     </center>    
-    <p>This editor is used to display the result of fits as an image. It collects the fit results from a given set for each pixel. these fit results are displayed as a color-coded image (top left). In addition a second parameter may be selected that serves as measure for the goodnes of fit (top center plot). In the top right plot the overview image of the measurement is displayed. By clicking on one of the images, you may select the corresponding ACF/CCF to be displayed below. If you keep Ctrl pressed, while clicking, multiple pixels may be selected. The currently selected pixels may optionally be shown as overlays in the three top-row plots. In addition to the ACFs/CCFs, also the fits is displayed. The fitparameters are shown in the table on the right of the correlation function plot. </p>
-    <p>On the right-hand side you may select different options that change the appearance of the plots (color scales, ranges, ...).</p>
-    <p>The parameters to display are selected above the plots. First you will have to select a fit parameter set. If you use the FCS Fit plugin for fitting, a new set will be created for every differing combination of evaluation item (if you have two, you can distinguish these), fit algorithm and fit function. Then as a second step you may selectthe parameters to display. The parameters can be transformed with some basic mathematical transformations (none reciprocal 1/x, square root, logarithm) before they are displayed. The display settings (transformation, color coding, ...) are stored for every fit parameter and result set separately in the project, so you can switch to and back between different parameters, without loosing the settings.</p>
-    <p>The plots have several <a href="$$mainhelpdir$$jkqtplotter.html">means to interact with the user</a>.</p>
-    
-    <p>Further display options:
+    <p>This editor is used to display the result of imagingFCS fits as an image (often created with the evaluation plugins <a href="$$plugin_info:help:imfcs_fit$$">imFCS fit</a> or <a href="$$plugin_info:help:imfccs_fit$$">global imFCCS Fit</a>). It collects the fit results from a given evaluation (here called <b>result set</b>) for each pixel. These fit results are displayed in two color-coded image (top left/center). In the top right plot the overview image of the measurement is displayed. </p>
+<p>By clicking on one of the images (with the <img src=":imaging_fcs/draw_point.png"> tool), you may <a href="#selections">select</a> a pixel (if you keep CTRL pressed, while clicking, multiple pixels may be selected, see below). The ACF/CCF and detailed fit results of the selected pixel(s) are displayed at the bottom of the window.  The currently selected pixels are marked by an overlay (red, semi-transparent by default) in the three top-row plots. In addition to the ACFs/CCFs, also the fits is displayed. The fit parameters are shown in the table on the right of the correlation function plot. If several pixels are selected, the table shows the average (and other statistics) over the fit results in the selected pixels. The correlation fucntion plot then shows (by debault) the averagre and standard deviation over the selected pixels.</p>    
+$$startbbox_note$$The plots have several <a href="$$mainhelpdir$$jkqtplotter.html">means to interact with the user</a>.$$endbox$$
+    <h4>Select Parameters to Display</h4>
+<p>The parameters to display are selected above the plots. First you will have to select a fit parameter set. If you use the FCS Fit plugin for fitting, a new set will be created for every differing combination of evaluation item (if you have two, you can distinguish these), fit algorithm and fit function. Then as a second step you may selectthe parameters to display. The parameters can be transformed with some basic mathematical transformations (none reciprocal 1/x, square root, logarithm) before they are displayed. The display settings (transformation, color coding, ...) are stored for every fit parameter and result set separately in the project, so you can switch to and back between different parameters, without loosing the settings.</p>
+<a name="annotations"><h4>Annotations</h4>
+<p><b>Annotations</b> are e.g. used to display the results of <a href="imfcs_annotatemodelselection.html">model selection</a> in the overview plot:<center><a name="imfcs_annotatemodelselection_pic001"><img src="./pic/imfcs_annotatemodelselection_pic001.png" border="1">
+</center>
+Basically they add a layer with additional information, that is drawn over the image, e.g. the blue crosses in the following screenshot (note the legend for the annotations that is displayed at the top-left above the three parameter image/overview plots):
+<center><a name="imfcs_annotatemodelselection_pic001"><a name="imfcs_annotatemodelselection_pic002"><img src="./pic/imfcs_annotatemodelselection_pic002.png" border="1">
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="imfcs_annotatemodelselection_pic003"><img src="./pic/imfcs_annotatemodelselection_pic003.png" border="1">
+</center>
+The color of this layer can beset on the rhs of the window under "annotations/selection style | annotation color". At the top of the window, you can choose whether to display annotations at all and if so, which annotation should be displayed.</p>
+
+$$see:See the <a href="tutorial_modelselection.html">tutorial on model selection</a> for details on how to use the annotations.$$
+
+    <h4>Display Options</h4>
+    <p>On the right-hand side you may select different <b>options</b> that change the appearance of the plots (color scales, ranges, ...):
     <ul>
       <li><b>Correlation plot styles/Selection Display mode:</b> here you can select what the correlation display should contain if several pixels are selected: Either the curves of all selected pixels are shown (which is possibly slow if you selected many pixels, or an average over these correlation curves is displayed. In that case the parameters table also contains the statistics of all selected fit results. Note that in DualView mode (see above) one average/statistics for every image channel will be displayed!</li>
-      <li><a name="annotations"><b>Annotations:</b> are e.g. used to display the results of <a href="imfcs_annotatemodelselection.html">model selection</a> in the overview plot:<center><a name="imfcs_annotatemodelselection_pic001"><img src="./pic/imfcs_annotatemodelselection_pic001.png" border="1">
-</center>
-Basically they add a layer with additional information, that is drawn over the image, e.g.:
-<center><a name="imfcs_annotatemodelselection_pic001"><a name="imfcs_annotatemodelselection_pic002"><img src="./pic/imfcs_annotatemodelselection_pic002.png" border="1">
-<br><a name="imfcs_annotatemodelselection_pic003"><img src="./pic/imfcs_annotatemodelselection_pic003.png" border="1">
-</center>
-The color of this layer can beset on the rhs of the window under "annotations/selection style | annotation color". At the top of the window, you can choose whether to display annotations at all and if so, which annotation should be displayed.</li>
+      <li></li>
     </ul>
     </p>
     $$note:In many settings widgets in this tab, a right-click will open a context-menu, in which you can copy the settings in the clicked widget to all other records. So e.g. if you copy the "overview image settings" to all records, the same display settings (color bar, ranges, ...) will be used if you select a different record in this window!$$
 
-    <h3>Pixel Selection</h3>
+    <a name="selections"><a name="selection"><h3>Pixel Selection</h3>
     <h4>Introduction</h4>
     <p>If you select several pixels, the lower part of the dialog will display the average and statistics of the selected pixels. Also you can convert a selection into a mask (<strong>mask/unmask selected</strong>). The correlation curves (and fit results) from masked pixels will not be taken into account for averages (e.g. for the average correlation curve/run -1), color-scaling etc. They can also be excluded from fits to save time.
 </p>

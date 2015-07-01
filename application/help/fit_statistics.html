@@ -156,7 +156,7 @@ $$endbox$$
 
 <h3>Bayes Model probability</h3>
 <p>Bayesian statistics allows to calculate probabilities for different fit models on the same dataset directly. This is detailed e.g. in the reference $$ref:HE2012:He J, Guo S, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data I: Theory. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3871-3879, doi: 10.1021/ac2034369$$. In the Laplace approximation and assuming non-correlated errors on the data, the non-normalized Bayes model probability is calculated by QuickFit $$version$$ as: 
-$[ p(\tilde{\vec{g}}|M_g,\vec{\beta})\approx \exp\left\{\frac{\mbox{NP}}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right]-\frac{1}{2}\cdot\sum\limits_{k=1}^\mbox{NR}\left(\frac{g(\tilde{\tau}_k;\vec{\beta}^\ast)-\tilde{g}_k}{\tilde{\sigma}_k}\right)^2+\ln\left[ (2\cdot \gamma_p)^\mbox{NP}\cdot\prod_{i=1}^\mbox{NP}\sqrt{\mat{\Sigma}_{ii}} \right]\right\}. ]$
+$[ p(\tilde{\vec{g}}|M_g,\vec{\beta})\approx \exp\left\{\frac{\mbox{NP}}{2}\cdot\ln(2\pi)+\frac{1}{2}\cdot\ln\left[\det(\mat{\Sigma})\right]-\frac{1}{2}\cdot\chi^2_\text{(weighted)}+\ln\left[ (2\cdot \gamma_p)^\mbox{NP}\cdot\prod_{i=1}^\mbox{NP}\sqrt{\mat{\Sigma}_{ii}} \right]\right\}. ]$
 Here, $(\mbox{NP})$ si the number of fit parameters, $(\mbox{NR})$ the number of datapoints, $(\vec{\beta}^\ast)$ is the best-fit parameter vector (in a least-squares sense), $(\mat{\Sigma})$ is the variance-covariance matrix (see below) of the least-squares fit problem and $(\gamma_p)$ is a fixed factor for the (flat) prior probability, which is currently choosen to be $(\gamma_p=200)$ $$ref:HE2012:$$. 
 </p>
 <p>
