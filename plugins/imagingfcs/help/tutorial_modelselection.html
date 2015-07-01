@@ -6,12 +6,15 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
 $$note:This tutorial serves two purposes: It explains how to simulate an imaging FCS measurement with the <a href="simulation.html">imaging FCS simulator</a> that is part of the plugin and it explains how to perform model selection for imaging FCS data.$$
 $$startbox_see$$
 A detailed introduction to least-squares fitting and the fit statistics used for model selection, as well as Bayesian model selection can be found in <img src=":/pdf.png"> <a href="file:///$$assetsdir$$help_pdf/bayesian_fit.pdf">A general Introduction to different methods of datafitting</a>. Also see <a href="$$mainhelpdir$$/fit_statistics.html">the help page on fit statistics</a>.
 $$endbox$$
 
-$$note:This is work in progress and will be finished in one of the following version!$$
+$$warning:A note of caution: The process described in this tutorial is statistically sound, but relies stringly on the data quality and the quality of the error estimates on the correlation curves. Therefore you should consider this method for very high-quality data only and put considerable effort into any measurement!$$
+
+<b>$$warning:This tutorial is still work in progress and the examples might change in future versions!$$</b>
 
     <h2>Introduction</h2>
     <p>Often in an FCS evaluation, you are faced with the question: Which model should I choose and which one describes my data best? To solve this question, one generally uses two principles:
@@ -34,14 +37,135 @@ This tutorial will cover the simple AIC/BIC-based method, as well as Bayesian mo
 
 
 <h3>Simulation of a Sythetic Dataset</h3>
-<p></p>
+<p>First we will generate two synthetic imaging FCS dataset, which will contain two regions with different types of mobilities:
+<ol>
+    <li>A dataset, where fast molecules diffuse in the whole simulational box and a second type of slow particles freely diffuses, but limited to a certain range of the simulational box.</li>
+    <li>A dataset, where again some molecules diffuse freely through the whole simulational box and their motion is modulated by a laminar flow in half of the box.</li>
+</ol>
+Then we will use different model selection methods to evaluate the dataset and reconstruct the two regions.</p>
 
 
+<h4>Simulating 1-component/2-component normal diffusion</h4>
+<p>
+<ol>
+    <li>Start the <a href="simulation.html">imaging FCS simulator</a> by clicking the mainwindow menu entry <img width="16" src=":imaging_fcs/qfrdrimagingfcs_simulate.png"> <b>Data items|Insert raw Data | imFCS: Imaging FCS| simulate images for correlation</b>. A window will open, which allows to set the simulation parameters. 
+</li>
+    <li>Set all options as shown in the following screenshot:
+    <center><a name="tutorial_modelselection_pic001"><img src="./pic/tutorial_modelselection_pic001.png" border="1">
+    </center>
+    The settings mean:
+<ul>
+    <li>
+This will generate a simulational box of 10x10 pixels, at a pixel size of 400nm. The PSF of the particles will be 600nm wide (1/e<sup>2</sup>-halfwidth).</li>
+<li>In this box, simulations will be done with a timestep of 200&micro;s and 500,000 vrames will be simulated.</li>
+<li>The simulation will be warmed up for 100,000 steps during which the particles move, but no output image series is created. This ensures that the simulation is in equilibrium, when data is generated.</li>
+<li>In this box two types of particles are diffusion. Fast particles (particle count: 200) with a diffusion coefficient of 50&micro;m&sup2;/s and a brightness of 20 counts/step are diffusing freely everywhere.</li>
+<li>A second species (count: 100 particles) diffuses only in the upper half (y>height/2) of the simulational box with a diffusion coefficient of 0.5&micro;m&sup2;/s.</li>
+<li>Finally the simulation will add a background signal to the output which are random numbers drawn from a normal distribution with mean 100/step and width 2/step.</li>
+<li>The data will be stored in the TIFF format in a file <tt>c:/temp/imfcs_modelselection/tirfcs_1comp2comp_200x50_100x0p5.tif</tt>. You should change this, so the file is generated in an appropriate place on your computer. <i><b>Note</b>, the directory in which to place the output data has to exist on your harddisk!</i></li>
+</ul></li>
+
+
+    <li>Now click on <b>Start Simulation</b>. and wait until the simulation completes (this may take several minutes!). A progress bar at the bottom of the window will inform you on the progress of the simulation and when it is finished, the correlation dialog will open up with the simulation result pre-selected.</li>
+    <li>In the correlation dialog you should set the following settings:
+    <center><a name="tutorial_modelselection_pic002"><img src="./pic/tutorial_modelselection_pic002.png" border="1">
+    </center>
+    Ensure that the following settings are set:
+    <ul>
+        <li>The file format should be "tinyTIFF", as otherwise the correlator cannot rea files with more than 65,000 frames (which we have).</li>
+        <li>The frametime should be preset to 200&micro;s (as set in the simulation!). If not, change the setting.</li>
+        <li>The correct background-file should be selected.</li>
+        <li>we don't need a bleach-correction, so set this to "none" and ans the DualView mode to "none".</li>
+        <li>Select only ACFs under "correlation functions", since we don't need to calculate cross-correlation functions for this tutorial.</li>
+        <li>Select "cut into 5 segments". This causes the correlator to cut the measurement into 5 segments and finally return the average over these five segments as ACF in each pixel. The standard deviation is used as an estimate for the errors on the correlation curve. <b>Note</b> especially for Bayesian model selection, it is essential to have a good estimate of the errors on the correlation curve, as otherwise the selection process cannot be performed with good results $$ref:HE2012:$$.</li>
+        <li>as correlator, choose "Direct Correlation, with Averaging", set <tt>P=16, m=2</tt> and choose <tt>S</tt> so the maximum lag time (displayed at the right of the correlator options) is slightly larger than the segment length.</li>
+        <li>Finally click on <b>add job</b> to start the correlation process. A task will be added to the area at the bottom of the window and display the progress of the correlation (note, QuickFit might need several minutes to fully process your data).</li>
+        <li>When the correlation is finished (a green check-mark is shown next to the progress), you can close the dialog and the correlated data will be loaded into the project.</li>
+    </ul></li>
+</ol></p>
+
+
+<!--
+<h4>Simulating 1-component normal diffusion + flow</h4>
+<p><ol>
+    <li>For a second test, we will now create a second synthetic dataset that has one diffusing component (D=2&micro;m&sup2;/s, 200 particles), which is modulated by a laminar flow with v=50&micro;m/s in one image half. Basically you will have to follow the same steps as above (including correlation), but in the simulator, configure as follows:
+<center><a name="tutorial_modelselection_pic004"><img src="./pic/tutorial_modelselection_pic004.png" border="1">
+</center>
+All changes from the last configuration are highlighted. Make sure to select "flow only for x>width/2", as then the flow is limited to the righ side of the simulation box and we have two regions in the results.
+</li>
+    <li>Now correlate the data with the same settings as above.</li>
+</ol></p>
+-->
+
+<h4>Inspect the results</h4>
+<p>After generating and correlating the datasets in the last setps, the project will look roughly like this:
+<center><a name="tutorial_modelselection_pic003"><img src="./pic/tutorial_modelselection_pic003.png" border="1">
+</center>
+Now we can inspect the data:
+<ol>
+    <li>Double-click on the first imFCS RDR (<img src=":imaging_fcs/qfrdrimagingfcs.png" width="16">) in the project. An RDR editor will open in which you should select the Tab "Parameter Image":
+<center><a name="tutorial_modelselection_pic005"><img src="./pic/tutorial_modelselection_pic005.png" border="1">
+</center>
+In the overview image you see two regions: A bright upper halve, where the fast and the slow particles are present and a dim lower halve, where only the slow particles are.
+</li>
+    <li>Select the tool <img src=":imaging_fcs/draw_point.png"> above the images and click on one pixel in the upper and one pixel in the lower halve, while keeping CTRL kressed.</li>
+    <li>In the options on the right-hand side, scroll down until you find these settings:
+    <center><a name="tutorial_modelselection_pic006"><img src="./pic/tutorial_modelselection_pic006.png" border="1">
+    </center>
+    and choose "selection display: display all". </li>
+    <li>Now the correlation plot on the bottom left will show two correlation curves: A fast decaying curve (here red) from the lower part and a slow decaying curve (green) from the two-component region:
+<center><a name="tutorial_modelselection_pic007"><img src="./pic/tutorial_modelselection_pic007.png" border="1"></center>
+Here you can clearly distinguish the two different regimes with one or two components.
+</li>
+    <!--<li>Now click on the "next" button at the top of the window to nagivate to the second dataset. here the intensity is equally distributed and the autocorrelation functions look like this:
+<center><a name="tutorial_modelselection_pic008"><img src="./pic/tutorial_modelselection_pic008.png" border="1">
+</center>
+The red curve is from diffusion only and the green curve from the diffusion+flow region. The additional peaks on the green curve for $(\tau>0.1\mathrm{s})$ are caused by the periodic boundary conditions of the simulation, as they cause the particles to re-occur, which generates this correlation echo. We will have to cut this artifact from the data lateron.
+</li>-->
+    <li>When you are done, close the RDR editor.</li>
+</ol></p>
 
 
 
 <h3>Fitting the Dataset with Different Models</h3>
-<p></p>
+<p>Now we will have to fit the data with the different models from which we want to select. We'll choose four models:
+<ul>
+    <li><a href="$$fitfunction:help:fcs_tir_diffe2$$">$$fitfunction:name:fcs_tir_diffe2$$</a> with 1 component</li>
+    <li><a href="$$fitfunction:help:fcs_tir_diffe2$$">$$fitfunction:name:fcs_tir_diffe2$$</a> with 2 components</li>
+   <!-- <li><a href="$$fitfunction:help:fcs_tir_adiffe2$$">$$fitfunction:name:fcs_tir_adiffe2$$</a></li>
+    <li><a href="$$fitfunction:help:fcs_tir_diff_flowe2$$">$$fitfunction:name:fcs_tir_diff_flowe2$$</a></li>-->
+</ul>
+To perform the fits, follow these steps for every of the above-mentioned four models:
+<ol>
+    <li>In the main window: Add a new fit evaluation object to the project by clicking <b>Data Items | Insert Evaluation | imFCS Curve Fitting</b>. A new evaluation object will appear at the end of the project tree.</li>
+    <li>Double-click the new evaluation and choose the Tab "Properties". Change the name to a short description of the model, e.g.:
+<ul>
+    <li>1-comp. normal Diff.</li>
+    <li>2-comp. normal Diff.</li>
+    <!--<li>1-comp. anomalous Diff.</li>
+    <li>.normal Diff. + flow</li>-->
+</ul></li>
+    <li>Change back to the Tab "Evaluation" (Sometimes the widgets do not appear, then close and reopen the window and the problem is solved! This bug will be fixed in a future version.):
+<center><a name="tutorial_modelselection_pic009"><img src="./pic/tutorial_modelselection_pic009.png" border="1">
+</center>
+Make sure to select the correct fit model (you can also press <b>select fit model</b> and search for the model). Then set the PSF-size $(w_{xy}=600\mathrm{nm})$ and the pixel size $(a=400\mathrm{nm})$ in the fit parameters on the right. Also make sure to select the correct number of components (at the top of the fit parameter list). </li>
+  <!--<li>The Diffusion+flow model has two components for the flow velocity $(v_x,v_y)$. These cannot be fit in an autocorrelation function due to the isotropy and symmetry of the focus. So you should choose $(v_x=0)$ and check the "fix" checkbox next to that value, which will fix this values for the fit.
+</li>-->
+    <li>Often the fit will not converge and may push one or the other parameter to unphysical values. This can be prevented by setting the fit parameter ranges. To do so, select the Tab "Parameter Ranges" above the fit parameters list on the right. There you should set the following ranges (depending on which are applicable for the current model):
+<ul>
+    <li>$(0.1\leq D_1\leq 200)$</li>
+    <li>$(0.1\leq D_2\leq 200)$</li>
+    <!--<li>$(0.1\leq v_x,v_y,v\leq 500)$</li>-->
+</ul></li>
+    <li>Select the <b>weight model: per run error</b> and set the  number of <b>repeats</b> to 3. The first will ensure that QuickFit uses the standard deviations over the five segments for weighting the fits and the latter will repeat each fit 3 times automatically, which improves convergence.</li>
+    <li>Initially the "Average" pixel is selected, which is a correlation function, averaged over all pixels. This is also a good starting point for a fit, so click on "Fit Current" and observe how the fit improves. You may have to click several times until you get a good fit result for the average. If the fit does not converge, try to play around a little bit with the fit parameters, before clicking again. The currently displayed parameters are used as starting values for the next fit. </li>
+    <li>When you are happy with your fit (see the examples below), click on <b>"Copy to Initial"</b>. Now the current fit results are used as initial values for all further fits in this evaluation object.</li>
+    <li>Now click on <b>Fit all Pixels, this file</b>, which will repeat the fit for all pixels in the currently selected file.</li>
+    <li>Now select the second RDR/file from the list on the right and repeat the fit, as described above for this file.</li>
+    <li>Finally close the fit dialog and repeat these steps for every fit model.</li>
+</ol>
+$$note:A shortcut exists for adding the 2nd (and more) fit evaluations: In the project-tree right-click an existing evaluation and click on <b>Duplicate Item</b>. Then the evaluation with all its settings, but without the results will be duplicated and you can simply open it and only change the fit model and/or number of components and should be fine to proceed to the rest of the evaluation.$$
+</p>
 
 
 
@@ -49,11 +173,47 @@ This tutorial will cover the simple AIC/BIC-based method, as well as Bayesian mo
 
 
 <h3>Model Selection with AIC/BIC</h3>
-<p></p>
+<p>Now we completed all fits and can inspect the results and do the model selection. First we will use the Akaike's information criterion (AIC) $[ \mbox{AICc}\ =\ K\cdot \ln\left[\frac{\mbox{RSS}}{K}\right]+2\cdot \mbox{NP}+\frac{2\cdot \mbox{NP}\cdot (\mbox{NP}+1)}{K-\mbox{NP}-1} ]$ or the 
+Bayesian information criterion (BIC) $[ \mbox{BIC}\ =\ K\cdot \ln\left[\frac{\mbox{RSS}}{K}\right]+\mbox{NP}\cdot\ln\left[K\right]. ]$ In both criteria, $(\mbox{RSS}=\chi^2)$ is the residual sum of squares, $(NP)$ is the number of fit parameters and $(K)$ is the number of datapoints in the autocorrelation curve. In the next section we will calculate the more complex Bayesian model properties. Now for the simple selection process:
+<ol>
+    <li>Double-click the first RDR in the project and choose the Tab "Parameter Image". Here you can now inspect the fit results as parameter images. You can choose the evaluation from which to display teh results as <b>result set</b> and two parameters from this fit for the two parameter images. Inthe following screenshot you see the fraction of the second component and the particle number, both from the 2-component normal diffusion fit:
+<center><a name="tutorial_modelselection_pic010"><img src="./pic/tutorial_modelselection_pic010.png" border="1">
+</center>
+You can see that for this "ideal" model (it describes the physical situation that we actually have!) you can clearly distiguish the two regions, but now we want to use a statistical method to really choose the best model!
+</li>
+    <li>For the model selection, click on the menu entry <b>ImagingFCS Tools | annotate model comparison</b>. A new dialog will open up, which looks as follows:
+<center><a name="tutorial_modelselection_pic012"><img src="./pic/tutorial_modelselection_pic012.png" border="1">
+</center>
+
+</center>
+</li>
+    <li><At the top of the dialog, you can select all the fit result sets (one for each model) that you can compare. Select only the 1-component and 2-component normal diffusion models here.</li>
+    <li><Below this list, you have to select the parameter on which the model comparison/selection should be based on. Select either the AICc or the BIC. For both choose the comparison mode "prefer model with smallest value".
+</li>
+    <li>Finally choose one of the available evaluations as "invisible evaluation" (here you should choose the 1-component fit). The idea is as follows: QuickFit will create an overlay over the overview plot with differently colored symbols that tell you which model should be used where. For one of the model (usually one, prefered by the user), no symbol is displayed.</li>
+    <li>Click on "OK".</li>
+    <li>Now QuickFit will perform the model comparison and add an annotation, which you can activate at the top of the window (check the annotation checkbox and choose the appropriate annottaion from the list):
+<center><a name="tutorial_modelselection_pic013"><img src="./pic/tutorial_modelselection_pic013.png" border="1">
+</center>
+As you can see in the screenshot, QuickFit now added an overlay/annotation with symbols to the overview plot and you can see the regions, where the 2-component model is prefered.
+</li>
+
+</ol></p>
 
 
 <h3>Bayesian Model Selection</h3>
-<p></p>
+<p>Model selection, based on Bayesian model probabilities is done the same way as model selection with AIC/BIC (see last section). But:
+<ul>
+    <li>In the "annotate model selection" dialog you should now choose the parameter <b>Bayes model probability</b> and the comparison mode "prefer model with largest value", as we want to prefer the model with the largest probability.</li>
+    <li>As described in the help pages/PDF referenced at the top, the Bayes model probabilities calculated by QuickFit are not yet normalized. The model selection dialog can perform this normalization, if you check "calculate model probabilities".</li>
+    <li>After a click on "OK", QuickFit adds a new annotation for the Bayesian model probabilities. In addition you can now select a fit parameter, which contains the normalized model probability of each model (the prob. for each model is in the result set of that model!):
+<center><a name="tutorial_modelselection_pic014"><img src="./pic/tutorial_modelselection_pic014.png" border="1">
+</center>
+</li>
+</ul> </p>
+
+<h2>Reference</h2>
+<p>$$references$$</p>
 
   </body>
 </html>
