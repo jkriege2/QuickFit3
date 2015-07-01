@@ -41,7 +41,7 @@ class QFFitFunctionsSPIMFCSDiffE2: public QFFitFunction {
         QFFitFunctionsSPIMFCSDiffE2();
         virtual ~QFFitFunctionsSPIMFCSDiffE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: 3D Normal Diffusion (rect. pixel, 1/e^2 radii)"); }
+        virtual QString name() const { return QString("SPIM-FCS (camera): 3D Normal Diffusion (rect. pixel, 1/e^2 radii)"); }
         /*! \copydoc QFFitFunction::category()   */
         virtual QString category() const { return QObject::tr("SPIM-FCS (camera)"); }
 

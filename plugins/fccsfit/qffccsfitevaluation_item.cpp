@@ -107,7 +107,7 @@ int QFFCCSFitEvaluationItem::getIndexMax(const QFRawDataRecord *r) const
 
 QFFitStatistics QFFCCSFitEvaluationItem::calcFitStatistics(bool storeAsResults, QFFitFunction *ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord *record, int run)
 {
-    return QFFitResultsByIndexEvaluationFitToolsBase::calcFitStatistics(storeAsResults, ffunc,  N, tauvals, corrdata, weights,  datacut_min,  datacut_max, fullParams, errors, paramsFix,  runAvgWidth,  residualHistogramBins, record,  run, QString("fitstat_"), QString("fit statistics"), QVector<double>(), NAN);
+    return QFFitResultsByIndexEvaluationFitToolsBase::calcFitStatistics(storeAsResults, ffunc,  N, tauvals, corrdata, weights,  datacut_min,  datacut_max, fullParams, errors, paramsFix,  runAvgWidth,  residualHistogramBins, record,  run, QString("fitstat_local_"), QString("local fit statistics"), QVector<double>(), NAN);
 }
 
 QFEvaluationRawDataModelProxy *QFFCCSFitEvaluationItem::getRawDataProxyModel() const

@@ -90,7 +90,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual int getIndexMax(const QFRawDataRecord* r) const;
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
-        QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errorsVector, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1, const QVector<double>& COV=QVector<double>(), double paramrange_size=200);
+        QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errorsVector, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1, const QVector<double>& COV=QVector<double>(), double paramrange_size=200, bool storeCOV=false);
 
 
         QFEvaluationRawDataModelProxy* getRawDataProxyModel() const;

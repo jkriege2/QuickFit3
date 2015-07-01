@@ -64,6 +64,10 @@ class QFRDRImagingFCSSimulator : public QDialog
 
         QFRDRImagingFCSSimulationThread* sim;
         QDateTime timeSimStart;
+        int oldstate;
+        QDateTime oldStateTime;
+        int oldstate2;
+        QDateTime oldStateTime2;
 };
 
 #endif // QFRDRIMAGINGFCSSIMULATOR_H

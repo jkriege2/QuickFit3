@@ -38,7 +38,7 @@ class QFFitFunctionsSPIMFCSADiffCE2: public QFFitFunction {
         QFFitFunctionsSPIMFCSADiffCE2();
         virtual ~QFFitFunctionsSPIMFCSADiffCE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: 3D Anomalous Diffusion, c as parameter (rect. pixel, 1/e^2 radii, new Veff)"); }
+        virtual QString name() const { return QString("SPIM-FCS (camera): 3D Anomalous Diffusion, c as parameter (rect. pixel, 1/e^2 radii, new Veff)"); }
 
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_adiffce2"); }

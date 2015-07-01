@@ -34,7 +34,7 @@ class QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorCCF: public QFFitFunction {
         QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorCCF();
         virtual ~QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorCCF() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("2-color TIR-FCCS: 1-comp. 2D anomalous diffusion (xy), species A+B+AB, c/D per species (rect. pixel, 1/e^2 radii), CCF"); }
+        virtual QString name() const { return QString("2-color TIR-FCCS (camera): 1-comp. 2D anomalous diffusion (xy), species A+B+AB, c/D per species (rect. pixel, 1/e^2 radii), CCF"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_tir_fw_2dadiffxy2colorccf"); }
         /*! \copydoc QFFitFunction::category()   */

@@ -583,9 +583,9 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
 
 
-QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run, const QString &prefix, const QString &pgroup, const QVector<double> &COV, double paramrange_size) {
+QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run, const QString &prefix, const QString &pgroup, const QVector<double> &COV, double paramrange_size, bool storeCOV) {
     //qDebug()<<"QFImFCSFitEvaluation::calcFitStatistics()  COV="<<COV<<" paramrange_size="<<paramrange_size;
-    QFFitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, COV, paramrange_size);
+    QFFitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, COV, paramrange_size, storeCOV);
 
     QString eid= getEvaluationResultID(run, record);
     double oldchi2=getFitValue(record, eid, prefix+"chisquared");
@@ -1048,7 +1048,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm* falg, QFFitFuncti
 
                     //qDebug()<<COV<<paramrange_size<<result.bayesProbability;
 
-                    setFitResultFitStatisticsInVector(record, evalID, run, result, "result", tr("fit statistics"));
+                    setFitResultFitStatisticsInVector(record, evalID, run, result, QString("fitstat_"), tr("fit statistics"));
 
                     result.free();
                 }

@@ -145,11 +145,6 @@ void QFRDRImagingFCSSimulator::readSettings()
     ui->chkBottomRG_2->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DRG_2", false).toBool());
     ui->chkFlowOnlyHalf->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/FlowOnlyHalf", false).toBool());
 
-    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DG_2", 15).toDouble());
-    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DR_2", 15).toDouble());
-    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DRG_2", 15).toDouble());
-    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/brightnessG_2", 100).toDouble());
-    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/brightnessR_2", 100).toDouble());
 
     ui->spinWalkersR_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersr_2", 0).toInt());
     ui->spinWalkersG_2->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersg_2", 0).toInt());
@@ -212,7 +207,12 @@ void QFRDRImagingFCSSimulator::on_btnRun_clicked()
         sim->set_brightnessR2(ui->spinBrigthnessR_2->value());
 
         sim->start();
+        QApplication::processEvents();
         timeSimStart=QDateTime::currentDateTime();
+        oldstate=0;
+        oldStateTime=timeSimStart;
+        oldstate2=0;
+        oldStateTime2=timeSimStart;
         writeSettings();
         setState(dsRunning);
     } else if (dstate==dsFinished) { writeSettings(); setState(dsParameterInput); accept(); }
@@ -225,7 +225,9 @@ void QFRDRImagingFCSSimulator::on_btnCancel_clicked()
     else if (dstate==dsRunning) {
         writeSettings();
         sim->cancel();
+        QApplication::processEvents();
         sim->waitForFinish();
+        QApplication::processEvents();
         setState(dsParameterInput);
     }
 }
@@ -246,14 +248,25 @@ void QFRDRImagingFCSSimulator::updateSimStatus(int status)
     ui->progressBar->setValue(status);
 
     double runtime=timeSimStart.msecsTo(QDateTime::currentDateTime())/1000.0;
-
-
     double finished=double(status)/double(ui->progressBar->maximum()-ui->progressBar->minimum());
-    double toend=1.0-finished;
     double timeperone=runtime/finished;
+
+    if (timeSimStart!=oldStateTime2 && timeSimStart!=oldStateTime && fabs(oldStateTime2.msecsTo(oldStateTime)/1000.0)>0) {
+        timeperone=fabs(oldStateTime2.msecsTo(oldStateTime))/1000.0/(fabs(oldstate-oldstate2)/double(ui->progressBar->maximum()-ui->progressBar->minimum()));
+    }
+
+    if (fabs(oldStateTime.msecsTo(QDateTime::currentDateTime())/1000.0)>10 && (abs(status-oldstate)>10)) {
+        oldstate2=oldstate;
+        oldStateTime2=oldStateTime;
+        oldstate=status;
+        oldStateTime=QDateTime::currentDateTime();
+    }
+    double toend=1.0-finished;
     double eta=toend*timeperone;
 
-    ui->labSimTime->setText(tr("runtime: %1 (ETA: %2)").arg(qfSecondsDurationToHMSString(runtime)).arg(qfSecondsDurationToHMSString(eta)));
+    //qDebug()<<"timeSimStart="<<timeSimStart<<" status="<<status<<"   oldStateTime="<<oldStateTime<<" oldstate="<<oldstate<<"  rt="<<runtime<<"  finished="<<finished<<"  perone="<<timeperone<<"  toend="<<toend<<"  eta="<<eta;
+
+    ui->labSimTime->setText(tr("runtime: %1 (est. remaining: %2)").arg(qfSecondsDurationToHMSString(runtime)).arg(qfSecondsDurationToHMSString(eta)));
 }
 
 void QFRDRImagingFCSSimulator::setState(QFRDRImagingFCSSimulator::DialogState new_dstate)
@@ -307,4 +320,5 @@ void QFRDRImagingFCSSimulator::setState(QFRDRImagingFCSSimulator::DialogState ne
     }
 
     dstate=new_dstate;
+    QApplication::processEvents();
 }

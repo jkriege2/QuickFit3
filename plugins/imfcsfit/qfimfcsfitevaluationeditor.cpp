@@ -776,7 +776,7 @@ void QFImFCSFitEvaluationEditor::updateFitFunctions() {
 
                 //double detCOV=eval->getFitValue(record, eval->getEvaluationResultID(eval->getCurrentIndex(), record), "fitstat_det_cov");
                 double prange_width=eval->getFitValue(record, eval->getEvaluationResultID(eval->getCurrentIndex(), record), "fitstat_bayes_model_probability_paramrangesize");
-                qDebug()<<"read old:   "<<eval->getCurrentIndex()<<eval->getEvaluationResultID(eval->getCurrentIndex(), record);//<<detCOV<<prange_width;
+                //qDebug()<<"read old:   "<<eval->getCurrentIndex()<<eval->getEvaluationResultID(eval->getCurrentIndex(), record);//<<detCOV<<prange_width;
                 if (!QFFloatIsOK(prange_width) || fabs(prange_width)<1000.0*DBL_MIN || fabs(prange_width)>1e36) {
                     prange_width=200;
                 }
@@ -785,7 +785,7 @@ void QFImFCSFitEvaluationEditor::updateFitFunctions() {
                 // calculate fit statistics
                 /////////////////////////////////////////////////////////////////////////////////
                 record->disableEmitResultsChanged();
-                QFFitStatistics fitResults=eval->calcFitStatistics(eval->hasFit(record, run), ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run, "fitstat_", tr("fit statistics"), QVector<double>(), prange_width);
+                QFFitStatistics fitResults=eval->calcFitStatistics(eval->hasFit(record, run), ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run, "fitstat_", tr("fit statistics"), QVector<double>(), prange_width, true);
 
                 record->enableEmitResultsChanged();
 

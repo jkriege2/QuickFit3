@@ -31,7 +31,8 @@
 #include <QDebug>
 #include "qftools.h"
 
-inline double sqr(const double& x) { return x*x; }
+
+inline float sqr(const float& x) { return x*x; }
 
 QFRDRImagingFCSSimulationThread::QFRDRImagingFCSSimulationThread(QObject *parent) :
     QThread(parent),
@@ -194,8 +195,11 @@ void QFRDRImagingFCSSimulationThread::run()
         realwidth=2*width;
         framesize=2*width*height;
     }
+    const float nvar=backgroundNoise*backgroundNoise;
+
     TinyTIFFFile* tif=TinyTIFFWriter_open(filename.toLatin1().data(), 16, realwidth, height);
     uint16_t* frame=(uint16_t*)qfMalloc(framesize*sizeof(uint16_t));
+    float* framef=(float*)qfMalloc(framesize*sizeof(float));
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> wg=createWalkers(walkersG, onlyHalf_DG);
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> wr=createWalkers(walkersR, onlyHalf_DR);
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> wrg=createWalkers(walkersRG, onlyHalf_DRG);
@@ -238,42 +242,62 @@ void QFRDRImagingFCSSimulationThread::run()
             for (currentFrame=0; currentFrame<frames; currentFrame++) {
                 for (register int i=0; i<framesize; i++) {
                     frame[i]=0;
+                    framef[i]=0;
                 }
 
                 //memset(frame, 0, framesize*sizeof(uint16_t));
                 propagateWalkers(wg, DG,onlyHalf_DG);
+                const float psfgsig2=sqr(psf_size_g);
+                const float psfrsig2=sqr(psf_size_r);
                 for (register int i=0; i<wg.size(); i++) {
                     //if (i==0) qDebug()<<wg[i].x<<", "<<wg[i].y;
-                    for (register int y=0; y<height; y++) {
-                        for (register int x=0; x<width; x++) {
-                            frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wg[i].x-double(x)*pixel_size)+sqr(wg[i].y-double(y)*pixel_size))/sqr(psf_size_g));
-                        }
+                    float* f=framef;
+                    for (register int c=0; c<framesize; c++) {
+                        const float x=float(c%realwidth)*pixel_size;
+                        const float y=float(c/realwidth)*pixel_size;
+                        const float d=sqr(wg[i].x-x)+sqr(wg[i].y-y);
+                        if (d<5.0*psfgsig2) (*f)=(*f)+brightnessG*exp(-2.0*(d)/psfgsig2);
+                        f++;
                     }
+//                    for (register int y=0; y<height; y++) {
+//                        for (register int x=0; x<width; x++) {
+//                            frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wg[i].x-float(x)*pixel_size)+sqr(wg[i].y-float(y)*pixel_size))/psfgsig2);
+//                        }
+//                    }
                 }
                 propagateWalkers(wg2, DG2,onlyHalf_DG2);
                 for (register int i=0; i<wg2.size(); i++) {
                     //if (i==0) qDebug()<<wg[i].x<<", "<<wg[i].y;
-                    for (register int y=0; y<height; y++) {
-                        for (register int x=0; x<width; x++) {
-                            frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG2*exp(-2.0*(sqr(wg2[i].x-double(x)*pixel_size)+sqr(wg2[i].y-double(y)*pixel_size))/sqr(psf_size_g));
-                        }
+                    float* f=framef;
+                    for (register int c=0; c<framesize; c++) {
+                        const float x=float(c%realwidth)*pixel_size;
+                        const float y=float(c/realwidth)*pixel_size;
+                        const float d=sqr(wg2[i].x-x)+sqr(wg2[i].y-y);
+                        if (d<5.0*psfgsig2) (*f)=(*f)+brightnessG2*exp(-2.0*(d)/psfgsig2);
+                        f++;
                     }
+//                    for (register int y=0; y<height; y++) {
+//                        for (register int x=0; x<width; x++) {
+//                            frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG2*exp(-2.0*(sqr(wg2[i].x-float(x)*pixel_size)+sqr(wg2[i].y-float(y)*pixel_size))/psfgsig2);
+//                        }
+//                    }
                 }
                 if (dualView) {
                     propagateWalkers(wr, DR,onlyHalf_DR);
                     propagateWalkers(wrg, DRG,onlyHalf_DRG);
+
                     for (register int i=0; i<wr.size(); i++) {
                         for (register int y=0; y<height; y++) {
                             for (register int x=0; x<width; x++) {
-                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wr[i].x-double(x)*pixel_size-deltax)+sqr(wr[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
+                                framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wr[i].x-float(x)*pixel_size-deltax)+sqr(wr[i].y-float(y)*pixel_size-deltay))/psfrsig2);
                             }
                         }
                     }
                     for (register int i=0; i<wrg.size(); i++) {
                         for (register int y=0; y<height; y++) {
                             for (register int x=0; x<width; x++) {
-                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size-deltax)+sqr(wrg[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
-                                frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size-deltax)+sqr(wrg[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_g));
+                                framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wrg[i].x-float(x)*pixel_size-deltax)+sqr(wrg[i].y-float(y)*pixel_size-deltay))/psfrsig2);
+                                framef[y*realwidth+x]=framef[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wrg[i].x-float(x)*pixel_size-deltax)+sqr(wrg[i].y-float(y)*pixel_size-deltay))/psfgsig2);
                             }
                         }
                     }
@@ -282,39 +306,41 @@ void QFRDRImagingFCSSimulationThread::run()
                     for (register int i=0; i<wr2.size(); i++) {
                         for (register int y=0; y<height; y++) {
                             for (register int x=0; x<width; x++) {
-                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR2*exp(-2.0*(sqr(wr2[i].x-double(x)*pixel_size-deltax)+sqr(wr2[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
+                                framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR2*exp(-2.0*(sqr(wr2[i].x-float(x)*pixel_size-deltax)+sqr(wr2[i].y-float(y)*pixel_size-deltay))/psfrsig2);
                             }
                         }
                     }
                     for (register int i=0; i<wrg2.size(); i++) {
                         for (register int y=0; y<height; y++) {
                             for (register int x=0; x<width; x++) {
-                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR2*exp(-2.0*(sqr(wrg2[i].x-double(x)*pixel_size-deltax)+sqr(wrg2[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
-                                frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG2*exp(-2.0*(sqr(wrg2[i].x-double(x)*pixel_size-deltax)+sqr(wrg2[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_g));
+                                framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR2*exp(-2.0*(sqr(wrg2[i].x-float(x)*pixel_size-deltax)+sqr(wrg2[i].y-float(y)*pixel_size-deltay))/psfrsig2);
+                                framef[y*realwidth+x]=framef[y*realwidth+x]+brightnessG2*exp(-2.0*(sqr(wrg2[i].x-float(x)*pixel_size-deltax)+sqr(wrg2[i].y-float(y)*pixel_size-deltay))/psfgsig2);
                             }
                         }
                     }
                     if (crosstalk>0) {
                         for (register int y=0; y<height; y++) {
                             for (register int x=0; x<width; x++) {
-                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+crosstalk*frame[y*realwidth+x];
+                                framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+crosstalk*framef[y*realwidth+x];
                             }
                         }
                     }
                 }
 
-                const double nvar=backgroundNoise*backgroundNoise;
-                if (nvar<=0) {
-                    const uint16_t rback=round(background);
+
+                if (nvar<=0 && background!=0) {
                     for (int i=0; i<framesize; i++) {
-                        frame[i]=frame[i]+rback;
+                        framef[i]=framef[i]+background;
                     }
-                } else {
+                } else if (nvar>0) {
                     for (int i=0; i<framesize; i++) {
-                        frame[i]=frame[i]+round(rng.randNorm(background, nvar));
+                        framef[i]=framef[i]+(rng.randNorm(background, nvar));
                     }
                 }
 
+                for (int i=0; i<framesize; i++) {
+                    frame[i]=qMax(uint16_t(0),(uint16_t)round(framef[i]));
+                }
 
                 TinyTIFFWriter_writeImage(tif, frame);
                 if (timer.elapsed()>200) {
@@ -328,6 +354,7 @@ void QFRDRImagingFCSSimulationThread::run()
         TinyTIFFWriter_close(tif);
     }
     qfFree(frame);
+    qfFree(framef);
 }
 
 QVector<QFRDRImagingFCSSimulationThread::WalkerData> QFRDRImagingFCSSimulationThread::createWalkers(int count, bool onlyHalfImage)
@@ -335,38 +362,38 @@ QVector<QFRDRImagingFCSSimulationThread::WalkerData> QFRDRImagingFCSSimulationTh
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> res;
     for (int i=0; i<count; i++) {
         QFRDRImagingFCSSimulationThread::WalkerData d;
-        d.x=rng.rand(pixel_size*double(width-1));
+        d.x=rng.rand(pixel_size*float(width-1));
         if (onlyHalfImage) {
-            d.y=rng.rand(pixel_size*double(height-1)/2.0);
+            d.y=rng.rand(pixel_size*float(height-1)/2.0);
         } else {
-            d.y=rng.rand(pixel_size*double(height-1));
+            d.y=rng.rand(pixel_size*float(height-1));
         }
         res<<d;
     }
     return res;
 }
 
-void QFRDRImagingFCSSimulationThread::propagateWalkers(QVector<QFRDRImagingFCSSimulationThread::WalkerData> &walkersv, double D, bool onlyHalfImage)
+void QFRDRImagingFCSSimulationThread::propagateWalkers(QVector<QFRDRImagingFCSSimulationThread::WalkerData> &walkersv, float D, bool onlyHalfImage)
 {
-    const double vxfactor=VX*frametime*1.0e-6;
-    const double vyfactor=VY*frametime*1.0e-6;
-    const double Dfactor=sqrt(2.0*D*frametime*1.0e-6);
+    const float vxfactor=VX*frametime*1.0e-6;
+    const float vyfactor=VY*frametime*1.0e-6;
+    const float Dfactor=sqrt(2.0*D*frametime*1.0e-6);
     for (register int i=0; i<walkersv.size(); i++) {
         QFRDRImagingFCSSimulationThread::WalkerData& d=walkersv[i];
 
-        register double v=(FlowEeverywhere || (d.x>double(width)*pixel_size/2.0))?1.0:0.0;
-        register double dx=d.x+rng.randNorm(0.0, 1.0)*Dfactor+v*vxfactor;
-        register double dy=d.y+rng.randNorm(0.0, 1.0)*Dfactor+v*vyfactor;
+        register float v=(FlowEeverywhere || (d.x>float(width)*pixel_size/2.0))?1.0:0.0;
+        register float dx=d.x+rng.randNorm(0.0, 1.0)*Dfactor+v*vxfactor;
+        register float dy=d.y+rng.randNorm(0.0, 1.0)*Dfactor+v*vyfactor;
 
 
-        if (dx<-4.0*pixel_size) dx=double(width+3)*pixel_size;
+        if (dx<-4.0*pixel_size) dx=float(width+3)*pixel_size;
         if (dx>(width+3)*pixel_size) dx=-4.0*pixel_size;
         if (onlyHalfImage) {
-            if (dy<double(height)*pixel_size/2.0) dy=double(height)*pixel_size/2.0;
-            if (dy>double(height+3)*pixel_size) dy=double(height+3)*pixel_size;
+            if (dy<float(height)*pixel_size/2.0) dy=float(height)*pixel_size/2.0;
+            if (dy>float(height+3)*pixel_size) dy=float(height+3)*pixel_size;
         } else {
-            if (dy<-4.0*pixel_size) dy=double(height+3)*pixel_size;
-            if (dy>double(height+3)*pixel_size) dy=-4.0*pixel_size;
+            if (dy<-4.0*pixel_size) dy=float(height+3)*pixel_size;
+            if (dy>float(height+3)*pixel_size) dy=-4.0*pixel_size;
         }
 
         d.x=dx;

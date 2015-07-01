@@ -107,9 +107,9 @@ int QFImFCCSFitEvaluationItem::getIndexMax(const QFRawDataRecord *r) const
     else return fcs->getCorrelationRuns()-1;
 }
 
-QFFitStatistics QFImFCCSFitEvaluationItem::calcFitStatistics(bool storeAsResults, QFFitFunction *ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord *record, int run, const QVector<double>& COV, double paramrange_size)
+QFFitStatistics QFImFCCSFitEvaluationItem::calcFitStatistics(bool storeAsResults, QFFitFunction *ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord *record, int run, const QVector<double>& COV, double paramrange_size, bool storeCOV)
 {
-    return QFFitResultsByIndexEvaluationFitToolsBase::calcFitStatistics(storeAsResults, ffunc,  N, tauvals, corrdata, weights,  datacut_min,  datacut_max, fullParams, errors, paramsFix,  runAvgWidth,  residualHistogramBins, record,  run, QString("fitstat_"), tr("fit statistics"), COV, paramrange_size);
+    return QFFitResultsByIndexEvaluationFitToolsBase::calcFitStatistics(storeAsResults, ffunc,  N, tauvals, corrdata, weights,  datacut_min,  datacut_max, fullParams, errors, paramsFix,  runAvgWidth,  residualHistogramBins, record,  run, QString("fitstat_local_"), tr("local fit statistics"), COV, paramrange_size, storeCOV);
 }
 
 QFEvaluationRawDataModelProxy *QFImFCCSFitEvaluationItem::getRawDataProxyModel() const
@@ -1757,7 +1757,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
                     {
                         QFFitStatistics fit_stat= dfd.ffunc->calcFitStatistics(dfd.N, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_low, dfd.cut_up, params, errors, dfd.paramsFix, 11, 25);
 
-                        setFitResultFitStatisticsInVector(record, evalID, run, fit_stat, "fitstat_", tr("fit statistics"));
+                        setFitResultFitStatisticsInVector(record, evalID, run, fit_stat, "fitstat_local_", tr("local fit statistics"));
 
                         fit_stat.free();
                     }
@@ -2056,7 +2056,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord:
                     {
                         QFFitStatistics fit_stat= dfd.ffunc->calcFitStatistics(dfd.N, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_low, dfd.cut_up, params, errors, dfd.paramsFix, 11, 25);
 
-                        setFitResultFitStatisticsInResultStore(fitresult[r], fit_stat, tr("fit statistics"), "fitstat_");
+                        setFitResultFitStatisticsInResultStore(fitresult[r], fit_stat, tr("local fit statistics"), "fitstat_local_");
 
                         fit_stat.free();
                     }

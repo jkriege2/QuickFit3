@@ -281,7 +281,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 // calculate fit statistics
                 /////////////////////////////////////////////////////////////////////////////////
                 record->disableEmitResultsChanged();
-                QFFitStatistics fitResults=eval->calcFitStatistics(eval->hasFit(record, run), ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run);
+                QFFitStatistics fitStats=eval->calcFitStatistics(eval->hasFit(record, run), ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run, QString("fitstat_"), QString("fit statistics"), QVector<double>(), 200, true);
                 record->enableEmitResultsChanged();
 
                 /////////////////////////////////////////////////////////////////////////////////
@@ -330,7 +330,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 }
 
 
-                size_t c_fit = ds->addCopiedColumn(fitResults.fitfunc, "fit_model");
+                size_t c_fit = ds->addCopiedColumn(fitStats.fitfunc, "fit_model");
                 //qDebug()<<"    f "<<t.elapsed()<<" ms";
                 t.start();
 
@@ -376,10 +376,10 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 size_t c_residuals=0;
                 JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals->get_plotter());
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residuals=dsres->addCopiedColumn(fitResults.residuals_weighted,  "residuals_weighted");
+                    c_residuals=dsres->addCopiedColumn(fitStats.residuals_weighted,  "residuals_weighted");
                     g_residuals->set_title("weighted residuals");
                 } else {
-                    c_residuals=dsres->addCopiedColumn(fitResults.residuals,  "residuals");
+                    c_residuals=dsres->addCopiedColumn(fitStats.residuals,  "residuals");
                     g_residuals->set_title("residuals");
                 }
                 g_residuals->set_xColumn(c_taures);
@@ -403,16 +403,16 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot residuals running average
                 /////////////////////////////////////////////////////////////////////////////////
-                size_t c_tauresra=dsres->addCopiedColumn(fitResults.tau_runavg,  "tau_resid_runavg");
+                size_t c_tauresra=dsres->addCopiedColumn(fitStats.tau_runavg,  "tau_resid_runavg");
                 size_t c_residualsra=0;
                 JKQTPxyLineGraph* g_residualsra=new JKQTPxyLineGraph(pltResiduals->get_plotter());
 
 
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualsra=dsres->addCopiedColumn(fitResults.residuals_runavg_weighted,  "residuals_runavg_weighted");
+                    c_residualsra=dsres->addCopiedColumn(fitStats.residuals_runavg_weighted,  "residuals_runavg_weighted");
                     g_residualsra->set_title("weighted residuals, movAvg");
                 } else {
-                    c_residualsra=dsres->addCopiedColumn(fitResults.residuals_runavg,  "residuals_runavg");
+                    c_residualsra=dsres->addCopiedColumn(fitStats.residuals_runavg,  "residuals_runavg");
                     g_residualsra->set_title("residuals, movAvg");
                 }
                 g_residualsra->set_xColumn(c_tauresra);
@@ -440,11 +440,11 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 size_t c_residualHistogramX=0;
                 size_t c_residualHistogramY=0;
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fitResults.rminw+fitResults.residHistWBinWidth/2.0, fitResults.rmaxw-fitResults.residHistWBinWidth/2.0, "residualhist_weighted_x");
-                    c_residualHistogramY=dsresh->addCopiedColumn(fitResults.resWHistogram,  "residualhist_weighted_y");
+                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fitStats.rminw+fitStats.residHistWBinWidth/2.0, fitStats.rmaxw-fitStats.residHistWBinWidth/2.0, "residualhist_weighted_x");
+                    c_residualHistogramY=dsresh->addCopiedColumn(fitStats.resWHistogram,  "residualhist_weighted_y");
                 } else {
-                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fitResults.rmin+fitResults.residHistBinWidth/2.0, fitResults.rmax-fitResults.residHistBinWidth/2.0, "residualhist_x");
-                    c_residualHistogramY=dsresh->addCopiedColumn(fitResults.resHistogram,  "residualhist_y");
+                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fitStats.rmin+fitStats.residHistBinWidth/2.0, fitStats.rmax-fitStats.residHistBinWidth/2.0, "residualhist_x");
+                    c_residualHistogramY=dsresh->addCopiedColumn(fitStats.resHistogram,  "residualhist_y");
                 }
                 JKQTPbarHorizontalGraph* g_residualsHistogram=new JKQTPbarHorizontalGraph(pltResidualHistogram->get_plotter());
                 g_residualsHistogram->set_xColumn(c_residualHistogramX);
@@ -459,14 +459,14 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot residuals correlations
                 /////////////////////////////////////////////////////////////////////////////////
-                size_t c_residualCorrelationX=dsresc->addLinearColumn(fitResults.resN-1, 1, fitResults.resN-1, "residualcorr_x");
+                size_t c_residualCorrelationX=dsresc->addLinearColumn(fitStats.resN-1, 1, fitStats.resN-1, "residualcorr_x");
                 size_t c_residualCorrelationY=0;
                 if (chkWeightedResiduals->isChecked()) {
-                    double* data=fitResults.resWCorrelation.data();
-                    c_residualCorrelationY=dsresc->addCopiedColumn(&(data[1]), fitResults.resN-1, "residualcorr_weighted_y");
+                    double* data=fitStats.resWCorrelation.data();
+                    c_residualCorrelationY=dsresc->addCopiedColumn(&(data[1]), fitStats.resN-1, "residualcorr_weighted_y");
                 } else {
-                    double* data=fitResults.resCorrelation.data();
-                    c_residualCorrelationY=dsresh->addCopiedColumn(&(data[1]), fitResults.resN-1, "residualcorr_y");
+                    double* data=fitStats.resCorrelation.data();
+                    c_residualCorrelationY=dsresh->addCopiedColumn(&(data[1]), fitStats.resN-1, "residualcorr_y");
                 }
                 JKQTPxyLineGraph* g_residualsCorrelation=new JKQTPxyLineGraph(pltResidualCorrelation->get_plotter());
                 g_residualsCorrelation->set_xColumn(c_residualCorrelationX);
@@ -488,7 +488,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 }
                 txtFit+=QString("<b>%1</b><center>").arg(tr("Fit Statistics:"));
 
-                txtFit+=fitResults.getAsHTMLTable();
+                txtFit+=fitStats.getAsHTMLTable();
                 t.start();
 
                 txtFit+=QString("</center></font>");
@@ -513,7 +513,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 qfFree(paramsFix);
                 if (weightsNorm) qfFree(weightsNorm);
                 if (corrdataNorm) qfFree(corrdataNorm);
-                fitResults.free();
+                fitStats.free();
 
                 //qDebug()<<"    n "<<t.elapsed()<<" ms";
                 t.start();

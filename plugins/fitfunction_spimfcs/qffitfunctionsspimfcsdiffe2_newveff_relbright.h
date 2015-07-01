@@ -41,7 +41,7 @@ class QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright: public QFFitFunction {
         QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright();
         virtual ~QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: 3D Normal Diffusion, different molecular brightnesses (rect. pixel, 1/e^2 radii, new Veff)"); }
+        virtual QString name() const { return QString("SPIM-FCS (camera): 3D Normal Diffusion, different molecular brightnesses (rect. pixel, 1/e^2 radii, new Veff)"); }
         /*! \copydoc QFFitFunction::category()   */
         virtual QString category() const { return QObject::tr("SPIM-FCS (camera)"); }
 

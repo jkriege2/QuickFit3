@@ -34,33 +34,33 @@ class QFRDRImagingFCSSimulationThread : public QThread
         explicit QFRDRImagingFCSSimulationThread(QObject *parent = 0);
         int getCurrentFrame() const;
 
-        GET_SET_MACRO(double, DG)
-        GET_SET_MACRO(double, DR)
-        GET_SET_MACRO(double, DRG)
-        GET_SET_MACRO(double, DG2)
-        GET_SET_MACRO(double, DR2)
-        GET_SET_MACRO(double, DRG2)
-        GET_SET_MACRO(double, psf_size_g)
-        GET_SET_MACRO(double, psf_size_r)
-        GET_SET_MACRO(double, crosstalk)
-        GET_SET_MACRO(double, VX)
-        GET_SET_MACRO(double, VY)
-        GET_SET_MACRO(double, deltax)
-        GET_SET_MACRO(double, deltay)
-        GET_SET_MACRO(double, pixel_size)
-        GET_SET_MACRO(double, frametime)
+        GET_SET_MACRO(float, DG)
+        GET_SET_MACRO(float, DR)
+        GET_SET_MACRO(float, DRG)
+        GET_SET_MACRO(float, DG2)
+        GET_SET_MACRO(float, DR2)
+        GET_SET_MACRO(float, DRG2)
+        GET_SET_MACRO(float, psf_size_g)
+        GET_SET_MACRO(float, psf_size_r)
+        GET_SET_MACRO(float, crosstalk)
+        GET_SET_MACRO(float, VX)
+        GET_SET_MACRO(float, VY)
+        GET_SET_MACRO(float, deltax)
+        GET_SET_MACRO(float, deltay)
+        GET_SET_MACRO(float, pixel_size)
+        GET_SET_MACRO(float, frametime)
         GET_SET_MACRO(long, frames)
         GET_SET_MACRO(long, warmup)
         GET_SET_MACRO(bool, dualView)
         GET_SET_MACRO(QString, filename)
         GET_SET_MACRO(int, width)
         GET_SET_MACRO(int, height)
-        GET_SET_MACRO(double, brightnessG)
-        GET_SET_MACRO(double, brightnessR)
-        GET_SET_MACRO(double, brightnessG2)
-        GET_SET_MACRO(double, brightnessR2)
-        GET_SET_MACRO(double, background)
-        GET_SET_MACRO(double, backgroundNoise)
+        GET_SET_MACRO(float, brightnessG)
+        GET_SET_MACRO(float, brightnessR)
+        GET_SET_MACRO(float, brightnessG2)
+        GET_SET_MACRO(float, brightnessR2)
+        GET_SET_MACRO(float, background)
+        GET_SET_MACRO(float, backgroundNoise)
         GET_SET_MACRO(int, walkersG)
         GET_SET_MACRO(int, walkersR)
         GET_SET_MACRO(int, walkersRG)
@@ -86,19 +86,19 @@ class QFRDRImagingFCSSimulationThread : public QThread
         virtual void run();
 
         struct WalkerData {
-            double x;
-            double y;
+            float x;
+            float y;
         };
         QVector<WalkerData> createWalkers(int count, bool onlyHalfImage);
-        void propagateWalkers(QVector<WalkerData>& walkers, double D, bool onlyHalfImage);
+        void propagateWalkers(QVector<WalkerData>& walkers, float D, bool onlyHalfImage);
 
         bool canceled;
-        double DG;
-        double DR;
-        double DRG;
-        double DG2;
-        double DR2;
-        double DRG2;
+        float DG;
+        float DR;
+        float DRG;
+        float DG2;
+        float DR2;
+        float DRG2;
 
         bool onlyHalf_DG;
         bool onlyHalf_DR;
@@ -107,16 +107,16 @@ class QFRDRImagingFCSSimulationThread : public QThread
         bool onlyHalf_DR2;
         bool onlyHalf_DRG2;
 
-        double psf_size_g;
-        double psf_size_r;
-        double deltax;
-        double deltay;
-        double crosstalk;
-        double VX;
-        double VY;
+        float psf_size_g;
+        float psf_size_r;
+        float deltax;
+        float deltay;
+        float crosstalk;
+        float VX;
+        float VY;
         bool FlowEeverywhere;
-        double pixel_size;
-        double frametime;
+        float pixel_size;
+        float frametime;
         long frames;
         long warmup;
 
@@ -126,18 +126,18 @@ class QFRDRImagingFCSSimulationThread : public QThread
         int width;
         int height;
         int currentFrame;
-        double brightnessG;
-        double brightnessR;
-        double brightnessG2;
-        double brightnessR2;
+        float brightnessG;
+        float brightnessR;
+        float brightnessG2;
+        float brightnessR2;
         int walkersG;
         int walkersR;
         int walkersRG;
         int walkersG2;
         int walkersR2;
         int walkersRG2;
-        double background;
-        double backgroundNoise;
+        float background;
+        float backgroundNoise;
 
 
         MTRand rng;

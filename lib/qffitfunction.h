@@ -218,10 +218,11 @@ class QFLIB_EXPORT QFFitFunction: public QFFitFunctionBase {
             \param residualHistogramBins bins in the residual histogram
             \param COV the variance/covariance matrix from the fit, if empty it is estimated from the provided data!
             \param paramrange_size an estimate of the maximal parameter value (i.e. all fit parameters have to be in the range -paramrange_size...paramrange_size. If this is not supplied, a bayesian model probability cannot be calculated!
+            \param storeCOV is set \c true, the var-cov-matrx is stored in the fit stratistics, otherwise the property COV is an empty vector!
 
             \note the arrays in the resulting struct are allocated using \c qfMalloc(), so you will have to free them using \c qfFree() !!!
           */
-        QFFitStatistics calcFitStatistics(long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, const QVector<double>& COV=QVector<double>(), double paramrange_size=200) const;
+        QFFitStatistics calcFitStatistics(long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, const QVector<double>& COV=QVector<double>(), double paramrange_size=200, bool storeCOV=false) const;
 
 };
 

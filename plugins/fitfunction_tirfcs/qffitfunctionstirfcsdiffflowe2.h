@@ -34,7 +34,7 @@ class QFFitFunctionsTIRFCSDiffFlowE2: public QFFitFunction {
         QFFitFunctionsTIRFCSDiffFlowE2();
         virtual ~QFFitFunctionsTIRFCSDiffFlowE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("TIR-FCS: 2D Normal Diffusion+Flow (rect. pixel, 1/e^2 radii)"); }
+        virtual QString name() const { return QString("TIR-FCS (camera): 2D Normal Diffusion+Flow (rect. pixel, 1/e^2 radii)"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */

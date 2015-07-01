@@ -33,7 +33,7 @@ class QFFitResultsByIndexEvaluationFitToolsBase {
         virtual ~QFFitResultsByIndexEvaluationFitToolsBase();
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
-        virtual QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1, const QString &prefix=QString("fitstat_"), const QString &pgroup=QString("fit statistics"), const QVector<double>& COV=QVector<double>(), double paramrange_size=200);
+        virtual QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1, const QString &prefix=QString("fitstat_"), const QString &pgroup=QString("fit statistics"), const QVector<double>& COV=QVector<double>(), double paramrange_size=200, bool storeCOV=false);
 
     protected:
 

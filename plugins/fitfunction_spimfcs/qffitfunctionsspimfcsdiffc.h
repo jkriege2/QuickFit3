@@ -39,7 +39,7 @@ class QFFitFunctionsSPIMFCSDiffC: public QFFitFunction {
         QFFitFunctionsSPIMFCSDiffC();
         virtual ~QFFitFunctionsSPIMFCSDiffC() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: 3D Normal Diffusionc c, D as parameters (rect. pixel, 1/sqrt(e) radii)"); };
+        virtual QString name() const { return QString("SPIM-FCS (camera): 3D Normal Diffusionc c, D as parameters (rect. pixel, 1/sqrt(e) radii)"); };
         /*! \copydoc QFFitFunction::category()   */
         virtual QString category() const { return QObject::tr("SPIM-FCS (camera)"); }
 

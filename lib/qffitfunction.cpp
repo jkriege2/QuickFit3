@@ -123,7 +123,7 @@ void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, c
 
 
 
-QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, const QVector<double> &COV, double paramrange_size) const {
+QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, const QVector<double> &COV, double paramrange_size, bool storeCOV) const {
     int fitparamN=0;
     const int pcount=paramCount();
     QVector<double> fitp, fitpe;
@@ -159,7 +159,7 @@ QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, 
 
         QFFitFunction* ff=duplicate();
         if (ff) {
-            qDebug()<<"("<<x[0]<<y[0]<<w[0]<<")   "<<"("<<x[1]<<y[1]<<w[1]<<")   "<<"("<<x[2]<<y[2]<<w[2]<<")   ";
+            //qDebug()<<"("<<x[0]<<y[0]<<w[0]<<")   "<<"("<<x[1]<<y[1]<<w[1]<<")   "<<"("<<x[2]<<y[2]<<w[2]<<")   ";
             QFFitAlgorithm::FitQFFitFunctionFunctor fm(ff, fullParams, paramsFix, x, y, w, M);
             double* pmapped=fm.createMappedArrayForFunctor(fullParams);
 
@@ -174,16 +174,16 @@ QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, 
 
             qfFree(pmapped);
 
-            qDebug()<<"estimated COV: "<<COVV<<"  chi2="<<chi2<<"  hasWeights="<<QFFitAlgorithm::functorHasWeights(&fm)<<"  allWeightsOne="<<allWeightsOne<<"  allWeightsEqual="<<allWeightsEqual;
+            //qDebug()<<"estimated COV: "<<COVV<<"  chi2="<<chi2<<"  hasWeights="<<QFFitAlgorithm::functorHasWeights(&fm)<<"  allWeightsOne="<<allWeightsOne<<"  allWeightsEqual="<<allWeightsEqual;
         }
         if (ff) delete ff;
     }
 
 
     if (fitp.data() && fitpe.data()) {
-        return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins, fitp.data(), fitpe.data(), COVV, paramrange_size);
+        return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins, fitp.data(), fitpe.data(), COVV, paramrange_size, storeCOV);
     } else {
-        return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins, NULL, NULL, COVV, paramrange_size);
+        return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins, NULL, NULL, COVV, paramrange_size, storeCOV);
     }
 }
 

@@ -44,6 +44,7 @@ JKTetrisMainWindow::JKTetrisMainWindow(QWidget *parent) :
                               .arg(ProgramOptions::getConfigValue("quickfit/entertain/highscore", 0).toInt())
                               .arg(ProgramOptions::getConfigValue("quickfit/entertain/highscore_date", QDate::currentDate()).toDate().toString())
                               .arg(ProgramOptions::getConfigValue("quickfit/entertain/highscore_level", 0).toInt()));
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 JKTetrisMainWindow::~JKTetrisMainWindow()

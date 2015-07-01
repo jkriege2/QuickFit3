@@ -1484,6 +1484,7 @@ struct QFLIB_EXPORT QFBasicFitStatistics {
         double weightSum;          /**<  sum of all weights (for normalizations */
 
         double detCOV;             /**<  determinant of fit variance/covariance matrix */
+        QVector<double> COV;       /**<  fit variance/covariance matrix */
 
         double rmin;       /**<  min of residuals */
         double rmax;       /**<  max of residuals */
@@ -1568,7 +1569,7 @@ struct QFLIB_EXPORT QFFitStatistics: public QFBasicFitStatistics {
 
     \note the arrays in the resulting struct are allocated using \c qfMalloc(), so you will have to free them using \c qfFree() !!!
   */
-QFLIB_EXPORT QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, const double* fitFuncParams=NULL, const double* fitFuncParamErrors=NULL, const QVector<double>& COV=QVector<double>(), double paramrange_size=200);
+QFLIB_EXPORT QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, const double* fitFuncParams=NULL, const double* fitFuncParamErrors=NULL, const QVector<double>& COV=QVector<double>(), double paramrange_size=200, bool storeCOV=true);
 
 /*! \brief calculate fit statistics for the given measurement dataset, using this fit function with the given parameters
 
@@ -1590,7 +1591,7 @@ QFLIB_EXPORT QFFitStatistics calculateFitStatistics(long N, const double* tauval
 
     \note the arrays in the resulting struct are allocated using \c qfMalloc(), so you will have to free them using \c qfFree() !!!
   */
-QFLIB_EXPORT QFBasicFitStatistics calculateBasicFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, const double* fitFuncParams=NULL, const double* fitFuncParamErrors=NULL, const QVector<double>& COV=QVector<double>(), double paramrange_size=200);
+QFLIB_EXPORT QFBasicFitStatistics calculateBasicFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, const double* fitFuncParams=NULL, const double* fitFuncParamErrors=NULL, const QVector<double>& COV=QVector<double>(), double paramrange_size=200, bool storeCOV=true);
 
 
 #endif // QFMATHTOOLS_H

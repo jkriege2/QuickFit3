@@ -174,6 +174,8 @@ QFFitStatistics::QFFitStatistics():
     //resCorrelation=0;
     //resWCorrelation=0;
     resN=0;
+
+    COV.clear();
 }
 
 void QFFitStatistics::free() {
@@ -204,7 +206,7 @@ QString QFFitStatistics::getAsHTMLTable(bool addExplanation, bool includeR2) con
 
 
 
-QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, const double* fitFuncParams, const double* fitFuncParamErrors, const QVector<double>& COV, double paramrange_size) {
+QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, const double* fitFuncParams, const double* fitFuncParamErrors, const QVector<double>& COV, double paramrange_size, bool storeCOV) {
     datacut_max=qBound((long)datacut_min, (long)datacut_max, (long)N-1);
     QFFitStatistics result;
 
@@ -249,6 +251,7 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
         //qDebug()<<"  detCOV="<<detCOV<<"  COVSqrtDiagProd="<<COVSqrtDiagProd<</*"   COVDiagProd="<<COVDiagProd<<*/"  n="<<n<<"  paramCount="<<paramCount;
     }
     result.detCOV=detCOV;
+    if (storeCOV) result.COV=COV;
 
 
     /////////////////////////////////////////////////////////////////////////////////
@@ -455,8 +458,8 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
 
 
 
-QFBasicFitStatistics calculateBasicFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, const double* fitFuncParams, const double* fitFuncParamErrors, const QVector<double>& COV, double paramrange_size) {
-    QFFitStatistics result=calculateFitStatistics(N, tauvals, model, corrdata, weights, datacut_min, datacut_max, paramCount, 11, 11, fitFuncParams, fitFuncParamErrors, COV, paramrange_size);
+QFBasicFitStatistics calculateBasicFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, const double* fitFuncParams, const double* fitFuncParamErrors, const QVector<double>& COV, double paramrange_size, bool storeCOV) {
+    QFFitStatistics result=calculateFitStatistics(N, tauvals, model, corrdata, weights, datacut_min, datacut_max, paramCount, 11, 11, fitFuncParams, fitFuncParamErrors, COV, paramrange_size, storeCOV);
     return result;
 }
 
@@ -589,6 +592,11 @@ QString QFBasicFitStatistics::getAsHTMLTable(bool addExplanation, bool includeR2
         txtFit+=QString("<tr>%1</tr>").arg(btxt);
     }
     txtFit+=QString("</table>");
+
+    if (COV.size()>0) {
+        int n=floor(sqrt(COV.size()));
+        txtFit.append(QString("<br><br>Var-Cov-Matrix:<blockquote>")+QString(linalgMatrixToHTMLString(COV.data(), n, n, 9, 3, "g", " border=\"0\"").c_str())+QString("</blockquote>"));
+    }
 
     if (addExplanation) {
         txtFit.append(QString("<br><br>")+getHTMLExplanation());
