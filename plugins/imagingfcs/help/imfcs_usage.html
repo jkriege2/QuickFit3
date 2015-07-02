@@ -201,8 +201,10 @@ You can right-click the input field to open its context-menu, which contains ent
     <li>The spin-box <b>"segments"</b> allows you to split the input image series into <i>N</i> segments. For each of these (equally long) segments, a separate correlation function is calculated and finally the average and standard deviation over these correlation functions is loaded into the project. This allows to use the standard deviation as an estimate of the measurement error of the correlation function, which can improve fit results. Also it is possible to later remove some of these segments form the average, e.g. to exclude any discontinuities from the measurement (e.g. aggregates moving through a pixel/the image).<br>Typically the segments should not be too short (at least 10,000-20,000 frames), so the calculated correlation function has sufficient statistical significance. Usually a value of 3-6 is a good choice, if ~100,000 frames were acquired.</li>
     <li>The input widgets <b>correlator</b> allow to modify the type of correlator, that is used for the data processing. the details of the available choices are explained in the help-page <a href="imfcs_correlator.html">theoretic description of the implemented correlation algorithms</a>.<br>A good choice is usually: $$example:<b>correlator</b> = <tt>Direct Correlation with Averaging</tt>, <br><b>P</b> = <tt>8 or 16</tt>, <br><b>m</b> = <tt>2</tt>, <br><b>S</b> selected, so &tau;<sub>max</sub> is a little bit larger than the segment length.$$</li>
 </li>
+<li>If you choose to not cut the measurement into segments (i.e. <tt>segments=1</tt>) and use the non-averaging correlators, you can use the <b><a href="imfcs_correlator.htmlblocking">blocking method</a></b> to estimate the standard error of the correlation cuvre. Note that this option is activated only, if it is applicable (<code>segments=1</code> and non-averaging direct correlation).</li>
 </ul>
 </p>
+<p></p>
 
 
     

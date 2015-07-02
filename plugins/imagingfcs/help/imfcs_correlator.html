@@ -3,114 +3,147 @@
   <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>Imaging FCS Plugin: Image Correlators</title>
-	  <link rel="prev" href="imfcs_bleach.html"> 
-	  <link rel="next" href="imfcs_dataformats.html"> 
-	  <link rel="contents" href="imaging_fcs.html">     
+      <link rel="prev" href="imfcs_bleach.html"> 
+      <link rel="next" href="imfcs_dataformats.html"> 
+      <link rel="contents" href="imaging_fcs.html">     
   </head>
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 
-	
-	<a name="#correlators"><h2>Correlators</h2>
-	<h3>Correlator Types</h3>
+    
+    <a name="#correlators"><h2>Correlator Types</h2>
     <p>In the last section only the definition of the ACFs/CCFs was given (in terms of integrals, i.e. continuous imae series). But the image series <i>I(t)</i> (omitting the pixel-specifier) are not continuous, but discrete in time:
-	 <blockquote>
-	   <img src="./pic/discrete_timeseries.png">
-	 </blockquote>	
-	 This section will describe the different types of correlators, available in this plugin, that calculate an ACF/CCF from one/two given discrete timeseries <i>I<sub>n</sub></i> (and <i>J<sub>n</sub></i> ). The integration or frame time is specified by <i>&tau;<sub>min</sub></i>:
-	<ul>
-	  <li><b>Direct Correlation:</b><br>This correlator directly estimates the above given correlation function by replacing the integrals with sums (only the CCF of two signals <i>I<sub>n</sub></i> and <i>J<sub>n</sub></i> is shown, the ACF is given by the CCF of the signal with itself, i.e. <i><i>J<sub>n</sub></i>=<i>I<sub>n</sub></i></i>):
-	     <blockquote>
-		   <img src="./pic/acf_direct.png">
-		 </blockquote>
-	  This sum is evaluated for semi-logarithmically spaced lags <i>&tau;</i>. These are specified by three integer numbers <i>S, P</i> and <i>m</i> that result in <i>S&middot;P</i> different values of <i>&tau; = &tau;<sub>s,p</sub></i>:
-	     <blockquote><i>
-		   &tau;<sub>0,0</sub> = &tau;<sub>min</sub><br>
-		   &tau;<sub>s,p</sub> = &tau;<sub>s-1,P-1</sub> + p&middot;m<sup>s</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>with<i> s=0..S-1 </i>and</i> p=0..P-1
-		 </i></blockquote>
-	  This recursive formula leads to <i>S</i> blocks of <i>P</i> linearly spaces lags. The difference between two subsequent lags increases exponentially (<i>m<sup>s</sup></i>) from block to block.
-	  The normalization is explained in more detail below.<br>
-	  <i>normal/"integer" correlators:</i> There are two varieties of this correlator implemented in QuickFit, the first one uses double-precision floating point numbers (64-bit IEEE floats) for calculating the sums and products in the correlations. This limits the range of representable numbers to about 15-16 decimal significant digits (correspond to 52 binary digits). The second version uses 64-bit unsigned integers (~19 decimal digits) for the products and sums. This increases the accuracy at high input-countrates, but at the cost of a rounding error when converting the floating point input value (including background and bleach corrections, which are non-integer) back to an integer number. So if you measured high count rates per pixel or use high non-averaging binning, this variant may be beneficial. On the other hand for low input values, the floating-point correlators are beneficial, as the rounding errors play a larger role.
-	  </li>
+     <blockquote>
+       <img src="./pic/discrete_timeseries.png">
+     </blockquote>    
+     This section will describe the different types of correlators, available in this plugin, that calculate an ACF/CCF from one/two given discrete timeseries <i>I<sub>n</sub></i> (and <i>J<sub>n</sub></i> ). The integration or frame time is specified by <i>&tau;<sub>min</sub></i>.
+    <h3>Direct Correlation:</h3>
+    <h4>Correlation Algorithm</h4>
+    <p>This correlator directly estimates the above given correlation function by replacing the integrals with sums (only the CCF of two signals <i>I<sub>n</sub></i> and <i>J<sub>n</sub></i> is shown, the ACF is given by the CCF of the signal with itself, i.e. <i><i>J<sub>n</sub></i>=<i>I<sub>n</sub></i></i>):
+         <blockquote>
+           <img src="./pic/acf_direct.png">
+         </blockquote>
+      This sum is evaluated for semi-logarithmically spaced lags <i>&tau;</i>. These are specified by three integer numbers <i>S, P</i> and <i>m</i> that result in <i>S&middot;P</i> different values of <i>&tau; = &tau;<sub>s,p</sub></i>:
+         <blockquote><i>
+           &tau;<sub>0,0</sub> = &tau;<sub>min</sub><br>
+           &tau;<sub>s,p</sub> = &tau;<sub>s-1,P-1</sub> + p&middot;m<sup>s</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>with<i> s=0..S-1 </i>and</i> p=0..P-1
+         </i></blockquote>
+      This recursive formula leads to <i>S</i> blocks of <i>P</i> linearly spaces lags. The difference between two subsequent lags increases exponentially (<i>m<sup>s</sup></i>) from block to block.
+      The normalization is explained in more detail below.<br>
+      <i>normal/"integer" correlators:</i> There are two varieties of this correlator implemented in QuickFit, the first one uses double-precision floating point numbers (64-bit IEEE floats) for calculating the sums and products in the correlations. This limits the range of representable numbers to about 15-16 decimal significant digits (correspond to 52 binary digits). The second version uses 64-bit unsigned integers (~19 decimal digits) for the products and sums. This increases the accuracy at high input-countrates, but at the cost of a rounding error when converting the floating point input value (including background and bleach corrections, which are non-integer) back to an integer number. So if you measured high count rates per pixel or use high non-averaging binning, this variant may be beneficial. On the other hand for low input values, the floating-point correlators are beneficial, as the rounding errors play a larger role.
+      </p>
+      
+      
+      
+      
 
-	  <li><b>Direct Correlation, with Averaging:</b><br>This correlator yields the same results as the <b>Direct Estimation</b>, but intrinsically averages the calculated correlation function (with a triangular kernel, see below). The width of the averaging increases from decade to decade of the quasi-logarithmically spaced &tau;-values at which the correlation function is evaluated. The correlation works like this:
-	  <ol>
-	    <li>calculate $$math:g(\tau_i)$$ at <i>P</i> linearly spaced lags $$math:\tau_{i}=i$$, using the same estimation as above:
-	     <blockquote>
-		   <img src="./pic/acf_direct.png">
-		 </blockquote>		
-		</li>
-	    <li>average the input signal series <i>J<sub>n</sub></i> and <i>I<sub>n</sub></i> by summing up <i>m</i> subsequent values. The new series <i>J<sub>n</sub>'</i> and <i>I<sub>n</sub>'</i> will then hold only <i>N/m</i> values.
-		</li>
-	    <li>return <i>S</i> times to step 1 with the new input signals</li>
-	  </ol>
-	  This can be illustrated:
-	     <blockquote>
-		   <img src="./pic/acf_directavg.png">
-		 </blockquote>		
+      <h3>Direct Correlation, with Averaging:</h3>
+      <p>This correlator yields the same results as the <b>Direct Estimation</b>, but intrinsically averages the calculated correlation function (with a triangular kernel, see below). The width of the averaging increases from decade to decade of the quasi-logarithmically spaced &tau;-values at which the correlation function is evaluated. The correlation works like this:
+      <ol>
+        <li>calculate $$math:g(\tau_i)$$ at <i>P</i> linearly spaced lags $$math:\tau_{i}=i$$, using the same estimation as above:
+         <blockquote>
+           <img src="./pic/acf_direct.png">
+         </blockquote>        
+        </li>
+        <li>average the input signal series <i>J<sub>n</sub></i> and <i>I<sub>n</sub></i> by summing up <i>m</i> subsequent values. The new series <i>J<sub>n</sub>'</i> and <i>I<sub>n</sub>'</i> will then hold only <i>N/m</i> values.
+        </li>
+        <li>return <i>S</i> times to step 1 with the new input signals</li>
+      </ol>
+      </p>
+      <p>
+      This can be illustrated:
+      
+         <center>
+           <img src="./pic/acf_directavg.png">
+         </center>        
+</p><p>
+      <i>Normal/"integer" correlators:</i> There are two varieties of this correlator implemented in QuickFit, the first one uses double-precision floating point numbers (64-bit IEEE floats) for calculating the sums and products in the correlations. This limits the range of representable numbers to about 15-16 decimal significant digits (correspond to 52 binary digits). The second version uses 64-bit unsigned integers (~19 decimal digits) for the products and sums. This increases the accuracy at high input-countrates, but at the cost of a rounding error when converting the floating point input value (including background and bleach corrections, which are non-integer) back to an integer number. So if you measured high count rates per pixel or use high non-averaging binning, this variant may be beneficial.
+      </p>
 
-	  <i>normal/"integer" correlators:</i> There are two varieties of this correlator implemented in QuickFit, the first one uses double-precision floating point numbers (64-bit IEEE floats) for calculating the sums and products in the correlations. This limits the range of representable numbers to about 15-16 decimal significant digits (correspond to 52 binary digits). The second version uses 64-bit unsigned integers (~19 decimal digits) for the products and sums. This increases the accuracy at high input-countrates, but at the cost of a rounding error when converting the floating point input value (including background and bleach corrections, which are non-integer) back to an integer number. So if you measured high count rates per pixel or use high non-averaging binning, this variant may be beneficial.
-	  </li>
-
-	  <li><b>Multi-&tau; Correlator:</b><br>
-	  This correlation scheme was introduced by K. Schätzel [1,2] for hardware correlators. It allows to estimate the ACF/CCF without keeping the whole time series in memory. It is based on the above semi-logarithmically spaced values of <i>&tau;<sub>s,p</sub></i>. For each of the <i>P</i> linear blocks an averaged set of input signals is created:
-	     <blockquote>
-		   <img src="./pic/multitau_signals.png">
-		 </blockquote>	  
-	  Using this scheme, the estimate of the CCF can be written as above:
-	     <blockquote>
-		   <img src="./pic/multitau_ccf.png">
-		 </blockquote>	  	  
-	  As can be seen only the averages intensities <i>I<sub>s,n</sub></i> appear in the formula. This scheme can also be drawn as a schematic, which shows the direct connection to a simple hardware implementation [3]:
-	     <blockquote>
-		   <img src="./pic/multi_tau_schaematic.png">
-		 </blockquote>
-      The &Delta;&tau; blocks delay the input signal by &Delta;&tau;, the &times;-blocks multiply the two input signals and the &Sigma;-blocks accumulate the input. The top row (a) shows a fully linear implementation (no logarithmic spacing) and (b)/(c) the multi-&tau; implementation. This plugin contains a software version of this scheme. Using this scheme introduces an additional (triangular) averaging into the ACF/CCF (as compared to the direct estimation), but allows to calculate it without the need to keep the whole image series in memory. Also this averaging depends on the linear block <i>s</i> and has only little impakt for small <i>s</i>. the systematic error introduced increases for the larger lags for which usually measured ACFs/CCFs already decayed to 0 [4]:
-	     <blockquote>
-		   <img src="./pic/multitau_avg.png">
-		 </blockquote>
-	  Here <img src="./pic/multitau_avg_triangle.png"> is a triangular kernel function and * denotes the convolution product. 
-	  </li>
-	</ul>
-	
-	<h3>Normalization</h3>
-	All types of correlators use the same normalization scheme for the term <i>1/&lang;I&rang;&lang;J&rang;</i> in the definition of the ACF/CCF. The normalization scheme is called "symmetric normalization", introduced in [2]. This normalization takes care for the reduced number <i>T-&tau;<sub>s,p</sub></i> of accumulations in the ACF/CCF and is defined as:
-	     <blockquote>
-		   <img src="./pic/symm_normalization.png">
-		 </blockquote>
-	The "delayed monitor" <i>M(&tau;<sub>k</sub>)</i> may be estimated in two ways. Either it is calculated for every lag <i>&tau;<sub>k</sub></i> separately, or it can bes estimated as:
-		 <blockquote>
-		   <img src="./pic/symm_normalization_estimate.png">
-		 </blockquote>
-	from the zero-lag monitor <i>M(0)</i>. This method possibly introduces additional errors that are but negligible for longer image series (see [3] for a detailed discussion).
-	</p>
-	<h3>Comparison of the correlators</h3>
-	<p>
-	  In general the results of all correlation scheme are the same. Those with intrinsic averaging will decrease the noise on the correlation curve at larger lag times, where the statistics tends to get worse due to the fewer summands in the average. This is beneficial, when the correlation curves decay to zero/one in this regime, as then the estimation error is decreased. If the correlation curves do not decay, using a correlator with averaging will introduce an additional systematic error. This can be illustrated in these examples:
-	     <blockquote>
-		   <b>autocorrelation of a sine signal:</b><br>
-		   <img src="./pic/corr_examples_sine.png">
-		 </blockquote>		
-	     <blockquote>
-		   <b>autocorrelation which decays to one for different decay times:</b><br>
-		   <img src="./pic/corr_examples.png">
-		 </blockquote>	
+      <h3>Multi-&tau; Correlator:</h3>
+      <p>
+      This correlation scheme was introduced by K. Sch&auml;tzel $$ref:SCHAETZEL1985:K. Sch&auml;tzel (1985): <b>New concepts in correlator design</b>, <i>Institute of Physics Conference Series</i> <b>77</b>, 175-184.$$$$ref:SCHAETZEL1990:K. Sch&auml;tzel (1990): <b>Noise on photon correlation data: I. Autocorrelation functions</b>, <i>Quantum Opt.</i> <b>2</b>, 287-305$$ for hardware correlators. It allows to estimate the ACF/CCF without keeping the whole time series in memory. It is based on the above semi-logarithmically spaced values of <i>&tau;<sub>s,p</sub></i>. For each of the <i>P</i> linear blocks an averaged set of input signals is created:
+         <blockquote>
+           <img src="./pic/multitau_signals.png">
+         </blockquote>      
+      Using this scheme, the estimate of the CCF can be written as above:
+         <blockquote>
+           <img src="./pic/multitau_ccf.png">
+         </blockquote>            
+      As can be seen only the averages intensities <i>I<sub>s,n</sub></i> appear in the formula. This scheme can also be drawn as a schematic, which shows the direct connection to a simple hardware implementation $$ref:BUCHHOL2012:J. Buchholz, J.W. Krieger, etal (2011): <b>FPGA implementation of a 32&times;32 autocorrelator array for analysis of fast image series</b>, <i>Optics Express</i>, vol. 20, issue 16, p. 17767$$:
+         <blockquote>
+           <img src="./pic/multi_tau_schaematic.png">
+         </blockquote>
+      The &Delta;&tau; blocks delay the input signal by &Delta;&tau;, the &times;-blocks multiply the two input signals and the &Sigma;-blocks accumulate the input. The top row (a) shows a fully linear implementation (no logarithmic spacing) and (b)/(c) the multi-&tau; implementation. This plugin contains a software version of this scheme. Using this scheme introduces an additional (triangular) averaging into the ACF/CCF (as compared to the direct estimation), but allows to calculate it without the need to keep the whole image series in memory. Also this averaging depends on the linear block <i>s</i> and has only little impakt for small <i>s</i>. the systematic error introduced increases for the larger lags for which usually measured ACFs/CCFs already decayed to 0 $$ref:KOJIRO1999:Z. Kojro, A. Riede, M. Schubert and W. Grill (1999): <b>Systematic and statistical errors in correlation estimators obtained from various digital correlators</b> <i>Review of Scientific Instruments</i> <b>70</b>, 4487-4496$$:
+         <blockquote>
+           <img src="./pic/multitau_avg.png">
+         </blockquote>
+      Here <img src="./pic/multitau_avg_triangle.png"> is a triangular kernel function and * denotes the convolution product. 
+      </p>
+    
+    <h2>Normalization</h2>
+    All types of correlators use the same normalization scheme for the term <i>1/&lang;I&rang;&lang;J&rang;</i> in the definition of the ACF/CCF. The normalization scheme is called "symmetric normalization", introduced in $$ref:SCHAETZEL1990:$$. This normalization takes care for the reduced number <i>T-&tau;<sub>s,p</sub></i> of accumulations in the ACF/CCF and is defined as:
+         <blockquote>
+           <img src="./pic/symm_normalization.png">
+         </blockquote>
+    The "delayed monitor" <i>M(&tau;<sub>k</sub>)</i> may be estimated in two ways. Either it is calculated for every lag <i>&tau;<sub>k</sub></i> separately, or it can bes estimated as:
+         <blockquote>
+           <img src="./pic/symm_normalization_estimate.png">
+         </blockquote>
+    from the zero-lag monitor <i>M(0)</i>. This method possibly introduces additional errors that are but negligible for longer image series (see $$ref:BUCHHOL2012:$$ for a detailed discussion).
+    </p>
+    <h2>Comparison of the correlators</h2>
+    <p>
+      In general the results of all correlation scheme are the same. Those with intrinsic averaging will decrease the noise on the correlation curve at larger lag times, where the statistics tends to get worse due to the fewer summands in the average. This is beneficial, when the correlation curves decay to zero/one in this regime, as then the estimation error is decreased. If the correlation curves do not decay, using a correlator with averaging will introduce an additional systematic error. This can be illustrated in these examples:
+         <blockquote>
+           <b>autocorrelation of a sine signal:</b><br>
+           <img src="./pic/corr_examples_sine.png">
+         </blockquote>        
+         <blockquote>
+           <b>autocorrelation which decays to one for different decay times:</b><br>
+           <img src="./pic/corr_examples.png">
+         </blockquote>    
       In addition to these discussed errors there are other differences in the implementations: The <i>direct correlators</i> need the whole image series to reside in memory, so if your image series is very long (longer than ~1,000,000 frames and with many pixels) it is usually better to use the multi-&tau; correlators, as these are fed frame by frame, so only few frames reside in memory at every time. 
     </p>
-	
-	$$qf_commondoc_backtop$$
+    
+    $$qf_commondoc_backtop$$
     <p></p>
     <p></p>
     <p></p>
-	
-	
-	<a name="#references"><h2>References:</h2><blockquote>
-	  [1]: K. Sch&auml;tzel (1985): <b>New concepts in correlator design</b>, <i>Institute of Physics Conference Series</i> <b>77</b>, 175-184.<br>
-	  [2]: K. Sch&auml;tzel (1990): <b>Noise on photon correlation data: I. Autocorrelation functions</b>, <i>Quantum Opt.</i> <b>2</b>, 287-305<br>
-	  [3]: J. Buchholz, J.W. Krieger, etal (2011): <b>FPGA implementation of a 32&times;32 autocorrelator array for analysis of fast image series</b>, <i>Optics Express</i>, vol. 20, issue 16, p. 17767<br>
-	  [4]: Z. Kojro, A. Riede, M. Schubert and W. Grill (1999): <b>Systematic and statistical errors in correlation estimators obtained from various digital correlators</b> <i>Review of Scientific Instruments</i> <b>70</b>, 4487-4496<br>
-	</blockquote></p>
-	</body>
+    
+    
+    
+    <h2>Error Estimation Methods</h2>
+    
+    
+    <h3>Error Estimation by repeated measurements/segments</h3>
+    <p>the simplest way to estimate the error of a correlation function is to simply repeat the measurement $(K)$ times and then use the average and standard deviation over these $(K)$ repeats as  curve and errorestimate for any further evaluation (e.g. for weighting a fit). The imFCS correlator can do such an average+SD, if you cut a measurement into $(K)$ segments.</p>
+    
+<a name="blocking"><h3>Error estimate with blocking</h3>
+      <p>The algorithm described above provides the correlation function, but not its error. The error can be calculated using a method called "blocking" $$ref:FLYVBJERG1989:Flyvbjerg H, Petersen H G  (1989) Error estimates on averages of correlated data. <i>The Journal of Chemical Physics</i> <b>91</b><b>:</b> 461, doi: 10.1063/1.457480$$. Generally the correlation algorithm calculates a sum  
+$[G_\tau=\frac{1}{N}\cdot\sum_{n=1}^N\underbrace{I_n\cdot J_{n+\tau}}{=x_n}]$ 
+and the error of such a summation is simply given by: 
+$[\sigma^2(G_\tau)=\langle G_\tau^2\rangle-\langle G_\tau\rangle^2.]$ 
+The standard error is accordingly:
+$[\mbox{SE}(G_\tau)=\sqrt{\frac{\sigma^2(G_\tau)}{N}}.]$ 
+This gives a good estimator of the variance only if the $(x_n=I_n\cdot J_{n+\tau})$ are a non-correlated random number. In FCS/FCCS we are interested in calculating $(G_\tau)$ for correlated signal $(I_n,J_n)$ and thus also for correlated $(x_n)$. This problem is solved by the mentiones "blocking" method due to Flyvbjerg &amp; Petersen $$ref:FLYVBJERG1989:$$. Here one averages the summands: $[x_{n/2}'\leftarrow \frac{x_{2n}+x_{2n+1}}{2}]$ repeatedly, until the resulting $(x_n)$ are approximateky un-correlated. Only then the variance $(\sigma(G_n))$ is calculated from the averaged summands.
+</p>
+<p>
+The authors of $$ref:GUO2012:Guo S, He J, Monnier N, Sun G, Wohland T, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data II: Application to Simulated and In Vitro Data. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3880-3888 doi: 10.1021/ac2034375 $$$$ref:HE2012: He J, Guo S, Bathe M  (2012) Bayesian Approach to the Analysis of Fluorescence Correlation Spectroscopy Data I: Theory. <i>Analytical Chemistry</i> <b>84</b><b>:</b> 3871-3879 doi: 10.1021/ac2034369$$$$ref:GUO2014:
+Guo S, Bag N, Mishra A, Wohland T, Bathe M  (2014) Bayesian Total Internal Reflection Fluorescence Correlation Spectroscopy Reveals hIAPP-Induced Plasma Membrane Domain Organization in Live Cells. <i>Biophysical Journal</i> <b>106</b><b>:</b> 190-200 $$ presented a  method that alows to automatically determine the level of blocking that is required to obtain statistically independent $(x_n)$. basically one tries different blocking levels for the first lag $(\tau=1)$ and for each blocking calculates $(\sigma^2(G_\tau))$ and it's standard error, which is (assuming a normal distribution of $(x_n)$: $$ref:Wonnapinij2010:Wonnapinij P, Chinnery P F, Samuels D C  (2010) Previous estimates of mitochondrial DNA mutation level variance did not account for sampling error: comparing the mtDNA genetic bottleneck in mice and humans.. <i>American journal of human genetics</i> <b>86</b><b>:</b> 540-50 $$ $[\sigma\left(\sigma^2(G_\tau)\right)=\sigma^2(G_\tau)\cdot\sqrt{\frac{2}{N-1}}.]$ then one selects the blocking level, for which the $(\sigma^2(G_\tau)\pm\sigma\left(\sigma^2(G_\tau)\right))$ are overlapping.</li>
+</ul>
+</p>
+
+<!--<p>For the "direct correlation with averaging" correlators, the input data is already averaged between linear blocks
+</p>-->
+
+
+    
+    
+    
+    <a name="#references"><h2>References</h2>
+    <p>$$references$$</p>
+    </body>
 </html>
 
 
