@@ -27,7 +27,7 @@
 #include <stdint.h>
 #include <QString>
 #include <QList>
-
+#include <QRegExp>
 
 
 /*! \brief represents a common data interface for additional images
@@ -95,6 +95,31 @@ class QFRDRAdditionalImagesInterface {
 
 };
 
+inline int QFRDRAdditionalImagesInterface_getImageIDForName(const QFRDRAdditionalImagesInterface* img, const QString& name, bool exactMatch=false) {
+    for (int i=0; i<img->getAdditionalImagesCount(); i++) {
+        QString n=img->getAdditionalImagesName(i);
+        if (exactMatch && n==name) return i;
+        if (!exactMatch) {
+            if (name.simplified().toLower().contains(n.simplified().trimmed().toLower())) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+inline int QFRDRAdditionalImagesInterface_getImageIDForNameRX(const QFRDRAdditionalImagesInterface* img, QRegExp name, bool exactMatch=false) {
+    for (int i=0; i<img->getAdditionalImagesCount(); i++) {
+        QString n=img->getAdditionalImagesName(i);
+        if (!exactMatch && name.indexIn(n)>=0) {
+            return i;
+        } else if (exactMatch && name.exactMatch(n)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 Q_DECLARE_INTERFACE( QFRDRAdditionalImagesInterface,
                      "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRAdditionalImagesInterface/1.0")
 
@@ -148,6 +173,31 @@ class QFRDROverviewImagesInterface {
 
 
 };
+
+inline int QFRDROverviewImagesInterface_getImageIDForName(const QFRDROverviewImagesInterface* img, const QString& name, bool exactMatch=false) {
+    for (int i=0; i<img->getOverviewImageCount(); i++) {
+        QString n=img->getOverviewImageName(i);
+        if (exactMatch && n==name) return i;
+        if (!exactMatch) {
+            if (name.simplified().toLower().contains(n.simplified().trimmed().toLower())) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+inline int QFRDROverviewImagesInterface_getImageIDForNameRX(const QFRDROverviewImagesInterface* img, QRegExp name, bool exactMatch=false) {
+    for (int i=0; i<img->getOverviewImageCount(); i++) {
+        QString n=img->getOverviewImageName(i);
+        if (!exactMatch && name.indexIn(n)>=0) {
+            return i;
+        } else if (exactMatch && name.exactMatch(n)) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 Q_DECLARE_INTERFACE( QFRDROverviewImagesInterface,
                      "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDROverviewImagesInterface/1.0")

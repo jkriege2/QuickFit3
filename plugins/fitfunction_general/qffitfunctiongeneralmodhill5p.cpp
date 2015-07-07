@@ -65,13 +65,13 @@ bool QFFitFunctionGeneralModHill5P::isParameterVisible(int parameter, const doub
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneralModHill5P::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralModHill5P::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralModHill5P::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralModHill5P::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -79,13 +79,13 @@ QString QFFitFunctionGeneralModHill5P::transformParametersForAdditionalPlot(int 
     return "";
 }
 
-bool QFFitFunctionGeneralModHill5P::get_implementsDerivatives()
+bool QFFitFunctionGeneralModHill5P::get_implementsDerivatives() const
 {
     return false;
 }
 
 
-bool QFFitFunctionGeneralModHill5P::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
+bool QFFitFunctionGeneralModHill5P::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

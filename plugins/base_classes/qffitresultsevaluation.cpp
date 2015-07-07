@@ -1397,6 +1397,16 @@ void QFFitResultsEvaluation::resetDefaultFitFix(QFRawDataRecord* rin, const QStr
 
 void QFFitResultsEvaluation::setFitResultFitStatistics(QFRawDataRecord *record, const QString &evalID, const QFFitStatistics &result, const QString &prefix, const QString &group)
 {
+    setFitResultBasicFitStatistics(record, evalID, result, prefix, group);
+}
+
+void QFFitResultsEvaluation::getFitResultFitStatistics(QFRawDataRecord *record, const QString &evalID, QFFitStatistics &result, const QString &prefix) const
+{
+    getFitResultBasicFitStatistics(record, evalID, result, prefix);
+}
+
+void QFFitResultsEvaluation::setFitResultBasicFitStatistics(QFRawDataRecord *record, const QString &evalID, const QFBasicFitStatistics &result, const QString &prefix, const QString &group)
+{
     QString param="";
     setFitResultValueNoParamTransform(record, evalID, param=prefix+"chisquared", result.residSqrSum, "");
     setFitResultGroupNoParamTransform(record, evalID, param, group);
@@ -1494,7 +1504,7 @@ void QFFitResultsEvaluation::setFitResultFitStatistics(QFRawDataRecord *record, 
 
 }
 
-void QFFitResultsEvaluation::getFitResultFitStatistics(QFRawDataRecord *record, const QString &evalID, QFFitStatistics &result, const QString &prefix) const
+void QFFitResultsEvaluation::getFitResultBasicFitStatistics(QFRawDataRecord *record, const QString &evalID, QFBasicFitStatistics &result, const QString &prefix) const
 {
     QString param="";
     double d;
@@ -1571,8 +1581,6 @@ void QFFitResultsEvaluation::getFitResultFitStatistics(QFRawDataRecord *record, 
 
     d=record->resultsGetAsDouble(evalID, param=prefix+"max_rel_param_error", index, &ok, true);
     if (ok) result.maxRelParamError=d;
-
-
 }
 
 void QFFitResultsEvaluation::resetAllFitValueCurrent(QFRawDataRecord* rin) {

@@ -246,11 +246,11 @@ bool QFFitFunctionFCSDistributionLogGaussian::isParameterVisible(int parameter, 
     return true;
 }
 
-unsigned int QFFitFunctionFCSDistributionLogGaussian::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionFCSDistributionLogGaussian::getAdditionalPlotCount(const double* /*params*/) const {
     return 2;
 }
 
-QString QFFitFunctionFCSDistributionLogGaussian::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSDistributionLogGaussian::transformParametersForAdditionalPlot(int plot, double* params) const {
     if (plot==0) {
         params[FCSDLG_n_nonfluorescent]=0;
         return "without non-fluorescent";

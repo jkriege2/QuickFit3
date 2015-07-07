@@ -191,12 +191,12 @@ bool QFFitFunctionFCSSimpleDiff::isParameterVisible(int parameter, const double*
     return true;
 }
 
-unsigned int QFFitFunctionFCSSimpleDiff::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSSimpleDiff::getAdditionalPlotCount(const double* params) const {
     Q_UNUSED(params);
     return 1;
 }
 
-QString QFFitFunctionFCSSimpleDiff::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSSimpleDiff::transformParametersForAdditionalPlot(int plot, double* params) const {
     Q_UNUSED(plot);
     params[FCSSDiff_nonfl_theta1]=0;
     return "without non-fluorescent";

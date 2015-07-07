@@ -105,6 +105,11 @@ void QFUsesResultsByIndexAndModelEvaluation::setFitResultFitStatistics(QFRawData
     setFitResultFitStatistics(record, getEvaluationResultID(index, model), result, prefix, group);
 }
 
+void QFUsesResultsByIndexAndModelEvaluation::setFitResultBasicFitStatistics(QFRawDataRecord *record, int index, int model, const QFBasicFitStatistics &result, const QString &prefix, const QString &group)
+{
+    setFitResultBasicFitStatistics(record, getEvaluationResultID(index, model), result, prefix, group);
+}
+
 
 
 void QFUsesResultsByIndexAndModelEvaluation::setFitResultGroup(QFRawDataRecord *r, int index, int model, const QString &parameterID, const QString &group) {

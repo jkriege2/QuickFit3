@@ -66,11 +66,11 @@ bool QFFitFunctionGeneral2LogNormal::isParameterVisible(int parameter, const dou
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneral2LogNormal::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionGeneral2LogNormal::getAdditionalPlotCount(const double* /*params*/) const {
     return 2;
 }
 
-QString QFFitFunctionGeneral2LogNormal::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneral2LogNormal::transformParametersForAdditionalPlot(int plot, double* params) const {
     if (plot==0) {
         params[PARAM_AMPLITUDE2]=0;
         return QObject::tr("Gauss 1");
@@ -81,13 +81,13 @@ QString QFFitFunctionGeneral2LogNormal::transformParametersForAdditionalPlot(int
     return "";
 }
 
-bool QFFitFunctionGeneral2LogNormal::get_implementsDerivatives()
+bool QFFitFunctionGeneral2LogNormal::get_implementsDerivatives() const
 {
     return false;
 }
 
 
-bool QFFitFunctionGeneral2LogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionGeneral2LogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     if (params && dataX && dataY) {
         StatisticsScopedPointer<double> dX(statisticsDuplicateAndApply(dataX, N, log));

@@ -101,6 +101,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void updateFrameCount();
         void updateImageSize();
         void updateBleach();
+        void updateBlocking();
         void startNextWaitingThread();
         void on_chkFirstFrame_clicked(bool checked);
         void on_chkLastFrame_clicked(bool checked);

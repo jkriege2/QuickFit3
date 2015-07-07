@@ -360,12 +360,12 @@ bool QFFitFunctionFCSMultiDiffusion::isParameterVisible(int parameter, const dou
     return true;
 }
 
-unsigned int QFFitFunctionFCSMultiDiffusion::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSMultiDiffusion::getAdditionalPlotCount(const double* params) const {
     Q_UNUSED(params);
     return 1;
 }
 
-QString QFFitFunctionFCSMultiDiffusion::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSMultiDiffusion::transformParametersForAdditionalPlot(int plot, double* params) const {
     Q_UNUSED(plot);
     params[FCSMULTI_n_nonfluorescent]=0;
     return "without non-fluorescent";

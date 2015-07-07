@@ -59,13 +59,13 @@ bool QFFitFunctionGeneralSine::isParameterVisible(int parameter, const double* d
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneralSine::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralSine::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralSine::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralSine::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -73,14 +73,14 @@ QString QFFitFunctionGeneralSine::transformParametersForAdditionalPlot(int plot,
     return "";
 }
 
-bool QFFitFunctionGeneralSine::get_implementsDerivatives()
+bool QFFitFunctionGeneralSine::get_implementsDerivatives() const
 {
     return false;
 }
 
 
 
-bool QFFitFunctionGeneralSine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
+bool QFFitFunctionGeneralSine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

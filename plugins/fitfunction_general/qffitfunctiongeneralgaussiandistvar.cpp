@@ -57,14 +57,14 @@ bool QFFitFunctionGeneralGaussianDistVar::isParameterVisible(int parameter, cons
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneralGaussianDistVar::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralGaussianDistVar::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionGeneralGaussianDistVar::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralGaussianDistVar::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -72,12 +72,12 @@ QString QFFitFunctionGeneralGaussianDistVar::transformParametersForAdditionalPlo
     return "";
 }
 
-bool QFFitFunctionGeneralGaussianDistVar::get_implementsDerivatives()
+bool QFFitFunctionGeneralGaussianDistVar::get_implementsDerivatives() const
 {
     return false;
 }
 
-bool QFFitFunctionGeneralGaussianDistVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionGeneralGaussianDistVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

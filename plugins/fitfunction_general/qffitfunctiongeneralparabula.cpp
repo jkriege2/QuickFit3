@@ -70,13 +70,13 @@ bool QFFitFunctionGeneralParabula::isParameterVisible(int parameter, const doubl
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneralParabula::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralParabula::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralParabula::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralParabula::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -84,13 +84,13 @@ QString QFFitFunctionGeneralParabula::transformParametersForAdditionalPlot(int p
     return "";
 }
 
-bool QFFitFunctionGeneralParabula::get_implementsDerivatives()
+bool QFFitFunctionGeneralParabula::get_implementsDerivatives() const
 {
     return false;
 }
 
 
-bool QFFitFunctionGeneralParabula::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
+bool QFFitFunctionGeneralParabula::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
 {
     if (params && dataX && dataY && N>0)  {
         double p[3]={0,0,0};

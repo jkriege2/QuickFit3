@@ -281,7 +281,8 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 // calculate fit statistics
                 /////////////////////////////////////////////////////////////////////////////////
                 record->disableEmitResultsChanged();
-                QFFitStatistics fitStats=eval->calcFitStatistics(eval->hasFit(record, run), ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run, QString("fitstat_"), QString("fit statistics"), QVector<double>(), 200, true);
+                QStringList pnames;
+                QFFitStatistics fitStats=eval->calcFitStatistics(eval->hasFit(record, run), ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run, QString("fitstat_"), QString("fit statistics"), QVector<double>(), 200, true, &pnames);
                 record->enableEmitResultsChanged();
 
                 /////////////////////////////////////////////////////////////////////////////////
@@ -488,7 +489,14 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 }
                 txtFit+=QString("<b>%1</b><center>").arg(tr("Fit Statistics:"));
 
-                txtFit+=fitStats.getAsHTMLTable();
+
+                txtFit+=fitStats.getAsHTMLTable(false);
+                txtFit+=tr("<br><br>Parameters in matrix:<br><blockquote><tt>%1</tt></blockquote>").arg(pnames.join(", "));
+                txtFit+=QString("<br><br>");
+                txtFit+=fitStats.getHTMLExplanation();
+
+
+               // txtFit+=fitStats.getAsHTMLTable();
                 t.start();
 
                 txtFit+=QString("</center></font>");

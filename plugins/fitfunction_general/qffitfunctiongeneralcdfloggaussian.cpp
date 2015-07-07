@@ -51,14 +51,14 @@ bool QFFitFunctionGeneralCDFLogGaussian::isParameterVisible(int parameter, const
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneralCDFLogGaussian::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralCDFLogGaussian::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionGeneralCDFLogGaussian::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralCDFLogGaussian::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -66,12 +66,12 @@ QString QFFitFunctionGeneralCDFLogGaussian::transformParametersForAdditionalPlot
     return "";
 }
 
-bool QFFitFunctionGeneralCDFLogGaussian::get_implementsDerivatives()
+bool QFFitFunctionGeneralCDFLogGaussian::get_implementsDerivatives() const
 {
     return false;
 }
 
-bool QFFitFunctionGeneralCDFLogGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralCDFLogGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix) const
 {
     Q_UNUSED(dataX);
     Q_UNUSED(params);

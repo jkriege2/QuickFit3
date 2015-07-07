@@ -303,11 +303,11 @@ bool QFFitFunctionsTIRFCSADiff3DE2::isParameterVisible(int parameter, const doub
     return true;
 }
 
-unsigned int QFFitFunctionsTIRFCSADiff3DE2::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionsTIRFCSADiff3DE2::getAdditionalPlotCount(const double* /*params*/) const {
     return 1;
 }
 
-QString QFFitFunctionsTIRFCSADiff3DE2::transformParametersForAdditionalPlot(int /*plot*/, double* params) {
+QString QFFitFunctionsTIRFCSADiff3DE2::transformParametersForAdditionalPlot(int /*plot*/, double* params) const {
     params[FCSSDiff_n_nonfluorescent]=0;
     return "without non-fluorescent";
 }

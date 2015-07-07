@@ -56,7 +56,7 @@ double QFFitFunctionLightsheetSlit::evaluate(double t, const double* data) const
 
 
 
-bool QFFitFunctionLightsheetSlit::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
+bool QFFitFunctionLightsheetSlit::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {
@@ -88,14 +88,14 @@ bool QFFitFunctionLightsheetSlit::isParameterVisible(int parameter, const double
 	// all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionLightsheetSlit::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionLightsheetSlit::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 	// we have one additional plot
 }
 
-QString QFFitFunctionLightsheetSlit::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionLightsheetSlit::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);

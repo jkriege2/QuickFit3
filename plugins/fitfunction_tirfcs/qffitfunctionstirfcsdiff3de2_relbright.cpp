@@ -298,13 +298,13 @@ bool QFFitFunctionsTIRFCSDiffE2Diff3Dbright::isParameterVisible(int parameter, c
 
 }
 
-unsigned int QFFitFunctionsTIRFCSDiffE2Diff3Dbright::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsTIRFCSDiffE2Diff3Dbright::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 1;
 }
 
-QString QFFitFunctionsTIRFCSDiffE2Diff3Dbright::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsTIRFCSDiffE2Diff3Dbright::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);

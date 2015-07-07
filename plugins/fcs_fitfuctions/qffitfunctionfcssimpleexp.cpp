@@ -79,11 +79,11 @@ bool QFFitFunctionFCSSimpleExp::isParameterVisible(int parameter, const double* 
     return true;
 }
 
-unsigned int QFFitFunctionFCSSimpleExp::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionFCSSimpleExp::getAdditionalPlotCount(const double* /*params*/) const {
     return 0;
 }
 
-QString QFFitFunctionFCSSimpleExp::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
+QString QFFitFunctionFCSSimpleExp::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) const {
     return QString();
 }
 

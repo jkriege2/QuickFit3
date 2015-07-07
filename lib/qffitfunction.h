@@ -155,12 +155,12 @@ class QFLIB_EXPORT QFFitFunction: public QFFitFunctionBase {
 
             The parameter fix is optional and may be ignored by the function. It indicates which values should be fixed to the value given in params for the estimation.
          */
-        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL);
-        inline virtual bool estimateInitial(QVector<double>& params, const QVector<double>& dataX, const QVector<double>& dataY, const QVector<bool>& fix) {
+        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL) const;
+        inline virtual bool estimateInitial(QVector<double>& params, const QVector<double>& dataX, const QVector<double>& dataY, const QVector<bool>& fix) const {
             params.resize(m_parameters.size());
             return estimateInitial(params.data(), dataX.constData(), dataY.constData(), qMin(dataX.size(), dataY.size()), fix.constData());
         }
-        inline virtual bool estimateInitial(QVector<double>& params, const QVector<double>& dataX, const QVector<double>& dataY) {
+        inline virtual bool estimateInitial(QVector<double>& params, const QVector<double>& dataX, const QVector<double>& dataY) const {
             params.resize(m_parameters.size());
             return estimateInitial(params.data(), dataX.constData(), dataY.constData(), qMin(dataX.size(), dataY.size()), NULL);
         }
@@ -219,10 +219,11 @@ class QFLIB_EXPORT QFFitFunction: public QFFitFunctionBase {
             \param COV the variance/covariance matrix from the fit, if empty it is estimated from the provided data!
             \param paramrange_size an estimate of the maximal parameter value (i.e. all fit parameters have to be in the range -paramrange_size...paramrange_size. If this is not supplied, a bayesian model probability cannot be calculated!
             \param storeCOV is set \c true, the var-cov-matrx is stored in the fit stratistics, otherwise the property COV is an empty vector!
+            \param estimateCOVIfNotAVailable if set \c true this function will try to estimate the va-cov-matrix, if it is not provided.
 
             \note the arrays in the resulting struct are allocated using \c qfMalloc(), so you will have to free them using \c qfFree() !!!
           */
-        QFFitStatistics calcFitStatistics(long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, const QVector<double>& COV=QVector<double>(), double paramrange_size=200, bool storeCOV=false) const;
+        QFFitStatistics calcFitStatistics(long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, const QVector<double>& COV=QVector<double>(), double paramrange_size=200, bool storeCOV=false, QStringList* returnFitParamNames=NULL, bool estimateCOVIfNotAVailable=true) const;
 
 };
 

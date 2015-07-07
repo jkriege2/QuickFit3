@@ -151,6 +151,7 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     connect(ui->spinFirstFrame, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     connect(ui->spinLastFrame, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     connect(ui->spinSegments, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
+    connect(ui->spinSegments, SIGNAL(valueChanged(int)), this, SLOT(updateBlocking()));
     connect(ui->spinStatistics, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     connect(ui->spinBackStatistics, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     connect(ui->spinVideoFrames, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
@@ -511,6 +512,7 @@ void QFRDRImagingFCSCorrelationDialog::on_spinM_valueChanged(int /*val*/) {
 //}
 void QFRDRImagingFCSCorrelationDialog::on_cmbCorrelator_currentIndexChanged(int /*idx*/) {
     updateCorrelator(true);
+    updateBlocking();
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_cmbBackground_currentIndexChanged(int idx) {
@@ -703,7 +705,7 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/video", ui->chkVideo->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/video_frames", ui->spinVideoFrames->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/acf", ui->chkACF->isChecked());
-    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked());
+    //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/segments", ui->spinSegments->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/binning", ui->spinBinning->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/interleavedbinning", ui->chkInterleavedBinning->isChecked());
@@ -733,6 +735,7 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/spinFCCSShiftY", ui->spinFCCSShiftY->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/chkSeparateColorChannels", ui->chkSeparateColorChannels->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/chkAddNB", ui->chkAddNB->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/chkBlocking", ui->chkBlocking->isChecked());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -754,7 +757,7 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->spinStatistics->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/statistics", ui->spinStatistics->value()).toInt());
     ui->spinBackStatistics->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/backStatistics", ui->spinBackStatistics->value()).toInt());
     ui->chkACF->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/acf", ui->chkACF->isChecked()).toBool());
-    ui->chkCCF->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked()).toBool());
+    //ui->chkCCF->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked()).toBool());
     ui->spinSegments->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/segments", ui->spinSegments->value()).toInt());
     ui->spinBinning->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/binning", ui->spinBinning->value()).toInt());
     ui->chkInterleavedBinning->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/interleavedbinning", ui->chkInterleavedBinning->isChecked()).toBool());
@@ -790,8 +793,9 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->chkSeparateColorChannels->setVisible(false);
 
     ui->chkAddNB->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkAddNB", ui->chkAddNB->isChecked()).toBool());
-    ui->chkCCF->setChecked(false);
-    ui->chkCCF->setVisible(false);
+    ui->chkBlocking->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkBlocking", ui->chkBlocking->isChecked()).toBool());
+    //ui->chkCCF->setChecked(false);
+    //ui->chkCCF->setVisible(false);
 }
 
 int QFRDRImagingFCSCorrelationDialog::getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const {
@@ -878,7 +882,6 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob(int biningForFCCS) {
         job.range_max=ui->spinLastFrame->value();
     }
     job.acf=ui->chkACF->isChecked();
-    job.ccf=false; //ui->chkCCF->isChecked();
     job.video=ui->chkVideo->isChecked();
     job.video_frames=qMax(2,ui->spinVideoFrames->value());
     job.statistics=true;
@@ -948,6 +951,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob(int biningForFCCS) {
     job.addFCCSSeparately=ui->chkSeparateColorChannels->isChecked();
     job.dualViewMode=ui->cmbDualView->currentIndex();
     job.addNandB=ui->chkAddNB->isChecked();
+    job.useBlockingErrorEstimate=ui->chkBlocking->isChecked();
     //job.bleachDecay=ui->spinDecay->value();
     //job.bleachA=ui->edtDecayA->value();
     //job.bleachDecay2=ui->spinDecay2->value();
@@ -1206,6 +1210,11 @@ void QFRDRImagingFCSCorrelationDialog::updateBleach() {
     //ui->labDecay->setTextFormat(Qt::RichText);
     //ui->labDecay->setText(tr("&tau;<sub>Bleach,1</sub> = %1 s<br>&tau;<sub>Bleach,2</sub> = %2 s").arg((double)ui->spinDecay->value()*ui->edtFrameTime->value()/1e6).arg((double)ui->spinDecay2->value()*ui->edtFrameTime->value()/1e6));
     //ui->labDecay->setText(tr("&tau;<sub>Bleach,1</sub> = %1 s").arg((double)ui->spinDecay->value()*ui->edtFrameTime->value()/1e6));
+}
+
+void QFRDRImagingFCSCorrelationDialog::updateBlocking()
+{
+    ui->chkBlocking->setEnabled((ui->spinSegments->value()<=1) && ((ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECT) || (ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECT_INT) || (ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECTAVG) || (ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECTAVG_INT)));
 }
 
 double QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(int corrType, double taumin, int S, int m, int P) {

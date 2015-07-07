@@ -253,14 +253,14 @@ class LIB_EXPORT QFCFitFunction {
             \param params The decision may be based on this parameter set.
             \return number of additional plots, or 0 if none
         */
-        virtual unsigned int getAdditionalPlotCount(const double* params) { return 0; }
+        virtual unsigned int getAdditionalPlotCount(const double* params) const { return 0; }
 
         /*! \brief transform the given parameter vector so tht it my be used to plot the \a plot -th additional graph
             \param plot the number of the plot to plot
             \param[in,out] params parameter vector. This is assumed to be filled with the full parameters when the function is called
             \return label/name for the graph
         */
-        virtual std::string transformParametersForAdditionalPlot(int plot, double* params) { return std::string(""); }
+        virtual std::string transformParametersForAdditionalPlot(int plot, double* params) const { return std::string(""); }
 
         /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. If called with NULL parameters, this should still return, whether guessing is possible at all!
 

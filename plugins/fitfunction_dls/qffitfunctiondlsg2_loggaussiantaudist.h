@@ -56,10 +56,10 @@ class QFFitFunctionDLSG2LogNormTauDist: public QFFitFunction {
         virtual bool isParameterVisible(int parameter, const double* parameterValues) const;
 
         /*! \copydoc QFFitFunction::getAdditionalPlotCount()   */
-        virtual unsigned int getAdditionalPlotCount(const double* params);
+        virtual unsigned int getAdditionalPlotCount(const double* params) const;
 
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
-        virtual QString transformParametersForAdditionalPlot(int plot, double* params);
+        virtual QString transformParametersForAdditionalPlot(int plot, double* params) const;
 
     protected:
         gsl_integration_workspace * w;

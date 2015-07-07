@@ -70,12 +70,12 @@ bool QFFitAlgorithmInst_F1::isParameterVisible(int parameter, const double* data
 	// all parameters are visible at all times
 }
 
-unsigned int QFFitAlgorithmInst_F1::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitAlgorithmInst_F1::getAdditionalPlotCount(const double* params) const {
     return 1;
 	// we have one additional plot
 }
 
-QString QFFitAlgorithmInst_F1::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitAlgorithmInst_F1::transformParametersForAdditionalPlot(int plot, double* params) const {
     params[PARAM1]=1;
     return "p1=1";
 	// ... which is the default parabula (i.e. p1=1)

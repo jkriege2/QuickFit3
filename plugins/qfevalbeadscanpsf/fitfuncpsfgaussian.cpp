@@ -59,16 +59,16 @@ bool QFFitFunctionPSFGaussian::isParameterVisible(int /*parameter*/, const doubl
 	// all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionPSFGaussian::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionPSFGaussian::getAdditionalPlotCount(const double* /*params*/) const {
     return 0;
 	// we have one additional plot
 }
 
-QString QFFitFunctionPSFGaussian::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
+QString QFFitFunctionPSFGaussian::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) const {
     return "";
 }
 
-bool QFFitFunctionPSFGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionPSFGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

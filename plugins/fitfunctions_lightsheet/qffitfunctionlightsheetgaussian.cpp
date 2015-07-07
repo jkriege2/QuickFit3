@@ -59,14 +59,14 @@ bool QFFitFunctionLightsheetGaussian::isParameterVisible(int parameter, const do
 	// all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionLightsheetGaussian::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionLightsheetGaussian::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 	// we have one additional plot
 }
 
-QString QFFitFunctionLightsheetGaussian::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionLightsheetGaussian::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -74,7 +74,7 @@ QString QFFitFunctionLightsheetGaussian::transformParametersForAdditionalPlot(in
     return "";
 }
 
-bool QFFitFunctionLightsheetGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionLightsheetGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

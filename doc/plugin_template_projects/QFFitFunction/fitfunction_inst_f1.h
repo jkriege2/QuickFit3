@@ -36,11 +36,11 @@ class QFFitAlgorithmInst_F1: public QFFitFunction {
         QFFitAlgorithmInst_F1();
         virtual ~QFFitAlgorithmInst_F1() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("long fit function name"); };
+        virtual QString name() const { return QObject::tr("long fit function name"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return /*name();*/QObject::tr("short name"); };
+        virtual QString shortName() const { return /*name();*/QObject::tr("short name"); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("ff_id"); };
+        virtual QString id() const { return QString("ff_id"); }
         /*! \copydoc QFFitFunction::category()   */
         virtual QString category() const {  return QString::tr("General Fit Functions"); }
         /*! \copydoc QFFitFunction::evaluate()   */
@@ -52,13 +52,13 @@ class QFFitAlgorithmInst_F1: public QFFitFunction {
         /*! \copydoc QFFitFunction::isParameterVisible()   */
         virtual bool isParameterVisible(int parameter, const double* parameterValues) const;
         /*! \copydoc QFFitFunction::getAdditionalPlotCount()   */
-        virtual unsigned int getAdditionalPlotCount(const double* params);
+        virtual unsigned int getAdditionalPlotCount(const double* params) const;
 
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
-        virtual QString transformParametersForAdditionalPlot(int plot, double* params);
+        virtual QString transformParametersForAdditionalPlot(int plot, double* params) const;
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
-        virtual bool get_implementsDerivatives() { return true; };
+        virtual bool get_implementsDerivatives() const { return true; }
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
         virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;

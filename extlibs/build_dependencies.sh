@@ -857,8 +857,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir doc
 	mkdir include
 	mkdir include/Eigen
-	tar xvf ./eigen-3.2.4.tar.gz -C ./build/
-	cd build/eigen-3.2.4/
+	tar xvf ./eigen-3.2.5.tar.gz -C ./build/
+	cd build/eigen-3.2.5/
 	cp -r ./Eigen/* ../../include/Eigen
 	libOK=$?
 	cp -r ./doc/* ../../doc

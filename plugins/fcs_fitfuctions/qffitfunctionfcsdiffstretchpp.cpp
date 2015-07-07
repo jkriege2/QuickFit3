@@ -335,11 +335,11 @@ bool QFFitFunctionFCSDiffStretchPP::isParameterVisible(int parameter, const doub
     return true;
 }
 
-unsigned int QFFitFunctionFCSDiffStretchPP::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionFCSDiffStretchPP::getAdditionalPlotCount(const double* /*params*/) const {
     return 1;
 }
 
-QString QFFitFunctionFCSDiffStretchPP::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSDiffStretchPP::transformParametersForAdditionalPlot(int plot, double* params) const {
     if (plot==0) {
         params[FCSDiff_n_nonfluorescent]=0;
         return "without non-fluorescent";

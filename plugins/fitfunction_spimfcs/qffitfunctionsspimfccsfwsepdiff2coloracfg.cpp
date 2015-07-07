@@ -183,13 +183,13 @@ bool QFFitFunctionsSPIMFCCSFWSepDiff2ColorACFG::isParameterVisible(int parameter
     return true;
 }
 
-unsigned int QFFitFunctionsSPIMFCCSFWSepDiff2ColorACFG::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsSPIMFCCSFWSepDiff2ColorACFG::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionsSPIMFCCSFWSepDiff2ColorACFG::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsSPIMFCCSFWSepDiff2ColorACFG::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);

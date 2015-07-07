@@ -87,10 +87,12 @@ QFFitAlgorithmLMFitBox::QFFitAlgorithmLMFitBox() {
 
 QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, QFFitAlgorithm::Functor* model, const double* paramsMin, const double* paramsMax) {
     QFFitAlgorithm::FitResult result;
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  1";
 
     int paramCount=model->get_paramcount(); // number of parameters
     memcpy(paramsOut, initialParams, paramCount*sizeof(double));
 
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  2";
     //double param=getParameter("param_name").toDouble();
 
 
@@ -103,6 +105,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
     control.epsilon=getParameter("epsilon").toDouble();
     control.stepbound=getParameter("stepbound").toDouble();
     control.patience=getParameter("max_iterations").toInt();
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  3";
 
     QFFItAlgorithmGSL_evalData d;
     d.model=model;
@@ -110,10 +113,13 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
     d.paramsMax=paramsMax;
     d.pcount=paramCount;
     d.p=(double*)qfMalloc(paramCount*sizeof(double));
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  4";
 
     bool transformParams=paramsMin&&paramsMax;
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  5";
 
     lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxlimits, &control, &status );
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  6";
     if (paramsMin && paramsMax) {
         bool atbound=false;
         for (int i=0; i<paramCount; i++) {
@@ -128,7 +134,9 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
             } else paramsOut[i]=qBound(mi, paramsOut[i], ma);
         }
         if (atbound) {
+            qDebug()<<"QFFitAlgorithmLMFitBox::intFit  6.2";
             lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxlimits, &control, &status );
+            qDebug()<<"QFFitAlgorithmLMFitBox::intFit  6.3";
             for (int i=0; i<paramCount; i++) {
                 const double mi=paramsMin[i];
                 const double ma=paramsMax[i];
@@ -137,20 +145,30 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
         }
 
     }
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  7";
 
     QVector<double> J(model->get_evalout()*model->get_paramcount());
     QVector<double> COV(model->get_paramcount()*model->get_paramcount());
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  8";
     model->evaluateJacobian(J.data(), paramsOut);
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  9";
     double chi2=status.fnorm;
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10";
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-isWLSQ"<<model->isWeightedLSQ();
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-hasWeight"<<QFFitAlgorithm::functorHasWeights(model);
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-allone"<<QFFitAlgorithm::functorAllWeightsOne(model);
 
     if (QFFitAlgorithm::functorHasWeights(model) && !QFFitAlgorithm::functorAllWeightsOne(model)) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
     else statisticsGetFitProblemVarCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount(), chi2);
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  11";
 
     result.addNumberMatrix("covariance_matrix", COV.data(), model->get_paramcount(), model->get_paramcount());
 
     for (int i=0; i<model->get_paramcount(); i++) {
+        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  12."<<i;
         paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV.data(), model->get_paramcount());
     }
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  13";
 
     result.addNumber("error_sum", chi2);
     result.addNumber("iterations", status.nfev);
@@ -164,8 +182,10 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
         result.message="";
         result.messageSimple="";
     }
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  14";
 
     if (d.p) qfFree(d.p);
+    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  15";
 
     return result;
 }

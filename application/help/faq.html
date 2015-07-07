@@ -157,6 +157,14 @@ $$faq_end$$
 
 
 $$faq_start$$
+  <a name="FAQ_RENAMEGROUP"><b>On Windows: When I use a file open dialog and navigate into a folder with large TIFF files with many frames, QuickFit afterwards uses a lot of processing power and memory. What can I do?</b>
+$$faq_answer$$
+  This behaviour seems to be connected to the Windows Explorer, which is used by Windows, when the OS-specific File-Open/File-Save/... dialogs are used. The explorer seems to try and read the TIFF-file and generate a preview from it. Usually you will notice this also in a "normal" explorer, when you navigate to that directory and the file dates appear only after seconds or minutes (or never for that matter). No solution is known to generally solve this explorer problem, but you can tell QuickFit to use its own File-Open dialogs, which do not have that problem. To do so, got to the settings dialog under the menu <b>File | Preferences ...</b> in the mainwindow. There you can change the type of file dialogs that QuickFit uses under <b>View, Language, General Settings</b>. Change the option <b>file dialogs</b> to <b>QuickFit 3/Qt specific dialogs</b>.
+$$faq_end$$
+
+
+
+$$faq_start$$
   <a name="FAQ_ENTERTAIN"><b>I'm bored! What can I do?</b>
 $$faq_answer$$
   What about hitting the Tetris highscore? Look into <b>Help | Entertain me</b> ... maybe that helps your state of mind ;-)

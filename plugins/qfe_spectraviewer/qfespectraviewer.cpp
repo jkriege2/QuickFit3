@@ -86,6 +86,7 @@ SpectrumManager *QFESpectraViewer::getSpectrumManager() const
 
 void QFESpectraViewer::reloadDatabases()
 {
+    if (loadThread->isRunning()) return;
     log_text(intReloadDatabases(manager, getID()));
 }
 
@@ -172,9 +173,10 @@ void QFESpectraViewer::initExtension() {
     log_text(tr("initializing ...\n"));
     log_text(tr("   registering plugin ...\n"));
     actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Spectra Viewer"), this);
-    actStartPlugin->setEnabled(true);
+    actStartPlugin->setEnabled(false);
+    actStartPlugin->setToolTip(tr("SpectraViewer: loading spectra database ... \n ... please wait until data is loaded, before starting this plugin!"));
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(showViewer()));
-    connect(loadThread, SIGNAL(enableAction(bool)), actStartPlugin, SLOT(setEnabled(bool)));
+    connect(loadThread, SIGNAL(enableAction(bool)), this, SLOT(loadThreadFinished(bool)));
     QToolBar* exttb=services->getToolbar("tools");
     if (exttb) {
         exttb->addAction(actStartPlugin);
@@ -184,9 +186,9 @@ void QFESpectraViewer::initExtension() {
         extm->addAction(actStartPlugin);
     }
 
-    log_text(QFESpectraViewer::intReloadDatabases(manager, getID()));
+    //log_text(QFESpectraViewer::intReloadDatabases(manager, getID()));
     log_text(tr("initializing ... DONE\n"));
-    //loadThread->start();
+    loadThread->start();
 }
 
 void QFESpectraViewer::loadSettings(ProgramOptions* settingspo) {
@@ -235,25 +237,33 @@ void QFESpectraViewer::doLog(const QString &text)
     log_text(text);
 }
 
+void QFESpectraViewer::loadThreadFinished(bool enabled)
+{
+    if (enabled) {
+        actStartPlugin->setToolTip(tr("start Spectra Viewer ..."));
+    }
+    actStartPlugin->setEnabled(enabled);
+}
+
 
 
 QFESpectraViewerLoadThread::QFESpectraViewerLoadThread(SpectrumManager *manager, QFESpectraViewer *parent): QThread(parent)
 {
     this->manager=manager;
-    sv=parent;
+    sv=parent->getID();
 }
 
-void QFESpectraViewerLoadThread::log_text(const QString &text)
+/*void QFESpectraViewerLoadThread::log_text(const QString &text)
 {
     emit slog_text(text);
-}
+}*/
 
 void QFESpectraViewerLoadThread::run()
 {
     try {
-        log_text(QFESpectraViewer::intReloadDatabases(manager, sv->getID()));        
+        emit slog_text(QFESpectraViewer::intReloadDatabases(manager, sv));
     } catch(std::exception& E) {
-        log_text(tr("error loading spectra viewer database: %1\n").arg(E.what()));
+        emit slog_text(tr("error loading spectra viewer database: %1\n").arg(E.what()));
     }
     emit enableAction(true);
 }

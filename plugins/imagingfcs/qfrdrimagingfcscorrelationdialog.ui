@@ -151,8 +151,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1135</width>
-           <height>589</height>
+           <width>1011</width>
+           <height>542</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -162,7 +162,16 @@
           </sizepolicy>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
            <number>0</number>
           </property>
           <item>
@@ -195,7 +204,16 @@
              <property name="verticalSpacing">
               <number>2</number>
              </property>
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="1" column="0">
@@ -458,7 +476,16 @@ p, li { white-space: pre-wrap; }
                 <bool>false</bool>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_17">
-                <property name="margin">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
                  <number>0</number>
                 </property>
                 <item>
@@ -818,7 +845,16 @@ p, li { white-space: pre-wrap; }
                   <property name="spacing">
                    <number>3</number>
                   </property>
-                  <property name="margin">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
                    <number>0</number>
                   </property>
                   <item>
@@ -1403,7 +1439,16 @@ p, li { white-space: pre-wrap; }
                   </size>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_22">
-                  <property name="margin">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
                    <number>0</number>
                   </property>
                   <item>
@@ -1456,35 +1501,6 @@ p, li { white-space: pre-wrap; }
                  </property>
                  <property name="checked">
                   <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_19">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="chkCCF">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>CCF to 4 neighbors</string>
-                 </property>
-                 <property name="checked">
-                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -1778,6 +1794,16 @@ p, li { white-space: pre-wrap; }
                   </widget>
                  </item>
                 </layout>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="chkBlocking">
+                 <property name="text">
+                  <string>use blocking for correlation error estimate (only for segments=1 and Direct Correlation without averaging!)</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -2323,8 +2349,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1058</width>
-           <height>96</height>
+           <width>1062</width>
+           <height>98</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -2337,7 +2363,16 @@ p, li { white-space: pre-wrap; }
           <property name="spacing">
            <number>2</number>
           </property>
-          <property name="margin">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
            <number>2</number>
           </property>
           <item>
@@ -2406,6 +2441,11 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qenhancedlineedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
@@ -2413,11 +2453,6 @@ p, li { white-space: pre-wrap; }
     <signal>valueChanged(double)</signal>
     <slot>setValue(double)</slot>
    </slots>
-  </customwidget>
-  <customwidget>
-   <class>QEnhancedLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qenhancedlineedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -2445,7 +2480,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>btnSelectBackgroundFile</tabstop>
   <tabstop>cmbBleachType</tabstop>
   <tabstop>chkACF</tabstop>
-  <tabstop>chkCCF</tabstop>
   <tabstop>spinSegments</tabstop>
   <tabstop>chkDistanceCCD</tabstop>
   <tabstop>cmbCorrelator</tabstop>

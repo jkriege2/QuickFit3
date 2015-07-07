@@ -81,21 +81,21 @@ bool QFFitFunctionGeneralSegmentedLine::isParameterVisible(int parameter, const 
     }
     return true;
 }
-unsigned int QFFitFunctionGeneralSegmentedLine::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionGeneralSegmentedLine::getAdditionalPlotCount(const double* /*params*/) const {
     return 0;
 }
 
-QString QFFitFunctionGeneralSegmentedLine::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
+QString QFFitFunctionGeneralSegmentedLine::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) const {
     return "";
 }
 
-bool QFFitFunctionGeneralSegmentedLine::get_implementsDerivatives()
+bool QFFitFunctionGeneralSegmentedLine::get_implementsDerivatives() const
 {
     return false;
 }
 
 
-bool QFFitFunctionGeneralSegmentedLine::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool* /*fix*/)
+bool QFFitFunctionGeneralSegmentedLine::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool* /*fix*/) const
 {
     return false;
 }

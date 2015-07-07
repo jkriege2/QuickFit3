@@ -72,6 +72,7 @@
 static QMutex qfallocationMutex(QMutex::Recursive);
 
 void* qfMalloc(size_t size) {
+    if (size<=0) return NULL;
 #ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
 #endif
@@ -95,6 +96,7 @@ void* qfCalloc(size_t size) {
 }
 
 void* qfCalloc(size_t num, size_t size) {
+    if (num*size<=0) return NULL;
 #ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
 #endif

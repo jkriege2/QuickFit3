@@ -52,16 +52,16 @@ class QFFitFunctionGeneralSigmoid: public QFFitFunction {
         /*! \copydoc QFFitFunction::isParameterVisible()   */
         virtual bool isParameterVisible(int parameter, const double* parameterValues) const;
         /*! \copydoc QFFitFunction::getAdditionalPlotCount()   */
-        virtual unsigned int getAdditionalPlotCount(const double* params);
+        virtual unsigned int getAdditionalPlotCount(const double* params) const;
 
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
-        virtual QString transformParametersForAdditionalPlot(int plot, double* params);
+        virtual QString transformParametersForAdditionalPlot(int plot, double* params) const;
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
-        virtual bool get_implementsDerivatives();
+        virtual bool get_implementsDerivatives() const;
 
         /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
-        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL);
+        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL) const;
 
 };
 

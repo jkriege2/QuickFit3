@@ -35,6 +35,8 @@ include(quickfit_config.pri)
 QFOUTPUT = ../$${OUTPUTDIR_NAME}
 
 
+
+
 #release {
 #    QFOUTPUT = ../output_release
 #} else {
@@ -68,3 +70,6 @@ include(quickfit3_configqtwidgets.pri)
 
 
 #QF3CONFIG += ffmdrivers
+
+# if you don't want to use the EIgen library, uncomment the following line:
+#QF3CONFIG+=noeigen3lib

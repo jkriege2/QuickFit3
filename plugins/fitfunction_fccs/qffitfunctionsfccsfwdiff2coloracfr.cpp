@@ -253,13 +253,13 @@ bool QFFitFunctionsFCCSFWDiff2ColorACFR::isParameterVisible(int parameter, const
     return true;
 }
 
-unsigned int QFFitFunctionsFCCSFWDiff2ColorACFR::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsFCCSFWDiff2ColorACFR::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionsFCCSFWDiff2ColorACFR::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsFCCSFWDiff2ColorACFR::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);

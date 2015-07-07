@@ -40,8 +40,12 @@ QFFCSFitEvaluation::QFFCSFitEvaluation(QFProject* parent):
         m_fitFunction="fcs_multidiff";
     }
 
-    if (m_fitAlgorithms.contains("fit_levmar")) {
-        m_fitAlgorithm="fit_levmar";
+    if (m_fitAlgorithms.contains("fit_lmfit")) {
+        m_fitAlgorithm="fit_lmfit";
+    } else {
+        if (m_fitAlgorithms.contains("fit_levmar")) {
+            m_fitAlgorithm="fit_levmar";
+        }
     }
 
 }
@@ -806,7 +810,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFunction
 
                 {
                     QFFitStatistics result= ffunc->calcFitStatistics(N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25, COV);
-                    record->resultsSetFitStatistics(result, evalID, "fitstat_", tr("fit statistics"));
+                    record->resultsSetBasicFitStatistics(result, evalID, "fitstat_", tr("fit statistics"));
                     result.free();
                 }
 

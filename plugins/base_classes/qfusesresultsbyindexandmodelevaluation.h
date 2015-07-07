@@ -306,6 +306,7 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
         virtual int getModelCount() const;
 
         virtual void setFitResultFitStatistics(QFRawDataRecord *record, int index, int model, const QFFitStatistics &result, const QString &prefix, const QString &group) ;
+        virtual void setFitResultBasicFitStatistics(QFRawDataRecord *record, int index, int model, const QFBasicFitStatistics &result, const QString &prefix, const QString &group) ;
 
     protected:
         /** \brief write object contents into XML file
@@ -321,6 +322,7 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
 
     public:
         using QFUsesResultsByIndexEvaluation::setFitResultFitStatistics;
+        using QFUsesResultsByIndexEvaluation::setFitResultBasicFitStatistics;
         using QFUsesResultsByIndexEvaluation::hasResults;
         using QFUsesResultsByIndexEvaluation::getEvaluationResultID;
         using QFUsesResultsByIndexEvaluation::setFitResultGroup;

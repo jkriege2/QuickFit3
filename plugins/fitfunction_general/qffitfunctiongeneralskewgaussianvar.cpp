@@ -61,14 +61,14 @@ bool QFFitFunctionGeneralSkewGaussianVar::isParameterVisible(int parameter, cons
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneralSkewGaussianVar::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralSkewGaussianVar::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionGeneralSkewGaussianVar::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralSkewGaussianVar::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -76,12 +76,12 @@ QString QFFitFunctionGeneralSkewGaussianVar::transformParametersForAdditionalPlo
     return "";
 }
 
-bool QFFitFunctionGeneralSkewGaussianVar::get_implementsDerivatives()
+bool QFFitFunctionGeneralSkewGaussianVar::get_implementsDerivatives() const
 {
     return false;
 }
 
-bool QFFitFunctionGeneralSkewGaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionGeneralSkewGaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

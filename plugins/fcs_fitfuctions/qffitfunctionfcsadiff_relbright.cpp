@@ -348,11 +348,11 @@ bool QFFitFunctionFCSADiffDifferentBrightness::isParameterVisible(int parameter,
     return true;
 }
 
-unsigned int QFFitFunctionFCSADiffDifferentBrightness::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionFCSADiffDifferentBrightness::getAdditionalPlotCount(const double* /*params*/) const {
     return 1;
 }
 
-QString QFFitFunctionFCSADiffDifferentBrightness::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSADiffDifferentBrightness::transformParametersForAdditionalPlot(int plot, double* params) const {
     //double* dat=duplicateArray(params, paramCount());
     if (plot==0) {
         params[FCSDiff_n_nonfluorescent]=0;

@@ -51,14 +51,14 @@ bool QFFitFunctionGeneralCDFCauchy::isParameterVisible(int parameter, const doub
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneralCDFCauchy::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralCDFCauchy::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionGeneralCDFCauchy::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralCDFCauchy::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -66,12 +66,12 @@ QString QFFitFunctionGeneralCDFCauchy::transformParametersForAdditionalPlot(int 
     return "";
 }
 
-bool QFFitFunctionGeneralCDFCauchy::get_implementsDerivatives()
+bool QFFitFunctionGeneralCDFCauchy::get_implementsDerivatives() const
 {
     return false;
 }
 
-bool QFFitFunctionGeneralCDFCauchy::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionGeneralCDFCauchy::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

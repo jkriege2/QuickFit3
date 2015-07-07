@@ -111,8 +111,6 @@ struct IMFCSJob {
     QString postfix;
     /** \brief calculate ACF of each pixel */
     bool acf;
-    /** \brief calculate the CCF to the nearest neighbour pixels */
-    bool ccf;
     /** \brief statistics over frames */
     uint32_t statistics_frames;
     /** \brief background statistics over frames */
@@ -165,6 +163,9 @@ struct IMFCSJob {
     int dualViewMode;
     bool addFCCSSeparately;
     bool addNandB;
+
+    /** \brief use the blocking method to estimate correlation errors (if available) **/
+    bool useBlockingErrorEstimate;
 
 };
 
@@ -316,7 +317,7 @@ class QFRDRImagingFCSCorrelationJobThread : public QThread {
             A CCF for every pixel is calculated and stored in ccf, ccf_tau and ccf_std, if the pixels and its shifted counterpart are
             both inside the image area.
          */
-        void correlate_series(float* image_series, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frames, double** ccf_tau, double** ccf, double** ccf_std, uint32_t& ccf_N, const QString& message, uint32_t increment_progress=250, double **ccf_segments_io=NULL);
+        void correlate_series(float* image_series, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frames, double** ccf_tau, double** ccf, double** ccf_std, uint32_t& ccf_N, const QString& message, uint32_t increment_progress=250, double **ccf_segments_io=NULL, uint32_t **ccf_blockingLevel=NULL, bool **ccf_blockingSuccess=NULL);
 
 
         /*! \brief contribute the data in the given image to the given correlators
@@ -524,27 +525,22 @@ data                                                   size [bytes]             
         double* acf;
         double* acf_segments;
         double* acf_std;
+
+        uint32_t* acf_blocklevel;
+        bool* acf_blocksuccess;
+
         uint32_t acf_N;
-        double* ccf_tau;
-        double* ccf1;
-        double* ccf2;
-        double* ccf3;
-        double* ccf4;
-        double* ccf1_segments;
-        double* ccf2_segments;
-        double* ccf3_segments;
-        double* ccf4_segments;
-        double* ccf1_std;
-        double* ccf2_std;
-        double* ccf3_std;
-        double* ccf4_std;
-        uint32_t ccf_N;
+
 
         struct DCCFRecord {
             double* dccf_tau;
             double* dccf;
             double* dccf_segments;
             double* dccf_std;
+
+            uint32_t* dccf_blocklevel;
+            bool* dccf_blocksuccess;
+
             uint32_t dccf_N;
             uint32_t dccfframe_width;
             uint32_t dccfframe_height;
@@ -581,6 +577,7 @@ data                                                   size [bytes]             
         FileTypes filetype;
         QMap<QString, QVariant> props;
         QString comment;
+
 
 };
 

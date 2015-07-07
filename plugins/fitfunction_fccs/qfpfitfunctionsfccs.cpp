@@ -110,7 +110,7 @@ int QFPFitFunctionsFCCS::getGlobalFitConfigCount() const
 
 QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsFCCS::getGlobalFitConfig(int i) const
 {
-    QString menulabel=tr("configure for 2-color Confocal FCCS ...");
+    QString menulabel=tr("configure for confocal 2-color-FCCS ...");
     QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig res;
     int c=0;
     if (i==c++) { // fccs_fw_diff2coloracfg, fccs_fw_diff2coloracfr, fccs_fw_diff2colorccf

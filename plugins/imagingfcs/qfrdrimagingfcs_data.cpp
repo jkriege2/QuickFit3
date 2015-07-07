@@ -802,7 +802,62 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     }
 
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // now we will provide some of the additional metadata as fit results
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    bool emres=isEmitResultsChangedEnabled();
+    disableEmitResultsChanged();
+    QString metadata_eid=QString("imfcs_metadata");
+    QString metadata_egroup=QString("imfcs_metadata");
+    QString metadata_elabel=tr("ImagingFCS Metadata");
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_percentage", QRegExp("bleach.*percentage file", Qt::CaseInsensitive), tr("bleach percentage"));
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_amplitude", QRegExp("bleach.*amplitue file", Qt::CaseInsensitive), tr("bleach correction amplitude"));
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_time", QRegExp("bleach.*time.*(file)?", Qt::CaseInsensitive), tr("bleach correction decay time"));
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_amplitude", QRegExp("bleach.*amplitue 2 file", Qt::CaseInsensitive), tr("bleach correction amplitude"));
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_time", QRegExp("bleach.*time 2 file", Qt::CaseInsensitive), tr("bleach correction decay time"));
+
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_poly_factor1", QRegExp("bleach.*polynomial factor file", Qt::CaseInsensitive), tr("bleach correction polynom. factor 1"));
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_poly_factor2", QRegExp("bleach.*polynomial factor 2 file", Qt::CaseInsensitive), tr("bleach correction polynom. factor 2"));
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_poly_factor3", QRegExp("bleach.*polynomial factor 3 file", Qt::CaseInsensitive), tr("bleach correction polynom. factor 3"));
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_poly_factor4", QRegExp("bleach.*polynomial factor 4 file", Qt::CaseInsensitive), tr("bleach correction polynom. factor 4"));
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_poly_factor5", QRegExp("bleach.*polynomial factor 5 file", Qt::CaseInsensitive), tr("bleach correction polynom. factor 5"));
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "bleach_success", QRegExp("bleach.*fit.*success.*(file)?", Qt::CaseInsensitive), tr("bleach corection success"));
+
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "blocking_success", QRegExp(QString("%1.*blocking.*success.*(file)?").arg(QRegExp::escape(getRole().toLower().simplified().trimmed())), Qt::CaseInsensitive), tr("blocking transform success"));
+    addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "blocking_level", QRegExp(QString("%1.*blocking.*level.*(file)?").arg(QRegExp::escape(getRole().toLower().simplified().trimmed())), Qt::CaseInsensitive), tr("blocking transform level"));
+
+    if (emres) enableEmitResultsChanged();
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     //qDebug()<<"loaded:   "<<width<<"x"<<height<<"  N="<<N<<"   channels="<<getSimpleCountrateChannels();
+}
+
+void QFRDRImagingFCSData::addImageAsResult(const QString&  metadata_eid, const QString& metadata_egroup, const QString&  metadata_elabel, const QString&  param, QRegExp rx, const QString& plabel) {
+    int idx=-1;
+    if (!resultsExists(metadata_eid,param)) {
+        if ((idx=QFRDRAdditionalImagesInterface_getImageIDForNameRX(this, rx, false))>=0) {
+            int siz=getAdditionalImagesWidth(idx)*getAdditionalImagesHeight(idx);
+            if (siz==getImageFromRunsWidth()*getImageFromRunsHeight()) {
+                resultsSetNumberList(metadata_eid,param, getAdditionalImage(idx), siz);
+                resultsSetGroupAndLabels(metadata_eid,param, metadata_egroup, plabel, plabel);
+                resultsSetEvaluationGroup(metadata_eid, metadata_egroup);
+                resultsSetEvaluationGroupLabel(metadata_egroup, metadata_elabel);
+            }
+//        } else if ((idx=QFRDROverviewImagesInterface_getImageIDForNameRX(this, rx, false))>=0) {
+//            int siz=getOverviewImageWidth(idx)*getOverviewImageHeight(idx);
+//            if (siz==getImageFromRunsWidth()*getImageFromRunsHeight()) {
+//                resultsSetNumberList(metadata_eid,param, getOverviewImage(idx), siz);
+//                resultsSetGroupAndLabels(metadata_eid,param, metadata_egroup, plabel, plabel);
+//                resultsSetEvaluationGroup(metadata_eid, metadata_egroup);
+//                resultsSetEvaluationGroupLabel(metadata_egroup, metadata_elabel);
+//            }
+        }
+    }
+
 }
 
 bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, const QString& filename) {

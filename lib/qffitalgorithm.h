@@ -199,6 +199,9 @@ class QFLIB_EXPORT QFFitAlgorithm {
             /** \brief return \c true if the jacobian is implemented */
             inline virtual bool get_implementsJacobian() const { return false; }
 
+            /** \brief return \c true if functor implements a weightes least-squares problem */
+            inline virtual bool isWeightedLSQ() const { return false; }
+
             /** \brief return dimension of function output vector \f$ M \f$ */
             inline uint64_t get_evalout() const { return m_evalout; }
 
@@ -253,6 +256,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 explicit FitFunctionFunctor(const double* dataX, const double* dataF, const double* dataWeight, uint64_t M) ;
 
                 virtual ~FitFunctionFunctor();
+                /** \copydoc QFFitAlgorithm::FitFunctionFunctor::isWeightedLSQ() */
+                virtual bool isWeightedLSQ() const;
 
                 /** \brief returns a pointer to the current x-data \f$ x_m \f$ */
                 const double* getDataX() const;
@@ -260,6 +265,12 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 const double* getDataF() const;
                 /** \brief returns a pointer to the current weights-data \f$ \sigma_m \f$ */
                 const double* getDataWeight() const;
+                /** \brief returns a pointer to the current x-data \f$ x_m \f$ */
+                QVector<double> getDataXV() const;
+                /** \brief returns a pointer to the current y-data \f$ y_m \f$ */
+                QVector<double> getDataFV() const;
+                /** \brief returns a pointer to the current weights-data \f$ \sigma_m \f$ */
+                QVector<double> getDataWeightV() const;
                 /** \brief returns the current number of datapoints in the \f$(x_m,y_m,\sigma_m)\f$ dataset. */
                 uint64_t getDataPoints() const;
 
@@ -379,6 +390,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 explicit FitFunctionFunctor2D(const double* dataX, const double* dataY, const double* dataF, const double* dataWeight, uint64_t M) ;
 
                 virtual ~FitFunctionFunctor2D();
+                /** \copydoc QFFitAlgorithm::FitFunctionFunctor::isWeightedLSQ() */
+                virtual bool isWeightedLSQ() const;
 
                 /** \brief returns a pointer to the current x-data \f$ x_m \f$ */
                 const double* getDataX() const;
@@ -530,6 +543,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 const double* getDataWeight() const;
                 /** \brief returns the current number of datapoints in the \f$(x_m,y_m,\sigma_m)\f$ dataset. */
                 uint64_t getDataPoints() const;
+                /** \copydoc QFFitAlgorithm::FitFunctionFunctor::isWeightedLSQ() */
+                virtual bool isWeightedLSQ() const;
 
                 /** \brief sets a new input data vector for x-data
                  *
@@ -781,6 +796,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
                 /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
                 virtual void evaluate(double* evalout, const double* params) const;
+                /** \brief evaluate the function underlying model function only (not taling into account the weights and measured data!) */
+                virtual void evaluateModelOnly(double* evalout, const double* params) const;
 
                 /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
                 virtual void evaluateJacobian(double* evalout, const double* params) const;

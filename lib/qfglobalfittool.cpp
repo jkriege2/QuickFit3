@@ -22,9 +22,9 @@
 #include "qfglobalfittool.h"
 #include "qftools.h"
 #include "qfmathtools.h"
-
+#include "statistics_tools.h"
 #define DEBUG_GLOBALFIT
-#undef DEBUG_GLOBALFIT
+//#undef DEBUG_GLOBALFIT
 
 
 
@@ -171,6 +171,7 @@ void QFFitMultiQFFitFunctionFunctor::recalculateInternals()
     for (int i=0; i<linkedParams.size(); i++) {
         //if (!isLinkedSingle(i)) {
             m_linkedParamsCount++;
+            paramNames.append(QString("Global%1").arg(m_linkedParamsCount-1));
 #ifdef DEBUG_GLOBALFIT
             dbg +=QString(" G%1 |").arg(m_linkedParamsCount-1,2,10,QLatin1Char(' '));
             dbg1+=QString("%1 |").arg(m_linkedParamsCount-1,4,10,QLatin1Char(' '));
@@ -189,6 +190,7 @@ void QFFitMultiQFFitFunctionFunctor::recalculateInternals()
 
 
     m_paramCount=0;
+    paramNames.clear();
     int paramIdx=m_linkedParamsCount;
 #ifdef DEBUG_GLOBALFIT
     int cnt=m_linkedParamsCount;
@@ -217,6 +219,7 @@ void QFFitMultiQFFitFunctionFunctor::recalculateInternals()
                 subFunctors[i].mapToLocal[p]=paramIdx;
                 paramIdx++;
                 realp++;
+                paramNames.append(QString("Model%1: ").arg(i)+f->getModel()->getParameterID(f->mapFromFunctorToModel(p)));
 #ifdef DEBUG_GLOBALFIT
                 dbg0+=QString("F%1             |").arg(i,2,10,QLatin1Char(' '));
                 dbg+= QString(" L%1(%2)        |").arg(p,2,10,QLatin1Char(' ')).arg(f->mapFromFunctorToModel(p),2,10,QLatin1Char(' '));
@@ -282,6 +285,30 @@ void QFFitMultiQFFitFunctionFunctor::setDoRecalculateInternals(bool enabled)
     if (enabled) recalculateInternals();
 }
 
+bool QFFitMultiQFFitFunctionFunctor::isWeightedLSQ() const
+{
+    for (int i=0; i<subFunctors.size(); i++) {
+        if (!subFunctors[i].f || !subFunctors[i].f->isWeightedLSQ()) return false;
+    }
+    return true;
+}
+
+bool QFFitMultiQFFitFunctionFunctor::areAllWeightsOne() const
+{
+    for (int i=0; i<subFunctors.size(); i++) {
+        if (subFunctors[i].f) {
+            const double* w=subFunctors[i].f->getDataWeight();
+            uint64_t N=subFunctors[i].f->getDataPoints();
+            for (uint64_t i=0; i<N; i++) {
+                if (w[i]!=1.0) return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
 void QFFitMultiQFFitFunctionFunctor::prepareBootstrapSelection()
 {
     for (int i=0; i<subFunctors.size(); i++) {
@@ -310,6 +337,37 @@ void QFFitMultiQFFitFunctionFunctor::setBootstrappingFraction(double fraction, b
 {
     bsFraction=fraction;
     if (bsEnabled&&prepBootstrapping) prepareBootstrapSelection();
+}
+
+void QFFitMultiQFFitFunctionFunctor::evaluateJacobianNum(double *evalout, const double *params, double h) const
+{
+    int outCnt=0;
+    for (int i=0; i<subFunctors.size(); i++) {
+        double* eout=&(evalout[outCnt]);
+        QFFitAlgorithm::FitQFFitFunctionFunctor* f=subFunctors[i].f;
+        int pcount=f->get_paramcount();
+        double* pin=(double*)qfMalloc(pcount*sizeof(double));
+
+        for (int p=0; p<pcount; p++) {
+            pin[p]=params[subFunctors[i].mapToLocal[p]];
+        }
+
+        f->evaluateJacobianNum(eout, pin, h);
+        qfFree(pin);
+
+        outCnt+=(subFunctors[i].f->get_evalout()*pcount);
+    }
+}
+
+double QFFitMultiQFFitFunctionFunctor::calculateChi2(const double *params) const
+{
+    QVector<double> eout(get_evalout());
+    evaluate(eout.data(), params);
+    double chi2=0;
+    for (uint64_t i=0; i<get_evalout(); i++) {
+        chi2 += qfSqr(eout[i]);
+    }
+    return chi2;
 }
 
 QFGlobalFitTool::QFGlobalFitTool(QFFitAlgorithm *algorithm)
@@ -403,7 +461,18 @@ void QFGlobalFitTool::createLocalFitFunctors()
     }
 }
 
-QFFitAlgorithm::FitResult QFGlobalFitTool::fit(const QList<double *> &paramsOut, const QList<double *> &paramErrorsOut, const QList<double *> &initialParams, const QList<double *> &paramErrorsIn) {
+QFFitAlgorithm::FitResult QFGlobalFitTool::fit(const QList<double *> &paramsOut, const QList<double *> &paramErrorsOut, const QList<double *> &initialParams, const QList<double *> &paramErrorsIn, QFBasicFitStatistics *fitstat, QVector<double> *rawFitResults_io, QVector<double> *rawFitResultsErrors_io, double *chi2_io, QVector<double> *cov_matrix_io, QStringList *paramNames_io, QVector<double> *fitX_io, QVector<double> *fitY_io, QVector<double> *fitW_io, QVector<double> *fitM_io) {
+    QVector<double> rawFitResults;
+    QVector<double> rawFitResultsErrors;
+    double chi2;
+    QVector<double> cov_matrix;
+    QStringList paramNames;
+    QVector<double> fitX;
+    QVector<double> fitY;
+    QVector<double> fitW;
+    QVector<double> fitM;
+
+    QFFitAlgorithm::FitResult result;
     for (int i=0; i<functor->getSubFunctorCount(); i++) {
         QFFitAlgorithm::FitQFFitFunctionFunctor* f=functor->getSubFunctor(i);
         int pcount=f->get_paramcount();
@@ -411,16 +480,36 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fit(const QList<double *> &paramsOut,
         copyArray(paramErrorsOut[i], paramErrorsIn[i], pcount);
     }
     if (m_globalLocalRepeats<=0) {
-        return fitGlobal(paramsOut, paramErrorsOut);
+        qDebug()<<"fit global ...";
+        result= fitGlobal(paramsOut, paramErrorsOut, &rawFitResults, &rawFitResultsErrors, &chi2, &cov_matrix, &paramNames, &fitX, &fitY, &fitW, &fitM);
     } else {
-        QFFitAlgorithm::FitResult result;
+
         for (int gl=0; gl<m_globalLocalRepeats; gl++) {
+            qDebug()<<"fit local ...";
             fitLocal(paramsOut, paramErrorsOut);
-            result=fitGlobal(paramsOut, paramErrorsOut);
+            qDebug()<<"fit global ...";
+            result=fitGlobal(paramsOut, paramErrorsOut, &rawFitResults, &rawFitResultsErrors, &chi2, &cov_matrix, &paramNames, &fitX, &fitY, &fitW, &fitM);
         }
-        return result;
     }
 
+    if (fitstat) {
+        qDebug()<<"calc stat ...";
+        //qDebug()<<"calc global fit stat fitX.size()="<<fitX.size()<<"  fitM.size()="<<fitM.size()<<"  fitY.size()="<<fitY.size()<<"  fitW.size()="<<fitW.size()<<"  rawFitResults.size()="<<rawFitResults.size()<<"  cov_matrix.size()="<<cov_matrix.size();
+        (*fitstat)=calculateBasicFitStatistics(fitX.size(), fitX.data(), fitM.data(), fitY.data(), fitW.data(), -1,-1, rawFitResults.size(), rawFitResults.data(), rawFitResultsErrors.data(), cov_matrix, 200, true);
+    }
+
+    qDebug()<<"save output ...";
+    if (rawFitResults_io) *rawFitResults_io=rawFitResults;
+    if (rawFitResultsErrors_io) *rawFitResultsErrors_io=rawFitResultsErrors;
+    if (chi2_io) *chi2_io=chi2;
+    if (cov_matrix_io) *cov_matrix_io=cov_matrix;
+    if (paramNames_io) *paramNames_io=paramNames;
+    if (fitX_io) *fitX_io=fitX;
+    if (fitY_io) *fitY_io=fitY;
+    if (fitW_io) *fitW_io=fitW;
+    if (fitM_io) *fitM_io=fitM;
+
+    return result;
 }
 
 QList<QFFitAlgorithm::FitResult> QFGlobalFitTool::fitLocal(const QList<double *> &paramsOut, const QList<double *> &paramErrorsOut) {
@@ -440,17 +529,27 @@ QList<QFFitAlgorithm::FitResult> QFGlobalFitTool::fitLocal(const QList<double *>
     return res;
 }
 
-QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &paramsOut, const QList<double *> &paramErrorsOut)
+QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &paramsOut, const QList<double *> &paramErrorsOut, QVector<double> *rawFitResults, QVector<double> *rawFitResultsErrors, double *chi2_out, QVector<double> *cov_matrix, QStringList* paramNames, QVector<double> *fitX, QVector<double> *fitY, QVector<double> *fitW, QVector<double> *fitM)
 {
-    QFFitAlgorithm::FitResult res;
+    int debugCnt=0;
+    QFFitAlgorithm::FitResult result;
     int ppcount=functor->get_paramcount();
+    qDebug()<<"fitglobal "<<(debugCnt++);
     double* params=(double*)qfCalloc(ppcount,sizeof(double));
+    qDebug()<<"fitglobal "<<(debugCnt++);
     double* errors=(double*)qfCalloc(ppcount,sizeof(double));
+    qDebug()<<"fitglobal "<<(debugCnt++);
     double* pmin=(double*)qfCalloc(ppcount,sizeof(double));
+    qDebug()<<"fitglobal "<<(debugCnt++);
     double* pmax=(double*)qfCalloc(ppcount,sizeof(double));
+    qDebug()<<"fitglobal "<<(debugCnt++);
     bool* fix=(bool*)qfCalloc(ppcount,sizeof(bool));
+    qDebug()<<"fitglobal "<<(debugCnt++);
     for (int i=0; i<ppcount; i++) fix[i]=true;
     bool minmax=true;
+
+    if (paramNames) (*paramNames)=functor->getParamNames();
+    qDebug()<<"fitglobal "<<(debugCnt++);
 
     // fill parameter vector
     for (int i=0; i<functor->getSubFunctorCount(); i++) {
@@ -502,15 +601,19 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
 
     if (minmax) {
         for (int i=0; i<m_repeatFit; i++) {
-            res=m_algorithm->lsqMinimize(params, errors, functor, params, fix, pmin, pmax);
+            qDebug()<<"fitglobal "<<(debugCnt++)<<"lsqMinimize() ...";
+            result=m_algorithm->lsqMinimize(params, errors, functor, params, fix, pmin, pmax);
+            qDebug()<<"fitglobal "<<(debugCnt++)<<"lsqMinimize() ... DONE";
         }
     } else {
         for (int i=0; i<m_repeatFit; i++) {
-            res=m_algorithm->lsqMinimize(params, errors, functor, params, fix, NULL, NULL);
+            qDebug()<<"fitglobal "<<(debugCnt++)<<"lsqMinimize() ...";
+            result=m_algorithm->lsqMinimize(params, errors, functor, params, fix, NULL, NULL);
+            qDebug()<<"fitglobal "<<(debugCnt++)<<"lsqMinimize() ... DONE";
         }
     }
 #ifdef DEBUG_GLOBALFIT
-    qDebug()<<"AFTER OPTIMIZE: ("<<res.messageSimple<<")";
+    qDebug()<<"AFTER OPTIMIZE: ";//("<<res.messageSimple<<")";
     qDebug()<<"  params = "<<arrayToString(params, ppcount);
     qDebug()<<"  errors = "<<arrayToString(errors, ppcount);
     qDebug()<<"  pmin   = "<<arrayToString(pmin, ppcount);
@@ -518,8 +621,26 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
     qDebug()<<"  fix    = "<<arrayToString(fix, ppcount);
 #endif
 
+    qDebug()<<"fitglobal "<<(debugCnt++)<<"chi2";
+    double chi2=functor->calculateChi2(params);
+    qDebug()<<"fitglobal "<<(debugCnt++)<<"rawRes ...";
+    if (rawFitResults) {
+        rawFitResults->clear();
+        for (int i=0; i<ppcount; i++) {
+            rawFitResults->append(params[i]);
+        }
+    }
+    qDebug()<<"fitglobal "<<(debugCnt++)<<"rawResErr ...";
 
-    // read out parameter vector
+    if (rawFitResultsErrors) {
+        rawFitResultsErrors->clear();
+        for (int i=0; i<ppcount; i++) {
+            rawFitResultsErrors->append(errors[i]);
+        }
+    }
+
+
+    // write out parameter vector
     for (int i=0; i<functor->getSubFunctorCount(); i++) {
         QFFitAlgorithm::FitQFFitFunctionFunctor* f=functor->getSubFunctor(i);
         int pcount=f->get_paramcount();
@@ -546,7 +667,61 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
             }
 #endif
         }
+        qDebug()<<"fitglobal "<<(debugCnt++)<<"writeparam ...";
+
     }
+
+    qDebug()<<"fitglobal "<<(debugCnt++)<<"det XYMW ...";
+
+    for (int i=0; i<functor->getSubFunctorCount(); i++) {
+        if (fitX) fitX->operator<<(functor->getSubFunctor(i)->getDataXV());
+        if (fitY) fitY->operator<<(functor->getSubFunctor(i)->getDataFV());
+        if (fitW) fitW->operator<<(functor->getSubFunctor(i)->getDataWeightV());
+        if (fitM) {
+            QVector<double> m;
+            m.resize(functor->getSubFunctor(i)->get_evalout());
+            functor->getSubFunctor(i)->evaluateModelOnly(m.data(), paramsOut[i]);
+            fitM->operator<<(m);
+        }
+    }
+
+    qDebug()<<"fitglobal "<<(debugCnt++)<<"COV ...";
+
+    if (cov_matrix) {
+        QVector<double> COV(functor->get_paramcount()*functor->get_paramcount());
+        if (result.params.contains("covariance_matrix") && result.params["covariance_matrix"].getVectorMatrixItems()==COV.size()) {
+            COV=result.params["covariance_matrix"].getAsDoubleVector();
+            //qDebug()<<"fit(): read cov matrix: "<<COV;
+        } else {
+            //if ( result.addNumberMatrix("covariance_matrix", COV.data(), model->get_paramcount(), model->get_paramcount());)
+            QVector<double> J(functor->get_evalout()*functor->get_paramcount());
+            functor->evaluateJacobian(J.data(), params);
+            bool hasWeights=true;
+            for (int i=0; i<functor->getSubFunctorCount(); i++) {
+                if (!QFFitAlgorithm::functorHasWeights(functor->getSubFunctor(i))) {
+                    hasWeights=false;
+                    break;
+                }
+            }
+            if (hasWeights) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), functor->get_evalout(), functor->get_paramcount());
+            else statisticsGetFitProblemVarCovMatrix(COV.data(), J.data(), functor->get_evalout(), functor->get_paramcount(), chi2);
+
+
+            result.addNumberMatrix("covariance_matrix", COV.data(), functor->get_paramcount(), functor->get_paramcount());
+            //qDebug()<<"fit(): calc cov matrix: "<<COV;
+        }
+
+        cov_matrix->clear();
+        (*cov_matrix)=COV;
+    }
+    if (chi2_out) {
+        *chi2_out=chi2;
+    }
+    result.addNumber("error_sum", chi2);
+
+
+    qDebug()<<"fitglobal "<<(debugCnt++)<<"FREE ...";
+
     qfFree(params);
     qfFree(errors);
     qfFree(pmin);
@@ -555,10 +730,10 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
 #ifdef DEBUG_GLOBALFIT
     qDebug()<<"return";
 #endif
-    return res;
+    return result;
 }
 
-void QFGlobalFitTool::evalueCHi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYValues, const QList<double *>& initialParams)
+void QFGlobalFitTool::evalueChi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYValues, const QList<double *>& initialParams)
 {
     int ppcount=functor->get_paramcount();
     double* params=(double*)qfCalloc(ppcount,sizeof(double));
@@ -613,27 +788,44 @@ QFFitMultiQFFitFunctionFunctor *QFGlobalFitTool::getFunctor() const
 }
 
 
+
 QFGlobalThreadedFit::QFGlobalThreadedFit(QObject *parent): QThread(parent)
 {
+    this->chi2=NULL;
+    this->COV=NULL;
+    this->paramNames=NULL;
+    this->fitstat=NULL;
+    this->rawFitResults=NULL;
+    this->rawFitResultsErrors=NULL;
 }
 
 QFGlobalThreadedFit::~QFGlobalThreadedFit()
 {
 }
 
-void QFGlobalThreadedFit::init(QFGlobalFitTool *globalTool, QList<double *> paramsOut, QList<double *> paramErrorsOut, QList<double *> initialParams, QList<double *> paramErrorsIn)
+void QFGlobalThreadedFit::init(QFGlobalFitTool *globalTool, QList<double *> paramsOut, QList<double *> paramErrorsOut, QList<double *> initialParams, QList<double *> paramErrorsIn, double *chi2, QFBasicFitStatistics *fitstat, QVector<double> *rawFitResults, QVector<double> *rawFitResultsErrors, QVector<double> *COV, QStringList *paramNames, QVector<double>* fitX, QVector<double>* fitY, QVector<double>* fitW, QVector<double>* fitM)
 {
     this->globalTool=globalTool;
     this->paramsOut=paramsOut;
     this->paramErrorsOut=paramErrorsOut;
     this->initialParams=initialParams;
     this->paramErrorsIn=paramErrorsIn;
+    this->chi2=chi2;
+    this->COV=COV;
+    this->paramNames=paramNames;
+    this->fitX=fitX;
+    this->fitY=fitY;
+    this->fitW=fitW;
+    this->fitM=fitM;
+    this->fitstat=fitstat;
+    this->rawFitResults=rawFitResults;
+    this->rawFitResultsErrors=rawFitResultsErrors;
     results.params.clear();
 }
 
 void QFGlobalThreadedFit::run()
 {
     QTime tstart=QTime::currentTime();
-    results=globalTool->fit(paramsOut, paramErrorsOut, initialParams, paramErrorsIn);
+    results=globalTool->fit(paramsOut, paramErrorsOut, initialParams, paramErrorsIn, fitstat, rawFitResults, rawFitResultsErrors, chi2, COV, paramNames, fitX, fitY, fitW, fitM);
     deltaTime=(double)tstart.msecsTo(QTime::currentTime());
 }

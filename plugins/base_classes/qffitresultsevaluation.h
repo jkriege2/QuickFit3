@@ -935,8 +935,11 @@ public:
     /*! \brief reset the given parameter fix (\a id) in the given raw data record \a r for the \a resultID to its default/initial value */
     virtual void resetDefaultFitFix(QFRawDataRecord *r, const QString &resultID, const QString &id);
 
-    virtual void setFitResultFitStatistics(QFRawDataRecord *record, const QString &index, const QFFitStatistics &result, const QString &prefix, const QString &group);
-    virtual void getFitResultFitStatistics(QFRawDataRecord *record, const QString &index, QFFitStatistics &result, const QString &prefix) const;
+    virtual void setFitResultFitStatistics(QFRawDataRecord *record, const QString &evalID, const QFFitStatistics &result, const QString &prefix, const QString &group);
+    virtual void setFitResultBasicFitStatistics(QFRawDataRecord *record, const QString &evalID, const QFBasicFitStatistics &result, const QString &prefix, const QString &group);
+
+    virtual void getFitResultFitStatistics(QFRawDataRecord *record, const QString &evalID, QFFitStatistics &result, const QString &prefix) const;
+    virtual void getFitResultBasicFitStatistics(QFRawDataRecord *record, const QString &evalID, QFBasicFitStatistics &result, const QString &prefix) const;
 
 signals:
 

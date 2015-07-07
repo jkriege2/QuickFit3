@@ -60,10 +60,10 @@ bool QFFitFunctionFCSOscillation::isParameterVisible(int /*parameter*/, const do
     return true;
 }
 
-unsigned int QFFitFunctionFCSOscillation::getAdditionalPlotCount(const double */*params*/) {
+unsigned int QFFitFunctionFCSOscillation::getAdditionalPlotCount(const double */*params*/) const {
     return 0;
 }
 
-QString QFFitFunctionFCSOscillation::transformParametersForAdditionalPlot(int /*plot*/, double */*params*/) {
+QString QFFitFunctionFCSOscillation::transformParametersForAdditionalPlot(int /*plot*/, double */*params*/) const {
     return QString("");
 }

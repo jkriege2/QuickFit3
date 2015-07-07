@@ -53,14 +53,14 @@ bool QFFitFunctionGeneralPDFLogGaussian::isParameterVisible(int parameter, const
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneralPDFLogGaussian::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralPDFLogGaussian::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionGeneralPDFLogGaussian::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralPDFLogGaussian::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -69,7 +69,7 @@ QString QFFitFunctionGeneralPDFLogGaussian::transformParametersForAdditionalPlot
 }
 
 
-bool QFFitFunctionGeneralPDFLogGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralPDFLogGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix) const
 {
     Q_UNUSED(dataX);
     Q_UNUSED(params);

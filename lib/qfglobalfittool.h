@@ -140,6 +140,12 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
 
         void setDoRecalculateInternals(bool enabled);
 
+        /** \copydoc QFFitAlgorithm::FitFunctionFunctor::isWeightedLSQ() */
+        virtual bool isWeightedLSQ() const;
+
+        bool areAllWeightsOne() const;
+
+
 
 
         /** \brief prepares a new selection of data for bootstrapping
@@ -156,6 +162,13 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
         virtual void setBootstrappingEnabled(bool enabled, bool prepBootstrapping=true);
         /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
         virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
+
+        virtual void evaluateJacobianNum(double* evalout, const double* params, double h=10.0*QF_SQRT_DBL_EPSILON) const;
+
+        /** \brief calculate the \f$ \chi^2=\sum\limits_i\left(\frac{y_i-f(x_i)}{\sigma_i}\right)^2 */
+        double calculateChi2(const double *params) const;
+
+        inline QStringList getParamNames() const { return paramNames; }
     protected:
         struct subFunctorData {
             /** \brief functor to evaluate this data term */
@@ -185,6 +198,7 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
         QList<QList<QPair<int, int> > > linkedParams;
 
         int m_paramCount;
+        QStringList paramNames;
         int m_linkedParamsCount;
 
         bool doRecalculateInternals;
@@ -231,10 +245,11 @@ class QFLIB_EXPORT QFGlobalFitTool {
         void createLocalFitFunctors();
 
 
-        QFFitAlgorithm::FitResult fit(const QList<double *>& paramsOut, const QList<double *>& paramErrorsOut, const QList<double *>& initialParams, const QList<double *>& paramErrorsIn);
-        void evalueCHi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, const QList<double *>& initialParams);
+        QFFitAlgorithm::FitResult fit(const QList<double *>& paramsOut, const QList<double *>& paramErrorsOut, const QList<double *>& initialParams, const QList<double *>& paramErrorsIn, QFBasicFitStatistics* fitstat=NULL, QVector<double> *rawFitResults=NULL, QVector<double> *rawFitResultsErrors=NULL, double *chi2=NULL, QVector<double> *cov_matrix=NULL, QStringList *paramNames=NULL, QVector<double>* fitX=NULL, QVector<double>* fitY=NULL, QVector<double>* fitW=NULL, QVector<double>* fitM=NULL);
+        void evalueChi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, const QList<double *>& initialParams);
 
         QFFitMultiQFFitFunctionFunctor* getFunctor() const;
+
     protected:
 
         QFFitAlgorithm* m_algorithm;
@@ -243,7 +258,7 @@ class QFLIB_EXPORT QFGlobalFitTool {
         int m_repeatFit;
         int m_globalLocalRepeats;
 
-        QFFitAlgorithm::FitResult fitGlobal(const QList<double *>& paramsOut, const QList<double *>& paramErrorsOut/*, const QList<double *>& initialParams, const QList<double *>& paramErrorsIn*/);
+        QFFitAlgorithm::FitResult fitGlobal(const QList<double *>& paramsOut, const QList<double *>& paramErrorsOut/*, const QList<double *>& initialParams, const QList<double *>& paramErrorsIn*/, QVector<double> *rawFitResults=NULL, QVector<double> *rawFitResultsErrors=NULL, double *chi2=NULL, QVector<double> *cov_matrix=NULL, QStringList *paramNames=NULL, QVector<double>* fitX=NULL, QVector<double>* fitY=NULL, QVector<double>* fitW=NULL, QVector<double>* fitM=NULL);
         QList<QFFitAlgorithm::FitResult> fitLocal(const QList<double *>& paramsOut, const QList<double *>& paramErrorsOut/*, const QList<double *>& initialParams, const QList<double *>& paramErrorsIn*/);
 };
 
@@ -262,12 +277,12 @@ class QFLIB_EXPORT QFGlobalThreadedFit: public QThread {
         Q_OBJECT
     public:
         /** \brief class cosntructor */
-        QFGlobalThreadedFit(QObject* parent=NULL);
+        explicit QFGlobalThreadedFit(QObject* parent=NULL);
         /** \brief class destructor */
         virtual ~QFGlobalThreadedFit();
 
         /** \brief initialize the fit parameters */
-        void init(QFGlobalFitTool* globalTool, QList<double*> paramsOut, QList<double*> paramErrorsOut, QList<double*> initialParams, QList<double *> paramErrorsIn);
+        void init(QFGlobalFitTool* globalTool, QList<double*> paramsOut, QList<double*> paramErrorsOut, QList<double*> initialParams, QList<double *> paramErrorsIn, double* chi2=NULL, QFBasicFitStatistics* fitstat=NULL, QVector<double> *rawFitResults=NULL, QVector<double> *rawFitResultsErrors=NULL, QVector<double>* COV=NULL, QStringList* paramNames=NULL, QVector<double>* fitX=NULL, QVector<double>* fitY=NULL, QVector<double>* fitW=NULL, QVector<double>* fitM=NULL);
 
         /** \brief return the result of the last fit call */
         inline QFFitAlgorithm::FitResult getResults() const { return results; }
@@ -281,7 +296,18 @@ class QFLIB_EXPORT QFGlobalThreadedFit: public QThread {
         QList<double*> initialParams;
         QList<double *> paramErrorsIn;
         QFFitAlgorithm::FitResult results;
+        double* chi2;
+        QVector<double>* COV;
+        QStringList* paramNames;
         double deltaTime;
+        QVector<double>* fitX;
+        QVector<double>* fitY;
+        QVector<double>* fitW;
+        QVector<double>* fitM;
+
+        QFBasicFitStatistics* fitstat;
+        QVector<double> *rawFitResults;
+        QVector<double> *rawFitResultsErrors;
 
         /** \brief here the fitting takes place */
         virtual void run();

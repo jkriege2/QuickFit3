@@ -53,3 +53,6 @@ QF3CONFIG+=nowebkit
 # if you want to use OpenMP (some libraries may profit from this)
 #QMAKE_CXXFLAGS += -fopenmp
 #QMAKE_LFLAGS += -fopenmp
+
+# if you don't want to use the EIgen library, uncomment the following line:
+#QF3CONFIG+=noeigen3lib

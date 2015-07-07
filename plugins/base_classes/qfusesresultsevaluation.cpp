@@ -314,6 +314,11 @@ void QFUsesResultsEvaluation::setFitResultValue(QFRawDataRecord *r, const QStrin
 
 void QFUsesResultsEvaluation::setFitResultFitStatistics(QFRawDataRecord *record, const QString &evalID, const QFFitStatistics &result, const QString &prefix, const QString &group)
 {
+    setFitResultBasicFitStatistics(record, evalID, result, prefix, group);
+}
+
+void QFUsesResultsEvaluation::setFitResultBasicFitStatistics(QFRawDataRecord *record, const QString &evalID, const QFBasicFitStatistics &result, const QString &prefix, const QString &group)
+{
     QString param="";
     setFitResultValue(record, evalID, param=prefix+"chisquared", result.residSqrSum, QString());
     setFitResultGroup(record, evalID, param, group);

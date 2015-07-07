@@ -90,13 +90,13 @@ bool QFFitFunctionGeneralPolynom::isParameterVisible(int parameter, const double
 
     return true;
 }
-unsigned int QFFitFunctionGeneralPolynom::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralPolynom::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralPolynom::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralPolynom::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -104,13 +104,13 @@ QString QFFitFunctionGeneralPolynom::transformParametersForAdditionalPlot(int pl
     return "";
 }
 
-bool QFFitFunctionGeneralPolynom::get_implementsDerivatives()
+bool QFFitFunctionGeneralPolynom::get_implementsDerivatives() const
 {
     return false;
 }
 
 
-bool QFFitFunctionGeneralPolynom::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
+bool QFFitFunctionGeneralPolynom::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
 {
     if (params && dataX && dataY && N>0) {
         int degree=params[PARAM_DEGREE];

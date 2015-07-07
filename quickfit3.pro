@@ -74,9 +74,11 @@ SUBDIRS += plg_importers_simpletcspcimporter
 plg_importers_simpletcspcimporter.subdir = ./plugins/importers_simpletcspcimporter
 plg_importers_simpletcspcimporter.depends = lib libqf3widgets
 
-SUBDIRS += plg_fcsmaxent
-plg_fcsmaxent.subdir = ./plugins/qffcsmaxentevaluation
-plg_fcsmaxent.depends = lib libqf3widgets
+!contains(QF3CONFIG, noeigen3lib) {
+    SUBDIRS += plg_fcsmaxent
+    plg_fcsmaxent.subdir = ./plugins/qffcsmaxentevaluation
+    plg_fcsmaxent.depends = lib libqf3widgets
+}
 
 SUBDIRS += plg_fcsmsdevaluation
 plg_fcsmsdevaluation.subdir = ./plugins/fcsmsdevaluation

@@ -65,12 +65,12 @@ bool QFFitFunctionGeneral3GaussianVar::isParameterVisible(int parameter, const d
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneral3GaussianVar::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionGeneral3GaussianVar::getAdditionalPlotCount(const double* /*params*/) const {
     return 3;
     // we have one additional plot
 }
 
-QString QFFitFunctionGeneral3GaussianVar::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneral3GaussianVar::transformParametersForAdditionalPlot(int plot, double* params) const {
     if (plot==0) {
         params[PARAM_AMPLITUDE2]=0;
         return QObject::tr("Gauss 1");
@@ -84,13 +84,13 @@ QString QFFitFunctionGeneral3GaussianVar::transformParametersForAdditionalPlot(i
     return "";
 }
 
-bool QFFitFunctionGeneral3GaussianVar::get_implementsDerivatives()
+bool QFFitFunctionGeneral3GaussianVar::get_implementsDerivatives() const
 {
     return false;
 }
 
 
-bool QFFitFunctionGeneral3GaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionGeneral3GaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     if (params && dataX && dataY) {
         double pW=0;

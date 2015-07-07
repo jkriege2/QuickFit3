@@ -30,6 +30,7 @@
 #include "../extlibs/MersenneTwister.h"
 #include "qftools.h"
 #include "statistics_tools.h"
+#include "qfglobalfittool.h"
 
 void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, const double* params) const {
     evaluateJacobianNum(evalout, params);
@@ -305,24 +306,62 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluate(double* evalout, const do
     register int ecount=get_evalout();
     QVector<double> evals(ecount, 0.0);
     m_model->multiEvaluate(evals.data(), m_dataX, ecount, m_modelParams);
-    if (!fitLogY) {
-        for (register int i=0; i<ecount; i++) {
-            v = ( m_dataF[i] -  evals[i] ) / m_dataWeight[i];
-            if (!QFFloatIsOK(v)) {
-                v=0;
+    if (m_dataWeight) {
+        if (!fitLogY) {
+            for (register int i=0; i<ecount; i++) {
+                v = ( m_dataF[i] -  evals[i] ) / m_dataWeight[i];
+                if (!QFFloatIsOK(v)) {
+                    v=0;
+                }
+                evalout[i]=v;
             }
-            evalout[i]=v;
+        } else {
+            for (register int i=0; i<ecount; i++) {
+                v = ( log(m_dataF[i]) -  log(evals[i]) ) /log(m_dataWeight[i]);
+                if (!QFFloatIsOK(v)) {
+                    v=0;
+                }
+                evalout[i]=v;
+            }
         }
-    } else {
-        for (register int i=0; i<ecount; i++) {
-            v = ( log(m_dataF[i]) -  log(evals[i]) ) /log(m_dataWeight[i]);
-            if (!QFFloatIsOK(v)) {
-                v=0;
+    } else{
+        if (!fitLogY) {
+            for (register int i=0; i<ecount; i++) {
+                v = ( m_dataF[i] -  evals[i] );
+                if (!QFFloatIsOK(v)) {
+                    v=0;
+                }
+                evalout[i]=v;
             }
-            evalout[i]=v;
+        } else {
+            for (register int i=0; i<ecount; i++) {
+                v = ( log(m_dataF[i]) -  log(evals[i]) );
+                if (!QFFloatIsOK(v)) {
+                    v=0;
+                }
+                evalout[i]=v;
+            }
         }
     }
     //mapArrayFromModelToFunctor(params, m_modelParams);
+}
+
+void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateModelOnly(double *evalout, const double *params) const
+{
+    mapArrayFromFunctorToModel(m_modelParams, params);
+
+
+    register double v;
+    register int ecount=get_evalout();
+    QVector<double> evals(ecount, 0.0);
+    m_model->multiEvaluate(evals.data(), m_dataX, ecount, m_modelParams);
+    for (register int i=0; i<ecount; i++) {
+        v = evals[i];
+        if (!QFFloatIsOK(v)) {
+            v=0;
+        }
+        evalout[i]=v;
+    }
 }
 
 void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, const double* params) const {
@@ -330,18 +369,36 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, 
     register int pcount=get_paramcount();
     register int ecount=get_evalout();
     double* p=(double*)qfCalloc(m_N, sizeof(double));
-    for (register int i=0; i<ecount; i++) {
-        register int offset=i*pcount;
-        for (register int j=0; j<m_N; j++) { p[j]=0; }
-        m_model->evaluateDerivatives(p, m_dataX[i], m_modelParams);
-        if (!fitLogY) {
-            for (register int j=0; j<pcount; j++) {
-                evalout[offset+j]=-1.0*p[modelFromFunctor[j]]/m_dataWeight[i];
+    if (m_dataWeight) {
+        for (register int i=0; i<ecount; i++) {
+            register int offset=i*pcount;
+            for (register int j=0; j<m_N; j++) { p[j]=0; }
+            m_model->evaluateDerivatives(p, m_dataX[i], m_modelParams);
+            if (!fitLogY) {
+                for (register int j=0; j<pcount; j++) {
+                    evalout[offset+j]=-1.0*p[modelFromFunctor[j]]/m_dataWeight[i];
+                }
+            } else {
+                double eval=m_model->evaluate(m_dataX[i], m_modelParams);
+                for (register int j=0; j<pcount; j++) {
+                    evalout[offset+j]=-1.0/eval*p[modelFromFunctor[j]]/log(m_dataWeight[i]);
+                }
             }
-        } else {
-            double eval=m_model->evaluate(m_dataX[i], m_modelParams);
-            for (register int j=0; j<pcount; j++) {
-                evalout[offset+j]=-1.0/eval*p[modelFromFunctor[j]]/log(m_dataWeight[i]);
+        }
+    } else {
+        for (register int i=0; i<ecount; i++) {
+            register int offset=i*pcount;
+            for (register int j=0; j<m_N; j++) { p[j]=0; }
+            m_model->evaluateDerivatives(p, m_dataX[i], m_modelParams);
+            if (!fitLogY) {
+                for (register int j=0; j<pcount; j++) {
+                    evalout[offset+j]=-1.0*p[modelFromFunctor[j]];
+                }
+            } else {
+                double eval=m_model->evaluate(m_dataX[i], m_modelParams);
+                for (register int j=0; j<pcount; j++) {
+                    evalout[offset+j]=-1.0/eval*p[modelFromFunctor[j]];
+                }
             }
         }
     }
@@ -397,27 +454,39 @@ QVector<double> QFFitAlgorithm::FitQFFitFunctionFunctor::backtransfromParameters
 
 bool QFFitAlgorithm::functorHasWeights(const QFFitAlgorithm::Functor *f)
 {
-    {
-        const QFFitAlgorithm::FitFunctionFunctor* ff=dynamic_cast<const QFFitAlgorithm::FitFunctionFunctor*>(f);
-        if (ff ) return (ff->getDataWeight()!=NULL);
+    if (f) {
+        return f->isWeightedLSQ();
+    } else {
+        return false;
     }
-    {
-        const QFFitAlgorithm::FitFunctionFunctor2D* ff=dynamic_cast<const QFFitAlgorithm::FitFunctionFunctor2D*>(f);
-        if (ff ) return (ff->getDataWeight()!=NULL);
-    }
-    {
-        const QFFitAlgorithm::FitFunctionFunctor3D* ff=dynamic_cast<const QFFitAlgorithm::FitFunctionFunctor3D*>(f);
-        if (ff ) return (ff->getDataWeight()!=NULL);
-    }
+//    {
+//        const QFFitAlgorithm::FitFunctionFunctor* ff=dynamic_cast<const QFFitAlgorithm::FitFunctionFunctor*>(f);
+//        if (ff ) return (ff->getDataWeight()!=NULL);
+//    }
+//    {
+//        const QFFitAlgorithm::FitFunctionFunctor2D* ff=dynamic_cast<const QFFitAlgorithm::FitFunctionFunctor2D*>(f);
+//        if (ff ) return (ff->getDataWeight()!=NULL);
+//    }
+//    {
+//        const QFFitAlgorithm::FitFunctionFunctor3D* ff=dynamic_cast<const QFFitAlgorithm::FitFunctionFunctor3D*>(f);
+//        if (ff ) return (ff->getDataWeight()!=NULL);
+//    }
 
-    return false;
+//    return false;
 }
 
 bool QFFitAlgorithm::functorAllWeightsOne(const QFFitAlgorithm::Functor *f)
 {
+    if (!f) return false;
+
+    const QFFitMultiQFFitFunctionFunctor* ff=dynamic_cast<const QFFitMultiQFFitFunctionFunctor*>(f);
+    if (ff ) {
+        return ff->areAllWeightsOne();
+    }
+
     uint64_t N=0;
     const double* w=functorGetWeights(f, &N);
-    if (w&&N>0) {
+    if (w && N>0) {
         bool all1=true;
         for (uint64_t i=0; i<N; i++) {
             if (w[i]!=1.0) return false;
@@ -1093,6 +1162,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
     double* ppparamsMax=NULL;
     const bool* pparamsFix=fixParams;
     bool* ppparamsFix=NULL;
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  1";
     if (paramsMin==NULL) {
         ppparamsMin=(double*)qfCalloc(model->get_paramcount(), sizeof(double));
         for (int i=0; i<model->get_paramcount(); i++) {
@@ -1100,6 +1170,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         }
         pparamsMin=ppparamsMin;
     }
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  2";
     if (paramsMax==NULL) {
         ppparamsMax=(double*)qfCalloc(model->get_paramcount(), sizeof(double));
         for (int i=0; i<model->get_paramcount(); i++) {
@@ -1107,6 +1178,8 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         }
         pparamsMax=ppparamsMax;
     }
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  3";
+
 
     if (fixParams==NULL) {
         ppparamsFix=(bool*)qfCalloc(model->get_paramcount(), sizeof(bool));
@@ -1115,6 +1188,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         }
         pparamsFix=ppparamsFix;
     }
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  4";
 
 
 
@@ -1126,14 +1200,22 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         fm=new QFFitAlgorithm::FitQFOptimizeFunctionFunctor(model, initialParams, pparamsFix);
     }
     fmbs=dynamic_cast<QFFitAlgorithm::FunctorBootstrapInterface*>(fm);
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  5";
 
     double* tparamsMin=fm->createMappedArrayForFunctor(pparamsMin);
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  6";
+
     double* tparamsMax=fm->createMappedArrayForFunctor(pparamsMax);
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  7";
     double* tparamsOut=(double*)qfCalloc(fm->get_paramcount(), sizeof(double));
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  8";
     double* tparamErrorsOut=(double*)qfCalloc(fm->get_paramcount(), sizeof(double));
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  9";
     double* tinitialParams=fm->createMappedArrayForFunctor(initialParams);
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  10";
 
     result=intFit(tparamsOut, tparamErrorsOut, tinitialParams, fm, tparamsMin, tparamsMax);
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  11";
 
 
     //qDebug()<<"### OPTIMIZE: "<<m_errorEstimateModeFit<<fmbs;
@@ -1215,19 +1297,29 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         paramsOut[i]=initialParams[i];
         if (paramErrorsOut) paramErrorsOut[i]=0;
     }
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  12";
+
     fm->mapArrayFromFunctorToModel(paramsOut, tparamsOut);
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  13";
     if (paramErrorsOut) fm->mapArrayFromFunctorToModel(paramErrorsOut, tparamErrorsOut);
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  14";
 
     qfFree(tparamsMax);
     qfFree(tparamsMin);
     qfFree(tparamErrorsOut);
     qfFree(tparamsOut);
     qfFree(tinitialParams);
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  15";
+
 
     if (ppparamsMin) qfFree(ppparamsMin);
     if (ppparamsMax) qfFree(ppparamsMax);
     if (ppparamsFix) qfFree(ppparamsFix);
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  16";
+
     delete fm;
+    qDebug()<<"QFFitAlgorithm::lsqMinimize  17";
+
     return result;
 }
 
@@ -1440,6 +1532,11 @@ QFFitAlgorithm::FitFunctionFunctor::~FitFunctionFunctor()
 {
 }
 
+bool QFFitAlgorithm::FitFunctionFunctor::isWeightedLSQ() const
+{
+    return (m_dataWeight!=NULL);
+}
+
 const double * QFFitAlgorithm::FitFunctionFunctor::getDataX() const
 {
     return m_dataX;
@@ -1453,6 +1550,36 @@ const double * QFFitAlgorithm::FitFunctionFunctor::getDataF() const
 const double * QFFitAlgorithm::FitFunctionFunctor::getDataWeight() const
 {
     return m_dataWeight;
+}
+
+QVector<double> QFFitAlgorithm::FitFunctionFunctor::getDataXV() const
+{
+    QVector<double> d;
+    if (!m_dataX) return d;
+    for (uint64_t i=0; i<m_M; i++) {
+        d.append(m_dataX[i]);
+    }
+    return d;
+}
+
+QVector<double> QFFitAlgorithm::FitFunctionFunctor::getDataFV() const
+{
+    QVector<double> d;
+    if (!m_dataF) return d;
+    for (uint64_t i=0; i<m_M; i++) {
+        d.append(m_dataF[i]);
+    }
+    return d;
+}
+
+QVector<double> QFFitAlgorithm::FitFunctionFunctor::getDataWeightV() const
+{
+    QVector<double> d;
+    if (!m_dataWeight) return d;
+    for (uint64_t i=0; i<m_M; i++) {
+        d.append(m_dataWeight[i]);
+    }
+    return d;
 }
 
 uint64_t QFFitAlgorithm::FitFunctionFunctor::getDataPoints() const
@@ -1737,6 +1864,11 @@ const double *QFFitAlgorithm::FitFunctionFunctor3D::getDataWeight() const
 uint64_t QFFitAlgorithm::FitFunctionFunctor3D::getDataPoints() const
 {
     return m_M;
+}
+
+bool QFFitAlgorithm::FitFunctionFunctor3D::isWeightedLSQ() const
+{
+    return (m_dataWeight!=NULL);
 }
 
 void QFFitAlgorithm::FitFunctionFunctor3D::setDataX(const double *data)
@@ -2087,6 +2219,11 @@ QFFitAlgorithm::FitFunctionFunctor2D::FitFunctionFunctor2D(const double *dataX, 
 QFFitAlgorithm::FitFunctionFunctor2D::~FitFunctionFunctor2D()
 {
 
+}
+
+bool QFFitAlgorithm::FitFunctionFunctor2D::isWeightedLSQ() const
+{
+    return (m_dataWeight!=NULL);
 }
 
 const double *QFFitAlgorithm::FitFunctionFunctor2D::getDataX() const

@@ -62,3 +62,9 @@ contains( HAS_CBLAS, true ) {
     DEFINES += QF_HAS_CBLAS
 }
 
+!contains(QF3CONFIG, noeigen3lib) {
+    include(extlibs/eigen.pri)
+    DEFINES += STATISTICS_TOOLS_MAY_USE_EIGEN3
+}
+
+DEFINES += STATISTICS_TOOLS_USE_QFTOOLS_H

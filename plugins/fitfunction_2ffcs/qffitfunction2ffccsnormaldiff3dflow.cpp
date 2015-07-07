@@ -409,12 +409,12 @@ bool QFFitFunctionFCCSNormalDiff3DFlow2Focus::isParameterVisible(int parameter, 
     return true;
 }
 
-unsigned int QFFitFunctionFCCSNormalDiff3DFlow2Focus::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCCSNormalDiff3DFlow2Focus::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionFCCSNormalDiff3DFlow2Focus::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
+QString QFFitFunctionFCCSNormalDiff3DFlow2Focus::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) const {
     return QString();
 }

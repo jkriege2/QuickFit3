@@ -56,14 +56,14 @@ bool QFFitFunctionPSFGaussianBeamZIntensity::isParameterVisible(int parameter, c
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionPSFGaussianBeamZIntensity::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionPSFGaussianBeamZIntensity::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionPSFGaussianBeamZIntensity::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionPSFGaussianBeamZIntensity::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -72,7 +72,7 @@ QString QFFitFunctionPSFGaussianBeamZIntensity::transformParametersForAdditional
 }
 
 
-bool QFFitFunctionPSFGaussianBeamZIntensity::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool* /*fix*/)
+bool QFFitFunctionPSFGaussianBeamZIntensity::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool* /*fix*/) const
 {
 
 

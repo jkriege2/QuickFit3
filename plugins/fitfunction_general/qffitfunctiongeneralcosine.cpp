@@ -59,13 +59,13 @@ bool QFFitFunctionGeneralCosine::isParameterVisible(int parameter, const double*
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneralCosine::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralCosine::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralCosine::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralCosine::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -73,13 +73,13 @@ QString QFFitFunctionGeneralCosine::transformParametersForAdditionalPlot(int plo
     return "";
 }
 
-bool QFFitFunctionGeneralCosine::get_implementsDerivatives()
+bool QFFitFunctionGeneralCosine::get_implementsDerivatives() const
 {
     return false;
 }
 
 
-bool QFFitFunctionGeneralCosine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
+bool QFFitFunctionGeneralCosine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

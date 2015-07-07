@@ -107,9 +107,9 @@ int QFImFCCSFitEvaluationItem::getIndexMax(const QFRawDataRecord *r) const
     else return fcs->getCorrelationRuns()-1;
 }
 
-QFFitStatistics QFImFCCSFitEvaluationItem::calcFitStatistics(bool storeAsResults, QFFitFunction *ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord *record, int run, const QVector<double>& COV, double paramrange_size, bool storeCOV)
+QFFitStatistics QFImFCCSFitEvaluationItem::calcFitStatistics(bool storeAsResults, QFFitFunction *ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord *record, int run, const QString &/*prefix*/, const QString &/*pgroup*/, const QVector<double>& COV, double paramrange_size, bool storeCOV, QStringList *returnFitParamNames)
 {
-    return QFFitResultsByIndexEvaluationFitToolsBase::calcFitStatistics(storeAsResults, ffunc,  N, tauvals, corrdata, weights,  datacut_min,  datacut_max, fullParams, errors, paramsFix,  runAvgWidth,  residualHistogramBins, record,  run, QString("fitstat_local_"), tr("local fit statistics"), COV, paramrange_size, storeCOV);
+    return QFFitResultsByIndexEvaluationFitToolsBase::calcFitStatistics(storeAsResults, ffunc,  N, tauvals, corrdata, weights,  datacut_min,  datacut_max, fullParams, errors, paramsFix,  runAvgWidth,  residualHistogramBins, record,  run, QString("fitstat_local_"), tr("local fit statistics"), COV, paramrange_size, storeCOV, returnFitParamNames);
 }
 
 QFEvaluationRawDataModelProxy *QFImFCCSFitEvaluationItem::getRawDataProxyModel() const
@@ -1153,7 +1153,7 @@ void QFImFCCSFitEvaluationItem::calcChi2Landscape(double *chi2Landscape, int par
     setupGlobalFitTool(tool, &fitData, iparams, paramsVector, initialParamsVector, errorsVector, errorsVectorI, records, run, rangeMinDatarange, rangeMaxDatarange, false);
 
 
-    tool.evalueCHi2Landscape(chi2Landscape, paramXFile, paramXID, paramXValues, paramYFile, paramYID, paramYValues, initialParamsVector);
+    tool.evalueChi2Landscape(chi2Landscape, paramXFile, paramXID, paramXValues, paramYFile, paramYID, paramYValues, initialParamsVector);
 
 
 
@@ -1206,6 +1206,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     QList<double*> paramsVector;
     QList<double*> initialParamsVector;
     QList<double*> errorsVector, errorsVectorI;
+    QFBasicFitStatistics fitstat;
 
     bool saveLongStrings=!getProperty("dontSaveFitResultMessage", true).toBool();
     bool dontFitMasked=getProperty("dontFitMaskedPixels", true).toBool();
@@ -1276,7 +1277,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
             }
             //qDebug()<<"### before thread->init(): paramsVector.size="<<paramsVector.size();
             //qDebug()<<"  params[0]="<<arrayToString(paramsVector[0], fitData[0].ffunc->paramCount());
-            doFitThread->init(&tool, paramsVector, errorsVector, initialParamsVector, errorsVectorI);
+            doFitThread->init(&tool, paramsVector, errorsVector, initialParamsVector, errorsVectorI, NULL, &fitstat);
             //qDebug()<<"### after thread->init(): paramsVector.size="<<paramsVector.size();
             //qDebug()<<"  params[0]="<<arrayToString(paramsVector[0], fitData[0].ffunc->paramCount());
             //doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);

@@ -79,10 +79,10 @@ bool QFFitFunctionFCSPowerLaw::isParameterVisible(int parameter, const double* d
     return true;
 }
 
-unsigned int QFFitFunctionFCSPowerLaw::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionFCSPowerLaw::getAdditionalPlotCount(const double* /*params*/) const {
     return 0;
 }
 
-QString QFFitFunctionFCSPowerLaw::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
+QString QFFitFunctionFCSPowerLaw::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) const {
     return QString();
 }

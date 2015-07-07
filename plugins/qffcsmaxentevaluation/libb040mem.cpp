@@ -527,7 +527,7 @@ void MaxEntB040::setMmatrix()
 	m_sigmamatrix=Eigen::MatrixXd::Zero(m_Nd,m_Nd);
 	for (int i=0; i< m_Nd ; i++)
 		{
-		m_sigmamatrix(i,i)=1.0/(pow(m_stdev(i),2));
+        m_sigmamatrix(i,i)=1.0/(qfSqr(m_stdev(i)));
 		}
 	m_M=m_Sred.transpose()*m_Vred.transpose()*m_sigmamatrix*m_Vred*m_Sred;
 
@@ -864,7 +864,7 @@ void MaxEntB040::Mmatrix(Eigen::MatrixXd m,int Nd, Eigen::MatrixXd Vred,Eigen::M
     Eigen::MatrixXd sigmamatrix=Eigen::MatrixXd::Zero(Nd,Nd);
     for (int i=0; i< Nd ; i++)
         {
-        sigmamatrix(i,i)=1.0/(pow(stdev(i),2));
+        sigmamatrix(i,i)=1.0/(qfSqr(stdev(i)));
         }
     m=Sred.transpose()*Vred.transpose()*sigmamatrix*Vred*Sred;
 
@@ -907,7 +907,7 @@ void MaxEntB040::diagK()
     Eigen::MatrixXd sigma=Eigen::MatrixXd::Zero(m_Nd,m_Nd);
     for (int i=0; i< m_Nd ; i++)
         {
-        sigma(i,i)=1.0/(pow(m_stdev(i),2));
+        sigma(i,i)=1.0/(qfSqr(m_stdev(i)));
         }
     m=m_Sred.transpose()*m_Vred.transpose()*sigma*m_Vred*m_Sred;
     // end of Mmatrix method                      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

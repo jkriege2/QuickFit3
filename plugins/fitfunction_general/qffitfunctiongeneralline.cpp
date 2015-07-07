@@ -50,13 +50,13 @@ bool QFFitFunctionGeneralLine::isParameterVisible(int parameter, const double* d
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneralLine::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralLine::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralLine::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralLine::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -64,14 +64,14 @@ QString QFFitFunctionGeneralLine::transformParametersForAdditionalPlot(int plot,
     return "";
 }
 
-bool QFFitFunctionGeneralLine::get_implementsDerivatives()
+bool QFFitFunctionGeneralLine::get_implementsDerivatives() const
 {
     return false;
 }
 
 
 
-bool QFFitFunctionGeneralLine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralLine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

@@ -54,13 +54,13 @@ bool QFFitFunctionGeneralSigmoid::isParameterVisible(int parameter, const double
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneralSigmoid::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralSigmoid::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralSigmoid::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralSigmoid::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -68,13 +68,13 @@ QString QFFitFunctionGeneralSigmoid::transformParametersForAdditionalPlot(int pl
     return "";
 }
 
-bool QFFitFunctionGeneralSigmoid::get_implementsDerivatives()
+bool QFFitFunctionGeneralSigmoid::get_implementsDerivatives() const
 {
     return false;
 }
 
 
-bool QFFitFunctionGeneralSigmoid::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
+bool QFFitFunctionGeneralSigmoid::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

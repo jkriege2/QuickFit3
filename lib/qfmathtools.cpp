@@ -207,6 +207,8 @@ QString QFFitStatistics::getAsHTMLTable(bool addExplanation, bool includeR2) con
 
 
 QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins, const double* fitFuncParams, const double* fitFuncParamErrors, const QVector<double>& COV, double paramrange_size, bool storeCOV) {
+    if (datacut_min<0) datacut_min=0;
+    if (datacut_max<0) datacut_max=N-1;
     datacut_max=qBound((long)datacut_min, (long)datacut_max, (long)N-1);
     QFFitStatistics result;
 
@@ -595,7 +597,14 @@ QString QFBasicFitStatistics::getAsHTMLTable(bool addExplanation, bool includeR2
 
     if (COV.size()>0) {
         int n=floor(sqrt(COV.size()));
-        txtFit.append(QString("<br><br>Var-Cov-Matrix:<blockquote>")+QString(linalgMatrixToHTMLString(COV.data(), n, n, 9, 3, "g", " border=\"0\"").c_str())+QString("</blockquote>"));
+        std::string colorlegend;
+        QString m=QString("<br><br>Var-Cov-Matrix:<blockquote><table border=\"1\" cellspacing=\"0\" cellpadding=\"3\"><tr><td>")
+                +QString::fromStdString(linalgMatrixToHTMLString(COV.data(), n, n, 9, 3, "g", " border=\"0\" cellpadding=\"3\" cellspacing=\"0\" ", "&nbsp;&nbsp;", "&nbsp;&nbsp;", true, true, &colorlegend))
+                +QString("</td></tr></table><br><br>Colors: ");
+        m+=(QString::fromStdString(colorlegend)+QString("</blockquote>"));
+        //m=m.replace("<td>", "<td>&nbsp;&nbsp;&nbsp;");
+        //qDebug()<<colorlegend.c_str()<<"\n\n"<<m;
+        txtFit.append(m);
     }
 
     if (addExplanation) {

@@ -20,10 +20,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "statistics_tools.h"
 #include "qfetcspcimporterjobthread.h"
 #include "qfetcspcimporterdialog.h"
 #include "qftcspcreader.h"
-#include "statistics_tools.h"
 #include <stdint.h>
 #include "qfimportermanager.h"
 #include "binarydatatools.h"

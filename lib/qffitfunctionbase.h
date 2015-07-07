@@ -104,7 +104,7 @@ class QFLIB_EXPORT QFFitFunctionBase
             /** \brief names for the items in the combobox (if type==IntCombo) */
             QStringList comboItems;
 
-            ParameterDescription() {
+            inline explicit ParameterDescription() {
                 widgetType=Invalid;
                 id="";
                 name="";
@@ -125,7 +125,7 @@ class QFLIB_EXPORT QFFitFunctionBase
                 parameterType=StandardParameter;
             }
         };
-        virtual ~QFFitFunctionBase() {};
+        inline virtual ~QFFitFunctionBase() {}
 
         /** \brief returns the number of parameters */
         inline int paramCount() const {
@@ -200,8 +200,8 @@ class QFLIB_EXPORT QFFitFunctionBase
             \param params The decision may be based on this parameter set.
             \return number of additional plots, or 0 if none
         */
-        virtual unsigned int getAdditionalPlotCount(const double* params);
-        inline  unsigned int getAdditionalPlotCount(const QVector<double>& params) {
+        virtual unsigned int getAdditionalPlotCount(const double* params) const;
+        inline  unsigned int getAdditionalPlotCount(const QVector<double>& params) const {
             return getAdditionalPlotCount(params.constData());
         }
 
@@ -210,8 +210,8 @@ class QFLIB_EXPORT QFFitFunctionBase
             \param[in,out] params parameter vector. This is assumed to be filled with the full parameters when the function is called
             \return label/name for the graph
         */
-        virtual QString transformParametersForAdditionalPlot(int plot, double* params) ;
-        inline  QString transformParametersForAdditionalPlot(int plot, QVector<double>& params) {
+        virtual QString transformParametersForAdditionalPlot(int plot, double* params) const ;
+        inline  QString transformParametersForAdditionalPlot(int plot, QVector<double>& params) const {
             params.resize(m_parameters.size());
             return transformParametersForAdditionalPlot(plot, params.data());
         }
@@ -237,18 +237,18 @@ class QFLIB_EXPORT QFFitFunctionBase
         }
 
         /** \brief return \c true if a parameter wit the given id exists */
-        inline bool hasParameter(QString id) {
+        inline bool hasParameter(QString id) const {
             return (getParameterNum(id)>=0);
         }
 
         /** \brief get id of the given parameter or an empty string */
-        inline QString getParameterID(int i) {
+        inline QString getParameterID(int i) const {
             if ((i>=0) && (i<m_parameters.size())) return m_parameters[i].id;
             return QString("");
         }
 
         /** \brief return a list with the ids of all parameters of this model */
-        inline QStringList getParameterIDs() {
+        inline QStringList getParameterIDs() const {
             QStringList sl;
             for (int i=0; i<m_parameters.size(); i++) sl.append(m_parameters[i].id);
             return sl;

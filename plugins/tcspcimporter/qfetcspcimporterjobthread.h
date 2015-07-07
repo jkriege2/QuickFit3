@@ -321,7 +321,7 @@ protected:
 
         bool cr_swapped;
 
-        ccfFileConfig() {
+        inline ccfFileConfig() {
             channel1=0;
             channel2=0;
             filename="";

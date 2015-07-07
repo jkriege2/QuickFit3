@@ -267,18 +267,18 @@ bool QFLibraryFitFunction::isParameterVisible(int parameter, const double *param
     else return QFFitFunction::isParameterVisible(parameter, parameterValues);
 }
 
-unsigned int QFLibraryFitFunction::getAdditionalPlotCount(const double *params) {
+unsigned int QFLibraryFitFunction::getAdditionalPlotCount(const double *params) const {
     if (d->lib_getAdditionalPlots) return d->lib_getAdditionalPlots(params);
     else return QFFitFunction::getAdditionalPlotCount(params);
 }
 
-QString QFLibraryFitFunction::transformParametersForAdditionalPlot(int plot, double *params)
+QString QFLibraryFitFunction::transformParametersForAdditionalPlot(int plot, double *params) const
 {
     if (d->lib_transformAdditionalPlot) return d->lib_transformAdditionalPlot(plot, params);
     else return QFFitFunction::transformParametersForAdditionalPlot(plot, params);
 }
 
-bool QFLibraryFitFunction::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFLibraryFitFunction::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix) const
 {
     if (d->lib_estimateInitial) {
         if (fix) {

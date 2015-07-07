@@ -186,13 +186,13 @@ bool QFFitFunctionsSPIMFCCSDiff::isParameterVisible(int parameter, const double*
     return true;
 }
 
-unsigned int QFFitFunctionsSPIMFCCSDiff::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsSPIMFCCSDiff::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionsSPIMFCCSDiff::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsSPIMFCCSDiff::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);

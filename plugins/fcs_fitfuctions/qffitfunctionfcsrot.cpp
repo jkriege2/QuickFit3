@@ -187,11 +187,11 @@ bool QFFitFunctionFCSRot::isParameterVisible(int /*parameter*/, const double* /*
     return true;
 }
 
-unsigned int QFFitFunctionFCSRot::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionFCSRot::getAdditionalPlotCount(const double* /*params*/) const {
     return 2;
 }
 
-QString QFFitFunctionFCSRot::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSRot::transformParametersForAdditionalPlot(int plot, double* params) const {
     if (plot==0) {
         params[FCSSDiff_nonfl_theta1]=0;
         return "without non-fluorescent";

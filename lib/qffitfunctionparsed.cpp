@@ -147,7 +147,7 @@ bool QFFitFunctionParsed::get_implementsDerivatives() const
 }
 
 
-QString QFFitFunctionParsed::transformParametersForAdditionalPlot(int plot, double *params)
+QString QFFitFunctionParsed::transformParametersForAdditionalPlot(int plot, double *params) const
 {
     Q_UNUSED(plot);
     Q_UNUSED(params);
@@ -155,7 +155,7 @@ QString QFFitFunctionParsed::transformParametersForAdditionalPlot(int plot, doub
 }
 
 
-unsigned int QFFitFunctionParsed::getAdditionalPlotCount(const double *params)
+unsigned int QFFitFunctionParsed::getAdditionalPlotCount(const double *params) const
 {
     Q_UNUSED(params);
     return 0;

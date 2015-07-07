@@ -52,14 +52,14 @@ bool QFFitFunctionGeneralPDFCauchy::isParameterVisible(int parameter, const doub
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneralPDFCauchy::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralPDFCauchy::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionGeneralPDFCauchy::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralPDFCauchy::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -68,7 +68,7 @@ QString QFFitFunctionGeneralPDFCauchy::transformParametersForAdditionalPlot(int 
 }
 
 
-bool QFFitFunctionGeneralPDFCauchy::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionGeneralPDFCauchy::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

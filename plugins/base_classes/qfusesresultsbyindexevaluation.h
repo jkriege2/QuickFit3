@@ -285,6 +285,7 @@ class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation {
 
 
         virtual void setFitResultFitStatistics(QFRawDataRecord *record, int index, const QFFitStatistics &result, const QString &prefix, const QString &group) ;
+        virtual void setFitResultBasicFitStatistics(QFRawDataRecord *record, int index, const QFBasicFitStatistics &result, const QString &prefix, const QString &group) ;
     protected:
         /** \brief write object contents into XML file
          *
@@ -298,6 +299,7 @@ class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation {
         int currentIndex;
 
     public:
+        using QFUsesResultsEvaluation::setFitResultBasicFitStatistics;
         using QFUsesResultsEvaluation::setFitResultFitStatistics;
         using QFUsesResultsEvaluation::hasResults;
         using QFUsesResultsEvaluation::getEvaluationResultID;

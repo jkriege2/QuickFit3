@@ -3367,7 +3367,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 
 }
 
-void QFRawDataRecord::resultsSetFitStatistics(const QFBasicFitStatistics &result, const QString &evalID, const QString &prefix, const QString &group)
+void QFRawDataRecord::resultsSetBasicFitStatistics(const QFBasicFitStatistics &result, const QString &evalID, const QString &prefix, const QString &group)
 {
 
     QString param;

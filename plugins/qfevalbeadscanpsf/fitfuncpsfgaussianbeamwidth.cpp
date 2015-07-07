@@ -52,17 +52,17 @@ bool QFFitFunctionPSFGaussianBeamWidth::isParameterVisible(int /*parameter*/, co
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionPSFGaussianBeamWidth::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionPSFGaussianBeamWidth::getAdditionalPlotCount(const double* /*params*/) const {
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionPSFGaussianBeamWidth::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) {
+QString QFFitFunctionPSFGaussianBeamWidth::transformParametersForAdditionalPlot(int /*plot*/, double* /*params*/) const {
     return "";
 }
 
 
-bool QFFitFunctionPSFGaussianBeamWidth::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionPSFGaussianBeamWidth::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

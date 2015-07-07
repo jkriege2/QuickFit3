@@ -91,13 +91,13 @@ bool QFFitFunctionGeneralPolynomCentered::isParameterVisible(int parameter, cons
 
     return true;
 }
-unsigned int QFFitFunctionGeneralPolynomCentered::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralPolynomCentered::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralPolynomCentered::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralPolynomCentered::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -105,13 +105,13 @@ QString QFFitFunctionGeneralPolynomCentered::transformParametersForAdditionalPlo
     return "";
 }
 
-bool QFFitFunctionGeneralPolynomCentered::get_implementsDerivatives()
+bool QFFitFunctionGeneralPolynomCentered::get_implementsDerivatives() const
 {
     return false;
 }
 
 
-bool QFFitFunctionGeneralPolynomCentered::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/)
+bool QFFitFunctionGeneralPolynomCentered::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

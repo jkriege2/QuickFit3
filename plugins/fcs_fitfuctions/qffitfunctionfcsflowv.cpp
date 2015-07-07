@@ -345,11 +345,11 @@ bool QFFitFunctionFCSFlowV::isParameterVisible(int /*parameter*/, const double* 
     return true;
 }
 
-unsigned int QFFitFunctionFCSFlowV::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionFCSFlowV::getAdditionalPlotCount(const double* /*params*/) const {
     return 2;
 }
 
-QString QFFitFunctionFCSFlowV::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSFlowV::transformParametersForAdditionalPlot(int plot, double* params) const {
     if (plot==0) {
         params[FCCSDiff_nonfl_theta1]=0;
         return "without non-fluorescent";

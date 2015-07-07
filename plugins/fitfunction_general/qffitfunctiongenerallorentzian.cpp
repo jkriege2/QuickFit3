@@ -55,14 +55,14 @@ bool QFFitFunctionGeneralLorentzian::isParameterVisible(int parameter, const dou
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneralLorentzian::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralLorentzian::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionGeneralLorentzian::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralLorentzian::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -70,12 +70,12 @@ QString QFFitFunctionGeneralLorentzian::transformParametersForAdditionalPlot(int
     return "";
 }
 
-bool QFFitFunctionGeneralLorentzian::get_implementsDerivatives()
+bool QFFitFunctionGeneralLorentzian::get_implementsDerivatives() const
 {
     return false;
 }
 
-bool QFFitFunctionGeneralLorentzian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionGeneralLorentzian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

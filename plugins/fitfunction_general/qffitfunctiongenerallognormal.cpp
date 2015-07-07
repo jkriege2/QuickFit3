@@ -57,13 +57,13 @@ bool QFFitFunctionGeneralLogNormal::isParameterVisible(int parameter, const doub
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneralLogNormal::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralLogNormal::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralLogNormal::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralLogNormal::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -71,13 +71,13 @@ QString QFFitFunctionGeneralLogNormal::transformParametersForAdditionalPlot(int 
     return "";
 }
 
-bool QFFitFunctionGeneralLogNormal::get_implementsDerivatives()
+bool QFFitFunctionGeneralLogNormal::get_implementsDerivatives() const
 {
     return false;
 }
 
 
-bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/)
+bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

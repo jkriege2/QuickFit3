@@ -292,13 +292,13 @@ bool QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright::isParameterVisible(int parame
     return true;
 }
 
-unsigned int QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);

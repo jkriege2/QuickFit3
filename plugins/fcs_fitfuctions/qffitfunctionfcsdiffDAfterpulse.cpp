@@ -405,11 +405,11 @@ bool QFFitFunctionFCSDiffDAfterPulse::isParameterVisible(int parameter, const do
     return true;
 }
 
-unsigned int QFFitFunctionFCSDiffDAfterPulse::getAdditionalPlotCount(const double* /*params*/) {
+unsigned int QFFitFunctionFCSDiffDAfterPulse::getAdditionalPlotCount(const double* /*params*/) const {
     return 2;
 }
 
-QString QFFitFunctionFCSDiffDAfterPulse::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSDiffDAfterPulse::transformParametersForAdditionalPlot(int plot, double* params) const {
     if (plot==0) {
         params[FCSDiff_n_nonfluorescent]=0;
         params[FCSDiff_afterpulsing]=0;

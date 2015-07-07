@@ -40,15 +40,15 @@ class QFESpectraViewer;
 class QFESpectraViewerLoadThread: public QThread {
         Q_OBJECT
     public:
-        QFESpectraViewerLoadThread(SpectrumManager*manager, QFESpectraViewer* parent=NULL);
+        explicit QFESpectraViewerLoadThread(SpectrumManager*manager, QFESpectraViewer* parent=NULL);
     signals:
         void slog_text(const QString& text);
         void enableAction(bool enabled);
     protected:
-        void log_text(const QString& text);
+        //void log_text(const QString& text);
         SpectrumManager* manager;
         virtual void run();
-        QFESpectraViewer* sv;
+        QString sv;
 };
 
 
@@ -73,24 +73,24 @@ class QFESpectraViewer : public QObject, public QFExtensionBase, public QFPlugin
     // QFExtension routines
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return QString("qfe_spectraviewer"); };
+        virtual QString getID() const  { return QString("qfe_spectraviewer"); }
         /** \copydoc QFExtension::getName() */
-        virtual QString getName() const  { return tr("Spectra Viewer"); };
+        virtual QString getName() const  { return tr("Spectra Viewer"); }
         /** \copydoc QFExtension::getDescription() */
-        virtual QString getDescription() const  { return tr("displays fluorophore and filter spectra"); };
+        virtual QString getDescription() const  { return tr("displays fluorophore and filter spectra"); }
         /** \copydoc QFExtension::getAuthor() */
-        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); }
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2013 by Jan W. Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2013-2015 by Jan W. Krieger"); }
         /** \copydoc QFExtension::getWeblink() */
-        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
+        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
         /** \copydoc QFExtension::getIconFilename() */
-        virtual QString getIconFilename() const  { return QString(":/qfe_spectraviewer/qfespectraviewer.png"); };
+        virtual QString getIconFilename() const  { return QString(":/qfe_spectraviewer/qfespectraviewer.png"); }
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
             minor=0;
-        };
+        }
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 
@@ -141,6 +141,8 @@ class QFESpectraViewer : public QObject, public QFExtensionBase, public QFPlugin
 	    /** \brief target, used in example code in initExtension() */
         void showViewer();
         void doLog(const QString& text);
+
+        void loadThreadFinished(bool enabled);
 
 };
 

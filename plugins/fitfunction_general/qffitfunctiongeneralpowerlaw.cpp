@@ -49,13 +49,13 @@ bool QFFitFunctionGeneralPowerLaw::isParameterVisible(int parameter, const doubl
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneralPowerLaw::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralPowerLaw::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralPowerLaw::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralPowerLaw::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -63,7 +63,7 @@ QString QFFitFunctionGeneralPowerLaw::transformParametersForAdditionalPlot(int p
     return "";
 }
 
-bool QFFitFunctionGeneralPowerLaw::get_implementsDerivatives()
+bool QFFitFunctionGeneralPowerLaw::get_implementsDerivatives() const
 {
     return false;
 }

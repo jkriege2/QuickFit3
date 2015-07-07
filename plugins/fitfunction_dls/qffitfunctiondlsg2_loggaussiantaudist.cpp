@@ -175,12 +175,12 @@ bool QFFitFunctionDLSG2LogNormTauDist::isParameterVisible(int parameter, const d
     return true;
 }
 
-unsigned int QFFitFunctionDLSG2LogNormTauDist::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionDLSG2LogNormTauDist::getAdditionalPlotCount(const double* params) const {
     Q_UNUSED(params);
     return 1;
 }
 
-QString QFFitFunctionDLSG2LogNormTauDist::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionDLSG2LogNormTauDist::transformParametersForAdditionalPlot(int plot, double* params) const {
     if (plot==0) {
         params[DLSG2_A]=-1.0*fabs(params[DLSG2_A]);
         return "distribution";

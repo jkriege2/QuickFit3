@@ -62,7 +62,7 @@ int QFPFitFunctions2FFCS::getGlobalFitConfigCount() const
 
 QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::getGlobalFitConfig(int i) const
 {
-    QString menulabel=tr("configure for confocal 2focus-FCCS ...");
+    QString menulabel=tr("configure for confocal 2-focus-FCCS ...");
     QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig res;
     int c=0;
     if (i==c++) {

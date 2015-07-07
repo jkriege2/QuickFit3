@@ -42,8 +42,8 @@
         <li>added function for real-values Faddeeva function used in TIR-FCS fit models: faddeeva_real()</li>
       </ul></li>
       <li>online-help:<ul>
-      <li>bugfix: the DOI's in the help texts should be linked now again!</li>
-      <li>bugfix: in some cases the equations in a tooltip were displayed wrong (mixed up with old renderings!)</li>
+          <li>bugfix: the DOI's in the help texts should be linked now again!</li>
+          <li>bugfix: in some cases the equations in a tooltip were displayed wrong (mixed up with old renderings!)</li>
       </ul></li>
       <li>QF 3 now compiles with Qt 5.4 on MacOS X!</li>
       <li>added Faddeeva Package to support real-valued Faddeeva-Function, which is required by some TIR-FCS fit modelss</li>
@@ -66,23 +66,26 @@
         <li>added tutorial for model selection</li>
         <li>bugfix: the "show key" checkbox works now</li>
         <li>added overlay plots of the runs in a single RDR</li>
-        <li></li>
+        <li>the fit statistics now display the var-cov-matrix of the fit with color-coded entries</li>
+        <li>LMFit is now the default/proposed fit algorithm. It is comparable to levmar, but significantly fatser! Also it now calculates parameter errors from the Var-Cov-Matrix and so no reason exists to use the slower levmar.</li>
     </ul></li>
     <li><b>imaging FCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
         <li>improved documentation of fit statistics</li>
         <li>bugfix: the "show key" checkbox works now</li>
         <li>added overlay plots of the runs in a single RDR</li>
+        <li>the fit statistics now display the var-cov-matrix of the fit with color-coded entries</li>
     </ul></li>
     <li><b>FCCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
         <li>improved documentation of fit statistics</li>
-        <li></li>
+        <li>fit statistics are now save as global (for the complete fit) and local (for each curve in the global fit set separately). Note: The local fit statistics give limited information, because it does not take into account the other curves!!!)</li>
         <li></li>
     </ul></li>
     <li><b>imaging FCCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
         <li>improved documentation of fit statistics</li>
+        <li>fit statistics are now save as global (for the complete fit) and local (for each curve in the global fit set separately). Note: The local fit statistics give limited information, because it does not take into account the other curves!!!)</li>
         <li></li>
         <li></li>
     </ul></li>
@@ -100,6 +103,8 @@
         <li>bugfix: correlator didn't recognize background image series from imFCS simulator.</li>
         <li>added display options for annotations of the imFCS RDR</li>
         <li>added model comparison function to "imagingFCS Tools" menu, entry "Annotate Model Comparison", which can also calculate model probability maps from (non-normalized) Bayesian model probabilities</li>
+        <li>implemented blocking method to estimate the standard error of the correlation function for some correlators and segments=1</li>
+        <li>several results of the correlation process (e.g. bleach correction fit results, blocking transform results, ...) are now readable as RDR results and thus displayable as parameter images. Note: If you delete one of these results, it will be regereated/reread when reopening the project!!!</li>
     </ul></li>
 
     <li><b>number and brightness</b><ul>
@@ -159,6 +164,10 @@
     </ul></li>
     <li><b>GSL fit algorithm plugin</b><ul>
         <li>some of the GSL fit algorithms now estimate errors from the variance/covariance matrix of the fit (estimated numerically)</li>
+        <li></li>
+    </ul></li>
+    <li><b>Spectra Viewer</b><ul>
+        <li>spectra database is now loaded in parallel to the program startup, so you can immediately start using QuickFit, but the SpectraViewer plugin will be enabled only a few seconds later ...</li>
         <li></li>
     </ul></li>
 

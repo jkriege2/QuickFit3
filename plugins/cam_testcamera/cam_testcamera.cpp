@@ -63,15 +63,15 @@ QFECamTestCamera::QFECamTestCamera(QObject* parent):
 
 QFECamTestCamera::~QFECamTestCamera()
 {
+}
+
+
+void QFECamTestCamera::deinit() {
     if (particleX[0]) qfFree(particleX[0]);
     if (particleY[0]) qfFree(particleY[0]);
     if (particleX[1]) qfFree(particleX[1]);
     if (particleY[1]) qfFree(particleY[1]);
     particleX[0]=particleY[0]=particleX[1]=particleY[1]=NULL;
-}
-
-
-void QFECamTestCamera::deinit() {
 }
 
 void QFECamTestCamera::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {

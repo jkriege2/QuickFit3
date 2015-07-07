@@ -68,7 +68,7 @@ void QFFitFunction::evaluateDerivatives(double *derivatives, double x, const dou
 
 
 
-bool QFFitFunction::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool */*fix*/)
+bool QFFitFunction::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool */*fix*/) const
 {
     return false;
 }
@@ -123,7 +123,7 @@ void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, c
 
 
 
-QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, const QVector<double> &COV, double paramrange_size, bool storeCOV) const {
+QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, const QVector<double> &COV, double paramrange_size, bool storeCOV, QStringList *returnFitParamNames, bool estimateCOVIfNotAVailable) const {
     int fitparamN=0;
     const int pcount=paramCount();
     QVector<double> fitp, fitpe;
@@ -133,7 +133,7 @@ QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, 
             fitparamN++;
             fitp<<fullParams[i];
             fitpe<<errors[i];
-
+            if (returnFitParamNames) (*returnFitParamNames)<<getParameterID(i);
         }
     }
 
@@ -144,17 +144,22 @@ QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, 
     QVector<double> COVV=COV;
 
 
-    if (COVV.size()<=0) {
+    if (COVV.size()<=0 && estimateCOVIfNotAVailable) {
         int M=datacut_max-datacut_min;
         const double * x=&(tauvals[datacut_min]);
         const double * y=&(corrdata[datacut_min]);
-        const double * w=&(weights[datacut_min]);
+        const double * w=NULL;
+        bool weightsOK=false;
+        if (weights) w=&(weights[datacut_min]);
 
         bool allWeightsOne=true;
         bool allWeightsEqual=true;
-        for (int i=0; i<M; i++) {
-            allWeightsOne=allWeightsOne&&(w[i]==1.0);
-            allWeightsEqual=allWeightsEqual&&(w[i]==w[0]);
+        if (w) {
+            weightsOK=true;
+            for (int i=0; i<M; i++) {
+                allWeightsOne=allWeightsOne&&(w[i]==1.0);
+                allWeightsEqual=allWeightsEqual&&(w[i]==w[0]);
+            }
         }
 
         QFFitFunction* ff=duplicate();
@@ -169,7 +174,7 @@ QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, 
             fm.evaluateJacobian(J.data(), pmapped);
             double chi2=fm.calculateChi2(pmapped);
             //if (allWeightsOne) chi2=chi2*qfSqr(double(M));
-            if (QFFitAlgorithm::functorHasWeights(&fm) && !allWeightsOne) statisticsGetFitProblemCovMatrix(COVV.data(), J.data(), fm.get_evalout(), fm.get_paramcount());
+            if (weightsOK && QFFitAlgorithm::functorHasWeights(&fm) && !allWeightsOne) statisticsGetFitProblemCovMatrix(COVV.data(), J.data(), fm.get_evalout(), fm.get_paramcount());
             else statisticsGetFitProblemVarCovMatrix(COVV.data(), J.data(), fm.get_evalout(), fm.get_paramcount(), chi2);
 
             qfFree(pmapped);

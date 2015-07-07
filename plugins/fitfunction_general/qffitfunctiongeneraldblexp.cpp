@@ -56,13 +56,13 @@ bool QFFitFunctionGeneralDblExp::isParameterVisible(int parameter, const double*
     Q_UNUSED(data);
     return true;
 }
-unsigned int QFFitFunctionGeneralDblExp::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralDblExp::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionGeneralDblExp::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralDblExp::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);
@@ -70,14 +70,14 @@ QString QFFitFunctionGeneralDblExp::transformParametersForAdditionalPlot(int plo
     return "";
 }
 
-bool QFFitFunctionGeneralDblExp::get_implementsDerivatives()
+bool QFFitFunctionGeneralDblExp::get_implementsDerivatives() const
 {
     return false;
 }
 
 
 
-bool QFFitFunctionGeneralDblExp::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionGeneralDblExp::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix) const
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

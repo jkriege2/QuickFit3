@@ -58,12 +58,12 @@ bool QFFitFunctionBase::isParameterVisible(int /*parameter*/, const double */*pa
     return true;
 }
 
-unsigned int QFFitFunctionBase::getAdditionalPlotCount(const double */*params*/)
+unsigned int QFFitFunctionBase::getAdditionalPlotCount(const double */*params*/) const
 {
     return 0;
 }
 
-QString QFFitFunctionBase::transformParametersForAdditionalPlot(int /*plot*/, double */*params*/)
+QString QFFitFunctionBase::transformParametersForAdditionalPlot(int /*plot*/, double */*params*/) const
 {
     return QString();
 }

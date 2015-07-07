@@ -252,13 +252,13 @@ bool QFFitFunctionsSPIMFCCSDiffCENewVeff2::isParameterVisible(int parameter, con
     return true;
 }
 
-unsigned int QFFitFunctionsSPIMFCCSDiffCENewVeff2::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsSPIMFCCSDiffCENewVeff2::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionsSPIMFCCSDiffCENewVeff2::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsSPIMFCCSDiffCENewVeff2::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);

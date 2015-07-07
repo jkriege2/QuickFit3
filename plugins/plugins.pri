@@ -23,6 +23,8 @@
 
 include(../quickfit_config.pri)
 
+
+
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \

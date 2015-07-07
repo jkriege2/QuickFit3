@@ -272,13 +272,13 @@ bool QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorCCF::isParameterVisible(int paramete
     return true;
 }
 
-unsigned int QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorCCF::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorCCF::getAdditionalPlotCount(const double* params) const {
 
     Q_UNUSED(params);
     return 0;
 }
 
-QString QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorCCF::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsTIRFFCCSFW2DADiffXY2ColorCCF::transformParametersForAdditionalPlot(int plot, double* params) const {
 
 
     Q_UNUSED(plot);

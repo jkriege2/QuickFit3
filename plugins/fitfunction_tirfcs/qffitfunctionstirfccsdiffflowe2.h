@@ -52,10 +52,10 @@ class QFFitFunctionsTIRFCCSDiffFlowE2: public QFFitFunction {
         /*! \copydoc QFFitFunction::isParameterVisible()   */
         virtual bool isParameterVisible(int parameter, const double* parameterValues) const;
         /*! \copydoc QFFitFunction::getAdditionalPlotCount()   */
-        virtual unsigned int getAdditionalPlotCount(const double* params);
+        virtual unsigned int getAdditionalPlotCount(const double* params) const;
 
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
-        virtual QString transformParametersForAdditionalPlot(int plot, double* params);
+        virtual QString transformParametersForAdditionalPlot(int plot, double* params) const;
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() const { return false; }

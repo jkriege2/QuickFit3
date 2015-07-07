@@ -54,7 +54,18 @@ bool QFFitResultsByIndexAsVectorEvaluation::isParamNameLocalStore(const QString 
     return paramID.endsWith("_islocal");
 }
 
+
 void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultStore(QFRawDataRecord::QFFitFitResultsStore &fitresult, const QFFitStatistics &result, const QString &group, const QString &prefix) const
+{
+    setFitResultBasicFitStatisticsInResultStore(fitresult, result, group, prefix);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInVector(QFRawDataRecord *record, const QString& evalID, int run, const QFFitStatistics &fit_stat, const QString &prefix, const QString &group) const
+{
+    setFitResultBasicFitStatisticsInVector(record, evalID, run, fit_stat, prefix, group);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultBasicFitStatisticsInResultStore(QFRawDataRecord::QFFitFitResultsStore &fitresult, const QFBasicFitStatistics &result, const QString &group, const QString &prefix) const
 {
     QString param="";
     fitresult.resultsSetNumberAndBool( param=prefix+"chisquared",  result.residSqrSum, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
@@ -81,10 +92,6 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultSto
     fitresult.resultsSetIntegerAndBool( param=prefix+"det_cov",  result.detCOV, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("det(fit cov matrix)"));
 
-
-
-
-
     fitresult.resultsSetIntegerAndBool( param=prefix+"datapoints",  result.dataSize, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("datapoints"));
 
@@ -100,13 +107,12 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultSto
     fitresult.resultsSetNumberAndBool( param=prefix+"tss",  result.TSS, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("total sum of squares (TSS)"));
 
-
-
     fitresult.resultsSetNumberAndBool( param=prefix+"bayes_model_probability_paramrangesize",  result.bayesProbabilityParamRangeSize, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("Bayes model probability"), tr("p<sub>Bayes</sub>(model|data)"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"bayes_model_probability",  result.bayesProbability, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("parameter range size for Bayes model probability"), tr("param_range<sub>Bayes</sub>"));
+
     fitresult.resultsSetNumberAndBool( param=prefix+"bayes_model_probability_log10",  result.bayesProbabilityLog10, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("log10 Bayes model probability"), tr("log<sub>10</sub>(p<sub>Bayes</sub>(model|data))"));
 
@@ -122,7 +128,6 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultSto
     fitresult.resultsSetNumberAndBool( param=prefix+"aicc_weighted",  result.AICcWeighted, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("weighted Akaike's information criterion"), tr("AICc (weighted)"));
 
-
     fitresult.resultsSetNumberAndBool( param=prefix+"bic",  result.BIC, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("Bayesian information criterion"), tr("BIC"));
 
@@ -134,9 +139,9 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInResultSto
 
 }
 
-void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInVector(QFRawDataRecord *record, const QString& evalID, int run, const QFFitStatistics &fit_stat, const QString &prefix, const QString &group) const
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultBasicFitStatisticsInVector(QFRawDataRecord *record, const QString &evalID, int run, const QFBasicFitStatistics &fit_stat, const QString &prefix, const QString &group) const
 {
-    if (run<0) record->resultsSetFitStatistics(fit_stat, evalID, prefix, group);
+    if (run<0) record->resultsSetBasicFitStatistics(fit_stat, evalID, prefix, group);
     else {
         QString param="";
         record->resultsSetInNumberListAndBool(evalID, param=prefix+"chisquared", run, fit_stat.residSqrSum, QString(""), getParamNameLocalStore(param),  true);
@@ -181,7 +186,6 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInVector(QF
         record->resultsSetInNumberListAndBool(evalID, param=prefix+"bayes_model_probability_log10", run, fit_stat.bayesProbabilityLog10, QString(""), getParamNameLocalStore(param),  true);
         record->resultsSetGroupAndLabels(evalID, param, group, tr("log10 Bayes model probability"), tr("log<sub>10</sub>(p<sub>Bayes</sub>(model|data))"));
 
-
         record->resultsSetInNumberListAndBool(evalID, param=prefix+"bayes_model_probability", run, fit_stat.bayesProbability, QString(""), getParamNameLocalStore(param),  true);
         record->resultsSetGroupAndLabels(evalID, param, group, tr("parameter range size for Bayes model probability"), tr("param_range<sub>Bayes</sub>"));
 
@@ -202,7 +206,28 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatisticsInVector(QF
 
         record->resultsSetInNumberListAndBool(evalID, param=prefix+"max_rel_param_error", run, fit_stat.maxRelParamError, QString(""), getParamNameLocalStore(param),  true);
         record->resultsSetGroupAndLabels(evalID, param, group, tr("maximum rel. parameter error"), tr("max<sub>P</sub>(&sigma;<sub>P</sub>/|P|)"));
+    }
+}
 
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultFitStatistics(QFRawDataRecord *record, const QString &evalID, const QFFitStatistics &result, const QString &prefix, const QString &group)
+{
+    int index=getIndexFromEvaluationResultID(evalID);
+    if (index<0) {
+        QFFitResultsByIndexEvaluation::setFitResultFitStatistics(record, evalID, result, prefix, group);
+    } else {
+        QString en=transformResultID(evalID);
+        setFitResultFitStatisticsInVector(record, en, index, result, prefix, group);
+    }
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultBasicFitStatistics(QFRawDataRecord *record, const QString &evalID, const QFBasicFitStatistics &result, const QString &prefix, const QString &group)
+{
+    int index=getIndexFromEvaluationResultID(evalID);
+    if (index<0) {
+        QFFitResultsByIndexEvaluation::setFitResultBasicFitStatistics(record, evalID, result, prefix, group);
+    } else {
+        QString en=transformResultID(evalID);
+        setFitResultBasicFitStatisticsInVector(record, en, index, result, prefix, group);
     }
 }
 

@@ -480,11 +480,12 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
         /** \brief return the number of parameters in the given model */
         virtual int getParameterCount(int model) const;
         /** \brief return the ID for the given parameter in the given model  */
-    virtual QString getParameterID(int model, int param) const;
+        virtual QString getParameterID(int model, int param) const;
 
-    virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value, double error);
+        virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value, double error);
 
         virtual void setFitResultFitStatistics(QFRawDataRecord *record, const QString &index, const QFFitStatistics &result, const QString &prefix, const QString &group);
+        virtual void setFitResultBasicFitStatistics(QFRawDataRecord *record, const QString &index, const QFBasicFitStatistics &result, const QString &prefix, const QString &group);
 
 signals:
         

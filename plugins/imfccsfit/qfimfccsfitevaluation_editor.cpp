@@ -943,7 +943,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                     g_fit->set_plotRefinement(true);
                     ui->pltData->get_plotter()->addGraph(g_fit);
 
-                    QFFitStatistics fstat=ff->calcFitStatistics(N, tau, data, sigma, ui->datacut->get_userMin(), ui->datacut->get_userMax(), params, err, fix, 3, 100);
+                    QFFitStatistics fstat=ff->calcFitStatistics(N, tau, data, sigma, ui->datacut->get_userMin(), ui->datacut->get_userMax(), params, err, fix, 3, 100, QVector<double>(), 200, false, NULL, false);
 
                     size_t c_resid=ds->addCopiedColumn(fstat.residuals, tr("file%1: residuals").arg(file+1));
                     size_t c_residw=ds->addCopiedColumn(fstat.residuals_weighted, tr("file%1: weighted residuals").arg(file+1));

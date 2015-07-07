@@ -183,6 +183,11 @@ void QFUsesResultsByIndexEvaluation::setFitResultFitStatistics(QFRawDataRecord* 
     setFitResultFitStatistics(record, getEvaluationResultID(index), result, prefix, group);
 }
 
+void QFUsesResultsByIndexEvaluation::setFitResultBasicFitStatistics(QFRawDataRecord *record, int index, const QFBasicFitStatistics &result, const QString &prefix, const QString &group)
+{
+    setFitResultBasicFitStatistics(record, getEvaluationResultID(index), result, prefix, group);
+}
+
 void QFUsesResultsByIndexEvaluation::setFitResultSortPriority(QFRawDataRecord *r, int index, const QString &parameterID, bool sortPriority) {
     setFitResultSortPriority(r, getEvaluationResultID(index), parameterID, sortPriority);
 }
