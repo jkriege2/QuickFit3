@@ -109,10 +109,10 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
                           RecordType = PTUTagHead.TagValue.integ;
               break;
           case tyBitSet64:
-              tagData=PTUTagHead.TagValue.integ;
+              tagData=QVariant((qint64)PTUTagHead.TagValue.integ);
               break;
           case tyColor8:
-              tagData=PTUTagHead.TagValue.integ;
+              tagData=QVariant((qint64)PTUTagHead.TagValue.integ);
               break;
           case tyFloat8:
               tagData=PTUTagHead.TagValue.dbl;

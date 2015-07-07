@@ -859,7 +859,7 @@ void QFFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<do
             dfd.weightsOK=false;
             dfd.taudata=&(dfd.taudata[cut_low]);
             dfd.corrdata=&(dfd.corrdata[cut_low]);
-            dfd.weights=allocWeights(&(dfd.weightsOK), record, run, cut_low, cut_up);
+            dfd.weights=allocWeights(&(dfd.weightsOK), record, run);
             if (!dfd.weightsOK && doLog) QFPluginLogTools::log_warning(tr("      - weights have invalid values => setting all weights to 1\n"));
             // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
             // we are working with a complete set of parameters

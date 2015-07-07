@@ -40,7 +40,7 @@
 
 
 # uncomment, so QF3 doesn't explicitly mutex lock the memory management routines qfMalloc, ... (e.g. if th system's memory management is already thread safe!)
-#DEFINES += QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
+DEFINES += QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
 
 # activate if webkit is NOT available
 QF3CONFIG+=nowebkit

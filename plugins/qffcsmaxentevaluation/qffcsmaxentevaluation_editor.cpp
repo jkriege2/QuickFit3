@@ -112,7 +112,7 @@ void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index
             }
 
             bool weightsOK=false;
-            double* weights=eval->allocWeights(&weightsOK, record, index, datacut_min, datacut_max, true);
+            double* weights=eval->allocWeights(&weightsOK, record, index, true);
 
 
             /////////////////////////////////////////////////////////////////////////////////
@@ -879,7 +879,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                     }
                 }
 
-                double* weights=eval->allocWeights(NULL, record, index, datacut_min, datacut_max);
+                double* weights=eval->allocWeights(NULL, record, index);
 
                 int rangeMaxDatarange=getUserMax(record, index);
                 int rangeMinDatarange=getUserMin(record, index);

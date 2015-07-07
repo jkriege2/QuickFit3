@@ -88,16 +88,21 @@ void QFFitMultiQFFitFunctionFunctor::evaluateJacobian(double *evalout, const dou
         double* eout=&(evalout[outCnt]);
         QFFitAlgorithm::FitQFFitFunctionFunctor* f=subFunctors[i].f;
         int pcount=f->get_paramcount();
-        double* pin=(double*)qfMalloc(pcount*sizeof(double));
+        //double* pin=(double*)qfMalloc(pcount*sizeof(double));
+
+        QVector<double> pin(pcount);
 
         for (int p=0; p<pcount; p++) {
+            qDebug()<<"multi::evalJac "<<i<<p<<"/"<<pcount<<"  => "<<subFunctors[i].mapToLocal[p];
             pin[p]=params[subFunctors[i].mapToLocal[p]];
         }
 
-        f->evaluateJacobian(eout, pin);
-        qfFree(pin);
+        f->evaluateJacobian(eout, pin.constData());
+        //qfFree(pin);
+
 
         outCnt+=(subFunctors[i].f->get_evalout()*pcount);
+        qDebug()<<"multi::evalJac "<<i<<"  outCnt="<<outCnt;
     }
 }
 
@@ -296,11 +301,14 @@ bool QFFitMultiQFFitFunctionFunctor::isWeightedLSQ() const
 bool QFFitMultiQFFitFunctionFunctor::areAllWeightsOne() const
 {
     for (int i=0; i<subFunctors.size(); i++) {
+        if (!(subFunctors[i].f) || (!subFunctors[i].f->isWeightedLSQ())) return false;
         if (subFunctors[i].f) {
             const double* w=subFunctors[i].f->getDataWeight();
             uint64_t N=subFunctors[i].f->getDataPoints();
-            for (uint64_t i=0; i<N; i++) {
-                if (w[i]!=1.0) return false;
+            if (w && N>0) {
+                for (uint64_t i=0; i<N; i++) {
+                    if (w[i]!=1.0) return false;
+                }
             }
         } else {
             return false;
@@ -695,6 +703,7 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
         } else {
             //if ( result.addNumberMatrix("covariance_matrix", COV.data(), model->get_paramcount(), model->get_paramcount());)
             QVector<double> J(functor->get_evalout()*functor->get_paramcount());
+            qDebug()<<"calling mault:EvalJac: outsize="<<J.size()<<"  psize="<<ppcount;
             functor->evaluateJacobian(J.data(), params);
             bool hasWeights=true;
             for (int i=0; i<functor->getSubFunctorCount(); i++) {

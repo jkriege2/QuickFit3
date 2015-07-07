@@ -76,15 +76,16 @@ void* qfMalloc(size_t size) {
 #ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
 #endif
+    size_t rsize=(size/QF_ALIGNMENT_BYTES+1)*QF_ALIGNMENT_BYTES;
 #ifdef __LINUX__
     #if  !defined(QF_DONT_USE_ALIGNED_MALLOC)
-    return aligned_alloc(QF_ALIGNMENT_BYTES, size);
+    return aligned_alloc(QF_ALIGNMENT_BYTES, rsize);
     #else
     return malloc(size);
     #endif
 #else
     #if  !defined(QF_DONT_USE_ALIGNED_MALLOC)
-    return _aligned_malloc(size, QF_ALIGNMENT_BYTES);
+    return _aligned_malloc(rsize, QF_ALIGNMENT_BYTES);
     #else
     return malloc(size);
     #endif
@@ -109,6 +110,7 @@ void* qfRealloc (void* ptr, size_t size) {
 #ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
 #endif
+    size_t rsize=(size/QF_ALIGNMENT_BYTES+1)*QF_ALIGNMENT_BYTES;
 #ifdef __LINUX__
     #if !defined(QF_DONT_USE_ALIGNED_MALLOC)
     return realloc(ptr, size);
@@ -117,7 +119,7 @@ void* qfRealloc (void* ptr, size_t size) {
     #endif
 #else
     #if !defined(QF_DONT_USE_ALIGNED_MALLOC)
-    return _aligned_realloc(ptr, size, QF_ALIGNMENT_BYTES);
+    return _aligned_realloc(ptr, rsize, QF_ALIGNMENT_BYTES);
     #else
     return realloc(ptr, size);
     #endif

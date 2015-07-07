@@ -283,7 +283,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
         if (doLog) QFPluginLogTools::log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
         bool weightsOK=false;
-        weights=allocWeights(&weightsOK, record, run, cut_low, cut_up);
+        weights=allocWeights(&weightsOK, record, run);
         if (!weightsOK && doLog) QFPluginLogTools::log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
 
         // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
@@ -777,7 +777,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm* falg, QFFitFuncti
         //if (logservice) logservice->log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
         bool weightsOK=false;
         double* weights=NULL;
-        weightsVec=allocVecWeights(&weightsOK, record, run, cut_low, cut_up);
+        weightsVec=allocVecWeights(&weightsOK, record, run);
         if (!weightsOK && logservice) {
             logservice->log_warning(tr("fitting file '%1', run %2:\n   weights have invalid values => setting all weights to 1\n").arg(record->getName()).arg(run));
         } else {
@@ -1154,7 +1154,7 @@ void QFImFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitRe
         //QMutexLocker locker(mutexThreadedFit);
         //if (logservice) logservice->log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
         bool weightsOK=false;
-        weights=allocWeights(&weightsOK, record, run, cut_low, cut_up);
+        weights=allocWeights(&weightsOK, record, run);
         if (!weightsOK && logservice) {
             logservice->log_warning(tr("fitting file '%1', run %2:\n   weights have invalid values => setting all weights to 1\n").arg(record->getName()).arg(run));
         }
@@ -1474,7 +1474,7 @@ void QFImFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int /*paramX
         }
 
         bool weightsOK=false;
-        weights=allocWeights(&weightsOK, record, run, cut_low, cut_up);
+        weights=allocWeights(&weightsOK, record, run);
 
         // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
         // we are working with a complete set of parameters

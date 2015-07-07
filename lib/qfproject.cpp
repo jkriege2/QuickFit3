@@ -113,6 +113,8 @@ QFProject::~QFProject()
     evaluations.clear();
     evaluationsOrder.clear();
     //std::cout<<"deleting QFProject ... OK\n";
+
+    delete p;
 }
 
 void QFProject::setSignalsEnabled(bool enabled, bool emitChange)

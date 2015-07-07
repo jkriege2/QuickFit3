@@ -143,7 +143,7 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
         /** \copydoc QFFitAlgorithm::FitFunctionFunctor::isWeightedLSQ() */
         virtual bool isWeightedLSQ() const;
 
-        bool areAllWeightsOne() const;
+        virtual bool areAllWeightsOne() const;
 
 
 

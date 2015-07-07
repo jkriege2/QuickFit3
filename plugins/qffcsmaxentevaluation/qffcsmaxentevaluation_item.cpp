@@ -656,7 +656,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         bool weightsOK=false;
         double* corrdata=data->getCorrelationMean();
         if (index>=0) corrdata=data->getCorrelationRun(index);
-        double* weights=allocWeights(&weightsOK, record, index, rangeMinDatarange, rangeMaxDatarange);
+        double* weights=allocWeights(&weightsOK, record, index);
         if (!weightsOK) getProject()->getServices()->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
 
         //////////Load Algorithm Parameters ////////////////////////////////////////////////

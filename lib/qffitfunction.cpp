@@ -76,6 +76,8 @@ bool QFFitFunction::estimateInitial(double */*params*/, const double */*dataX*/,
 void QFFitFunction::evaluateNumericalDerivatives(double *derivatives, double x, const double *parameters, double stepsize) const
 {
     int N=m_parameters.size();
+
+    //QVector<double> ptemp=duplicateArrayV(parameters, N);
     double* ptemp=duplicateArray(parameters, N);
     for (int i=0; i<N; i++) {
         derivatives[i]=0;
@@ -91,7 +93,7 @@ void QFFitFunction::evaluateNumericalDerivatives(double *derivatives, double x, 
         ptemp[i]=oldpi;
         derivatives[i]=(-fp2h+8.0*fp1h-8.0*fm1h+fm2h)/(12.0*stepsize);
     }
-    qfFree(ptemp);
+    //qfFree(ptemp);
 }
 
 void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, const double *parameters, double residualSigma2, double stepsize) const

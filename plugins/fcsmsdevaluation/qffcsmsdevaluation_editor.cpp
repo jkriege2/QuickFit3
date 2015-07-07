@@ -119,7 +119,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
             if (corrdata) acf=arrayToVector(corrdata, N);
 
             bool weightsOK=false;
-            double* weights=eval->allocWeights(&weightsOK, record, index, datacut_min, datacut_max, true);
+            double* weights=eval->allocWeights(&weightsOK, record, index, true);
 
 
             /////////////////////////////////////////////////////////////////////////////////

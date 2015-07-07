@@ -917,6 +917,48 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		rm -rf build
 	fi
 	cd ${CURRENTDIR}
+# 	
+# 	if [ $libOK != 0 ] ; then
+# 	  echo -e  "\n------------------------------------------------------------------------\n"\
+# 	  "-- BUILDING: UNOFFICIAL nlopt                                         --\n"\
+# 	  "------------------------------------------------------------------------\n\n"
+# 	  
+# 	  pwd
+# 	  cd nlopt
+# 	  rm -rf build
+# 	  mkdir -p build
+# 	  pwd
+# 	  ls -l
+# 	  tar xvf nlopt-master.tar.gz -C ./build/
+# 	  cd build/nlopt-master
+# 	  sh autogen.sh
+# 	  ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/nlopt  --with-cxx --with-mthreads --without-guile --without-python --without-octave --without-matlab CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}" LDFLAGS="${MORELDFLAGS}"
+# 	  libOK=$?
+# 	  if [ $libOK -eq 0 ] ; then
+# 		  make -j${MAKE_PARALLEL_BUILDS}
+# 		  
+# 		  libOK=$?
+# 		  if [ $libOK -eq 0 ] ; then		
+# 			  make -j${MAKE_PARALLEL_BUILDS} install
+# 			  libOK=$?
+# 			  if [ $libOK -ne 0 ] ; then		
+# 				  libOK=-4
+# 			  fi
+# 		  else
+# 			  libOK=-3
+# 		  fi
+# 	  else
+# 	      libOK=-2
+# 	  fi
+# 	  
+# 
+# 	  cd ../../
+# 	  if [ $KEEP_BUILD_DIR == "n" ] ; then
+# 		  rm -rf build
+# 	  fi
+# 	  cd ${CURRENTDIR}
+# 	fi
+	
 	
 	libnloptOK=$libOK
 

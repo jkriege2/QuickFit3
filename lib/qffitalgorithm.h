@@ -199,8 +199,11 @@ class QFLIB_EXPORT QFFitAlgorithm {
             /** \brief return \c true if the jacobian is implemented */
             inline virtual bool get_implementsJacobian() const { return false; }
 
-            /** \brief return \c true if functor implements a weightes least-squares problem */
+            /** \brief return \c true if functor implements a weighted least-squares problem */
             inline virtual bool isWeightedLSQ() const { return false; }
+
+            /** \brief return \c true if functor implements a weighted least-squares problem and all weights are equal to 1 */
+            inline virtual bool areAllWeightsOne() const { return false; }
 
             /** \brief return dimension of function output vector \f$ M \f$ */
             inline uint64_t get_evalout() const { return m_evalout; }
@@ -258,6 +261,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 virtual ~FitFunctionFunctor();
                 /** \copydoc QFFitAlgorithm::FitFunctionFunctor::isWeightedLSQ() */
                 virtual bool isWeightedLSQ() const;
+                /** \copydoc QFFitAlgorithm::FitFunctionFunctor::areAllWeightsOne() */
+                virtual bool areAllWeightsOne() const;
 
                 /** \brief returns a pointer to the current x-data \f$ x_m \f$ */
                 const double* getDataX() const;
@@ -392,6 +397,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 virtual ~FitFunctionFunctor2D();
                 /** \copydoc QFFitAlgorithm::FitFunctionFunctor::isWeightedLSQ() */
                 virtual bool isWeightedLSQ() const;
+                /** \copydoc QFFitAlgorithm::FitFunctionFunctor::areAllWeightsOne() */
+                virtual bool areAllWeightsOne() const;
 
                 /** \brief returns a pointer to the current x-data \f$ x_m \f$ */
                 const double* getDataX() const;
@@ -545,6 +552,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 uint64_t getDataPoints() const;
                 /** \copydoc QFFitAlgorithm::FitFunctionFunctor::isWeightedLSQ() */
                 virtual bool isWeightedLSQ() const;
+                /** \copydoc QFFitAlgorithm::FitFunctionFunctor::areAllWeightsOne() */
+                virtual bool areAllWeightsOne() const;
 
                 /** \brief sets a new input data vector for x-data
                  *
@@ -844,7 +853,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 int m_N;
                 /** \brief number of real (non-fixed) parameters, \c m_paramCount<=m_N */
                 int m_paramCount;
-                /** \brief maps from function parameter index to model parameter index (size m_N) */
+                /** \brief maps from model parameter index to functor parameter index (size m_N) */
                 int* functorFromModel;
                 /** \brief maps from functor parameter index to model parameter index (size m_paramCount) */
                 int* modelFromFunctor;

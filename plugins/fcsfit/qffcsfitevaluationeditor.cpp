@@ -265,7 +265,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                     }
                 }
 
-                double* weights=eval->allocWeights(NULL, record, eval->getCurrentIndex(), datacut_min, datacut_max);
+                double* weights=eval->allocWeights(NULL, record, eval->getCurrentIndex());
 
 
                 /////////////////////////////////////////////////////////////////////////////////
@@ -741,7 +741,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
         item.x=acftau;
         item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
         bool ok=true;
-        double* w=eval->allocWeights(&ok, rec, index, -1, -1, true);
+        double* w=eval->allocWeights(&ok, rec, index, true);
         if (ok && w) {
             item.yerrors=arrayToVector(w, data->getCorrelationN());
         }

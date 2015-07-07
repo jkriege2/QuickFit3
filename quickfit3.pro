@@ -327,3 +327,6 @@ plg_qfevalcolocalization.depends = lib libqf3widgets
 RESOURCES += \
     ../lib/lib.qrc
 
+DISTFILES += \
+    quickfit3.supp
+

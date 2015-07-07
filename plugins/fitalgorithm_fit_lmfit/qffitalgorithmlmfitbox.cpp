@@ -147,26 +147,38 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
     }
     qDebug()<<"QFFitAlgorithmLMFitBox::intFit  7";
 
-    QVector<double> J(model->get_evalout()*model->get_paramcount());
-    QVector<double> COV(model->get_paramcount()*model->get_paramcount());
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  8";
-    model->evaluateJacobian(J.data(), paramsOut);
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  9";
     double chi2=status.fnorm;
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10";
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-isWLSQ"<<model->isWeightedLSQ();
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-hasWeight"<<QFFitAlgorithm::functorHasWeights(model);
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-allone"<<QFFitAlgorithm::functorAllWeightsOne(model);
+    {
+        long long nout=model->get_evalout();
+        long long np=model->get_paramcount();
+        double* J=(double*)qfMalloc(nout*np*sizeof(double));
+        double* COV=(double*)qfMalloc(np*np*sizeof(double));
+        //QVector<double> J(model->get_evalout()*model->get_paramcount());
+        //QVector<double> COV(model->get_paramcount()*model->get_paramcount());
+        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  8";
+        qDebug()<<"  calling evalJac: J.size="<<nout*np<<"  p.size="<<np<<"   nout="<<nout;
+        model->evaluateJacobian(J/*.data()*/, paramsOut);
+        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  9";
+        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10";
+        bool b=model->isWeightedLSQ();
+        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-isWLSQ"<<model->isWeightedLSQ();
+        b=model->areAllWeightsOne();
+        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-allOne"<<model->areAllWeightsOne();
+        //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-hasWeight"<<QFFitAlgorithm::functorHasWeights(model);
+        //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-allone"<<QFFitAlgorithm::functorAllWeightsOne(model);
 
-    if (QFFitAlgorithm::functorHasWeights(model) && !QFFitAlgorithm::functorAllWeightsOne(model)) statisticsGetFitProblemCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount());
-    else statisticsGetFitProblemVarCovMatrix(COV.data(), J.data(), model->get_evalout(), model->get_paramcount(), chi2);
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  11";
+        if (model->isWeightedLSQ() && !model->areAllWeightsOne()) statisticsGetFitProblemCovMatrix(COV/*.data()*/, J/*.data()*/, model->get_evalout(), model->get_paramcount());
+        else statisticsGetFitProblemVarCovMatrix(COV/*.data()*/, J/*.constData()*/, model->get_evalout(), model->get_paramcount(), chi2);
+        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  11";
 
-    result.addNumberMatrix("covariance_matrix", COV.data(), model->get_paramcount(), model->get_paramcount());
+        result.addNumberMatrix("covariance_matrix", COV/*.data()*/, model->get_paramcount(), model->get_paramcount());
 
-    for (int i=0; i<model->get_paramcount(); i++) {
-        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  12."<<i;
-        paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV.data(), model->get_paramcount());
+        for (int i=0; i<model->get_paramcount(); i++) {
+            qDebug()<<"QFFitAlgorithmLMFitBox::intFit  12."<<i;
+            paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV/*.data()*/, model->get_paramcount());
+        }
+        qfFree(COV);
+        qfFree(J);
     }
     qDebug()<<"QFFitAlgorithmLMFitBox::intFit  13";
 

@@ -890,10 +890,11 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
             dfd.weightsOK=false;
             dfd.taudata=&(dfd.taudata[cut_low]);
             dfd.corrdata=&(dfd.corrdata[cut_low]);
-            dfd.weights=allocWeights(&(dfd.weightsOK), record, run, cut_low, cut_up);
+            dfd.weights=allocWeights(&(dfd.weightsOK), record, run);
             if (!dfd.weightsOK && doLog) QFPluginLogTools::log_warning(tr("      - weights have invalid values => setting all weights to 1\n"));
             // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
             // we are working with a complete set of parameters
+            if (dfd.weights) dfd.weights=&(dfd.weights[cut_low]);
             dfd.params=allocFillParameters(record, run, ffunc);
             dfd.initialparams=duplicateArray(dfd.params, ffunc->paramCount());// allocFillParameters(record, run, ffunc);
             dfd.errors=allocFillParameterErrors(record, run, ffunc);
@@ -1033,10 +1034,11 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
                 dfd.weightsOK=false;
                 dfd.taudata=&(dfd.taudata[cut_low]);
                 dfd.corrdata=&(dfd.corrdata[cut_low]);
-                dfd.weights=allocWeights(&(dfd.weightsOK), record, run, cut_low, cut_up);
+                dfd.weights=allocWeights(&(dfd.weightsOK), record, run);
                 if (!dfd.weightsOK && doLog) QFPluginLogTools::log_warning(tr("      - weights have invalid values => setting all weights to 1\n"));
                 // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
                 // we are working with a complete set of parameters
+                if (dfd.weights) dfd.weights=&(dfd.weights[cut_low]);
                 record->readLock();
                 dfd.params=allocFillParameters(record, run, ffunc);
                 //if (r==0) qDebug()<<record->getName()<<run<<arrayToString(dfd.params, ffunc->paramCount(), false);
