@@ -110,16 +110,18 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
 }
 
 QFExtensionCameraRh2v2::~QFExtensionCameraRh2v2() {
-    delete cameraSetting[0].prefix;
-    delete cameraSetting[0].params;
-    delete cameraSetting[1].prefix;
-    delete cameraSetting[1].params;
-    qfFree(cameraSetting);
+
 }
 
 
 void QFExtensionCameraRh2v2::deinit() {
 	/* add code for cleanup here */
+    delete cameraSetting[0].prefix;
+    delete cameraSetting[0].params;
+    delete cameraSetting[1].prefix;
+    delete cameraSetting[1].params;
+    qfFree(cameraSetting);
+    cameraSetting=NULL;
 }
 
 void QFExtensionCameraRh2v2::projectChanged(QFProject* oldProject, QFProject* project) {

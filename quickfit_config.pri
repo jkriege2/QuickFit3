@@ -49,8 +49,9 @@ exists(quickfit.inc):include(quickfit.inc)
     !macx:CXXTUNE= -march=native
     DEFINES += \'GLOBALCONFIGDIR=\"$$GLOBALCONFIGDIR\"\'
 }
-QMAKE_CXXFLAGS += -Wno-unused-variable -Wno-unused-but-set-variable -Werror=return-type $${CXXTUNE} -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -funroll-loops
+QMAKE_CXXFLAGS += -Wno-unused-variable -Wno-unused-but-set-variable -Werror=return-type $${CXXTUNE}
 !macx:QMAKE_CXXFLAGS += -malign-double
+!debug:QMAKE_CXXFLAGS += -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -funroll-loops
 
 #-ftree-vectorizer-verbose=5
 

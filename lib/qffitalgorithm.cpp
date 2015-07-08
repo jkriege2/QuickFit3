@@ -32,12 +32,21 @@
 #include "statistics_tools.h"
 #include "qfglobalfittool.h"
 
+//#define DEBUG_QFFitAlgorithm
+
+
 void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, const double* params) const {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::Functor::evaluateJacobian ... run numerical evalJac!";
+#endif
     evaluateJacobianNum(evalout, params);
 }
 
 void QFFitAlgorithm::Functor::evaluateJacobianNum(double *evalout, const double *params, double h) const
 {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::Functor::evaluateJacobianNum(eout="<<evalout<<", p="<<params<<", ecnt="<<get_evalout()<<", pcnt="<<get_paramcount()<<")";
+#endif
     int pcount=get_paramcount();
     uint64_t outcount=get_evalout();
     uint64_t i=0;
@@ -116,7 +125,7 @@ void QFFitAlgorithm::FitResult::addNumberMatrix(QString resultName, QVector<doub
 }
 
 
-void QFFitAlgorithm::FitResult::addNumberList(QString resultName, double* value, int items, QString unit) {
+void QFFitAlgorithm::FitResult::addNumberList(QString resultName, const double* value, int items, QString unit) {
     QFRawDataRecord::evaluationResult r;
 
     r.type=QFRawDataRecord::qfrdreNumberVector;
@@ -128,7 +137,7 @@ void QFFitAlgorithm::FitResult::addNumberList(QString resultName, double* value,
 }
 
 
-void QFFitAlgorithm::FitResult::addNumberMatrix(QString resultName, double* value, int columns, int rows, QString unit) {
+void QFFitAlgorithm::FitResult::addNumberMatrix(QString resultName, const double* value, int columns, int rows, QString unit) {
     QFRawDataRecord::evaluationResult r;
 
     r.type=QFRawDataRecord::qfrdreNumberVector;
@@ -370,48 +379,50 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateModelOnly(double *evalout,
 }
 
 void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, const double* params) const {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(eout="<<evalout<<", p="<<params<<", ecnt="<<get_evalout()<<", pcnt="<<get_paramcount()<<")";
+#endif
     double* mpt=duplicateArray(m_modelParams, m_N);
     mapArrayFromFunctorToModel(mpt, params);
-    register int pcount=get_paramcount();
-    register int ecount=get_evalout();
+    const int pcount=get_paramcount();
+    const int ecount=get_evalout();
     double* p=(double*)qfCalloc(m_N, sizeof(double));
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian  m_N="<<m_N<<"  pcount="<<pcount<<"  ecound="<<ecount<<"  m_dataWeight="<<m_dataWeight<<"  fitLogY="<<fitLogY<<"\n"; std::cout.flush();
+#endif
     if (m_dataWeight) {
         for (register int i=0; i<ecount; i++) {
-            register int offset=i*pcount;
+            const int offset=i*pcount;
             for (register int j=0; j<m_N; j++) { p[j]=0; }
             m_model->evaluateDerivatives(p, m_dataX[i], mpt);
             if (!fitLogY) {
-                for (register int j=0; j<pcount; j++) {
-                    qDebug()<<"QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian: evalout["<<offset<<"+"<<j<<"="<<(offset+j)<<"]=-1.0*p[modelFromFunctor["<<j<<"]]/m_dataWeight["<<i<<"]";
+                for ( int j=0; j<pcount; j++) {
                     evalout[offset+j]=-1.0*p[modelFromFunctor[j]]/m_dataWeight[i];
                 }
             } else {
                 double eval=m_model->evaluate(m_dataX[i], mpt);
-                for (register int j=0; j<pcount; j++) {
+                for ( int j=0; j<pcount; j++) {
                     evalout[offset+j]=-1.0/eval*p[modelFromFunctor[j]]/log(m_dataWeight[i]);
                 }
             }
         }
     } else {
         for (register int i=0; i<ecount; i++) {
-            register int offset=i*pcount;
+            const int offset=i*pcount;
             for (register int j=0; j<m_N; j++) { p[j]=0; }
             m_model->evaluateDerivatives(p, m_dataX[i], mpt);
             if (!fitLogY) {
-                for (register int j=0; j<pcount; j++) {
+                for ( int j=0; j<pcount; j++) {
                     evalout[offset+j]=-1.0*p[modelFromFunctor[j]];
                 }
             } else {
                 double eval=m_model->evaluate(m_dataX[i], mpt);
-                for (register int j=0; j<pcount; j++) {
+                for ( int j=0; j<pcount; j++) {
                     evalout[offset+j]=-1.0/eval*p[modelFromFunctor[j]];
                 }
             }
         }
     }
-    //std::cout<<"jac"<<doublevectortostr(params, pcount)<<"=    [ecount="<<ecount<<", pcount="<<pcount<<"";
-    //std::cout<<"modelFromFunctor"<<intvectortostr(modelFromFunctor, pcount)<<" ]\n";
-    //std::cout<<doublearraytostr(evalout, pcount, ecount)<<std::endl;
     qfFree(p);
     qfFree(mpt);
 }
@@ -1170,7 +1181,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
     double* ppparamsMax=NULL;
     const bool* pparamsFix=fixParams;
     bool* ppparamsFix=NULL;
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  1";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  1\n"; std::cout.flush();
     if (paramsMin==NULL) {
         ppparamsMin=(double*)qfCalloc(model->get_paramcount(), sizeof(double));
         for (int i=0; i<model->get_paramcount(); i++) {
@@ -1178,7 +1189,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         }
         pparamsMin=ppparamsMin;
     }
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  2";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  2\n"; std::cout.flush();
     if (paramsMax==NULL) {
         ppparamsMax=(double*)qfCalloc(model->get_paramcount(), sizeof(double));
         for (int i=0; i<model->get_paramcount(); i++) {
@@ -1186,7 +1197,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         }
         pparamsMax=ppparamsMax;
     }
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  3";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  3\n"; std::cout.flush();
 
 
     if (fixParams==NULL) {
@@ -1196,7 +1207,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         }
         pparamsFix=ppparamsFix;
     }
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  4";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  4\n"; std::cout.flush();
 
 
 
@@ -1208,22 +1219,22 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         fm=new QFFitAlgorithm::FitQFOptimizeFunctionFunctor(model, initialParams, pparamsFix);
     }
     fmbs=dynamic_cast<QFFitAlgorithm::FunctorBootstrapInterface*>(fm);
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  5";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  5\n"; std::cout.flush();
 
     double* tparamsMin=fm->createMappedArrayForFunctor(pparamsMin);
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  6";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  6\n"; std::cout.flush();
 
     double* tparamsMax=fm->createMappedArrayForFunctor(pparamsMax);
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  7";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  7\n"; std::cout.flush();
     double* tparamsOut=(double*)qfCalloc(fm->get_paramcount(), sizeof(double));
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  8";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  8\n"; std::cout.flush();
     double* tparamErrorsOut=(double*)qfCalloc(fm->get_paramcount(), sizeof(double));
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  9";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  9\n"; std::cout.flush();
     double* tinitialParams=fm->createMappedArrayForFunctor(initialParams);
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  10";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  10\n"; std::cout.flush();
 
     result=intFit(tparamsOut, tparamErrorsOut, tinitialParams, fm, tparamsMin, tparamsMax);
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  11";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  11\n"; std::cout.flush();
 
 
     //qDebug()<<"### OPTIMIZE: "<<m_errorEstimateModeFit<<fmbs;
@@ -1305,28 +1316,28 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         paramsOut[i]=initialParams[i];
         if (paramErrorsOut) paramErrorsOut[i]=0;
     }
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  12";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  12\n"; std::cout.flush();
 
     fm->mapArrayFromFunctorToModel(paramsOut, tparamsOut);
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  13";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  13\n"; std::cout.flush();
     if (paramErrorsOut) fm->mapArrayFromFunctorToModel(paramErrorsOut, tparamErrorsOut);
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  14";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  14\n"; std::cout.flush();
 
     qfFree(tparamsMax);
     qfFree(tparamsMin);
     qfFree(tparamErrorsOut);
     qfFree(tparamsOut);
     qfFree(tinitialParams);
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  15";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  15\n"; std::cout.flush();
 
 
     if (ppparamsMin) qfFree(ppparamsMin);
     if (ppparamsMax) qfFree(ppparamsMax);
     if (ppparamsFix) qfFree(ppparamsFix);
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  16";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  16\n"; std::cout.flush();
 
     delete fm;
-    qDebug()<<"QFFitAlgorithm::lsqMinimize  17";
+    std::cout<<"QFFitAlgorithm::lsqMinimize  17\n"; std::cout.flush();
 
     return result;
 }
@@ -1475,7 +1486,8 @@ QFFitAlgorithm::FitQFOptimizeFunctionFunctor::FitQFOptimizeFunctionFunctor(Funct
         if (!fixParams[i]) {
             functorFromModel[i]=pid;
             modelFromFunctor[pid]=i;
-            //printf("   mapping m=%2d -> f=%2d [%s]\n", i, pid, d.id.toStdString().c_str());
+
+            printf("   mapping m=%2d -> f=%2d\n", i, pid);
             pid++;
         }
     }
@@ -1508,8 +1520,9 @@ void QFFitAlgorithm::FitQFOptimizeFunctionFunctor::mapArrayFromModelToFunctor(do
 }
 
 void QFFitAlgorithm::FitQFOptimizeFunctionFunctor::mapArrayFromFunctorToModel(double* modelData, const double* functorData) const {
-    for (register int i=0; i<m_paramCount; i++) {
+    for (int i=0; i<m_paramCount; i++) {
         modelData[modelFromFunctor[i]]=functorData[i];
+        //std::cout<<"FitQFOptimizeFunctionFunctor::mapArrayFromFunctorToModel: "<<i<<"modelData[modelFromFunctor["<<i<<"]="<<modelFromFunctor[i]<<"]=functorData[i]\n"; std::cout.flush();
     }
 }
 
@@ -1522,10 +1535,22 @@ void QFFitAlgorithm::FitQFOptimizeFunctionFunctor::evaluate(double* evalout, con
 }
 
 void QFFitAlgorithm::FitQFOptimizeFunctionFunctor::evaluateJacobian(double* evalout, const double* params) const {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FitQFOptimizeFunctionFunctor::evaluateJacobian(eout="<<evalout<<", p="<<params<<", ecnt="<<get_evalout()<<", pcnt="<<get_paramcount()<<")";
+#endif
     double* mpt=duplicateArray(m_modelParams, m_N);
     mapArrayFromFunctorToModel(mpt, params);
-    m_model->evaluateJacobian(evalout, mpt);
+    double* e_out=(double*)qfMalloc(m_model->get_evalout()*m_model->get_paramcount()*sizeof(double));
+    m_model->evaluateJacobian(e_out, mpt);
+    const int pcnt=get_paramcount();
+    const int m_pcnt=m_model->get_paramcount();
+    for (uint64_t i=0; i<m_model->get_evalout(); i++) {
+        for (int p=0; p<pcnt; p++) {
+            evalout[i*pcnt+p]=e_out[i*m_pcnt+modelFromFunctor[p]];
+        }
+    }
     qfFree(mpt);
+    qfFree(e_out);
 }
 
 QFFitAlgorithm::FitFunctionFunctor::FitFunctionFunctor(const double *dataX, const double *dataF, const double *dataWeight, uint64_t M):
@@ -1722,6 +1747,9 @@ double QFFitAlgorithm::FitFunctionFunctor::getBootstrappingFraction() const
 
 void QFFitAlgorithm::FitFunctionFunctor::evaluateJacobianNum(double *evalout, const double *params, double h) const
 {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FitFunctionFunctor::evaluateJacobianNum(eout="<<evalout<<", p="<<params<<", ecnt="<<get_evalout()<<", pcnt="<<get_paramcount()<<")";
+#endif
     Functor::evaluateJacobianNum(evalout, params, h);
     if (m_dataWeight) {
         for (uint64_t i=0; i<m_M; i++) {
@@ -1773,6 +1801,9 @@ void QFFitAlgorithm::IRLSFunctorAdaptor::evaluate(double *evalout, const double 
 
 void QFFitAlgorithm::IRLSFunctorAdaptor::evaluateJacobian(double *evalout, const double *params) const
 {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::IRLSFunctorAdaptor::evaluateJacobian(eout="<<evalout<<", p="<<params<<", ecnt="<<get_evalout()<<", pcnt="<<get_paramcount()<<")";
+#endif
     irls_functor->evaluateJacobian(evalout, params);
 }
 
@@ -2046,6 +2077,9 @@ double QFFitAlgorithm::FitFunctionFunctor3D::getBootstrappingFraction() const
 
 void QFFitAlgorithm::FitFunctionFunctor3D::evaluateJacobianNum(double *evalout, const double *params, double h) const
 {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FitFunctionFunctor3D::evaluateJacobian(eout="<<evalout<<", p="<<params<<", ecnt="<<get_evalout()<<", pcnt="<<get_paramcount()<<")";
+#endif
     Functor::evaluateJacobianNum(evalout, params, h);
     if (m_dataWeight) {
         for (uint64_t i=0; i<m_M; i++) {
@@ -2177,8 +2211,10 @@ void QFFitAlgorithm::FitQFFitFunction3DFunctor::evaluate(double *evalout, const 
 
 void QFFitAlgorithm::FitQFFitFunction3DFunctor::evaluateJacobian(double *evalout, const double *params) const
 {
-    Q_UNUSED(evalout);
-    Q_UNUSED(params);
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FitFunctionFunctor3D::evaluateJacobian(eout="<<evalout<<", p="<<params<<", ecnt="<<get_evalout()<<", pcnt="<<get_paramcount()<<")";
+#endif
+    evaluateJacobianNum(evalout, params);
 }
 
 void QFFitAlgorithm::FitQFFitFunction3DFunctor::transfromParameters(double *params) const
@@ -2425,6 +2461,9 @@ double QFFitAlgorithm::FitFunctionFunctor2D::getBootstrappingFraction() const
 
 void QFFitAlgorithm::FitFunctionFunctor2D::evaluateJacobianNum(double *evalout, const double *params, double h) const
 {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FitFunctionFunctor2D::evaluateJacobianNum(eout="<<evalout<<", p="<<params<<", ecnt="<<get_evalout()<<", pcnt="<<get_paramcount()<<")";
+#endif
     Functor::evaluateJacobianNum(evalout, params, h);
     if (m_dataWeight) {
         for (uint64_t i=0; i<m_M; i++) {
@@ -2556,8 +2595,10 @@ void QFFitAlgorithm::FitQFFitFunction2DFunctor::evaluate(double *evalout, const 
 
 void QFFitAlgorithm::FitQFFitFunction2DFunctor::evaluateJacobian(double *evalout, const double *params) const
 {
-    Q_UNUSED(evalout);
-    Q_UNUSED(params);
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FitFunctionFunctor2D::evaluateJacobian(eout="<<evalout<<", p="<<params<<", ecnt="<<get_evalout()<<", pcnt="<<get_paramcount()<<")";
+#endif
+    evaluateJacobianNum(evalout, params);
 }
 
 void QFFitAlgorithm::FitQFFitFunction2DFunctor::transfromParameters(double *params) const
@@ -2616,12 +2657,17 @@ QVector<double> QFFitAlgorithm::FitQFFitFunction2DFunctor::backtransfromParamete
 
 void QFFitAlgorithm::FunctorForFMin::evaluateJacobian(double *evalout, const double *params)
 {
-    Q_UNUSED(evalout)
-    Q_UNUSED(params)
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FunctorForFMin::evaluateJacobian(eout="<<evalout<<", p="<<params<<", ecnt="<<1<<", pcnt="<<get_paramcount()<<")";
+#endif
+    evaluateJacobianNum(evalout, params);
 }
 
 void QFFitAlgorithm::FunctorForFMin::evaluateJacobianNum(double *evalout, const double *params, double h)
 {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FunctorForFMin::evaluateJacobianNum(eout="<<evalout<<", p="<<params<<", ecnt="<<1<<", pcnt="<<get_paramcount()<<")";
+#endif
     int pcount=get_paramcount();
     QVector<double> dat0=duplicateArrayV(params, pcount);
     for (int io=0; io<pcount; io++) {
@@ -2732,6 +2778,9 @@ double QFFitAlgorithm::FunctorForFMinFixAdaptor::evaluate(const double *params)
 
 void QFFitAlgorithm::FunctorForFMinFixAdaptor::evaluateJacobian(double *evalout, const double *params)
 {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FunctorForFMinFixAdaptor::evaluateJacobian(eout="<<evalout<<", p="<<params<<", ecnt="<<1<<", pcnt="<<get_paramcount()<<")";
+#endif
     double* mpt=duplicateArray(m_modelParams, m_N);
     mapArrayFromFunctorToModel(mpt, params);
     m_model->evaluateJacobian(evalout, mpt);
@@ -2796,6 +2845,9 @@ double QFFitAlgorithm::FunctorForFMinFromCFunc::evaluate(const double *params)
 
 void QFFitAlgorithm::FunctorForFMinFromCFunc::evaluateJacobian(double *evalout, const double *params)
 {
+#ifdef DEBUG_QFFitAlgorithm
+    qDebug()<<"QFFitAlgorithm::FunctorForFMinFromCFunc::evaluateJacobian(eout="<<evalout<<", p="<<params<<", ecnt="<<1<<", pcnt="<<get_paramcount()<<")";
+#endif
     if (dFdp) {
         (*dFdp)(evalout, params, m_userData);
     } else if (dFdpNoUser) {

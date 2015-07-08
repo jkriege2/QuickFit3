@@ -24,7 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <cmath>
 #include "lmmin.h"
 #include "statistics_tools.h"
-
+#include <typeinfo>
 #define RANGE_MAXVAL (DBL_MAX/10.0)
 
 struct QFFItAlgorithmGSL_evalData {
@@ -87,12 +87,12 @@ QFFitAlgorithmLMFitBox::QFFitAlgorithmLMFitBox() {
 
 QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, QFFitAlgorithm::Functor* model, const double* paramsMin, const double* paramsMax) {
     QFFitAlgorithm::FitResult result;
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  1";
+    //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  1";
 
     int paramCount=model->get_paramcount(); // number of parameters
     memcpy(paramsOut, initialParams, paramCount*sizeof(double));
 
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  2";
+    //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  2";
     //double param=getParameter("param_name").toDouble();
 
 
@@ -105,7 +105,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
     control.epsilon=getParameter("epsilon").toDouble();
     control.stepbound=getParameter("stepbound").toDouble();
     control.patience=getParameter("max_iterations").toInt();
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  3";
+    //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  3";
 
     QFFItAlgorithmGSL_evalData d;
     d.model=model;
@@ -113,13 +113,13 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
     d.paramsMax=paramsMax;
     d.pcount=paramCount;
     d.p=(double*)qfMalloc(paramCount*sizeof(double));
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  4";
+    //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  4";
 
     bool transformParams=paramsMin&&paramsMax;
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  5";
+    //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  5";
 
     lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxlimits, &control, &status );
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  6";
+    //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  6";
     if (paramsMin && paramsMax) {
         bool atbound=false;
         for (int i=0; i<paramCount; i++) {
@@ -134,9 +134,9 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
             } else paramsOut[i]=qBound(mi, paramsOut[i], ma);
         }
         if (atbound) {
-            qDebug()<<"QFFitAlgorithmLMFitBox::intFit  6.2";
+            //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  6.2";
             lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxlimits, &control, &status );
-            qDebug()<<"QFFitAlgorithmLMFitBox::intFit  6.3";
+            //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  6.3";
             for (int i=0; i<paramCount; i++) {
                 const double mi=paramsMin[i];
                 const double ma=paramsMax[i];
@@ -145,42 +145,80 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
         }
 
     }
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  7";
+    //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  7";
 
     double chi2=status.fnorm;
-    {
-        long long nout=model->get_evalout();
-        long long np=model->get_paramcount();
-        double* J=(double*)qfMalloc(nout*np*sizeof(double));
-        double* COV=(double*)qfMalloc(np*np*sizeof(double));
-        //QVector<double> J(model->get_evalout()*model->get_paramcount());
-        //QVector<double> COV(model->get_paramcount()*model->get_paramcount());
-        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  8";
-        qDebug()<<"  calling evalJac: J.size="<<nout*np<<"  p.size="<<np<<"   nout="<<nout;
-        model->evaluateJacobian(J/*.data()*/, paramsOut);
-        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  9";
-        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10";
-        bool b=model->isWeightedLSQ();
-        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-isWLSQ"<<model->isWeightedLSQ();
-        b=model->areAllWeightsOne();
-        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-allOne"<<model->areAllWeightsOne();
-        //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-hasWeight"<<QFFitAlgorithm::functorHasWeights(model);
-        //qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-allone"<<QFFitAlgorithm::functorAllWeightsOne(model);
+    if (true) {
+        const long long nout=model->get_evalout();
+        const long long np=model->get_paramcount();
+        double* J=(double*)qfCalloc(nout*np*2*sizeof(double));
+        double* COV=(double*)qfCalloc(np*np*2*sizeof(double));
 
-        if (model->isWeightedLSQ() && !model->areAllWeightsOne()) statisticsGetFitProblemCovMatrix(COV/*.data()*/, J/*.data()*/, model->get_evalout(), model->get_paramcount());
-        else statisticsGetFitProblemVarCovMatrix(COV/*.data()*/, J/*.constData()*/, model->get_evalout(), model->get_paramcount(), chi2);
-        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  11";
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  7: test J";
+//        for (long long i=nout*np; i<nout*np*2; i++) {
+//            if (J[i]!=0) qDebug()<<"!!! J["<<i<<"] != 0 (="<<J[i]<<") !!!";
+//        }
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  7: test COV";
+//        for (long long i=np*np; i<np*np*2; i++) {
+//            if (COV[i]!=0) qDebug()<<"!!! COV["<<i<<"] != 0 !!!";
+//        }
 
-        result.addNumberMatrix("covariance_matrix", COV/*.data()*/, model->get_paramcount(), model->get_paramcount());
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  8";
+//        qDebug()<<"  calling evalJac: J.size="<<nout*np<<"  p.size="<<np<<"   nout="<<nout<<"   J="<<J<<"   COV="<<COV<<"   model="<<typeid(model).name();
+        model->evaluateJacobian(J, paramsOut);
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  8: test J";
+//        for (long long i=nout*np; i<nout*np*2; i++) {
+//            if (J[i]!=0) qDebug()<<"!!! J["<<i<<"] != 0 (="<<J[i]<<") !!!";
+//        }
 
-        for (int i=0; i<model->get_paramcount(); i++) {
-            qDebug()<<"QFFitAlgorithmLMFitBox::intFit  12."<<i;
-            paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV/*.data()*/, model->get_paramcount());
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  9";
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10";
+//        bool b=model->isWeightedLSQ();
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-isWLSQ"<<model->isWeightedLSQ();
+//        b=model->areAllWeightsOne();
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-allOne"<<model->areAllWeightsOne();
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-allOne: test J";
+//        for (long long i=nout*np; i<nout*np*2; i++) {
+//            if (J[i]!=0) qDebug()<<"!!! J["<<i<<"] != 0 (="<<J[i]<<") !!!";
+//        }
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10-allOne: test COV";
+//        for (long long i=np*np; i<np*np*2; i++) {
+//            if (COV[i]!=0) qDebug()<<"!!! COV["<<i<<"] != 0 !!!";
+//        }
+
+        if (model->isWeightedLSQ() && !model->areAllWeightsOne()) statisticsGetFitProblemCovMatrix(COV, J, nout, np);
+        else statisticsGetFitProblemVarCovMatrix(COV, J/*.constData()*/, nout, np, chi2);
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10: test J";
+//        for (long long i=nout*np; i<nout*np*2; i++) {
+//            if (J[i]!=0) qDebug()<<"!!! J["<<i<<"] != 0 (="<<J[i]<<") !!!";
+//        }
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  10: test COV";
+//        for (long long i=np*np; i<np*np*2; i++) {
+//            if (COV[i]!=0) qDebug()<<"!!! COV["<<i<<"] != 0 !!!";
+//        }
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  11";
+
+        result.addNumberMatrix("covariance_matrix", COV, np,np);
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  11: test COV";
+//        for (long long i=np*np; i<np*np*2; i++) {
+//            if (COV[i]!=0) qDebug()<<"!!! COV["<<i<<"] != 0 !!!";
+//        }
+
+        for (long long i=0; i<model->get_paramcount(); i++) {
+//            qDebug()<<"QFFitAlgorithmLMFitBox::intFit  12."<<i;
+            paramErrorsOut[i]=statisticsGetFitProblemParamErrors(i, COV, model->get_paramcount());
         }
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  12: test COV";
+//        for (long long i=np*np; i<np*np*2; i++) {
+//            if (COV[i]!=0) qDebug()<<"!!! COV["<<i<<"] != 0 !!!";
+//        }
+
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  12-end1";
         qfFree(COV);
+//        qDebug()<<"QFFitAlgorithmLMFitBox::intFit  12-end2";
         qfFree(J);
     }
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  13";
+//    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  13";
 
     result.addNumber("error_sum", chi2);
     result.addNumber("iterations", status.nfev);
@@ -194,10 +232,10 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
         result.message="";
         result.messageSimple="";
     }
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  14";
+//    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  14";
 
     if (d.p) qfFree(d.p);
-    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  15";
+//    qDebug()<<"QFFitAlgorithmLMFitBox::intFit  15";
 
     return result;
 }

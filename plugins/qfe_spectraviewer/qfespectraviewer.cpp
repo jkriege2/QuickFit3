@@ -50,18 +50,20 @@ QFESpectraViewer::QFESpectraViewer(QObject* parent):
 }
 
 QFESpectraViewer::~QFESpectraViewer() {
-    if (dlg) {
-        dlg->close();
-        delete dlg;
-        dlg=NULL;
-    }
-    delete manager;
+
 }
 
 
 void QFESpectraViewer::deinit() {
     /* add code for cleanup here */
     if (dlg) dlg->writeSettings();
+    if (dlg) {
+        dlg->close();
+        delete dlg;
+        dlg=NULL;
+    }
+    delete manager;
+    manager=NULL;
 }
 
 QString QFESpectraViewer::pluginOptionsName() const

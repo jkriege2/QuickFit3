@@ -51,7 +51,6 @@ QFEDiffusionCoefficientCalculator::QFEDiffusionCoefficientCalculator(QObject* pa
 }
 
 QFEDiffusionCoefficientCalculator::~QFEDiffusionCoefficientCalculator() {
-    if (inst==this) inst=NULL;
 }
 
 
@@ -62,6 +61,7 @@ void QFEDiffusionCoefficientCalculator::deinit() {
         delete dlg;
         dlg=NULL;
     }
+    if (inst==this) inst=NULL;
 }
 
 int QFEDiffusionCoefficientCalculator::getComponentCount() const

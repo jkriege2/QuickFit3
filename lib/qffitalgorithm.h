@@ -1428,9 +1428,9 @@ class QFLIB_EXPORT QFFitAlgorithm {
             /** \brief set a result of type number matrix */
             void addNumberMatrix(QString resultName, QVector<double>& value, int columns, QString unit=QString(""));
             /** \brief set a result of type number vector */
-            void addNumberList(QString resultName, double* value, int items, QString unit=QString(""));
+            void addNumberList(QString resultName, const double* value, int items, QString unit=QString(""));
             /** \brief set a result of type number matrix */
-            void addNumberMatrix(QString resultName, double* value, int columns, int rows, QString unit=QString(""));
+            void addNumberMatrix(QString resultName, const double* value, int columns, int rows, QString unit=QString(""));
             /** \brief set a result of type number+error */
             void addNumberError(QString resultName, double value, double error, QString unit=QString(""));
             /** \brief set a result of type integer */

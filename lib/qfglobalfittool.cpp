@@ -24,7 +24,7 @@
 #include "qfmathtools.h"
 #include "statistics_tools.h"
 #define DEBUG_GLOBALFIT
-//#undef DEBUG_GLOBALFIT
+#undef DEBUG_GLOBALFIT
 
 
 
@@ -83,27 +83,64 @@ void QFFitMultiQFFitFunctionFunctor::evaluate(double *evalout, const double *par
 }
 
 void QFFitMultiQFFitFunctionFunctor::evaluateJacobian(double *evalout, const double *params) const {
+#ifdef DEBUG_GLOBALFIT
+    qDebug()<<"QFFitMultiQFFitFunctionFunctor::evaluateJacobian(eout="<<evalout<<", p="<<params<<", ecnt="<<get_evalout()<<", pcnt="<<get_paramcount()<<")";
+#endif
+    const int global_pcount=get_paramcount();
+
+    int max_func_pcount=32;
+    uint64_t max_func_evalout=32;
+    for (int i=0; i<subFunctors.size(); i++) {
+        max_func_pcount=qMax(max_func_pcount, subFunctors[i].f->get_paramcount());
+        max_func_evalout=qMax(max_func_evalout, subFunctors[i].f->get_evalout());
+    }
+    double* pin=(double*)qfMalloc(max_func_pcount*sizeof(double));
+    double* f_eout=(double*)qfMalloc(max_func_pcount*max_func_evalout*sizeof(double));
+
+    //memset(evalout, 0, global_pcount*get_evalout()*sizeof(double));
+
     int outCnt=0;
     for (int i=0; i<subFunctors.size(); i++) {
         double* eout=&(evalout[outCnt]);
-        QFFitAlgorithm::FitQFFitFunctionFunctor* f=subFunctors[i].f;
-        int pcount=f->get_paramcount();
-        //double* pin=(double*)qfMalloc(pcount*sizeof(double));
+        const QFFitAlgorithm::FitQFFitFunctionFunctor* f=subFunctors[i].f;
+        const int func_pcount=f->get_paramcount();
+        const uint64_t func_evalout=f->get_evalout();
 
-        QVector<double> pin(pcount);
 
-        for (int p=0; p<pcount; p++) {
-            qDebug()<<"multi::evalJac "<<i<<p<<"/"<<pcount<<"  => "<<subFunctors[i].mapToLocal[p];
+        // create parameter vector for functor
+        for (int p=0; p<func_pcount; p++) {
+            //qDebug()<<"multi::evalJac "<<i<<p<<"/"<<func_pcount<<"  => "<<subFunctors[i].mapToLocal[p];
             pin[p]=params[subFunctors[i].mapToLocal[p]];
         }
+        for (uint64_t p=0; p<func_pcount*func_evalout; p++) {
+            f_eout[p]=0;
+        }
 
-        f->evaluateJacobian(eout, pin.constData());
-        //qfFree(pin);
+        // evaluate jacobian of functor
+#ifdef DEBUG_GLOBALFIT
+        qDebug()<<"    f->evaluateJacobian(f["<<(max_func_pcount*max_func_evalout)<<"], p["<<func_pcount<<"])";
+#endif
+        f->evaluateJacobian(f_eout, pin);
 
 
-        outCnt+=(subFunctors[i].f->get_evalout()*pcount);
-        qDebug()<<"multi::evalJac "<<i<<"  outCnt="<<outCnt;
+        // map back results
+        for (uint64_t d=0; d<func_evalout; d++) {
+            //QString s=QString("d=%1:  ").arg(d);
+            for (int p=0; p<func_pcount; p++) {
+                const int pglobal=subFunctors[i].mapToLocal[p];
+                //s+=QString("eout[%3 + %1 = %5/%7]=f_eout[%4 + %2 = %6/%8]   ").arg(pglobal).arg(p).arg(d*global_pcount).arg(d*func_pcount).arg(d*global_pcount+pglobal).arg(d*func_pcount+p).arg(global_pcount*get_evalout()).arg(func_pcount*func_evalout);
+                eout[d*global_pcount+pglobal]=f_eout[d*func_pcount+p];
+            }
+            //qDebug()<<s;
+        }
+
+        outCnt+=(func_evalout*global_pcount);
+#ifdef DEBUG_GLOBALFIT
+        qDebug()<<"multi::evalJac "<<i<<"  outCnt="<<outCnt<<"/"<<(get_evalout()*get_paramcount())<<get_evalout()<<get_paramcount();
+#endif
     }
+    qfFree(pin);
+    qfFree(f_eout);
 }
 
 bool QFFitMultiQFFitFunctionFunctor::get_implementsJacobian() const
@@ -293,7 +330,7 @@ void QFFitMultiQFFitFunctionFunctor::setDoRecalculateInternals(bool enabled)
 bool QFFitMultiQFFitFunctionFunctor::isWeightedLSQ() const
 {
     for (int i=0; i<subFunctors.size(); i++) {
-        if (!subFunctors[i].f || !subFunctors[i].f->isWeightedLSQ()) return false;
+        if ((!subFunctors[i].f) || (!subFunctors[i].f->isWeightedLSQ())) return false;
     }
     return true;
 }
@@ -301,10 +338,10 @@ bool QFFitMultiQFFitFunctionFunctor::isWeightedLSQ() const
 bool QFFitMultiQFFitFunctionFunctor::areAllWeightsOne() const
 {
     for (int i=0; i<subFunctors.size(); i++) {
-        if (!(subFunctors[i].f) || (!subFunctors[i].f->isWeightedLSQ())) return false;
         if (subFunctors[i].f) {
+            if ((!subFunctors[i].f->isWeightedLSQ())) return false;
             const double* w=subFunctors[i].f->getDataWeight();
-            uint64_t N=subFunctors[i].f->getDataPoints();
+            const uint64_t N=subFunctors[i].f->getDataPoints();
             if (w && N>0) {
                 for (uint64_t i=0; i<N; i++) {
                     if (w[i]!=1.0) return false;
@@ -452,7 +489,7 @@ void QFGlobalFitTool::createLocalFitFunctors()
         const double* dataW=functor->getSubFunctor(i)->getDataWeight();
         uint64_t dataN=functor->getSubFunctor(i)->getDataPoints();
         const double* param=functor->getSubFunctor(i)->getModelParams();
-         bool* fixParams=functor->getSubFunctor(i)->getModelParamsFix();
+        bool* fixParams=functor->getSubFunctor(i)->getModelParamsFix();
 
         int freeParams=0;
         for (int p=0; p<ff->paramCount(); p++) {
@@ -488,25 +525,35 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fit(const QList<double *> &paramsOut,
         copyArray(paramErrorsOut[i], paramErrorsIn[i], pcount);
     }
     if (m_globalLocalRepeats<=0) {
+#ifdef DEBUG_GLOBALFIT
         qDebug()<<"fit global ...";
+#endif
         result= fitGlobal(paramsOut, paramErrorsOut, &rawFitResults, &rawFitResultsErrors, &chi2, &cov_matrix, &paramNames, &fitX, &fitY, &fitW, &fitM);
     } else {
 
         for (int gl=0; gl<m_globalLocalRepeats; gl++) {
+#ifdef DEBUG_GLOBALFIT
             qDebug()<<"fit local ...";
+#endif
             fitLocal(paramsOut, paramErrorsOut);
+#ifdef DEBUG_GLOBALFIT
             qDebug()<<"fit global ...";
+#endif
             result=fitGlobal(paramsOut, paramErrorsOut, &rawFitResults, &rawFitResultsErrors, &chi2, &cov_matrix, &paramNames, &fitX, &fitY, &fitW, &fitM);
         }
     }
 
     if (fitstat) {
+#ifdef DEBUG_GLOBALFIT
         qDebug()<<"calc stat ...";
         //qDebug()<<"calc global fit stat fitX.size()="<<fitX.size()<<"  fitM.size()="<<fitM.size()<<"  fitY.size()="<<fitY.size()<<"  fitW.size()="<<fitW.size()<<"  rawFitResults.size()="<<rawFitResults.size()<<"  cov_matrix.size()="<<cov_matrix.size();
+#endif
         (*fitstat)=calculateBasicFitStatistics(fitX.size(), fitX.data(), fitM.data(), fitY.data(), fitW.data(), -1,-1, rawFitResults.size(), rawFitResults.data(), rawFitResultsErrors.data(), cov_matrix, 200, true);
     }
 
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"save output ...";
+#endif
     if (rawFitResults_io) *rawFitResults_io=rawFitResults;
     if (rawFitResultsErrors_io) *rawFitResultsErrors_io=rawFitResultsErrors;
     if (chi2_io) *chi2_io=chi2;
@@ -539,25 +586,39 @@ QList<QFFitAlgorithm::FitResult> QFGlobalFitTool::fitLocal(const QList<double *>
 
 QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &paramsOut, const QList<double *> &paramErrorsOut, QVector<double> *rawFitResults, QVector<double> *rawFitResultsErrors, double *chi2_out, QVector<double> *cov_matrix, QStringList* paramNames, QVector<double> *fitX, QVector<double> *fitY, QVector<double> *fitW, QVector<double> *fitM)
 {
-    int debugCnt=0;
     QFFitAlgorithm::FitResult result;
     int ppcount=functor->get_paramcount();
+#ifdef DEBUG_GLOBALFIT
+    int debugCnt=0;
     qDebug()<<"fitglobal "<<(debugCnt++);
+#endif
     double* params=(double*)qfCalloc(ppcount,sizeof(double));
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++);
+#endif
     double* errors=(double*)qfCalloc(ppcount,sizeof(double));
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++);
+#endif
     double* pmin=(double*)qfCalloc(ppcount,sizeof(double));
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++);
+#endif
     double* pmax=(double*)qfCalloc(ppcount,sizeof(double));
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++);
+#endif
     bool* fix=(bool*)qfCalloc(ppcount,sizeof(bool));
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++);
+#endif
     for (int i=0; i<ppcount; i++) fix[i]=true;
     bool minmax=true;
 
     if (paramNames) (*paramNames)=functor->getParamNames();
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++);
+#endif
 
     // fill parameter vector
     for (int i=0; i<functor->getSubFunctorCount(); i++) {
@@ -609,15 +670,23 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
 
     if (minmax) {
         for (int i=0; i<m_repeatFit; i++) {
+#ifdef DEBUG_GLOBALFIT
             qDebug()<<"fitglobal "<<(debugCnt++)<<"lsqMinimize() ...";
+#endif
             result=m_algorithm->lsqMinimize(params, errors, functor, params, fix, pmin, pmax);
+#ifdef DEBUG_GLOBALFIT
             qDebug()<<"fitglobal "<<(debugCnt++)<<"lsqMinimize() ... DONE";
+#endif
         }
     } else {
         for (int i=0; i<m_repeatFit; i++) {
+#ifdef DEBUG_GLOBALFIT
             qDebug()<<"fitglobal "<<(debugCnt++)<<"lsqMinimize() ...";
+#endif
             result=m_algorithm->lsqMinimize(params, errors, functor, params, fix, NULL, NULL);
+#ifdef DEBUG_GLOBALFIT
             qDebug()<<"fitglobal "<<(debugCnt++)<<"lsqMinimize() ... DONE";
+#endif
         }
     }
 #ifdef DEBUG_GLOBALFIT
@@ -629,16 +698,22 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
     qDebug()<<"  fix    = "<<arrayToString(fix, ppcount);
 #endif
 
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++)<<"chi2";
+#endif
     double chi2=functor->calculateChi2(params);
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++)<<"rawRes ...";
+#endif
     if (rawFitResults) {
         rawFitResults->clear();
         for (int i=0; i<ppcount; i++) {
             rawFitResults->append(params[i]);
         }
     }
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++)<<"rawResErr ...";
+#endif
 
     if (rawFitResultsErrors) {
         rawFitResultsErrors->clear();
@@ -675,11 +750,15 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
             }
 #endif
         }
+#ifdef DEBUG_GLOBALFIT
         qDebug()<<"fitglobal "<<(debugCnt++)<<"writeparam ...";
+#endif
 
     }
 
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++)<<"det XYMW ...";
+#endif
 
     for (int i=0; i<functor->getSubFunctorCount(); i++) {
         if (fitX) fitX->operator<<(functor->getSubFunctor(i)->getDataXV());
@@ -693,7 +772,9 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
         }
     }
 
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++)<<"COV ...";
+#endif
 
     if (cov_matrix) {
         QVector<double> COV(functor->get_paramcount()*functor->get_paramcount());
@@ -703,7 +784,9 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
         } else {
             //if ( result.addNumberMatrix("covariance_matrix", COV.data(), model->get_paramcount(), model->get_paramcount());)
             QVector<double> J(functor->get_evalout()*functor->get_paramcount());
+#ifdef DEBUG_GLOBALFIT
             qDebug()<<"calling mault:EvalJac: outsize="<<J.size()<<"  psize="<<ppcount;
+#endif
             functor->evaluateJacobian(J.data(), params);
             bool hasWeights=true;
             for (int i=0; i<functor->getSubFunctorCount(); i++) {
@@ -729,7 +812,9 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
     result.addNumber("error_sum", chi2);
 
 
+#ifdef DEBUG_GLOBALFIT
     qDebug()<<"fitglobal "<<(debugCnt++)<<"FREE ...";
+#endif
 
     qfFree(params);
     qfFree(errors);

@@ -63,6 +63,8 @@
 #define QF_ALIGNMENT_BYTES 32
 #endif
 
+//#define QFDEBUG_ALLOCATION
+
 #if !defined(QF_DONT_USE_ALIGNED_MALLOC)
 #warning("using aligned _aligned_malloc, _aligned_free, _aligned_realloc")
 #else
@@ -70,26 +72,40 @@
 #endif
 
 static QMutex qfallocationMutex(QMutex::Recursive);
+#ifdef QFDEBUG_ALLOCATION
+static QMap<void*,size_t> qfallocationDebugMap=QMap<void*,size_t>();
+#endif
 
 void* qfMalloc(size_t size) {
+    void* p=NULL;
     if (size<=0) return NULL;
 #ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
 #endif
-    size_t rsize=(size/QF_ALIGNMENT_BYTES+1)*QF_ALIGNMENT_BYTES;
+#if !defined(QF_DONT_USE_ALIGNED_MALLOC)
+    const size_t rsize=(size/QF_ALIGNMENT_BYTES+1)*QF_ALIGNMENT_BYTES;
+#else
+    const size_t rsize=size;
+#endif
 #ifdef __LINUX__
     #if  !defined(QF_DONT_USE_ALIGNED_MALLOC)
-    return aligned_alloc(QF_ALIGNMENT_BYTES, rsize);
+    p= aligned_alloc(QF_ALIGNMENT_BYTES, rsize);
     #else
-    return malloc(size);
+    p= malloc(rsize);
     #endif
 #else
     #if  !defined(QF_DONT_USE_ALIGNED_MALLOC)
-    return _aligned_malloc(rsize, QF_ALIGNMENT_BYTES);
+    p= _aligned_malloc(rsize, QF_ALIGNMENT_BYTES);
     #else
-    return malloc(size);
+    p= malloc(rsize);
     #endif
 #endif
+#ifdef QFDEBUG_ALLOCATION
+    qDebug()<<"qfMalloc("<<size<<rsize<<"): "<<p<<(!qfallocationDebugMap.contains(p));
+    qfallocationDebugMap.insert(p, size);
+#endif
+
+    return p;
 }
 
 void* qfCalloc(size_t size) {
@@ -110,20 +126,31 @@ void* qfRealloc (void* ptr, size_t size) {
 #ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
 #endif
-    size_t rsize=(size/QF_ALIGNMENT_BYTES+1)*QF_ALIGNMENT_BYTES;
+    void* p;
+#if !defined(QF_DONT_USE_ALIGNED_MALLOC)
+    const size_t rsize=(size/QF_ALIGNMENT_BYTES+1)*QF_ALIGNMENT_BYTES;
+#else
+    const size_t rsize=size;
+#endif
 #ifdef __LINUX__
     #if !defined(QF_DONT_USE_ALIGNED_MALLOC)
-    return realloc(ptr, size);
+    p= realloc(ptr, rsize);
     #else
-    return realloc(ptr, size);
+    p= realloc(ptr, rsize);
     #endif
 #else
     #if !defined(QF_DONT_USE_ALIGNED_MALLOC)
-    return _aligned_realloc(ptr, rsize, QF_ALIGNMENT_BYTES);
+    p= _aligned_realloc(ptr, rsize, QF_ALIGNMENT_BYTES);
     #else
-    return realloc(ptr, size);
+    p= realloc(ptr, rsize);
     #endif
 #endif
+#ifdef QFDEBUG_ALLOCATION
+    qDebug()<<"qfRealloc("<<ptr<<size<<rsize<<")"<<p<<qfallocationDebugMap.contains(p);
+    qfallocationDebugMap[p]=rsize;
+#endif
+
+    return p;
 }
 
 void qfFree(void* data) {
@@ -145,6 +172,12 @@ void qfFree(void* data) {
     #endif
 
 #endif
+#ifdef QFDEBUG_ALLOCATION
+    qDebug()<<"qfFree("<<data<<")  "<<qfallocationDebugMap.contains(data);
+    if (!qfallocationDebugMap.contains(data)) qDebug()<<"qfFREE("<<data<<")  !!!ERROR ERROR ERROR!!!";
+    qfallocationDebugMap.remove(data);
+#endif
+
 }
 
 
