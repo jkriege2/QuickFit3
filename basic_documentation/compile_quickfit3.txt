@@ -1,0 +1,331 @@
+========================================================================================
+== Install a GCC and Qt                                                               ==
+========================================================================================
+1. install a current version of the GNU compiler (>4.4) and install Qt (5.x or 4.8.x 
+   ... although 4.7.x should also work.) You can check the
+   compiler and Qt versions, that have been used to build the current binary release 
+   of QF3 in the Help|About menu entry (scroll down in the Info tab). It is advised
+   to use a modern MinGW gcc compiler and a recent Qt version! 
+   
+
+   -- LINUX ----------------------------------------------------------------------------   
+   On Linux: this can be done using your prefered distribution management (e.g. 
+   Yast on SUSE). Make sure to also install the developer libraries for Qt, as 
+   you will need the link- and header-files!
+
+   -- MACOS X --------------------------------------------------------------------------   
+   On MacOS X you will have to install XCode first and then  the Qt SDK. You can then 
+   compile QuickFit using QtCreator, as described below. QF3 then compiles with the clang 
+   installed by Apple along with XCode!
+   Note: You'll have to run XCode at least once, so the command line tools (clang/gcc/...)
+   are actually installed and activated after installing XCode.
+   
+   -- WINDOWS --------------------------------------------------------------------------
+   On windows: You will need a current version of Qt and the MinGW gcc compiler. 
+   There are several options to achieve this:
+      1.1. You can download Qt 4.8.x and a QtCreator (including MinGW) from 
+               http://www.qt-project.org/
+           This should work in most cases, but the compiler is a 32-bit version,
+           so you can only create a 32-bit version of Qt.
+      
+      1.2. You can download a recent MinGW compiler, ideally from MinGW-builds: 
+               http://sourceforge.net/projects/mingwbuilds/
+               we use: w32/w64, seh, 4.8.1, rev. 5, posix
+               
+      1.3. You can also use the 64-bit Qt builds from this resource:
+               http://tver-soft.org/qt64
+           Just make sure to choose the version with SEH exception handling (since that 
+           is required by the compiler, as mentioned above!!!) and OpenGL
+           They also provide an installer, which is supposed to contain a compiler also.
+           NOTE: You might have to run the utility qtbinpatcher.exe, distributed with
+                 the Qt archives, before using the binaries!
+
+      1.4. It is now possible to download some precompiled Qt version for the compiler 
+           mentioned in 1.2. from 
+               http://www.dkfz.de/Macromol/quickfit/compile.html
+           These were created with the compiler, mentioned above, and you will only 
+           have to unzip the according ZIP-file into an empty directory. 
+           
+      Now you need to install MSys, which provides a bash and several standard 
+	  Linux/Unix tools:
+        You can get MSys 1.0.x from here: 
+               http://downloads.sourceforge.net/mingw/MSYS-1.0.11.exe
+        This tool will give you a full unix bash on Windows and should work with all
+		MinGW/MinGW64 GCC compilers. SImply run the installer (usually I install it into
+		a subdirectory \MSys\ of the MinGW installation. Also run the post-
+		install steps. In these you need to answer "yes" you have a GCC/MinGW installed 
+		and yes, you want to configure MSys now. Finally you will have to give the full
+		path to the MSys installation directory (the one, in which bin, lib, includes, ...
+		recide). Note, that here you have to provide the path with slashed '/' instead of
+		backslashes '\'. So, if MinGW is installed in C:\development\MinGW64\, you have to
+		enter C:/development/MinGW64/. 
+		
+	 Finally, you need to tell your windows system, where the Qt libs and tools can be 
+	 found. To do this, you have to add its location to the system-wide PATH variable, 
+	 or by modifying the file C:\development\MinGW64\MSys\msys.bat of your MSys to contain 
+	 a line 
+	    set PATH=C:\development\Qt32-4.8.6\bin;%PATH%
+     where you only have to change the Qt-path accordingly.
+        
+========================================================================================
+== Unpack QuickFit Sources                                                            ==
+========================================================================================
+2. Unpack the source ZIP file. Due to history, there are two directories in this: 
+     * LIB/trunk (which contains some common C++-libraries) 
+     * FCSTOOLS/trunk/QuickFit3 which contains the actual Quickfit!
+     * in the base directory you'll find several images and .txt files, which describe
+       how you can configure your system to compile QuickFit 3     
+   Alternatively (if you have a Login/PW) you can check out the stuff from
+   our subversion repository:
+         https://www.dkfz.de/svn/B040     
+   But note: This repository contains much more than QuickFit3, so it might be 
+   enough to check out only the two directories mentioned above. Make sure the
+   relative pathes are correct (i.e. your main directory should have the two 
+   subfolders LIB and FCSTOOLS !)
+   
+   
+========================================================================================
+== Build dependency libraries                                                         ==
+========================================================================================
+QuickFit depends on a set of external open source libraries (GSL, libTIFF, cairo, ...).
+The source archive of QuickFit contains versions of these libraries, that work well with
+QF3 and are also used by us to build the system. Also it contains a bash script, that
+builds all these libaries. Note, that they are NOT installed in the system, so they are
+only available for QuickFit and not to your Linux-system or MinGW!!!
+So you can run the steps, described below savely on any Linux system!!!
+
+3. We will now build some of the dependency libraries needed for QuickFit3
+   
+   3.1 start a bash shell (or MSys on Win) and change to the directory 
+               FCSTOOLS/trunk/QuickFit3/extlibs
+       of your QuickFit source tree.
+   3.2 run the shell script ./build_dependencies.sh, which will build
+       the external libraries, needed to build QuickFit 3 (e.g. libtiff, GSL, ...)
+       
+       3.2.1 select "n" when asked if you want to keep the build directories,
+             as this is a DEBUG function.
+       3.2.2 depending on the number of processors in your computer, select the
+             appropriate number of threads to use for compile (2 on a DualCore,
+             4 on a QuadCore, ...)
+       3.2.3 choose whether to use agressive optimizations (e.g. -O3 -msse ...)
+             Note, that you might not be able to run the resulting binaries
+             on another computer, if you choose "y". The same goes for "optimize
+             for local machine" (e.g. --march=native)... 
+			 ON LINUX: You can typically answer both questions with "y", as you 
+			 will build for the current machine only!
+			 ON MACOS X: Choose M, which switches off most optimization. This is
+			 necessary, as the clang-compiler of MacOS does not understand the same
+			 command-line switches as GCC on Linux/Windows.
+       3.2.4 On some system the scrip will ask you, whether position-independent
+	         code should be produced. Find out, whether you need the -fPIC option
+			 for your system (Linux: typically yes, Windows: no) and answer
+			 accordingly with y or n.
+       3.2.5 copy Qt DLLs: YES on windows and NO on Linux. 
+             ON WINDOWS: If this goes wrong, you'll have to copy the Qt DLLs 
+             from the bin-subdir of the Qt installation to the output folder of 
+             QuickFit! ALso you have to copy the CONTENTS of the plugins folder
+			 of Qt into a subfolder 'qtplugins' of the output directory of QuickFit.
+			 the output folder of QuickFit is:
+			     FCSTOOLS/trunk/QuickFit3/output
+       3.2.6 build these libraries:         
+              
+              library       | Linux               | Windows                            | MacOS X
+             ---------------+---------------------+---------------------------------------------------------------- 
+              zlib          | y (but is usually   | y                                  | n (there is a zlib on MacOS X!)
+                            |    available anyways|                                    |
+                            |    so if this doesnt|                                    |
+                            |    work, QF3 will   |                                    |
+                            |    still compile)   |                                    |
+              lmfit         | y                   | y                                  | y
+              lmfit v5      | y                   | y                                  | y
+              levmar        | y                   | y                                  | y
+                                        for all systems: have lapack: "n"
+              libpng        | y                   | y                                  | y
+              libjpeg       | y                   | y                                  | y
+              libtiff       | y                   | y                                  | y
+              gsl           | y                   | y                                  | y
+              libusb-win32  | n (libusb has to be | y (if you want to build some       | n
+                            |    available on your|    of the hardware drivers)        |
+                            |    computer, if you | USE PREBUILT: n                    |
+                            |    want to use the  |                                    |
+                            |    Radhrad2 and     |                                    |
+                            |    RH2V2 plugins!   |                                    |
+                            |    By default these |                                    |
+                            |    plugins are deac-|                                    |
+                            |    tivated!)        |                                    |
+              libNIDAQmx    | n (currently no     | n (this is for future              | n
+                            |    working LINUX    |    extensions!)                    |
+                            |    driver from Nat. |                                    |
+                            |    Instruments avail|                                    |
+                            |    able!!!)         |                                    |
+              libAndor      | n (you will have to | n (y only if you want to           | n
+                            |    install the andor|    build the Andor driver,         |
+                            |    SDK, as advised  |    which has to be activated       |
+                            |    by Andor and make|    explicitly in quickfit.inc!!!)  |
+                            |    sure, that gcc   |                                    |  
+                            |    finds the SDK    |                                    |  
+              eigen         | y                   | y                                  | y
+              cimg          | y                   | y                                  | y
+              pixman        | y                   | y                                  | n (currently does not compile on MacOS X)
+              cairo         | y                   | y                                  | n (currently does not compile on MacOS X)
+                            |                     |                                    |
+                            |                     |                                    |
+                            |                     |                                    |
+                            |                     |                                    |
+                            |                     |                                    |
+                            |                     |                                    |
+                            |                     |                                    |
+                            |                     |                                    |
+             Note: these libraries will not be installed globally for the system !!!
+                   So they will not interfere with version already available!!!
+                   
+                   If one or the other of these libraries is already available
+                   on your system (with standard linker-parameters), then you can
+                   in principle omit it above ... but the libs included in your
+                   QF3 copy are tested to work with your QF3 version, so using 
+                   other version is on your own risk. Basically if a library on 
+                   your computer does not work, you can rerun the script and build
+                   it in a second run!
+				   
+				   
+   3.3 now we will build QuickFit 3 itself
+       3.3.1 change to FCSTOOLS/trunk/QuickFit3
+       3.3.2 create a file quickfit.inc with the following contents (or edit the 
+             existing file as needed):
+                QF3CONFIG+=nohardwaredrivers
+                QF3CONFIG+=nospecialdrivers
+                QF3CONFIG+=noandor
+                QF3CONFIG+=nospecials
+                #QF3CONFIG+=bits64
+             If you want to build a 64-bit build, uncomment the last line!    
+             Changes these options ONLY IF YOU KNOW WHAT YOU ARE DING!!! 
+             See quickfit.inc.template for an example and an explanation of the
+             additional options!
+			 
+			 On MacOS X, you should also add:
+			    QF3CONFIG+=nonlopt
+                QF3CONFIG+=nocairo
+			 as/if these libs are not available on MacOS X.
+			 
+			 If you get errors about _aligned_malloc() not fopund, set:
+			    DEFINES += QF_DONT_USE_ALIGNED_MALLOC
+				
+			Note: There are templates for such a file under different conditions.
+				
+       3.3.3 run (make sure that your qmake points to the qmake of the Qt version you want to use 
+	         ... possibly you'll have to add the absolute path to that tool!!!)    
+               RELEASE:   qmake quickfit3.pro "CONFIG+=release"
+               DEBUG:     qmake quickfit3.pro "CONFIG+=declarative_debug"
+       3.3.4 run twice:
+               make -jN
+             where N=1 for a 1-core system 2 for a 2-core syste ... or leave 
+             away the -j option completely.
+             NOTE: The first call will compile two libraries, but will end with 
+             a link error (library not found). This is normal due to the broken
+             dependency checking of qmake, so simply run 
+               make -jN
+             again.  
+       3.3.5 run
+               make install -j16
+             Now the online-help, examples and other asset files will be copied 
+             to the output directory. After this step QF3 is ready to run.
+       3.3.6 you should have an executable 
+                     LINUX:  FCSTOOLS/trunk/QuickFit3/output/quickfit3
+                     WIN:    FCSTOOLS/trunk/QuickFit3/output/quickfit3.exe
+					 MACOS:  FCSTOOLS/trunk/QuickFit3/output/quickfit3.app
+             now. Run this to see whether everyting worked!
+             Note: QuickFit 3.0 and all files it requires will be stored in the
+                   directory FCSTOOLS/trunk/QuickFit3/output/. 
+			 MACOS X: Here, the compile process generates a halve-complete app-bundle, 
+                      which you'll have to complete by running an additional bash script
+					  FCSTOOLS/trunk/QuickFit3/output/macosx_bundle.sh in the output
+					  directory! Please edit this script before running it and make sure
+					  that the paths to the Qt-version at the start of the script are correct!
+					  This script will copy the required Qt frameworks, Qt plugins, QF3 plugins
+					  and other QF3 assets/examples/sdks/... into the app-bundle, which should
+					  then be ready for deployment and running!
+       3.3.7 [WINDOWS] QuickFit requires some libraries to start, such as the
+             Qt libs and MinGW runtime. These have to be found by quickfit3.exe,
+             which can be ensured by copying them to the same directory as
+             quickfit3.exe. The build_dependencies.sh script should have done
+             this for most libs, but nevertheless, check this by checking, if these
+             files are present in the same directory as quickfit3.exe:
+                libgcc_s_dw2-1.dll   (if present in MinGW/bin)
+                libgcc_s_seh-1.dll   (if present in MinGW/bin)
+                libstdc++-6.dll      (if present in MinGW/bin)
+                libusb-1.0.dll       (if radhard2 plugins were built)
+                libwinpthread-1.dll  (if present in MinGW/bin)
+                mingwm10.dll         (if present in MinGW/bin)
+             for Qt4.x:    
+                QtCore4.dll (and QtCore4d.dll for debug-builds)
+                QtGui4.dll (and QtGui4d.dll for debug-builds)
+                QtMultimedia4.dll (and QtMultimedia4d.dll for debug-builds)
+                QtNetwork4.dll (and QtNetwork4d.dll for debug-builds)
+                QtOpenGL4.dll (and QtOpenGL4d.dll for debug-builds)
+                QtScript4.dll (and QtScript4d.dll for debug-builds)
+                QtScriptTools4.dll (and QtScriptTools4d.dll for debug-builds)
+                QtSvg4.dll (and QtSvg4d.dll for debug-builds)
+                QtXml4.dll (and QtXml4d.dll for debug-builds)
+                also copy all the subfolders of the Qt plugins folder into the
+                qtplugins folder of QuickFit!
+             for Qt5.x:
+			    icudt54.dll   (if present in Qt/bin dir)
+				icuin54.dll   (if present in Qt/bin dir)
+				icuuc54.dll   (if present in Qt/bin dir)
+				libeay32.dll  (if present in Qt/bin dir)
+				ssleay32.dll  (if present in Qt/bin dir)
+				libEGL.dll    (if present in Qt/bin dir)
+				libGLESv2.dll (if present in Qt/bin dir)
+				Qt5Concurrent.dll
+				Qt5Core.dll
+				Qt5Gui.dll
+				Qt5Multimedia.dll
+				Qt5MultimediaWidgets.dll
+				Qt5Network.dll
+				Qt5OpenGL.dll
+				Qt5PrintSupport.dll
+				Qt5Script.dll
+				Qt5ScriptTools.dll
+				Qt5Svg.dll
+				Qt5Widgets.dll
+				Qt5WinExtras.dll
+				Qt5Xml.dll
+				
+				
+                also copy all the subfolders of the Qt plugins folder into the
+                qtplugins folder of QuickFit!
+             If one of the files is missing AND QF3 does not start, you can copy 
+             it to the output directory from either the MinGW/bin directory or
+             the QT/bin directory (where MinGW and Qt have to be replaced by the
+             appropriate paths on your system!)
+             
+                   
+========================================================================================
+== Build QuickFit using QtCreator (ALTERNATIVE!!!)                                    ==
+========================================================================================
+  * You can also copile QF3 (step 3.3) using Qt Creator. To do so, load the 
+    project quickfit3.pro and make sure NOT to use "shadow builds" 
+    (out-of-source builds). When the project is loaded, go to the project 
+    options and set:
+      + "distclean" instead of "clean" for the clean-call to make
+      + add an install step "make install"
+  * Screenshots of example configurations for Kits, ... in QtCreator are available
+    in the base directory of the source tree (qtcreator_*.png and
+	build_quickfit3_config_qtcreator_*.png)
+  * Note: On MacOS X you'll still have to run the script
+      FCSTOOLS/trunk/QuickFit3/output/macosx_bundle.sh	
+	from a terminal after building QF3!
+	
+	
+	
+	
+========================================================================================
+== TROUBLESHOOTING                                                                    ==
+========================================================================================
+* In some cases, the dependency libraries are not built correctly with position-independent 
+  code (PIC) on Linux. This problem especially arrises with lmfit v5. If the dependency-build-
+  script asks you, whether PIC should be set, answer with YES. (On windows all code seems
+  to be PIC, so this is omitted and you can ignore the according warnings!)
+* If some of the libraries in extlibs make problems: You can deactivate several plugins, by
+  their use of a lirary in quickfit.inc ... See above and the provided templates for this 
+  file for details.

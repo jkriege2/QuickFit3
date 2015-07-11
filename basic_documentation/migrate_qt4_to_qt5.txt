@@ -1,0 +1,88 @@
+============================================================
+= CHECK for Qt <5.0
+============================================================
+#include <QtGlobal>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+#endif        
+
+
+
+
+============================================================
+= CHECK for Qt >=5.0
+============================================================
+#include <QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#endif        
+
+
+
+
+============================================================
+= PRO-file Qt4+5
+============================================================
+QT += core gui svg xml
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
+
+
+QT += core gui svg xml network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
+
+
+
+============================================================
+= #include <QtGui> Qt4+5
+============================================================
+#include <QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
+#include <QtGui>
+#endif
+
+
+
+
+============================================================
+= QAbstractItemModel::reset()
+============================================================
+replace by:
+#include <QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+beginResetModel();
+endResetModel();
+#else
+reset();
+#endif
+
+
+
+
+============================================================
+= new declaration in headers of Qt Plugins classes
+============================================================
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.PLUGIN_CALSS_NAME")
+#endif         
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.")
+#endif  
+
+
+
+
+
+
+============================================================
+= tosetSectionResizeMode()
+============================================================
+#include <QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+h->setSectionResizeMode(QHeaderView::Fixed);
+#else
+h->setResizeMode(QHeaderView::Fixed);
+#endif
+
+
+
+

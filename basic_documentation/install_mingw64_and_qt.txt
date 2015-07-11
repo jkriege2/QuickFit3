@@ -1,0 +1,114 @@
+
+------------------------------------------------------------------------------------------------
+-- INSTALL MINGW-BUILDS 64-bit GCC
+------------------------------------------------------------------------------------------------
+1. download MinGW-builds: http://sourceforge.net/projects/mingwbuilds/
+      w64, seh, 4.8.1, rev. 5, posix
+  and install in C:\development\mingw-builds\x64-4.8.1-posix-seh-rev5\mingw64
+  
+2. get MSys and all the rest from here: http://sourceforge.net/projects/mingwbuilds/files/external-binary-packages/
+   unzip into C:\development\mingw-builds\x64-4.8.1-posix-seh-rev5\mingw64 
+   so there will be a subdir msys
+   edit the file fstab in ...\msys\etc and add this line:
+     C:/development/mingw-builds/x64-4.8.1-posix-seh-rev5/mingw64		/mingw
+   which tells MSys where to find the compiler.	 
+   
+3. also add the line 
+     set PATH=C:\development\Qt64-4.8.4\bin;%PATH%
+   to msys.bat in the msys subdirectory of the GCC installation. This will make the Qt directory
+   available to the shell. Especially afterwards the correct qmake command will be found.
+   After compiling Qt, you can test that with
+     qmake -v
+   which should print the correct Qt version and path!
+   
+4. download a current Qt 4.8 bin release from 
+   and unpack into C:\development\Qt64-4.8.4\
+   
+   or compile yourself (see [c1] down)
+   
+5. copy these DLLs from the MinGW/bin directory to the Qt/bin directory:
+     libgcc_s_seh-1.dll
+	 libstdc++-6.dll
+	 libwinpthread-1.dll   
+   Otherwise qmake. does not always run, as the DLLs are not found! (see https://bugreports.qt-project.org/browse/QTCREATORBUG-10596)
+   
+6. add proper Qt version, compilers and kits to QtCreator. This seems to fail
+   for the Qt version (qmake.exe is not found or executable, although there) 
+   created with this compiler and the compiler (wrong ABI).
+   This can be overcome by changing all settings after starting QtCreator again.
+   see also:
+      https://bugreports.qt-project.org/browse/QTCREATORBUG-10584
+	  https://bugreports.qt-project.org/browse/QTCREATORBUG-10582
+	  https://bugreports.qt-project.org/browse/QTCREATORBUG-10596
+   
+   
+   
+   
+   
+   
+   
+----------------------------------------------------------------------------------------------------
+-- COMPILE  Qt-4.8.6 for MinGW64
+----------------------------------------------------------------------------------------------------
+
+(c1) download the Qt 4.8.6 sorce package from  http://download.qt-project.org/archive/qt/4.8/4.8.6/
+     unzip to C:\development\Qt64-4.8.6\
+(c2) start msys
+(c3) change into cd /c/development/Qt64-4.8.4
+(c4) ./configure.exe -opensource -confirm-license -debug-and-release -fast -qt-zlib -qt-libpng -qt-libtiff -qt-libjpeg -qt-libmng -mmx -3dnow -sse -sse2 -no-dbus -qt-style-windowsxp -qt-style-windowsvista -no-openssl -no-webkit -dont-process
+(c5) ./bin/qmake.exe  -r QT_BUILD_PARTS="libs tools"
+(c6) make 
+
+NOTE: If you leave the -dont-process option away from configure.exe, you can skip the qmake-step (c6). With the settings above (namely -dont-process and qmake QT_BUILD_PARTS="libs tools" only the Qt libs and the tools will be built ... not the examples. This is a bit faster!
+    
+	
+   
+   
+   
+----------------------------------------------------------------------------------------------------
+-- COMPILE  Qt-4.8.4 for MinGW64
+----------------------------------------------------------------------------------------------------
+
+(c1) download the Qt 4.8.4 sorce package from  http://download.qt-project.org/archive/qt/4.8/4.8.4/
+     unzip to C:\development\Qt64-4.8.4\
+     Note: There are problems when running 4.8.5's configure tool, so we can't compile that version.
+(c2) start msys
+(c3) change into cd /c/development/Qt64-4.8.4
+(c4) edit /c/development/Qt64-4.8.4/src/corelib/tools/qsimd.cpp and add this line to the file:
+        #include <intrin.h>
+(c5) ./configure.exe -opensource -confirm-license -debug-and-release -fast -qt-zlib -qt-libpng -qt-libtiff -qt-libjpeg -qt-libmng -mmx -3dnow -sse -sse2 -no-dbus -qt-style-windowsxp -qt-style-windowsvista -no-openssl -no-webkit -dont-process
+(c6) ./bin/qmake.exe  -r QT_BUILD_PARTS="libs tools"
+(c7) make -j4
+
+NOTE: If you leave the -dont-process option away from configure.exe, you can skip the qmake-step (c6). With the settings above (namely -dont-process and qmake QT_BUILD_PARTS="libs tools" only the Qt libs and the tools will be built ... not the examples. This is a bit faster!
+    
+	
+	
+	
+=========================================================================================================================================	
+== TEMPORARY:
+=========================================================================================================================================	
+	
+The steps above build Qt without webkit, OpenSSL, ... these can be added by following the instructions below:
+(c4) create a subdirectory qt_dep
+(c5) unpack http://www.openssl.org/source/openssl-1.0.1e.tar.gz into this directory and change to openssl-1.0.1e:
+       cd qt_deps/openssl-1.0.1e
+(c6) configure and make:
+       ./Configure --prefix=/c/development/Qt64-4.8.4/qt_dep/openssl-1.0.1e/dist no-idea no-mdc2 no-rc5 shared mingw64 no-tests
+	   make depend
+	   make 
+	   make install
+(c7) configure Qt:
+     set INCLUDE=C:\development\Qt64-4.8.4\qt_dep\openssl-1.0.1e\dist\include
+     set LIB=C:\development\Qt64-4.8.4\qt_dep\openssl-1.0.1e\dist\include\lib
+     ./configure.exe -opensource -confirm-license -debug-and-release -fast -qt-zlib -qt-libpng -qt-libtiff -qt-libjpeg -qt-libmng -mmx -3dnow -sse -sse2 -no-dbus -qt-style-windowsxp -qt-style-windowsvista -nomake tests -dont-process
+(c8) ./bin/qmake.exe  -r QT_BUILD_PARTS="libs tools"
+(c9) make -j4	   
+	   
+	   
+	   
+	   
+=========================================================================================================================================	
+== TEMPORARY:
+=========================================================================================================================================	
+http://download.icu-project.org/files/icu4c/52.1/icu4c-52_1-src.zip	   
