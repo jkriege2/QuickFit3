@@ -83,54 +83,54 @@ This software is provided as is without any warranties. Use it at your own risk.
 
 # Screenshots
 ## Welcome Screen
-![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_welcome.png)
+![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_welcome.png)
 
-## Main Window</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_main.png)
+## Main Window
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_main.png)
 
-## Settings Dialog</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_settings.png)
+## Settings Dialog
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_settings.png)
 
-## Online Help</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_help.png)
+## Online Help
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_help.png)
 
-## User-Defined Fit Functions</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_userfitfunctions.png)
+## User-Defined Fit Functions
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_userfitfunctions.png)
 
-## imaging FCS</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_imfcs.png)
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_imfcs_paramcorrelation.png)
+## imaging FCS
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_imfcs.png)
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_imfcs_paramcorrelation.png)
 
-## imaging FCS Fit</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_imfcsfit.png)
+## imaging FCS Fit
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_imfcsfit.png)
 
-## imaging FCCS Fit</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_imfccsfit.png)
+## imaging FCCS Fit
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_imfccsfit.png)
 
-## FCS Fit</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_fcsfit.png)
+## FCS Fit
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_fcsfit.png)
 
-## FCS: MSD Evaluation</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_msd.png)
+## FCS: MSD Evaluation
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_msd.png)
 
-## FCS: MaxEnt evaluation</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_maxent.png)
+## FCS: MaxEnt evaluation
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_maxent.png)
 
-## global FCCS Fit</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_fccsfit.png)
+## global FCCS Fit
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_fccsfit.png)
 
-## table plugin (spreadsheet/plots)</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_table.png)
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_tableplot.png)
+## table plugin (spreadsheet/plots)
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_table.png)
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_tableplot.png)
 
-## SPIM Lightsheet Analysis</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_lightsheet.png)
+## SPIM Lightsheet Analysis
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_lightsheet.png)
 
-## Spectra Viewer</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_spectra.png)
+## Spectra Viewer
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_spectra.png)
 
-## Diffusion Coefficient Calculator</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_dcalc.png)
+## Diffusion Coefficient Calculator
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_dcalc.png)
 
-## 3D Image Stack Viewer</h3>
- ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/screenshots/screen_3dviewer.png)
+## 3D Image Stack Viewer
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_3dviewer.png)
