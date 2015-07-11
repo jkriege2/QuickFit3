@@ -2,8 +2,7 @@
 A data evaluation package for (imaging) fluorescnece correlation spectroscopy and other biophysical methods
 Project Homepage: http://www.dkfz.de/Macromol/quickfit/
 
-![Logo](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/images/icon_256.png.png)
-![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/images/splash.png.png)
+![Logo](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/images/icon_256.png)
 
 #Download
 Currently QuickFit can be found here (will be moved to GitHub soon):
@@ -11,6 +10,8 @@ Currently QuickFit can be found here (will be moved to GitHub soon):
 - Source Code: https://github.com/jkriege2/QuickFit3
 
 #Description
+![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/images/splash.png)
+
 QuickFit 3 is a data evaluation software for FCS and imagingFCS (imFCS) measurements, developed in the group B040 (Prof. Jörg Langowski) at the German Cancer Research Center (DKFZ). Actually QuickFit 3 itself is a project manager and all functionality is added as plugins. A set of tested plugins for FCS, imagingFCS and some microscopy-related image processing tasks is supplied together with the software. New plugins that provide additional features will be added to this distribution of QuickFit when they become available. Currently these features are supported: 
 - FCS:
   - dataimport from ALV5000/6000/7000, ISS Alba files, Zeiss Confocor3 files, correlator.com .sin-files, CSV files
