@@ -92,7 +92,9 @@ echo -e "\n   bit depth: ${BITDEPTH}\n\n"
 THISDIR=`pwd`
 
 QF3REPOSITORY=https://www.dkfz.de/svn/B040/FCSTOOLS/trunk/QuickFit3
-LIBREPOSITORY=https://www.dkfz.de/svn/B040/LIB
+LIBREPOSITORY=https://www.dkfz.de/svn/B040/FCSTOOLS/trunk/QuickFit3/global_lib
+QF3DIR=./FCSTOOLS/trunk/QuickFit3
+LIBDIR=./FCSTOOLS/trunk/QuickFit3/global_lib
 COMPILETXT2_REPOSITORY=https://www.dkfz.de/svn/B040/compile_quickfit3.txt
 COMPILETXT1_REPOSITORY=https://www.dkfz.de/svn/B040/install_mingw64_and_qt.txt
 COMPILEIMGS_REPOSITORY=https://www.dkfz.de/svn/B040/
@@ -148,10 +150,10 @@ if [ "${create_deploy}" != "0" ]; then
 	
 	echo -e "\n\nCREATING ${CAIRO4QTZIPFILE}:\n"
 	mkdir cairo4qtv2
-	cp -f ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/cairo4qtv2.readme ./cairo4qtv2/readme.txt
-	cp -rf ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/qcairo*.* ./cairo4qtv2
-	cp -rf ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/cairoQ*.* ./cairo4qtv2
-	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./cairo4qtv2
+	cp -f ${QF3DIR}/plugins/qfe_plotterexportercairo/cairo4qtv2.readme ./cairo4qtv2/readme.txt
+	cp -rf ${QF3DIR}/plugins/qfe_plotterexportercairo/qcairo*.* ./cairo4qtv2
+	cp -rf ${QF3DIR}/plugins/qfe_plotterexportercairo/cairoQ*.* ./cairo4qtv2
+	cp -rf ${QF3DIR}/gpl-3.0.txt ./cairo4qtv2
 	cd cairo4qtv2
 	zip -rv9 ../../${CAIRO4QTZIPFILE} *
 	cd ${DEPLOY_RETURN_DIR}
@@ -165,17 +167,17 @@ if [ "${create_deploy}" != "0" ]; then
 	mkdir tinytiff/tinytiff_doc
 	mkdir tinytiff/tinytiff_doc/latex
 	mkdir tinytiff/tinytiff_doc/html
-	cp -f ./LIB/trunk/tinytiff.readme ./tinytiff/readme.txt
-	cp -f ./LIB/trunk/tinytiff.Doxyfile ./tinytiff
-	cp -f ./LIB/trunk/tinytiff.dox ./tinytiff
-	cp -rf ./LIB/trunk/tinytiff*.* ./tinytiff
-	cp -rf ./LIB/trunk/lib_imexport.h ./tinytiff
-	cp -rf ./LIB/trunk/libtiff_tools.* ./tinytiff
-	cp -rf ./LIB/trunk/highrestimer.* ./tinytiff
-	cp -rf ./LIB/trunk/tools.* ./tinytiff
-	cp -rf ./LIB/trunk/test/tinytiffwriter_test/* ./tinytiff/test/tinytiffwriter_test/
-	cp -rf ./LIB/trunk/test/tinytiff_reader_test/* ./tinytiff/test/tinytiff_reader_test/
-	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./tinytiff
+	cp -f ${LIBDIR}/tinytiff.readme ./tinytiff/readme.txt
+	cp -f ${LIBDIR}/tinytiff.Doxyfile ./tinytiff
+	cp -f ${LIBDIR}/tinytiff.dox ./tinytiff
+	cp -rf ${LIBDIR}/tinytiff*.* ./tinytiff
+	cp -rf ${LIBDIR}/lib_imexport.h ./tinytiff
+	cp -rf ${LIBDIR}/libtiff_tools.* ./tinytiff
+	cp -rf ${LIBDIR}/highrestimer.* ./tinytiff
+	cp -rf ${LIBDIR}/tools.* ./tinytiff
+	cp -rf ${LIBDIR}/test/tinytiffwriter_test/* ./tinytiff/test/tinytiffwriter_test/
+	cp -rf ${LIBDIR}/test/tinytiff_reader_test/* ./tinytiff/test/tinytiff_reader_test/
+	cp -rf ${QF3DIR}/gpl-3.0.txt ./tinytiff
 	cd tinytiff
 	doxygen tinytiff.Doxyfile
 	cd tinytiff_doc/latex
@@ -202,22 +204,22 @@ if [ "${create_deploy}" != "0" ]; then
 	mkdir jkqtplotter/qt/jkqtplotter_doc
 	mkdir jkqtplotter/qt/jkqtplotter_doc/html
 	mkdir jkqtplotter/qt/jkqtplotter_doc/latex
-	cp -f ./LIB/trunk/qt/jkqtplotter.readme ./jkqtplotter/
-	cp -f ./LIB/trunk/qt/jkqtfastplotter.readme ./jkqtplotter/
-	cp -f ./LIB/trunk/qt/jkqtmathtext.readme ./jkqtplotter/
+	cp -f ${LIBDIR}/qt/jkqtplotter.readme ./jkqtplotter/
+	cp -f ${LIBDIR}/qt/jkqtfastplotter.readme ./jkqtplotter/
+	cp -f ${LIBDIR}/qt/jkqtmathtext.readme ./jkqtplotter/
 	cp -rf ./jkqtplotter/qt/images/* ./jkqtplotter/qt/images
-	cp -rf ./LIB/trunk/lib_imexport.h ./jkqtplotter
-	cp -rf ./LIB/trunk/highrestimer.* ./jkqtplotter
-	cp -rf ./LIB/trunk/tools.* ./jkqtplotter
-	cp -rf ./LIB/trunk/jkmathparser.* ./jkqtplotter
-	cp -rf ./LIB/trunk/qt/jkautooutputtimer.* ./jkqtplotter/qt
-	cp -rf ./LIB/trunk/qt/jkqtmathtext.* ./jkqtplotter/qt
-	cp -rf ./LIB/trunk/qt/jkqttools.* ./jkqtplotter/qt
-	cp -rf ./LIB/trunk/qt/jkqtp*.* ./jkqtplotter/qt
-	cp -rf ./LIB/trunk/qt/test/jkqtfastplotter_test/* ./jkqtplotter/qt/test/jkqtfastplotter_test/
-	cp -rf ./LIB/trunk/qt/test/jkqtmathtext_test/* ./jkqtplotter/qt/test/jkqtmathtext_test/
-	cp -rf ./LIB/trunk/qt/test/jkqtplot_test/* ./jkqtplotter/qt/test/jkqtplot_test/
-	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./jkqtplotter
+	cp -rf ${LIBDIR}/lib_imexport.h ./jkqtplotter
+	cp -rf ${LIBDIR}/highrestimer.* ./jkqtplotter
+	cp -rf ${LIBDIR}/tools.* ./jkqtplotter
+	cp -rf ${LIBDIR}/jkmathparser.* ./jkqtplotter
+	cp -rf ${LIBDIR}/qt/jkautooutputtimer.* ./jkqtplotter/qt
+	cp -rf ${LIBDIR}/qt/jkqtmathtext.* ./jkqtplotter/qt
+	cp -rf ${LIBDIR}/qt/jkqttools.* ./jkqtplotter/qt
+	cp -rf ${LIBDIR}/qt/jkqtp*.* ./jkqtplotter/qt
+	cp -rf ${LIBDIR}/qt/test/jkqtfastplotter_test/* ./jkqtplotter/qt/test/jkqtfastplotter_test/
+	cp -rf ${LIBDIR}/qt/test/jkqtmathtext_test/* ./jkqtplotter/qt/test/jkqtmathtext_test/
+	cp -rf ${LIBDIR}/qt/test/jkqtplot_test/* ./jkqtplotter/qt/test/jkqtplot_test/
+	cp -rf ${QF3DIR}/gpl-3.0.txt ./jkqtplotter
 	cp -rf ./jkqtplotter/qt/*.readme ./jkqtplotter
 	cd jkqtplotter/qt
 	
@@ -242,10 +244,10 @@ if [ "${create_deploy}" != "0" ]; then
 		rm -rf $f
 	done
 	
-	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win32/ATMCD32D.DLL
-	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win32/ATMCD32D.H
-	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win64/atmcd64d.DLL
-	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win64/ATMCD32D.H
+	rm ${QF3DIR}/extlibs/andor_win32/ATMCD32D.DLL
+	rm ${QF3DIR}/extlibs/andor_win32/ATMCD32D.H
+	rm ${QF3DIR}/extlibs/andor_win64/atmcd64d.DLL
+	rm ${QF3DIR}/extlibs/andor_win64/ATMCD32D.H
 	
 	THISDIRSD=`pwd`
 	cd ../../tools/qf3sourcedeploy/
@@ -256,39 +258,39 @@ if [ "${create_deploy}" != "0" ]; then
 	
 	LIB_FILES=`../../tools/qf3sourcedeploy/qf3sourcedeploy ./FCSTOOLS`
 	
-	TEMP_VAR=`find ./LIB/trunk/test/multitau-correlator_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/test/multitau-correlator_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/test/jkserial_testQt -type f`
+	TEMP_VAR=`find ${LIBDIR}/test/jkserial_testQt -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/test/jkserial_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/test/jkserial_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/test/jkmathparser_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/test/jkmathparser_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/test/jkiniparser2_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/test/jkiniparser2_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/test/datatable2_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/test/datatable2_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/test/statistics_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/test/statistics_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/test/tinytiff_reader_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/test/tinytiff_reader_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/test/tinytiffwriter_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/test/tinytiffwriter_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/test/videocapture_testQt -type f`
+	TEMP_VAR=`find ${LIBDIR}/test/videocapture_testQt -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/qt/test/jkfloatedit_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/qt/test/jkfloatedit_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/qt/test/jkqtfastplotter_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/qt/test/jkqtfastplotter_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/qt/test/jkqtmathtext_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/qt/test/jkqtmathtext_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/qt/test/jkqtplot_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/qt/test/jkqtplot_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/qt/test/qfasttablelabel_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/qt/test/qfasttablelabel_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/qt/test/QKeySequenceEdit_test -type f`
+	TEMP_VAR=`find ${LIBDIR}/qt/test/QKeySequenceEdit_test -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
-	TEMP_VAR=`find ./LIB/trunk/doc -type f`
+	TEMP_VAR=`find ${LIBDIR}/doc -type f`
 	LIB_FILES="${LIB_FILES} ${TEMP_VAR}"
 	
 	
@@ -304,7 +306,7 @@ if [ "${create_deploy}" != "0" ]; then
 		rm -rf $f
 	done
 	
-	cp ./FCSTOOLS/trunk/QuickFit3/quickfit.inc.deploy ./FCSTOOLS/trunk/QuickFit3/quickfit.inc
+	cp ${QF3DIR}/quickfit.inc.deploy ${QF3DIR}/quickfit.inc
 
 
 	echo -e "\n\nCREATING RELEASE NOTES:\n\n"

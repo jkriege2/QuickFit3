@@ -21,8 +21,8 @@
 
 #include "qfvisualize3dglwidget.h"
 #include <float.h>
-#include "../../../LIB/trunk/statistics_tools.h"
-#include "../../../LIB/trunk/ticktock.h"
+#include "statistics_tools.h"
+#include "ticktock.h"
 #include <QDebug>
 #include <QMouseEvent>
 #include <QMatrix4x4>

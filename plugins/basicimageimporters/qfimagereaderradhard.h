@@ -23,8 +23,8 @@ Copyright (c) 2008-2014 Jan Buchholz & Jan W. Krieger, German Cancer Research Ce
 #define QFIMAGEREADERRADHARD_H
 
 #include "qfimporterimageseries.h"
-#include "global_lib/frame.h"
-#include "global_lib/crc_ccitt.h"
+#include "frame.h"
+#include "crc_ccitt.h"
 #include <QFile>
 #include <QDataStream>
 #include <stdint.h>
