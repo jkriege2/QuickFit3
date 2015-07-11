@@ -36,13 +36,13 @@ DESTDIR = $${QFOUTPUT}/plugins/
 HEADERS += qfextensiontmclfilterchanger.h \
     ../interfaces/qfextensionfilterchanger.h \
     ../base_classes/qf3comportmanager.h \
-    ../../../../../LIB/trunk/jkserialconnection.h \
+    ../../global_lib/jkserialconnection.h \
     ../base_classes/qf3tmclprotocolhandler.h \
     ../interfaces/qfextensionglobalsettingsreadwrite.h
 
 SOURCES += qfextensiontmclfilterchanger.cpp \
     ../base_classes/qf3comportmanager.cpp \
-    ../../../../../LIB/trunk/jkserialconnection.cpp \
+    ../../global_lib/jkserialconnection.cpp \
     ../base_classes/qf3tmclprotocolhandler.cpp
 
 FORMS =
@@ -53,8 +53,8 @@ TRANSLATIONS= ./translations/de.filterc_tmcl.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

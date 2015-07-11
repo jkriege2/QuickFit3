@@ -57,8 +57,8 @@ TRANSLATIONS= ./translations/de.eval_beadscanpsf.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 
 ASSETS_1color.files = ./examples/1color/*.*

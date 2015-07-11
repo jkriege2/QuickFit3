@@ -39,16 +39,16 @@ HEADERS += spimb040.h \
            qfespimb040cameraview.h \
            qfespimb040samplestageconfig.h \
            ../interfaces/qfextensioncamera.h \
-           ../../../../../LIB/trunk/jkimage.h  \
-           ../../../../../LIB/trunk/highrestimer.h \
-           ../../../../../LIB/trunk/tinytiffwriter.h \
-           ../../../../../LIB/trunk/libtiff_tools.h \
+           ../../global_lib/jkimage.h  \
+           ../../global_lib/highrestimer.h \
+           ../../global_lib/tinytiffwriter.h \
+           ../../global_lib/libtiff_tools.h \
            ../interfaces/qfextensionlinearstage.h \
     qfespimb040opticssetup.h \
     qfespimb040simplecameraconfig.h \
     qfespimb00histogrammaskdialog.h \
-    ../../../../../LIB/trunk/qt/qfasttablelabel.h \
-    ../../../../../LIB/trunk/histogram.h \
+    ../../global_lib/qt/qfasttablelabel.h \
+    ../../global_lib/histogram.h \
     qfespimb040mainwindow2.h \
     qfespimb040experimentdescription.h \
     qfespimb040samplestageconfigthread.h \
@@ -71,8 +71,8 @@ HEADERS += spimb040.h \
     qfespimb040configtabwidget.h \
     qfespimb040opticssetupbase.h \
     qfespimb040opticssetup2.h \
-    ../../../../../LIB/trunk/jkmathparser.h \
-    ../../../../../LIB/trunk/jkiniparser2.h \
+    ../../global_lib/jkmathparser.h \
+    ../../global_lib/jkiniparser2.h \
     qfespimb040overviewacquisitionconfigwidget.h \
     qfespimb040finddialog.h \
     spimb040optionswidget.h
@@ -80,13 +80,13 @@ HEADERS += spimb040.h \
 SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
            qfespimb040samplestageconfig.cpp \
-           ../../../../../LIB/trunk/highrestimer.cpp \
-           ../../../../../LIB/trunk/tinytiffwriter.cpp \
-           ../../../../../LIB/trunk/libtiff_tools.cpp \
+           ../../global_lib/highrestimer.cpp \
+           ../../global_lib/tinytiffwriter.cpp \
+           ../../global_lib/libtiff_tools.cpp \
     qfespimb040opticssetup.cpp \
     qfespimb040simplecameraconfig.cpp \
     qfespimb00histogrammaskdialog.cpp \
-    ../../../../../LIB/trunk/qt/qfasttablelabel.cpp \
+    ../../global_lib/qt/qfasttablelabel.cpp \
     qfespimb040mainwindow2.cpp \
     qfespimb040experimentdescription.cpp \
     qfespimb040samplestageconfigthread.cpp \
@@ -106,8 +106,8 @@ SOURCES += spimb040.cpp \
     qfespimb040configtabwidget.cpp \
     qfespimb040opticssetupbase.cpp \
     qfespimb040opticssetup2.cpp \
-    ../../../../../LIB/trunk/jkmathparser.cpp \
-    ../../../../../LIB/trunk/jkiniparser2.cpp \
+    ../../global_lib/jkmathparser.cpp \
+    ../../global_lib/jkiniparser2.cpp \
     qfespimb040overviewacquisitionconfigwidget.cpp \
     qfespimb040finddialog.cpp \
     spimb040optionswidget.cpp
@@ -138,8 +138,8 @@ TRANSLATIONS= ./translations/de.spimb040.ts
 INCLUDEPATH += . \
                ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 QT +=  script
 include(../../quickfit3_configqtwidgets.pri)

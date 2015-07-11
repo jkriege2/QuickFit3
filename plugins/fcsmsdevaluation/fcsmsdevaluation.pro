@@ -81,8 +81,8 @@ TRANSLATIONS= ./translations/de.fcsmsdevaluation.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

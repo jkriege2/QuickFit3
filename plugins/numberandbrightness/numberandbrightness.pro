@@ -41,7 +41,7 @@ HEADERS += qfrdrnumberandbrightness.h \
            qfrdrnumberandbrightness_data.h \
 		   qfrdrnumberandbrightness_dataeditor.h \
     ../base_classes/qfrdrimagingfcstools.h \
-    ../../../../../LIB/trunk/libtiff_tools.h \
+    ../../global_lib/libtiff_tools.h \
     qfrdrnumberandbrightness_overvieweditor.h \
     ../base_classes/qfrdroverviewimagedisplay.h \
     ../base_classes/qfrdrimagemasktools.h \
@@ -55,7 +55,7 @@ SOURCES += qfrdrnumberandbrightness.cpp \
            qfrdrnumberandbrightness_data.cpp \
 		   qfrdrnumberandbrightness_dataeditor.cpp \
     ../base_classes/qfrdrimagingfcstools.cpp \
-    ../../../../../LIB/trunk/libtiff_tools.cpp \
+    ../../global_lib/libtiff_tools.cpp \
     qfrdrnumberandbrightness_overvieweditor.cpp \
     ../base_classes/qfrdroverviewimagedisplay.cpp \
     ../base_classes/qfrdrimagemasktools.cpp \
@@ -76,8 +76,8 @@ TRANSLATIONS= ./translations/de.number_and_brightness.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

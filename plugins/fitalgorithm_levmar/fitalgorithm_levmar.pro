@@ -48,8 +48,8 @@ TRANSLATIONS= ./translations/de.fitalgorithm_levmar.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/ \
+               ../../global_lib/ \
+               ../../global_lib/qt/ \
                .
 SRC_DISTRIBUTED.files = $$HEADERS \
                         $$SOURCES \

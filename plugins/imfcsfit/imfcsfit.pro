@@ -59,7 +59,7 @@ HEADERS += qfpevalimfcsfit.h \
     ../interfaces/qfrdrimfcscorrelatorremote.h \
     ../base_classes/qffcsfitchi2landscapedialog.h\
     ../base_classes/qfimagetransform.h \
-    ../../../../../LIB/trunk/libtiff_tools.h
+    ../../global_lib/libtiff_tools.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -81,7 +81,7 @@ SOURCES += qfpevalimfcsfit.cpp \
     imfcscalibrationwizard.cpp \
     ../base_classes/qffcsfitchi2landscapedialog.cpp\
     ../base_classes/qfimagetransform.cpp \
-    ../../../../../LIB/trunk/libtiff_tools.cpp
+    ../../global_lib/libtiff_tools.cpp
 
 
 
@@ -99,8 +99,8 @@ TRANSLATIONS= ./translations/de.qfevalimfcsfit.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 SRC_DISTRIBUTED.files = $$HEADERS \
                         $$SOURCES \

@@ -54,16 +54,16 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcscorrelationdialog.h \
     qfrdrimagingfcsthreadprogress.h \
     qfrdrimagingfcscorrelationjobthread.h \
-    ../../../../../LIB/trunk/tinytiffwriter.h \
-    ../../../../../LIB/trunk/libtiff_tools.h \
-    ../../../../../LIB/trunk/shiftregister.h \
-    ../../../../../LIB/trunk/multitau-correlator.h \
-    ../../../../../LIB/trunk/correlator_multitau.h \
+    ../../global_lib/tinytiffwriter.h \
+    ../../global_lib/libtiff_tools.h \
+    ../../global_lib/shiftregister.h \
+    ../../global_lib/multitau-correlator.h \
+    ../../global_lib/correlator_multitau.h \
     qfrdrimagingfcsdataexplorer.h \
     qfrdrimagingfcsmaskbyintensity.h \
     qfrdrimagingfcscountratedisplay.h \
     qfrdrimagingfcsoverviewrateeditor.h \
-    ../../../../../LIB/trunk/yaid_rh.h \
+    ../../global_lib/yaid_rh.h \
     qfrdrimagingfcsseriesdialog.h \
     qfrdrimagingfcs_dataeditor_countrate.h \
     qfrdrimagingfcsedittools.h \
@@ -78,10 +78,10 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcsmaskbuilder.h \
     qfrdrimagingfcscopycorrasrdrdialog.h \
     qfrdrimagingfcspostprocessbinningdialog.h \
-    ../../../../../LIB/trunk/textcolor.h \
-    ../../../../../LIB/trunk/crc_ccitt.h \
-    ../../../../../LIB/trunk/crc.h \
-    ../../../../../LIB/trunk/correlator_multitau.h \
+    ../../global_lib/textcolor.h \
+    ../../global_lib/crc_ccitt.h \
+    ../../global_lib/crc.h \
+    ../../global_lib/correlator_multitau.h \
     qfrdrimagingfcs_parserfunctions.h \
     qfrdrimagingfcsdiffusionlawdialog.h
 #    ../base_classes/frawdataimageeditor.h \
@@ -96,8 +96,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcscorrelationdialog.cpp \
     qfrdrimagingfcsthreadprogress.cpp \
     qfrdrimagingfcscorrelationjobthread.cpp \
-    ../../../../../LIB/trunk/tinytiffwriter.cpp \
-    ../../../../../LIB/trunk/libtiff_tools.cpp \
+    ../../global_lib/tinytiffwriter.cpp \
+    ../../global_lib/libtiff_tools.cpp \
     qfrdrimagingfcsdataexplorer.cpp \
     qfrdrimagingfcsmaskbyintensity.cpp \
     qfrdrimagingfcscountratedisplay.cpp \
@@ -146,8 +146,8 @@ TRANSLATIONS= ./translations/de.imaging_fcs.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

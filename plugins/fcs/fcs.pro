@@ -39,10 +39,10 @@ HEADERS += dlgcsvparameters.h \
             qfrdrfcsdata.h \
             qfrdrfcsrateeditor.h \
             qfprdrfcs.h \
-            ../../../../../LIB/trunk/qt/completertextedit.h \
+            ../../global_lib/qt/completertextedit.h \
             qfrdrfcsfitfunctionsimulator.h \
-            ../../../../../LIB/trunk/jkmathparser.h \
-            ../../../../../LIB/trunk/jkiniparser2.h \
+            ../../global_lib/jkmathparser.h \
+            ../../global_lib/jkiniparser2.h \
             ../interfaces/qfrdrsimplecountrateinterface.h \
             ../base_classes/qfcorrelationmasktools.h \
             ../base_classes/qfrdrimagemasktools.h \
@@ -68,10 +68,10 @@ SOURCES += dlgcsvparameters.cpp \
            qfrdrfcsdata.cpp \
            qfrdrfcsrateeditor.cpp \
              qfprdrfcs.cpp \
-    ../../../../../LIB/trunk/qt/completertextedit.cpp \
+    ../../global_lib/qt/completertextedit.cpp \
     qfrdrfcsfitfunctionsimulator.cpp \
-    ../../../../../LIB/trunk/jkmathparser.cpp \
-    ../../../../../LIB/trunk/jkiniparser2.cpp \
+    ../../global_lib/jkmathparser.cpp \
+    ../../global_lib/jkiniparser2.cpp \
     ../base_classes/qfcorrelationmasktools.cpp \
     ../base_classes/qfrdrimagemasktools.cpp \
     ../base_classes/qffinderroneouscorrelationdlg.cpp \
@@ -97,8 +97,8 @@ TRANSLATIONS= ./translations/de.fcs.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

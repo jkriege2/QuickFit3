@@ -65,8 +65,8 @@ TRANSLATIONS= ../../output/assets/translations/de.fit_gsl.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 SRC_DISTRIBUTED.files = $$HEADERS \
                         $$SOURCES \

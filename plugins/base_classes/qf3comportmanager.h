@@ -26,7 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QString>
 #include <QSettings>
 #include <QMutex>
-#include "../../../../../LIB/trunk/jkserialconnection.h"
+#include "../../global_lib/jkserialconnection.h"
 
 /*! \brief you may use this class to manage a list of COM ports.
     \ingroup qf3extensionplugins

@@ -36,13 +36,13 @@ include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += meas_spadmeasurement.h \
-           ../../../../../LIB/trunk/jkserialconnection.h \
+           ../../global_lib/jkserialconnection.h \
     ../base_classes/qf3simpleb040serialprotocolhandler.h \
     ../base_classes/qf3comportmanager.h \
     ../interfaces/qfextensionmeasurementdevice.h
 
 SOURCES += meas_spadmeasurement.cpp \
-           ../../../../../LIB/trunk/jkserialconnection.cpp \
+           ../../global_lib/jkserialconnection.cpp \
     ../base_classes/qf3simpleb040serialprotocolhandler.cpp \
     ../base_classes/qf3comportmanager.cpp
 
@@ -54,8 +54,8 @@ TRANSLATIONS= ./translations/de.meas_spadmeasurement.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

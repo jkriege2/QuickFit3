@@ -27,8 +27,8 @@ DEPENDPATH += . \
 INCLUDEPATH += . \
                ../lib/ \
                ../libqf3widgets/ \
-               ../../../../LIB/trunk/ \
-               ../../../../LIB/trunk/qt
+               ../global_lib/ \
+               ../global_lib/qt
 
 include(../quickfit3.pri)
 include(../libquickfitwidgets.pri)
@@ -128,7 +128,7 @@ RESOURCES += quickfit3.qrc \
 
 TRANSLATIONS= ./translations/de.ts
 
-INCLUDEPATH += ../../../../LIB/trunk/
+INCLUDEPATH += ../global_lib/
 
 win32 {
     RC_FILE = quickfit3.rc

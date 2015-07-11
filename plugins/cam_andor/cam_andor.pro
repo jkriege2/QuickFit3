@@ -41,21 +41,21 @@ include(../../libquickfitwidgets.pri)
 HEADERS += cam_andor.h \
            camandoracquisitionthread.h \
            ../interfaces/qfextensioncamera.h \
-           ../../../../../LIB/trunk/highrestimer.h \
+           ../../global_lib/highrestimer.h \
            andorglobalcamerasettingswidget.h \
            andorsettingsdialog.h \
            andortools.h \
-           ../../../../../LIB/trunk/tinytiffwriter.h \
+           ../../global_lib/tinytiffwriter.h \
            ../interfaces/qfextensionshutter.h \
     ../interfaces/qfextensionmeasurementdevice.h
 
 SOURCES += cam_andor.cpp \
            camandoracquisitionthread.cpp \
-           ../../../../../LIB/trunk/highrestimer.cpp \
+           ../../global_lib/highrestimer.cpp \
            andorglobalcamerasettingswidget.cpp \
            andorsettingsdialog.cpp \
            andortools.cpp \
-           ../../../../../LIB/trunk/tinytiffwriter.cpp
+           ../../global_lib/tinytiffwriter.cpp
 
 FORMS = \
     andorglobalcamerasettingswidget.ui \
@@ -67,9 +67,9 @@ TRANSLATIONS= ./translations/de.cam_andor.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/ \
-               ../../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/ \
+               ../../../global_lib/qt/
 
 
 

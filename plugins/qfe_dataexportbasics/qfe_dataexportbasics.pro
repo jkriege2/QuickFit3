@@ -48,8 +48,8 @@ TRANSLATIONS= ./translations/de.qfe_dataexportbasics.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(xlslib.pri)
 

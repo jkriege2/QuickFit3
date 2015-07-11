@@ -36,7 +36,7 @@ DESTDIR = $${QFOUTPUT}/plugins/
 HEADERS += \
     ../base_classes/qf3comportmanager.h \
     ../interfaces/qfextensionlightsource.h \
-    ../../../../../LIB/trunk/jkserialconnection.h \
+    ../../global_lib/jkserialconnection.h \
     qfextensioncoboltlaser.h \
     qfcoboltlaserprotocolhandler.h \
     ../base_classes/qfsimpleserialprotocolhandler.h \
@@ -45,7 +45,7 @@ HEADERS += \
 
 SOURCES += \
     ../base_classes/qf3comportmanager.cpp \
-    ../../../../../LIB/trunk/jkserialconnection.cpp \
+    ../../global_lib/jkserialconnection.cpp \
     qfextensioncoboltlaser.cpp \
     qfcoboltlaserprotocolhandler.cpp \
     ../base_classes/qfsimpleserialprotocolhandler.cpp
@@ -58,8 +58,8 @@ TRANSLATIONS= ./translations/de.lights_coboltlaser.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

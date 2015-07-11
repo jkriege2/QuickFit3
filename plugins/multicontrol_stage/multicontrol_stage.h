@@ -12,7 +12,7 @@
 #include <QVector>
 #include "qfextension.h"
 #include "qfextensionlinearstage.h"
-#include "../../../../../LIB/trunk/jkserialconnection.h"
+#include "../../global_lib/jkserialconnection.h"
 #include "mcstagecontroller.h"
 #include "multicontrol_settingsdialog.h"
 

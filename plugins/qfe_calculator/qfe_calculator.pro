@@ -55,8 +55,8 @@ TRANSLATIONS= ./translations/de.qfe_calculator.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 
 HELPREF_FILES.files = ./help/parserreference/*.*

@@ -41,7 +41,7 @@ HEADERS += qfrdrtable.h \
     qfrdrtableplotwidget.h \
     qftablepluginmodel.h \
     qfrdrtablecolumnvaluesdialog.h \
-    ../../../../../LIB/trunk/jkmathparser.h \
+    ../../global_lib/jkmathparser.h \
     qfrdrtableformuladialog.h \
     qfrdrtablesortdialog.h \
     qfrdrtablehistogramdialog.h \
@@ -69,7 +69,7 @@ SOURCES += qfrdrtable.cpp \
     qfrdrtableplotwidget.cpp \
     qftablepluginmodel.cpp \
     qfrdrtablecolumnvaluesdialog.cpp \
-    ../../../../../LIB/trunk/jkmathparser.cpp \
+    ../../global_lib/jkmathparser.cpp \
     qfrdrtableformuladialog.cpp \
     qfrdrtablesortdialog.cpp \
     qfrdrtablehistogramdialog.cpp \
@@ -113,7 +113,7 @@ RESOURCES += qfrdrtable.qrc \
 TRANSLATIONS= ./translations/de.qfrdrtable.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../../../../LIB/trunk/
+               ../../global_lib/
 
 QT += gui xml
 CONFIG += exceptions rtti stl

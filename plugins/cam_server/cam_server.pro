@@ -47,15 +47,15 @@ TRANSLATIONS= ./translations/de.cam_server.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 
 
-EXAMPLESTINYTIFF_FILES.files = ../../../../../LIB/trunk/tinytiff*.*
+EXAMPLESTINYTIFF_FILES.files = ../../global_lib/tinytiff*.*
 EXAMPLESTINYTIFF_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
-EXAMPLESHIGHRESTIMER_FILES.files = ../../../../../LIB/trunk/highrestimer.*
+EXAMPLESHIGHRESTIMER_FILES.files = ../../global_lib/highrestimer.*
 EXAMPLESHIGHRESTIMER_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
 
 

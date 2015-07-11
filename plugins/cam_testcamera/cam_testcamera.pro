@@ -39,10 +39,10 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += cam_testcamera.h \
            ../interfaces/qfextensioncamera.h \
-           ../../../../../LIB/trunk/highrestimer.h
+           ../../global_lib/highrestimer.h
 
 SOURCES += cam_testcamera.cpp \
-           ../../../../../LIB/trunk/highrestimer.cpp
+           ../../global_lib/highrestimer.cpp
 
 FORMS =
 
@@ -52,8 +52,8 @@ TRANSLATIONS= ./translations/de.cam_testcamera.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

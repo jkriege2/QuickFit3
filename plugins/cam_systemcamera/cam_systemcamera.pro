@@ -35,7 +35,7 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qfecamsystemcamera.h \
            ../interfaces/qfextensioncamera.h \
-        ../../../../../LIB/trunk/videocapture.h \
+        ../../global_lib/videocapture.h \
     syscamconfigdialog.h
 
 SOURCES += qfecamsystemcamera.cpp \
@@ -44,12 +44,12 @@ SOURCES += qfecamsystemcamera.cpp \
 
 unix {
   LIBS +=
-  SOURCES += ../../../../../LIB/trunk/videocapture_v4l2.cpp
+  SOURCES += ../../global_lib/videocapture_v4l2.cpp
 }
 
 win32 {
   LIBS += -lgdi32 -luser32 -lkernel32 -lvfw32
-  SOURCES += ../../../../../LIB/trunk/videocapture_vfw.cpp
+  SOURCES += ../../global_lib/videocapture_vfw.cpp
 }
 
 
@@ -62,8 +62,8 @@ TRANSLATIONS= ./translations/de.cam_systemcam.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

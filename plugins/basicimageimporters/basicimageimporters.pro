@@ -33,27 +33,27 @@ DESTDIR = $$QFOUTPUT/plugins
 # Input
 HEADERS += qfbasicimageimporters.h \
            qfimagereaderlibtiff.h \
-    ../../../../../LIB/trunk/libtiff_tools.h \
+    ../../global_lib/libtiff_tools.h \
     qfimagereaderradhard.h \
-    ../../../../../LIB/trunk/crc_ccitt.h \
-    ../../../../../LIB/trunk/crc.h \
-    ../../../../../LIB/trunk/frame.h \
+    ../../global_lib/crc_ccitt.h \
+    ../../global_lib/crc.h \
+    ../../global_lib/frame.h \
     qfbasicimageimportersoptionswidget.h \
     qfimagereadertinytiff.h \
-    ../../../../../LIB/trunk/tinytiffwriter.h \
-    ../../../../../LIB/trunk/tinytiffreader.h \
+    ../../global_lib/tinytiffwriter.h \
+    ../../global_lib/tinytiffreader.h \
     qfimagereaderdiffusion4binary.h \
-    ../../../../../LIB/trunk/helper.h \
+    ../../global_lib/helper.h \
     qfimagereaderraw.h
 
 SOURCES += qfbasicimageimporters.cpp\
            qfimagereaderlibtiff.cpp \
-    ../../../../../LIB/trunk/libtiff_tools.cpp \
+    ../../global_lib/libtiff_tools.cpp \
     qfimagereaderradhard.cpp \
     qfbasicimageimportersoptionswidget.cpp \
     qfimagereadertinytiff.cpp \
-    ../../../../../LIB/trunk/tinytiffwriter.cpp \
-    ../../../../../LIB/trunk/tinytiffreader.cpp \
+    ../../global_lib/tinytiffwriter.cpp \
+    ../../global_lib/tinytiffreader.cpp \
     qfimagereaderdiffusion4binary.cpp \
     qfimagereaderraw.cpp
 
@@ -69,15 +69,15 @@ TRANSLATIONS= ./translations/de.importers_basicimages.ts
 INCLUDEPATH += ../../lib/
 
 
-TINYTIFF_FILES.files = ../../../../../LIB/trunk/tinytiffwriter.cpp \
-                       ../../../../../LIB/trunk/tinytiffreader.cpp  \
-                       ../../../../../LIB/trunk/tinytiffwriter.h \
-                       ../../../../../LIB/trunk/tinytiffreader.h \
+TINYTIFF_FILES.files = ../../global_lib/tinytiffwriter.cpp \
+                       ../../global_lib/tinytiffreader.cpp  \
+                       ../../global_lib/tinytiffwriter.h \
+                       ../../global_lib/tinytiffreader.h \
                        $$GPL3LICENSE
 TINYTIFF_FILES.path = $${QFOUTPUT}/source/tinytiff/
-tinytiff_reader_test_FILES.files = ../../../../../LIB/trunk/test/tinytiff_reader_test/*.*
+tinytiff_reader_test_FILES.files = ../../global_lib/test/tinytiff_reader_test/*.*
 tinytiff_reader_test_FILES.path = $${QFOUTPUT}/source/tinytiff/test/tinytiff_reader_test
-tinytiffwriter_test_FILES.files = ../../../../../LIB/trunk/test/tinytiffwriter_test/*.*
+tinytiffwriter_test_FILES.files = ../../global_lib/test/tinytiffwriter_test/*.*
 tinytiffwriter_test_FILES.path = $${QFOUTPUT}/source/tinytiff/test/tinytiffwriter_test
 
 INSTALLS += TINYTIFF_FILES \

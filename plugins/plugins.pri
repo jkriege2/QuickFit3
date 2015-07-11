@@ -27,8 +27,8 @@ include(../quickfit_config.pri)
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/ \
+               ../../global_lib/ \
+               ../../global_lib/qt/ \
                ../interfaces \
                ../base_classes \
                ../../extlibs/

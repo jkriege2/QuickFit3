@@ -37,14 +37,14 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += \
            ../interfaces/qfextensionlinearstage.h \
-           ../../../../../LIB/trunk/jkserialconnection.h \
+           ../../global_lib/jkserialconnection.h \
     multicontrol_stage.h \
     mcstagecontroller.h \
     ../b040_ffmcontrol/ffmmainlogfile.h \
     multicontrol_settingsdialog.h
 
 SOURCES += \
-           ../../../../../LIB/trunk/jkserialconnection.cpp \
+           ../../global_lib/jkserialconnection.cpp \
     multicontrol_stage.cpp \
     mcstagecontroller.cpp \
     ../b040_ffmcontrol/ffmmainlogfile.cpp \
@@ -59,8 +59,8 @@ TRANSLATIONS= ./translations/de.stage_mc2000.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

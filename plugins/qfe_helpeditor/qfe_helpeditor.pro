@@ -75,8 +75,8 @@ TRANSLATIONS= ./translations/de.qfe_helpeditor.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 ASSETSe_FILES.files = ./assets/examples/*.*
 ASSETSe_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/examples

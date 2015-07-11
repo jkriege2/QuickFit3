@@ -37,12 +37,12 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += stage_pi.h \
            ../interfaces/qfextensionlinearstage.h \
-           ../../../../../LIB/trunk/jkserialconnection.h \
+           ../../global_lib/jkserialconnection.h \
     pimercury863calibrationdialog.h \
     ../base_classes/qf3comportmanager.h
 
 SOURCES += stage_pi.cpp \
-           ../../../../../LIB/trunk/jkserialconnection.cpp \
+           ../../global_lib/jkserialconnection.cpp \
     pimercury863calibrationdialog.cpp \
     ../base_classes/qf3comportmanager.cpp
 
@@ -54,8 +54,8 @@ TRANSLATIONS= ./translations/de.stage_pi863.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../global_lib/ \
+               ../../global_lib/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 
