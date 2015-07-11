@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/QKeySequenceEdit">
+        <file alias="clear.png">images/qkeysequenceedit_clear.png</file>
+    </qresource>
+</RCC>

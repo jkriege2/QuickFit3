@@ -1,0 +1,23 @@
+TARGET  := statistics_test
+SRCS    := test.cpp  ../../statistics_tools.cpp
+OBJS    := ${SRCS:.cpp=.o} 
+
+CCFLAGS = -O2 -Wall -Werror -ggdb 
+LDFLAGS = -lm
+LIBS    = 
+CC      = g++
+
+.PHONY: all clean distclean 
+all:: ${TARGET} 
+
+
+${TARGET}: ${OBJS} 
+	${CC} ${LDFLAGS} -o $@ $^ ${LIBS} 
+
+${OBJS}: %.o: %.cpp
+	${CC} ${CCFLAGS} -o $@ -c $< 
+
+clean:: 
+	-rm -f *~ *.o ${TARGET} 
+
+distclean:: clean

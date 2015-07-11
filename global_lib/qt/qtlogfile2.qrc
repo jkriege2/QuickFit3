@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/QtLogFile2Model">
+        <file alias="log_error.png">images/log_error.png</file>
+        <file alias="log_warning.png">images/log_warning.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="executetoolbutton.png">images/flash.png</file>
+    <file alias="fileselecttoolbutton.png">images/folder_open.png</file>
+    <file alias="wwwtoolbutton.png">images/network.png</file>
+</qresource>
+</RCC>

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/NumberEdit">
+        <file alias="btn_down.png">images/numberedit_down.png</file>
+        <file alias="btn_up.png">images/numberedit_up.png</file>
+    </qresource>
+</RCC>

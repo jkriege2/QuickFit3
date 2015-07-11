@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/qtlogfile">
+        <file alias="find.png">images/find.png</file>
+        <file alias="findnext.png">images/findnext.png</file>
+        <file alias="findprev.png">images/findprev.png</file>
+        <file alias="copy.png">images/edit_copy.png</file>
+        <file alias="clearall.png">images/clearall.png</file>
+        <file alias="openfolder.png">images/openfolder.png</file>
+    </qresource>
+</RCC>

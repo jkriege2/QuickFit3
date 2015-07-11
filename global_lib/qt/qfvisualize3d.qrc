@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/QFVisualize3DGLWidget">
+        <file alias="volviz_stdfragmentshader.frag">qfvisualize3d_shaders/volviz_stdfragmentshader.frag</file>
+        <file alias="volviz_stdvertexshader.vert">qfvisualize3d_shaders/volviz_stdvertexshader.vert</file>
+    </qresource>
+</RCC>

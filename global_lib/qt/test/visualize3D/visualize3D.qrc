@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/visualize3d">
+        <file>lena.jpg</file>
+    </qresource>
+</RCC>

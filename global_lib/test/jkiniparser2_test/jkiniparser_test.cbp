@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="jkiniparser2_test" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="jkiniparser2_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="D:\kriegerj\c++\lib\test\jkiniparser2_test\.objs" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DJKIP_USE_MATHPARSER" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="..\..\jkiniparser2.cpp" />
+		<Unit filename="..\..\jkiniparser2.h" />
+		<Unit filename="..\..\jkmathparser.cpp" />
+		<Unit filename="..\..\jkmathparser.h" />
+		<Unit filename="diffusion3.ini" />
+		<Unit filename="jkiniparser2_test.cpp" />
+		<Unit filename="test.ini" />
+		<Unit filename="test1.ini" />
+		<Unit filename="test2.ini" />
+		<Unit filename="..\..\tools.cpp" />
+		<Unit filename="..\..\tools.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

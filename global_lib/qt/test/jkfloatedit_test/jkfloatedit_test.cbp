@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="jkfloatedit_test" />
+		<Option makefile_is_custom="1" />
+		<Option execution_dir="." />
+		<Option pch_mode="2" />
+		<Option compiler="gnu_gcc_compiler_450" />
+		<MakeCommands>
+			<Build command="$make -f $makefile.$target" />
+			<CompileFile command="$make -f $makefile.$target $file" />
+			<Clean command="$make -f.$makefile clean" />
+			<DistClean command="$make -f $makefile.$target distclean" />
+			<AskRebuildNeeded command="$make -q -f $makefile.$target" />
+			<SilentBuild command="$make -s -f $makefile.$target" />
+		</MakeCommands>
+		<Build>
+			<Target title="Debug">
+				<Option output="jkfloatedit_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_compiler_450" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<ExtraCommands>
+					<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
+				</ExtraCommands>
+				<MakeCommands>
+					<Build command="$make -f $makefile.$target" />
+					<CompileFile command="$make -f $makefile.$target $file" />
+					<Clean command="$make -f $makefile clean" />
+					<DistClean command="$make -f $makefile.$target distclean" />
+					<AskRebuildNeeded command="$make -q -f $makefile.$target" />
+					<SilentBuild command="$make -s -f $makefile.$target" />
+				</MakeCommands>
+			</Target>
+			<Target title="Release">
+				<Option output="jkfloatedit_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_compiler_450" />
+				<ExtraCommands>
+					<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
+				</ExtraCommands>
+				<MakeCommands>
+					<Build command="$make -f $makefile.$target" />
+					<CompileFile command="$make -f $makefile.$target $file" />
+					<Clean command="$make -f $makefile clean" />
+					<DistClean command="$make -f $makefile.$target distclean" />
+					<AskRebuildNeeded command="$make -q -f $makefile.$target" />
+					<SilentBuild command="$make -s -f $makefile.$target" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<ExtraCommands>
+			<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
+		</ExtraCommands>
+		<Unit filename="..\..\jkdoubleedit.cpp" />
+		<Unit filename="..\..\jkdoubleedit.h" />
+		<Unit filename="jkfloatedit_test.cpp" />
+		<Unit filename="jkfloatedit_test.pro" />
+		<Unit filename="testmain.cpp" />
+		<Unit filename="testmain.h" />
+		<Extensions>
+			<code_completion>
+				<search_path add="$(#qt4)/include" />
+				<search_path add="$(#qt4)\include\include\ActiveQt" />
+				<search_path add="$(#qt4)\include\Phonon" />
+				<search_path add="$(#qt4)\include\Qt" />
+				<search_path add="$(#qt4)\include\QtCore" />
+				<search_path add="$(#qt4)\include\QtGui" />
+				<search_path add="$(#qt4)\include\QtNetwork" />
+				<search_path add="$(#qt4)\include\QtOpenGL" />
+				<search_path add="$(#qt4)\include\QtHelp" />
+				<search_path add="$(#qt4)\include\QtScript" />
+				<search_path add="$(#qt4)\include\QtScriptTools" />
+				<search_path add="$(#qt4)\include\QtSql" />
+				<search_path add="$(#qt4)\include\QtSvg" />
+				<search_path add="$(#qt4)\include\QtWebKit" />
+				<search_path add="$(#qt4)\include\QtXml" />
+				<search_path add="$(#qt4)\include\QtXmlPatterns" />
+			</code_completion>
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

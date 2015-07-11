@@ -1,0 +1,26 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource prefix="/jkstyledbutton">
+    <file alias="network.png">images/network.png</file>
+    <file alias="network_disabled.png">images/network_disabled.png</file>
+    <file alias="network_hover.png">images/network_hover.png</file>
+    <file alias="network_pressed.png">images/network_active.png</file>
+    <file alias="execute.png">images/execute.png</file>
+    <file alias="execute_disabled.png">images/execute_disabled.png</file>
+    <file alias="execute_hover.png">images/execute_hover.png</file>
+    <file alias="execute_pressed.png">images/execute_active.png</file>
+    <file alias="openfile.png">images/fileopen.png</file>
+    <file alias="openfile_disabled.png">images/fileopen_disabled.png</file>
+    <file alias="openfile_hover.png">images/fileopen_hover.png</file>
+    <file alias="openfile_pressed.png">images/fileopen_active.png</file>
+    <file alias="selectfile.png">images/fileselect.png</file>
+    <file alias="selectfile_disabled.png">images/fileselect_disabled.png</file>
+    <file alias="selectfile_hover.png">images/fileselect_hover.png</file>
+    <file alias="selectfile_pressed.png">images/fileselect_active.png</file>
+    <file alias="clear_edt.png">images/clear_edt.png</file>
+    <file alias="clear_edt_disabled.png">images/clear_edt_disabled.png</file>
+    <file alias="clear_edt_hover.png">images/clear_edt_hover.png</file>
+    <file alias="clear_edt_pressed.png">images/clear_edt_pressed.png</file>
+</qresource>
+
+</RCC>

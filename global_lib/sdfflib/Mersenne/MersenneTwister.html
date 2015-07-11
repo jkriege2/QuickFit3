@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+	<meta name="Author" content="Richard Joseph Wagner">
+	<meta name="Description" content="C++ class implementing the Mersenne Twister random number generator">
+	<meta name="Keywords" content="Mersenne,Twister,MT,random,number,generator,RNG,pseudorandom,PRNG,C++,class,MTRand">
+	<link href="main.css" rel="stylesheet" type="text/css">
+	<style type="text/css">
+		body { background: url("AntBlueMaize.jpg"); }
+		tr { text-indent: 2em }
+	</style>
+	<title>Mersenne Twister Random Number Generator</title>
+</head>
+
+<body>
+
+<h1>Mersenne Twister Random Number Generator</h1>
+
+The Mersenne Twister is an algorithm for generating random numbers.
+It was designed with consideration of the flaws in various other generators.
+The period, 2^19937-1, and the order of equidistribution, 623 dimensions, are far greater.
+The generator is also fast; it avoids multiplication and division, and it benefits from caches and pipelines.
+See the
+<a href="http://www.math.keio.ac.jp/~matumoto/emt.html">inventors' page</a>
+for more details.
+
+<p>I have implemented the Mersenne Twister in a C++ class that is fast, convenient, portable, and free.
+Take a look at the
+<a href="MersenneTwister.h">class</a>
+or download the complete package in
+<a href="Mersenne-1.0.zip">zip</a>
+or
+<a href="Mersenne-1.0.tar.gz">tarball</a>
+format.
+
+<p>Features:
+<ul>
+	<li>Simple creation of generator with <code>MTRand r;</code>
+	<li>Convenient access with <code>double a = r();</code>
+	<li>Generation of integers or floating-point numbers
+	<li>Easy seeding options
+	<ul>
+		<li>Automatically from <code>/dev/urandom</code> or <code>time()</code> and <code>clock()</code>
+		<li>Single integer
+		<li>Arrays of any length (to access full 19937-bit range)
+	</ul>
+	<li>Ability to save and restore state
+	<li>Thorough example program
+	<li>Validation and performance tests
+	<li>Open source code under BSD license
+</ul>
+
+<p>On my system, a Pentium III running Linux at 500 MHz, the performance test gives the following results for generation of random integers:
+<table>
+	<tr><td>MersenneTwister.h</td><td>28.4 million per second</td></tr>
+	<tr><td>Inventors' C version</td><td>14.3 million per second</td></tr>
+	<tr><td>Cokus's optimized C version</td><td>16.6 million per second</td></tr>
+	<tr><td>Standard rand()</td><td>6.8 million per second</td></tr>
+</table>
+
+<p>The latest version, v1.0, incorporates several changes released by the Mersenne Twister inventors on 26 January 2002.  The seeding algorithm was revised to correct a minor problem in which the highest bit of the seed was not well represented in the generator state.  The ability to start with large seeds was extended to seed arrays of arbitrary length.  Access was added for 53-bit real numbers in [0,1), matching the accuracy of IEEE doubles.  Also, the software license was changed from the GNU Lesser General Public License to a BSD license, making commercial use of this software more convenient.
+
+<p>The v1.0 release includes some other improvements as well.  By popular demand, access was added for real numbers from normal (Gaussian) distributions.  Safeguards were added to prevent out-of-range number generation on 64-bit machines.  Finally, new optimizations yield 25% faster generation overall and 100% faster generation for integers in [0,n].
+
+<!-- counter included only in online version -->
+
+<p><table align=center><tr>
+	<td><a href="http://www-personal.engin.umich.edu/~wagnerr/index.html">
+		<img class="nav" src="ArrowHome.gif" alt="^ home" height=16 width=16 border=0>
+	</a></td>
+	<td><span class="center"><address>
+		Rick Wagner (
+		<a href="mailto:rjwagner@writeme.com">rjwagner@writeme.com</a>
+		) 15 May 03
+	</address></span></td>
+</table>
+
+</body>
+</html>

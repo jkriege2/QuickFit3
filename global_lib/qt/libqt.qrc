@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/lib/qt">
+        <file alias="dblbtn_down.png">images/btn_down.png</file>
+        <file alias="dblbtn_up.png">images/btn_up.png</file>
+    </qresource>
+</RCC>
