@@ -155,3 +155,11 @@ Thumbs.db
 /output/qf3icon.ico
 /output/qf3icon_old.ico
 /output/quickfit3.exe
+/output/plugins
+/output/qtplugins
+/output/sdk
+/output/source
+/output/assets
+/output/examples
+/output/globalconfig_templates
+/quickfit.inc
