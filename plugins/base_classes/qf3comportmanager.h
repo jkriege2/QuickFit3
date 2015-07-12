@@ -26,7 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QString>
 #include <QSettings>
 #include <QMutex>
-#include "../../global_lib/qfserialconnection.h"
+#include "qfserialconnection.h"
 
 /*! \brief you may use this class to manage a list of COM ports.
     \ingroup qf3extensionplugins
