@@ -121,7 +121,7 @@ unsigned int QFExtensionB040LaserBox::getLightSourceCount() {
 
 void QFExtensionB040LaserBox::lightSourceConnect(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return;
 
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -150,7 +150,7 @@ void QFExtensionB040LaserBox::lightSourceConnect(unsigned int lightSource) {
 
 void QFExtensionB040LaserBox::lightSourceDisonnect(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return;
 
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -164,7 +164,7 @@ void QFExtensionB040LaserBox::setLightSourceLogging(QFPluginLogService *logServi
 
 bool QFExtensionB040LaserBox::isLightSourceConnected(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
     QMutexLocker locker(mutex);
@@ -173,7 +173,7 @@ bool QFExtensionB040LaserBox::isLightSourceConnected(unsigned int lightSource) {
 
 unsigned int QFExtensionB040LaserBox::getLightSourceLineCount(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return 0;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return 0;
     return 1;
 }
@@ -181,7 +181,7 @@ unsigned int QFExtensionB040LaserBox::getLightSourceLineCount(unsigned int light
 QString QFExtensionB040LaserBox::getLightSourceLineDescription(unsigned int lightSource, unsigned int wavelengthLine) {
     Q_UNUSED(wavelengthLine);
     if (lightSource>=getLightSourceCount()) return "";
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return QString("");
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -195,7 +195,7 @@ void QFExtensionB040LaserBox::getLightSourceLinePowerRange(unsigned int lightSou
     minimum=maximum=0;
     Q_UNUSED(wavelengthLine);
     if (lightSource>=getLightSourceCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -214,7 +214,7 @@ QString QFExtensionB040LaserBox::getLightSourceLinePowerUnit(unsigned int lightS
 void QFExtensionB040LaserBox::setLightSourcePower(unsigned int lightSource, unsigned int wavelengthLine, double power) {
     Q_UNUSED(wavelengthLine);
     if (lightSource>=getLightSourceCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -226,7 +226,7 @@ void QFExtensionB040LaserBox::setLightSourcePower(unsigned int lightSource, unsi
 double QFExtensionB040LaserBox::getLightSourceCurrentSetPower(unsigned int lightSource, unsigned int wavelengthLine) {
     Q_UNUSED(wavelengthLine);
     if (lightSource>=getLightSourceCount()) return 0;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
     QMutexLocker locker(mutex);
@@ -237,7 +237,7 @@ double QFExtensionB040LaserBox::getLightSourceCurrentSetPower(unsigned int light
 double QFExtensionB040LaserBox::getLightSourceCurrentMeasuredPower(unsigned int lightSource, unsigned int wavelengthLine) {
     Q_UNUSED(wavelengthLine);
     if (lightSource>=getLightSourceCount()) return 0;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return 0;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -249,7 +249,7 @@ double QFExtensionB040LaserBox::getLightSourceCurrentMeasuredPower(unsigned int 
 void QFExtensionB040LaserBox::setLightSourceLineEnabled(unsigned int lightSource, unsigned int wavelengthLine, bool enabled) {
     Q_UNUSED(wavelengthLine);
     if (lightSource>=getLightSourceCount()) return ;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -262,7 +262,7 @@ void QFExtensionB040LaserBox::setLightSourceLineEnabled(unsigned int lightSource
 bool QFExtensionB040LaserBox::getLightSourceLineEnabled(unsigned int lightSource, unsigned int wavelengthLine) {
     Q_UNUSED(wavelengthLine);
     if (lightSource>=getLightSourceCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return false;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -272,7 +272,7 @@ bool QFExtensionB040LaserBox::getLightSourceLineEnabled(unsigned int lightSource
 
 bool QFExtensionB040LaserBox::isLastLightSourceActionFinished(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return false;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -282,7 +282,7 @@ bool QFExtensionB040LaserBox::isLastLightSourceActionFinished(unsigned int light
 
 QString QFExtensionB040LaserBox::getLightSourceDescription(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return "";
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return QString("");
     return tr("B040 Laser Remote Control");
@@ -290,7 +290,7 @@ QString QFExtensionB040LaserBox::getLightSourceDescription(unsigned int lightSou
 
 QString QFExtensionB040LaserBox::getLightSourceShortName(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return "";
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return QString("");
     return tr("Laser Box");

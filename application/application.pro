@@ -28,7 +28,9 @@ INCLUDEPATH += . \
                ../lib/ \
                ../libqf3widgets/ \
                ../global_lib/ \
-               ../global_lib/qt
+               ../global_lib/qt \
+               ../extlibsb040/StatisticsTools/ \
+               ../extlibsb040/JKQtPlotter/
 
 include(../quickfit3.pri)
 include(../libquickfitwidgets.pri)

@@ -118,7 +118,7 @@ unsigned int QFExtensionShutterServoArduino::getShutterCount() {
 
 void QFExtensionShutterServoArduino::shutterConnect(unsigned int shutter) {
     if (shutter>=getShutterCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -145,7 +145,7 @@ void QFExtensionShutterServoArduino::shutterConnect(unsigned int shutter) {
 
 void QFExtensionShutterServoArduino::shutterDisonnect(unsigned int shutter) {
     if (shutter>=getShutterCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -154,7 +154,7 @@ void QFExtensionShutterServoArduino::shutterDisonnect(unsigned int shutter) {
 
 bool QFExtensionShutterServoArduino::isShutterConnected(unsigned int shutter) {
     if (shutter>=getShutterCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -163,7 +163,7 @@ bool QFExtensionShutterServoArduino::isShutterConnected(unsigned int shutter) {
 
 bool QFExtensionShutterServoArduino::isShutterOpen(unsigned int shutter)  {
     if (shutter>=getShutterCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -176,7 +176,7 @@ bool QFExtensionShutterServoArduino::isShutterOpen(unsigned int shutter)  {
 
 void QFExtensionShutterServoArduino::setShutterState(unsigned int shutter, bool opened) {
     if (shutter>=getShutterCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return ;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);

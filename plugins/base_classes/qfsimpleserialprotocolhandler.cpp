@@ -26,7 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QTime>
 #include <QDebug>
 
-QFSimpleSerialProtocolHandler::QFSimpleSerialProtocolHandler(JKSerialConnection *com, QString name, const QString &sendTerminationString, const QString &receiveReadUntilString)
+QFSimpleSerialProtocolHandler::QFSimpleSerialProtocolHandler(QFSerialConnection *com, QString name, const QString &sendTerminationString, const QString &receiveReadUntilString)
 {
     this->com=com;
     this->log=NULL;

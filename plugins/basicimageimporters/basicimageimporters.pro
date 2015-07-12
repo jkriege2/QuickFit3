@@ -28,32 +28,28 @@ DEPENDPATH += ./
 include(../plugins.pri)
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
+include(../../extlibsb040/tinytiff.pri)
+
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input
 HEADERS += qfbasicimageimporters.h \
            qfimagereaderlibtiff.h \
-    ../../global_lib/libtiff_tools.h \
     qfimagereaderradhard.h \
     ../../global_lib/crc_ccitt.h \
     ../../global_lib/crc.h \
     ../../global_lib/frame.h \
     qfbasicimageimportersoptionswidget.h \
     qfimagereadertinytiff.h \
-    ../../global_lib/tinytiffwriter.h \
-    ../../global_lib/tinytiffreader.h \
     qfimagereaderdiffusion4binary.h \
     ../../global_lib/helper.h \
     qfimagereaderraw.h
 
 SOURCES += qfbasicimageimporters.cpp\
            qfimagereaderlibtiff.cpp \
-    ../../global_lib/libtiff_tools.cpp \
     qfimagereaderradhard.cpp \
     qfbasicimageimportersoptionswidget.cpp \
     qfimagereadertinytiff.cpp \
-    ../../global_lib/tinytiffwriter.cpp \
-    ../../global_lib/tinytiffreader.cpp \
     qfimagereaderdiffusion4binary.cpp \
     qfimagereaderraw.cpp
 
@@ -66,18 +62,19 @@ RESOURCES += \
 TRANSLATIONS= ./translations/de.importers_basicimages.ts
 
 
-INCLUDEPATH += ../../lib/
+INCLUDEPATH += ../../lib/ \
+               ../../extlibsb040/TinyTIFF/
 
 
-TINYTIFF_FILES.files = ../../global_lib/tinytiffwriter.cpp \
-                       ../../global_lib/tinytiffreader.cpp  \
-                       ../../global_lib/tinytiffwriter.h \
-                       ../../global_lib/tinytiffreader.h \
+TINYTIFF_FILES.files = ../../extlibsb040/TinyTIFF/tinytiffwriter.cpp \
+                       ../../extlibsb040/TinyTIFF/tinytiffreader.cpp  \
+                       ../../extlibsb040/TinyTIFF/tinytiffwriter.h \
+                       ../../extlibsb040/TinyTIFF/tinytiffreader.h \
                        $$GPL3LICENSE
 TINYTIFF_FILES.path = $${QFOUTPUT}/source/tinytiff/
-tinytiff_reader_test_FILES.files = ../../global_lib/test/tinytiff_reader_test/*.*
+tinytiff_reader_test_FILES.files = ../../extlibsb040/TinyTIFF/test/tinytiff_reader_test/*.*
 tinytiff_reader_test_FILES.path = $${QFOUTPUT}/source/tinytiff/test/tinytiff_reader_test
-tinytiffwriter_test_FILES.files = ../../global_lib/test/tinytiffwriter_test/*.*
+tinytiffwriter_test_FILES.files = ../../extlibsb040/TinyTIFF/test/tinytiffwriter_test/*.*
 tinytiffwriter_test_FILES.path = $${QFOUTPUT}/source/tinytiff/test/tinytiffwriter_test
 
 INSTALLS += TINYTIFF_FILES \

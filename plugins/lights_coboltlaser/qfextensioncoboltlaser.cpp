@@ -69,7 +69,7 @@ void QFExtensionCoboltLaser::initExtension() {
     int count=inifile.value("lightsource_count", 0).toUInt();
     for (int i=0; i<count; i++) {
         LIGHTSOURCE s;
-        s.port=ports.addCOMPort(inifile, "lightsource"+QString::number(i+1)+"/", 115200, JKSC8databits, JKSCnoParity, JKSCnoHandshaking, JKSConeStopbit, 500);
+        s.port=ports.addCOMPort(inifile, "lightsource"+QString::number(i+1)+"/", 115200, QFSC8databits, QFSCnoParity, QFSCnoHandshaking, QFSConeStopbit, 500);
         s.serialNumber="";
         s.setPower=0;
         s.lastAction=QTime::currentTime();
@@ -151,7 +151,7 @@ unsigned int QFExtensionCoboltLaser::getLightSourceCount() {
 
 void QFExtensionCoboltLaser::lightSourceConnect(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return;
 
@@ -204,7 +204,7 @@ void QFExtensionCoboltLaser::lightSourceConnect(unsigned int lightSource) {
 
 void QFExtensionCoboltLaser::lightSourceDisonnect(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return;
 
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -218,7 +218,7 @@ void QFExtensionCoboltLaser::setLightSourceLogging(QFPluginLogService *logServic
 
 bool QFExtensionCoboltLaser::isLightSourceConnected(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
     QMutexLocker locker(mutex);
@@ -227,7 +227,7 @@ bool QFExtensionCoboltLaser::isLightSourceConnected(unsigned int lightSource) {
 
 unsigned int QFExtensionCoboltLaser::getLightSourceLineCount(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return 0;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return 0;
     return 1;
 }
@@ -251,7 +251,7 @@ QString QFExtensionCoboltLaser::getLightSourceLinePowerUnit(unsigned int /*light
 
 void QFExtensionCoboltLaser::setLightSourcePower(unsigned int lightSource, unsigned int /*wavelengthLine*/, double power) {
     if (lightSource>=getLightSourceCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -281,7 +281,7 @@ double QFExtensionCoboltLaser::getLightSourceCurrentSetPower(unsigned int lightS
 
 double QFExtensionCoboltLaser::getLightSourceCurrentMeasuredPower(unsigned int lightSource, unsigned int /*wavelengthLine*/) {
     if (lightSource>=getLightSourceCount()) return 0;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return 0;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -292,7 +292,7 @@ double QFExtensionCoboltLaser::getLightSourceCurrentMeasuredPower(unsigned int l
 
 void QFExtensionCoboltLaser::setLightSourceLineEnabled(unsigned int lightSource, unsigned int /*wavelengthLine*/, bool enabled) {
     if (lightSource>=getLightSourceCount()) return ;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -310,7 +310,7 @@ bool QFExtensionCoboltLaser::getLightSourceLineEnabled(unsigned int lightSource,
 
 bool QFExtensionCoboltLaser::isLastLightSourceActionFinished(unsigned int lightSource) {
     if (lightSource>=getLightSourceCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return false;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
@@ -506,7 +506,7 @@ QVariant QFExtensionCoboltLaser::getMeasurementDeviceValue(unsigned int measurem
     if (measuremenDevice>=getMeasurementDeviceCount()) return false;
     if (value==0) return getLightSourceCurrentMeasuredPower(measuremenDevice, 0);
 
-    JKSerialConnection* com=ports.getCOMPort(sources[measuremenDevice].port);
+    QFSerialConnection* com=ports.getCOMPort(sources[measuremenDevice].port);
     QFCoboltLaserProtocolHandler* serial=sources[measuremenDevice].serial;
     if (!com || !serial) return QVariant();
     QMutex* mutex=ports.getMutex(sources[measuremenDevice].port);

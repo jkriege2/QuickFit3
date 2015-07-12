@@ -26,7 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QTime>
 #include <QDebug>
 
-QFBinarySerialProtocolHandler::QFBinarySerialProtocolHandler(JKSerialConnection *com, QString name)
+QFBinarySerialProtocolHandler::QFBinarySerialProtocolHandler(QFSerialConnection *com, QString name)
 {
     this->com=com;
     this->log=NULL;

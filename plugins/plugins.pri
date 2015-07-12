@@ -31,7 +31,9 @@ INCLUDEPATH += ../../lib/ \
                ../../global_lib/qt/ \
                ../interfaces \
                ../base_classes \
-               ../../extlibs/
+               ../../extlibs/ \
+               ../../extlibsb040/StatisticsTools/ \
+               ../../extlibsb040/JKQtPlotter/
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/

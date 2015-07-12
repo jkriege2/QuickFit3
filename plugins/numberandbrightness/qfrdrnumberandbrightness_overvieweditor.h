@@ -36,7 +36,7 @@
 #include <QGroupBox>
 #include <QAbstractTableModel>
 #include "datacutslider.h"
-#include "qt/jkqtfastplotter.h"
+#include "jkqtfastplotter.h"
 #include "jkqtptools.h"
 #include "qfrdroverviewimagedisplay.h"
 

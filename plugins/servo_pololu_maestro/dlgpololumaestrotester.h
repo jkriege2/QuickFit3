@@ -24,7 +24,7 @@
 #define DLGPOLOLUMAESTROTESTER_H
 
 #include <QDialog>
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 #include "programoptions.h"
 #include "qfbinaryserialprotocolhandler.h"
 
@@ -47,7 +47,7 @@ class DlgPololuMaestroTester : public QDialog
         void on_cmbBaudrate_currentIndexChanged(int index);
     private:
         Ui::DlgPololuMaestroTester *ui;
-        JKSerialConnection com;
+        QFSerialConnection com;
         QFBinarySerialProtocolHandler* serial;
 };
 

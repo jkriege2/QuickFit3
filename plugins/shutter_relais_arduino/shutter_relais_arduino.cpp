@@ -118,7 +118,7 @@ unsigned int QFExtensionShutterShuterArduino::getShutterCount() {
 
 void QFExtensionShutterShuterArduino::shutterConnect(unsigned int shutter) {
     if (shutter>=getShutterCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -145,7 +145,7 @@ void QFExtensionShutterShuterArduino::shutterConnect(unsigned int shutter) {
 
 void QFExtensionShutterShuterArduino::shutterDisonnect(unsigned int shutter) {
     if (shutter>=getShutterCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -154,7 +154,7 @@ void QFExtensionShutterShuterArduino::shutterDisonnect(unsigned int shutter) {
 
 bool QFExtensionShutterShuterArduino::isShutterConnected(unsigned int shutter) {
     if (shutter>=getShutterCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -163,7 +163,7 @@ bool QFExtensionShutterShuterArduino::isShutterConnected(unsigned int shutter) {
 
 bool QFExtensionShutterShuterArduino::isShutterOpen(unsigned int shutter)  {
     if (shutter>=getShutterCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -176,7 +176,7 @@ bool QFExtensionShutterShuterArduino::isShutterOpen(unsigned int shutter)  {
 
 void QFExtensionShutterShuterArduino::setShutterState(unsigned int shutter, bool opened) {
     if (shutter>=getShutterCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return ;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);

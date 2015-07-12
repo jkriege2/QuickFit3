@@ -2,7 +2,7 @@
 #define SCANCONTROLLER_H
 
 #include <QObject>
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 #include <stdint.h>
 #include<QtGlobal>
 #include <QtGlobal>
@@ -105,7 +105,7 @@ private:
     /* Properties
     ---------------
       */
-    JKSerialConnection *SerConn;
+    QFSerialConnection *SerConn;
   //  int16_t xpos;
     // int16_t ypos;
     //float x_readback_gain_correction;

@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
+#    Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 #	
 #	 last modification: $LastChangedDate$  (revision $Rev$)
 #
@@ -19,11 +19,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/libtiff/include/
-LIBS += -L$$PWD/libtiff/lib/ -ltiff
-DEFINES += QF_HAS_LIBTIFF cimg_use_tiff
-include(zlib.pri)
-include(jpeg.pri)
+DEFINES += QF_HAS_TINYTIFF
 
-HEADERS += $$PWD/../extlibsb040/libtiff_tools/libtiff_tools.h
-SOURCES += $$PWD/../extlibsb040/libtiff_tools/libtiff_tools.cpp
+HEADERS += $$PWD/../extlibsb040/TinyTIFF/tinytiffwriter.h \
+           $$PWD/../extlibsb040/TinyTIFF/tinytiffreader.h
+SOURCES += $$PWD/../extlibsb040/TinyTIFF/tinytiffwriter.cpp \
+           $$PWD/../extlibsb040/TinyTIFF/tinytiffreader.cpp
+
+INCLUDEPATH += $$PWD/../extlibsb040/TinyTIFF/ \
+               $$PWD/../extlibsb040/libtiff_tools/

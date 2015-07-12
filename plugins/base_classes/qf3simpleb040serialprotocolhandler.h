@@ -21,7 +21,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #ifndef QF3SIMPLEB040SERIALPROTOCOLHANDLER_H
 #define QF3SIMPLEB040SERIALPROTOCOLHANDLER_H
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 #include <QString>
 #include "qfpluginservices.h"
 
@@ -42,7 +42,7 @@ class QF3SimpleB040SerialProtocolHandler {
          *  \param com com port to use
          *  \param name name of the device (for error messages)
          */
-        QF3SimpleB040SerialProtocolHandler(JKSerialConnection* com, QString name);
+        QF3SimpleB040SerialProtocolHandler(QFSerialConnection* com, QString name);
 
         void setLogging(QFPluginLogService* log, QString LOG_PREFIX);
 
@@ -61,7 +61,7 @@ class QF3SimpleB040SerialProtocolHandler {
         QString getLastError();
         void setAddToCommand(const QString& add);
     private:
-        JKSerialConnection* com;
+        QFSerialConnection* com;
         QFPluginLogService* log;
         QString LOG_PREFIX;
         QString name;

@@ -24,7 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QTime>
 #include <QDebug>
 
-QF3SimpleB040SerialProtocolHandler::QF3SimpleB040SerialProtocolHandler(JKSerialConnection* com, QString name) {
+QF3SimpleB040SerialProtocolHandler::QF3SimpleB040SerialProtocolHandler(QFSerialConnection* com, QString name) {
     this->com=com;
     this->log=NULL;
     this->LOG_PREFIX="";

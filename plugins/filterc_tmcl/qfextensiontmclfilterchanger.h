@@ -31,7 +31,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfextensionfilterchanger.h"
 #include "../base_classes/qf3tmclprotocolhandler.h"
 #include "../base_classes/qf3comportmanager.h"
-#include "../../global_lib/jkserialconnection.h"
+#include "../../global_lib/qfserialconnection.h"
 #include "qfextensionglobalsettingsreadwrite.h"
 
 /*!

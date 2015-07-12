@@ -2,7 +2,7 @@
 #define MCSTAGECONTROLLER_H
 
 #include <QObject>
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 #include <stdint.h>
 #include<QtGlobal>
 #include <QtGlobal>
@@ -140,7 +140,7 @@ protected:
 
     // objects and status flags
 
-    JKSerialConnection *SerConn; // Serial Connection to the multicontrol 2000 Stage;
+    QFSerialConnection *SerConn; // Serial Connection to the multicontrol 2000 Stage;
     uint8_t dims; // Number of dimensions.
                   // Affects the instructions set_scales, set_pos, ...
                   // Values can be 1, 2, or 3;

@@ -26,7 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include <QObject>
 
-QF3TMCLProtocolHandler::QF3TMCLProtocolHandler(JKSerialConnection* com, QString name) {
+QF3TMCLProtocolHandler::QF3TMCLProtocolHandler(QFSerialConnection* com, QString name) {
     this->com=com;
     this->log=NULL;
     this->LOG_PREFIX="";

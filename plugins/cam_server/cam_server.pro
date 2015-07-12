@@ -53,7 +53,7 @@ INCLUDEPATH += ../../lib/ \
 include(../../quickfit3_configqtwidgets.pri)
 
 
-EXAMPLESTINYTIFF_FILES.files = ../../global_lib/tinytiff*.*
+EXAMPLESTINYTIFF_FILES.files = ../../extlibsb040/TinyTIFF/tinytiff*.*
 EXAMPLESTINYTIFF_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
 EXAMPLESHIGHRESTIMER_FILES.files = ../../global_lib/highrestimer.*
 EXAMPLESHIGHRESTIMER_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/

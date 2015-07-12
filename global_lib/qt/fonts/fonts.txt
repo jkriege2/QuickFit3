@@ -1,7 +1,0 @@
-This directory contains additional fonts which may be useful to ensure system compatibility between 
-different OSes (Win/Linux/MacOS). Here are the fonts:
-
-- symbol.ttf from the Wine project (http://www.winehq.org/) replaces the windows symbol font
-  on systems which do not have it. This is needed by:
-    * JKQTmathText
-    * JKQtPlotter, as it depends on JKQTmathText

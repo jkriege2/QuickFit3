@@ -30,7 +30,7 @@
 #include <QList>
 #include "qfcoboltlaserprotocolhandler.h"
 #include "../base_classes/qf3comportmanager.h"
-#include "../../global_lib/jkserialconnection.h"
+#include "../../global_lib/qfserialconnection.h"
 #include "qfextensionmeasurementdevice.h"
 #include "qfextensionlightsource.h"
 #include "qftools.h"

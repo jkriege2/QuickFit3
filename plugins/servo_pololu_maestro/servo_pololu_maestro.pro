@@ -37,7 +37,7 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += servo_pololu_maestro.h \
            ../interfaces/qfextensionshutter.h \
-           ../../global_lib/jkserialconnection.h \
+           ../../global_lib/qfserialconnection.h \
     ../base_classes/qfbinaryserialprotocolhandler.h \
     ../base_classes/qf3comportmanager.h \
     dlgpololumaestrotester.h \
@@ -45,7 +45,7 @@ HEADERS += servo_pololu_maestro.h \
     ../interfaces/qfextensionfilterchanger.h
 
 SOURCES += servo_pololu_maestro.cpp \
-           ../../global_lib/jkserialconnection.cpp \
+           ../../global_lib/qfserialconnection.cpp \
     ../base_classes/qfbinaryserialprotocolhandler.cpp \
     ../base_classes/qf3comportmanager.cpp \
     dlgpololumaestrotester.cpp \

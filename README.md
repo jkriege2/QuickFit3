@@ -4,12 +4,12 @@ Project Homepage: http://www.dkfz.de/Macromol/quickfit/
 
 ![Logo](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/images/icon_64.png)
 
-#Download
+##Download
 Currently QuickFit can be found here (will be moved to GitHub soon):
 - Windows Binaries: http://www.dkfz.de/Macromol/quickfit/#download
 - Source Code: https://github.com/jkriege2/QuickFit3
 
-#Description
+##Description
 ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/images/splash.png)
 
 QuickFit 3 is a data evaluation software for FCS and imagingFCS (imFCS) measurements, developed in the group B040 (Prof. Jörg Langowski) at the German Cancer Research Center (DKFZ). Actually QuickFit 3 itself is a project manager and all functionality is added as plugins. A set of tested plugins for FCS, imagingFCS and some microscopy-related image processing tasks is supplied together with the software. New plugins that provide additional features will be added to this distribution of QuickFit when they become available. Currently these features are supported: 
@@ -53,7 +53,7 @@ QuickFit 3 is a data evaluation software for FCS and imagingFCS (imFCS) measurem
 - we now also release out SPIM hardware control plugins, including a driver for Andor EMCCD cameras
 
 
-# Licensing & Citation
+## Licensing & Citation
 
 This software is partly LGPL 2.1 and partly GPL 3.0, as well as postcard ware: If you find QuickFit usefull and like it, please send us a postcard from your part of the world to
 ```
@@ -81,56 +81,56 @@ A citation may look like this:
 This software is provided as is without any warranties. Use it at your own risk. But: We do our best to make a well tested and good pakage (as it is massively used in our department).
 
 
-# Screenshots
-## Welcome Screen
+## Screenshots
+### Welcome Screen
 ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_welcome.png)
 
-## Main Window
+### Main Window
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_main.png)
 
-## Settings Dialog
+### Settings Dialog
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_settings.png)
 
-## Online Help
+### Online Help
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_help.png)
 
-## User-Defined Fit Functions
+### User-Defined Fit Functions
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_userfitfunctions.png)
 
-## imaging FCS
+### imaging FCS
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_imfcs.png)
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_imfcs_paramcorrelation.png)
 
-## imaging FCS Fit
+### imaging FCS Fit
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_imfcsfit.png)
 
-## imaging FCCS Fit
+### imaging FCCS Fit
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_imfccsfit.png)
 
-## FCS Fit
+### FCS Fit
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_fcsfit.png)
 
-## FCS: MSD Evaluation
+### FCS: MSD Evaluation
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_msd.png)
 
-## FCS: MaxEnt evaluation
+### FCS: MaxEnt evaluation
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_maxent.png)
 
-## global FCCS Fit
+### global FCCS Fit
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_fccsfit.png)
 
-## table plugin (spreadsheet/plots)
+### table plugin (spreadsheet/plots)
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_table.png)
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_tableplot.png)
 
-## SPIM Lightsheet Analysis
+### SPIM Lightsheet Analysis
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_lightsheet.png)
 
-## Spectra Viewer
+### Spectra Viewer
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_spectra.png)
 
-## Diffusion Coefficient Calculator
+### Diffusion Coefficient Calculator
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_dcalc.png)
 
-## 3D Image Stack Viewer
+### 3D Image Stack Viewer
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_3dviewer.png)

@@ -29,6 +29,7 @@ include(../plugins.pri)
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibs/lmfit.pri)
+include(../../extlibsb040/tinytiff.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
@@ -54,10 +55,8 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcscorrelationdialog.h \
     qfrdrimagingfcsthreadprogress.h \
     qfrdrimagingfcscorrelationjobthread.h \
-    ../../global_lib/tinytiffwriter.h \
-    ../../global_lib/libtiff_tools.h \
-    ../../global_lib/shiftregister.h \
-    ../../global_lib/multitau-correlator.h \
+    ../../extlibsb040/StatisticsTools/shiftregister.h \
+    ../../extlibsb040/StatisticsTools/multitau-correlator.h \
     ../../global_lib/correlator_multitau.h \
     qfrdrimagingfcsdataexplorer.h \
     qfrdrimagingfcsmaskbyintensity.h \
@@ -96,8 +95,6 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcscorrelationdialog.cpp \
     qfrdrimagingfcsthreadprogress.cpp \
     qfrdrimagingfcscorrelationjobthread.cpp \
-    ../../global_lib/tinytiffwriter.cpp \
-    ../../global_lib/libtiff_tools.cpp \
     qfrdrimagingfcsdataexplorer.cpp \
     qfrdrimagingfcsmaskbyintensity.cpp \
     qfrdrimagingfcscountratedisplay.cpp \

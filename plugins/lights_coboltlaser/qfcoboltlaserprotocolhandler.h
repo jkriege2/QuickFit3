@@ -22,7 +22,7 @@
 
 #ifndef QFCOBOLTLASERPROTOCOLHANDLER_H
 #define QFCOBOLTLASERPROTOCOLHANDLER_H
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 #include <QString>
 #include "qfpluginservices.h"
 #include "qfsimpleserialprotocolhandler.h"
@@ -35,7 +35,7 @@ public:
      *  \param com com port to use
      *  \param name name of the device (for error messages)
      */
-    QFCoboltLaserProtocolHandler(JKSerialConnection* com, QString name);
+    QFCoboltLaserProtocolHandler(QFSerialConnection* com, QString name);
 };
 
 #endif // QFCOBOLTLASERPROTOCOLHANDLER_H

@@ -36,7 +36,7 @@ DEFINES += TARGETNAME=$$TARGET
 
 
 include(../../libquickfitwidgets.pri)
-
+include(../../extlibsb040/tinytiff.pri)
 # Input
 HEADERS += cam_andor.h \
            camandoracquisitionthread.h \
@@ -45,7 +45,6 @@ HEADERS += cam_andor.h \
            andorglobalcamerasettingswidget.h \
            andorsettingsdialog.h \
            andortools.h \
-           ../../global_lib/tinytiffwriter.h \
            ../interfaces/qfextensionshutter.h \
     ../interfaces/qfextensionmeasurementdevice.h
 
@@ -54,8 +53,7 @@ SOURCES += cam_andor.cpp \
            ../../global_lib/highrestimer.cpp \
            andorglobalcamerasettingswidget.cpp \
            andorsettingsdialog.cpp \
-           andortools.cpp \
-           ../../global_lib/tinytiffwriter.cpp
+           andortools.cpp
 
 FORMS = \
     andorglobalcamerasettingswidget.ui \

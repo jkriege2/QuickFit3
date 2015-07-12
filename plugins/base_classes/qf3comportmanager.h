@@ -26,7 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QString>
 #include <QSettings>
 #include <QMutex>
-#include "../../global_lib/jkserialconnection.h"
+#include "../../global_lib/qfserialconnection.h"
 
 /*! \brief you may use this class to manage a list of COM ports.
     \ingroup qf3extensionplugins
@@ -42,15 +42,15 @@ class QF3ComPortManager {
 
         void clear();
 
-        int addCOMPort(QSettings& settings, QString prefix=QString(""), int defaultSpeed=9600, JKSCdatabits databits=JKSC8databits,  JKSCparity parity=JKSCnoParity, JKSChandshaking handshaking=JKSCnoHandshaking, JKSCstopbits stopbits=JKSConeStopbit, int defaulttimeout=500);
+        int addCOMPort(QSettings& settings, QString prefix=QString(""), int defaultSpeed=9600, QFSCdatabits databits=QFSC8databits,  QFSCparity parity=QFSCnoParity, QFSChandshaking handshaking=QFSCnoHandshaking, QFSCstopbits stopbits=QFSConeStopbit, int defaulttimeout=500);
         void storeCOMPort(int port, QSettings& settings, QString prefix=QString(""));
 
-        JKSerialConnection* getCOMPort(int port) const;
+        QFSerialConnection* getCOMPort(int port) const;
         QMutex* getMutex(int port) const;
     protected:
         struct COMPORTS {
             /** \brief serial connection object */
-            JKSerialConnection* com;
+            QFSerialConnection* com;
             QMutex* mutex;
         };
         QList<COMPORTS> coms;

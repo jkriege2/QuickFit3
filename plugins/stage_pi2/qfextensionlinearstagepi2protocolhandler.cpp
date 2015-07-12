@@ -22,9 +22,9 @@
 
 #include "qfextensionlinearstagepi2protocolhandler.h"
 
-QMap<JKSerialConnection*, QChar> QFExtensionLinearStagePI2ProtocolHandler::currentID=QMap<JKSerialConnection*, QChar>();
+QMap<QFSerialConnection*, QChar> QFExtensionLinearStagePI2ProtocolHandler::currentID=QMap<QFSerialConnection*, QChar>();
 
-QFExtensionLinearStagePI2ProtocolHandler::QFExtensionLinearStagePI2ProtocolHandler(JKSerialConnection *com, QMutex* mutexSerial, QString name)
+QFExtensionLinearStagePI2ProtocolHandler::QFExtensionLinearStagePI2ProtocolHandler(QFSerialConnection *com, QMutex* mutexSerial, QString name)
 {
     this->com=com;
     this->log=NULL;
@@ -89,7 +89,7 @@ QMutex *QFExtensionLinearStagePI2ProtocolHandler::getMutex() const
     return mutexSerial;
 }
 
-JKSerialConnection *QFExtensionLinearStagePI2ProtocolHandler::getCOM() const
+QFSerialConnection *QFExtensionLinearStagePI2ProtocolHandler::getCOM() const
 {
     return com;
 }

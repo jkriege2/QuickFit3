@@ -21,7 +21,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #ifndef QF3TMCLPROTOCOLHANDLER_H
 #define QF3TMCLPROTOCOLHANDLER_H
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 #include <QString>
 #include "qfpluginservices.h"
 
@@ -86,7 +86,7 @@ class QF3TMCLProtocolHandler {
          *  \param com com port to use
          *  \param name name of the device (for error messages)
          */
-        QF3TMCLProtocolHandler(JKSerialConnection* com, QString name);
+        QF3TMCLProtocolHandler(QFSerialConnection* com, QString name);
 
         void setLogging(QFPluginLogService* log, QString LOG_PREFIX);
 
@@ -121,7 +121,7 @@ class QF3TMCLProtocolHandler {
         /** \brief read the answer of a command 136 (get firmware version) */
         bool readVersionResult(QString &version);
 
-        JKSerialConnection* com;
+        QFSerialConnection* com;
         QFPluginLogService* log;
         QString LOG_PREFIX;
         QString name;

@@ -36,13 +36,13 @@ DESTDIR = $${QFOUTPUT}/plugins/
 HEADERS += qfextensiontmclfilterchanger.h \
     ../interfaces/qfextensionfilterchanger.h \
     ../base_classes/qf3comportmanager.h \
-    ../../global_lib/jkserialconnection.h \
+    ../../global_lib/qfserialconnection.h \
     ../base_classes/qf3tmclprotocolhandler.h \
     ../interfaces/qfextensionglobalsettingsreadwrite.h
 
 SOURCES += qfextensiontmclfilterchanger.cpp \
     ../base_classes/qf3comportmanager.cpp \
-    ../../global_lib/jkserialconnection.cpp \
+    ../../global_lib/qfserialconnection.cpp \
     ../base_classes/qf3tmclprotocolhandler.cpp
 
 FORMS =

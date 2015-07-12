@@ -204,7 +204,7 @@ void QFExtensionLinearStagePI::showSettingsDialog(unsigned int /*axis*/, QWidget
         formlayout->addRow("", new QLabel(tr("<b>All settings marked with * will be<br>used when connecting the next time!</b>"), dlg));
 
         QComboBox* cmbPort=new QComboBox(dlg);
-        std::vector<std::string> ports=JKSerialConnection::listPorts();
+        std::vector<std::string> ports=QFSerialConnection::listPorts();
         for (unsigned int i=0; i<ports.size(); i++) {
             cmbPort->addItem(ports[i].c_str());
         }
@@ -340,9 +340,9 @@ void QFExtensionLinearStagePI::connectDevice(unsigned int /*axis*/) {
     QMutexLocker lock(mutexSerial);
     com.set_port(COMPort.toStdString());
     com.set_baudrate(COMPortSpeed);
-    com.set_stopbits(JKSConeStopbit);
-    com.set_parity(JKSCnoParity);
-    com.set_databits(JKSC8databits);
+    com.set_stopbits(QFSConeStopbit);
+    com.set_parity(QFSCnoParity);
+    com.set_databits(QFSC8databits);
     com.open();
     if (com.isConnectionOpen()) {
         for (int i=0; i<axes.size(); i++) {

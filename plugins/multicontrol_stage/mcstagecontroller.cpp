@@ -33,7 +33,7 @@ MCStageController::~MCStageController()
 
 bool MCStageController::connectToStage()
 {
-    SerConn = new JKSerialConnection(comPort, comPortSpeed);
+    SerConn = new QFSerialConnection(comPort, comPortSpeed);
     SerConn->set_logToFile(true);
     bool ok;
     if(!SerConn->isConnectionOpen()){

@@ -32,7 +32,7 @@
 #include <QGroupBox>
 #include <QAbstractTableModel>
 #include <QToolButton>
-#include "qt/jkqtfastplotter.h"
+#include "jkqtfastplotter.h"
 #include "qfrdrimagetoruninterface.h"
 #include "qfrawdatarecord.h"
 #include "qfrdrrunselection.h"

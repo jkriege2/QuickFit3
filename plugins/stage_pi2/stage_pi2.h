@@ -28,7 +28,7 @@
 #include <QVector>
 #include "qfextension.h"
 #include "qfextensionlinearstage.h"
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 #include "qf3comportmanager.h"
 #include "qfextensionlinearstagepi2protocolhandler.h"
 #include "pimercury863calibrationdialog.h"

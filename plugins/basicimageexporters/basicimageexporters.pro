@@ -31,19 +31,16 @@ DESTDIR = $$QFOUTPUT/plugins
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibs/cimg.pri)
+include(../../extlibsb040/tinytiff.pri)
 # Input
 HEADERS += qfpbasicimageexporters.h \
            qfimagewriterlibtiff.h \
-    ../../global_lib/libtiff_tools.h \
-    ../../global_lib/tinytiffwriter.h \
     qfimagewriterrawdouble.h \
     qfimagewriterrawfloat.h \
     qfbasicimageexportersoptionswidget.h
 
 SOURCES += qfpbasicimageexporters.cpp\
            qfimagewriterlibtiff.cpp \
-    ../../global_lib/libtiff_tools.cpp \
-    ../../global_lib/tinytiffwriter.cpp \
     qfimagewriterrawdouble.cpp \
     qfimagewriterrawfloat.cpp \
     qfbasicimageexportersoptionswidget.cpp

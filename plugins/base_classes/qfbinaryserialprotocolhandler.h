@@ -21,7 +21,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #ifndef QFBinarySerialProtocolHandler_H
 #define QFBinarySerialProtocolHandler_H
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 #include <QString>
 #include "qfpluginservices.h"
 
@@ -32,7 +32,7 @@ class QFBinarySerialProtocolHandler {
          *  \param com com port to use
          *  \param name name of the device (for error messages)
          */
-        QFBinarySerialProtocolHandler(JKSerialConnection* com, QString name);
+        QFBinarySerialProtocolHandler(QFSerialConnection* com, QString name);
 
         void setLogging(QFPluginLogService* log, QString LOG_PREFIX);
 
@@ -51,7 +51,7 @@ class QFBinarySerialProtocolHandler {
         bool hasErrorOccured();
         QString getLastError();
     protected:
-        JKSerialConnection* com;
+        QFSerialConnection* com;
         QFPluginLogService* log;
         QString LOG_PREFIX;
         QString name;

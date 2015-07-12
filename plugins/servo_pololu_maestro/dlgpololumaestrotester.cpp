@@ -31,7 +31,7 @@ DlgPololuMaestroTester::DlgPololuMaestroTester(QWidget *parent) :
     serial=new QFBinarySerialProtocolHandler(&com, "popolu maestro");
     ui->setupUi(this);
     ui->cmbPort->clear();
-    std::vector<std::string> ports=JKSerialConnection::listPorts();
+    std::vector<std::string> ports=QFSerialConnection::listPorts();
     for (size_t i=0; i<ports.size(); i++) {
         ui->cmbPort->addItem(ports[i].c_str());
     }

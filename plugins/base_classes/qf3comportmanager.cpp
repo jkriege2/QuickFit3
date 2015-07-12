@@ -40,17 +40,17 @@ void QF3ComPortManager::clear()
     coms.clear();
 }
 
-int QF3ComPortManager::addCOMPort(QSettings &settings, QString prefix, int defaultSpeed, JKSCdatabits defaultdatabits, JKSCparity defaultparity, JKSChandshaking defaulthandshaking, JKSCstopbits defaultstopbits, int defaulttimeout) {
+int QF3ComPortManager::addCOMPort(QSettings &settings, QString prefix, int defaultSpeed, QFSCdatabits defaultdatabits, QFSCparity defaultparity, QFSChandshaking defaulthandshaking, QFSCstopbits defaultstopbits, int defaulttimeout) {
 #ifdef Q_OS_WIN32
     QString port=settings.value(prefix+"port", "COM1").toString();
 #else
     QString port=settings.value(prefix+"port", "/dev/ttyS0").toString();
 #endif
     int speed=settings.value(prefix+"port_speed", defaultSpeed).toInt();
-    JKSCdatabits databits=string2JKSCdatabits(settings.value(prefix+"port_databits", JKSCdatabits2string(defaultdatabits).c_str()).toString().toStdString());
-    JKSCparity parity=string2JKSCparity(settings.value(prefix+"port_parity", JKSChandshaking2string(defaulthandshaking).c_str()).toString().toStdString());
-    JKSChandshaking handshaking=string2JKSChandshaking(settings.value(prefix+"port_handshaking", JKSCparity2string(defaultparity).c_str()).toString().toStdString());
-    JKSCstopbits stopbits=string2JKSCstopbits(settings.value(prefix+"port_stopbits", JKSCstopbits2string(defaultstopbits).c_str()).toString().toStdString());
+    QFSCdatabits databits=string2QFSCdatabits(settings.value(prefix+"port_databits", QFSCdatabits2string(defaultdatabits).c_str()).toString().toStdString());
+    QFSCparity parity=string2QFSCparity(settings.value(prefix+"port_parity", QFSChandshaking2string(defaulthandshaking).c_str()).toString().toStdString());
+    QFSChandshaking handshaking=string2QFSChandshaking(settings.value(prefix+"port_handshaking", QFSCparity2string(defaultparity).c_str()).toString().toStdString());
+    QFSCstopbits stopbits=string2QFSCstopbits(settings.value(prefix+"port_stopbits", QFSCstopbits2string(defaultstopbits).c_str()).toString().toStdString());
     unsigned int timeout=settings.value(prefix+"port_timeout", defaulttimeout).toInt();
 
     int portID=-1;
@@ -64,7 +64,7 @@ int QF3ComPortManager::addCOMPort(QSettings &settings, QString prefix, int defau
     if (portID<0) {
         portID=coms.size();
         COMPORTS p;
-        p.com=new JKSerialConnection(port.toStdString(), speed, databits, parity, stopbits, handshaking);
+        p.com=new QFSerialConnection(port.toStdString(), speed, databits, parity, stopbits, handshaking);
         p.mutex=new QMutex(QMutex::Recursive);
         coms.append(p);
     }
@@ -82,15 +82,15 @@ void QF3ComPortManager::storeCOMPort(int port, QSettings& settings, QString pref
     if (port>=0 && port<coms.size()) {
         settings.setValue(prefix+"port", QString(coms[port].com->get_port().c_str()));
         settings.setValue(prefix+"port_speed", coms[port].com->get_baudrate());
-        if (coms[port].com->get_databits()!=JKSC8databits) settings.setValue(prefix+"port_databits", QString(JKSCdatabits2string(coms[port].com->get_databits()).c_str()));
-        if (coms[port].com->get_parity()!=JKSCnoParity) settings.setValue(prefix+"port_parity", QString(JKSCparity2string(coms[port].com->get_parity()).c_str()));
-        if (coms[port].com->get_handshaking()!=JKSCnoHandshaking) settings.setValue(prefix+"port_handshaking", QString(JKSChandshaking2string(coms[port].com->get_handshaking()).c_str()));
-        if (coms[port].com->get_stopbits()!=JKSConeStopbit) settings.setValue(prefix+"port_stopbits", QString(JKSCstopbits2string(coms[port].com->get_stopbits()).c_str()));
+        if (coms[port].com->get_databits()!=QFSC8databits) settings.setValue(prefix+"port_databits", QString(QFSCdatabits2string(coms[port].com->get_databits()).c_str()));
+        if (coms[port].com->get_parity()!=QFSCnoParity) settings.setValue(prefix+"port_parity", QString(QFSCparity2string(coms[port].com->get_parity()).c_str()));
+        if (coms[port].com->get_handshaking()!=QFSCnoHandshaking) settings.setValue(prefix+"port_handshaking", QString(QFSChandshaking2string(coms[port].com->get_handshaking()).c_str()));
+        if (coms[port].com->get_stopbits()!=QFSConeStopbit) settings.setValue(prefix+"port_stopbits", QString(QFSCstopbits2string(coms[port].com->get_stopbits()).c_str()));
         if (coms[port].com->get_timeout_ms()!=500) settings.setValue(prefix+"port_timeout", coms[port].com->get_timeout_ms());
     }
 }
 
-JKSerialConnection* QF3ComPortManager::getCOMPort(int port) const {
+QFSerialConnection* QF3ComPortManager::getCOMPort(int port) const {
     if (port>=0 && port<coms.size()) return coms.at(port).com;
     return NULL;
 }

@@ -40,7 +40,7 @@ HEADERS += qfeb040ffmcontrol.h \
     ffmexpcontrolwidget.h \
     ffmimagewidget.h \
     ffmexpdescriptionwidget.h \
-    ../../global_lib/jkserialconnection.h \
+    ../../global_lib/qfserialconnection.h \
 
 
 
@@ -50,7 +50,7 @@ SOURCES += qfeb040ffmcontrol.cpp \
     ffmexpcontrolwidget.cpp \
     ffmimagewidget.cpp \
     ffmexpdescriptionwidget.cpp \
-    ../../global_lib/jkserialconnection.cpp \
+    ../../global_lib/qfserialconnection.cpp \
 
 
 

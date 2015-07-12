@@ -23,7 +23,7 @@
 #ifndef QFEXTENSIONLINEARSTAGEPI2PROTOCOLHANDLER_H
 #define QFEXTENSIONLINEARSTAGEPI2PROTOCOLHANDLER_H
 
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 #include <QString>
 #include "qfpluginservices.h"
 #include <QMutex>
@@ -42,7 +42,7 @@
 */
 class QFExtensionLinearStagePI2ProtocolHandler {
     public:
-        QFExtensionLinearStagePI2ProtocolHandler(JKSerialConnection* com, QMutex* mutexSerial, QString name);
+        QFExtensionLinearStagePI2ProtocolHandler(QFSerialConnection* com, QMutex* mutexSerial, QString name);
 
         bool hasErrorOccured();
         QString getLastError();
@@ -61,16 +61,16 @@ class QFExtensionLinearStagePI2ProtocolHandler {
         std::string queryCommand(std::string command);
 
         QMutex* getMutex() const;
-        JKSerialConnection* getCOM() const;
+        QFSerialConnection* getCOM() const;
 
 
 private:
-        JKSerialConnection* com;
+        QFSerialConnection* com;
         QFPluginLogService* log;
         QString LOG_PREFIX;
         QString name;
         QMutex* mutexSerial;
-        static QMap<JKSerialConnection*, QChar> currentID;
+        static QMap<QFSerialConnection*, QChar> currentID;
 };
 
 #endif // QFEXTENSIONLINEARSTAGEPI2PROTOCOLHANDLER_H

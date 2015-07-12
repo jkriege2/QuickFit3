@@ -245,7 +245,7 @@ bool ScanController::connectToScanner()
 {
     bool ok;
     if (!SerConn){
-        SerConn = new JKSerialConnection(std::string("COM1"), 2400, JKSC8databits, JKSCnoParity, JKSConeStopbit, JKSChardwareHandshakingRTS);
+        SerConn = new QFSerialConnection(std::string("COM1"), 2400, QFSC8databits, QFSCnoParity, QFSConeStopbit, QFSChardwareHandshakingRTS);
         SerConn->set_logToFile(true);
     }
     //SerConn->set_baudrate(baudrate);

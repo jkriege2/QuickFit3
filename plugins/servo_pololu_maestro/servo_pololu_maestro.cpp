@@ -160,7 +160,7 @@ unsigned int QFExtensionServoPololuMaestro::getShutterCount() {
 
 void QFExtensionServoPololuMaestro::shutterConnect(unsigned int shutter) {
     if (shutter>=getShutterCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -180,7 +180,7 @@ void QFExtensionServoPololuMaestro::shutterConnect(unsigned int shutter) {
 
 void QFExtensionServoPololuMaestro::shutterDisonnect(unsigned int shutter) {
     if (shutter>=getShutterCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -189,7 +189,7 @@ void QFExtensionServoPololuMaestro::shutterDisonnect(unsigned int shutter) {
 
 bool QFExtensionServoPololuMaestro::isShutterConnected(unsigned int shutter) {
     if (shutter>=getShutterCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -198,7 +198,7 @@ bool QFExtensionServoPololuMaestro::isShutterConnected(unsigned int shutter) {
 
 bool QFExtensionServoPololuMaestro::isShutterOpen(unsigned int shutter)  {
     if (shutter>=getShutterCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -212,7 +212,7 @@ bool QFExtensionServoPololuMaestro::isShutterOpen(unsigned int shutter)  {
 
 void QFExtensionServoPololuMaestro::setShutterState(unsigned int shutter, bool opened) {
     if (shutter>=getShutterCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return ;
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
@@ -333,7 +333,7 @@ unsigned int QFExtensionServoPololuMaestro::getFilterChangerCount()
 void QFExtensionServoPololuMaestro::filterChangerConnect(unsigned int filterChanger)
 {
     if (filterChanger>=getFilterChangerCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
+    QFSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(wheels[filterChanger].port);
     QMutexLocker locker(mutex);
@@ -355,7 +355,7 @@ void QFExtensionServoPololuMaestro::filterChangerConnect(unsigned int filterChan
 void QFExtensionServoPololuMaestro::filterChangerDisonnect(unsigned int filterChanger)
 {
     if (filterChanger>=getFilterChangerCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
+    QFSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(wheels[filterChanger].port);
     QMutexLocker locker(mutex);
@@ -370,7 +370,7 @@ void QFExtensionServoPololuMaestro::setFilterChangerLogging(QFPluginLogService *
 bool QFExtensionServoPololuMaestro::isFilterChangerConnected(unsigned int filterChanger)
 {
     if (filterChanger>=getFilterChangerCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
+    QFSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(wheels[filterChanger].port);
     return com->isConnectionOpen();
@@ -385,7 +385,7 @@ unsigned int QFExtensionServoPololuMaestro::getFilterChangerFilterCount(unsigned
 void QFExtensionServoPololuMaestro::setFilterChangerFilter(unsigned int filterChanger, unsigned int filter)
 {
     if (filterChanger>=getFilterChangerCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
+    QFSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(wheels[filterChanger].port);
     QMutexLocker locker(mutex);

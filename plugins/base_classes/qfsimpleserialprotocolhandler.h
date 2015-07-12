@@ -21,7 +21,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #ifndef QFSIMPLESERIALPROTOCOLHANDLER_H
 #define QFSIMPLESERIALPROTOCOLHANDLER_H
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 #include <QString>
 #include "qfpluginservices.h"
 
@@ -32,7 +32,7 @@ class QFSimpleSerialProtocolHandler {
          *  \param com com port to use
          *  \param name name of the device (for error messages)
          */
-        QFSimpleSerialProtocolHandler(JKSerialConnection* com, QString name, const QString& sendTerminationString=QString("\n"), const QString& receiveReadUntilString=QString("\n"));
+        QFSimpleSerialProtocolHandler(QFSerialConnection* com, QString name, const QString& sendTerminationString=QString("\n"), const QString& receiveReadUntilString=QString("\n"));
 
         void setLogging(QFPluginLogService* log, QString LOG_PREFIX);
 
@@ -52,7 +52,7 @@ class QFSimpleSerialProtocolHandler {
         void setSendTerminationString(const QString& str);
         void setReceiveUntilString(const QString& str);
     protected:
-        JKSerialConnection* com;
+        QFSerialConnection* com;
         QFPluginLogService* log;
         QString LOG_PREFIX;
         QString name;

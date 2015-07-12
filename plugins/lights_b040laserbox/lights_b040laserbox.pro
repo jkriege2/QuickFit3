@@ -37,13 +37,13 @@ HEADERS += \
     ../base_classes/qf3simpleb040serialprotocolhandler.h \
     ../base_classes/qf3comportmanager.h \
     ../interfaces/qfextensionlightsource.h \
-    ../../global_lib/jkserialconnection.h \
+    ../../global_lib/qfserialconnection.h \
     qfextensionb040laserbox.h
 
 SOURCES += \
     ../base_classes/qf3simpleb040serialprotocolhandler.cpp \
     ../base_classes/qf3comportmanager.cpp \
-    ../../global_lib/jkserialconnection.cpp \
+    ../../global_lib/qfserialconnection.cpp \
     qfextensionb040laserbox.cpp
 
 FORMS =

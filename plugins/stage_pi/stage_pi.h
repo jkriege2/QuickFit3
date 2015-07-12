@@ -28,7 +28,7 @@
 #include <QVector>
 #include "qfextension.h"
 #include "qfextensionlinearstage.h"
-#include "jkserialconnection.h"
+#include "qfserialconnection.h"
 
 /*!
     \defgroup qf3ext_StagePI QFExtensionLinearStage implementation for PI mercury stages
@@ -197,7 +197,7 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
         /** \brief speed of com port */
         int COMPortSpeed;
         /** \brief serial connection object */
-        JKSerialConnection com;
+        QFSerialConnection com;
 
         QMutex* mutexSerial;
         /** \brief settings of P-Term */

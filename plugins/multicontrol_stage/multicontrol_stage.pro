@@ -37,14 +37,14 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += \
            ../interfaces/qfextensionlinearstage.h \
-           ../../global_lib/jkserialconnection.h \
+           ../../global_lib/qfserialconnection.h \
     multicontrol_stage.h \
     mcstagecontroller.h \
     ../b040_ffmcontrol/ffmmainlogfile.h \
     multicontrol_settingsdialog.h
 
 SOURCES += \
-           ../../global_lib/jkserialconnection.cpp \
+           ../../global_lib/qfserialconnection.cpp \
     multicontrol_stage.cpp \
     mcstagecontroller.cpp \
     ../b040_ffmcontrol/ffmmainlogfile.cpp \

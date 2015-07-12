@@ -30,7 +30,7 @@ DEPENDPATH += ./
 include(../plugins.pri)
 include(../../extlibs/lmfit.pri)
 include(../../extlibs/tiff.pri)
-
+include(../../extlibsb040/tinytiff.pri)
 DESTDIR = $$QFOUTPUT/plugins
 include(../../libquickfitwidgets.pri)
 
@@ -41,8 +41,6 @@ HEADERS += spimb040.h \
            ../interfaces/qfextensioncamera.h \
            ../../global_lib/jkimage.h  \
            ../../global_lib/highrestimer.h \
-           ../../global_lib/tinytiffwriter.h \
-           ../../global_lib/libtiff_tools.h \
            ../interfaces/qfextensionlinearstage.h \
     qfespimb040opticssetup.h \
     qfespimb040simplecameraconfig.h \
@@ -81,8 +79,6 @@ SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
            qfespimb040samplestageconfig.cpp \
            ../../global_lib/highrestimer.cpp \
-           ../../global_lib/tinytiffwriter.cpp \
-           ../../global_lib/libtiff_tools.cpp \
     qfespimb040opticssetup.cpp \
     qfespimb040simplecameraconfig.cpp \
     qfespimb00histogrammaskdialog.cpp \

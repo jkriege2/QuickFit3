@@ -39,7 +39,7 @@ release {
 
 
 INCLUDEPATH += .
-INCLUDEPATH += ../global_lib/
+INCLUDEPATH += ../extlibsb040/StatisticsTools/
 
 
 
@@ -83,8 +83,7 @@ HEADERS += dlgnewproperty.h \
            qflib_version.h \
            csvtools.h \
            qfrdrcolumngraphsinterface.h \
-    ../global_lib/statistics_tools.h \
-    ../global_lib/mathtools.h \
+    ../extlibsb040/StatisticsTools/statistics_tools.h \
     qtriple.h \
     qvisiblehandlesplitter.h \
     lib_imexport.h \
@@ -209,8 +208,7 @@ SOURCES += dlgnewproperty.cpp \
            qfextensionmanager.cpp \
            qfevaluationresultsmodel.cpp \
            csvtools.cpp \
-    ../global_lib/statistics_tools.cpp \
-    ../global_lib/mathtools.cpp \
+    ../extlibsb040/StatisticsTools/statistics_tools.cpp \
     qvisiblehandlesplitter.cpp \
     qfpluginrawdata.cpp \
     qfhtmldelegate.cpp \

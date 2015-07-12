@@ -269,7 +269,7 @@ bool QFExtensionLinearStagePI2::isConnected(unsigned int i) {
 void QFExtensionLinearStagePI2::connectDevice(unsigned int i) {
     if (((int64_t)i<axes.size())) {
         QMutexLocker locker(axes[i].serial->getMutex());
-        JKSerialConnection* com=axes[i].serial->getCOM();
+        QFSerialConnection* com=axes[i].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[i].serial;
         com->open();
         if (com->isConnectionOpen()) {
@@ -303,7 +303,7 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int i) {
 void QFExtensionLinearStagePI2::disconnectDevice(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
-        JKSerialConnection* com=axes[axis].serial->getCOM();
+        QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
         com->close();
         axes[axis].state=QFExtensionLinearStage::Disconnected;
@@ -317,7 +317,7 @@ void QFExtensionLinearStagePI2::setLogging(QFPluginLogService* logService) {
 void QFExtensionLinearStagePI2::setJoystickActive(unsigned int axis, bool enabled, double maxVelocity) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
-        JKSerialConnection* com=axes[axis].serial->getCOM();
+        QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
 
         if (enabled) {
@@ -342,7 +342,7 @@ bool QFExtensionLinearStagePI2::isJoystickActive(unsigned int axis) {
 void QFExtensionLinearStagePI2::stop(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
-        JKSerialConnection* com=axes[axis].serial->getCOM();
+        QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
@@ -354,7 +354,7 @@ void QFExtensionLinearStagePI2::stop(unsigned int axis) {
 double QFExtensionLinearStagePI2::getSpeed(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
-        JKSerialConnection* com=axes[axis].serial->getCOM();
+        QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
@@ -376,7 +376,7 @@ double QFExtensionLinearStagePI2::getSpeed(unsigned int axis) {
 double QFExtensionLinearStagePI2::getPosition(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
-        JKSerialConnection* com=axes[axis].serial->getCOM();
+        QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
@@ -398,7 +398,7 @@ double QFExtensionLinearStagePI2::getPosition(unsigned int axis) {
 void QFExtensionLinearStagePI2::move(unsigned int axis, double newPosition) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
-        JKSerialConnection* com=axes[axis].serial->getCOM();
+        QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
         serial->selectAxis(axes[axis].ID);
         if (com->isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready) && (!axes[axis].joystickEnabled)) {
@@ -414,7 +414,7 @@ void QFExtensionLinearStagePI2::move(unsigned int axis, double newPosition) {
 QFExtensionLinearStage::AxisState QFExtensionLinearStagePI2::getAxisState(unsigned int axis)  {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
-        JKSerialConnection* com=axes[axis].serial->getCOM();
+        QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
 
 

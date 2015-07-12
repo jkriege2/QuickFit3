@@ -37,13 +37,13 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += stage_pi2.h \
            ../interfaces/qfextensionlinearstage.h \
-           ../../global_lib/jkserialconnection.h \
+           ../../global_lib/qfserialconnection.h \
     pimercury863calibrationdialog.h \
     ../base_classes/qf3comportmanager.h \
     qfextensionlinearstagepi2protocolhandler.h
 
 SOURCES += stage_pi2.cpp \
-           ../../global_lib/jkserialconnection.cpp \
+           ../../global_lib/qfserialconnection.cpp \
     pimercury863calibrationdialog.cpp \
     ../base_classes/qf3comportmanager.cpp \
     qfextensionlinearstagepi2protocolhandler.cpp

@@ -36,7 +36,7 @@ DESTDIR = $${QFOUTPUT}/plugins/
 HEADERS += \
     ../base_classes/qf3comportmanager.h \
     ../interfaces/qfextensionlightsource.h \
-    ../../global_lib/jkserialconnection.h \
+    ../../global_lib/qfserialconnection.h \
     qfextensioncoboltlaser.h \
     qfcoboltlaserprotocolhandler.h \
     ../base_classes/qfsimpleserialprotocolhandler.h \
@@ -45,7 +45,7 @@ HEADERS += \
 
 SOURCES += \
     ../base_classes/qf3comportmanager.cpp \
-    ../../global_lib/jkserialconnection.cpp \
+    ../../global_lib/qfserialconnection.cpp \
     qfextensioncoboltlaser.cpp \
     qfcoboltlaserprotocolhandler.cpp \
     ../base_classes/qfsimpleserialprotocolhandler.cpp

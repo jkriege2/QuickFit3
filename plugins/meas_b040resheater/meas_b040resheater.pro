@@ -36,13 +36,13 @@ include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += meas_b040resheater.h \
-           ../../global_lib/jkserialconnection.h \
+           ../../global_lib/qfserialconnection.h \
     ../base_classes/qf3simpleb040serialprotocolhandler.h \
     ../base_classes/qf3comportmanager.h \
     ../interfaces/qfextensionmeasurementdevice.h
 
 SOURCES += meas_b040resheater.cpp \
-           ../../global_lib/jkserialconnection.cpp \
+           ../../global_lib/qfserialconnection.cpp \
     ../base_classes/qf3simpleb040serialprotocolhandler.cpp \
     ../base_classes/qf3comportmanager.cpp
 

@@ -1,0 +1,12 @@
+[submodule "extlibsb040/StatisticsTools"]
+	path = extlibsb040/StatisticsTools
+	url = https://github.com/jkriege2/StatisticsTools.git
+[submodule "extlibsb040/JKQtPlotter"]
+	path = extlibsb040/JKQtPlotter
+	url = https://github.com/jkriege2/JKQtPlotter.git
+[submodule "extlibsb040/TinyTIFF"]
+	path = extlibsb040/TinyTIFF
+	url = https://github.com/jkriege2/TinyTIFF.git
+[submodule "extlibsb040/libtiff_tools"]
+	path = extlibsb040/libtiff_tools
+	url = https://github.com/jkriege2/libtiff_tools.git

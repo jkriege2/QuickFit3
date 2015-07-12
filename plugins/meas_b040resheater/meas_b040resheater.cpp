@@ -147,7 +147,7 @@ void QFExtensionB040ResistorHeater::showMeasurementDeviceSettingsDialog(unsigned
 bool QFExtensionB040ResistorHeater::isMeasurementDeviceConnected(unsigned int measuremenDevice)
 {
     if ( measuremenDevice>=getMeasurementDeviceCount()) return false;
-    JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
+    QFSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     if (!com) return false;
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);
     QMutexLocker locker(mutex);
@@ -157,7 +157,7 @@ bool QFExtensionB040ResistorHeater::isMeasurementDeviceConnected(unsigned int me
 void QFExtensionB040ResistorHeater::connectMeasurementDevice(unsigned int measuremenDevice)
 {
     if ( measuremenDevice>=getMeasurementDeviceCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
+    QFSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);
     QMutexLocker locker(mutex);
@@ -187,7 +187,7 @@ void QFExtensionB040ResistorHeater::connectMeasurementDevice(unsigned int measur
 void QFExtensionB040ResistorHeater::disconnectMeasurementDevice(unsigned int measuremenDevice)
 {
     if ( measuremenDevice>=getMeasurementDeviceCount()) return;
-    JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
+    QFSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     if (!com) return;
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);
     QMutexLocker locker(mutex);
@@ -211,7 +211,7 @@ void QFExtensionB040ResistorHeater::setMeasurementDeviceLogging(QFPluginLogServi
 QVariant QFExtensionB040ResistorHeater::getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)
 {
     if ( measuremenDevice>=getMeasurementDeviceCount()) return QVariant();
-    JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
+    QFSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     QF3SimpleB040SerialProtocolHandler* serial=devices[measuremenDevice].serial;
     if (!com) return QVariant();
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);
@@ -245,7 +245,7 @@ QVariant QFExtensionB040ResistorHeater::getMeasurementDeviceValue(unsigned int m
 void QFExtensionB040ResistorHeater::setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant &data)
 {
     if ( measuremenDevice>=getMeasurementDeviceCount()) return ;
-    JKSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
+    QFSerialConnection* com=ports.getCOMPort(devices[measuremenDevice].port);
     QF3SimpleB040SerialProtocolHandler* serial=devices[measuremenDevice].serial;
     if (!com) return ;
     QMutex* mutex=ports.getMutex(devices[measuremenDevice].port);

@@ -37,12 +37,12 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += shutter_relais_arduino.h \
            ../interfaces/qfextensionshutter.h \
-           ../../global_lib/jkserialconnection.h \
+           ../../global_lib/qfserialconnection.h \
     ../base_classes/qf3simpleb040serialprotocolhandler.h \
     ../base_classes/qf3comportmanager.h
 
 SOURCES += shutter_relais_arduino.cpp \
-           ../../global_lib/jkserialconnection.cpp \
+           ../../global_lib/qfserialconnection.cpp \
     ../base_classes/qf3simpleb040serialprotocolhandler.cpp \
     ../base_classes/qf3comportmanager.cpp
 
