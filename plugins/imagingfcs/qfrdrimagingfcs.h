@@ -112,7 +112,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, 
 
         void correctOffset();
 
-        void startWizard();
+        void startWizard(bool isProject=false);
+        void startProjectWizard();
     protected:
         /*! \brief add correlations from a video_correlator file to the current project
 

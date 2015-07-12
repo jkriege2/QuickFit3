@@ -163,3 +163,7 @@ Thumbs.db
 /output/examples
 /output/globalconfig_templates
 /quickfit.inc
+/plugins/imagingfcs/release
+/plugins/imagingfcs/debug
+debug
+release

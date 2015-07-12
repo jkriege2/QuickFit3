@@ -71,6 +71,9 @@ void QFRDRImagingFCSPlugin::init()
     QFPluginServices::getInstance()->addQFMathParserRefernceDir(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
 
 
+    services->registerWizard("project_wizards", tr("Imaging FCS/FCCS Project Wizard"), QIcon(getIconFilename()), this, SLOT(startProjectWizard()));
+    services->registerWizard("rdr_wizards", tr("Imaging FCS/FCCS Correlation Wizard"), QIcon(getIconFilename()), this, SLOT(startWizard()));
+
     QFMathParser::addGlobalFunction("rdr_isimfcs", fRDR_isimfcs);
 
 }
@@ -116,7 +119,7 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
 
     QAction* actWizard=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_correlate.png"), tr("imaging FCS Correlation &Wizard ..."), parentWidget);
     actWizard->setStatusTip(tr("Correlate an image series and insert the result into the current project. This wizard simplifies the process, but the option \"correlate images and insert\" will offer finer control and more options."));
-    connect(actWizard, SIGNAL(triggered()), this, SLOT(startWizard()()));
+    connect(actWizard, SIGNAL(triggered()), this, SLOT(startWizard()));
     m->addAction(actWizard);
 
     m->addSeparator();
@@ -250,9 +253,14 @@ void QFRDRImagingFCSPlugin::correctOffset()
     }
 }
 
-void QFRDRImagingFCSPlugin::startWizard()
+void QFRDRImagingFCSPlugin::startProjectWizard()
 {
-    QFRDRImagingFCSWizard* wiz=new QFRDRImagingFCSWizard(parentWidget);
+    startWizard(true);
+}
+
+void QFRDRImagingFCSPlugin::startWizard(bool isProject)
+{
+    QFRDRImagingFCSWizard* wiz=new QFRDRImagingFCSWizard(isProject, parentWidget);
     if (wiz->exec()) {
 
     }
