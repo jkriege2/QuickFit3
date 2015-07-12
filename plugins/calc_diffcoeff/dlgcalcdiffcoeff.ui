@@ -409,6 +409,9 @@
            <property name="text">
             <string>type:</string>
            </property>
+           <property name="buddy">
+            <cstring>cmbShapeType</cstring>
+           </property>
           </widget>
          </item>
          <item row="0" column="1">
@@ -440,6 +443,9 @@
            <property name="text">
             <string>rotation axis diameter a:</string>
            </property>
+           <property name="buddy">
+            <cstring>spinRotationAxis</cstring>
+           </property>
           </widget>
          </item>
          <item row="1" column="1">
@@ -465,6 +471,9 @@
           <widget class="QLabel" name="labOtherAxis">
            <property name="text">
             <string>other axis diameter b:</string>
+           </property>
+           <property name="buddy">
+            <cstring>spinOtherAxis</cstring>
            </property>
           </widget>
          </item>
@@ -516,6 +525,9 @@
            <property name="text">
             <string>particle properties:</string>
            </property>
+           <property name="buddy">
+            <cstring>cmbParticlePropsType</cstring>
+           </property>
           </widget>
          </item>
          <item row="3" column="1">
@@ -537,6 +549,9 @@
              <widget class="QLabel" name="label_11">
               <property name="text">
                <string>type:</string>
+              </property>
+              <property name="buddy">
+               <cstring>cmbParticlePropsType</cstring>
               </property>
              </widget>
             </item>
@@ -573,6 +588,9 @@
              <widget class="QLabel" name="label_47">
               <property name="text">
                <string>partial specific volume:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinParticlePropsPSVolume</cstring>
               </property>
              </widget>
             </item>
@@ -1457,7 +1475,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>931</x>
-     <y>376</y>
+     <y>372</y>
     </hint>
     <hint type="destinationlabel">
      <x>721</x>
@@ -1472,8 +1490,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>244</x>
-     <y>97</y>
+     <x>159</x>
+     <y>72</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1488,8 +1506,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>219</x>
-     <y>150</y>
+     <x>145</x>
+     <y>125</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -1504,8 +1522,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>219</x>
-     <y>176</y>
+     <x>145</x>
+     <y>151</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -1520,8 +1538,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>102</x>
-     <y>40</y>
+     <x>246</x>
+     <y>41</y>
     </hint>
     <hint type="destinationlabel">
      <x>724</x>
@@ -1536,8 +1554,8 @@
    <slot>updateGivenD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>213</x>
-     <y>68</y>
+     <x>214</x>
+     <y>62</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -1569,7 +1587,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>666</x>
-     <y>308</y>
+     <y>306</y>
     </hint>
     <hint type="destinationlabel">
      <x>484</x>
@@ -1585,7 +1603,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>782</x>
-     <y>308</y>
+     <y>306</y>
     </hint>
     <hint type="destinationlabel">
      <x>477</x>
@@ -1601,7 +1619,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>921</x>
-     <y>308</y>
+     <y>306</y>
     </hint>
     <hint type="destinationlabel">
      <x>479</x>
@@ -1729,7 +1747,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>772</x>
-     <y>377</y>
+     <y>373</y>
     </hint>
     <hint type="destinationlabel">
      <x>940</x>
@@ -1872,8 +1890,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>102</x>
-     <y>39</y>
+     <x>226</x>
+     <y>47</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1888,8 +1906,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>102</x>
-     <y>42</y>
+     <x>226</x>
+     <y>73</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -1920,11 +1938,11 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
+     <x>424</x>
      <y>63</y>
     </hint>
     <hint type="destinationlabel">
-     <x>436</x>
+     <x>453</x>
      <y>63</y>
     </hint>
    </hints>
@@ -1936,12 +1954,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>411</x>
-     <y>52</y>
+     <x>424</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel">
-     <x>409</x>
-     <y>83</y>
+     <x>388</x>
+     <y>91</y>
     </hint>
    </hints>
   </connection>
@@ -1952,12 +1970,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>403</x>
-     <y>51</y>
+     <x>424</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel">
-     <x>271</x>
-     <y>85</y>
+     <x>159</x>
+     <y>72</y>
     </hint>
    </hints>
   </connection>
@@ -1968,12 +1986,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
-     <y>58</y>
+     <x>424</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel">
-     <x>323</x>
-     <y>119</y>
+     <x>145</x>
+     <y>99</y>
     </hint>
    </hints>
   </connection>
@@ -1984,12 +2002,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>399</x>
-     <y>69</y>
+     <x>424</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel">
-     <x>399</x>
-     <y>143</y>
+     <x>145</x>
+     <y>125</y>
     </hint>
    </hints>
   </connection>
@@ -2000,12 +2018,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>417</x>
-     <y>67</y>
+     <x>424</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel">
-     <x>360</x>
-     <y>176</y>
+     <x>145</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>
@@ -2016,12 +2034,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>418</x>
+     <x>424</x>
      <y>63</y>
     </hint>
     <hint type="destinationlabel">
-     <x>395</x>
-     <y>278</y>
+     <x>156</x>
+     <y>256</y>
     </hint>
    </hints>
   </connection>
@@ -2032,12 +2050,44 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>399</x>
-     <y>48</y>
+     <x>424</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel">
-     <x>450</x>
-     <y>304</y>
+     <x>156</x>
+     <y>282</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbParticlePropsType</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>282</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>148</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinParticlePropsPSVolume</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>298</x>
+     <y>161</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>180</y>
     </hint>
    </hints>
   </connection>

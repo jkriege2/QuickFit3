@@ -85,7 +85,7 @@ QString qfInfoGITVersion() {
     }
     bool nOK=false;
     int ver=s.toInt(&nOK);
-    if (nOK) s=QString::number(4000+ver); // this offset accounts for the change from our internal subversion repository to GitHub!!!
+    if (nOK) s=QString::number(2100+ver); // this offset accounts for the change from our internal subversion repository to GitHub!!!
     return s;
 }
 
