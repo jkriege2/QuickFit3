@@ -1181,7 +1181,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
     double* ppparamsMax=NULL;
     const bool* pparamsFix=fixParams;
     bool* ppparamsFix=NULL;
-    std::cout<<"QFFitAlgorithm::lsqMinimize  1\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  1\n"; std::cout.flush();
     if (paramsMin==NULL) {
         ppparamsMin=(double*)qfCalloc(model->get_paramcount(), sizeof(double));
         for (int i=0; i<model->get_paramcount(); i++) {
@@ -1189,7 +1189,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         }
         pparamsMin=ppparamsMin;
     }
-    std::cout<<"QFFitAlgorithm::lsqMinimize  2\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  2\n"; std::cout.flush();
     if (paramsMax==NULL) {
         ppparamsMax=(double*)qfCalloc(model->get_paramcount(), sizeof(double));
         for (int i=0; i<model->get_paramcount(); i++) {
@@ -1197,7 +1197,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         }
         pparamsMax=ppparamsMax;
     }
-    std::cout<<"QFFitAlgorithm::lsqMinimize  3\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  3\n"; std::cout.flush();
 
 
     if (fixParams==NULL) {
@@ -1207,7 +1207,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         }
         pparamsFix=ppparamsFix;
     }
-    std::cout<<"QFFitAlgorithm::lsqMinimize  4\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  4\n"; std::cout.flush();
 
 
 
@@ -1219,22 +1219,22 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         fm=new QFFitAlgorithm::FitQFOptimizeFunctionFunctor(model, initialParams, pparamsFix);
     }
     fmbs=dynamic_cast<QFFitAlgorithm::FunctorBootstrapInterface*>(fm);
-    std::cout<<"QFFitAlgorithm::lsqMinimize  5\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  5\n"; std::cout.flush();
 
     double* tparamsMin=fm->createMappedArrayForFunctor(pparamsMin);
-    std::cout<<"QFFitAlgorithm::lsqMinimize  6\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  6\n"; std::cout.flush();
 
     double* tparamsMax=fm->createMappedArrayForFunctor(pparamsMax);
-    std::cout<<"QFFitAlgorithm::lsqMinimize  7\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  7\n"; std::cout.flush();
     double* tparamsOut=(double*)qfCalloc(fm->get_paramcount(), sizeof(double));
-    std::cout<<"QFFitAlgorithm::lsqMinimize  8\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  8\n"; std::cout.flush();
     double* tparamErrorsOut=(double*)qfCalloc(fm->get_paramcount(), sizeof(double));
-    std::cout<<"QFFitAlgorithm::lsqMinimize  9\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  9\n"; std::cout.flush();
     double* tinitialParams=fm->createMappedArrayForFunctor(initialParams);
-    std::cout<<"QFFitAlgorithm::lsqMinimize  10\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  10\n"; std::cout.flush();
 
     result=intFit(tparamsOut, tparamErrorsOut, tinitialParams, fm, tparamsMin, tparamsMax);
-    std::cout<<"QFFitAlgorithm::lsqMinimize  11\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  11\n"; std::cout.flush();
 
 
     //qDebug()<<"### OPTIMIZE: "<<m_errorEstimateModeFit<<fmbs;
@@ -1316,28 +1316,28 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::lsqMinimize(double* paramsOut, double*
         paramsOut[i]=initialParams[i];
         if (paramErrorsOut) paramErrorsOut[i]=0;
     }
-    std::cout<<"QFFitAlgorithm::lsqMinimize  12\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  12\n"; std::cout.flush();
 
     fm->mapArrayFromFunctorToModel(paramsOut, tparamsOut);
-    std::cout<<"QFFitAlgorithm::lsqMinimize  13\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  13\n"; std::cout.flush();
     if (paramErrorsOut) fm->mapArrayFromFunctorToModel(paramErrorsOut, tparamErrorsOut);
-    std::cout<<"QFFitAlgorithm::lsqMinimize  14\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  14\n"; std::cout.flush();
 
     qfFree(tparamsMax);
     qfFree(tparamsMin);
     qfFree(tparamErrorsOut);
     qfFree(tparamsOut);
     qfFree(tinitialParams);
-    std::cout<<"QFFitAlgorithm::lsqMinimize  15\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  15\n"; std::cout.flush();
 
 
     if (ppparamsMin) qfFree(ppparamsMin);
     if (ppparamsMax) qfFree(ppparamsMax);
     if (ppparamsFix) qfFree(ppparamsFix);
-    std::cout<<"QFFitAlgorithm::lsqMinimize  16\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  16\n"; std::cout.flush();
 
     delete fm;
-    std::cout<<"QFFitAlgorithm::lsqMinimize  17\n"; std::cout.flush();
+    //std::cout<<"QFFitAlgorithm::lsqMinimize  17\n"; std::cout.flush();
 
     return result;
 }
