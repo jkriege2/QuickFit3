@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
+Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -68,7 +68,7 @@ class QFPFitAlgorithmLMFitPlugin : public QObject, public QFPluginFitAlgorithm {
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("plugin: (c) 2011-2014 Jan Krieger<br/>lmfit: (c) 2009-2013  Joachim Wuttke <j.wuttke@fz-juelich.de>");
+            return tr("plugin: (c) 2011-2015 Jan Krieger<br/>lmfit: (c) 2009-2013  Joachim Wuttke <j.wuttke@fz-juelich.de>");
         };
 
         /** \brief weblink for the plugin */

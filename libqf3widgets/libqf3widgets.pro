@@ -1,7 +1,7 @@
 #
 #    Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 #	
-#	 last modification: $LastChangedDate$  (revision $Rev$)
+#	 
 #
 #    This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 #
@@ -54,7 +54,6 @@ DESTDIR = $$QFOUTPUT
 HEADERS += jkqttools.h \
            flowlayout.h \
            qtlogfile.h \
-           cpptools.h \
            jkverticalscrollarea.h \
            colorcombobox.h \
            jkstyledbutton.h \
@@ -140,14 +139,14 @@ HEADERS += jkqttools.h \
     qfimageplot.h \
     qftableview.h \
     qfrdrmaskbyoverviewimagedlg.h\
-    numberedit.h
+    numberedit.h \
+    qfasttablelabel.h
 
 
 SOURCES +=  \
            jkqttools.cpp \
             flowlayout.cpp \
            qtlogfile.cpp \
-           cpptools.cpp \
            jkverticalscrollarea.cpp \
            colorcombobox.cpp \
            jkstyledbutton.cpp \
@@ -224,7 +223,8 @@ SOURCES +=  \
     qfimageplot.cpp \
     qftableview.cpp \
     qfrdrmaskbyoverviewimagedlg.cpp \
-    numberedit.cpp
+    numberedit.cpp \
+    qfasttablelabel.cpp
 
 
 FORMS += qf3objectiveeditor.ui \

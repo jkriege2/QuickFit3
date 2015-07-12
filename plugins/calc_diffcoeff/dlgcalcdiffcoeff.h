@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
+Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -65,6 +65,7 @@ class DlgCalcDiffCoeff : public QDialog
         void on_btnCHelp5_clicked();
         void on_btnEditGivenD_toggled(bool checked);
         void on_cmbShapeType_currentIndexChanged(int index);
+        void on_cmbParticlePropsType_currentIndexChanged(int index);
         void showHelp();
         void on_btnSendEmailGivenD_clicked();
     protected:

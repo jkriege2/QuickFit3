@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2008-2014 Jan Buchholz, German Cancer Research Center
+Copyright (c) 2008-2015 Jan Buchholz, German Cancer Research Center
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 

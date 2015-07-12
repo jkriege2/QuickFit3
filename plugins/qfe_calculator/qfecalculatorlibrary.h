@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
+    Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     German Cancer Research Center/University Heidelberg
 
     last modification: $LastChangedDate: 2014-09-12 18:00:48 +0200 (Fr, 12 Sep 2014) $  (revision $Rev: 3461 $)

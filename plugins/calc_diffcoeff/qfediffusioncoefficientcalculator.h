@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
+Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -103,7 +103,7 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
             Ellipsoid=0,
             Cylinder=1,
             Sphere=2,
-            GlobularProtein=3
+            GlobularParticleWithPartSpecVol=3
         };
 
 
@@ -120,7 +120,7 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         /** \brief returns the diffusion coefficient in m^2/s */
         double getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
         /** \brief returns the diffusion coefficient in m^2/s */
-        double getShapeDCoeff(int solution, double rotation_axis_or_length_meter_orMolMassDa, double second_axis_or_diameter_meter, SpheroidType type, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0, double* Dsphere=NULL, double* volume=NULL);
+        double getShapeDCoeff(int solution, double rotation_axis_or_length_meter_orMolMassDa, double second_axis_or_diameter_meter, SpheroidType type, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0, double partSpecVolume=0.73, double* Dsphere=NULL, double* volume=NULL);
         /** \brief returns the hydrodynamic radius in m^2 */
         double getHydrodynRadius_from_D(double D, int solution, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
         /** \brief returns the hydrodynamic radius in m^2 */

@@ -1,7 +1,7 @@
 /*
     Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    
 
     This software is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License (LGPL) as published by
@@ -53,12 +53,12 @@ class  TickTock
 {
     public:
         /** Default constructor */
-        TickTock() { runtime=0; intAvgTimingTicTock=0; }
+        inline TickTock() { runtime=0; intAvgTimingTicTock=0; }
         /** Default destructor */
-        virtual ~TickTock() {}
+        inline virtual ~TickTock() {}
 
         /** \return duration in seconds */
-        inline double get_duration() { return runtime; };
+        inline double get_duration() { return runtime; }
     protected:
 
         /** \brief run-time of the run() method in seconds */
@@ -156,12 +156,12 @@ class  TickTock
 /** \brief implementation of TickTock with public access
  * \ingroup tool_classes
  */
-class QFLIB_EXPORT PublicTickTock: public TickTock {
+class  PublicTickTock: public TickTock {
     public:
         /** Default constructor */
-        PublicTickTock(): TickTock() {}
+        inline PublicTickTock(): TickTock() {}
         /** Default destructor */
-        virtual ~PublicTickTock() {}
+        inline virtual ~PublicTickTock() {}
 
         inline void tick() {
             TickTock::tick();

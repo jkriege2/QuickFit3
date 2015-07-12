@@ -25,7 +25,6 @@ Copyright (c) 2014
 #include "qfpluginexporters.h"
 #include "qfexporter.h"
 #include "qfexporterimageseries.h"
-#include "libtiff_tools.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <QMutex>

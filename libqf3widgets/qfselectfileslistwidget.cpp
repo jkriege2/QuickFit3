@@ -2,7 +2,7 @@
     Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     German Cancer Research Center/University Heidelberg
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 

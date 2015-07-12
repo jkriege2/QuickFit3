@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -245,7 +245,7 @@ double QFEDiffusionCoefficientCalculator::getSphereDRotCoeff(int solution, doubl
     return K_BOLTZ*at_temperature_K/(8.0*M_PI*eta*qfCube(diameter_meter/2.0));
 }
 
-double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double rotation_axis_or_length_meter_ormolmassDa, double second_axis_or_diameter_meter, QFEDiffusionCoefficientCalculator::SpheroidType type, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double viscosity_factor, double* Dsphere, double* volume) {
+double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double rotation_axis_or_length_meter_ormolmassDa, double second_axis_or_diameter_meter, QFEDiffusionCoefficientCalculator::SpheroidType type, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double viscosity_factor, double partSpecVolume, double* Dsphere, double* volume) {
     double eta=getSolutionViscosity(solution, at_temperature_K, components)*viscosity_factor;
 
     double Re=0;
@@ -277,11 +277,10 @@ double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double ro
     } else if (type==QFEDiffusionCoefficientCalculator::Sphere){
         Ft=1;
         Re=rotation_axis_or_length_meter_ormolmassDa/2.0;
-    } else if (type==QFEDiffusionCoefficientCalculator::GlobularProtein){
+    } else if (type==QFEDiffusionCoefficientCalculator::GlobularParticleWithPartSpecVol){
         Ft=1;
-        const double partspecvol=0.73; //[cm^3/g]
         // 1e21/6.022e23= 1.0/6.022*1e-2
-        double vol=partspecvol/6.022*1e-2*rotation_axis_or_length_meter_ormolmassDa; //[in nm^3]
+        double vol=partSpecVolume/6.022*1e-2*rotation_axis_or_length_meter_ormolmassDa; //[in nm^3]
         Re=pow(3.0*vol/4.0/M_PI, 1.0/3.0)*1e-9;
         Ft=1;
     }

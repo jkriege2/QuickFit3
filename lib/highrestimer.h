@@ -1,7 +1,7 @@
 /*
     Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    
 
     This software is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License (LGPL) as published by
@@ -34,6 +34,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include "lib_imexport.h"
 
 #ifndef __WINDOWS__
 # if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
@@ -137,7 +138,7 @@
  * \test you can find an example application in the file \link test_hrestimer.cpp .
  *
  */
-class HighResTimer {
+class QFLIB_EXPORT HighResTimer {
   protected:
     #ifdef __WINDOWS__
       /** \brief internal: time stamp of the last call of start() */

@@ -234,7 +234,7 @@ class QFLIB_EXPORT jkINIParser2 {
                                 jkip2Bool};   /*!< \brief a boolean value true|false */
 
         /** \brief this struct represents one property */
-        struct jkip2Property {
+        struct QFLIB_EXPORT jkip2Property {
             /** \brief points to the parser object owning this property */
             jkINIParser2* parser;
             /** \brief type of the property */
@@ -294,7 +294,7 @@ class QFLIB_EXPORT jkINIParser2 {
          * This class may be used to build a tree of configuration properties. Each node represents one
          * group and may contain a number of properties.
          */
-         class groupNode {
+         class QFLIB_EXPORT groupNode {
              protected:
                 /** \brief points to the parser object owning this groupNode. */
                 jkINIParser2* parser;
@@ -538,7 +538,7 @@ class QFLIB_EXPORT jkINIParser2 {
         groupNode* currentRoot;
 
         /** \brief this struct is used to store the current parser state */
-        struct ParserState {
+        struct QFLIB_EXPORT ParserState {
             /** \brief name of the currently processed group */
             std::string currentGroup;
             /** \brief name of the currently processed field */

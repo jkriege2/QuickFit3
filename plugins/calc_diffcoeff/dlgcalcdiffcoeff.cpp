@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -217,9 +217,9 @@ void DlgCalcDiffCoeff::updateD() {
                Dwater.append(plugin->getDCoeff_from_D20W(0, ui->spinGivenD20W->value()/1e12, 273.15+T)*1e12);
         } else if (ui->tabWidget->currentWidget()==ui->tabGeometry) {
             double DS=0;
-                    D.append(plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, ui->spinViscosityFactor->value(), &DS)*1e12);
-            Dsolution.append(plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, QList<QFEDiffusionCoefficientCalculator::Component>(), ui->spinViscosityFactor->value())*1e12);
-               Dwater.append(plugin->getShapeDCoeff(0, ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T)*1e12);
+                    D.append(plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, ui->spinViscosityFactor->value(), ui->spinParticlePropsPSVolume->value(), &DS)*1e12);
+            Dsolution.append(plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, QList<QFEDiffusionCoefficientCalculator::Component>(), ui->spinViscosityFactor->value(), ui->spinParticlePropsPSVolume->value())*1e12);
+               Dwater.append(plugin->getShapeDCoeff(0, ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, QList<QFEDiffusionCoefficientCalculator::Component>(), 1.0, ui->spinParticlePropsPSVolume->value())*1e12);
               Dsphere.append(DS*1e12);
         } else  {
             D.append(0);
@@ -278,14 +278,14 @@ void DlgCalcDiffCoeff::updateD() {
     } else if (ui->tabWidget->currentWidget()==ui->tabGeometry) {
         double length_rot=ui->spinRotationAxis->value()*1e-9;
         double length_other=ui->spinOtherAxis->value()*1e-9;
-        if (ui->cmbShapeType->currentIndex()==QFEDiffusionCoefficientCalculator::GlobularProtein) {
+        if (ui->cmbShapeType->currentIndex()==QFEDiffusionCoefficientCalculator::GlobularParticleWithPartSpecVol) {
             length_rot=ui->spinRotationAxis->value()*1e3;
             length_other=ui->spinOtherAxis->value()*1e3;
         }
-        DD=plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), length_rot, length_other, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
+        DD=plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), length_rot, length_other, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, ui->spinViscosityFactor->value(), ui->spinParticlePropsPSVolume->value())*1e12;
         double D20Wsphere=0;
         double volume=0;
-        double D20W=plugin->getShapeDCoeff(0, length_rot, length_other, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+20.0, QList<QFEDiffusionCoefficientCalculator::Component>(), 1, &D20Wsphere, &volume)*1e12;
+        double D20W=plugin->getShapeDCoeff(0, length_rot, length_other, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+20.0, QList<QFEDiffusionCoefficientCalculator::Component>(), 1.0, ui->spinParticlePropsPSVolume->value(), &D20Wsphere, &volume)*1e12;
         double etaW20=plugin->getSolutionViscosity(0, 293.15);
         D20Wsphere*=1e12;
         volume=volume*1e27;
@@ -580,6 +580,8 @@ void DlgCalcDiffCoeff::readSettings() {
             ui->spinRotationAxis->setValue(set->value(plugin->getID()+"/shape/rot", 4).toDouble());
             ui->spinOtherAxis->setValue(set->value(plugin->getID()+"/shape/other", 3).toDouble());
             ui->cmbShapeType->setCurrentIndex(set->value(plugin->getID()+"/shape/type", 0).toDouble());
+            ui->spinParticlePropsPSVolume->setValue(set->value(plugin->getID()+"/shape/partspecvol", 0.73).toDouble());
+            ui->cmbParticlePropsType->setCurrentIndex(set->value(plugin->getID()+"/shape/moltype", 0).toInt());
             on_cmbShapeType_currentIndexChanged(ui->cmbShapeType->currentIndex());
 
             updateD();
@@ -615,6 +617,8 @@ void DlgCalcDiffCoeff::writeSettings() {
             set->setValue(plugin->getID()+"/shape/rot", ui->spinRotationAxis->value());
             set->setValue(plugin->getID()+"/shape/other", ui->spinOtherAxis->value());
             set->setValue(plugin->getID()+"/shape/type", ui->cmbShapeType->currentIndex());
+            set->setValue(plugin->getID()+"/shape/moltype", ui->cmbParticlePropsType->currentIndex());
+            set->setValue(plugin->getID()+"/shape/partspecvol", ui->spinParticlePropsPSVolume->value());
 
             set->setValue(plugin->getID()+"/givenD20W", ui->spinGivenD20W->value());
 
@@ -791,12 +795,16 @@ void DlgCalcDiffCoeff::on_cmbShapeType_currentIndexChanged(int index) {
         ui->labOtherAxis->setText(tr("other axes diameter b:"));
         ui->labOtherAxis->setVisible(true);
         ui->spinOtherAxis->setVisible(true);
+        ui->widParticleProps->setVisible(false);
+        ui->labParticleProps->setVisible(false);
     } else if (index==1) {
         ui->labShapePic->setPixmap(QPixmap(":/calc_diffcoeff/cylinder.png"));
         ui->labRotAxis->setText(tr("cylinder length L:"));
         ui->labOtherAxis->setText(tr("diameter d:"));
         ui->labOtherAxis->setVisible(true);
         ui->spinOtherAxis->setVisible(true);
+        ui->widParticleProps->setVisible(false);
+        ui->labParticleProps->setVisible(false);
     } else if (index==3) {
         ui->labShapePic->setPixmap(QPixmap(":/calc_diffcoeff/globprot.png"));
         ui->labRotAxis->setText(tr("molecular mass:"));
@@ -804,12 +812,31 @@ void DlgCalcDiffCoeff::on_cmbShapeType_currentIndexChanged(int index) {
         ui->labOtherAxis->setVisible(false);
         ui->spinOtherAxis->setVisible(false);
         ui->spinRotationAxis->setSuffix(tr(" kDa"));
+        ui->widParticleProps->setVisible(true);
+        ui->labParticleProps->setVisible(true);
+        on_cmbParticlePropsType_currentIndexChanged(ui->cmbParticlePropsType->currentIndex());
     } else {
         ui->labShapePic->setPixmap(QPixmap(":/calc_diffcoeff/sphere.png"));
         ui->labRotAxis->setText(tr("diameter d:"));
         ui->labOtherAxis->setText(tr("---"));
         ui->labOtherAxis->setVisible(false);
         ui->spinOtherAxis->setVisible(false);
+        ui->widParticleProps->setVisible(false);
+        ui->labParticleProps->setVisible(false);
+    }
+}
+
+void DlgCalcDiffCoeff::on_cmbParticlePropsType_currentIndexChanged(int index)
+{
+    ui->spinParticlePropsPSVolume->setEnabled(index==ui->cmbParticlePropsType->count()-1);
+    if (index==0) {
+        ui->spinParticlePropsPSVolume->setValue(0.73);
+    } else if (index==1) {
+        ui->spinParticlePropsPSVolume->setValue(0.61);
+    } else if (index==2) {
+        ui->spinParticlePropsPSVolume->setValue(0.53);
+    } else if (index==3) {
+        ui->spinParticlePropsPSVolume->setValue(0.58);
     }
 }
 
