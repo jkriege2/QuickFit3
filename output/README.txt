@@ -1,13 +1,13 @@
 --------------------------------------------------------------------------------
 -- QuickFit 3.0                                                               --
--- (c) 2010-2014 by Jan W. Krieger                                            --
+-- (c) 2008-2015 by Jan W. Krieger                                            --
 --     Biophysics of Macromolecules (B040)                                    --
 --        German Cancer Research center (DKFZ)                                --
 --     Institute for scientific computation (IWR)                             --
 --        University of Heidelberg                                            --
 --------------------------------------------------------------------------------
 --   http://www.dkfz.de/Macromol/quickfit/                                    --
---   http://www.dkfz.de/Macromol/quickfit/source.html                         --
+--   https://github.com/jkriege2/QuickFit3.git                                --
 --------------------------------------------------------------------------------
 
 
