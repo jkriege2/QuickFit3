@@ -70,8 +70,8 @@ QString qfInfoLicense() {
     return QLatin1String(QF_LICENSE);
 }
 
-QString qfInfoSVNVersion() {
-    QString s= QLatin1String(SVNVERSION);
+QString qfInfoGITVersion() {
+    QString s= QLatin1String(GITCOMMITCOUNT);
     if (s.contains("exportiert", Qt::CaseInsensitive) || s.contains("exported", Qt::CaseInsensitive)) {
         s="???";
     } else if (s.endsWith("M")) {
@@ -83,6 +83,9 @@ QString qfInfoSVNVersion() {
         int i2=rxc.cap(2).toInt();
         s.setNum(qMax(i1,i2));
     }
+    bool nOK=false;
+    int ver=s.toInt(&nOK);
+    if (nOK) s=SQtring::number(4000+ver); // this offset accounts for the change from our internal subversion repository to GitHub!!!
     return s;
 }
 

@@ -32,7 +32,7 @@ DlgContactAuthors::DlgContactAuthors(QWidget *parent, bool contactMailinglist) :
 {
     ui->setupUi(this);
     ui->labWebpage->setText(tr("for further information and new versions, go to: <a href=\"%1\">%1</a>.</small>").arg(qfInfoWeblink()));
-    ui->edtVersion->setText(QString("QuickFit v%1 (SVN%2 COMPILEDATE: %3), %4 bits").arg(qfInfoVersion()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()));
+    ui->edtVersion->setText(QString("QuickFit v%1 (SVN%2 COMPILEDATE: %3), %4 bits").arg(qfInfoVersion()).arg(qfInfoGITVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()));
     if (contactMailinglist) ui->cmbSendTo->setCurrentIndex(1);
     ui->edtEMail->setText(ProgramOptions::getConfigValue("DlgContactAuthors/email", "").toString());
     ui->edtName->setText(ProgramOptions::getConfigValue("DlgContactAuthors/name", "").toString());

@@ -807,13 +807,13 @@ void QFProject::internalWriteXMLConst(QIODevice *file, const QString &projectFil
     if (writeRecordsOnly) {
         w.writeStartElement("quickfitprojectsubset");
         w.writeAttribute("quickfit_version", qfInfoVersionFull());
-        w.writeAttribute("quickfit_svn", qfInfoSVNVersion());
+        w.writeAttribute("quickfit_svn", qfInfoGITVersion());
         w.writeAttribute("quickfit_compiledate", qfInfoCompileDate());
         w.writeAttribute("sortorder", QString::number(m_sortOrder));
     } else {
         w.writeStartElement("quickfitproject");
         w.writeAttribute("quickfit_version", qfInfoVersionFull());
-        w.writeAttribute("quickfit_svn", qfInfoSVNVersion());
+        w.writeAttribute("quickfit_svn", qfInfoGITVersion());
         w.writeAttribute("quickfit_compiledate", qfInfoCompileDate());
         w.writeAttribute("name", name);
         w.writeAttribute("creator", creator);

@@ -30,8 +30,8 @@ INCLUDEPATH += ../../lib/ \
                ../interfaces \
                ../base_classes \
                ../../extlibs/ \
-               ../../extlibsb040/StatisticsTools/ \
-               ../../extlibsb040/JKQtPlotter/
+               ../../extlibsb040/StatisticsTools/
+
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
@@ -40,7 +40,8 @@ OBJECTS_DIR = ./.objs/
 QFOUTPUT = ../../$${OUTPUTDIR_NAME}
 DESTDIR = $$QFOUTPUT/plugins
 
-GPL3LICENSE = ../../doc/gpl-3.0.txt
+GPL3LICENSE = $$PWD/../doc/gpl-3.0.txt \
+              $$PWD/../doc/lgpl-2.1.txt
 
 #release {
 #    QFOUTPUT = ../../output_release

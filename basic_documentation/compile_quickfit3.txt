@@ -70,18 +70,18 @@
 ========================================================================================
 == Unpack QuickFit Sources                                                            ==
 ========================================================================================
-2. Unpack the source ZIP file. Due to history, there are two directories in this: 
-     * LIB/trunk (which contains some common C++-libraries) 
-     * FCSTOOLS/trunk/QuickFit3 which contains the actual Quickfit!
-     * in the base directory you'll find several images and .txt files, which describe
+2. The full sourcecode is available on GitHub::
+         https://github.com/jkriege2/QuickFit3.git
+   Unpack the source ZIP file / Checkout the repository from GitHub: 
+     * The base directory contains the main QMake project quickfit.pro
+	 * All plugins are contained in the ./plugins/ subdirectory
+	 * The main application quickfit3.exe/app can be found in application
+	 * All outputs will be written into the folder ./output/
+	 * The folder ./extlibs contains several external dependencies and a script to build them
+	 * the folder ./extlibsb040 contains external libraries that are also from Dept. B040 and
+	   are added as submodules in this directory!
+     * in the base directory you'll also find several images and .txt files, which describe
        how you can configure your system to compile QuickFit 3     
-   Alternatively (if you have a Login/PW) you can check out the stuff from
-   our subversion repository:
-         https://www.dkfz.de/svn/B040     
-   But note: This repository contains much more than QuickFit3, so it might be 
-   enough to check out only the two directories mentioned above. Make sure the
-   relative pathes are correct (i.e. your main directory should have the two 
-   subfolders LIB and FCSTOOLS !)
    
    
 ========================================================================================
@@ -97,7 +97,7 @@ So you can run the steps, described below savely on any Linux system!!!
 3. We will now build some of the dependency libraries needed for QuickFit3
    
    3.1 start a bash shell (or MSys on Win) and change to the directory 
-               FCSTOOLS/trunk/QuickFit3/extlibs
+               ./extlibs
        of your QuickFit source tree.
    3.2 run the shell script ./build_dependencies.sh, which will build
        the external libraries, needed to build QuickFit 3 (e.g. libtiff, GSL, ...)
@@ -126,7 +126,7 @@ So you can run the steps, described below savely on any Linux system!!!
              QuickFit! ALso you have to copy the CONTENTS of the plugins folder
 			 of Qt into a subfolder 'qtplugins' of the output directory of QuickFit.
 			 the output folder of QuickFit is:
-			     FCSTOOLS/trunk/QuickFit3/output
+			     ./output
        3.2.6 build these libraries:         
               
               library       | Linux               | Windows                            | MacOS X
@@ -189,7 +189,7 @@ So you can run the steps, described below savely on any Linux system!!!
 				   
 				   
    3.3 now we will build QuickFit 3 itself
-       3.3.1 change to FCSTOOLS/trunk/QuickFit3
+       3.3.1 change to the base directory
        3.3.2 create a file quickfit.inc with the following contents (or edit the 
              existing file as needed):
                 QF3CONFIG+=nohardwaredrivers
@@ -230,15 +230,15 @@ So you can run the steps, described below savely on any Linux system!!!
              Now the online-help, examples and other asset files will be copied 
              to the output directory. After this step QF3 is ready to run.
        3.3.6 you should have an executable 
-                     LINUX:  FCSTOOLS/trunk/QuickFit3/output/quickfit3
-                     WIN:    FCSTOOLS/trunk/QuickFit3/output/quickfit3.exe
-					 MACOS:  FCSTOOLS/trunk/QuickFit3/output/quickfit3.app
+                     LINUX:  ./output/quickfit3
+                     WIN:    ./output/quickfit3.exe
+					 MACOS:  ./output/quickfit3.app
              now. Run this to see whether everyting worked!
              Note: QuickFit 3.0 and all files it requires will be stored in the
-                   directory FCSTOOLS/trunk/QuickFit3/output/. 
+                   directory ./output/. 
 			 MACOS X: Here, the compile process generates a halve-complete app-bundle, 
                       which you'll have to complete by running an additional bash script
-					  FCSTOOLS/trunk/QuickFit3/output/macosx_bundle.sh in the output
+					  ./output/macosx_bundle.sh in the output
 					  directory! Please edit this script before running it and make sure
 					  that the paths to the Qt-version at the start of the script are correct!
 					  This script will copy the required Qt frameworks, Qt plugins, QF3 plugins
@@ -267,7 +267,7 @@ So you can run the steps, described below savely on any Linux system!!!
                 QtSvg4.dll (and QtSvg4d.dll for debug-builds)
                 QtXml4.dll (and QtXml4d.dll for debug-builds)
                 also copy all the subfolders of the Qt plugins folder into the
-                qtplugins folder of QuickFit!
+                ./output/qtplugins/ folder of QuickFit!
              for Qt5.x:
 			    icudt54.dll   (if present in Qt/bin dir)
 				icuin54.dll   (if present in Qt/bin dir)
@@ -293,7 +293,10 @@ So you can run the steps, described below savely on any Linux system!!!
 				
 				
                 also copy all the subfolders of the Qt plugins folder into the
-                qtplugins folder of QuickFit!
+                ./output/qtplugins/ folder of QuickFit! Make sure to have
+				the platform plugin, as all Qt applications need that (i.e. the
+				plugins in the ./QTDIR/plugins/platforms directory should be copied
+				to ./output/qtplugins/platforms/
              If one of the files is missing AND QF3 does not start, you can copy 
              it to the output directory from either the MinGW/bin directory or
              the QT/bin directory (where MinGW and Qt have to be replaced by the
@@ -313,7 +316,7 @@ So you can run the steps, described below savely on any Linux system!!!
     in the base directory of the source tree (qtcreator_*.png and
 	build_quickfit3_config_qtcreator_*.png)
   * Note: On MacOS X you'll still have to run the script
-      FCSTOOLS/trunk/QuickFit3/output/macosx_bundle.sh	
+      ./output/macosx_bundle.sh	
 	from a terminal after building QF3!
 	
 	

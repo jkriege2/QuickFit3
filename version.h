@@ -3,7 +3,7 @@
 
 #include <QtGlobal>
 #include "compiledate.h"
-#include "svnversion.h"
+#include "gitversion.h"
 #include "compiler.h"
 #include "qfversion.h"
 

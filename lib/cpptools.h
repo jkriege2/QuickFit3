@@ -45,8 +45,8 @@
 
 
 
-#ifndef tools_h
-#define tools_h
+#ifndef cpptools_h
+#define cpptools_h
 
 #ifndef __WINDOWS__
 # if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
@@ -500,10 +500,10 @@ private:
 /*@{*/
 
 /** \brief test whether the given file exists */
-LIB_EXPORT bool file_exists (std::string fileName);
+QFLIB_EXPORT bool file_exists (std::string fileName);
 
 /** \brief test whether the given file exists */
-LIB_EXPORT void copy_file(std::string in, std::string out);
+QFLIB_EXPORT void copy_file(std::string in, std::string out);
 
 /** \brief make all dirs specified
  *
@@ -511,7 +511,7 @@ LIB_EXPORT void copy_file(std::string in, std::string out);
  * dir1, but not dir 2 and dir3. THis function will create the complete directory tree. I.e. it ensures the existence of all specified
  * driectories.
  */
-LIB_EXPORT void mk_all_dir(std::string directories);
+QFLIB_EXPORT void mk_all_dir(std::string directories);
 
 /*! \brief list all files matching a given wildcard
 
@@ -522,7 +522,7 @@ LIB_EXPORT void mk_all_dir(std::string directories);
 
     It returns a vector containing the filenames relative to the current directory.
  */
-LIB_EXPORT std::vector<std::string> listfiles_wildcard(std::string pattern);
+QFLIB_EXPORT std::vector<std::string> listfiles_wildcard(std::string pattern);
 /*@}*/
 
 
@@ -560,10 +560,10 @@ LIB_EXPORT std::vector<std::string> listfiles_wildcard(std::string pattern);
     fclose(f);
     \endcode
  */
-LIB_EXPORT std::vector<double> csv_readline(FILE* f, char separator_char=',', char comment_char='#');
+QFLIB_EXPORT std::vector<double> csv_readline(FILE* f, char separator_char=',', char comment_char='#');
 
 /** \brief returns the size of the specified file */
-LIB_EXPORT long get_filesize(char *FileName);
+QFLIB_EXPORT long get_filesize(char *FileName);
 
 /** \brief counts the lines in a file
  *
@@ -572,7 +572,7 @@ LIB_EXPORT long get_filesize(char *FileName);
  * If comment_char is kept 0 the function counts all lines in the file. Use this to count the actual
  * data lines in a CSV file!
  */
-LIB_EXPORT unsigned long long count_lines(std::string filename, char comment_char=0);
+QFLIB_EXPORT unsigned long long count_lines(std::string filename, char comment_char=0);
 
 /*@}*/
 
@@ -593,21 +593,21 @@ LIB_EXPORT unsigned long long count_lines(std::string filename, char comment_cha
 /*@{*/
 
 /** \brief convert a long integer to a C++ string */
-LIB_EXPORT std::string inttostr(long data);
+QFLIB_EXPORT std::string inttostr(long data);
 /** \brief convert a long integer to a C++ string containing the number in hex notation */
-LIB_EXPORT std::string inttohex(long data);
+QFLIB_EXPORT std::string inttohex(long data);
 /** \brief convert a unsigned long integer to a C++ string */
-LIB_EXPORT std::string uinttostr(unsigned long data);
+QFLIB_EXPORT std::string uinttostr(unsigned long data);
 /** \brief convert a long integer to a C++ string by using a printf-style format string (see <A HREF="http://www.cplusplus.com/reference/clibrary/cstdio/printf.html">printf format quick reference</A>)  */
-LIB_EXPORT std::string inttostr_fmt(long data, std::string format="%ld");
+QFLIB_EXPORT std::string inttostr_fmt(long data, std::string format="%ld");
 /** \brief convert an unsigned long integer to a C++ string by using a printf-style format string (see <A HREF="http://www.cplusplus.com/reference/clibrary/cstdio/printf.html">printf format quick reference</A>)  */
-LIB_EXPORT std::string uinttostr_fmt(unsigned long data, std::string format="%ld");
+QFLIB_EXPORT std::string uinttostr_fmt(unsigned long data, std::string format="%ld");
 /** \brief convert a double float to a C++ string. in \a past_comma you can give the number of digits
  *         to show after the decimal divider. If \a remove_trail0 is \c true the method removes all trailing '0'.
  *
  * If \a belowIsZero>0 and \c abs(data) is smaller than \a belowIsZero, then \c "0" is returned.
  */
-LIB_EXPORT std::string floattostr(double data, int past_comma=-1, bool remove_trail0=false, double belowIsZero=1e-16);
+QFLIB_EXPORT std::string floattostr(double data, int past_comma=-1, bool remove_trail0=false, double belowIsZero=1e-16);
 /*! \brief convert a given string to a double floating point value.
 
     \param data input string
@@ -616,16 +616,16 @@ LIB_EXPORT std::string floattostr(double data, int past_comma=-1, bool remove_tr
 
     Basically this function is a wrapper around strtod() from libc.
  */
-LIB_EXPORT double strtofloat(std::string data);
+QFLIB_EXPORT double strtofloat(std::string data);
 /** \brief convert a double float to a C++ string by using a printf-style format string (see <A HREF="http://www.cplusplus.com/reference/clibrary/cstdio/printf.html">printf format quick reference</A>) */
-LIB_EXPORT std::string floattostr_fmt(double data, std::string format="%lf");
+QFLIB_EXPORT std::string floattostr_fmt(double data, std::string format="%lf");
 /** \brief prints the supplied number of bytes. If bytes>1024 it prints (bytes/1024)+" kBytes" ... */
-LIB_EXPORT std::string bytestostr(double bytes);
+QFLIB_EXPORT std::string bytestostr(double bytes);
 /** \brief convert a double float to a C++ string in [number][unit_id] format.
  *         So \f$ 3.2\cdot 10^{-3} \f$ will be returned as \c "3.2m". The parameter \a past_comma gives the number of digits
  *          after the comma. If \a remove_trail0 is \c true the method removes all trailing '0'.
  */
-LIB_EXPORT std::string floattounitstr(double data, int past_comma=5, bool remove_trail0=false);
+QFLIB_EXPORT std::string floattounitstr(double data, int past_comma=5, bool remove_trail0=false);
 /*! \brief convert a double float to a C++ string in [number]*10^xx format. the output is a LaTeX string
 
   For example the output of \c floattohtmlstr(10.5e8) is \verbatim 10.5\times10^{8} \endverbatim
@@ -635,7 +635,7 @@ LIB_EXPORT std::string floattounitstr(double data, int past_comma=5, bool remove
 
   If \c minNoExponent<abs(data)<maxNoExponent the no exponent character is displayed
  */
-LIB_EXPORT std::string floattolatexstr(double data, int past_comma=5, bool remove_trail0=false, double belowIsZero=1e-16, double minNoExponent=1e-3, double maxNoExponent=1e4);
+QFLIB_EXPORT std::string floattolatexstr(double data, int past_comma=5, bool remove_trail0=false, double belowIsZero=1e-16, double minNoExponent=1e-3, double maxNoExponent=1e4);
 /*! \brief convert a double float to a C++ string in [number]*10^xx format. the output is a HTML string,
 
   For example the output of \c floattohtmlstr(10.5e8) is \verbatim 10.5&times;10<sup>8</sup> \endverbatim
@@ -644,9 +644,9 @@ LIB_EXPORT std::string floattolatexstr(double data, int past_comma=5, bool remov
 
   If \c minNoExponent<abs(data)<maxNoExponent the no exponent character is displayed
  */
-LIB_EXPORT std::string floattohtmlstr(double data, int past_comma=5, bool remove_trail0=false, double belowIsZero=1e-16, double minNoExponent=1e-3, double maxNoExponent=1e4);
+QFLIB_EXPORT std::string floattohtmlstr(double data, int past_comma=5, bool remove_trail0=false, double belowIsZero=1e-16, double minNoExponent=1e-3, double maxNoExponent=1e4);
 /** \brief convert a char to a C++ string. Here the corresponding ASCII character is beeing returned. */
-LIB_EXPORT std::string chartostr(char data);
+QFLIB_EXPORT std::string chartostr(char data);
 /*! \brief convert a char to a C++ string. Here the corresponding ASCII character is beeing returned. For un-printable characters a character description is returned.
 
     This function recognises some unprintable characters and returns them as follows:
@@ -689,20 +689,20 @@ LIB_EXPORT std::string chartostr(char data);
          127 |     [DEL]
 \endverbatim
  */
-LIB_EXPORT std::string chartoprintablestr(char data);
+QFLIB_EXPORT std::string chartoprintablestr(char data);
 /** \brief convert a string. For un-printable characters a character description is returned. For details, see documentation of chartoprintablestr() . */
-LIB_EXPORT std::string toprintablestr(std::string data);
+QFLIB_EXPORT std::string toprintablestr(std::string data);
 /** \brief convert a boolean to a C++ string. Return \c "true" or \c "false" */
-LIB_EXPORT std::string booltostr(bool data);
+QFLIB_EXPORT std::string booltostr(bool data);
 /*! \brief convert a C++ string to a boolean.
 
     This function accepts \c "true", \c "t", \c "1", \c "j", \c "y", \c "yes", \c "ja" as \c true and returns \c false
     if none of these was found.
  */
-LIB_EXPORT bool strtobool(std::string data);
+QFLIB_EXPORT bool strtobool(std::string data);
 /** \brief extract an integer from the given string that is right-aligned in it. So from "text123" this method would return 123. The left part of the string will be ignored
   */
-LIB_EXPORT long extract_right_int(std::string text);
+QFLIB_EXPORT long extract_right_int(std::string text);
 /** \brief converts the given time into a string
  *
  * for more information see <a href="http://www.gnu.org/software/libc/manual/html_node/Formatting-Calendar-Time.html">
@@ -710,7 +710,7 @@ LIB_EXPORT long extract_right_int(std::string text);
  *
  * To print the current date and time, simply use \code    std::cout<<datetimetostr(time(0))<<std::endl; \endcode
  */
-LIB_EXPORT std::string datetimetostr(time_t t);
+QFLIB_EXPORT std::string datetimetostr(time_t t);
 /** \brief converts a string \a s to a \c double or <tt>long long</tt> number in standard floating point notation.
  *         Additionally the number may include an unit identifier which specifies an additional power of ten.
  *
@@ -735,12 +735,12 @@ LIB_EXPORT std::string datetimetostr(time_t t);
  *
  * An example of such a number is \c 1.23k = \f$ 1.23\cdot10^3 \f$ or \c 1.45e-4T = \f$ 1.45\cdot 10^{8} \f$
  */
-LIB_EXPORT int read_number_ex(std::string s, double* dv, long long* iv, int *newpos);
+QFLIB_EXPORT int read_number_ex(std::string s, double* dv, long long* iv, int *newpos);
 /** \brief converts a string \a data to a \c double number in standard floating point notation.
  *         Additionally the number may include an unit identifier which specifies an additional power of ten. This
  *         is just a convenience wrapper around read_number_ex(). For more information, see there.
  */
-LIB_EXPORT double unitstringtofloat(std::string data);
+QFLIB_EXPORT double unitstringtofloat(std::string data);
 
 /** \brief converts a RGBA color to its SVG color name (string), or a string like \#RRGGBB[AA]
  *
@@ -748,17 +748,17 @@ LIB_EXPORT double unitstringtofloat(std::string data);
  * more information about SVG color names. This method is (basically) compatible with Qt, as Qt uses SVG color naming
  * conventions.
  */
-LIB_EXPORT std::string rgbtostring(unsigned char r, unsigned char g, unsigned char b, unsigned char a=255);
+QFLIB_EXPORT std::string rgbtostring(unsigned char r, unsigned char g, unsigned char b, unsigned char a=255);
 
 /** \brief split the string into a list of tokens which are separated by one of the characters in \c separators */
-LIB_EXPORT std::vector<std::string> tokenize_string(std::string data, std::string separators);
+QFLIB_EXPORT std::vector<std::string> tokenize_string(std::string data, std::string separators);
 
 /** \brief create a valid variable name from the string, i.e. a string with only characters and digits and \c '_'. ALso the first character has to be a charcter. */
-LIB_EXPORT std::string to_valid_variable_name(std::string input);
+QFLIB_EXPORT std::string to_valid_variable_name(std::string input);
 
 
 /** \brief create string containing the \a n repeats of the given \a substr */
-LIB_EXPORT std::string repeated_string(std::string input, int n);
+QFLIB_EXPORT std::string repeated_string(std::string input, int n);
 
 /*@}*/
 
@@ -770,18 +770,18 @@ LIB_EXPORT std::string repeated_string(std::string input, int n);
 /*@{*/
 
 /** \brief returns true if the given string is an integer */
-LIB_EXPORT bool isInt(std::string s);
+QFLIB_EXPORT bool isInt(std::string s);
 
 /** \brief returns true if the given string \a s contains a right aligned string
  * (\c "abs123" will return true and \c "1243a" will return false)
  */
-LIB_EXPORT bool isRightInt(std::string s);
+QFLIB_EXPORT bool isRightInt(std::string s);
 
 /** \brief returns true if the given string is a floating point number */
-LIB_EXPORT bool isFloat(std::string s);
+QFLIB_EXPORT bool isFloat(std::string s);
 
 /** \brief returns \c true if there are only whitespace (ACSII<=32) characters in \a text */
-LIB_EXPORT bool onlySpace(std::string text);
+QFLIB_EXPORT bool onlySpace(std::string text);
 /*@}*/
 
 
@@ -795,7 +795,7 @@ LIB_EXPORT bool onlySpace(std::string text);
 /*@{*/
 
 /** \brief like sprintf(), but returns a std::string (see <A HREF="http://www.cplusplus.com/reference/clibrary/cstdio/printf.html">printf format quick reference</A>)  */
-LIB_EXPORT std::string format(std::string templ, ...);
+QFLIB_EXPORT std::string format(std::string templ, ...);
 
 /** \brief convert a 2D array of doubles to a string (as a table of values).
   * \param width number of columns
@@ -820,7 +820,7 @@ LIB_EXPORT std::string format(std::string templ, ...);
 +---------------+---------------+---------------+
     \endverbatim
   */
-LIB_EXPORT std::string doublearraytostr(double* data, long width, long height, bool linenumber=true);
+QFLIB_EXPORT std::string doublearraytostr(double* data, long width, long height, bool linenumber=true);
 
 /** \brief convert a 1D array of doubles into vector notation
   * \param data an array of doubles
@@ -829,7 +829,7 @@ LIB_EXPORT std::string doublearraytostr(double* data, long width, long height, b
   * The output looks like this:
   * \verbatim   ( 1.00, 4.5, 3.4 )\endverbatim
   */
-LIB_EXPORT std::string doublevectortostr(double* data, unsigned int N);
+QFLIB_EXPORT std::string doublevectortostr(double* data, unsigned int N);
 
 /** \brief convert a 1D array of doubles into vector notation
   * \param data an array of doubles
@@ -838,7 +838,7 @@ LIB_EXPORT std::string doublevectortostr(double* data, unsigned int N);
   * The output looks like this:
   * \verbatim   ( 1.00, 4.5, 3.4 )\endverbatim
   */
-LIB_EXPORT std::string intvectortostr(int* data, unsigned int N);
+QFLIB_EXPORT std::string intvectortostr(int* data, unsigned int N);
 
 /** \brief convert a vector (1D array) of unit8_t to a string (as a table of values).
   * \param height number of lines
@@ -867,7 +867,7 @@ LIB_EXPORT std::string intvectortostr(int* data, unsigned int N);
 +-----+----------+
     \endverbatim
   */
-LIB_EXPORT std::string uint8vectostr(uint8_t* data, unsigned long height, bool showdec, bool showhex, bool showbits, bool linenumber);
+QFLIB_EXPORT std::string uint8vectostr(uint8_t* data, unsigned long height, bool showdec, bool showhex, bool showbits, bool linenumber);
 
 /** \brief convert a vector (1D array) of unit16_t to a string (as a table of values).
   * \param height number of lines
@@ -896,7 +896,7 @@ LIB_EXPORT std::string uint8vectostr(uint8_t* data, unsigned long height, bool s
 +-------+------+------------------+
     \endverbatim
   */
-LIB_EXPORT std::string uint16vectostr(uint16_t* data, unsigned long height, bool showdec, bool showhex, bool showbits, bool linenumber);
+QFLIB_EXPORT std::string uint16vectostr(uint16_t* data, unsigned long height, bool showdec, bool showhex, bool showbits, bool linenumber);
 
 /** \brief convert a vector (1D array) of unit16_t to a string (as a table of values).
   * \param height number of lines
@@ -925,7 +925,7 @@ LIB_EXPORT std::string uint16vectostr(uint16_t* data, unsigned long height, bool
 +-------+------+------------------+
     \endverbatim
   */
-LIB_EXPORT std::string intvectostr(int* data, unsigned long height, bool showdec=true, bool showhex=false, bool showbits=false, bool linenumber=false);
+QFLIB_EXPORT std::string intvectostr(int* data, unsigned long height, bool showdec=true, bool showhex=false, bool showbits=false, bool linenumber=false);
 
 /** \brief convert a vector (1D array) of unit32_t to a string (as a table of values).
   * \param height number of lines
@@ -954,7 +954,7 @@ LIB_EXPORT std::string intvectostr(int* data, unsigned long height, bool showdec
 +-------+------+----------------------------------+
 \endverbatim
   */
-LIB_EXPORT std::string uint32vectostr(uint32_t* data, unsigned long height, bool showdec, bool showhex, bool showbits, bool linenumber);
+QFLIB_EXPORT std::string uint32vectostr(uint32_t* data, unsigned long height, bool showdec, bool showhex, bool showbits, bool linenumber);
 /*@}*/
 
 /**
@@ -966,30 +966,30 @@ LIB_EXPORT std::string uint32vectostr(uint32_t* data, unsigned long height, bool
   *        (separated by separator, standard is \c '\\n'). If \a strip is \c true then leading and
   *        trailing whitespace will be stripped from the items in lst.
   */
-LIB_EXPORT void toStringVector(std::vector<std::string>& lst, std::string text, char separator='\n', bool strip=false);
+QFLIB_EXPORT void toStringVector(std::vector<std::string>& lst, std::string text, char separator='\n', bool strip=false);
 
 /** \brief convert vector of strings into a string. Each entry of the vector represents one line
   * (separated by separator, standard is \c '\\n')
   */
-LIB_EXPORT std::string fromStringVector(std::vector<std::string>& lst, std::string separator="\n");
+QFLIB_EXPORT std::string fromStringVector(std::vector<std::string>& lst, std::string separator="\n");
 
 /** \brief convert a string to all lower case letters */
-LIB_EXPORT std::string tolower(std::string s);
+QFLIB_EXPORT std::string tolower(std::string s);
 
 /** \brief convert a string to all upper case letters */
-LIB_EXPORT std::string toupper(std::string s);
+QFLIB_EXPORT std::string toupper(std::string s);
 
 
 /** \brief convert some special characters to their respective UTF-8 encoding (\c ¥`∞ß≤≥µÄƒ‰‹‰‰¸ﬂ·ÈÌÛ˙¡…Õ”⁄‡ËÏÚ˘¿»Ã“Ÿ‚ÍÓÙ˚¬ Œ‘€), see <a href="http://www.utf8-zeichentabelle.de/unicode-utf8-table.pl?number=1024&htmlent=1">UTF-8 database</a> and <a href="http://de.wikipedia.org/wiki/UTF-8">UTF-8 on wikipedia.de</a>
   */
-LIB_EXPORT std::string toUTF8(std::string text);
+QFLIB_EXPORT std::string toUTF8(std::string text);
 /** \brief strips whitespaces at the beginning and end of the string
   */
-LIB_EXPORT std::string strstrip(std::string text);
+QFLIB_EXPORT std::string strstrip(std::string text);
 
 /** \brief convert a double to a string with a unit character, like 1e-4 -> "100u"
   */
-LIB_EXPORT std::string floattounitstr(double data, std::string unitname="");
+QFLIB_EXPORT std::string floattounitstr(double data, std::string unitname="");
 
 /*! \brief remove delimiters from string and return the part between the delimiters
 
@@ -1020,7 +1020,7 @@ LIB_EXPORT std::string floattounitstr(double data, std::string unitname="");
     <"\"">   <\">
 \endverbatim
  */
-LIB_EXPORT std::string removeDelimiters(std::string data);
+QFLIB_EXPORT std::string removeDelimiters(std::string data);
 
 
 /*! \brief remove delimiters from string and return the part between the delimiters
@@ -1030,7 +1030,7 @@ LIB_EXPORT std::string removeDelimiters(std::string data);
 
   The function will find out which delimiter is used by simply scanning for the first non-whitespace character.
 */
-LIB_EXPORT std::string removeDelimitersPascal(std::string data);
+QFLIB_EXPORT std::string removeDelimitersPascal(std::string data);
 /*@}*/
 
 
@@ -1064,10 +1064,10 @@ chars<32      -> \xHH
   * The Pair  escapify() and deescapify() can be used to produce strings for transfer with TCP/IP
   * where there are some special characters (like '\\0') used as field dividers.
   */
-LIB_EXPORT std::string escapify(std::string text);
+QFLIB_EXPORT std::string escapify(std::string text);
 
 /** \brief generate a string where a special character is replaced by escape sequences in the C style. */
-LIB_EXPORT std::string escapify(const char c);
+QFLIB_EXPORT std::string escapify(const char c);
 
 /** \brief decode a string with C style escape sequences. This method does the reverse replacement of escapify().
   *
@@ -1136,13 +1136,13 @@ end
 ret=res;
     \endverbatim
   */
-LIB_EXPORT std::string deescapify(std::string text);
+QFLIB_EXPORT std::string deescapify(std::string text);
 
 
 /** \brief converts a string into a Pascal-style string constant, i.e. with tripple delimiters for single delimiters ... so if you want to provide
  *         <code>Jan's example</code> you will get <code>'Jan'''s example'</code> */
 
-LIB_EXPORT std::string pascalifyString(std::string data, char delim='\'');
+QFLIB_EXPORT std::string pascalifyString(std::string data, char delim='\'');
 /*@}*/
 
 
@@ -1156,44 +1156,44 @@ LIB_EXPORT std::string pascalifyString(std::string data, char delim='\'');
 /*@{*/
 
 /** \brief extracts the path from the given \a filename */
-LIB_EXPORT std::string extract_file_path(std::string filename);
+QFLIB_EXPORT std::string extract_file_path(std::string filename);
 /** \brief replace slashes and backslashes by the system path separator in \a filename */
-LIB_EXPORT std::string replace_to_system_pathseparator(std::string filename);
+QFLIB_EXPORT std::string replace_to_system_pathseparator(std::string filename);
 
 /** \brief extracts the name from the given \a filename */
-LIB_EXPORT std::string extract_file_name(std::string filename);
+QFLIB_EXPORT std::string extract_file_name(std::string filename);
 
 /** \brief extracts the file extension from the given \a filename */
-LIB_EXPORT std::string extract_file_ext(std::string filename);
+QFLIB_EXPORT std::string extract_file_ext(std::string filename);
 
 /** \brief replaces the extension of the given \a filename with \a ext. \a ext may be given in
  *         the form \c ".ext" or \c "ext".
  */
-LIB_EXPORT std::string change_file_ext(std::string filename, std::string ext);
+QFLIB_EXPORT std::string change_file_ext(std::string filename, std::string ext);
 
 /** \brief add another part to the path */
-LIB_EXPORT std::string extend_file_path(std::string filename, std::string addpath);
+QFLIB_EXPORT std::string extend_file_path(std::string filename, std::string addpath);
 
 /** \brief takes care that there is a backslash at the end of the given \a filename */
-LIB_EXPORT std::string include_trailing_backslash(std::string filename);
+QFLIB_EXPORT std::string include_trailing_backslash(std::string filename);
 
 /** \brief takes care that there is no backslash at the end of the given \a filename */
-LIB_EXPORT std::string exclude_trailing_backslash(std::string filename);
+QFLIB_EXPORT std::string exclude_trailing_backslash(std::string filename);
 
 /** \brief this method returns the full filename of the file specified in \a filename
  *
  * \attention This method uses system specific code!
  */
-LIB_EXPORT std::string get_full_filename(std::string filename);
+QFLIB_EXPORT std::string get_full_filename(std::string filename);
 
 /** \brief return the current working directory */
-LIB_EXPORT std::string get_currentworkingdirectory();
+QFLIB_EXPORT std::string get_currentworkingdirectory();
 
 /** \brief execute command in given directory
  *
  *  \return The return value is -1 if it wasn't possible to create the shell process, and otherwise is the status of the shell process.
  */
-LIB_EXPORT int execute_in(std::string command, std::string directory);
+QFLIB_EXPORT int execute_in(std::string command, std::string directory);
 /*@}*/
 
 
@@ -1254,16 +1254,16 @@ LIB_EXPORT int execute_in(std::string command, std::string directory);
   \endcode
 
  */
-LIB_EXPORT bool match_wildcard(std::string data, std::string pattern);
+QFLIB_EXPORT bool match_wildcard(std::string data, std::string pattern);
 
 
 /*! \brief same as match_wildcard(), but also returns \c true if the wildcard does not exactly match, but is contained in
            the string; so <code>"12*"</code> will match <code>"Test12Test"</code>, which won't match for match_wildcard().
  */
-LIB_EXPORT bool contains_wildcard(std::string data, std::string pattern);
+QFLIB_EXPORT bool contains_wildcard(std::string data, std::string pattern);
 
 /** \brief replace all occurences of the given substring \a match in the string by \a replace */
-LIB_EXPORT std::string string_replace(std::string input, std::string match, std::string replace);
+QFLIB_EXPORT std::string string_replace(std::string input, std::string match, std::string replace);
 /*@}*/
 
 
@@ -1331,7 +1331,7 @@ LIB_EXPORT std::string string_replace(std::string input, std::string match, std:
 #define bound(a,x,b) (mmin((b), mmax((a), (x))))
 
 /** \brief converts a number to a bool (==0 -> false, !=0 -> true) */
-LIB_EXPORT bool toBool(double val);
+QFLIB_EXPORT bool toBool(double val);
 
 /** \brief returns the current time in microseconds (might have lower resolution on non-windows and non-linux systems!!!) */
 double getHighResolutionTime();
@@ -1339,4 +1339,4 @@ double getHighResolutionTime();
 /*@}*/
 
 
-#endif /* tools_h */
+#endif /* cpptools_h */

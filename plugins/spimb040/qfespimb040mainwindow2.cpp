@@ -672,7 +672,7 @@ QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension*
     QSettings settings(iniFilename, QSettings::IniFormat);
 
     settings.setValue("software/QuickFit/version", qfInfoVersion());
-    settings.setValue("software/QuickFit/SVNVersion", qfInfoSVNVersion());
+    settings.setValue("software/QuickFit/SVNVersion", qfInfoGITVersion());
     settings.setValue("software/QuickFit/CompileDate", qfInfoCompileDate());
     settings.setValue(QString("software/ControlPlugin/ID"), plugin->getID());
     int min=1, maj=0;

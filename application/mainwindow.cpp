@@ -319,7 +319,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     splash->setProgressValue(2);
     QApplication::processEvents();
 
-    htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(qfInfoSVNVersion()).trimmed()));
+    htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(qfInfoGITVersion()).trimmed()));
     htmlReplaceList.append(qMakePair(QString("version.status"), QString(qfInfoVersionStatus())));
     htmlReplaceList.append(qMakePair(QString("version.date"), QString(qfInfoCompileDate()).trimmed()));
     htmlReplaceList.append(qMakePair(QString("version"), QString(qfInfoVersionFull())));
@@ -653,7 +653,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
             }
             plotViews.clear();
         }
-        ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoSVNVersion());
+        ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoGITVersion());
         event->accept();
 
         if (tetris) {
@@ -672,7 +672,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::showEvent(QShowEvent */*event*/) {
-    QString SVN=qfInfoSVNVersion();
+    QString SVN=qfInfoGITVersion();
     QString lastSVN=ProgramOptions::getConfigValue("quickfit/lastrunsvn", "").toString();
 
     if (SVN!=lastSVN && !ProgramOptions::getConfigValue("quickfit/nosvncheck", false).toBool()) {
@@ -900,7 +900,7 @@ void MainWindow::about() {
                             "<b>QuickFit bit-depth:</b><blockquote>%14-bit</blockquote>"
                             "<b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul>"
                             "<b>compiler used for this version:</b><blockquote>%7</blockquote>"
-                            "<b>operating system:</b><blockquote>%15</blockquote><br><br>").arg(QT_VERSION_STR).arg(qfInfoThanksTo()).arg(qfInfoCopyright()).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(qfInfoEmail()).arg(qfHTMLEscape(qfInfoCompiler())).arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoVersion()).arg(qfInfoVersionStatus()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()).arg(getOSName()));
+                            "<b>operating system:</b><blockquote>%15</blockquote><br><br>").arg(QT_VERSION_STR).arg(qfInfoThanksTo()).arg(qfInfoCopyright()).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(qfInfoEmail()).arg(qfHTMLEscape(qfInfoCompiler())).arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoVersion()).arg(qfInfoVersionStatus()).arg(qfInfoGITVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()).arg(getOSName()));
     ui_labelLic->setText(qfInfoLicense());
     ui_citing->setText(tr("If you used QuickFit for your data evaluation, please cite it in your publication. You can use a citation like this:"
                           "<blockquote>%1</blockquote>"
@@ -910,7 +910,7 @@ void MainWindow::about() {
     QFile f(":/quickfit3/releasenotes.html");
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QString text=f.readAll();
-        text=text.replace("$$SVN$$", qfInfoSVNVersion());
+        text=text.replace("$$SVN$$", qfInfoGITVersion());
         text=text.replace("$$COMPILEDATE$$", qfInfoCompileDate());
         ui_releasenotes->setText(text);
     } else {
@@ -1709,7 +1709,7 @@ void MainWindow::createWidgets() {
     tabLogs->addTab(logFileMainWidget, tr("QuickFit Log"));
     //qDebug()<<"opening log: "<<QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log");
     logFileMainWidget->open_logfile(QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"), false);
-    logFileMainWidget->log_text(tr("starting up QuickFit %1 (SVN: %2 COMILEDATE: %3), %4-bit ...\n").arg(qfInfoVersionFull()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()));
+    logFileMainWidget->log_text(tr("starting up QuickFit %1 (SVN: %2 COMILEDATE: %3), %4-bit ...\n").arg(qfInfoVersionFull()).arg(qfInfoGITVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()));
     logFileMainWidget->log_text(tr("logging to '%1' ...\n").arg(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"));
     logFileMainWidget->log_text(tr("configuration directory: '%1' ...\n").arg(settings->getConfigFileDirectory()));
     logFileMainWidget->log_text(tr("global configuration directory: '%1' ...\n").arg(settings->getGlobalConfigFileDirectory()));
@@ -3477,7 +3477,7 @@ void MainWindow::displayNewVersionDlg()
     DlgNewVersion* dlg=new DlgNewVersion(this);
     dlg->exec();
     delete dlg;
-    ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoSVNVersion());
+    ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoGITVersion());
     QTimer::singleShot(200,this, SLOT(displayWelcomeDlg()));
 }
 
@@ -4296,7 +4296,7 @@ void MainWindow::showUpdateInfo(QNetworkReply* reply) {
         if (reply->error()==QNetworkReply::NoError) {
             MainWindow::updateInfo info=MainWindow::readUpdateInfo(reply);
             bool ok=false;
-            int svn=qfReadFirstInt(qfInfoSVNVersion(), &ok);
+            int svn=qfReadFirstInt(qfInfoGITVersion(), &ok);
 
             if (info.valid) {
                 log_global_text("update info from "+reply->url().toString()+":\n");

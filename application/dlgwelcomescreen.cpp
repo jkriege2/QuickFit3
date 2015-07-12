@@ -33,7 +33,7 @@ DlgWelcomeScreen::DlgWelcomeScreen(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->chkShow->setChecked(ProgramOptions::getConfigValue("quickfit/welcomescreen", true).toBool());
-    ui->labQF->setText(tr("QuickFit %1 <small>SVN: %2 - compiledate: %3</small>").arg(qfInfoVersion()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()));
+    ui->labQF->setText(tr("QuickFit %1 <small>SVN: %2 - compiledate: %3</small>").arg(qfInfoVersion()).arg(qfInfoGITVersion()).arg(qfInfoCompileDate()));
     ui->labThesis->setOpenUrl(QUrl("http://www.ub.uni-heidelberg.de/archiv/17187"));
     ui->labWebsite->setOpenUrl(QUrl(qfInfoWeblink()));
     ui->labExamples->setOpenUrl(QUrl("http://www.dkfz.de/Macromol/quickfit/examples.html"));

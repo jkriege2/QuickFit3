@@ -248,7 +248,6 @@ FORMS += qf3objectiveeditor.ui \
 
 RESOURCES += qspecialtoolbutton.qrc \
              jkstyledbutton.qrc \
-             libqt.qrc \
              qkeysequenceedit.qrc \
              numberedit.qrc \
              libqf3widgets.qrc \

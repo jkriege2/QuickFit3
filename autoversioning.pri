@@ -32,23 +32,17 @@ message($$QMAKE_CXX  .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_S
 system($$QMAKE_CXX  .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}main.cpp -o .$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX})
 
 # try to read the SVN version
-SVNVERSION = $$system(svnversion)
-contains(SVNVERSION,exported):SVNVERSION=
-contains(SVNVERSION,exported):SVNVERSION=
-isEmpty(SVNVERSION){
-    # if SVN does not work, try git svn
-    unix {
-        SVNVERSION = $$system(git svn info | grep -i 'revision' | cut -d: -f2)
-    }
-}
-isEmpty(SVNVERSION) {
-    SVNVERSION = ---
+GITCOMMITCOUNT = $$system(git rev-list HEAD --count)
+contains(GITCOMMITCOUNT,exported):GITCOMMITCOUNT=
+contains(GITCOMMITCOUNT,exported):GITCOMMITCOUNT=
+isEmpty(GITCOMMITCOUNT) {
+    GITCOMMITCOUNT = ---
 }
 
 DATESTR = $$system(.$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX} --date)
 DATESTRYEAR = $$system(.$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX} --year)
 
-message("COMPILE MODE: SVNVERSION is: $$SVNVERSION")
+message("COMPILE MODE: GITCOMMITCOUNT is: $$GITCOMMITCOUNT")
 message("COMPILE MODE: build date is: $$DATESTR")
 message("COMPILE MODE: compiler: $$COMPILERVERSION")
 message("COMPILE MODE: compiler.machine: $$COMPILERVERSION_MACHINE")
@@ -56,10 +50,10 @@ message("COMPILE MODE: compiler.machine: $$COMPILERVERSION_MACHINE")
 system($$PWD$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX} --writedate $$PWD$${DIR_SEPARATOR}compiledate.h)
 
 win32 {
-    system(echo $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"  > svnversion.h )
+    system(echo $$LITERAL_HASH define GITCOMMITCOUNT \"$$GITCOMMITCOUNT\"  > gitversion.h )
     system(echo $$LITERAL_HASH define COMPILER \"$$COMPILERVERSION (MACHINE: $$COMPILERVERSION_MACHINE)\"  > compiler.h )
 } else {
-    system(echo \'$$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"\'  > svnversion.h )
+    system(echo \'$$LITERAL_HASH define GITCOMMITCOUNT \"$$GITCOMMITCOUNT\"\'  > gitversion.h )
     system(echo \'$$LITERAL_HASH define COMPILER \"$$COMPILERVERSION (MACHINE: $$COMPILERVERSION_MACHINE)\"\'  > compiler.h )
 }
 #    system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate1.h )

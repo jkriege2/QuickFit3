@@ -134,3 +134,13 @@ This software is provided as is without any warranties. Use it at your own risk.
 
 ### 3D Image Stack Viewer
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_3dviewer.png)
+
+ 
+ ##How to compile
+ 1. Check out the source code from this GitHub repository (https://github.com/jkriege2/QuickFit3.git)
+ 2. Set up the build environment. You will need (This is also detailed in https://github.com/jkriege2/QuickFit3/blob/master/basic_documentation/compile_quickfit3.txt ):
+     * GIT (to check out the repository
+	 * the GNU C++ Compiler GCC/G++ (use MinGW on Windows!)
+	 * a bash environment (use MSys for MinGW on Windows!)
+	 * a current Qt version for your compiler (we use Qt 5.4.0 now!!!)
+ 3. Follow the instructions in https://github.com/jkriege2/QuickFit3/blob/master/basic_documentation/compile_quickfit3.txt

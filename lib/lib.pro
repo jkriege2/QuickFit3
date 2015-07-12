@@ -305,7 +305,6 @@ SOURCES += dlgnewproperty.cpp \
     image_tools.cpp \
     jkmathparser.cpp \
     highrestimer.cpp \
-    ticktock.cpp\
     jkiniparser2.cpp
 
 FORMS +=   dlg_newproperty.ui \

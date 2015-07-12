@@ -38,7 +38,6 @@
 #include <QDebug>
 #endif
 
-#include "lib_imexport.h"
 
 /** \brief this class provides a time measurement service
  * \ingroup tool_classes
@@ -50,7 +49,7 @@
  * On Windows this implementation uses the class HighResTimer to get a high-resolution measurement of the
  * time. On other systems it uses the standard C library timing routines.
  */
-class QFLIB_EXPORT TickTock
+class  TickTock
 {
     public:
         /** Default constructor */

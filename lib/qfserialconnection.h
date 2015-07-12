@@ -358,11 +358,11 @@ class QFLIB_EXPORT QFSerialConnection
         GET_SET_MACRO_I(bool, binary, reopen())
         GET_SET_MACRO_I(bool, logToFile, reopen())
         GET_SET_MACRO_I(std::string, port, reopen())
-        GET_SET_MACRO_I(JKSCdatabits, databits, reopen())
-        GET_SET_MACRO_I(JKSChandshaking, handshaking, reopen())
+        GET_SET_MACRO_I(QFSCdatabits, databits, reopen())
+        GET_SET_MACRO_I(QFSChandshaking, handshaking, reopen())
         GET_SET_MACRO_I(unsigned int, baudrate, reopen())
-        GET_SET_MACRO_I(JKSCparity, parity, reopen())
-        GET_SET_MACRO_I(JKSCstopbits, stopbits, reopen())
+        GET_SET_MACRO_I(QFSCparity, parity, reopen())
+        GET_SET_MACRO_I(QFSCstopbits, stopbits, reopen())
         GET_SET_MACRO_I(unsigned int, timeout_ms, reopen())
     protected:
         /** \brief the timeout period for read operations in milliseconds */

@@ -37,7 +37,11 @@ QFLIB_EXPORT QString qfInfoMaillist();
 QFLIB_EXPORT QString qfInfoMaillistRequest();
 QFLIB_EXPORT QString qfInfoWeblink();
 QFLIB_EXPORT QString qfInfoLicense();
-QFLIB_EXPORT QString qfInfoSVNVersion();
+QFLIB_EXPORT QString qfInfoGITVersion();
+inline QString qfInfoSVNVersion() {
+    return qfInfoGITVersion();
+}
+
 QFLIB_EXPORT QString qfInfoCompiler();
 QFLIB_EXPORT QString qfInfoCompileDate();
 QFLIB_EXPORT bool qfIsSpecialVersion();

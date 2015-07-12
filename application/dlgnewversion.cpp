@@ -36,13 +36,13 @@ DlgNewVersion::DlgNewVersion(QWidget *parent) :
     QFile f(":/quickfit3/releasenotes.html");
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QString text=f.readAll();
-        text=text.replace("$$SVN$$", qfInfoSVNVersion());
+        text=text.replace("$$SVN$$", qfInfoGITVersion());
         text=text.replace("$$COMPILEDATE$$", qfInfoCompileDate());
         ui->edtReleaseNotes->setText(text);
     } else {
         ui->edtReleaseNotes->setPlainText(tr("none available :-((("));
     }
-    ui->labVersion->setText(tr("version %1 (SVN: %2 compiledate: %3)").arg(qfInfoVersion()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()));
+    ui->labVersion->setText(tr("version %1 (SVN: %2 compiledate: %3)").arg(qfInfoVersion()).arg(qfInfoGITVersion()).arg(qfInfoCompileDate()));
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
 
