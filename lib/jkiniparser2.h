@@ -27,6 +27,7 @@
 
 #include "jkmathparser.h"
 #include "cpptools.h"
+#include "lib_imexport.h"
 
 
 /*! \brief parser class for INI-style configuration files
@@ -180,7 +181,7 @@
     Comments start with a \c # and last until the end of the current line.
 
   */
-class jkINIParser2 {
+class QFLIB_EXPORT jkINIParser2 {
     public:
         /** \brief error handling: exceptions of the type of this class will be thrown if an error occurs */
         class error : public std::exception {

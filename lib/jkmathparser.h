@@ -233,7 +233,7 @@
      }
      \endcode
  */
-class jkMathParser
+class QFLIB_EXPORT jkMathParser
 {
     protected:
         void* data;
@@ -317,7 +317,7 @@ class jkMathParser
 
 
         /** \brief result of any expression  */
-        struct jkmpResult {
+        struct QFLIB_EXPORT jkmpResult {
           jkmpResult();
 
           bool isValid;
@@ -418,7 +418,7 @@ class jkMathParser
          * \brief This class is the abstract base class for nodes.
          * All allowed node types must inherit from jkmpNode
          */
-        class jkmpNode {
+        class QFLIB_EXPORT jkmpNode {
           protected:
             jkMathParser* parser;  /*!< \brief points to the parser object that is used to evaluate this node */
             jkmpNode* parent;      /*!< \brief points to the parent node */
@@ -447,7 +447,7 @@ class jkMathParser
          * \brief This class represents a binary arithmetic operation:
          *  add (+), subtract (-), multiply (*), divide (/), a to the power of b (a^b)
          */
-        class jkmpBinaryArithmeticNode: public jkmpNode {
+        class QFLIB_EXPORT jkmpBinaryArithmeticNode: public jkmpNode {
           private:
             jkmpNode* left, *right;
             char operation;
@@ -471,7 +471,7 @@ class jkMathParser
         /**
          * \brief This class represents a binary boolean operation: and, or, xor, nor, nand
          */
-        class jkmpBinaryBoolNode: public jkmpNode {
+        class QFLIB_EXPORT jkmpBinaryBoolNode: public jkmpNode {
           private:
             jkmpNode* left, *right;
             char operation;
@@ -495,7 +495,7 @@ class jkMathParser
         /**
          * \brief This class represents a binary compare operation: !=, ==, >=, <=, >, <
          */
-        class jkmpCompareNode: public jkmpNode {
+        class QFLIB_EXPORT jkmpCompareNode: public jkmpNode {
           private:
             jkmpNode* left, *right;
             char operation;
@@ -519,7 +519,7 @@ class jkMathParser
         /**
          * \brief This class represents a unary operations: ! (bool negation), - (arithmetic negation)
          */
-        class jkmpUnaryNode: public jkmpNode {
+        class QFLIB_EXPORT jkmpUnaryNode: public jkmpNode {
           private:
             jkmpNode* child;
             char operation;
@@ -542,7 +542,7 @@ class jkMathParser
         /**
          * \brief This class represents a variable assignment (a = expression)
          */
-        class jkmpVariableAssignNode: public jkmpNode {
+        class QFLIB_EXPORT jkmpVariableAssignNode: public jkmpNode {
           private:
             jkmpNode* child;
             std::string variable;
@@ -566,7 +566,7 @@ class jkMathParser
         /**
          * \brief This class represents a number, a string contant or a boolean contant (true/false)
          */
-        class jkmpConstantNode: public jkmpNode {
+        class QFLIB_EXPORT jkmpConstantNode: public jkmpNode {
           private:
             jkmpResult data;
           public:
@@ -584,7 +584,7 @@ class jkMathParser
         /**
          * \brief This class represents a variable.
          */
-        class jkmpVariableNode: public jkmpNode {
+        class QFLIB_EXPORT jkmpVariableNode: public jkmpNode {
           private:
             std::string var;
           public:
@@ -608,7 +608,7 @@ class jkMathParser
          *
          * Functions may have 8 parameters at the most.
          */
-        class jkmpFunctionNode: public jkmpNode {
+        class QFLIB_EXPORT jkmpFunctionNode: public jkmpNode {
           private:
             std::string fun;
             jkmpNode** child;
@@ -636,7 +636,7 @@ class jkMathParser
          *
          * when evaluating the result will be the result of the last node in the list.
          */
-        class jkmpNodeList: public jkmpNode {
+        class QFLIB_EXPORT jkmpNodeList: public jkmpNode {
           private:
             std::vector<jkmpNode*> list;
           public:
@@ -678,7 +678,7 @@ class jkMathParser
          * error handler and assign it (function pointer) to the global variable jkmathparser_exception_function.
          * If this is not NULL this function will be called instead of throwing an exception.
          */
-        class jkmpException : public std::exception {
+        class QFLIB_EXPORT jkmpException : public std::exception {
           private:
                /** \brief the error message */
                std::string errormessage;

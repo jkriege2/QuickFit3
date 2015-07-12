@@ -112,15 +112,15 @@ inline void calc_statistics(const T* image, const uint32_t size, double* mean, d
 
 #include <stdint.h>
 
-LIB_EXPORT void yuv420_rgb (unsigned char Y1, unsigned char Cb, unsigned char Cr, int *ER, int *EG, int *EB);
+QFLIB_EXPORT void yuv420_rgb (unsigned char Y1, unsigned char Cb, unsigned char Cr, int *ER, int *EG, int *EB);
 
-LIB_EXPORT void process_image_rgb32 (const uint8_t * videoFrame,  uint8_t* output, int width, int height, int pos_r=1, int pos_g=2, int pos_b=3);
+QFLIB_EXPORT void process_image_rgb32 (const uint8_t * videoFrame,  uint8_t* output, int width, int height, int pos_r=1, int pos_g=2, int pos_b=3);
 
-LIB_EXPORT void process_image_rgb24 (const uint8_t * videoFrame,  uint8_t* output, int width, int height, int pos_r=0, int pos_g=1, int pos_b=2);
+QFLIB_EXPORT void process_image_rgb24 (const uint8_t * videoFrame,  uint8_t* output, int width, int height, int pos_r=0, int pos_g=1, int pos_b=2);
 
-LIB_EXPORT void process_image_yuyv (const uint8_t * videoFrame,  uint8_t* output, int width, int height, int pos_Y1=0, int pos_U=1, int pos_Y2=2, int pos_V=3);
+QFLIB_EXPORT void process_image_yuyv (const uint8_t * videoFrame,  uint8_t* output, int width, int height, int pos_Y1=0, int pos_U=1, int pos_Y2=2, int pos_V=3);
 
-LIB_EXPORT void process_image_grey (const uint8_t * videoFrame,  uint8_t* output, int width, int height);
+QFLIB_EXPORT void process_image_grey (const uint8_t * videoFrame,  uint8_t* output, int width, int height);
 
 
 #endif // IMAGE_TOOLS_H_INCLUDED

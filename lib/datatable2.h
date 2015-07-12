@@ -109,7 +109,7 @@
  * If this is not NULL  this function will be called instead of throwing an exception.
  */
 // the exception class is used in the standard case (NO_EXCEPTIONS not defined)
-class LIB_EXPORT datatable2_exception : public std::exception  {
+class QFLIB_EXPORT datatable2_exception : public std::exception  {
     private:
         /** \brief the error message */
         std::string message;
@@ -197,7 +197,7 @@ WHITESPACE       ->   LB | CR | SPACE | TAB
  *
  * \test a test application for the class datatable2 can be found in the file \link test_csv.cpp.
  */
-class LIB_EXPORT datatable2
+class QFLIB_EXPORT datatable2
 {
     private:
 

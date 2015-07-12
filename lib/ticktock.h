@@ -50,7 +50,7 @@
  * On Windows this implementation uses the class HighResTimer to get a high-resolution measurement of the
  * time. On other systems it uses the standard C library timing routines.
  */
-class LIB_EXPORT TickTock
+class QFLIB_EXPORT TickTock
 {
     public:
         /** Default constructor */
@@ -157,7 +157,7 @@ class LIB_EXPORT TickTock
 /** \brief implementation of TickTock with public access
  * \ingroup tool_classes
  */
-class LIB_EXPORT PublicTickTock: public TickTock {
+class QFLIB_EXPORT PublicTickTock: public TickTock {
     public:
         /** Default constructor */
         PublicTickTock(): TickTock() {}
