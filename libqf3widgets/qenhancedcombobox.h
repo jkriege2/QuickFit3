@@ -22,7 +22,7 @@
 #define QENHANCEDCOMBOBOX_H
 
 #include <QComboBox>
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 #include <QKeyEvent>
 
 /** \brief this QComboox descendent implements features, missing in Qt
@@ -34,7 +34,7 @@
  *    - editingFinished() signal, which is emitted when "return" or "enter" key is pressed
  *    .
  */
-class LIB_EXPORT QEnhancedComboBox : public QComboBox {
+class QFWIDLIB_EXPORT QEnhancedComboBox : public QComboBox {
         Q_OBJECT
     public:
         explicit QEnhancedComboBox(QWidget *parent = 0);

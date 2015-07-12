@@ -3,13 +3,13 @@
 
 #include <QtGui>
 #include "numberedit.h"
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 
 
 /** \brief this struct represents one shortcut used by ShortcutQSPinBox, ShortcutQDoubleSpinBox, ShortcutQComboBox, ...
  *  \ingroup tools_qt
  */
-class LIB_EXPORT myShortcut {
+class QFWIDLIB_EXPORT myShortcut {
     private:
         /** \brief returns the Qt key code of the key described by \a part */
         int partToKey(QString part);
@@ -35,7 +35,7 @@ class LIB_EXPORT myShortcut {
 /** \brief this specialized QSpinBox allows to catch keyboard events
  *  \ingroup tools_qt
  */
-class LIB_EXPORT ShortcutQSpinBox: public QSpinBox {
+class QFWIDLIB_EXPORT ShortcutQSpinBox: public QSpinBox {
         Q_OBJECT
     protected:
         /** \brief reimplementation that catches some of the keyboard shortcuts */
@@ -70,7 +70,7 @@ class LIB_EXPORT ShortcutQSpinBox: public QSpinBox {
 /** \brief this specialized QDoubleSpinBox allows to catch keyboard events
  *  \ingroup tools_qt
  */
-class LIB_EXPORT ShortcutQDoubleSpinBox: public QDoubleSpinBox {
+class QFWIDLIB_EXPORT ShortcutQDoubleSpinBox: public QDoubleSpinBox {
         Q_OBJECT
     protected:
         /** \brief reimplementation that catches some of the keyboard shortcuts */
@@ -105,7 +105,7 @@ class LIB_EXPORT ShortcutQDoubleSpinBox: public QDoubleSpinBox {
 /** \brief this specialized QLineEdit allows to catch keyboard events
  *  \ingroup tools_qt
  */
-class LIB_EXPORT ShortcutQLineEdit: public QLineEdit {
+class QFWIDLIB_EXPORT ShortcutQLineEdit: public QLineEdit {
         Q_OBJECT
     protected:
         /** \brief reimplementation that catches some of the keyboard shortcuts */
@@ -140,7 +140,7 @@ class LIB_EXPORT ShortcutQLineEdit: public QLineEdit {
 /** \brief this specialized DoubleEdit allows to catch keyboard events
  *  \ingroup tools_qt
  */
-class LIB_EXPORT ShortcutNumberEdit: public NumberEdit {
+class QFWIDLIB_EXPORT ShortcutNumberEdit: public NumberEdit {
         Q_OBJECT
     protected:
         /** \brief reimplementation that catches some of the keyboard shortcuts */
@@ -176,7 +176,7 @@ class LIB_EXPORT ShortcutNumberEdit: public NumberEdit {
 /** \brief this specialized QComboBox allows to catch keyboard events
  *  \ingroup tools_qt
  */
-class LIB_EXPORT ShortcutQComboBox: public QComboBox {
+class QFWIDLIB_EXPORT ShortcutQComboBox: public QComboBox {
         Q_OBJECT
     protected:
         /** \brief reimplementation that catches some of the keyboard shortcuts */

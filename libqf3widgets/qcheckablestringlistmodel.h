@@ -3,7 +3,9 @@
 
 #include <QStringListModel>
 #include <QSet>
-class QCheckableStringListModel : public QStringListModel {
+#include "libwid_imexport.h"
+
+class QFWIDLIB_EXPORT QCheckableStringListModel : public QStringListModel {
     Q_OBJECT
 public:
     explicit QCheckableStringListModel(QObject *parent = 0);

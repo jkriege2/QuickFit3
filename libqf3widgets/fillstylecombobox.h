@@ -18,32 +18,32 @@
 */
 
 
-#ifndef LineStyleComboBox_H
-#define LineStyleComboBox_H
+#ifndef FillStyleComboBox_H
+#define FillStyleComboBox_H
 
 #include <QComboBox>
 #include <QColor>
 #include <QVariant>
-#include <QPen>
-#include "../lib_imexport.h"
+#include <QBrush>
+#include "libwid_imexport.h"
 
 /*! \brief a QComboBox variant that allows to select line styles
     \ingroup tools_qt
 */
-class LIB_EXPORT LineStyleComboBox : public QComboBox {
+class QFWIDQFWIDLIB_EXPORT FillStyleComboBox : public QComboBox {
         Q_OBJECT
     public:
         /** Default constructor */
-        LineStyleComboBox(QWidget* parent=NULL);
+        FillStyleComboBox(QWidget* parent=NULL);
         /** Default destructor */
-        virtual ~LineStyleComboBox();
+        virtual ~FillStyleComboBox();
 
         /** \brief insert a given line style at the given position */
-        void insertLineStyle(int index, Qt::PenStyle style, const QString &name);
+        void insertFillStyle(int index, Qt::BrushStyle style, const QString &name);
 
         /** \brief insert a given line style at the end of the list */
-        inline void addLineStyle(Qt::PenStyle style, const QString &name) {
-            insertLineStyle(styleCount(), style, name);
+        inline void addFillStyle(Qt::BrushStyle style, const QString &name) {
+            insertFillStyle(styleCount(), style, name);
         };
 
 
@@ -53,32 +53,32 @@ class LIB_EXPORT LineStyleComboBox : public QComboBox {
         };
 
         /** \brief set the current item to the given line style (and add it, if it is not there) */
-        inline void setCurrentLineStyle(Qt::PenStyle style) {
+        inline void setCurrentFillStyle(Qt::BrushStyle style) {
             int idx=findData((int)style);
             if (idx>=0) setCurrentIndex(idx);
         }
 
         /** \brief return the currently selected line style */
-        inline Qt::PenStyle currentLineStyle() const {
-            return lineStyle(currentIndex());
+        inline Qt::BrushStyle currentFillStyle() const {
+            return fillStyle(currentIndex());
         }
 
         /** \brief return the line style of the given item index */
-        Qt::PenStyle lineStyle(int index) const {
-            return (Qt::PenStyle)(itemData(index).toInt());
+        Qt::BrushStyle fillStyle(int index) const {
+            return (Qt::BrushStyle)(itemData(index).toInt());
         };
     signals:
-        void activated(Qt::PenStyle style);
-        void highlighted(Qt::PenStyle style);
+        void activated(Qt::BrushStyle style);
+        void highlighted(Qt::BrushStyle style);
 
     protected slots:
         void emitActivated(int i) {
-            emit activated(lineStyle(i));
+            emit activated(fillStyle(i));
         };
         void emitHighlighted(int i)  {
-            emit highlighted(lineStyle(i));
+            emit highlighted(fillStyle(i));
         };
     private:
 };
 
-#endif // LineStyleComboBox_H
+#endif // FillStyleComboBox_H

@@ -7,7 +7,7 @@
 #include <QPushButton>
 #include <QToolButton>
 #include "tools.h"
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 
 
 
@@ -16,7 +16,7 @@
  *  \ingroup tools_qt
  *
  */
-class LIB_EXPORT NumberEdit : public QLineEdit {
+class QFWIDLIB_EXPORT NumberEdit : public QLineEdit {
         Q_OBJECT
     public:
         /** Default constructor */

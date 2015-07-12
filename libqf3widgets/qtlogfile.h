@@ -44,8 +44,8 @@
 #include <QFileInfo>
 #include <QDesktopServices>
 #include <QContextMenuEvent>
-#include "../tools.h"
-#include "../lib_imexport.h"
+#include "cpptools.h"
+#include "libwid_imexport.h"
 #include <QMutex>
 #include <QMutexLocker>
 #include <QVBoxLayout>
@@ -72,7 +72,7 @@
   \note the log functions are thread safe!!!
   */
 
-class LIB_EXPORT QtLogFile : public QWidget {
+class QFWIDLIB_EXPORT QtLogFile : public QWidget {
         Q_OBJECT
     protected:
 

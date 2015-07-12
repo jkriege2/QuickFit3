@@ -20,7 +20,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 */
 
 #include "videocapture.h"
-#include "tools.h"
+#include "cpptools.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,7 +39,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "tools.h"
+#include "cpptools.h"
 #include <CImg.h>
 
 

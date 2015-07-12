@@ -27,6 +27,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QSettings>
 #include <QMutex>
 #include "qfserialconnection.h"
+#include "lib_imexport.h"
 
 /*! \brief you may use this class to manage a list of COM ports.
     \ingroup qf3extensionplugins
@@ -35,7 +36,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     its ID is returned, otherwise the port is added.
  */
 
-class QF3ComPortManager {
+class QFLIB_EXPORT QF3ComPortManager {
     public:
         QF3ComPortManager();
         ~QF3ComPortManager();

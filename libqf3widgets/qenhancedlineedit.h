@@ -24,7 +24,7 @@
 #include <QAbstractButton>
 #include <QLineEdit>
 #include <QList>
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 #include <QVariant>
 
 /*! \brief enhanced QLineEdit which adds some features missing in the basic Qt implementation
@@ -35,7 +35,7 @@
        - it is possible to add QAbstractButton to the widget that will appear inside the line edit.
     .
  */
-class LIB_EXPORT QEnhancedLineEdit : public QLineEdit {
+class QFWIDLIB_EXPORT QEnhancedLineEdit : public QLineEdit {
         Q_OBJECT
     public:
         /** Default constructor */

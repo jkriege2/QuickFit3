@@ -35,7 +35,7 @@
 #include <fstream>
 #include <string.h>
 #include <locale>
-#include "tools.h"
+#include "cpptools.h"
 #include "histogram.h"
 
 /**

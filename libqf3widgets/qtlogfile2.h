@@ -24,8 +24,8 @@
 #include <QAbstractTableModel>
 #include <QVBoxLayout>
 #include <QTableView>
-#include "../tools.h"
-#include "../lib_imexport.h"
+#include "tools.h"
+#include "libwid_imexport.h"
 
 
 /** \brief this is the indention increment when calling LogFile.inc_indent()
@@ -43,7 +43,7 @@
   a file all messages logged so far will be written out to the file. This allows to define the log file
   AFTER creating the widget and to change the log file, while the logged messages are preserved.
   */
-class LIB_EXPORT QtLogFile2Model : public QAbstractTableModel {
+class QFWIDLIB_EXPORT QtLogFile2Model : public QAbstractTableModel {
         Q_OBJECT
     public:
         QtLogFile2Model(QObject* parent=NULL);
@@ -259,7 +259,7 @@ class LIB_EXPORT QtLogFile2Model : public QAbstractTableModel {
   a file all messages logged so far will be written out to the file. This allows to define the log file
   AFTER creating the widget and to change the log file, while the logged messages are preserved.
   */
-class LIB_EXPORT QtLogFile2 : public QWidget {
+class QFWIDLIB_EXPORT QtLogFile2 : public QWidget {
         Q_OBJECT
     public:
         /** \brief class constructor */

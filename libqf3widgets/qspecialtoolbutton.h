@@ -29,7 +29,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <iostream>
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 
 
 
@@ -38,7 +38,7 @@
  *         it in the system's standard application
  *  \ingroup tools_qt
  */
-class LIB_EXPORT QWWWToolButton : public QToolButton {
+class QFWIDLIB_EXPORT QWWWToolButton : public QToolButton {
         Q_OBJECT
     public:
         /** Default constructor */
@@ -58,7 +58,7 @@ class LIB_EXPORT QWWWToolButton : public QToolButton {
 /** \brief specialized QToolButton which allows to select a file and saves its path in the buddy
  *  \ingroup tools_qt
  */
-class LIB_EXPORT QFileSelectToolButton : public QToolButton {
+class QFWIDLIB_EXPORT QFileSelectToolButton : public QToolButton {
         Q_OBJECT
     public:
         /** Default constructor */
@@ -80,7 +80,7 @@ class LIB_EXPORT QFileSelectToolButton : public QToolButton {
 /** \brief specialized QToolButton which allows to open the file referenced by the buddy edit
  *  \ingroup tools_qt
  */
-class LIB_EXPORT QFileExecuteToolButton : public QToolButton {
+class QFWIDLIB_EXPORT QFileExecuteToolButton : public QToolButton {
         Q_OBJECT
     public:
         /** Default constructor */

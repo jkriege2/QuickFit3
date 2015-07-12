@@ -26,9 +26,9 @@
 #include <QAbstractItemModel>
 #include <QSettings>
 #include <QRegExp>
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 
-class LIB_EXPORT QSettingsModel : public QAbstractItemModel
+class QFWIDLIB_EXPORT QSettingsModel : public QAbstractItemModel
 {
         Q_OBJECT
     public:

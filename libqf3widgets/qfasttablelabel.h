@@ -38,6 +38,7 @@
 #include <QPair>
 #include <QHash>
 #include <QStringList>
+#include "libwid_imexport.h"
 
 /*! \brief class for fast rendering of tables
     \ingroup jfasttablelabel
@@ -56,7 +57,7 @@
 
 
  */
-class QFastTableLabel : public QWidget {
+class QFWIDLIB_EXPORT QFastTableLabel : public QWidget {
     Q_OBJECT
 public:
     explicit QFastTableLabel(QWidget *parent = 0);

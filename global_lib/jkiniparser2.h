@@ -26,7 +26,7 @@
 
 
 #include "jkmathparser.h"
-#include "tools.h"
+#include "cpptools.h"
 
 
 /*! \brief parser class for INI-style configuration files

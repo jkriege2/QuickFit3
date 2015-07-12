@@ -58,7 +58,7 @@
 //#include <QGLFunctions>
 #include <QGLBuffer>
 #include "../ticktock.h"
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 #include <QGLShader>
 #include <QGLShaderProgram>
 
@@ -77,9 +77,9 @@
  *  \see <a href="http://www.cg.informatik.uni-siegen.de/data/Tutorials/EG2006/RTVG03_VolumeRendering.pdf">http://www.cg.informatik.uni-siegen.de/data/Tutorials/EG2006/RTVG03_VolumeRendering.pdf</a>
  */
 #ifdef QFVisualize3DGLWidget_USES_QOPENGLWIDGET
-class LIB_EXPORT QFVisualize3DGLWidget : public QOpenGLWidget, public TickTock
+class QFWIDLIB_EXPORT QFVisualize3DGLWidget : public QOpenGLWidget, public TickTock
 #else
-class LIB_EXPORT QFVisualize3DGLWidget : public QGLWidget, public TickTock
+class QFWIDLIB_EXPORT QFVisualize3DGLWidget : public QGLWidget, public TickTock
 #endif
 {
         Q_OBJECT
@@ -101,7 +101,7 @@ class LIB_EXPORT QFVisualize3DGLWidget : public QGLWidget, public TickTock
     public:
         class GLScene; // forward
         /** \brief an element in the scene graph, displayed in a QFVisualize3DGLWidget */
-        class LIB_EXPORT GLSceneElement {
+        class QFWIDLIB_EXPORT GLSceneElement {
             public:
                 GLSceneElement(GLScene* scene);
                 virtual ~GLSceneElement();
@@ -129,7 +129,7 @@ class LIB_EXPORT QFVisualize3DGLWidget : public QGLWidget, public TickTock
         };
 
         /** \brief a group of lines in the scene graph, displayed in a QFVisualize3DGLWidget */
-        class LIB_EXPORT GLLines: public GLSceneElement {
+        class QFWIDLIB_EXPORT GLLines: public GLSceneElement {
             public:
                 GLLines(GLScene* scene, GLenum mode=GL_LINES);
                 void appendLine(const QVector3D &c1, const QVector3D& c2);
@@ -147,7 +147,7 @@ class LIB_EXPORT QFVisualize3DGLWidget : public QGLWidget, public TickTock
 
 
         /** \brief a quadrilateral in the scene graph, displayed in a QFVisualize3DGLWidget */
-        class LIB_EXPORT GLQuad: public GLSceneElement {
+        class QFWIDLIB_EXPORT GLQuad: public GLSceneElement {
             public:
                 GLQuad(GLScene* scene, GLenum mode=GL_QUADS);
                 void appendTexCoord(const QVector2D& c);
@@ -181,7 +181,7 @@ class LIB_EXPORT QFVisualize3DGLWidget : public QGLWidget, public TickTock
 
 
         /** \brief manages the scene graph, displayed in a QFVisualize3DGLWidget */
-        class LIB_EXPORT GLScene {
+        class QFWIDLIB_EXPORT GLScene {
             public:
                 GLScene(QFVisualize3DGLWidget* sceneWidget);
                 virtual ~GLScene();
@@ -228,7 +228,7 @@ class LIB_EXPORT QFVisualize3DGLWidget : public QGLWidget, public TickTock
 
         };
         /** \brief a light source for the scene graph, displayed in a QFVisualize3DGLWidget */
-        class LIB_EXPORT GLLight {
+        class QFWIDLIB_EXPORT GLLight {
             public:
                 GLLight(GLenum  light, QFVisualize3DGLWidget* sceneWidget);
                 void draw();
@@ -247,7 +247,7 @@ class LIB_EXPORT QFVisualize3DGLWidget : public QGLWidget, public TickTock
         };
 
         /** \brief represents in a QFVisualize3DGLWidget */
-        class LIB_EXPORT GLCamera {
+        class QFWIDLIB_EXPORT GLCamera {
             public:
                 GLCamera(QFVisualize3DGLWidget* sceneWidget);
                 void draw();
@@ -275,7 +275,7 @@ class LIB_EXPORT QFVisualize3DGLWidget : public QGLWidget, public TickTock
         };
 
         /** \brief represents a volume data object, together with its properties */
-        struct LIB_EXPORT VolumeData {
+        struct QFWIDLIB_EXPORT VolumeData {
             VolumeData(){
                 transparentLowerThreshold=0;
                 transparentUpperThreshold=1;

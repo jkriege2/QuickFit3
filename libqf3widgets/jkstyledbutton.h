@@ -22,7 +22,7 @@
 #define JKSTYLEDBUTTON_H
 
 #include <QAbstractButton>
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 #include <QIcon>
 #include <QItemEditorCreator>
 
@@ -48,7 +48,7 @@
     You can reset this behaviour by calling \code setBuddy(NULL, JKStyledButton::None) \endcode .
 
  */
-class LIB_EXPORT JKStyledButton : public QAbstractButton {
+class QFWIDQFWIDLIB_EXPORT JKStyledButton : public QAbstractButton {
         Q_OBJECT
     public:
         enum ActionMode { None=0, OpenURL=1, ExecuteFile=2, SelectFile=3, OpenPrependedURL=4, ClearLineEdit=5, OpenFile=6 };

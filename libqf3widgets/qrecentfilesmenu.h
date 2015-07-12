@@ -28,13 +28,13 @@
 #include <QMap>
 #include <QFileInfo>
 #include <QFileIconProvider>
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 #include <QDateTime>
 
 /*! \brief a special QMenu that allows to manage a list of recently loaded files
     \ingroup tools_qt
  */
-class LIB_EXPORT QRecentFilesMenu : public QMenu {
+class QFWIDLIB_EXPORT QRecentFilesMenu : public QMenu {
         Q_OBJECT
     public:
         explicit QRecentFilesMenu(QWidget *parent = 0);

@@ -30,7 +30,7 @@ class QRectF;
 class QSizeF;
 class QPicture;
 class QTextCursor;
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 
 #include <QObject>
 
@@ -44,7 +44,7 @@ class QTextCursor;
  *  \ingroup tools_qt
  *
  */
-class LIB_EXPORT QSvgTextObject : public QObject, public QTextObjectInterface {
+class QFWIDLIB_EXPORT QSvgTextObject : public QObject, public QTextObjectInterface {
         Q_OBJECT
         Q_INTERFACES(QTextObjectInterface)
 
@@ -63,7 +63,7 @@ bool insertSVG(QTextCursor cursor, int SvgTextFormat, QString fileName, double r
  *  \ingroup tools_qt
  *
  */
-class LIB_EXPORT QPictureTextObject : public QObject, public QTextObjectInterface {
+class QFWIDLIB_EXPORT QPictureTextObject : public QObject, public QTextObjectInterface {
         Q_OBJECT
         Q_INTERFACES(QTextObjectInterface)
 
@@ -74,8 +74,8 @@ class LIB_EXPORT QPictureTextObject : public QObject, public QTextObjectInterfac
      protected:
 };
 
-LIB_EXPORT bool insertQPicture(QTextCursor cursor, int SvgTextFormat, const QPicture& picture, QSizeF size=QSizeF(), double relativeWidth=-1);
-LIB_EXPORT bool insertQPicture(QTextCursor cursor, int SvgTextFormat, const QPicture& picture, QPointF translate, QSizeF size=QSizeF(), double relativeWidth=-1);
+QFWIDLIB_EXPORT bool insertQPicture(QTextCursor cursor, int SvgTextFormat, const QPicture& picture, QSizeF size=QSizeF(), double relativeWidth=-1);
+QFWIDLIB_EXPORT bool insertQPicture(QTextCursor cursor, int SvgTextFormat, const QPicture& picture, QPointF translate, QSizeF size=QSizeF(), double relativeWidth=-1);
 
 
 #endif // QMORETEXTOBJECT_H

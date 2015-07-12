@@ -41,13 +41,13 @@
 
 #ifndef FLOWLAYOUT_H
 #define FLOWLAYOUT_H
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 #include <QLayout>
 #include <QRect>
 #include <QWidgetItem>
 #include <QStyle>
 //! [0]
-class LIB_EXPORT FlowLayout : public QLayout
+class QFWIDQFWIDLIB_EXPORT FlowLayout : public QLayout
 {
 public:
     FlowLayout(QWidget *parent, int margin = -1, int hSpacing = -1, int vSpacing = -1);

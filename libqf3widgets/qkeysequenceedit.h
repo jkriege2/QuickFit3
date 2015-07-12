@@ -25,7 +25,7 @@
 #include <QKeyEvent>
 #include "qenhancedlineedit.h"
 #include "jkstyledbutton.h"
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 #include <QVariant>
 
 /*! \brief enhanced QLineEdit which allows the user to edit a QKeySequence
@@ -37,7 +37,7 @@
        - adds a button to clear the widget
     .
  */
-class LIB_EXPORT QKeySequenceEdit : public QEnhancedLineEdit
+class QFWIDLIB_EXPORT QKeySequenceEdit : public QEnhancedLineEdit
 {
         Q_OBJECT
     public:

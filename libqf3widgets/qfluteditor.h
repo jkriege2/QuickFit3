@@ -28,7 +28,7 @@
 #include <QTimer>
 #include <QAction>
 #include "jkqtpimagetools.h"
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 
 class QFLUTEditorNode; // forwrd
 
@@ -37,7 +37,7 @@ class QFLUTEditorNode; // forwrd
  *  \ingroup QFVisualize3D
  *
  */
-class LIB_EXPORT QFLUTEditor : public QFrame {
+class QFWIDLIB_EXPORT QFLUTEditor : public QFrame {
         Q_OBJECT
     public:
         QFLUTEditor( QWidget * parent = 0 );
@@ -153,7 +153,7 @@ class LIB_EXPORT QFLUTEditor : public QFrame {
 
 
 
-class LIB_EXPORT QFLUTEditorNode {
+class QFWIDLIB_EXPORT QFLUTEditorNode {
      public:
          QFLUTEditorNode(int lut, QColor color, QFLUTEditor *graphWidget);
 

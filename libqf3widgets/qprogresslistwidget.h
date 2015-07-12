@@ -26,7 +26,7 @@
 #include <QMap>
 #include <QIcon>
 #include <QList>
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 #include <QLabel>
 #include <QGridLayout>
 #include <QPushButton>
@@ -37,7 +37,7 @@
 /** \brief displays a list of items with an icon next to each which indicates the current task performed on the item (e.g. not started, in progress, success, failed, ...)
  *  \ingroup tools_qt
  */
-class LIB_EXPORT QProgressListWidget : public QWidget {
+class QFWIDLIB_EXPORT QProgressListWidget : public QWidget {
         Q_OBJECT
     public:
         enum {
@@ -98,7 +98,7 @@ class LIB_EXPORT QProgressListWidget : public QWidget {
 /** \brief a dialog with a QProgressListWidget and a cancel button (optional)
  *  \ingroup tools_qt
  */
-class LIB_EXPORT QProgressListDialog : public QDialog {
+class QFWIDLIB_EXPORT QProgressListDialog : public QDialog {
         Q_OBJECT
     public:
         QProgressListDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);

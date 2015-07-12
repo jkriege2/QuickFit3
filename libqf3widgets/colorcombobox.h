@@ -24,7 +24,7 @@
 #include <QComboBox>
 #include <QColor>
 #include <QVariant>
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 #include <QAction>
 
 
@@ -32,7 +32,7 @@
            if e.g. a configuration is deleted or added
     \ingroup tools_qt
 */
-class ColorComboBoxNotifier: public QObject {
+class QFWIDQFWIDLIB_EXPORT ColorComboBoxNotifier: public QObject {
         Q_OBJECT
     public:
         ColorComboBoxNotifier(QObject* parent=NULL): QObject(parent) {};
@@ -47,7 +47,7 @@ class ColorComboBoxNotifier: public QObject {
 /*! \brief a QComboBox variant that allows to select colors
     \ingroup tools_qt
 */
-class LIB_EXPORT ColorComboBox : public QComboBox {
+class QFWIDQFWIDLIB_EXPORT ColorComboBox : public QComboBox {
         Q_OBJECT
     public:
         /** Default constructor */

@@ -44,7 +44,7 @@
 #include <ctype.h>
 #include <list>
 #include <utility>
-#include "tools.h"
+#include "cpptools.h"
 
 
 #ifndef JKMATHPARSER_H

@@ -25,7 +25,7 @@
 #include <QMainWindow>
 #include "jkqtpimagetools.h"
 #include "qfvisualize3dglwidget.h"
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 
 namespace Ui {
     class QFVisualize3DGLEditor;
@@ -33,7 +33,7 @@ namespace Ui {
 /** \brief wrapper class around QFVisualize3DGLWidget, with additional widgets to set the rendering mode ...
  *  \ingroup QFVisualize3D
  */
-class LIB_EXPORT QFVisualize3DGLEditor : public QWidget
+class QFWIDLIB_EXPORT QFVisualize3DGLEditor : public QWidget
 {
         Q_OBJECT
         

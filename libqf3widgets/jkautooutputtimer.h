@@ -22,9 +22,9 @@
 
 #include <QElapsedTimer>
 #include <QString>
-#include "../lib_imexport.h"
+#include "libwid_imexport.h"
 
-class LIB_EXPORT JKAutoOutputTimer : public QElapsedTimer
+class QFWIDQFWIDLIB_EXPORT JKAutoOutputTimer : public QElapsedTimer
 {
     public:
         explicit JKAutoOutputTimer(const QString& message);
