@@ -27,6 +27,10 @@
  */
 
 
+#ifndef cpptools_h
+#define cpptools_h
+
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -43,10 +47,6 @@
 #include "lib_imexport.h"
 
 
-
-
-#ifndef cpptools_h
-#define cpptools_h
 
 #ifndef __WINDOWS__
 # if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
