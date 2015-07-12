@@ -46,9 +46,7 @@ RESOURCES += qfe_gslmathparserextensions.qrc
 TRANSLATIONS= ./translations/de.qfe_gslmathparserextensions.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 HELPREF_FILES.files = ./help/parserreference/*.*
 HELPREF_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/parserreference/

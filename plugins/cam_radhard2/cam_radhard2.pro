@@ -41,13 +41,11 @@ HEADERS += cam_radhard2.h \
            radhard2lib/radhard2lib.h \
            ../base_classes/radhard2flash.h \
            ../interfaces/qfextensioncamera.h \
-           ../../global_lib/highrestimer.h \
     qfradhard2flashtool.h
 
 SOURCES += cam_radhard2.cpp \
            radhard2lib/radhard2.cpp \
            ../base_classes/radhard2flash.cpp \
-           ../../global_lib/highrestimer.cpp \
     qfradhard2flashtool.cpp
 
 FORMS = \
@@ -58,9 +56,7 @@ RESOURCES += cam_radhard2.qrc
 TRANSLATIONS= ./translations/de.cam_radhard2.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 
 include(../../quickfit3_configqtwidgets.pri)

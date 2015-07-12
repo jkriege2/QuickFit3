@@ -33,7 +33,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QVector>
 #include <iostream>
 
-#include "tools.h"
+#include "cpptools.h"
 
 /*
   Simple mdaptation from alv5000tools.h

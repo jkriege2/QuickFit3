@@ -26,7 +26,7 @@
 #include <QString>
 #include "jkqtpelements.h"
 #include "qffitfunction.h"
-#include "tools.h"
+#include "cpptools.h"
 
 struct JKQTPxQFFitFunctionLineGraphFunctionParams; // forward
 

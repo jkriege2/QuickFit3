@@ -180,7 +180,16 @@ HEADERS += dlgnewproperty.h \
     qfrdrtablecombobox.h \
     qfpseudotreemodel.h \
     qfrdrannotationinterface.h \
-    qfrdrannotationtools.h
+    qfrdrannotationtools.h \
+    qfserialconnection.h \
+    qf3comportmanager.h \
+    datatable2.h \
+    image_tools.h \
+    jkmathparser.h \
+    highrestimer.h \
+    ticktock.h \
+    jkiniparser2.h
+
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -289,7 +298,15 @@ SOURCES += dlgnewproperty.cpp \
     qfexporttotabledialog.cpp \
     qfrdrtablecombobox.cpp \
     qfpseudotreemodel.cpp \
-    qfrdrannotationtools.cpp
+    qfrdrannotationtools.cpp \
+    qfserialconnection.cpp \
+    qf3comportmanager.cpp\
+    datatable2.cpp \
+    image_tools.cpp \
+    jkmathparser.cpp \
+    highrestimer.cpp \
+    ticktock.cpp\
+    jkiniparser2.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

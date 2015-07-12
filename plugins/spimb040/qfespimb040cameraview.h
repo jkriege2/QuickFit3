@@ -47,7 +47,7 @@
 #include "jkqtfastplotter.h"
 #include "jkqttools.h"
 #include "colorcombobox.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qfextensionmanager.h"
 #include "qfcameracombobox.h"
 #include "qfcameraconfigcombobox.h"

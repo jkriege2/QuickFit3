@@ -52,9 +52,7 @@ RESOURCES += qfspimlightsheetevaluation.qrc
 TRANSLATIONS= ./translations/de.spim_lightsheet_eval.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

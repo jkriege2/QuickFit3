@@ -37,7 +37,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrfcscrosscorrelationeditor.h"
 #include "qfrdrfcsrateeditor.h"
 #include "datatable2.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qfrawdatarecordfactory.h"
 #include "qfrdrfcsdatainterface.h"
 #include "qfrdrcountratesinterface.h"

@@ -12,6 +12,5 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 	}
 }
 CONFIG += exceptions rtti stl link_prl
-INCLUDEPATH += ../../global_lib/ \
-               ../../extlibsb040/JKQtPlotter/ \
+INCLUDEPATH += ../../extlibsb040/JKQtPlotter/ \
                ../../extlibsb040/StatisticsTools/

@@ -96,9 +96,7 @@ RESOURCES += qfevalimfcsfit.qrc \
 TRANSLATIONS= ./translations/de.qfevalimfcsfit.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 SRC_DISTRIBUTED.files = $$HEADERS \
                         $$SOURCES \

@@ -29,8 +29,8 @@
 #include <QVector>
 #include <QList>
 #include "qfcoboltlaserprotocolhandler.h"
-#include "../base_classes/qf3comportmanager.h"
-#include "../../global_lib/qfserialconnection.h"
+#include "qf3comportmanager.h"
+#include "qfserialconnection.h"
 #include "qfextensionmeasurementdevice.h"
 #include "qfextensionlightsource.h"
 #include "qftools.h"

@@ -25,7 +25,7 @@
 #include <QDoubleSpinBox>
 #include <QWidget>
 #include <QLabel>
-#include "tools.h"
+#include "cpptools.h"
 #include <iostream>
 #include "libwid_imexport.h"
 

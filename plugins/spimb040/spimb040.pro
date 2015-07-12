@@ -39,14 +39,12 @@ HEADERS += spimb040.h \
            qfespimb040cameraview.h \
            qfespimb040samplestageconfig.h \
            ../interfaces/qfextensioncamera.h \
-           ../../global_lib/jkimage.h  \
-           ../../global_lib/highrestimer.h \
+           ../base_classes/jkimage.h  \
            ../interfaces/qfextensionlinearstage.h \
     qfespimb040opticssetup.h \
     qfespimb040simplecameraconfig.h \
     qfespimb00histogrammaskdialog.h \
-    ../../global_lib/qt/qfasttablelabel.h \
-    ../../global_lib/histogram.h \
+    ../base_classes/histogram.h \
     qfespimb040mainwindow2.h \
     qfespimb040experimentdescription.h \
     qfespimb040samplestageconfigthread.h \
@@ -69,8 +67,6 @@ HEADERS += spimb040.h \
     qfespimb040configtabwidget.h \
     qfespimb040opticssetupbase.h \
     qfespimb040opticssetup2.h \
-    ../../global_lib/jkmathparser.h \
-    ../../global_lib/jkiniparser2.h \
     qfespimb040overviewacquisitionconfigwidget.h \
     qfespimb040finddialog.h \
     spimb040optionswidget.h
@@ -78,11 +74,9 @@ HEADERS += spimb040.h \
 SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
            qfespimb040samplestageconfig.cpp \
-           ../../global_lib/highrestimer.cpp \
     qfespimb040opticssetup.cpp \
     qfespimb040simplecameraconfig.cpp \
     qfespimb00histogrammaskdialog.cpp \
-    ../../global_lib/qt/qfasttablelabel.cpp \
     qfespimb040mainwindow2.cpp \
     qfespimb040experimentdescription.cpp \
     qfespimb040samplestageconfigthread.cpp \
@@ -102,8 +96,6 @@ SOURCES += spimb040.cpp \
     qfespimb040configtabwidget.cpp \
     qfespimb040opticssetupbase.cpp \
     qfespimb040opticssetup2.cpp \
-    ../../global_lib/jkmathparser.cpp \
-    ../../global_lib/jkiniparser2.cpp \
     qfespimb040overviewacquisitionconfigwidget.cpp \
     qfespimb040finddialog.cpp \
     spimb040optionswidget.cpp
@@ -133,9 +125,7 @@ TRANSLATIONS= ./translations/de.spimb040.ts
 
 INCLUDEPATH += . \
                ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 QT +=  script
 include(../../quickfit3_configqtwidgets.pri)

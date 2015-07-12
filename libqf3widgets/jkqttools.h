@@ -47,7 +47,7 @@
     \param widget the widget to store
     \param prefix this prefix is prepended to the QSettings keys
 */
-QFWIDQFWIDLIB_EXPORT void jksaveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
+QFWIDLIB_EXPORT void jksaveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
 
 /*! \brief load the geometry of a given widget to a QSettings
     \ingroup tools_qt
@@ -58,7 +58,7 @@ QFWIDQFWIDLIB_EXPORT void jksaveWidgetGeometry(QSettings& settings, QWidget* wid
     \param[out] widget the widget to change
     \param prefix this prefix is prepended to the QSettings keys
 */
-QFWIDQFWIDLIB_EXPORT void jkloadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
+QFWIDLIB_EXPORT void jkloadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
 
 
 /*! \brief load the geometry of a given widget to a QSettings
@@ -72,7 +72,7 @@ QFWIDQFWIDLIB_EXPORT void jkloadWidgetGeometry(QSettings& settings, QWidget* wid
     \param defaultSize default size of the widget
     \param prefix this prefix is prepended to the QSettings keys
 */
-QFWIDQFWIDLIB_EXPORT void jkloadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosition, QSize defaultSize, QString prefix=QString(""));
+QFWIDLIB_EXPORT void jkloadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosition, QSize defaultSize, QString prefix=QString(""));
 
 /*! \brief store the geometry of a given widget to a QSettings
     \ingroup tools_qt
@@ -83,7 +83,7 @@ QFWIDQFWIDLIB_EXPORT void jkloadWidgetGeometry(QSettings& settings, QWidget* wid
     \param widget the widget to store
     \param prefix this prefix is prepended to the QSettings keys
 */
-QFWIDQFWIDLIB_EXPORT void jksaveSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QString(""));
+QFWIDLIB_EXPORT void jksaveSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QString(""));
 
 /*! \brief load the geometry of a given widget to a QSettings
     \ingroup tools_qt
@@ -94,19 +94,19 @@ QFWIDQFWIDLIB_EXPORT void jksaveSplitter(QSettings& settings, QSplitter* splitte
     \param[out] plitter the plitter to change
     \param prefix this prefix is prepended to the QSettings keys
 */
-QFWIDQFWIDLIB_EXPORT void jkloadSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QString(""));
+QFWIDLIB_EXPORT void jkloadSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QString(""));
 
 
 /*! \brief convert a QList<QVariant> to a string
     \ingroup tools_qt
 
 */
-QFWIDQFWIDLIB_EXPORT QString jkVariantListToString(const QList<QVariant>& data, QString separator=QString(", "));
+QFWIDLIB_EXPORT QString jkVariantListToString(const QList<QVariant>& data, QString separator=QString(", "));
 
 
 /*! \brief filename-ize a string, i.e. replace every non-number and non-character (and also not <code> _ -</code>) character to \c _ */
-QFWIDQFWIDLIB_EXPORT QString filenameize(const QString& data);
+QFWIDLIB_EXPORT QString filenameize(const QString& data);
 
 /** \brief create a valid variable name from the string, i.e. a string with only characters and digits and \c '_'. ALso the first character has to be a charcter. */
-QFWIDQFWIDLIB_EXPORT QString toValidVariableName(const QString& input);
+QFWIDLIB_EXPORT QString toValidVariableName(const QString& input);
 #endif // JKQTTOOLS_H

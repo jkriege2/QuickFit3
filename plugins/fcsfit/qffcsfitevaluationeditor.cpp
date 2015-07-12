@@ -30,7 +30,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <iostream>
 #include <cfloat>
 #include "qffcsfitevaluation.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "statistics_tools.h"
 #include <QThread>
 #include "dlgestimatefocalvolume.h"

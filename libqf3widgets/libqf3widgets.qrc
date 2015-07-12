@@ -106,4 +106,9 @@
         <file alias="stage_nojoystick.png">icons/nojoystick.png</file>
         <file alias="plugin.png">icons/plugin.png</file>
     </qresource>
+    <qresource prefix="/lib/qt">
+         <file alias="dblbtn_down.png">images/btn_down.png</file>
+         <file alias="dblbtn_up.png">images/btn_up.png</file>
+     </qresource>
+
 </RCC>

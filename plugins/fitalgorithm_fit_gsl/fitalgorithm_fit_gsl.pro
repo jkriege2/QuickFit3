@@ -64,9 +64,7 @@ RESOURCES +=
 TRANSLATIONS= ../../output/assets/translations/de.fit_gsl.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 SRC_DISTRIBUTED.files = $$HEADERS \
                         $$SOURCES \

@@ -30,8 +30,8 @@
 #include "qfextension.h"
 #include "qfextensionshutter.h"
 #include "../base_classes/qf3simpleb040serialprotocolhandler.h"
-#include "../base_classes/qf3comportmanager.h"
-#include "../../global_lib/qfserialconnection.h"
+#include "qf3comportmanager.h"
+#include "qfserialconnection.h"
 
 /*!
     \defgroup qf3ext_ShutterArduinoB040 QFExtensionShutter implementation for RC-servos switchable between two states using a custom C program running on an Arduino Nano 3.0 board

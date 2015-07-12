@@ -51,7 +51,7 @@
 #include "qfextensionmanager.h"
 #include "qfextensioncamera.h"
 #include "qfextension.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qfcameracombobox.h"
 #include "qfcameraconfigcombobox.h"
 #include "qfextensionmeasurementdevice.h"

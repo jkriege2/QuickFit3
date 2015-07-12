@@ -27,8 +27,6 @@ DEPENDPATH += . \
 INCLUDEPATH += . \
                ../lib/ \
                ../libqf3widgets/ \
-               ../global_lib/ \
-               ../global_lib/qt \
                ../extlibsb040/StatisticsTools/ \
                ../extlibsb040/JKQtPlotter/
 
@@ -130,7 +128,6 @@ RESOURCES += quickfit3.qrc \
 
 TRANSLATIONS= ./translations/de.ts
 
-INCLUDEPATH += ../global_lib/
 
 win32 {
     RC_FILE = quickfit3.rc

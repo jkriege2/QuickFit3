@@ -50,7 +50,7 @@
 #include "qfextensionmanager.h"
 #include "qfextensionmeasurementdevice.h"
 #include "qfextension.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qfmeasurementdevicecombobox.h"
 #include "filters.h"
 #include "libwid_imexport.h"

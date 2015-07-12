@@ -25,7 +25,7 @@
 #include "libtiff_tools.h"
 #include "csvtools.h"
 #include <QTextStream>
-#include "tools.h"
+#include "cpptools.h"
 #include "statistics_tools.h"
 #include "csvtools.h"
 #include "qfrdrimagingfcstools.h"

@@ -99,9 +99,7 @@ RESOURCES += qfimfccsfitevaluation.qrc  \
 TRANSLATIONS= ./translations/de.imfccs_fit.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

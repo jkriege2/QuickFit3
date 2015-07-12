@@ -30,8 +30,8 @@
 #include "qfextension.h"
 #include "qfextensionshutter.h"
 #include "../base_classes/qfbinaryserialprotocolhandler.h"
-#include "../base_classes/qf3comportmanager.h"
-#include "../../global_lib/qfserialconnection.h"
+#include "qf3comportmanager.h"
+#include "qfserialconnection.h"
 #include "pololu_tools.h"
 #include "qfextensionfilterchanger.h"
 /*!

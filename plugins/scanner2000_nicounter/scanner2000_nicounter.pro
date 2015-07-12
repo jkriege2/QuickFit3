@@ -36,7 +36,6 @@ DESTDIR = $$QFOUTPUT/plugins
 include(../../libquickfitwidgets.pri)
 
 HEADERS += \
-           ../../global_lib/qfserialconnection.h \
            scanner2000nicounter.h \
            scancontroller.h \
            ../../extlibs/NIDAQmx/NIDAQmx.h \
@@ -44,7 +43,6 @@ HEADERS += \
 
 
 SOURCES += \
-           ../../global_lib/qfserialconnection.cpp \
            scanner2000nicounter.cpp \
            scancontroller.cpp \
     nidaq6602.cpp
@@ -57,8 +55,6 @@ RESOURCES += \
 TRANSLATIONS= ./translations/de.stage_mc2000.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)

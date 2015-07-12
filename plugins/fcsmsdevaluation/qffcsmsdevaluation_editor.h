@@ -30,7 +30,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
 #include "qfplotter.h"
-#include "tools.h"
+#include "cpptools.h"
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>
@@ -73,7 +73,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrfcsdatainterface.h"
 #include <iostream>
 #include <cfloat>
-#include "tools.h"
+#include "cpptools.h"
 #include "statistics_tools.h"
 #include <QThread>
 #include "qmoretextobject.h"

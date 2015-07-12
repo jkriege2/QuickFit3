@@ -36,11 +36,11 @@ INCLUDEPATH += ../global_lib/ \
                . \
                ../lib/ \
                ../plugins/interfaces/ \
-               ../extlibsb040/StatisticsTools/ \
-               ../extlibsb040/JKQtPlotter/
+               ../extlibsb040/StatisticsTools/
 
 include(../libquickfit.pri)
-include(../global_lib/qt/qfvisualize3dshaders.pri)
+include(../extlibsb040/jkqtplotters.pri)
+include(qfvisualize3dshaders.pri)
 
 include(../quickfit3_configqtwidgets.pri)
 
@@ -51,28 +51,17 @@ DESTDIR = $$QFOUTPUT
 
 #DEFINES += JKQTBP_AUTOTIMER
 # Input
-HEADERS += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.h \
-           ../extlibsb040/JKQtPlotter/jkqtpdatastorage.h \
-           ../extlibsb040/JKQtPlotter/jkqtpelements.h \
-           ../extlibsb040/JKQtPlotter/jkqtpgeoelements.h \
-           ../extlibsb040/JKQtPlotter/jkqtmathtext.h \
-           ../extlibsb040/JKQtPlotter/jkqtpbaseelements.h \
-           ../extlibsb040/JKQtPlotter/jkqtplotter.h \
-           ../extlibsb040/JKQtPlotter/jkqtptools.h \
-           ../extlibsb040/JKQtPlotter/jkqtpmathparser.h \
-           ../global_lib/qt/jkqttools.h \
-           ../global_lib/qt/flowlayout.h \
-           ../extlibsb040/JKQtPlotter/jkqtfastplotter.h \
-           ../global_lib/qt/qtlogfile.h \
-           ../global_lib/tools.h \
-           ../global_lib/datatable2.h \
-           ../global_lib/qt/jkverticalscrollarea.h \
-           ../global_lib/qt/colorcombobox.h \
-           ../global_lib/qt/jkstyledbutton.h \
-           ../global_lib/qt/qenhancedlineedit.h \
-           ../global_lib/qt/qspecialtoolbutton.h \
-           ../global_lib/qt/qmodernprogresswidget.h \
-           ../global_lib/qt/qmoretextobject.h \
+HEADERS += jkqttools.h \
+           flowlayout.h \
+           qtlogfile.h \
+           cpptools.h \
+           jkverticalscrollarea.h \
+           colorcombobox.h \
+           jkstyledbutton.h \
+           qenhancedlineedit.h \
+           qspecialtoolbutton.h \
+           qmodernprogresswidget.h \
+           qmoretextobject.h \
            qehtreeview.h \
            datacutslider.h \
            qffitparameterwidget.h \
@@ -85,19 +74,14 @@ HEADERS += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.h \
     ../plugins/interfaces/qfextensionlinearstage.h \
     ../plugins/interfaces/qfextensioncamera.h \
     libwid_imexport.h \
-    ../global_lib/lib_imexport.h \
-    ../extlibsb040/JKQtPlotter/jkqtpimagetools.h \
-    ../extlibsb040/JKQtPlotter/jkqtpimageelements.h \
     filters.h \
-    ../global_lib/qt/qenhancedcombobox.h \
+    qenhancedcombobox.h \
     qfshuttercombobox.h \
-    ../global_lib/qt/qrecentfilesmenu.h \
+    qrecentfilesmenu.h \
     qfplayercontrols.h \
-    ../extlibsb040/JKQtPlotter/jkqtpoverlayelements.h \
     qfsimplefitparameterinterface.h \
     qfsimplefitparameterswidget.h \
-    ../global_lib/image_tools.h \
-    ../global_lib/qt/qkeysequenceedit.h \
+    qkeysequenceedit.h \
     qffilterchangercombobox.h \
     ../plugins/interfaces/qfextensionlightsource.h \
     ../plugins/interfaces/qfextensionfilterchanger.h \
@@ -106,9 +90,9 @@ HEADERS += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.h \
     qffilterchangerconfigwidget.h \
     qflightsourceconfigwidget.h \
     qflightsourceconfigwidgetthread.h \
-    ../global_lib/qt/qprogresslistwidget.h \
-    ../global_lib/qt/qsettingsmodel.h \
-    ../global_lib/qt/linestylecombobox.h \
+    qprogresslistwidget.h \
+    qsettingsmodel.h \
+    linestylecombobox.h \
     qfacquisitionconfigcombobox.h \
     qfacquisitioncombobox.h \
     qfshutterconfigwidgetthread.h \
@@ -120,8 +104,6 @@ HEADERS += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.h \
     qfselectionlistdialog.h \
     qfcompletertextedit.h \
     qfqtscripthighlighter.h \
-    ../extlibsb040/JKQtPlotter/jkqtpparsedfunctionelements.h \
-    ../global_lib/jkmathparser.h \
     qfhtmlhighlighter.h \
     qfplotter.h \
     qfplotterprivate.h \
@@ -130,11 +112,11 @@ HEADERS += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.h \
     qfplottercopytotabledialog.h \
     qfmathparserxfunctionlinegraph.h \
     doubledatacutsliders.h \
-    ../global_lib/qt/jkautooutputtimer.h \
+    jkautooutputtimer.h \
     qfrecentfilesmenu.h \
     qfstageconfigwidgetthread.h \
     qfstageconfigwidget.h \
-    ../global_lib/qt/fillstylecombobox.h \
+    fillstylecombobox.h \
     qfsimplecurvefitdialog.h \
     qfparametercorrelationview.h \
     qfmeasurementdevicecombobox.h \
@@ -143,11 +125,9 @@ HEADERS += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.h \
     qfrdrimagetorunpreview.h \
     qfrdrimagemaskedittools.h \
     qfrdrimagemaskbyintensity.h \
-    ../global_lib/qt/qfluteditor.h \
-    ../global_lib/highrestimer.h \
-    ../global_lib/ticktock.h \
-    ../global_lib/qt/qfvisualize3dglwidget.h \
-    ../global_lib/qt/qfvisualize3dgleditor.h \
+    qfluteditor.h \
+    qfvisualize3dglwidget.h \
+    qfvisualize3dgleditor.h \
     qffitfunctionselectdialog.h \
     qfoverlayplotdialog.h \
     ../plugins/interfaces/qfgetplotdatainterface.h \
@@ -159,31 +139,22 @@ HEADERS += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.h \
     qfmathparserwidgetsmall.h \
     qfimageplot.h \
     qftableview.h \
-    qfrdrmaskbyoverviewimagedlg.h
+    qfrdrmaskbyoverviewimagedlg.h\
+    numberedit.h
 
 
-SOURCES += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.cpp \
-           ../extlibsb040/JKQtPlotter/jkqtpdatastorage.cpp \
-           ../extlibsb040/JKQtPlotter/jkqtpelements.cpp \
-           ../extlibsb040/JKQtPlotter/jkqtpgeoelements.cpp \
-           ../extlibsb040/JKQtPlotter/jkqtmathtext.cpp \
-           ../extlibsb040/JKQtPlotter/jkqtpbaseelements.cpp \
-           ../extlibsb040/JKQtPlotter/jkqtplotter.cpp \
-           ../extlibsb040/JKQtPlotter/jkqtptools.cpp \
-           ../extlibsb040/JKQtPlotter/jkqtpmathparser.cpp \
-           ../global_lib/qt/jkqttools.cpp \
-            ../global_lib/qt/flowlayout.cpp \
-           ../global_lib/qt/qtlogfile.cpp \
-           ../extlibsb040/JKQtPlotter/jkqtfastplotter.cpp \
-           ../global_lib/tools.cpp \
-           ../global_lib/datatable2.cpp \
-           ../global_lib/qt/jkverticalscrollarea.cpp \
-           ../global_lib/qt/colorcombobox.cpp \
-           ../global_lib/qt/jkstyledbutton.cpp \
-           ../global_lib/qt/qenhancedlineedit.cpp \
-           ../global_lib/qt/qspecialtoolbutton.cpp \
-           ../global_lib/qt/qmodernprogresswidget.cpp \
-           ../global_lib/qt/qmoretextobject.cpp \
+SOURCES +=  \
+           jkqttools.cpp \
+            flowlayout.cpp \
+           qtlogfile.cpp \
+           cpptools.cpp \
+           jkverticalscrollarea.cpp \
+           colorcombobox.cpp \
+           jkstyledbutton.cpp \
+           qenhancedlineedit.cpp \
+           qspecialtoolbutton.cpp \
+           qmodernprogresswidget.cpp \
+           qmoretextobject.cpp \
            qehtreeview.cpp \
            datacutslider.cpp \
            qffitparameterwidget.cpp \
@@ -191,26 +162,22 @@ SOURCES += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.cpp \
     qfcameraconfigcombobox.cpp \
     qfcameracombobox.cpp \
     objectives.cpp \
-    ../extlibsb040/JKQtPlotter/jkqtpimagetools.cpp \
-    ../extlibsb040/JKQtPlotter/jkqtpimageelements.cpp \
     filters.cpp \
-    ../global_lib/qt/qenhancedcombobox.cpp \
+    qenhancedcombobox.cpp \
     qfshuttercombobox.cpp \
-    ../global_lib/qt/qrecentfilesmenu.cpp \
+    qrecentfilesmenu.cpp \
     qfplayercontrols.cpp \
-    ../extlibsb040/JKQtPlotter/jkqtpoverlayelements.cpp \
     qfsimplefitparameterswidget.cpp \
-    ../global_lib/image_tools.cpp \
-    ../global_lib/qt/qkeysequenceedit.cpp \
+    qkeysequenceedit.cpp \
     qffilterchangercombobox.cpp \
     qflightsourcecombobox.cpp \
     qfshutterconfigwidget.cpp \
     qffilterchangerconfigwidget.cpp \
     qflightsourceconfigwidget.cpp \
     qflightsourceconfigwidgetthread.cpp \
-    ../global_lib/qt/qprogresslistwidget.cpp \
-    ../global_lib/qt/qsettingsmodel.cpp \
-    ../global_lib/qt/linestylecombobox.cpp \
+    qprogresslistwidget.cpp \
+    qsettingsmodel.cpp \
+    linestylecombobox.cpp \
     qfacquisitionconfigcombobox.cpp \
     qfacquisitioncombobox.cpp \
     qfshutterconfigwidgetthread.cpp \
@@ -222,8 +189,6 @@ SOURCES += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.cpp \
     qfselectionlistdialog.cpp \
     qfqtscripthighlighter.cpp \
     qfcompletertextedit.cpp \
-    ../extlibsb040/JKQtPlotter/jkqtpparsedfunctionelements.cpp \
-    ../global_lib/jkmathparser.cpp \
     qfhtmlhighlighter.cpp \
     qfplotter.cpp \
     qfplotterprivate.cpp \
@@ -232,11 +197,11 @@ SOURCES += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.cpp \
     qfplottercopytotabledialog.cpp \
     qfmathparserxfunctionlinegraph.cpp \
     doubledatacutsliders.cpp \
-    ../global_lib/qt/jkautooutputtimer.cpp \
+    jkautooutputtimer.cpp \
     qfrecentfilesmenu.cpp \
     qfstageconfigwidgetthread.cpp \
     qfstageconfigwidget.cpp \
-    ../global_lib/qt/fillstylecombobox.cpp \
+    fillstylecombobox.cpp \
     qfsimplecurvefitdialog.cpp \
     qfparametercorrelationview.cpp \
     qfmeasurementdevicecombobox.cpp \
@@ -245,10 +210,9 @@ SOURCES += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.cpp \
     qfrdrimagetorunpreview.cpp \
     qfrdrimagemaskedittools.cpp \
     qfrdrimagemaskbyintensity.cpp \
-    ../global_lib/qt/qfluteditor.cpp \
-    ../global_lib/highrestimer.cpp \
-    ../global_lib/qt/qfvisualize3dglwidget.cpp \
-    ../global_lib/qt/qfvisualize3dgleditor.cpp \
+    qfluteditor.cpp \
+    qfvisualize3dglwidget.cpp \
+    qfvisualize3dgleditor.cpp \
     qffitfunctionselectdialog.cpp \
     qfoverlayplotdialog.cpp \
     qfselectfileslistwidget.cpp \
@@ -259,7 +223,8 @@ SOURCES += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.cpp \
     qfmathparserwidgetsmall.cpp \
     qfimageplot.cpp \
     qftableview.cpp \
-    qfrdrmaskbyoverviewimagedlg.cpp
+    qfrdrmaskbyoverviewimagedlg.cpp \
+    numberedit.cpp
 
 
 FORMS += qf3objectiveeditor.ui \
@@ -269,7 +234,7 @@ FORMS += qf3objectiveeditor.ui \
     qfplottercopytotabledialog.ui \
     qfsimplecurvefitdialog.ui \
     qfrdrimagemaskbyintensity.ui \
-    ../global_lib/qt/qfvisualize3dgleditor.ui \
+    qfvisualize3dgleditor.ui \
     qffitfunctionselectdialog.ui \
     qfoverlayplotdialog.ui \
     qfselectfileslistwidget.ui \
@@ -281,24 +246,19 @@ FORMS += qf3objectiveeditor.ui \
     qfrdrmaskbyoverviewimagedlg.ui
 
 
-RESOURCES += ../extlibsb040/JKQtPlotter/jkqtpbaseplotter.qrc \
-             ../global_lib/qt/qspecialtoolbutton.qrc \
-             ../global_lib/qt/jkstyledbutton.qrc \
-             ../global_lib/qt/libqt.qrc \
-             ../global_lib/qt/qkeysequenceedit.qrc \
-             ../global_lib/qt/numberedit.qrc \
+RESOURCES += qspecialtoolbutton.qrc \
+             jkstyledbutton.qrc \
+             libqt.qrc \
+             qkeysequenceedit.qrc \
+             numberedit.qrc \
              libqf3widgets.qrc \
-    ../global_lib/qt/qprogresslistwidget.qrc \
-    ../global_lib/qt/qtlogfile.qrc \
+    qprogresslistwidget.qrc \
+    qtlogfile.qrc \
     ../extlibs/xits.qrc \
-    ../global_lib/qt/qfvisualize3d.qrc
+    qfvisualize3d.qrc
 
 
 TRANSLATIONS= ./translations/de.quickfit3widgets.ts
-
-INCLUDEPATH += ../global_lib/ \
-               ../global_lib/qt/ \
-			   ../extlibsb040/JKQtPlotter/
 
 CONFIG += dll lib_bundle exceptions rtti stl create_prl
 

@@ -30,7 +30,7 @@
 /*! \brief a QComboBox variant that allows to select line styles
     \ingroup tools_qt
 */
-class QFWIDQFWIDLIB_EXPORT FillStyleComboBox : public QComboBox {
+class QFWIDLIB_EXPORT FillStyleComboBox : public QComboBox {
         Q_OBJECT
     public:
         /** Default constructor */

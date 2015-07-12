@@ -54,9 +54,7 @@ RESOURCES += qfecalculator.qrc
 TRANSLATIONS= ./translations/de.qfe_calculator.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 
 HELPREF_FILES.files = ./help/parserreference/*.*

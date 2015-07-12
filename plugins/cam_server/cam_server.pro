@@ -46,16 +46,13 @@ RESOURCES += qfecamserver.qrc
 TRANSLATIONS= ./translations/de.cam_server.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
-
+               ../../libqf3widgets/
 include(../../quickfit3_configqtwidgets.pri)
 
 
-EXAMPLESTINYTIFF_FILES.files = ../../extlibsb040/TinyTIFF/tinytiff*.*
+EXAMPLESTINYTIFF_FILES.files = ../../extlibsb040/TinyTIFF/*.*
 EXAMPLESTINYTIFF_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
-EXAMPLESHIGHRESTIMER_FILES.files = ../../global_lib/highrestimer.*
+EXAMPLESHIGHRESTIMER_FILES.files = ../../lib/highrestimer.* ../../lib/lib_imexport.h
 EXAMPLESHIGHRESTIMER_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
 
 

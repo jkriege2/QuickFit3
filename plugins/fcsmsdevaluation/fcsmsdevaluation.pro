@@ -80,9 +80,7 @@ RESOURCES += fcsmsdevaluation.qrc \
 TRANSLATIONS= ./translations/de.fcsmsdevaluation.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

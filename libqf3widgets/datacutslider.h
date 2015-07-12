@@ -31,7 +31,7 @@
 #endif
 
 
-#include "tools.h"
+#include "cpptools.h"
 #include <iostream>
 #include "libwid_imexport.h"
 

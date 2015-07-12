@@ -46,9 +46,7 @@ RESOURCES += qfevalcolocalization.qrc
 TRANSLATIONS= ./translations/de.eval_colocalization.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

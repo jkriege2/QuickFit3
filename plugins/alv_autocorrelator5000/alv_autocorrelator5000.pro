@@ -56,9 +56,7 @@ RESOURCES += \
 TRANSLATIONS= ./translations/de.alv_autocorrelator5000.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 Qinclude(../quickfit3_configqtwidgets.pri)
 

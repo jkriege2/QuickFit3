@@ -58,7 +58,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include <cstdlib>
 #include <cstring>
-#include "tools.h"
+#include "cpptools.h"
 
 #if defined(__WINDOWS__) && defined(__LINUX__)
 # error("you may compile this for EITHER windows (define __WINDOWS__) OR linux (define __LINUX__), but both symbols are defined at the same time!!!")
@@ -205,7 +205,7 @@ QFSCstopbits string2QFSCstopbits(std::string dd);
     \example jkserial_test/jkserial_test.cpp
 
  */
-class QFSerialConnection
+class QFLIB_EXPORT QFSerialConnection
 {
     public:
         /** \brief class constructor.

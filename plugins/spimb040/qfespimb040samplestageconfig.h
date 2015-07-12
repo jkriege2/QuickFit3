@@ -54,7 +54,7 @@ class QFESPIMB040MainWindow; // forward
 #include "qfextensionmanager.h"
 #include "qfextensionlinearstage.h"
 #include "qfextension.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qfstagecombobox.h"
 #include "qfmanyfilessettings.h"
 

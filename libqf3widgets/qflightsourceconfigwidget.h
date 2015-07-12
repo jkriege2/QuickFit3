@@ -53,7 +53,7 @@
 #include "qfextensionmanager.h"
 #include "qfextensionlightsource.h"
 #include "qfextension.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qflightsourcecombobox.h"
 #include "filters.h"
 #include "libwid_imexport.h"

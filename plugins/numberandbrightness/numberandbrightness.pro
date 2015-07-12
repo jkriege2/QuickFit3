@@ -73,9 +73,7 @@ RESOURCES += numberandbrightness.qrc
 TRANSLATIONS= ./translations/de.number_and_brightness.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

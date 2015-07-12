@@ -27,7 +27,7 @@
 #include "qfrawdatapropertyeditor.h"
 #include "qfrawdatarecord.h"
 #include <cmath>
-#include "tools.h"
+#include "cpptools.h"
 #include "qfrdrtable.h"
 #include "QToolTip"
 #include "qfmathparser.h"

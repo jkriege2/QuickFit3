@@ -42,7 +42,7 @@
 #include <QVector>
 #include <QString>
 #include <QMap>
-#include "tools.h"
+#include "cpptools.h"
 #include "jkiniparser2.h"
 #include <QStringList>
 #include <QSettings>

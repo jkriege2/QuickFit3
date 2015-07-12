@@ -21,10 +21,9 @@
 
 DEFINES += QF_HAS_TINYTIFF
 
-HEADERS += $$PWD/../extlibsb040/TinyTIFF/tinytiffwriter.h \
-           $$PWD/../extlibsb040/TinyTIFF/tinytiffreader.h
-SOURCES += $$PWD/../extlibsb040/TinyTIFF/tinytiffwriter.cpp \
-           $$PWD/../extlibsb040/TinyTIFF/tinytiffreader.cpp
+HEADERS += $$PWD/TinyTIFF/tinytiffwriter.h \
+           $$PWD/TinyTIFF/tinytiffreader.h
+SOURCES += $$PWD/TinyTIFF/tinytiffwriter.cpp \
+           $$PWD/TinyTIFF/tinytiffreader.cpp
 
-INCLUDEPATH += $$PWD/../extlibsb040/TinyTIFF/ \
-               $$PWD/../extlibsb040/libtiff_tools/
+INCLUDEPATH += $$PWD/TinyTIFF/ 

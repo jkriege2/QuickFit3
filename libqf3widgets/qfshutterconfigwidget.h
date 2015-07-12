@@ -51,7 +51,7 @@
 #include "qfextensionmanager.h"
 #include "qfextensionshutter.h"
 #include "qfextension.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qfshuttercombobox.h"
 #include "libwid_imexport.h"
 #include "qfshutterconfigwidgetthread.h"

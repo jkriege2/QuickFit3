@@ -52,9 +52,7 @@ RESOURCES += qfe_plotterexportercairo.qrc
 TRANSLATIONS= ./translations/de.qfe_plotterexportercairo.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

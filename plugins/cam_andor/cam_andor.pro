@@ -41,7 +41,6 @@ include(../../extlibsb040/tinytiff.pri)
 HEADERS += cam_andor.h \
            camandoracquisitionthread.h \
            ../interfaces/qfextensioncamera.h \
-           ../../global_lib/highrestimer.h \
            andorglobalcamerasettingswidget.h \
            andorsettingsdialog.h \
            andortools.h \
@@ -50,7 +49,6 @@ HEADERS += cam_andor.h \
 
 SOURCES += cam_andor.cpp \
            camandoracquisitionthread.cpp \
-           ../../global_lib/highrestimer.cpp \
            andorglobalcamerasettingswidget.cpp \
            andorsettingsdialog.cpp \
            andortools.cpp
@@ -64,10 +62,7 @@ RESOURCES += cam_andor.qrc
 TRANSLATIONS= ./translations/de.cam_andor.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/ \
-               ../../../global_lib/qt/
+               ../../libqf3widgets/
 
 
 

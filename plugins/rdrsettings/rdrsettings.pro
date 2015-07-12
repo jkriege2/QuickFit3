@@ -49,9 +49,7 @@ RESOURCES += qfrdrsettings.qrc
 TRANSLATIONS= ./translations/de.rdr_settings.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 ASSETS_TESTDATA.files = ./assets/examples/testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/examples/$${TARGET}/testdata/

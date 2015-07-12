@@ -37,7 +37,7 @@
 #include "qfextensionmanager.h"
 #include "qfextensioncamera.h"
 #include "qfextension.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "objectives.h"
 
 #include "qtriple.h"

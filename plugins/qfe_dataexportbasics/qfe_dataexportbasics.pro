@@ -47,9 +47,7 @@ RESOURCES += qfe_dataexportbasics.qrc
 TRANSLATIONS= ./translations/de.qfe_dataexportbasics.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(xlslib.pri)
 

@@ -57,7 +57,7 @@
 #include "qfextensioncamera.h"
 #include "qfextensionlinearstage.h"
 #include "qfextension.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qfespimb040samplestageconfig.h"
 #include "qfespimb040imagestackconfigwidget2.h"
 #include "qfespimb040acquisitionconfigwidget2.h"

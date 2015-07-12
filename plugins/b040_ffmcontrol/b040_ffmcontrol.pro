@@ -39,8 +39,7 @@ HEADERS += qfeb040ffmcontrol.h \
     ffmmainwindow.h \
     ffmexpcontrolwidget.h \
     ffmimagewidget.h \
-    ffmexpdescriptionwidget.h \
-    ../../global_lib/qfserialconnection.h \
+    ffmexpdescriptionwidget.h
 
 
 
@@ -49,8 +48,7 @@ SOURCES += qfeb040ffmcontrol.cpp \
     ffmmainwindow.cpp \
     ffmexpcontrolwidget.cpp \
     ffmimagewidget.cpp \
-    ffmexpdescriptionwidget.cpp \
-    ../../global_lib/qfserialconnection.cpp \
+    ffmexpdescriptionwidget.cpp
 
 
 
@@ -61,9 +59,7 @@ RESOURCES += qfeb040ffmcontrol.qrc
 TRANSLATIONS= ./translations/de.b040_ffmcontrol.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/ \
+               ../../libqf3widgets/
 
 
 include(../quickfit3_configqtwidgets.pri)

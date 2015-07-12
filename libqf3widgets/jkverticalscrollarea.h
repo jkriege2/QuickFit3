@@ -30,7 +30,7 @@
 
 
  */
-class QFWIDQFWIDLIB_EXPORT JKVerticalScrollArea : public QScrollArea {
+class QFWIDLIB_EXPORT JKVerticalScrollArea : public QScrollArea {
         Q_OBJECT
     public:
         JKVerticalScrollArea(QWidget* parent);

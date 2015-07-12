@@ -25,7 +25,7 @@
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
 #include "qfplotter.h"
-#include "tools.h"
+#include "cpptools.h"
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>

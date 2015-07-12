@@ -37,17 +37,13 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += servo_pololu_maestro.h \
            ../interfaces/qfextensionshutter.h \
-           ../../global_lib/qfserialconnection.h \
     ../base_classes/qfbinaryserialprotocolhandler.h \
-    ../base_classes/qf3comportmanager.h \
     dlgpololumaestrotester.h \
     pololu_tools.h \
     ../interfaces/qfextensionfilterchanger.h
 
 SOURCES += servo_pololu_maestro.cpp \
-           ../../global_lib/qfserialconnection.cpp \
     ../base_classes/qfbinaryserialprotocolhandler.cpp \
-    ../base_classes/qf3comportmanager.cpp \
     dlgpololumaestrotester.cpp \
     pololu_tools.cpp
 
@@ -59,9 +55,7 @@ RESOURCES += servo_pololu_maestro.qrc
 TRANSLATIONS= ./translations/de.servo_pololu_maestro.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

@@ -58,9 +58,7 @@ RESOURCES += qfediffusioncoefficientcalculator.qrc
 TRANSLATIONS= ./translations/de.qfe_calc_diffcoeff.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

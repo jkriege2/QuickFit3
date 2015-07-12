@@ -47,9 +47,7 @@ TRANSLATIONS= ./translations/de.fitalgorithm_simanneal.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../extlib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 
 include(../../quickfit3_configqt.pri)

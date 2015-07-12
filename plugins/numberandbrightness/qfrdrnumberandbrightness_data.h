@@ -45,7 +45,7 @@
 #include "qfimporter.h"
 #include "qfimporterimageseries.h"
 #include "qfimportermanager.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qfrdrimagemasktools.h"
 #include "imagetools.h"
 

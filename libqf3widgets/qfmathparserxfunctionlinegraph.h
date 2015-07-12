@@ -24,7 +24,7 @@
 #include <QPainter>
 #include <QPair>
 #include "jkqtptools.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "libwid_imexport.h"
 #include "jkqtpelements.h"
 #include "qfmathparser.h"

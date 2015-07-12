@@ -56,9 +56,7 @@ RESOURCES += qfrdrimagestack.qrc
 TRANSLATIONS= ./translations/de.image_stack.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 ASSETS_TESTDATA.files = ./examples/testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/examples/$${TARGET}/testdata/

@@ -32,7 +32,7 @@
            if e.g. a configuration is deleted or added
     \ingroup tools_qt
 */
-class QFWIDQFWIDLIB_EXPORT ColorComboBoxNotifier: public QObject {
+class QFWIDLIB_EXPORT ColorComboBoxNotifier: public QObject {
         Q_OBJECT
     public:
         ColorComboBoxNotifier(QObject* parent=NULL): QObject(parent) {};
@@ -47,7 +47,7 @@ class QFWIDQFWIDLIB_EXPORT ColorComboBoxNotifier: public QObject {
 /*! \brief a QComboBox variant that allows to select colors
     \ingroup tools_qt
 */
-class QFWIDQFWIDLIB_EXPORT ColorComboBox : public QComboBox {
+class QFWIDLIB_EXPORT ColorComboBox : public QComboBox {
         Q_OBJECT
     public:
         /** Default constructor */

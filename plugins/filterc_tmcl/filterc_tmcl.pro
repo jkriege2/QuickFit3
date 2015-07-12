@@ -35,14 +35,10 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qfextensiontmclfilterchanger.h \
     ../interfaces/qfextensionfilterchanger.h \
-    ../base_classes/qf3comportmanager.h \
-    ../../global_lib/qfserialconnection.h \
     ../base_classes/qf3tmclprotocolhandler.h \
     ../interfaces/qfextensionglobalsettingsreadwrite.h
 
 SOURCES += qfextensiontmclfilterchanger.cpp \
-    ../base_classes/qf3comportmanager.cpp \
-    ../../global_lib/qfserialconnection.cpp \
     ../base_classes/qf3tmclprotocolhandler.cpp
 
 FORMS =
@@ -52,9 +48,7 @@ RESOURCES += qfextensiontmclfilterchanger.qrc
 TRANSLATIONS= ./translations/de.filterc_tmcl.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

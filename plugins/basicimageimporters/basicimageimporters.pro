@@ -29,20 +29,17 @@ include(../plugins.pri)
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibsb040/tinytiff.pri)
+include(../../extlibsb040/yaidtools.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input
 HEADERS += qfbasicimageimporters.h \
            qfimagereaderlibtiff.h \
-    qfimagereaderradhard.h \
-    ../../global_lib/crc_ccitt.h \
-    ../../global_lib/crc.h \
-    ../../global_lib/frame.h \
+    qfimagereaderradhard.h  \
     qfbasicimageimportersoptionswidget.h \
     qfimagereadertinytiff.h \
     qfimagereaderdiffusion4binary.h \
-    ../../global_lib/helper.h \
     qfimagereaderraw.h
 
 SOURCES += qfbasicimageimporters.cpp\

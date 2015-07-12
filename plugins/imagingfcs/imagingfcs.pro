@@ -30,6 +30,7 @@ include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibs/lmfit.pri)
 include(../../extlibsb040/tinytiff.pri)
+include(../../extlibsb040/yaidtools.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
@@ -57,12 +58,10 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcscorrelationjobthread.h \
     ../../extlibsb040/StatisticsTools/shiftregister.h \
     ../../extlibsb040/StatisticsTools/multitau-correlator.h \
-    ../../global_lib/correlator_multitau.h \
     qfrdrimagingfcsdataexplorer.h \
     qfrdrimagingfcsmaskbyintensity.h \
     qfrdrimagingfcscountratedisplay.h \
     qfrdrimagingfcsoverviewrateeditor.h \
-    ../../global_lib/yaid_rh.h \
     qfrdrimagingfcsseriesdialog.h \
     qfrdrimagingfcs_dataeditor_countrate.h \
     qfrdrimagingfcsedittools.h \
@@ -77,10 +76,6 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcsmaskbuilder.h \
     qfrdrimagingfcscopycorrasrdrdialog.h \
     qfrdrimagingfcspostprocessbinningdialog.h \
-    ../../global_lib/textcolor.h \
-    ../../global_lib/crc_ccitt.h \
-    ../../global_lib/crc.h \
-    ../../global_lib/correlator_multitau.h \
     qfrdrimagingfcs_parserfunctions.h \
     qfrdrimagingfcsdiffusionlawdialog.h
 #    ../base_classes/frawdataimageeditor.h \
@@ -142,9 +137,7 @@ RESOURCES += qfrdrimagingfcs.qrc
 TRANSLATIONS= ./translations/de.imaging_fcs.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

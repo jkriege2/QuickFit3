@@ -20,7 +20,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 */
 
 #include "dlgestimatefocalvolume.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qftools.h"
 #include <cmath>
 

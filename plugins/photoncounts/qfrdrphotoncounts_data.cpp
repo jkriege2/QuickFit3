@@ -23,7 +23,7 @@
 #include "qfrdrphotoncounts_data.h"
 #include <QtXml>
 #include "datatable2.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qfrdrphotoncounts_dataeditor.h"
 #include "binarydatatools.h"
 

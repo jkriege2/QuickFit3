@@ -33,7 +33,7 @@
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
 #include "qfplotter.h"
-#include "tools.h"
+#include "cpptools.h"
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>
@@ -75,7 +75,7 @@
 #include "qfrdrfcsdatainterface.h"
 #include <iostream>
 #include <cfloat>
-#include "tools.h"
+#include "cpptools.h"
 #include "statistics_tools.h"
 #include <QThread>
 #include "qmoretextobject.h"

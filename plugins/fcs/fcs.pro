@@ -39,10 +39,7 @@ HEADERS += dlgcsvparameters.h \
             qfrdrfcsdata.h \
             qfrdrfcsrateeditor.h \
             qfprdrfcs.h \
-            ../../global_lib/qt/completertextedit.h \
             qfrdrfcsfitfunctionsimulator.h \
-            ../../global_lib/jkmathparser.h \
-            ../../global_lib/jkiniparser2.h \
             ../interfaces/qfrdrsimplecountrateinterface.h \
             ../base_classes/qfcorrelationmasktools.h \
             ../base_classes/qfrdrimagemasktools.h \
@@ -68,10 +65,7 @@ SOURCES += dlgcsvparameters.cpp \
            qfrdrfcsdata.cpp \
            qfrdrfcsrateeditor.cpp \
              qfprdrfcs.cpp \
-    ../../global_lib/qt/completertextedit.cpp \
     qfrdrfcsfitfunctionsimulator.cpp \
-    ../../global_lib/jkmathparser.cpp \
-    ../../global_lib/jkiniparser2.cpp \
     ../base_classes/qfcorrelationmasktools.cpp \
     ../base_classes/qfrdrimagemasktools.cpp \
     ../base_classes/qffinderroneouscorrelationdlg.cpp \
@@ -96,9 +90,7 @@ RESOURCES += qfrdrfcs.qrc
 TRANSLATIONS= ./translations/de.fcs.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

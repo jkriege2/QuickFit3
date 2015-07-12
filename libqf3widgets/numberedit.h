@@ -6,7 +6,7 @@
 #include <QDoubleValidator>
 #include <QPushButton>
 #include <QToolButton>
-#include "tools.h"
+#include "cpptools.h"
 #include "libwid_imexport.h"
 
 

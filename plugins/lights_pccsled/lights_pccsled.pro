@@ -34,16 +34,12 @@ DESTDIR = $${QFOUTPUT}/plugins/
 
 # Input
 HEADERS += \
-    ../base_classes/qf3comportmanager.h \
     ../interfaces/qfextensionlightsource.h \
-    ../../global_lib/qfserialconnection.h \
     qfextensionpccsled.h \
     ../interfaces/qfextensionshutter.h \
     ../base_classes/qf3simpleb040serialprotocolhandler.h
 
 SOURCES += \
-    ../base_classes/qf3comportmanager.cpp \
-    ../../global_lib/qfserialconnection.cpp \
     qfextensionpccsled.cpp \
     ../base_classes/qf3simpleb040serialprotocolhandler.cpp
 
@@ -54,8 +50,6 @@ RESOURCES += qfextensionpccpled.qrc
 TRANSLATIONS= ./translations/de.lights_pccsled.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)

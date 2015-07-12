@@ -44,9 +44,7 @@ RESOURCES += qfextensiontestfilterchanger.qrc
 TRANSLATIONS= ./translations/de.filterc_test.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

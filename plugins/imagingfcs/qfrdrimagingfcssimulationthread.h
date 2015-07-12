@@ -23,7 +23,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFRDRIMAGINGFCSSIMULATIONTHREAD_H
 
 #include <QThread>
-#include "tools.h"
+#include "cpptools.h"
 #include "tinytiffwriter.h"
 #include "../../extlibs/MersenneTwister.h"
 

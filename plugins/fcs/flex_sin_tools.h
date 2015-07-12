@@ -34,7 +34,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <iostream>
 #include <QFile>
 #include <QMap>
-#include "tools.h"
+#include "cpptools.h"
 #include "datatools.h"
 
 

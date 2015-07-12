@@ -51,7 +51,7 @@
 #include "qfextensionmanager.h"
 #include "qfextensionfilterchanger.h"
 #include "qfextension.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qffilterchangercombobox.h"
 #include "filters.h"
 #include "libwid_imexport.h"

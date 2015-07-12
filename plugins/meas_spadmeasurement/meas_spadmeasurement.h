@@ -30,8 +30,8 @@
 #include "qfextension.h"
 #include "qfextensionmeasurementdevice.h"
 #include "../base_classes/qf3simpleb040serialprotocolhandler.h"
-#include "../base_classes/qf3comportmanager.h"
-#include "../../global_lib/qfserialconnection.h"
+#include "qf3comportmanager.h"
+#include "qfserialconnection.h"
 
 /*!
     \defgroup qf3ext_ShutterArduinoB040 QFExtensionShutter implementation for Relais converted to shutters and controlled by an Arduino UNO

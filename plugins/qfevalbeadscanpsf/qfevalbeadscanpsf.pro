@@ -56,9 +56,7 @@ RESOURCES += qfevalbeadscanpsf.qrc
 TRANSLATIONS= ./translations/de.eval_beadscanpsf.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 
 ASSETS_1color.files = ./examples/1color/*.*

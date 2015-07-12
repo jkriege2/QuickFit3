@@ -74,9 +74,7 @@ RESOURCES += qfehelpeditor.qrc
 TRANSLATIONS= ./translations/de.qfe_helpeditor.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 ASSETSe_FILES.files = ./assets/examples/*.*
 ASSETSe_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/examples

@@ -37,14 +37,10 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += shutter_relais_arduino.h \
            ../interfaces/qfextensionshutter.h \
-           ../../global_lib/qfserialconnection.h \
-    ../base_classes/qf3simpleb040serialprotocolhandler.h \
-    ../base_classes/qf3comportmanager.h
+    ../base_classes/qf3simpleb040serialprotocolhandler.h
 
 SOURCES += shutter_relais_arduino.cpp \
-           ../../global_lib/qfserialconnection.cpp \
-    ../base_classes/qf3simpleb040serialprotocolhandler.cpp \
-    ../base_classes/qf3comportmanager.cpp
+    ../base_classes/qf3simpleb040serialprotocolhandler.cpp
 
 FORMS =
 
@@ -53,9 +49,7 @@ RESOURCES += shutter_relais_arduino.qrc
 TRANSLATIONS= ./translations/de.shutter_relais_arduino.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

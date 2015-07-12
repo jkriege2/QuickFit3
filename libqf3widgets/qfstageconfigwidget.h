@@ -55,7 +55,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfextensionmanager.h"
 #include "qfextensionlinearstage.h"
 #include "qfextension.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qfstagecombobox.h"
 #include "qfmanyfilessettings.h"
 #include "libwid_imexport.h"

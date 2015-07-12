@@ -21,7 +21,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 #include "qfacquisitionconfigcombobox.h"
-#include "tools.h"
+#include "cpptools.h"
 #include "qftools.h"
 
 QFAcquisitionConfigComboBoxNotifier::QFAcquisitionConfigComboBoxNotifier(QObject* parent):

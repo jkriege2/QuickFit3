@@ -37,12 +37,10 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qferesultstools.h \
     qfertresultcalculator.h \
-    ../../global_lib/jkmathparser.h \
     qfertregexpdialog.h
 
 SOURCES += qferesultstools.cpp \
     qfertresultcalculator.cpp \
-    ../../global_lib/jkmathparser.cpp \
     qfertregexpdialog.cpp
 
 FORMS = \
@@ -55,9 +53,7 @@ RESOURCES += qferesultstools.qrc \
 TRANSLATIONS= ./translations/de.qfe_resultstools.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

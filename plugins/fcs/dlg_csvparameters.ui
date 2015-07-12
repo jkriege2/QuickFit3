@@ -41,7 +41,7 @@
     </widget>
    </item>
    <item>
-    <widget class="CompleterTextEdit" name="txtContents" native="true"/>
+    <widget class="QFCompleterTextEdit" name="txtContents" native="true"/>
    </item>
    <item>
     <widget class="QLabel" name="label_6">
@@ -308,9 +308,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CompleterTextEdit</class>
+   <class>QFCompleterTextEdit</class>
    <extends>QWidget</extends>
-   <header>completertextedit.h</header>
+   <header>qfcompletertextedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

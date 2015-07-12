@@ -68,9 +68,7 @@ RESOURCES += qffcsmaxentevaluation.qrc
 TRANSLATIONS= ./translations/de.fcs_maxent.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

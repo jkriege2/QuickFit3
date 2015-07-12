@@ -36,7 +36,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 #include <QtCore>
-#include "tools.h"
+#include "cpptools.h"
 #include "dlgqfprogressdialog.h"
 #include "qmoretextobject.h"
 #include "qffcsfitchi2landscapedialog.h"

@@ -44,14 +44,12 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += cam_rh2v2.h \
            ../interfaces/qfextensioncamera.h \
-           ../../global_lib/highrestimer.h \
     qfradhard2flashtool.h \
     ../base_classes/radhard2flash.h \
     cam_rh2v2_cfgdlg.h \
     cam_rh2v2_cordlg.h
 
 SOURCES += cam_rh2v2.cpp \
-           ../../global_lib/highrestimer.cpp \
     qfradhard2flashtool.cpp \
     ../base_classes/radhard2flash.cpp \
     cam_rh2v2_cfgdlg.cpp \
@@ -67,9 +65,7 @@ RESOURCES += cam_rh2v2.qrc
 TRANSLATIONS= ./translations/de.cam_rh2v2.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../global_lib/ \
-               ../../global_lib/qt/
+               ../../libqf3widgets/
 
 include(../../quickfit3_configqtwidgets.pri)
 

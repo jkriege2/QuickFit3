@@ -28,7 +28,7 @@
 #include "qfevaluationitem.h"
 #include <iostream>
 #include <cfloat>
-#include "tools.h"
+#include "cpptools.h"
 #include "statistics_tools.h"
 #include <QThread>
 #include "qmoretextobject.h"
