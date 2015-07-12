@@ -315,7 +315,7 @@ namespace yaid_rh {
 							//No frame found
 							break;
 						}
-                        if((pass==0)&&(((fID[validFrames-1]).pos-fileBuffer)>bytesToCheck))break;
+                        if((pass==0)&&(((fID[validFrames-1]).pos-fileBuffer)>(int64_t)bytesToCheck))break;
 					}while(((fID[validFrames-1]).size!=0)&&((fID[validFrames-1]).pos!=NULL));
 					//validFrames-=1;
 					if(callback!=0)callback(100);

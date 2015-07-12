@@ -349,27 +349,27 @@ void VideoCapture::showConfigDialog(int dlg) {
 }
 
 
-bool VideoCapture::supportsUserProperty(int prop) const {
+bool VideoCapture::supportsUserProperty(int /*prop*/) const {
     return false;
 }
 
-void VideoCapture::getUserPropertyRange(int prop, int& min, int& max) const {
+void VideoCapture::getUserPropertyRange(int /*prop*/, int& min, int& max) const {
     min=max=0;
 }
 
-int VideoCapture::getUserProperty(int prop) {
+int VideoCapture::getUserProperty(int /*prop*/) {
     return 0;
 }
 
 
-void VideoCapture::setUserProperty(int prop, int value) {
+void VideoCapture::setUserProperty(int /*prop*/, int /*value*/) {
 }
 
 int VideoCapture::getAdditionalUserPropertyCount() const {
     return 0;
 }
 
-bool VideoCapture::isUserPropertyEnabled(int prop) {
+bool VideoCapture::isUserPropertyEnabled(int /*prop*/) {
     return false;
 }
 

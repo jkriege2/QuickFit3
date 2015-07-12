@@ -172,7 +172,7 @@ void NumberEdit::setSuffix(QString s) {
     setValue(num);
 };
 
-void NumberEdit::cursorChanged ( int old, int newp ) {
+void NumberEdit::cursorChanged ( int /*old*/, int newp ) {
     //std::cout<<"old_pos="<<old<<"   new_pos="<<newp<<"   text().size()="<<text().size()<<"   suffix.size()="<<suffix.size()<<std::endl;
     if (newp>text().size()-suffix.size())
         setCursorPosition(text().size()-suffix.size());

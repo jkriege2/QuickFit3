@@ -215,7 +215,7 @@ void QFECamSystemcamera::useCameraSettings(unsigned int camera, const QSettings&
     }
 }
 
-bool QFECamSystemcamera::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
+bool QFECamSystemcamera::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString /*filenamePrefix*/) {
     /* set the camera settings to the values specified in settings parameter, called before startAcquisition() */
 
     // uncomment this if the code is the same as in useCameraSettings()
@@ -262,11 +262,11 @@ int QFECamSystemcamera::getCameraImageHeight(unsigned int camera) {
     return 0;
 }
 
-double QFECamSystemcamera::getCameraPixelWidth(unsigned int camera) {
+double QFECamSystemcamera::getCameraPixelWidth(unsigned int /*camera*/) {
     return 1;
 }
 
-double QFECamSystemcamera::getCameraPixelHeight(unsigned int camera) {
+double QFECamSystemcamera::getCameraPixelHeight(unsigned int /*camera*/) {
     return 1;
 }
 
@@ -286,7 +286,7 @@ bool QFECamSystemcamera::isCameraConnected(unsigned int camera) {
     return false;
 }
 
-bool QFECamSystemcamera::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
+bool QFECamSystemcamera::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* /*parameters*/) {
     if (camera>=cameras.size()) return false;
     if (timestamp!=NULL) {
         *timestamp=(uint64_t)round(timer[camera].elapsed());;
@@ -337,42 +337,42 @@ double QFECamSystemcamera::getCameraExposureTime(unsigned int camera) {
     return 0;
 }
 
-bool QFECamSystemcamera::startCameraAcquisition(unsigned int camera) {
+bool QFECamSystemcamera::startCameraAcquisition(unsigned int /*camera*/) {
     return false;
 }
 
-void QFECamSystemcamera::cancelCameraAcquisition(unsigned int camera) {
+void QFECamSystemcamera::cancelCameraAcquisition(unsigned int /*camera*/) {
 
 }
 
-bool QFECamSystemcamera::isCameraAcquisitionRunning(unsigned int camera) {
+bool QFECamSystemcamera::isCameraAcquisitionRunning(unsigned int /*camera*/) {
     return false;
 }
 
-void QFECamSystemcamera::getCameraAcquisitionDescription(unsigned int camera, QList<CameraAcquititonFileDescription> *files, QMap<QString, QVariant>* parameters) {
+void QFECamSystemcamera::getCameraAcquisitionDescription(unsigned int /*camera*/, QList<CameraAcquititonFileDescription> */*files*/, QMap<QString, QVariant>* /*parameters*/) {
 }
 
-bool QFECamSystemcamera::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {
+bool QFECamSystemcamera::getCameraAcquisitionPreview(unsigned int /*camera*/, uint32_t* /*data*/) {
     return false;
 }
 
-int QFECamSystemcamera::getCameraAcquisitionProgress(unsigned int camera) {
+int QFECamSystemcamera::getCameraAcquisitionProgress(unsigned int /*camera*/) {
     return 0; // return a number between 0 and 100 which indicates the progress of a currently running acquisition
 }
 
-bool QFECamSystemcamera::isCameraSettingChangable(QFExtensionCamera::CameraSetting which)   {
+bool QFECamSystemcamera::isCameraSettingChangable(QFExtensionCamera::CameraSetting /*which*/)   {
 	return false; 
 }
 
-void QFECamSystemcamera::changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value)  {  
+void QFECamSystemcamera::changeCameraSetting(QSettings& /*settings*/, QFExtensionCamera::CameraSetting /*which*/, QVariant /*value*/)  {
 
 }
 
-QVariant QFECamSystemcamera::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which)   {
+QVariant QFECamSystemcamera::getCameraSetting(QSettings& /*settings*/, QFExtensionCamera::CameraSetting /*which*/)   {
     return QVariant();
 }
 
-QVariant QFECamSystemcamera::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which)
+QVariant QFECamSystemcamera::getCameraCurrentSetting(int /*camera*/, QFExtensionCamera::CameraSetting /*which*/)
 {
     return QVariant();
 }
