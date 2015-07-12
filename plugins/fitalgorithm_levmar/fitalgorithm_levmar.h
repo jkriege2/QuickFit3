@@ -107,6 +107,7 @@ class QFFitAlgorithmLevmar: public QFFitAlgorithm {
         virtual bool displayConfig();
         /** \copydoc QFFitAlgorithm::isThreadSafe() */
         virtual bool isThreadSafe() const ;
+        virtual bool isDeprecated() const;
 };
 
 
