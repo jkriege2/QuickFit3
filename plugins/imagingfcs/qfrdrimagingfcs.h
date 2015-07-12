@@ -26,6 +26,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrimagingfcscorrelationdialog.h"
 #include "qfrdrimagingfcssimulator.h"
 #include "qfrdrimfcscorrelatorremote.h"
+#include "qfrdrimagingfcswizard.h"
 #include <QPointer>
 /*!
     \defgroup qf3rdrdp_imaging_fcs Raw Data Record Plugin
@@ -110,6 +111,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, 
         void importCorrelationsFromSimulation();
 
         void correctOffset();
+
+        void startWizard();
     protected:
         /*! \brief add correlations from a video_correlator file to the current project
 

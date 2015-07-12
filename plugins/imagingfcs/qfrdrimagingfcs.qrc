@@ -11,6 +11,9 @@
         <file alias="imaging_fcs/fcsplot_enone.png">icons/fcsplot_enone.png</file>
         <file alias="imaging_fcs/fcsplot_epoly.png">icons/fcsplot_epoly.png</file>
         <file alias="imaging_fcs/fcsplot_epolybars.png">icons/fcsplot_epolybars.png</file>
+
+        <file alias="imaging_fcs/imfcs_flow.png">icons/imfcs_flow.png</file>
+        <file alias="imaging_fcs/dualview_fccs.png">icons/dualview_fccs.png</file>
     </qresource>
     <qresource prefix="/imaging_fcs">
         <file alias="abs.png">icons/abs.png</file>

@@ -113,6 +113,14 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
     QMenu* m=menu->addMenu(QIcon(getIconFilename()), tr("&imFCS: Imaging FCS"));
 
     // create menu entries to insert data with this type
+
+    QAction* actWizard=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_correlate.png"), tr("imaging FCS Correlation &Wizard ..."), parentWidget);
+    actWizard->setStatusTip(tr("Correlate an image series and insert the result into the current project. This wizard simplifies the process, but the option \"correlate images and insert\" will offer finer control and more options."));
+    connect(actWizard, SIGNAL(triggered()), this, SLOT(startWizard()()));
+    m->addAction(actWizard);
+
+    m->addSeparator();
+
     QAction* action=new QAction(QIcon(getIconFilename()), tr("&load imFCS dataset"), parentWidget);
     action->setStatusTip(tr("Insert a new imaging FCS record"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertRecord()));
@@ -240,6 +248,16 @@ void QFRDRImagingFCSPlugin::correctOffset()
         }
 
     }
+}
+
+void QFRDRImagingFCSPlugin::startWizard()
+{
+    QFRDRImagingFCSWizard* wiz=new QFRDRImagingFCSWizard(parentWidget);
+    if (wiz->exec()) {
+
+    }
+
+    delete wiz;
 }
 
 
