@@ -19,6 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+#message("!!! !!! NOW IN libquickfit.pri  PWD=$$PWD  LIBS=$$LIBS  QFOUTPUT=$$QFOUTPUT")
 macx {
     !contains( LIBS, quickfit3lib ) {
         QMAKE_LFLAGS += -F$$QFOUTPUT
@@ -30,7 +31,9 @@ macx {
     }
 }
 
-INCLUDEPATH += $$QFOUTPUT/../lib/
+INCLUDEPATH += $$PWD/lib/
 
 HEADERS +=
+
+#message("!!! !!! NOW LEAVING libquickfit.pri  PWD=$$PWD  LIBS=$$LIBS  QFOUTPUT=$$QFOUTPUT")
 

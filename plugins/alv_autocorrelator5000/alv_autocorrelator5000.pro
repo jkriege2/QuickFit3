@@ -58,6 +58,6 @@ TRANSLATIONS= ./translations/de.alv_autocorrelator5000.ts
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/
 
-Qinclude(../quickfit3_configqtwidgets.pri)
+include(../quickfit3_configqtwidgets.pri)
 
 

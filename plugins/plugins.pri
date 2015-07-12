@@ -20,17 +20,17 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+#message("!!! !!! NOW IN plugins.pri PWD=$$PWD")
 
-include(../quickfit_config.pri)
+include($$PWD/../quickfit_config.pri)
 
 
-
-INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/
-               ../interfaces \
-               ../base_classes \
-               ../../extlibs/ \
-               ../../extlibsb040/StatisticsTools/
+INCLUDEPATH += $$PWD/../lib/ \
+               $$PWD/../libqf3widgets/ \
+               $$PWD/interfaces \
+               $$PWD/base_classes \
+               $$PWD/../extlibs/ \
+               $$PWD/../extlibs/StatisticsTools
 
 
 MOC_DIR = ./.mocs/
@@ -135,18 +135,18 @@ release {
 
 DEFINES += QTLIB_IN_DLL LIB_IN_DLL IS_QUICKFIT3 IS_QUICKFIT3_PLUGIN
 
-include(../quickfit3_configqt.pri)
+include($$PWD/../quickfit3_configqt.pri)
 
 
 CONFIG += link_prl
 
 
-include(../libquickfit.pri)
+include($$PWD/../libquickfit.pri)
 
 
 
 
-
+#message("!!! !!! NOW LEAVING plugins.pri QFOUTPUT=$$QFOUTPUT")
 
 
 

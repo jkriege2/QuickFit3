@@ -28,7 +28,6 @@ DEPENDPATH += ./
 include(../plugins.pri)
 include(../../extlibs/gsl.pri)
 
-DESTDIR = $$QFOUTPUT/plugins
 
 # Input
 HEADERS += qfpfitfunctionsdls.h \
@@ -45,7 +44,6 @@ SOURCES += qfpfitfunctionsdls.cpp\
     qffitfunctiondlsg2_gaussiantaudist.cpp \
     qffitfunctiondlsg2_loggaussiantaudist.cpp
 
-FORMS =
 
 RESOURCES +=
 
@@ -64,3 +62,4 @@ SRC_DISTRIBUTED.files = $$HEADERS \
                         $$TRANSLATIONS \
                         $$GPL3LICENSE
 
+message("!!!!!! fitfunction_dls LIB=$$LIB  QFOUTPUT=$$QFOUTPUT")

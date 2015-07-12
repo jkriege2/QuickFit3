@@ -188,7 +188,8 @@ HEADERS += dlgnewproperty.h \
     jkmathparser.h \
     highrestimer.h \
     ticktock.h \
-    jkiniparser2.h
+    jkiniparser2.h \
+    cpptools.h
 
 
 SOURCES += dlgnewproperty.cpp \
@@ -305,7 +306,8 @@ SOURCES += dlgnewproperty.cpp \
     image_tools.cpp \
     jkmathparser.cpp \
     highrestimer.cpp \
-    jkiniparser2.cpp
+    jkiniparser2.cpp \
+    cpptools.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

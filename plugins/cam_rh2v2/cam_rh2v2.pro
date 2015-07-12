@@ -19,7 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include(../../../../../SPIM/trunk/software/processing_chain/processing_chain.pri)
+include(../../extlibsb040/processing_chain/processing_chain.pri)
 
 QMAKE_CXXFLAGS += -ggdb
 
