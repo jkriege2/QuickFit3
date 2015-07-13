@@ -5,6 +5,7 @@
 #include "libwid_imexport.h"
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
+#include <QLabel>
 
 class QFWIDLIB_EXPORT QFPixelSizeEdit : public QWidget
 {

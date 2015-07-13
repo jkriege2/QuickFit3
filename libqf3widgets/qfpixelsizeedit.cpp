@@ -4,14 +4,14 @@ QFPixelSizeEdit::QFPixelSizeEdit(QWidget *parent) : QWidget(parent)
 {
     lay=new QHBoxLayout();
     lay->setContentsMargins(0,0,0,0);
-    spinWidth=new QDoubleSpinBox(wizLSAnalysisImgPreview);
+    spinWidth=new QDoubleSpinBox(this);
     spinWidth->setRange(0,100000);
     spinWidth->setSuffix(" nm");
     spinWidth->setValue(400);
     spinWidth->setDecimals(2);
     lay->addWidget(spinWidth);
     lay->addWidget(new QLabel("  X  ", this));
-    spinHeight=new QDoubleSpinBox(wizLSAnalysisImgPreview);
+    spinHeight=new QDoubleSpinBox(this);
     spinHeight->setRange(0,100000);
     spinHeight->setSuffix(" nm");
     spinHeight->setValue(400);
