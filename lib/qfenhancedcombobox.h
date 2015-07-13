@@ -46,6 +46,8 @@ class QFLIB_EXPORT QFEnhancedComboBox : public QComboBox
         virtual void findAndSelectText(const QString& text, int defaultIdx);
         virtual void findAndSelectContainedLCText(const QString& text);
         virtual void findAndSelectContainedLCText(const QString& text, int defaultIdx);
+        void addItemsAndVariantdata(const QStringList& items, const QVariantList& data);
+        void addItemsAndStringData(const QStringList& items, const QStringList& data);
 
         virtual void showPopup();
     signals:

@@ -102,6 +102,30 @@ void QFEnhancedComboBox::findAndSelectContainedLCText(const QString &text, int d
 
 }
 
+void QFEnhancedComboBox::addItemsAndVariantdata(const QStringList &items, const QVariantList &data)
+{
+    bool en=updatesEnabled();
+    if (en) setUpdatesEnabled(false);
+    clear();
+    for (int i=0; i<qMax(items.size(), data.size()); i++) {
+        addItem(items.value(i, tr("item %1").arg(i+1)), data.value(i, QVariant()));
+    }
+    if (en) setUpdatesEnabled(en);
+}
+
+void QFEnhancedComboBox::addItemsAndStringData(const QStringList &items, const QStringList &data)
+{
+    bool en=updatesEnabled();
+    if (en) setUpdatesEnabled(false);
+    clear();
+    for (int i=0; i<qMax(items.size(), data.size()); i++) {
+        QVariant d=data.value(i, "");
+        if (i<0 || i>=data.size()) d=QVariant();
+        addItem(items.value(i, tr("item %1").arg(i+1)), d);
+    }
+    if (en) setUpdatesEnabled(en);
+}
+
 void QFEnhancedComboBox::selectIndex(const QModelIndex &index)
 {
     setCurrentIndex(index.row());
