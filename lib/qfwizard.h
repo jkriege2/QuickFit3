@@ -58,7 +58,8 @@ class QFLIB_EXPORT QFWizard : public QWizard
     public slots:
 
     protected:
-        void closeEvent(QCloseEvent * e);
+        virtual void closeEvent(QCloseEvent * e);
+        virtual void done(int result);
         QString configPrefix;
 
 };

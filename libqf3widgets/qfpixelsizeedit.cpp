@@ -47,6 +47,11 @@ void QFPixelSizeEdit::addLayoutStretchAtEnd()
     lay->addStretch();
 }
 
+void QFPixelSizeEdit::addWidget(QWidget *widget)
+{
+    lay->addWidget(widget);
+}
+
 void QFPixelSizeEdit::setPixelSize(double width_and_height)
 {
     setPixelSize(QSizeF(width_and_height, width_and_height));

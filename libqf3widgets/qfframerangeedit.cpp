@@ -59,6 +59,11 @@ void QFFrameRangeEdit::setFirstLastText(const QString &first, const QString &las
     chkLast->setText(last);
 }
 
+void QFFrameRangeEdit::addWidget(QWidget *widget)
+{
+    lay->addWidget(widget);
+}
+
 void QFFrameRangeEdit::setPixelSize(double width_and_height)
 {
     setPixelSize(QSizeF(width_and_height, width_and_height));

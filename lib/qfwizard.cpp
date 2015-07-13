@@ -48,6 +48,14 @@ void QFWizard::closeEvent(QCloseEvent *e)
     QWizard::closeEvent(e);
 }
 
+void QFWizard::done(int result)
+{
+    if (!configPrefix.isEmpty()) {
+        ProgramOptions::setConfigWindowGeometry(this, configPrefix+"wizard_geometry/");
+    }
+    QWizard::done(result);
+}
+
 
 QFWizardPage::QFWizardPage(QWidget *parent):
     QWizardPage(parent)

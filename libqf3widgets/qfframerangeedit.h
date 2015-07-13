@@ -19,6 +19,7 @@ class QFWIDLIB_EXPORT QFFrameRangeEdit : public QWidget
         int getLast() const;
         void addLayoutStretchAtEnd();
         void setFirstLastText(const QString& first, const QString& last);
+        void addWidget(QWidget* widget);
 
     public slots:
         void setPixelSize(double width_and_height);

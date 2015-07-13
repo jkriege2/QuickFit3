@@ -18,6 +18,7 @@ class QFWIDLIB_EXPORT QFPixelSizeEdit : public QWidget
         double getPixelWidth() const;
         double getPixelHeight() const;
         void addLayoutStretchAtEnd();
+        void addWidget(QWidget* widget);
 
     public slots:
         void setPixelSize(double width_and_height);
