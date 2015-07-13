@@ -108,6 +108,7 @@ So you can run the steps, described below savely on any Linux system!!!
              appropriate number of threads to use for compile (2 on a DualCore,
              4 on a QuadCore, ...)
        3.2.3 choose whether to use agressive optimizations (e.g. -O3 -msse ...)
+	         and whether to optimized for the local machine (e.g. --march=native).
              Note, that you might not be able to run the resulting binaries
              on another computer, if you choose "y". The same goes for "optimize
              for local machine" (e.g. --march=native)... 
@@ -116,18 +117,25 @@ So you can run the steps, described below savely on any Linux system!!!
 			 ON MACOS X: Choose M, which switches off most optimization. This is
 			 necessary, as the clang-compiler of MacOS does not understand the same
 			 command-line switches as GCC on Linux/Windows.
-       3.2.4 On some system the scrip will ask you, whether position-independent
+       3.2.4 On some system the script will ask you, whether position-independent
 	         code should be produced. Find out, whether you need the -fPIC option
-			 for your system (Linux: typically yes, Windows: no) and answer
-			 accordingly with y or n.
-       3.2.5 copy Qt DLLs: YES on windows and NO on Linux. 
+			 for your system (Linux: typically yes, Windows: no, MacOS: yes) and 
+			 answer accordingly with y or n.
+       3.2.5 If you want, you can use OpenMP to speed up some of the libraries.
+	         If you want that, answer this question with yes. We usually don't
+			 use OpenMP, as QF3 typically executes fits etc. already in parallel,
+			 so an addition parallelization by OpenMP will not lead to a significant
+			 speedup. Although: Some plugins might really profit from this!
+			 Note that OpenMP often add additional dependencies on external libraries
+			 to the binaryies!!!
+       3.2.6 copy Qt DLLs: YES on windows and NO on Linux. 
              ON WINDOWS: If this goes wrong, you'll have to copy the Qt DLLs 
              from the bin-subdir of the Qt installation to the output folder of 
              QuickFit! ALso you have to copy the CONTENTS of the plugins folder
 			 of Qt into a subfolder 'qtplugins' of the output directory of QuickFit.
 			 the output folder of QuickFit is:
 			     ./output
-       3.2.6 build these libraries:         
+       3.2.7 build these libraries:         
               
               library       | Linux               | Windows                            | MacOS X
              ---------------+---------------------+---------------------------------------------------------------- 
@@ -164,10 +172,21 @@ So you can run the steps, described below savely on any Linux system!!!
                             |    by Andor and make|    explicitly in quickfit.inc!!!)  |
                             |    sure, that gcc   |                                    |  
                             |    finds the SDK    |                                    |  
+					If you don't have libAndor, you'll have to set QF3CONFIG+=noandor in quickfit.inc
+					     		which switches off all macros that use libAndor!
               eigen         | y                   | y                                  | y
               cimg          | y                   | y                                  | y
+			  nlopt         | y                   | y                                  | n (currently does not compile on MacOS X)
+			                |                     |                                    |   If this does not compile on your system,
+							|                     |                                    |   set QF3CONFIG+=nonlopt in quickfit.inc
+              OOL           | y                   | y                                  | n (currently does not compile on MacOS X)
               pixman        | y                   | y                                  | n (currently does not compile on MacOS X)
+			                |                     |                                    |   If this does not compile on your system,
+							|                     |                                    |   set QF3CONFIG+=nocairo in quickfit.inc.
+							|                     |                                    |   Also: building cairo will fail!
               cairo         | y                   | y                                  | n (currently does not compile on MacOS X)
+			                |                     |                                    |   If this does not compile on your system,
+							|                     |                                    |   set QF3CONFIG+=nocairo in quickfit.inc.
                             |                     |                                    |
                             |                     |                                    |
                             |                     |                                    |
