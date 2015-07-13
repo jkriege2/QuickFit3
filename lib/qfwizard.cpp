@@ -35,13 +35,15 @@ QFWizard::QFWizard(QWidget *parent, const QString &config_prefix) :
 {
     configPrefix=config_prefix;
     setWizardStyle(QWizard::ModernStyle);
-    ProgramOptions::getConfigWindowGeometry(this, prefix+"wizard_geometry/");
+    if (!configPrefix.isEmpty()) {
+        ProgramOptions::getConfigWindowGeometry(this, configPrefix+"wizard_geometry/");
+    }
 }
 
 void QFWizard::closeEvent(QCloseEvent *e)
 {
     if (!configPrefix.isEmpty()) {
-        ProgramOptions::setConfigWindowGeometry(this, prefix+"wizard_geometry/");
+        ProgramOptions::setConfigWindowGeometry(this, configPrefix+"wizard_geometry/");
     }
     QWizard::closeEvent(e);
 }
