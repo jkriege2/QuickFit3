@@ -20,6 +20,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 */
 
 #include "qfwizard.h"
+#include "programoptions.h"
 #include<QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets>
@@ -29,10 +30,20 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 
-QFWizard::QFWizard(QWidget *parent) :
+QFWizard::QFWizard(QWidget *parent, const QString &config_prefix) :
     QWizard(parent)
 {
+    configPrefix=config_prefix;
     setWizardStyle(QWizard::ModernStyle);
+    ProgramOptions::getConfigWindowGeometry(this, prefix+"wizard_geometry/");
+}
+
+void QFWizard::closeEvent(QCloseEvent *e)
+{
+    if (!configPrefix.isEmpty()) {
+        ProgramOptions::setConfigWindowGeometry(this, prefix+"wizard_geometry/");
+    }
+    QWizard::closeEvent(e);
 }
 
 

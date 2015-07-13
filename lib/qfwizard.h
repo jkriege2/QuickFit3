@@ -37,11 +37,15 @@ class QFLIB_EXPORT QFWizard : public QWizard
 {
         Q_OBJECT
     public:
-        explicit QFWizard(QWidget *parent = 0);
+        explicit QFWizard(QWidget *parent = 0, const QString& config_prefix=QString());
 
     signals:
 
     public slots:
+
+    protected:
+        void closeEvent(QCloseEvent * e);
+        QString configPrefix;
 
 };
 

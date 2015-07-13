@@ -769,7 +769,7 @@ struct FCSProjectWizardEvalSettingsData {
 
 void QFPRDRFCS::startFCSProjectWizard()
 {
-    QFWizard* wiz=new QFWizard(parentWidget);
+    QFWizard* wiz=new QFWizard(parentWidget, QString("fcs/wizards/"));
     wiz->setWindowTitle(tr("FCS Project Wizard"));
     wiz->addPage(new QFTextWizardPage(tr("Introduction"),
                                       tr("This wizard will help you to load a set of FCS or DLS correlation curves from files and select the appropriate mode of data evaluation. It will finally set up a complete QuickFit 3.0 project with all the data you entered."),

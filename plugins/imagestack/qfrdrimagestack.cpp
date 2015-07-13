@@ -343,7 +343,7 @@ void QFRDRImageStackPlugin::startProjectWizardLightsheetAnalysisData()
 
 void QFRDRImageStackPlugin::startProjectWizardPSFAnalysis(bool insertEval)
 {
-    QFWizard* wiz=new QFWizard(parentWidget);
+    QFWizard* wiz=new QFWizard(parentWidget, QString("image_stack/wizards/"));
     wiz->setWindowTitle(tr("PSF Analysis Project Wizard"));
     wiz->addPage(new QFTextWizardPage(tr("Introduction"),
                                       tr("This wizard will help you to perform a PSF analysis in a z-scan through a sample with fixed sub-diffractive beads, i.e. it will help you to load an image stack, which contains the z-scan and then set all properties accordingly."),//<br><center><img src=\":/image_stack/spim_lightsheet_scan.png\"></center>"),
@@ -470,7 +470,7 @@ void QFRDRImageStackPlugin::startProjectWizardPSFAnalysisData()
 
 void QFRDRImageStackPlugin::startProjectWizardCamCalibAnalysis(bool insertEval)
 {
-    QFWizard* wiz=new QFWizard(parentWidget);
+    QFWizard* wiz=new QFWizard(parentWidget, QString("image_stack/wizards/"));
     wiz->setWindowTitle(tr("Camera Calibration Project Wizard"));
     wiz->addPage(new QFTextWizardPage(tr("Introduction"),
                                       tr("This wizard will help you to perform a camera calibration from images with an intensity gradient, or different image stacks with different illumination intensities. I.e. it will help you to load the image stacks and then set all properties accordingly."),//<br><center><img src=\":/image_stack/spim_lightsheet_scan.png\"></center>"),
@@ -570,7 +570,7 @@ void QFRDRImageStackPlugin::startProjectWizardColocAnalysisData()
 
 void QFRDRImageStackPlugin::startProjectWizardColocAnalysis(bool insertEval)
 {
-    QFWizard* wiz=new QFWizard(parentWidget);
+    QFWizard* wiz=new QFWizard(parentWidget, QString("image_stack/wizards/"));
     wiz->setWindowTitle(tr("Colocalization Analysis Project Wizard"));
     wiz->addPage(new QFTextWizardPage(tr("Introduction"),
                                       tr("This wizard will help you to perform a colocalization analysis. I.e. it will help you to load the dual-color image stacks and then set all properties accordingly."),//<br><center><img src=\":/image_stack/spim_lightsheet_scan.png\"></center>"),
@@ -836,7 +836,7 @@ void QFRDRImageStackPlugin::startImagestackWizard()
 
 void QFRDRImageStackPlugin::startProjectWizardLightsheetAnalysis(bool insertEval)
 {
-    QFWizard* wiz=new QFWizard(parentWidget);
+    QFWizard* wiz=new QFWizard(parentWidget, QString("image_stack/wizards/"));
     wiz->setWindowTitle(tr("SPIM Lightsheet Analysis Project Wizard"));
     wiz->addPage(new QFTextWizardPage(tr("Introduction"),
                                       tr("This wizard will help you to perform a SPIM lightsheet analysis, i.e. it will help you to load an image stack, which contains a lightsheet scan taken with a 45\xB0 mirror and then set all properties accordingly.<br><center><img src=\":/image_stack/spim_lightsheet_scan.png\"></center>"),
