@@ -253,10 +253,11 @@ class QFRDRImagingFCSCorrelationJobThread : public QThread {
         ~QFRDRImagingFCSCorrelationJobThread();
         int status() const;
         void init(IMFCSJob job);
-        static QStringList getImageFilterList(QFPluginServices* pluginservices);
-        static QStringList getImageFormatNameList(QFPluginServices *pluginservices);
-        static QFImporterImageSeries* getImageReader(int idx, QFPluginServices* pluginservices);
-        static int getImageReaderCount(QFPluginServices* pluginservices);
+        static QStringList getImageFilterList(QFPluginServices* pluginservices=QFPluginServices::getInstance());
+        static QStringList getImageFormatNameList(QFPluginServices *pluginservices=QFPluginServices::getInstance());
+        static QStringList getImageFormatIDList(QFPluginServices *pluginservices=QFPluginServices::getInstance());
+        static QFImporterImageSeries* getImageReader(int idx, QFPluginServices* pluginservices=QFPluginServices::getInstance());
+        static int getImageReaderCount(QFPluginServices* pluginservices=QFPluginServices::getInstance());
         QList<Fileinfo> getAddFiles() const;
         IMFCSJob getJob() const;
         double durationMS() const;

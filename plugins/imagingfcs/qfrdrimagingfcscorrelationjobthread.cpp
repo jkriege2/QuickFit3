@@ -100,11 +100,17 @@ QStringList QFRDRImagingFCSCorrelationJobThread::getImageFormatNameList(QFPlugin
      return l;
 }
 
+QStringList QFRDRImagingFCSCorrelationJobThread::getImageFormatIDList(QFPluginServices *pluginservices)
+{
+    QStringList imp=pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
+    return imp;
+}
+
 QFImporterImageSeries* QFRDRImagingFCSCorrelationJobThread::getImageReader(int idx, QFPluginServices* pluginservices)  {
     QFImporterImageSeries* r=NULL;
 
     QStringList imp=pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
-    qDebug()<<imp;
+    //qDebug()<<imp;
 
     if (idx>=0 && idx<imp.size()) {
         r=dynamic_cast<QFImporterImageSeries*>(pluginservices->getImporterManager()->createImporter(imp[idx]));
