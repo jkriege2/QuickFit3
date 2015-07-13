@@ -59,6 +59,9 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
 
         QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> getFilesToAdd() const;
 
+        static void readStackProperties(const QString &filename, int fileFormat, bool readFiles=true, bool countFrames=true, QWidget* parentWid=NULL, int* channels=NULL, int* frame_count_io=NULL, qint64 *filesize_io=NULL, double *frametime_io=NULL, double *baseline_offset_io=NULL, QString *backgroundF_io=NULL, double *pixel_width_io=NULL, double *pixel_height_io=NULL, bool*hasPixel_io=NULL, int *dualViewMode_io=NULL, int *image_width_io=NULL, int* image_height_io=NULL, QString* inputconfigfile_io=NULL, double** frame_data_io=NULL, int *background_width_io=NULL, int *background_height_io=NULL, int *background_frame_count_io=NULL);
+        static void readBackgroundProperties(const QString &filename, int fileFormat, QWidget* parentWid=NULL, int *background_width_io=NULL, int *background_height_io=NULL, int *background_frame_count_io=NULL);
+
     signals:
         void runSimulation();
     public slots:
