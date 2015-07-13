@@ -33,6 +33,20 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QProgressBar>
 #include <QTextEdit>
 
+class QFWizardPage; // forward
+
+class QFLIB_EXPORT QFWizardValidateFunctor {
+    public:
+        inline virtual ~QFWizardValidateFunctor() {}
+        virtual bool isValid(QFWizardPage* page)=0;
+};
+
+class QFLIB_EXPORT QFWizardIsCompleteFunctor {
+    public:
+        inline virtual ~QFWizardIsCompleteFunctor() {}
+        virtual bool isComplete(const QFWizardPage* page)=0;
+};
+
 class QFLIB_EXPORT QFWizard : public QWizard
 {
         Q_OBJECT
@@ -48,7 +62,6 @@ class QFLIB_EXPORT QFWizard : public QWizard
         QString configPrefix;
 
 };
-
 
 
 class QFLIB_EXPORT QFWizardPage : public QWizardPage
@@ -70,6 +83,8 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
 
         void setExternalValidate(bool enabled=true);
         void setExternalIsValid(bool valid=true);
+        void setValidator(QFWizardValidateFunctor* validator);
+        void setIsCompleteFunctor(QFWizardIsCompleteFunctor* validator);
     signals:
         void onInitialize(QWizardPage* page);
         void onInitialize(QWizardPage* page, QWizardPage* userPreviousPage);
@@ -77,9 +92,6 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         void onValidate(QWizardPage* page);
         void onValidate(QWizardPage* page, QWizardPage* userPage);
         void onValidateA(QWizardPage* page, void* userArg);
-
-
-
     public slots:
     protected:
         QWizardPage* m_userLast;
@@ -88,6 +100,8 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         void* m_userValidateArg;
         bool m_externalvalidate;
         bool m_isvalid;
+        QFWizardValidateFunctor* m_validator;
+        QFWizardIsCompleteFunctor* m_iscomplete;
 
 };
 

@@ -52,6 +52,7 @@ void QFWizard::closeEvent(QCloseEvent *e)
 QFWizardPage::QFWizardPage(QWidget *parent):
     QWizardPage(parent)
 {
+    m_validator=NULL;
     m_userLast=NULL;
     m_userValidatePage=NULL;
     m_userLastArg=NULL;
@@ -63,6 +64,7 @@ QFWizardPage::QFWizardPage(QWidget *parent):
 QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
     QWizardPage(parent)
 {
+    m_validator=NULL;
     m_userLast=NULL;
     m_userValidatePage=NULL;
     m_userLastArg=NULL;
@@ -85,13 +87,17 @@ bool QFWizardPage::validatePage()
     emit onValidate(this);
     emit onValidate(this, m_userValidatePage);
     emit onValidateA(this, m_userValidateArg);
-    return QWizardPage::validatePage();
+    if (m_validator) return m_validator->isValid(this);
+    else return QWizardPage::validatePage();
 }
 
 bool QFWizardPage::isComplete() const
 {
     if (m_externalvalidate) {
         return m_isvalid;
+    }
+    if (m_iscomplete) {
+        return m_iscomplete->isComplete(this);
     }
     return QWizardPage::isComplete();
 }
@@ -125,6 +131,18 @@ void QFWizardPage::setExternalValidate(bool enabled)
 void QFWizardPage::setExternalIsValid(bool valid)
 {
     m_isvalid=valid;
+    emit completeChanged();
+}
+
+void QFWizardPage::setValidator(QFWizardValidateFunctor *validator)
+{
+    m_validator=validator;
+    emit completeChanged();
+}
+
+void QFWizardPage::setIsCompleteFunctor(QFWizardIsCompleteFunctor *validator)
+{
+    m_iscomplete=validator;
     emit completeChanged();
 }
 

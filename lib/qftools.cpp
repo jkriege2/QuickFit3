@@ -299,25 +299,30 @@ void loadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosi
 
 
 void saveWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix) {
+    if (!widget) return;
     if (settings) saveWidgetGeometry(*settings,widget, prefix);
 }
 void saveWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix) {
+    if (!widget) return;
 #ifndef QFMATHPARSER_MATHPARSERTEST
     if (settings) saveWidgetGeometry(*settings->getQSettings(),widget, prefix);
 #endif
 }
 
 void loadWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix) {
-    if (settings) loadWidgetGeometry(*settings,widget, prefix);
+    if (!widget) return;
+    if (settings) loadWidgetGeometry(*settings,widget, widget->pos(), widget->size(), prefix);
 }
 void loadWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix) {
+    if (!widget) return;
 #ifndef QFMATHPARSER_MATHPARSERTEST
-    if (settings) loadWidgetGeometry(*settings->getQSettings(),widget, prefix);
+    if (settings) loadWidgetGeometry(*settings->getQSettings(),widget, widget->pos(), widget->size(), prefix);
 #endif
 }
 
 void loadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
-    loadWidgetGeometry(settings, widget, QPoint(10, 10), QSize(100, 100), prefix);
+    if (!widget) return;
+    loadWidgetGeometry(settings, widget, widget->pos(), widget->size(), prefix);
 }
 
 void saveSplitter(QSettings& settings, QSplitter* splitter, QString prefix) {
