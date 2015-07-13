@@ -57,6 +57,8 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QSpinBox* spinBackgroundOffset;
         QLabel* labBackgroundError;
 
+        QLabel* labImageProps;
+
 
         int channels;
         int frame_count_io;

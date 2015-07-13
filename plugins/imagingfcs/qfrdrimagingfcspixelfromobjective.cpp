@@ -10,6 +10,8 @@ QFRDRImagingFCSPixelFromObjective::QFRDRImagingFCSPixelFromObjective(QWidget *pa
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinMagnification, tr("imaging_fcs/QFRDRImagingFCSPixelFromObjective/spinMagnification"));
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinPixelSize, tr("imaging_fcs/QFRDRImagingFCSPixelFromObjective/spinPixelSize"));
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinTubeLens, tr("imaging_fcs/QFRDRImagingFCSPixelFromObjective/spinTubeLens"));
+
+    updateM();
 }
 
 QFRDRImagingFCSPixelFromObjective::~QFRDRImagingFCSPixelFromObjective()

@@ -70,10 +70,17 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool isp, QWidget *parent):
     labFileError=new QLabel(wizSelfiles);
     wizSelfiles->addRow(QString(), labFileError);
 
+
+
+
+
+
     addPage(wizImageProps=new QFImagePlotWizardPage(tr("Set image stack properties ..."), this));
     wizImageProps->setSubTitle(tr("Set/check the properties of the image stack.<br><small><i>The plot shows an average over the first 10 frames.</i></small>"));
     connect(wizImageProps, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(initImagePreview()));
 
+    labImageProps=new QLabel(wizImageProps);
+    wizImageProps->addRow(tr("Image Stack Properties:"), labImageProps);
 
     cmbDualView = new QFEnhancedComboBox(wizImageProps);
     cmbDualView->addItem(QIcon(":/imaging_fcs/dvnone.png"), tr("no DualView"));
@@ -86,11 +93,11 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool isp, QWidget *parent):
     widPixSize->setUnits(" nm");
     widPixSize->setPixelSize(400);
     widPixSize->setDecimals(2);
-    widPixSize->addLayoutStretchAtEnd();
     wizImageProps->addRow(tr("&Pixel Size:"), widPixSize);
-    btnPixSize=new QPushButton(tr("calculate pixel size ..."), wizImageProps);
+    btnPixSize=new QPushButton(tr("calculate ..."), wizImageProps);
     connect(btnPixSize, SIGNAL(clicked()), this, SLOT(calcPixelSize()));
-    wizImageProps->addRow(QString(), btnPixSize);
+    widPixSize->addWidget(btnPixSize);
+    widPixSize->addLayoutStretchAtEnd();
 
     spinFrametime=new QDoubleSpinBox(wizImageProps);
     spinFrametime->setRange(0,1000000000);
@@ -313,6 +320,7 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
         double* frame_data_io=NULL;
         QFRDRImagingFCSCorrelationDialog::readStackProperties(wizard->edtFilename->text(), wizard->cmbFileformat->currentIndex(), true, true, wizard, &(wizard->channels), &(wizard->frame_count_io), &(wizard->filesize_io), &(wizard->frametime_io), &(wizard->baseline_offset_io), &(wizard->backgroundF_io), &(wizard->pixel_width_io), &(wizard->pixel_height_io), &(wizard->hasPixel_io), &(wizard->dualViewMode_io), &(wizard->image_width_io), &(wizard->image_height_io), &(wizard->inputconfigfile_io), &(frame_data_io), &(wizard->background_width), &(wizard->background_height), &(wizard->background_count));
 
+        wizard->labImageProps->setText(QObject::tr("frames: %1,   frame-size: %2x%3").arg(wizard->frame_count_io).arg(wizard->image_width_io).arg(wizard->image_height_io));
         wizard->widPixSize->setPixelSize(wizard->pixel_width_io, wizard->pixel_height_io);
         wizard->widFrameRange->setRange(0, wizard->frame_count_io-1);
         wizard->cmbDualView->setCurrentIndex(wizard->dualViewMode_io);
