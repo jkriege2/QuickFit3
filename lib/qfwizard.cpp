@@ -53,6 +53,7 @@ QFWizardPage::QFWizardPage(QWidget *parent):
     QWizardPage(parent)
 {
     m_validator=NULL;
+    m_iscomplete=NULL;
     m_userLast=NULL;
     m_userValidatePage=NULL;
     m_userLastArg=NULL;
@@ -65,6 +66,7 @@ QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
     QWizardPage(parent)
 {
     m_validator=NULL;
+    m_iscomplete=NULL;
     m_userLast=NULL;
     m_userValidatePage=NULL;
     m_userLastArg=NULL;

@@ -6,6 +6,11 @@
 QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool isp, QWidget *parent):
     QFWizard(parent, QString("imaging_fcs/wizard/"))
 {
+    QLabel* lab;
+
+    fctrBack=new QFRDRImagingFCSWizard_BackgroundIsValid(this);
+    fctrStack=new QFRDRImagingFCSWizard_ImagestackIsValid(this);
+
     channels=1;
     frame_count_io=0;
     filesize_io=0;
@@ -32,11 +37,15 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool isp, QWidget *parent):
     addPage(new QFTextWizardPage(tr("Introduction"),
                                       tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br><br><br><center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"),
                                       this));
+
+
+
     addPage(wizSelfiles=new QFFormWizardPage(tr("Select image stack files ..."), this));
     connect(wizSelfiles, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(initFileSelection()));
     wizSelfiles->setSubTitle(tr("Select the image stack that you want to correlate."));
     wizSelfiles->setExternalValidate(true);
     wizSelfiles->setExternalIsValid(false);
+    wizSelfiles->setValidator(fctrStack);
 
 
     edtFilename=new QFEnhancedLineEdit(wizSelfiles);
@@ -50,19 +59,21 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool isp, QWidget *parent):
     if (cmbFileformat->currentIndex()<0) cmbFileformat->findAndSelectContainedLCText("tiff", -1);
     wizSelfiles->addRow(tr("image stack:"), edtFilename);
     wizSelfiles->addRow(tr("import filter/filetype:"), cmbFileformat);
-
+    wizSelfiles->addRow(QString(), lab=new QLabel(tr("<i>Please select the image stack you want to correlate and the image reader that should be used to read it. "
+                                                 "If you use the file-open dialog (<img src=\":/lib/qfstyledbutton/selectfile.png\">) to select a file, the correct "
+                                                 "image reader will be selected automatically."
+                                                 "<br><br>After selecting an image stack and clicking on <b>Next</b>, the file will be analyzed and you can set all necessary"
+                                                 "metadata on the next wizard page. Afterwards you can configure the imaging FCS/FCCS correlation process and finish the wizard."
+                                                 "<br><br><u>Note:</u>If you want to read an uncompressed TIFF file, we propose to use the <b>tinyTIFF</b> image reader, "
+                                                 "as it can read larger files than the libTIFF reader!</i>"), wizSelfiles));
+    lab->setWordWrap(true);
+    labFileError=new QLabel(wizSelfiles);
+    wizSelfiles->addRow(QString(), labFileError);
 
     addPage(wizImageProps=new QFImagePlotWizardPage(tr("Set image stack properties ..."), this));
     wizImageProps->setSubTitle(tr("Set/check the properties of the image stack.<br><small><i>The plot shows an average over the first 10 frames.</i></small>"));
     connect(wizImageProps, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(initImagePreview()));
 
-//    edtBackground=new QFEnhancedLineEdit(wizImageProps);
-//    edtBackground->addButton(btnBackground=new QFStyledButton(QFStyledButton::SelectFile, edtFilename, edtFilename));
-//    btnBackground->setFilter(imageFilters.join(";;"));
-//    chkBackground=new QCheckBox(tr("background correction:"), wizImageProps);
-//    edtBackground->setEnabled(false);
-//    connect(chkBackground, SIGNAL(toggled(bool)), edtBackground, SLOT(setEnabled(bool)));
-//    wizImageProps->addRow(chkBackground, edtBackground);
 
     cmbDualView = new QFEnhancedComboBox(wizImageProps);
     cmbDualView->addItem(QIcon(":/imaging_fcs/dvnone.png"), tr("no DualView"));
@@ -77,18 +88,55 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool isp, QWidget *parent):
     widPixSize->setDecimals(2);
     widPixSize->addLayoutStretchAtEnd();
     wizImageProps->addRow(tr("&Pixel Size:"), widPixSize);
+    btnPixSize=new QPushButton(tr("calculate pixel size ..."), wizImageProps);
+    connect(btnPixSize, SIGNAL(clicked()), this, SLOT(calcPixelSize()));
+    wizImageProps->addRow(QString(), btnPixSize);
 
     spinFrametime=new QDoubleSpinBox(wizImageProps);
     spinFrametime->setRange(0,1000000000);
     spinFrametime->setDecimals(3);
     spinFrametime->setValue(1000);
-    spinFrametime->setSuffix(tr("\xB5s"));
+    spinFrametime->setSuffix(QLatin1String(" \xB5s"));
     wizImageProps->addRow(tr("Frame &Time (=1/frame rate):"), spinFrametime);
 
     widFrameRange=new QFFrameRangeEdit(wizImageProps);
     widFrameRange->setRange(0,1000);
     widFrameRange->addLayoutStretchAtEnd();
     wizImageProps->addRow(tr("Correlated Frame &Range:"), widFrameRange);
+
+
+
+
+
+
+
+
+    addPage(wizBackground=new QFFormWizardPage(tr("Background Correction Settings ..."), this));
+    wizBackground->setValidator(fctrBack);
+    cmbBackgroundMode=new QComboBox(wizBackground);
+    cmbBackgroundMode->addItem(tr("none"));
+    cmbBackgroundMode->addItem(tr("remove offset"));
+    cmbBackgroundMode->addItem(tr("remove minimum counts & offset"));
+    cmbBackgroundMode->addItem(tr("remove background image & offset"));
+    connect(cmbBackgroundMode, SIGNAL(currentIndexChanged(int)), this, SLOT(backgroundModeChanged(int)));
+    wizBackground->addRow(tr("background correction mode:"), cmbBackgroundMode);
+    edtBackgroundFilename=new QFEnhancedLineEdit(wizBackground);
+    edtBackgroundFilename->addButton(btnBackgroundFilename=new QFStyledButton(QFStyledButton::SelectFile, edtBackgroundFilename, edtBackgroundFilename));
+    btnBackgroundFilename->setFilter(imageFilters.join(";;"));
+    edtBackgroundFilename->setEnabled(false);
+    wizBackground->addRow(tr("background image stack:"), edtBackgroundFilename);
+    spinBackgroundOffset=new QSpinBox(wizBackground);
+    spinBackgroundOffset->setSuffix(tr(" ADU"));
+    spinBackgroundOffset->setRange(-100000000,100000000);
+    spinBackgroundOffset->setValue(0);
+    spinBackgroundOffset->setEnabled(false);
+    wizBackground->addRow(tr("background offset:"), spinBackgroundOffset);
+    labBackgroundError=new QLabel(wizBackground);
+    wizBackground->addRow(QString(), labBackgroundError);
+
+
+
+
 
 
 //    addPage(wizLSAnalysisImgPreview=new QFImagePlotWizardPage(tr("Image preview ..."), this));
@@ -120,7 +168,8 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool isp, QWidget *parent):
 
 QFRDRImagingFCSWizard::~QFRDRImagingFCSWizard()
 {
-
+    delete fctrBack;
+    delete fctrStack;
 }
 
 void QFRDRImagingFCSWizard::selectFileClicked()
@@ -153,20 +202,24 @@ void QFRDRImagingFCSWizard::edtFilenameTextChanged(const QString &filename)
 
 void QFRDRImagingFCSWizard::initImagePreview()
 {
-    //QFImporterImageSeries* reader=NULL;
-    QString readerid=imageFormatIDs.value(cmbFileformat->currentIndex(), imageFormatIDs.value(0, ""));
+//    QString readerid=imageFormatIDs.value(cmbFileformat->currentIndex(), imageFormatIDs.value(0, ""));
 
-    wizImageProps->setImageAvg(edtFilename->text(), readerid, 0, 10);
+//    wizImageProps->setImageAvg(edtFilename->text(), readerid, 0, 10);
 
 
-    double* frame_data_io=NULL;
-    QFRDRImagingFCSCorrelationDialog::readStackProperties(edtFilename->text(), cmbFileformat->currentIndex(), true, true, this, &channels, &frame_count_io, &filesize_io, &frametime_io, &baseline_offset_io, &backgroundF_io, &pixel_width_io, &pixel_height_io, &hasPixel_io, &dualViewMode_io, &image_width_io, &image_height_io, &inputconfigfile_io, &frame_data_io);
+//    double* frame_data_io=NULL;
+//    QFRDRImagingFCSCorrelationDialog::readStackProperties(edtFilename->text(), cmbFileformat->currentIndex(), true, true, this, &channels, &frame_count_io, &filesize_io, &frametime_io, &baseline_offset_io, &backgroundF_io, &pixel_width_io, &pixel_height_io, &hasPixel_io, &dualViewMode_io, &image_width_io, &image_height_io, &inputconfigfile_io, &frame_data_io, &background_width, &background_height, &background_count);
 
-    widPixSize->setPixelSize(pixel_width_io, pixel_height_io);
-    widFrameRange->setRange(0, frame_count_io-1);
-    cmbDualView->setCurrentIndex(dualViewMode_io);
-    spinFrametime->setValue(frametime_io);
-    if (frame_data_io) qfFree(frame_data_io);
+//    widPixSize->setPixelSize(pixel_width_io, pixel_height_io);
+//    widFrameRange->setRange(0, frame_count_io-1);
+//    cmbDualView->setCurrentIndex(dualViewMode_io);
+//    spinFrametime->setValue(frametime_io);
+//    edtBackgroundFilename->setText(backgroundF_io);
+//    cmbBackgroundMode->setCurrentIndex(0);
+//    if (!backgroundF_io.isEmpty()) cmbBackgroundMode->setCurrentIndex(3);
+//    spinBackgroundOffset->setValue(0);
+//    if (frame_data_io) qfFree(frame_data_io);
+//    backgroundModeChanged(cmbBackgroundMode->currentIndex());
 }
 
 void QFRDRImagingFCSWizard::initFileSelection()
@@ -176,4 +229,114 @@ void QFRDRImagingFCSWizard::initFileSelection()
 
 }
 
+void QFRDRImagingFCSWizard::backgroundModeChanged(int mode)
+{
+    if (mode==0) {
+        edtBackgroundFilename->setEnabled(false);
+        spinBackgroundOffset->setEnabled(false);
+    } else if (mode==1) {
+        edtBackgroundFilename->setEnabled(false);
+        spinBackgroundOffset->setEnabled(true);
+    } else if (mode==2) {
+        edtBackgroundFilename->setEnabled(false);
+        spinBackgroundOffset->setEnabled(true);
+    } else if (mode==3) {
+        edtBackgroundFilename->setEnabled(true);
+        spinBackgroundOffset->setEnabled(true);
+    }
+}
 
+void QFRDRImagingFCSWizard::calcPixelSize()
+{
+    QFRDRImagingFCSPixelFromObjective* dlg=new QFRDRImagingFCSPixelFromObjective(this);
+    if (dlg->exec()) {
+        widPixSize->setPixelSize(dlg->getPixelSize()*1000.0);
+    }
+    delete dlg;
+}
+
+
+
+
+QFRDRImagingFCSWizard_BackgroundIsValid::QFRDRImagingFCSWizard_BackgroundIsValid(QFRDRImagingFCSWizard *wizard):
+    QFWizardValidateFunctor()
+{
+    this->wizard=wizard;
+}
+
+bool QFRDRImagingFCSWizard_BackgroundIsValid::isValid(QFWizardPage *page)
+{
+    if (wizard) {
+        wizard->labBackgroundError->setText("");
+        QFRDRImagingFCSCorrelationDialog::readBackgroundProperties(wizard->edtBackgroundFilename->text(), wizard->cmbFileformat->currentIndex(), page, &(wizard->background_width), &(wizard->background_height), &(wizard->background_count));
+        if (wizard->cmbBackgroundMode->currentIndex()==0) {
+            return true;
+        } else if (wizard->cmbBackgroundMode->currentIndex()==1) {
+            return true;
+        } else if (wizard->cmbBackgroundMode->currentIndex()==2) {
+            return true;
+        } else if (wizard->cmbBackgroundMode->currentIndex()==3) {
+            if (wizard->background_count<=0) {
+                wizard->edtBackgroundFilename->setFocus();
+                wizard->labBackgroundError->setText(QObject::tr("<font color=\"red\"><b><u>ERROR:</u> Background file does not contain frames or could not be read!</b></font>"));
+                return false;
+            }
+            if ((wizard->image_width_io==wizard->background_width) && (wizard->image_height_io==wizard->background_height)) {
+                return true;
+            } else {
+                wizard->edtBackgroundFilename->setFocus();
+                wizard->labBackgroundError->setText(QObject::tr("<font color=\"red\"><b><u>ERROR:</u> Background file and image stack do not have the same frame size!</b><br>&nbsp;&nbsp;&nbsp;&nbsp;image stack frame size: <tt>%1x%2</tt>,&nbsp;&nbsp;&nbsp;&nbsp;background frame size: <tt>%3x%4</tt></font>").arg(wizard->image_width_io).arg(wizard->image_height_io).arg(wizard->background_width).arg(wizard->background_height));
+                return false;
+            }
+        }
+        return true;
+    } else {
+        return true;
+    }
+}
+
+
+QFRDRImagingFCSWizard_ImagestackIsValid::QFRDRImagingFCSWizard_ImagestackIsValid(QFRDRImagingFCSWizard *wizard):
+    QFWizardValidateFunctor()
+{
+    this->wizard=wizard;
+}
+
+bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
+{
+    if (wizard) {
+        QString readerid=wizard->imageFormatIDs.value(wizard->cmbFileformat->currentIndex(), wizard->imageFormatIDs.value(0, ""));
+
+        wizard->wizImageProps->setImageAvg(wizard->edtFilename->text(), readerid, 0, 10);
+
+
+        double* frame_data_io=NULL;
+        QFRDRImagingFCSCorrelationDialog::readStackProperties(wizard->edtFilename->text(), wizard->cmbFileformat->currentIndex(), true, true, wizard, &(wizard->channels), &(wizard->frame_count_io), &(wizard->filesize_io), &(wizard->frametime_io), &(wizard->baseline_offset_io), &(wizard->backgroundF_io), &(wizard->pixel_width_io), &(wizard->pixel_height_io), &(wizard->hasPixel_io), &(wizard->dualViewMode_io), &(wizard->image_width_io), &(wizard->image_height_io), &(wizard->inputconfigfile_io), &(frame_data_io), &(wizard->background_width), &(wizard->background_height), &(wizard->background_count));
+
+        wizard->widPixSize->setPixelSize(wizard->pixel_width_io, wizard->pixel_height_io);
+        wizard->widFrameRange->setRange(0, wizard->frame_count_io-1);
+        wizard->cmbDualView->setCurrentIndex(wizard->dualViewMode_io);
+        wizard->spinFrametime->setValue(wizard->frametime_io);
+        wizard->edtBackgroundFilename->setText(wizard->backgroundF_io);
+        wizard->cmbBackgroundMode->setCurrentIndex(0);
+        if (!wizard->backgroundF_io.isEmpty()) wizard->cmbBackgroundMode->setCurrentIndex(3);
+        wizard->spinBackgroundOffset->setValue(0);
+        if (frame_data_io) qfFree(frame_data_io);
+        wizard->backgroundModeChanged(wizard->cmbBackgroundMode->currentIndex());
+
+        if (wizard->frame_count_io<=0) {
+            wizard->labFileError->setText(QObject::tr("<font color=\"red\"><b><u>ERROR:</u> Image stack file does not contain frames or could not be read!</b></font>"));
+            wizard->edtFilename->setFocus();
+            return false;
+        }
+        if (wizard->image_width_io*wizard->image_height_io<=0) {
+            wizard->labFileError->setText(QObject::tr("<font color=\"red\"><b><u>ERROR:</u> Image stack does not contain frames with a size larger than 0x0!</b></font>"));
+            wizard->edtFilename->setFocus();
+            return false;
+        }
+
+        return true;
+    } else {
+        return true;
+    }
+}

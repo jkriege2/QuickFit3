@@ -78,7 +78,8 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcspostprocessbinningdialog.h \
     qfrdrimagingfcs_parserfunctions.h \
     qfrdrimagingfcsdiffusionlawdialog.h \
-    qfrdrimagingfcswizard.h
+    qfrdrimagingfcswizard.h \
+    qfrdrimagingfcspixelfromobjective.h
 #    ../base_classes/frawdataimageeditor.h \
 
 
@@ -116,7 +117,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcspostprocessbinningdialog.cpp \
     qfrdrimagingfcs_parserfunctions.cpp \
     qfrdrimagingfcsdiffusionlawdialog.cpp \
-    qfrdrimagingfcswizard.cpp
+    qfrdrimagingfcswizard.cpp \
+    qfrdrimagingfcspixelfromobjective.cpp
 #    ../base_classes/frawdataimageeditor.cpp \
 
 FORMS = \
@@ -132,7 +134,8 @@ FORMS = \
     qfrdrimagingfcsmaskbuilder.ui \
     qfrdrimagingfcscopycorrasrdrdialog.ui \
     qfrdrimagingfcspostprocessbinningdialog.ui \
-    qfrdrimagingfcsdiffusionlawdialog.ui
+    qfrdrimagingfcsdiffusionlawdialog.ui \
+    qfrdrimagingfcspixelfromobjective.ui
 
 RESOURCES += qfrdrimagingfcs.qrc
 
