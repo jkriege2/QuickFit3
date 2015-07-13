@@ -30,7 +30,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "radhard2lib/radhard2lib.h"
 #include "../base_classes/radhard2flash.h"
 #include "highrestimer.h"
-#include "qenhancedlineedit.h"
+#include "qfenhancedlineedit.h"
 #include "jkstyledbutton.h"
 #include "qfradhard2flashtool.h"
 
@@ -255,7 +255,7 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         int retries;
         int retryDelay;
 
-        QEnhancedLineEdit* edtBitfile;
+        QFEnhancedLineEdit* edtBitfile;
         QTextEdit* edtFlashSuccess;
         QSpinBox* spIterations;
         QSpinBox* spDivider;

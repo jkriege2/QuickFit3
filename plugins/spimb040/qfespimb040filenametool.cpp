@@ -75,13 +75,13 @@ void QFESPIMB040FilenameTool::setReplaceValue(const QString &key, const QString 
     replaceValues[key]=value;
 }
 
-void QFESPIMB040FilenameTool::bindLineEdit(QEnhancedLineEdit *edit) {
+void QFESPIMB040FilenameTool::bindLineEdit(QFEnhancedLineEdit *edit) {
     if (!edits.contains(edit)) edits.append(edit);
     fillLineEdits();
 }
 
 void QFESPIMB040FilenameTool::fillLineEdits() {
-    foreach(QEnhancedLineEdit* edit, edits) {
+    foreach(QFEnhancedLineEdit* edit, edits) {
         edit->clearContextMenu();
         edit->addInsertContextMenuEntry(QObject::tr("insert %counter% ..."), "%counter%");
         foreach(QString item, replaceValues.keys()) {

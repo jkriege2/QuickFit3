@@ -410,6 +410,14 @@ int QFRDRImagingFCSCorrelationDialog::waitingThreads() const  {
 }
 
 void QFRDRImagingFCSCorrelationDialog::ensureTiffReader() {
+    if (!ui->cmbFileformat->currentText().toUpper().contains("TINYTIFF")) {
+        for (int i=0; i<ui->cmbFileformat->currentIndex(); i++) {
+            if (ui->cmbFileformat->itemText(i).toUpper().contains("TINYTIFF")) {
+                ui->cmbFileformat->setCurrentIndex(i);
+                break;
+            }
+        }
+    }
     if (!ui->cmbFileformat->currentText().toUpper().contains("TIFF")) {
         for (int i=0; i<ui->cmbFileformat->currentIndex(); i++) {
             if (ui->cmbFileformat->itemText(i).toUpper().contains("TIFF")) {

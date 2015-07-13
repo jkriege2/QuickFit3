@@ -395,6 +395,16 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
     }
 }
 
+void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &imageReaderID, int frameStart, int frameCount, QFImporter::FileInfo *fileinfo)
+{
+    double* image=NULL;
+    int width;
+    int height;
+    setImageAvg(filename, imageReaderID, frameStart, frameCount, image, width, height, fileinfo);
+    if (image) qfFree(image);
+
+}
+
 void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, QFImporter::FileInfo *fileinfo)
 {
     setImage(filename, imageReaderID, 0, fileinfo);

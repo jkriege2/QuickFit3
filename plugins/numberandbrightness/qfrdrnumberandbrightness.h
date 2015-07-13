@@ -31,7 +31,7 @@
 class QFImagePlotWizardPage; // forward
 class QFSelectFilesWizardPage;
 class QFSelectFilesListWizardPage;
-class QEnhancedLineEdit;
+class QFEnhancedLineEdit;
 class QFProcessingWizardPage;
 class QFComboBoxWizardPage;
 
@@ -125,7 +125,7 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         QPointer<QFImagePlotWizardPage> wizLSAnalysisImgPreview;
         QPointer<QFSelectFilesWizardPage> wizSelfiles;
         QPointer<QFSelectFilesListWizardPage> wizSelfilesList;
-        QPointer<QEnhancedLineEdit> edtBackgroundFile;
+        QPointer<QFEnhancedLineEdit> edtBackgroundFile;
         QPointer<QLineEdit> edtResultsPrefix;
         QPointer<QFComboBoxWizardPage> wizAcqType;
         QPointer<QLabel> wizLabWidth;

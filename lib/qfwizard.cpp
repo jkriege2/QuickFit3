@@ -43,6 +43,8 @@ QFWizardPage::QFWizardPage(QWidget *parent):
     m_userValidatePage=NULL;
     m_userLastArg=NULL;
     m_userValidateArg=NULL;
+    m_externalvalidate=false;
+    m_isvalid=false;
 }
 
 QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
@@ -52,6 +54,8 @@ QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
     m_userValidatePage=NULL;
     m_userLastArg=NULL;
     m_userValidateArg=NULL;
+    m_externalvalidate=false;
+    m_isvalid=false;
     setTitle(title);
 }
 
@@ -69,6 +73,14 @@ bool QFWizardPage::validatePage()
     emit onValidate(this, m_userValidatePage);
     emit onValidateA(this, m_userValidateArg);
     return QWizardPage::validatePage();
+}
+
+bool QFWizardPage::isComplete() const
+{
+    if (m_externalvalidate) {
+        return m_isvalid;
+    }
+    return QWizardPage::isComplete();
 }
 
 void QFWizardPage::setUserPreviousPage(QWizardPage *page)
@@ -89,6 +101,18 @@ void QFWizardPage::setUserPreviousArgument(void *page)
 void QFWizardPage::setUserOnValidateArgument(void *page)
 {
     m_userValidateArg=page;
+}
+
+void QFWizardPage::setExternalValidate(bool enabled)
+{
+    m_externalvalidate=enabled;
+    emit completeChanged();
+}
+
+void QFWizardPage::setExternalIsValid(bool valid)
+{
+    m_isvalid=valid;
+    emit completeChanged();
 }
 
 

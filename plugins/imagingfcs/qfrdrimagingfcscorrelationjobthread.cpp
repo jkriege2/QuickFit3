@@ -104,6 +104,7 @@ QFImporterImageSeries* QFRDRImagingFCSCorrelationJobThread::getImageReader(int i
     QFImporterImageSeries* r=NULL;
 
     QStringList imp=pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
+    qDebug()<<imp;
 
     if (idx>=0 && idx<imp.size()) {
         r=dynamic_cast<QFImporterImageSeries*>(pluginservices->getImporterManager()->createImporter(imp[idx]));

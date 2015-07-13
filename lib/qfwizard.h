@@ -57,11 +57,15 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
 
         virtual void initializePage();
         virtual bool validatePage();
+        virtual bool isComplete() const;
 
         void setUserPreviousPage(QWizardPage* page);
         void setUserOnValidatePage(QWizardPage* page);
         void setUserPreviousArgument(void* page);
         void setUserOnValidateArgument(void* page);
+
+        void setExternalValidate(bool enabled=true);
+        void setExternalIsValid(bool valid=true);
     signals:
         void onInitialize(QWizardPage* page);
         void onInitialize(QWizardPage* page, QWizardPage* userPreviousPage);
@@ -78,6 +82,8 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         QWizardPage* m_userValidatePage;
         void* m_userLastArg;
         void* m_userValidateArg;
+        bool m_externalvalidate;
+        bool m_isvalid;
 
 };
 

@@ -27,7 +27,7 @@
 #include <QDir>
 
 QFESPIMB040ConfigComboBox::QFESPIMB040ConfigComboBox(QWidget *parent) :
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     updating=false;
     connect(this, SIGNAL(activated(int)), this, SLOT(cmbCurrentIndexChanged(int)));

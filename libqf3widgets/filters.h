@@ -33,7 +33,7 @@
 #include <QSettings>
 #include <QMessageBox>
 #include "libwid_imexport.h"
-#include "qenhancedcombobox.h"
+#include "qfenhancedcombobox.h"
 #include "qfmanyfilessettings.h"
 #include <QFormLayout>
 
@@ -139,7 +139,7 @@ protected slots:
 
 protected:
     QList<FilterDescription> filters;
-    QEnhancedComboBox* cmbFilters;
+    QFEnhancedComboBox* cmbFilters;
     QToolButton* btnAddFilter;
     QToolButton* btnEditFilter;
     QToolButton* btnDeleteFilter;
@@ -181,7 +181,7 @@ class QFWIDLIB_EXPORT QF3DualViewWidget : public QWidget {
     public slots:
         void setReadOnly(bool ro);
     protected:
-        QEnhancedComboBox* cmbDirection;
+        QFEnhancedComboBox* cmbDirection;
         QF3FilterCombobox* fltSplitter;
         QF3FilterCombobox* fltShort;
         QF3FilterCombobox* fltLong;

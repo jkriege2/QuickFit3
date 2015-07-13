@@ -35,7 +35,7 @@
 #include "qfextension.h"
 #include "qfcameracombobox.h"
 #include "libwid_imexport.h"
-#include "qenhancedcombobox.h"
+#include "qfenhancedcombobox.h"
 /*! \brief Interface that allows to stop/resume an acquisition
     \ingroup qf3lib_widgets
  */
@@ -76,7 +76,7 @@ class QFWIDLIB_EXPORT QFCameraConfigComboBoxNotifier: public QObject {
     box changes.
 
  */
-class QFWIDLIB_EXPORT QFCameraConfigComboBox : public QEnhancedComboBox {
+class QFWIDLIB_EXPORT QFCameraConfigComboBox : public QFEnhancedComboBox {
         Q_OBJECT
     public:
         QFCameraConfigComboBox(QWidget* parent=NULL, QString configDirectory=QString(""));

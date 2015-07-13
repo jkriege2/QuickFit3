@@ -21,9 +21,45 @@
 
 #include "qfenhancedcombobox.h"
 #include <QDebug>
+#include <QLineEdit>
+#include <QAbstractItemView>
+#include <QListView>
 QFEnhancedComboBox::QFEnhancedComboBox(QWidget *parent) :
     QComboBox(parent)
 {
+    m_readonly=false;
+    m_oldEditable=isEditable();
+}
+
+void QFEnhancedComboBox::setReadOnly(bool readonly) {
+    m_readonly=readonly;
+    if (lineEdit()) lineEdit()->setReadOnly(readonly);
+    if (isEditable() && readonly) {
+        m_oldEditable=true;
+        setEditable(false);
+    }
+    if (!readonly && (m_oldEditable!=isEditable())) {
+        setEditable(m_oldEditable);
+    }
+}
+
+void QFEnhancedComboBox::showPopup() {
+    if (!m_readonly) {
+        QComboBox::showPopup();
+
+
+
+        QFontMetrics fm(view()->font());
+        int width=view()->size().width();
+        for (int i=0; i<qMin(count(), 100); i++) {
+            int w=fm.width(itemText(i));
+            if (w>width) width=w;
+        }
+
+        view()->setMinimumWidth(qMax(width, this->width()));
+        view()->setGeometry(0,0,width, view()->size().height());
+
+    }
 }
 
 QVariant QFEnhancedComboBox::currentData(int role) const
@@ -53,6 +89,19 @@ void QFEnhancedComboBox::findAndSelectText(const QString &text, int defaultIdx)
     else setCurrentIndex(defaultIdx);
 }
 
+void QFEnhancedComboBox::findAndSelectContainedLCText(const QString &text)
+{
+    findAndSelectContainedLCText(text, currentIndex());
+}
+
+void QFEnhancedComboBox::findAndSelectContainedLCText(const QString &text, int defaultIdx)
+{
+    int idx=findText(text, Qt::MatchContains|Qt::MatchFixedString);
+    if (idx>=0) setCurrentIndex(idx);
+    else setCurrentIndex(defaultIdx);
+
+}
+
 void QFEnhancedComboBox::selectIndex(const QModelIndex &index)
 {
     setCurrentIndex(index.row());
@@ -68,14 +117,23 @@ void QFEnhancedComboBox::setCurrentData(const QVariant &data, int role)
 
 void QFEnhancedComboBox::wheelEvent(QWheelEvent *e)
 {
-    QComboBox::wheelEvent(e);
-    correctCurrentItem();
+    if (!m_readonly) {
+        QComboBox::wheelEvent(e);
+        correctCurrentItem();
+    }
 }
 
 void QFEnhancedComboBox::keyPressEvent(QKeyEvent *e)
 {
-    QComboBox::keyPressEvent(e);
-    correctCurrentItem();
+    if (e->key()==Qt::Key_Enter || e->key()==Qt::Key_Return) emit editingFinished();
+    if (!m_readonly) {
+        QComboBox::keyPressEvent(e);
+        correctCurrentItem();
+    }
+}
+
+void QFEnhancedComboBox::keyReleaseEvent ( QKeyEvent * e ) {
+    if (!m_readonly) QComboBox::keyReleaseEvent(e);
 }
 
 void QFEnhancedComboBox::correctCurrentItem()

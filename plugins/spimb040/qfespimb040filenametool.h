@@ -25,7 +25,7 @@
 
 #include <QMap>
 #include <QString>
-#include "qenhancedlineedit.h"
+#include "qfenhancedlineedit.h"
 #include <QWidget>
 #include <QDir>
 #include <QFileInfo>
@@ -41,12 +41,12 @@ class QFESPIMB040FilenameTool {
         QString transformFilename(const QString& filename) const;
         void setReplaceValues(const QMap<QString, QString>& replaceValues);
         void setReplaceValue(const QString& key, const QString& value);
-        void bindLineEdit(QEnhancedLineEdit* edit);
+        void bindLineEdit(QFEnhancedLineEdit* edit);
         void setGlobalReplaces(QFESPIMB040OpticsSetupBase* setup, QFESPIMB040ExperimentDescription* exp, QFESPIMB040AcquisitionDescription* acq);
 
     protected:
         QMap<QString, QString> replaceValues;
-        QList<QEnhancedLineEdit*> edits;
+        QList<QFEnhancedLineEdit*> edits;
         void fillLineEdits();
 };
 

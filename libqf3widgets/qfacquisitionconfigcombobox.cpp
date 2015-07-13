@@ -46,7 +46,7 @@ QFAcquisitionConfigComboBoxNotifier* QFAcquisitionConfigComboBox::m_notifier=NUL
 
 
 QFAcquisitionConfigComboBox::QFAcquisitionConfigComboBox(QWidget* parent, QString configDirectory):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     m_configDirectory=configDirectory;
     m_cam=NULL;

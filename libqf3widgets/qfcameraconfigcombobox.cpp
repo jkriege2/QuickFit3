@@ -46,7 +46,7 @@ QFCameraConfigComboBoxNotifier* QFCameraConfigComboBox::m_notifier=NULL;
 
 
 QFCameraConfigComboBox::QFCameraConfigComboBox(QWidget* parent, QString configDirectory):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     m_configDirectory=configDirectory;
     m_cam=NULL;

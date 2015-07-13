@@ -24,7 +24,7 @@
 
 #include <QShortcut>
 QKeySequenceEdit::QKeySequenceEdit(QWidget *parent) :
-    QEnhancedLineEdit(parent)
+    QFEnhancedLineEdit(parent)
 {
     currentKS=QKeySequence();
 

@@ -23,13 +23,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfstagecombobox.h"
 
 QFStageComboBox::QFStageComboBox(QFExtensionManager* extManager, QWidget* parent):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     init(extManager);
 }
 
 QFStageComboBox::QFStageComboBox(QWidget* parent):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     m_extManager=NULL;
     setSizeAdjustPolicy(QComboBox::AdjustToContents);

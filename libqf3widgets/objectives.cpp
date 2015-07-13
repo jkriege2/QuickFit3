@@ -90,7 +90,7 @@ QF3ObjectiveCombobox::QF3ObjectiveCombobox(QWidget* parent):
     setLayout(hbl);
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
-    cmbObjective=new QEnhancedComboBox(this);
+    cmbObjective=new QFEnhancedComboBox(this);
     cmbObjective->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(cmbObjective, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
     hbl->addWidget(cmbObjective);

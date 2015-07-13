@@ -845,7 +845,7 @@ void QFRDRNumberAndBrightnessPlugin::startWizardImageStack()
     wizSelfilesList->setAddOnStartup(false);
     wizSelfilesList->setOnlyOneFormatAllowed(true);
 
-    edtBackgroundFile=new QEnhancedLineEdit(wizSelfilesList);
+    edtBackgroundFile=new QFEnhancedLineEdit(wizSelfilesList);
     QFStyledButton* btn;
     edtBackgroundFile->addButton(btn=new QFStyledButton(QFStyledButton::None, edtBackgroundFile, edtBackgroundFile));
     btn->setDefaultIcon(QFStyledButton::SelectFile);

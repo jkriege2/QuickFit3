@@ -48,6 +48,7 @@ DESTDIR = $$QFOUTPUT
 
 # Input
 HEADERS += dlgnewproperty.h \
+           qehtreeview.h \
            dlgqffitalgorithmprogressdialog.h \
            qenhancedtableview.h \
            programoptions.h \
@@ -193,6 +194,7 @@ HEADERS += dlgnewproperty.h \
 
 
 SOURCES += dlgnewproperty.cpp \
+           qehtreeview.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
            qenhancedtableview.cpp \
            programoptions.cpp \

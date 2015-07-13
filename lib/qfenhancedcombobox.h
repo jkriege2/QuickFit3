@@ -25,6 +25,8 @@
 #include <QComboBox>
 #include "lib_imexport.h"
 #include <QVariant>
+#include <QKeyEvent>
+#include <QWheelEvent>
 
 
 /*! \brief enhanced QComboBox
@@ -42,13 +44,23 @@ class QFLIB_EXPORT QFEnhancedComboBox : public QComboBox
         virtual void setCurrentFromModelData(const QVariant& data, int role=Qt::UserRole) ;
         virtual void findAndSelectText(const QString& text);
         virtual void findAndSelectText(const QString& text, int defaultIdx);
+        virtual void findAndSelectContainedLCText(const QString& text);
+        virtual void findAndSelectContainedLCText(const QString& text, int defaultIdx);
 
+        virtual void showPopup();
+    signals:
+        void editingFinished();
     public slots:
         virtual void selectIndex(const QModelIndex&index);
         void setCurrentData(const QVariant& data, int role=Qt::UserRole);
+        void setReadOnly(bool readonly);
+
     signals:
 
     protected:
+        bool m_readonly;
+        bool m_oldEditable;
+        virtual void keyReleaseEvent ( QKeyEvent * e );
         virtual void wheelEvent(QWheelEvent *e);
         virtual void keyPressEvent(QKeyEvent *e);
         virtual void correctCurrentItem();

@@ -91,7 +91,7 @@ QF3FilterCombobox::QF3FilterCombobox(QWidget* parent):
     setLayout(hbl);
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
-    cmbFilters=new QEnhancedComboBox(this);
+    cmbFilters=new QFEnhancedComboBox(this);
     cmbFilters->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
     cmbFilters->setMinimumContentsLength(10);
     cmbFilters->view()->setTextElideMode(Qt::ElideRight);
@@ -471,7 +471,7 @@ QF3DualViewWidget::QF3DualViewWidget(QWidget *parent):
     lay=new QGridLayout();
     setLayout(lay);
     QLabel* l=NULL;
-    cmbDirection=new QEnhancedComboBox(this);
+    cmbDirection=new QFEnhancedComboBox(this);
     cmbDirection->addItem(QIcon(":/libqf3widgets/dvhor.png"), tr("horizontal"));
     cmbDirection->addItem(QIcon(":/libqf3widgets/dvver.png"), tr("vertical"));
     lay->addWidget(new QLabel(tr("<small>&orientation:</small>")),0,0);

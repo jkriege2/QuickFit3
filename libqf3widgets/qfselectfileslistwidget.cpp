@@ -335,7 +335,7 @@ void QFSelectFilesWizardPage::addFileSelection(const QString &label, const QStri
 {
     QFSelectFilesWizardPage::FileData fd;
     fd.label=new QLabel(label, this);
-    fd.edit=new QEnhancedLineEdit(this);
+    fd.edit=new QFEnhancedLineEdit(this);
     fd.edit->addButton(fd.button=new QFStyledButton(QFStyledButton::None, fd.edit, fd.edit));
     fd.button->setDefaultIcon(QFStyledButton::SelectFile);
     connect(fd.button, SIGNAL(clickedWithButton(QFStyledButton*)), this, SLOT(buttonClicked(QFStyledButton*)));

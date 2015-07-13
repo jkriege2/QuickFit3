@@ -105,7 +105,7 @@ QtLogFile::QtLogFile(QWidget *parent):
     QHBoxLayout* layFind=new QHBoxLayout;
     widFind->setLayout(layFind);
     layFind->addWidget(new QLabel(tr("     phrase: ")));
-    edtFind=new QEnhancedLineEdit(this);
+    edtFind=new QFEnhancedLineEdit(this);
     edtFind->addButton(new JKStyledButton(JKStyledButton::ClearLineEdit, edtFind, edtFind));
     edtFind->setMinimumWidth(150);
     edtFind->setToolTip(tr("simply enter a search phrase\n\nthe search begins immediately after typing the first letter. If no match was found, the field will change its background color to a light red."));

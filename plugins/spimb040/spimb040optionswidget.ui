@@ -29,7 +29,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QEnhancedLineEdit" name="edtOptSetupDir"/>
+    <widget class="QFEnhancedLineEdit" name="edtOptSetupDir"/>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label_3">
@@ -39,7 +39,7 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QEnhancedLineEdit" name="edtOptSetupConfigDirReadonly"/>
+    <widget class="QFEnhancedLineEdit" name="edtOptSetupConfigDirReadonly"/>
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_5">
@@ -49,7 +49,7 @@
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="QEnhancedLineEdit" name="edtOptSetupConfigDir"/>
+    <widget class="QFEnhancedLineEdit" name="edtOptSetupConfigDir"/>
    </item>
    <item row="4" column="1">
     <spacer name="verticalSpacer">
@@ -94,9 +94,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QEnhancedLineEdit</class>
+   <class>QFEnhancedLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>qenhancedlineedit.h</header>
+   <header>qfenhancedlineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

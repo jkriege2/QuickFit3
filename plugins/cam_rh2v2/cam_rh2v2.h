@@ -27,7 +27,7 @@ Copyright (c) 2008-2015 Jan Buchholz, German Cancer Research Center
 #include "qfextension.h"
 #include "qfextensioncamera.h"
 #include "processing_chain.h"
-#include "qenhancedlineedit.h"
+#include "qfenhancedlineedit.h"
 #include "jkstyledbutton.h"
 #include "../base_classes/radhard2flash.h"
 #include "qfradhard2flashtool.h"

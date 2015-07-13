@@ -33,7 +33,7 @@
 #include <QSettings>
 #include <QMessageBox>
 #include "libwid_imexport.h"
-#include "qenhancedcombobox.h"
+#include "qfenhancedcombobox.h"
 #include <QPointer>
 #include "qfmanyfilessettings.h"
 /*! \brief description of an objective
@@ -132,7 +132,7 @@ protected slots:
 
 protected:
     QList<ObjectiveDescription> objectives;
-    QEnhancedComboBox* cmbObjective;
+    QFEnhancedComboBox* cmbObjective;
     QToolButton* btnAddObjective;
     QToolButton* btnEditObjective;
     QToolButton* btnDeleteObjective;

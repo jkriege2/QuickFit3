@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfacquisitioncombobox.h"
 
 QFAcquisitionComboBox::QFAcquisitionComboBox(QFExtensionManager* extManager, QWidget* parent):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     m_extManager=extManager;
     setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -33,7 +33,7 @@ QFAcquisitionComboBox::QFAcquisitionComboBox(QFExtensionManager* extManager, QWi
 }
 
 QFAcquisitionComboBox::QFAcquisitionComboBox(QWidget* parent):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     m_extManager=NULL;
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(deviceIndexChanged(int)));
