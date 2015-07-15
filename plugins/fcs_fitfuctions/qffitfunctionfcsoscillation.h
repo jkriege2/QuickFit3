@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFITFUNCTIONFCSOSCILLATION_H
 
 #include "qffitfunction.h"
-
+#include <QObject>
 
 /*! \brief plugin class for oscillatory FCS correlation functions
     \ingroup qf3fitfunp_fcs

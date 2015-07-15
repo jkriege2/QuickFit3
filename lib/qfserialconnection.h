@@ -24,9 +24,11 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 
+#include <QtGlobal>
 
-
-
+#ifdef Q_OS_MAC
+#  define __LINUX__
+#endif
 
 #ifndef __WINDOWS__
 # if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
