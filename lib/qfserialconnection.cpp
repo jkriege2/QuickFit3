@@ -21,6 +21,10 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qfserialconnection.h"
 #include <stdint.h>
+#include <QtGlobal>
+#ifdef Q_OS_MAC
+#  define __LINUX__
+#endif
 
 std::string QFSCdatabits2string(QFSCdatabits databits) {
     return inttostr(databits);
@@ -496,41 +500,41 @@ bool QFSerialConnection::open() {
       lastError="unable to set baudrate "+inttostr(baudrate);
       return false; /* Fehler beim �ffnen der Schnittstelle ist aufgetreten */
   }
-    if (parity==JKSCevenParity) {
+    if (parity==QFSCevenParity) {
         options.c_cflag |= PARENB;
         options.c_cflag &= ~PARODD;
-    } else if (parity==JKSCoddParity) {
+    } else if (parity==QFSCoddParity) {
         options.c_cflag |= PARENB;
         options.c_cflag |= PARODD;
-    } else if (parity==JKSCnoParity) {
+    } else if (parity==QFSCnoParity) {
         options.c_cflag &= ~PARENB;
         options.c_cflag &= ~PARODD;
     }
-    if (stopbits==JKSConeStopbit) {
+    if (stopbits==QFSConeStopbit) {
         options.c_cflag &= ~CSTOPB;
-    } else if (stopbits==JKSCone5Stopbits) {
+    } else if (stopbits==QFSCone5Stopbits) {
       errorOccured=true;
       lastError="unable to set 1.5 stopbits on Linux!";
       return false; /* Fehler beim �ffnen der Schnittstelle ist aufgetreten */
-    } else if (stopbits==JKSCtwoStopbits) {
+    } else if (stopbits==QFSCtwoStopbits) {
         options.c_cflag |= CSTOPB;
     }
     options.c_cflag &= ~CSIZE;
 
-    if (databits==JKSC5databits) options.c_cflag |= CS5;
-    else if (databits==JKSC6databits) options.c_cflag |= CS6;
-    else if (databits==JKSC7databits) options.c_cflag |= CS7;
-    else if (databits==JKSC8databits) options.c_cflag |= CS8;
+    if (databits==QFSC5databits) options.c_cflag |= CS5;
+    else if (databits==QFSC6databits) options.c_cflag |= CS6;
+    else if (databits==QFSC7databits) options.c_cflag |= CS7;
+    else if (databits==QFSC8databits) options.c_cflag |= CS8;
 #ifdef CS9
-    else if (databits==JKSC9databits) options.c_cflag |= CS9;
+    else if (databits==QFSC9databits) options.c_cflag |= CS9;
 #endif
 
     switch (handshaking) {
-    case JKSCnoHandshaking:
+    case QFSCnoHandshaking:
         options.c_cflag &= ~CRTSCTS;
         break;
 
-    case JKSChardwareHandshakingRTS:
+    case QFSChardwareHandshakingRTS:
 #ifdef CRTSCTS
         options.c_cflag |= CRTSCTS;
 #else
@@ -541,7 +545,7 @@ bool QFSerialConnection::open() {
 #endif
         break;
 
-    case JKSChardwareHandshakingDTRRTS:
+    case QFSChardwareHandshakingDTRRTS:
 #ifdef CRTSCTS
         #warning("There is no support for DTRRTS handshaking ... fallback to CRT/RTS handshaking!!!")
         options.c_cflag |= CRTSCTS;
@@ -553,7 +557,7 @@ bool QFSerialConnection::open() {
 #endif
         break;
 
-    case JKSCxonXoffHandshaking:
+    case QFSCxonXoffHandshaking:
         errorOccured=true;
         lastError="unable to set XON/XOFF handshaking on Linux! (not yet implemented)";
         return false;
@@ -581,7 +585,11 @@ bool QFSerialConnection::open() {
   //options.c_cc[] = 0;
 
   // switch off post-processing ...
-  options.c_oflag &= ~(OPOST | OPOST | OLCUC | ONLCR | OCRNL |  ONLRET | OFILL | OFDEL);
+  options.c_oflag &= ~(OPOST | OPOST | ONLCR | OCRNL |  ONLRET | OFILL | OFDEL
+#ifdef OLCUC
+                       | OLCUC
+                     #endif
+                       );
   // write options
   tcsetattr(unixPortHandle, TCSANOW, &options);
 
