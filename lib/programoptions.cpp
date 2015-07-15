@@ -65,11 +65,15 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     #if defined(Q_OS_MAC)
         // get out of /MyApp.app/Contents/MacOS in MacOSX App-Bundle
         QDir aappDir(appDir);
+        QDir aapppDir(appDir);
         if (aappDir.dirName() == "MacOS") {
             aappDir.cdUp();
             //aappDir.cdUp();
             //aappDir.cdUp();
             aappDir.cd("SharedSupport");
+            aapppDir.cdUp();
+            aapppDir.cdUp();
+            aapppDir.cdUp();
         }
         appDir=	aappDir.absolutePath();
     #endif
@@ -83,6 +87,8 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     //assetsDir=appDir+"/quickfit3.app/Contents/SharedSupport/assets/";
     //examplesDir=appDir+"/quickfit3.app/Contents/SharedSupport/examples/";
     pluginsDir=appDir+"/../PlugIns/";
+    QString altPluginDir=aapppDir.absolutePath()+"/plugins/";
+    if (!QDir::exists(pluginsDir) && QDir::exists(altPluginDir)) pluginsDir=altPluginDir;
     #endif
 
     #if defined(__LINUX__) || defined(Q_OS_MAC)
