@@ -112,6 +112,7 @@ if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 		cp /mingw/bin/libwinpthread*.dll ../output/
 		
 		USEDQTMODULES="QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4 QtNetwork4"
+		USEDQTMODULES5="Qt5Core Qt5Gui Qt5Network Qt5OpenGL Qt5Script Qt5ScriptTools Qt5PrintSupport Qt5Svg Qt5Xml Qt5Widgets Qt5WinExtras"
 		USEDQTPLUGINS= "${QT_INFO_PLUGINS}/*"
 		mkdir ../output/qtplugins
 		for f in $USEDQTMODULES
@@ -119,6 +120,9 @@ if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 			cp "${QT_INFO_BIN}/${f}d.dll"  "../output/"
 			cp "${QT_INFO_BIN}/${f}.dll"  "../output/"
 		done
+		
+		cp -rf "${QT_INFO_BIN}/icu*.dll"  "../output/"
+		
 		for f in $USEDQTPLUGINS
 		do
 			cp -rf "${f}"  "../output/qtplugins/"
@@ -148,11 +152,24 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		BINARY_PATH='../../bin'
 		INCLUDE_PATH='../../include'
 		LIBRARY_PATH='../../lib'
-		
+
 		echo -e 'BINARY_PATH='$BINARY_PATH'\nINCLUDE_PATH='$INCLUDE_PATH'\nLIBRARY_PATH='$LIBRARY_PATH'\nLOC='${PICFLAGS} $MORECFLAGS|cat - ./win32/Makefile.gcc > ./Makefile.gcc
 		
 		MAKEFILE="Makefile.gcc"
 	else
+		if [ -z "$MORECFLAGS" ]; then
+			if [ -z "$MORELDFLAGS" ]; then
+				./configure --static --prefix=${CURRENTDIR}/zlib
+			else
+				./configure --static --prefix=${CURRENTDIR}/zlib  LDFLAGS="${MORELDFLAGS}"
+			fi
+		else
+			if [ -z "$MORELDFLAGS" ]; then
+				./configure --static --prefix=${CURRENTDIR}/zlib  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}"
+			else
+				./configure --static --prefix=${CURRENTDIR}/zlib  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}"  LDFLAGS="${MORELDFLAGS}"
+			fi
+		fi
 		./configure --static --prefix=${CURRENTDIR}/zlib  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}" LDFLAGS="${MORELDFLAGS}"
 		MAKEFILE="Makefile"
 	fi
@@ -562,8 +579,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd libtiff
 	mkdir build
-	tar xvf tiff-4.0.3.tar.gz -C ./build/
-	cd build/tiff-4.0.3
+	tar xvf tiff-4.0.4.tar.gz -C ./build/
+	cd build/tiff-4.0.4
 	if [ -e ${CURRENTDIR}/libjpeg/lib/libjpeg.a ] ; then
 		./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff
 	else
@@ -1056,7 +1073,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf pixman-0.32.6.tar.gz -C ./build/
 	cd build/pixman-0.32.6
-	./configure --enable-static --disable-shared --enable-libpng --disable-gtk --prefix=${CURRENTDIR}/pixman   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" LDFLAGS=" ${zlib_LDFLAGS} ${MORELDFLAGS}" PNG_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib" PNG_CFLAGS=" -I${CURRENTDIR}/libpng -I${CURRENTDIR}/libpng/include"
+	./configure --enable-static --disable-shared --enable-libpng --disable-gtk  --disable-dependency-tracking --prefix=${CURRENTDIR}/pixman   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" LDFLAGS=" ${zlib_LDFLAGS} ${MORELDFLAGS}" PNG_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib" PNG_CFLAGS=" -I${CURRENTDIR}/libpng -I${CURRENTDIR}/libpng/include"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -1111,7 +1128,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	cd build/cairo-1.14.2
 	if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 	    cp ../../Makefile.in_hack ./Makefile.in
-		./configure --verbose --enable-static --disable-shared --disable-dependency-tracking --enable-gobject=no --enable-trace=no --enable-xcb-shm=no --enable-xlib=no --enable-xlib-xrender=no --enable-xcb=no --enable-egl=no --enable-glx=no --enable-wgl=no --enable-ft=no  --enable-fc=no --disable-xlib --without-x --disable-quartz-font --disable-quartz --disable-valgrind --prefix=${CURRENTDIR}/cairo   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}/pixman/include/pixman-1 " CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}pixman/include/pixman-1 " LDFLAGS=" ${zlib_LDFLAGS} -L${CURRENTDIR}/pixman/lib -lpixman-1 " png_REQUIRES=libpng png_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib " png_CFLAGS=" -I${CURRENTDIR}/libpng/include " pixman_CFLAGS=" -I${CURRENTDIR}pixman/include/pixman-1" pixman_LIBS=" -L${CURRENTDIR}/pixman/lib -lpixman-1" PKG_CONFIG="${CURRENTDIR}/cairo/build/pkgconfigfake" ax_cv_c_float_words_bigendian=no
+		./configure --verbose --enable-static --disable-shared  --disable-ft --disable-dependency-tracking --enable-gobject=no --enable-trace=no --enable-xcb-shm=no --enable-xlib=no --enable-xlib-xrender=no --enable-xcb=no --enable-egl=no --enable-glx=no --enable-wgl=no --enable-ft=no  --enable-fc=no --disable-xlib --without-x --disable-quartz-font --disable-quartz --disable-valgrind --prefix=${CURRENTDIR}/cairo   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}/pixman/include/pixman-1 " CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}pixman/include/pixman-1 " LDFLAGS=" ${zlib_LDFLAGS} -L${CURRENTDIR}/pixman/lib -lpixman-1 " png_REQUIRES=libpng png_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib " png_CFLAGS=" -I${CURRENTDIR}/libpng/include " pixman_CFLAGS=" -I${CURRENTDIR}pixman/include/pixman-1" pixman_LIBS=" -L${CURRENTDIR}/pixman/lib -lpixman-1" PKG_CONFIG="${CURRENTDIR}/cairo/build/pkgconfigfake" ax_cv_c_float_words_bigendian=no
 	else 
         ./configure --verbose --enable-static --disable-shared --disable-dependency-tracking  --prefix=${CURRENTDIR}/cairo   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}/pixman/include/pixman-1 " CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}pixman/include/pixman-1 " LDFLAGS=" ${zlib_LDFLAGS} -L${CURRENTDIR}/pixman/lib -lpixman-1 " png_REQUIRES=libpng png_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib " png_CFLAGS=" -I${CURRENTDIR}/libpng/include " pixman_CFLAGS=" -I${CURRENTDIR}pixman/include/pixman-1" pixman_LIBS=" -L${CURRENTDIR}/pixman/lib -lpixman-1"	ax_cv_c_float_words_bigendian=no
 	fi
