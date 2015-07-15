@@ -32,6 +32,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QCheckBox>
 #include <QProgressBar>
 #include <QTextEdit>
+#include <QRadioButton>
 
 class QFWizardPage; // forward
 
@@ -129,6 +130,9 @@ class QFLIB_EXPORT QFFormWizardPage : public QFWizardPage
         void addRow(const QString &labelText, QLayout *field);
         void addRow(QWidget *widget);
         void addRow(QLayout *layout);
+        QLabel* addRow(const QString& text);
+        QLabel* addRow(const QString &labelText, const QString& text);
+        QLabel* addRow(QWidget *label, const QString& text);
         void setRowEnabled(int row, bool enabled=true);
         void setWidgetEnabled(QWidget* wid, bool enabled=true);
         void setRowVisible(int row, bool enabled=true);
@@ -219,7 +223,7 @@ class QFLIB_EXPORT QFCheckboxListWizardPage : public QFEnableableFormWizardPage
         explicit QFCheckboxListWizardPage(const QString &title, QWidget *parent = 0);
         void setItems(const QStringList& items);
         void clear();
-        void addItem(const QString& item);
+        void addItem(const QString& item, bool checked=false);
         void setChecked(const QList<bool>& checked);
         void setChecked(int id, bool checked);
 
@@ -236,6 +240,28 @@ class QFLIB_EXPORT QFCheckboxListWizardPage : public QFEnableableFormWizardPage
     protected:
         QList<QCheckBox*> boxes;
         QWizardPage* nextIfAllDisabled;
+
+};
+
+class QFLIB_EXPORT QFRadioButtonListWizardPage : public QFEnableableFormWizardPage
+{
+        Q_OBJECT
+    public:
+        explicit QFRadioButtonListWizardPage(const QString &title, QWidget *parent = 0);
+        void setItems(const QStringList& items);
+        void clear();
+        void addItem(const QString& item, bool checked=false);
+        void setChecked(int id);
+
+        bool getChecked(int id) const;
+        int getChecked() const;
+        int count() const;
+
+    signals:
+
+    public slots:
+    protected:
+        QList<QRadioButton*> boxes;
 
 };
 

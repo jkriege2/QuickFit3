@@ -278,6 +278,34 @@ void QFFormWizardPage::addRow(QLayout *layout)
     m_layout->addRow(layout);
 }
 
+QLabel *QFFormWizardPage::addRow(const QString &text)
+{
+    QLabel* lab=new QLabel(this);
+    lab->setWordWrap(true);
+    lab->setText(text);
+    addRow(lab);
+    return lab;
+}
+
+QLabel *QFFormWizardPage::addRow(const QString &labelText, const QString &text)
+{
+    QLabel* lab=new QLabel(this);
+    lab->setWordWrap(true);
+    lab->setText(text);
+    addRow(labelText, lab);
+    return lab;
+}
+
+QLabel *QFFormWizardPage::addRow(QWidget *label, const QString &text)
+{
+    QLabel* lab=new QLabel(this);
+    lab->setWordWrap(true);
+    lab->setText(text);
+    addRow(label, lab);
+    return lab;
+}
+
+
 void QFFormWizardPage::setRowEnabled(int row, bool enabled)
 {
     if (row>=0 && row<m_layout->rowCount() && m_layout->itemAt(row, QFormLayout::FieldRole)) setWidgetEnabled(m_layout->itemAt(row, QFormLayout::FieldRole)->widget(), enabled);
@@ -406,10 +434,11 @@ void QFCheckboxListWizardPage::clear()
     }
 }
 
-void QFCheckboxListWizardPage::addItem(const QString &item)
+void QFCheckboxListWizardPage::addItem(const QString &item, bool checked)
 {
     QCheckBox* chk=new QCheckBox(item, this);
     boxes.append(chk);
+    chk->setChecked(checked);
     addRow("", chk);
 }
 
@@ -688,3 +717,65 @@ void QFProcessingWizardPage::addSubProgressWidgets()
     labSubMessage<<l;
     progressSub<<p;
 }
+
+
+QFRadioButtonListWizardPage::QFRadioButtonListWizardPage(const QString &title, QWidget *parent):
+    QFEnableableFormWizardPage(title, parent)
+{
+    setEnableable(false);
+}
+
+void QFRadioButtonListWizardPage::setItems(const QStringList &items)
+{
+    clear();
+    for (int i=0; i<items.size(); i++)  {
+        addItem(items[i]);
+    }
+}
+
+void QFRadioButtonListWizardPage::clear()
+{
+    for (int i=0; i<boxes.size(); i++) {
+        m_layout->removeWidget(boxes[i]);
+        delete boxes[i];
+    }
+}
+
+void QFRadioButtonListWizardPage::addItem(const QString &item, bool checked)
+{
+    QRadioButton* chk=new QRadioButton(item, this);
+    boxes.append(chk);
+    chk->setChecked(checked);
+    addRow("", chk);
+}
+
+void QFRadioButtonListWizardPage::setChecked(int id)
+{
+    if (id>=0 && id<boxes.size()) {
+        boxes[id]->setChecked(true);
+    }
+}
+
+bool QFRadioButtonListWizardPage::getChecked(int id) const
+{
+    if (id>=0 && id<boxes.size()) {
+        return boxes[id]->isChecked();
+    }
+    return false;
+}
+
+int QFRadioButtonListWizardPage::getChecked() const
+{
+    for (int i=0; i<boxes.size(); i++) {
+        if (boxes[i]->isChecked()) {
+            return true;
+        }
+    }
+    return -1;
+}
+
+int QFRadioButtonListWizardPage::count() const
+{
+    return boxes.size();
+}
+
