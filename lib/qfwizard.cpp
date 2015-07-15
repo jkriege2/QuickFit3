@@ -40,6 +40,17 @@ QFWizard::QFWizard(QWidget *parent, const QString &config_prefix) :
     }
 }
 
+QFWizard::QFWizard(QSize windowSize, QWidget *parent, const QString &config_prefix):
+    QWizard(parent)
+{
+    configPrefix=config_prefix;
+    setWizardStyle(QWizard::ModernStyle);
+    if (windowSize.isValid()) resize(windowSize);
+    if (!configPrefix.isEmpty()) {
+        ProgramOptions::getConfigWindowGeometry(this, configPrefix+"wizard_geometry/");
+    }
+}
+
 void QFWizard::closeEvent(QCloseEvent *e)
 {
     if (!configPrefix.isEmpty()) {

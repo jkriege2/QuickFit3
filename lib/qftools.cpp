@@ -287,14 +287,19 @@ void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
 }
 
 void loadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosition, QSize defaultSize, QString prefix) {
-    QPoint pos = settings.value(prefix+"pos", defaultPosition).toPoint();
     QSize size = settings.value(prefix+"size", defaultSize).toSize();
 
-    if (pos.x()<0 || pos.x()>QApplication::desktop()->screenGeometry(widget).width()) pos.setX(0);
-    if (pos.y()<0 || pos.y()>QApplication::desktop()->screenGeometry(widget).height()) pos.setY(0);
-    widget->move(pos);
+    if (settings.contains(prefix+"pos")){
+        QPoint pos = settings.value(prefix+"pos", defaultPosition).toPoint();
+        if (pos.x()<0 || pos.x()>QApplication::desktop()->screenGeometry(widget).width()) pos.setX(0);
+        if (pos.y()<0 || pos.y()>QApplication::desktop()->screenGeometry(widget).height()) pos.setY(0);
+        widget->move(pos);
+    }
 
-    widget->resize(size.boundedTo(QApplication::desktop()->screenGeometry(widget).size()));
+    if (settings.contains(prefix+"size")){
+        QSize size = settings.value(prefix+"size", defaultSize).toSize();
+        widget->resize(size.boundedTo(QApplication::desktop()->screenGeometry(widget).size()));
+    }
 }
 
 

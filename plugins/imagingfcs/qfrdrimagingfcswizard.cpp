@@ -4,7 +4,7 @@
 
 
 QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
-    QFWizard(parent, QString("imaging_fcs/wizard/"))
+    QFWizard(QSize(600, 440), parent, QString("imaging_fcs/wizard/"))
 {
     QLabel* lab;
 

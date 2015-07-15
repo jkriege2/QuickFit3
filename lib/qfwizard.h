@@ -53,6 +53,7 @@ class QFLIB_EXPORT QFWizard : public QWizard
         Q_OBJECT
     public:
         explicit QFWizard(QWidget *parent = 0, const QString& config_prefix=QString());
+        explicit QFWizard(QSize windowSize, QWidget *parent = 0, const QString& config_prefix=QString());
 
     signals:
 
