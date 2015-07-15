@@ -163,3 +163,16 @@ Thumbs.db
 /output/examples
 /output/globalconfig_templates
 /quickfit.inc
+/extlibs/andor_win64/err.txt
+/extlibs/andor_win64/err1.txt
+/extlibs/andor_win64/err2.txt
+/extlibs/andor_win64/err3.txt
+/extlibs/andor_win64/err4.txt
+/extlibs/andor_win64/err5.txt
+/extlibs/andor_win64/err6.txt
+/extlibs/andor_win64/test1.cpp
+*.bak
+/extlibs/libjpeg/jpeg-9a
+/output/*.zip
+/output/*.nsi
+/output/*.exe
