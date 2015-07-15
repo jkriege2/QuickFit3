@@ -20,16 +20,18 @@ class QFRDRImagingFCSWizard_ImagestackIsValid;
 class QFRDRImagingFCSWizard : public QFWizard {
         Q_OBJECT
     public:
-        QFRDRImagingFCSWizard(bool isp=false, QWidget* parent=NULL);
+        QFRDRImagingFCSWizard(bool is_project=false, QWidget* parent=NULL);
         ~QFRDRImagingFCSWizard();
     protected slots:
         void selectFileClicked();
         void edtFilenameTextChanged(const QString& filename);
         void initImagePreview();
         void initFileSelection();
+        void finishedIntro();
         void backgroundModeChanged(int mode);
         void calcPixelSize();
     protected:
+        QFRadioButtonListWizardPage* wizIntro;
         QFFormWizardPage* wizSelfiles;
         QFImagePlotWizardPage* wizImageProps;
         QStringList imageFilters;
@@ -59,6 +61,12 @@ class QFRDRImagingFCSWizard : public QFWizard {
 
         QLabel* labImageProps;
 
+        QFFormWizardPage* lastPage;
+        QLabel* labFinal;
+        QPointer<QCheckBox> chkLastImFCSFit1;
+        QPointer<QCheckBox> chkLastImFCCSFit;
+        QPointer<QFEnhancedComboBox> cmbImFCSFitMode;
+
 
         int channels;
         int frame_count_io;
@@ -80,6 +88,8 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QFRDRImagingFCSWizard_ImagestackIsValid* fctrStack;
         friend class QFRDRImagingFCSWizard_BackgroundIsValid;
         friend class QFRDRImagingFCSWizard_ImagestackIsValid;
+
+        bool isCalibration;
 
 };
 

@@ -3,7 +3,7 @@
 #include "programoptions.h"
 
 
-QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool isp, QWidget *parent):
+QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     QFWizard(parent, QString("imaging_fcs/wizard/"))
 {
     QLabel* lab;
@@ -25,18 +25,21 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool isp, QWidget *parent):
     hasPixel_io=false;
     inputconfigfile_io="";
     pluginServices=QFPluginServices::getInstance();
-    isProject=isp;
+    isProject=is_project;
     imageFilters=QFRDRImagingFCSCorrelationJobThread::getImageFilterList();
     imageFormatNames=QFRDRImagingFCSCorrelationJobThread::getImageFormatNameList();
     imageFormatIDs=QFRDRImagingFCSCorrelationJobThread::getImageFormatIDList();
-    qDebug()<<imageFilters;
+    /*qDebug()<<imageFilters;
     qDebug()<<imageFormatNames;
-    qDebug()<<imageFormatIDs;
+    qDebug()<<imageFormatIDs;*/
 
     setWindowTitle(tr("Imaging FCS/FCCS Wizard"));
-    addPage(new QFTextWizardPage(tr("Introduction"),
-                                      tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br><br><br><center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"),
-                                      this));
+    addPage(wizIntro=new QFRadioButtonListWizardPage(tr("Introduction"), this));
+    wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br><br><br><center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"));
+    wizIntro->addItem(tr("imFCS / imFCCS evaluation"), true);
+    wizIntro->addItem(tr("imFCS focus volume calibration"), false);
+    connect(wizIntro, SIGNAL(onValidate(QWizardPage*)), this, SLOT(finishedIntro()));
+
 
 
 
@@ -171,6 +174,41 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool isp, QWidget *parent):
 //        wizLSAnalysisImgPreview->addRow(tr("step size"), wizLSAnalysisedtStepSize);
 //    }
 
+
+
+
+    addPage(lastPage=new QFFormWizardPage(tr("Finalize"), this));
+    labFinal=new QLabel(this);
+    labFinal->setWordWrap(true);
+    lastPage->addRow(labFinal);
+    if (isProject) {
+        labFinal->setText(tr("You completed this wizard. The selected files will now be inserted as imaging FCS raw data records (RDR) into the project.<br><br>If not present yet, you can add evaluation items to the project now and start the evaluation."));
+    } else {
+        labFinal->setText(tr("You completed this wizard. The selected files will now be inserted as imaging FCS raw data records (RDR) into the project.<br><br><b>Please select the evaluation objects that should be added to the project below.</b>"));
+        cmbImFCSFitMode=new QFEnhancedComboBox(this);
+        lastPage->addRow(tr("Fit Mode:"), cmbImFCSFitMode);
+        cmbImFCSFitMode->addItem(tr("TIR-FCS: normal diffusion 1-component"));
+        cmbImFCSFitMode->addItem(tr("TIR-FCS: normal diffusion 2-component"));
+        cmbImFCSFitMode->addItem(tr("TIR-FCS: anomalous diffusion"));
+        cmbImFCSFitMode->addItem(tr("TIR-FCS: diffusion + flow"));
+        cmbImFCSFitMode->addItem(tr("SPIM-FCS: normal diffusion 1-component"));
+        cmbImFCSFitMode->addItem(tr("SPIM-FCS: normal diffusion 2-component"));
+        cmbImFCSFitMode->addItem(tr("SPIM-FCS: anomalous diffusion"));
+        cmbImFCSFitMode->addItem(tr("SPIM-FCS: diffusion + flow"));
+        cmbImFCSFitMode->addItem(tr("confocal FCS: normal diffusion 1-component"));
+        cmbImFCSFitMode->addItem(tr("confocal FCS: normal diffusion 2-component"));
+        cmbImFCSFitMode->addItem(tr("confocal FCS: anomalous diffusion"));
+        cmbImFCSFitMode->addItem(tr("confocal FCS: diffusion + flow"));
+        chkLastImFCSFit1=new QCheckBox(tr("single-curve FCS fit (e.g. ACF)"), this);
+        chkLastImFCSFit1->setChecked(true);
+        lastPage->addRow(tr("Evaluations"), chkLastImFCSFit1);
+        chkLastImFCCSFit=new QCheckBox(tr("global FCCS fit (2-color/2-pixel FCCS"), this);
+        chkLastImFCCSFit->setChecked(true);
+        lastPage->addRow(QString(), chkLastImFCCSFit);
+    }
+    lastPage->setFinalPage(true);
+
+
 }
 
 QFRDRImagingFCSWizard::~QFRDRImagingFCSWizard()
@@ -209,24 +247,7 @@ void QFRDRImagingFCSWizard::edtFilenameTextChanged(const QString &filename)
 
 void QFRDRImagingFCSWizard::initImagePreview()
 {
-//    QString readerid=imageFormatIDs.value(cmbFileformat->currentIndex(), imageFormatIDs.value(0, ""));
 
-//    wizImageProps->setImageAvg(edtFilename->text(), readerid, 0, 10);
-
-
-//    double* frame_data_io=NULL;
-//    QFRDRImagingFCSCorrelationDialog::readStackProperties(edtFilename->text(), cmbFileformat->currentIndex(), true, true, this, &channels, &frame_count_io, &filesize_io, &frametime_io, &baseline_offset_io, &backgroundF_io, &pixel_width_io, &pixel_height_io, &hasPixel_io, &dualViewMode_io, &image_width_io, &image_height_io, &inputconfigfile_io, &frame_data_io, &background_width, &background_height, &background_count);
-
-//    widPixSize->setPixelSize(pixel_width_io, pixel_height_io);
-//    widFrameRange->setRange(0, frame_count_io-1);
-//    cmbDualView->setCurrentIndex(dualViewMode_io);
-//    spinFrametime->setValue(frametime_io);
-//    edtBackgroundFilename->setText(backgroundF_io);
-//    cmbBackgroundMode->setCurrentIndex(0);
-//    if (!backgroundF_io.isEmpty()) cmbBackgroundMode->setCurrentIndex(3);
-//    spinBackgroundOffset->setValue(0);
-//    if (frame_data_io) qfFree(frame_data_io);
-//    backgroundModeChanged(cmbBackgroundMode->currentIndex());
 }
 
 void QFRDRImagingFCSWizard::initFileSelection()
@@ -234,6 +255,11 @@ void QFRDRImagingFCSWizard::initFileSelection()
     wizSelfiles->setExternalValidate(true);
     wizSelfiles->setExternalIsValid(!edtFilename->text().isEmpty());
 
+}
+
+void QFRDRImagingFCSWizard::finishedIntro()
+{
+    isCalibration=wizIntro->getChecked(1);
 }
 
 void QFRDRImagingFCSWizard::backgroundModeChanged(int mode)
