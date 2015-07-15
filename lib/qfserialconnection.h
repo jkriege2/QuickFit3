@@ -24,10 +24,11 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 
-#include <QtGlobal>
 
-#ifdef Q_OS_MAC
-#  define __LINUX__
+#ifndef __APPLE__
+#  if define(__APPLE__) || define(macintosh) || define(Macintosh) || define(__APPLE__ && __MACH__) || defined(__APPLE_CC__) || defined(__OSX__)
+#    define __APPLE__
+#  endif
 #endif
 
 #ifndef __WINDOWS__
@@ -48,6 +49,9 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 # endif
 #endif
 
+#if defined(__APPLE__) || defined(__LINUX__)
+#  define __APPLE_OR_LINUX__
+#endif
 
 
 #include <string>
@@ -62,8 +66,8 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <cstring>
 #include "cpptools.h"
 
-#if defined(__WINDOWS__) && defined(__LINUX__)
-# error("you may compile this for EITHER windows (define __WINDOWS__) OR linux (define __LINUX__), but both symbols are defined at the same time!!!")
+#if defined(__WINDOWS__) && defined(__APPLE_OR_LINUX__)
+# error("you may compile this for EITHER windows (define __WINDOWS__) OR linux/MacOS (define __APPLE_OR_LINUX__), but both symbols are defined at the same time!!!")
 #endif
 
 #ifdef __WINDOWS__
@@ -71,22 +75,17 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 # define QFSCDEFAULTPORT std::string("COM1")
 #endif
 
-#ifdef __LINUX__
+#ifdef __APPLE_OR_LINUX__
 # include <termios.h>
 # define QFSCDEFAULTPORT std::string("/dev/ttys0")
 #endif
 
 
 
-/*! \defgroup jkhardware Classes for Hardware Control and Communication
-    \ingroup tools
 
-    Classes in this group implement interfaces to hardware, like the serial port, ...
-
- */
 
 /*! \defgroup jkserial Classes for Hardware serial connections (RS-232)
-    \ingroup jkhardware
+    \ingroup qf3lib_hardware
 
  */
 
@@ -402,7 +401,7 @@ class QFLIB_EXPORT QFSerialConnection
         /** \brief windows API port handle for the serial port */
         HANDLE portHandle;
         #endif
-        #ifdef __LINUX__
+        #ifdef __APPLE_OR_LINUX__
         /** \brief POSIX API port handle for the serial port */
         int unixPortHandle;
         #endif

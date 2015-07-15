@@ -21,10 +21,6 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qfserialconnection.h"
 #include <stdint.h>
-#include <QtGlobal>
-#ifdef Q_OS_MAC
-#  define __LINUX__
-#endif
 
 std::string QFSCdatabits2string(QFSCdatabits databits) {
     return inttostr(databits);
@@ -287,8 +283,7 @@ bool QFSerialConnection::open() {
         return connectionOpen=false;
     }
 
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
   struct termios options;
 
   /* open port */
@@ -588,7 +583,7 @@ bool QFSerialConnection::open() {
   options.c_oflag &= ~(OPOST | OPOST | ONLCR | OCRNL |  ONLRET | OFILL | OFDEL
 #ifdef OLCUC
                        | OLCUC
-                     #endif
+#endif
                        );
   // write options
   tcsetattr(unixPortHandle, TCSANOW, &options);
@@ -612,8 +607,7 @@ bool QFSerialConnection::close() {
         CloseHandle(portHandle);
         portHandle=INVALID_HANDLE_VALUE;
     }
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     if (unixPortHandle) ::close(unixPortHandle);
     unixPortHandle=0;
 
@@ -651,8 +645,7 @@ bool QFSerialConnection::write(std::string data) {
         }
     }
 
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     if (data.size()>0) {
         int num= ::write(unixPortHandle, data.c_str(), data.size());
         if (num!=(int64_t)data.size()) {
@@ -701,8 +694,7 @@ bool JKSerialConnection::write(uint8_t *data, int count) {
         }
     }
 
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     if (count>0) {
         int num= ::write(unixPortHandle, data, count);
         if (num!=count) {
@@ -776,8 +768,7 @@ bool QFSerialConnection::write(uint8_t *data, int count) {
         }
     }*/
 
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     if (count>0) {
         int num= ::write(unixPortHandle, data, count);
         if (num!=count) {
@@ -829,8 +820,7 @@ bool QFSerialConnection::read(uint8_t *data, size_t num_bytes) {
         }
     }
 
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
 
     char b=0;
     unsigned long dwNumberOfBytesRecvd = 0;
@@ -909,8 +899,7 @@ std::string QFSerialConnection::read(size_t num_bytes, bool* ok) {
         }
     }
 
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     /*char b=0;
     int bytes=0;
     std::string res;
@@ -990,8 +979,7 @@ bool QFSerialConnection::read(char* ch) {
         return false;
     }
 
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     fd_set set;
     struct timeval timeout;
 
@@ -1097,8 +1085,7 @@ bool QFSerialConnection::read_nowait(char *ch) {
     commTimeout.WriteTotalTimeoutMultiplier = 10;
     SetCommTimeouts(portHandle, &commTimeout);
 
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     if (::read(unixPortHandle, ch, 1) <= 0) {
         ok= false;
     } else {
@@ -1167,8 +1154,7 @@ std::string QFSerialConnection::readUntil(std::string end_string, bool* ok) {
         std::cout<<"   okloop="<<okloop<<std::endl;*/
 
     }
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     char b=0;
     int bytes=0;
     std::string res="";
@@ -1264,8 +1250,7 @@ int QFSerialConnection::readUntil(char *result, int result_maxsize, const char *
         }
 
     }
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     char b=0;
     int bytes=0;
     int cnt=0;
@@ -1354,8 +1339,7 @@ std::string QFSerialConnection::readUntil(char end_char, bool* ok) {
             return res;
         }
     }
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     char b=0;
     int bytes=0;
     std::string res="";
@@ -1410,8 +1394,7 @@ bool QFSerialConnection::clearBuffer() {
         return false;
     }
 
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     if (logToFile && (log==NULL)) log=fopen("rs232.log", "w");
     if (logToFile) {
         fprintf(log, "<<!! clearing buffer\n");
@@ -1457,8 +1440,7 @@ std::vector<std::string> QFSerialConnection::listPorts() {
          }
          CloseHandle(hFile);
      }
-#endif
-#ifdef __LINUX__
+#elif __APPLE_OR_LINUX__
     std::vector<std::string> res1=listfiles_wildcard("/dev/*tty*");
     /*for (int i=res.size()-1; i>=0; i--)  {
         FILE* test=fopen(res[i].c_str(), "r+");
