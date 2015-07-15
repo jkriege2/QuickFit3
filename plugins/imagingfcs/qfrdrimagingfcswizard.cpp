@@ -62,7 +62,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     if (cmbFileformat->currentIndex()<0) cmbFileformat->findAndSelectContainedLCText("tiff", -1);
     wizSelfiles->addRow(tr("image stack:"), edtFilename);
     wizSelfiles->addRow(tr("import filter/filetype:"), cmbFileformat);
-    wizSelfiles->addRow(QString(), lab=new QLabel(tr("<i>Please select the image stack you want to correlate and the image reader that should be used to read it. "
+    wizSelfiles->addRow(lab=new QLabel(tr("<i>Please select the image stack you want to correlate and the image reader that should be used to read it. "
                                                  "If you use the file-open dialog (<img src=\":/lib/qfstyledbutton/selectfile.png\">) to select a file, the correct "
                                                  "image reader will be selected automatically."
                                                  "<br><br>After selecting an image stack and clicking on <b>Next</b>, the file will be analyzed and you can set all necessary"
@@ -181,7 +181,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     labFinal=new QLabel(this);
     labFinal->setWordWrap(true);
     lastPage->addRow(labFinal);
-    if (isProject) {
+    if (!isProject) {
         labFinal->setText(tr("You completed this wizard. The selected files will now be inserted as imaging FCS raw data records (RDR) into the project.<br><br>If not present yet, you can add evaluation items to the project now and start the evaluation."));
     } else {
         labFinal->setText(tr("You completed this wizard. The selected files will now be inserted as imaging FCS raw data records (RDR) into the project.<br><br><b>Please select the evaluation objects that should be added to the project below.</b>"));
