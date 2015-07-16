@@ -161,16 +161,18 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     cmbCalibRegion->addItem(tr("top center (around y = h/4)"));
     cmbCalibRegion->addItem(tr("bottom center (around y = 3*h/4)"));
     cmbCalibRegion->addItem(tr("user-defined crop"));
+    cmbCalibRegion->setCurrentIndex(0);
     wizCalibration->addRow(tr("calibration region:"), cmbCalibRegion);
-    connect(cmbCalibRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(calibrationCropValuesChanged(int)));
-    calibrationCropValuesChanged();
     spinCalibrationCenterSize=new QSpinBox(wizCalibration);
     wizCalibration->addRow(tr("\"center\" region size:"), spinCalibrationCenterSize);
-    connect(spinCalibrationCenterSize, SIGNAL(valueChanged(int)), this, SLOT(calibrationCropValuesChanged()));
 
     widCropCalibration=new QFCropPixelsEdit(wizCalibration);
     wizCalibration->addRow(tr("user-defined crop:"), widCropCalibration);
+
+    connect(spinCalibrationCenterSize, SIGNAL(valueChanged(int)), this, SLOT(calibrationCropValuesChanged()));
     connect(widCropCalibration, SIGNAL(valueChanged(int,int,int,int)), this, SLOT(calibrationCropValuesChanged()));
+    connect(cmbCalibRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(calibrationCropValuesChanged(int)));
+    calibrationCropValuesChanged();
 
 
     setPage(CropAndBinPage, wizCropAndBin=new QFFormWizardPage(tr("Setup Crop & Bin ..."), this));
@@ -452,6 +454,13 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
         wizard->widCropCalibration->setImageSize(wizard->image_width_io, wizard->image_height_io);
         wizard->widCropCalibration->setFullImageSize();
 
+        if (wizard->cmbDualView->currentIndex()==1) {
+            wizard->cmbCalibRegion->setCurrentIndex(1);
+        }
+        if (wizard->cmbDualView->currentIndex()==2) {
+            wizard->cmbCalibRegion->setCurrentIndex(3);
+        }
+
         if (wizard->frame_count_io<=0) {
             wizard->labFileError->setText(QObject::tr("<font color=\"red\"><b><u>ERROR:</u> Image stack file does not contain frames or could not be read!</b></font>"));
             wizard->edtFilename->setFocus();
@@ -486,7 +495,7 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
 
 
 
-int QFRDRImagingFCSWizard_BackgroundNextId::nextID(const QFWizardPage *page) const
+int QFRDRImagingFCSWizard_BackgroundNextId::nextID(const QFWizardPage */*page*/) const
 {
     if (wizard->wizIntro->isChecked(1)) {
         return QFRDRImagingFCSWizard::CalibrationPage;
