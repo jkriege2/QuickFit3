@@ -354,7 +354,7 @@ void QFRDRImageStackPlugin::startProjectWizardPSFAnalysis(bool insertEval)
 
 
     wiz->addPage(wizSelfiles=new QFSelectFilesListWizardPage(tr("Image stack files ...")));
-    wizSelfiles->setSubTitle(tr("Select one or more image stack files, that contain your bedscan. If you use a DualView, each file will be imported as a separate stack. If each file contains a separate color channel, all files may be imported as a single multi-channel stack, or as separate single-channel stacks.<br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
+    wizSelfiles->setSubTitle(tr("Select one or more image stack files, that contain your beadscan. If you use a DualView, each file will be imported as a separate stack. If each file contains a separate color channel, all files may be imported as a single multi-channel stack, or as separate single-channel stacks.<br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
     wizSelfiles->setFilters(QFRDRImageStackData::getImageFilterList(services), QFRDRImageStackData::getImageReaderIDList(services));
     wizSelfiles->setSettingsIDs("image_stack/last_imagestackwizard_dir", "image_stack/last_imagestackwizard_filter");
     wizSelfiles->setAddOnStartup(false);

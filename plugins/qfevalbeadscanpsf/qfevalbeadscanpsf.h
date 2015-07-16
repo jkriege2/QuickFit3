@@ -61,7 +61,7 @@ class QFEvalBeadScanPSF : public QObject, public QFPluginEvaluationItemBase, pub
         virtual QString getID() const  { return tr("eval_beadscanpsf"); }
 
         /** \brief name for the plugin */
-        virtual QString getName() const  { return tr("Bedscan Evaluation: PSF"); }
+        virtual QString getName() const  { return tr("Beadscan Evaluation: PSF"); }
 
         /** \brief short description for the plugin */
         virtual QString getDescription() const  { return tr("determines the PSF from a z-stack of fluorescent beads inside a gel (\"beadstack\")"); }

@@ -136,12 +136,12 @@ bool QFWizardPage::isComplete() const
     return QWizardPage::isComplete();
 }
 
-int QFWizardPage::?nextId() const
+int QFWizardPage::nextId() const
 {
     if (m_nextID) {
         return m_nextID->nextID(this);
     }
-    return QWizard::nextId();
+    return QWizardPage::nextId();
 }
 
 void QFWizardPage::setUserPreviousPage(QWizardPage *page)
