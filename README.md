@@ -1,5 +1,5 @@
 # QuickFit3
-A data evaluation package for (imaging) fluorescnece correlation spectroscopy and other biophysical methods
+A data evaluation package for (imaging) fluorescence correlation spectroscopy and other biophysical methods
 Project Homepage: http://www.dkfz.de/Macromol/quickfit/
 
 ![Logo](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/images/icon_64.png)
