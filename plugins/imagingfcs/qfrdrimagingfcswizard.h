@@ -48,7 +48,7 @@ class QFRDRImagingFCSWizard : public QFWizard {
         void finishedIntro();
         void backgroundModeChanged(int mode);
         void calcPixelSize();
-        void calibrationCropValuesChanged(int region);
+        void calibrationRegionChanged(int region);
         void calibrationCropValuesChanged();
     protected:
 

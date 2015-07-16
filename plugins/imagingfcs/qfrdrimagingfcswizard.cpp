@@ -32,7 +32,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     qDebug()<<imageFormatIDs;*/
 
     setWindowTitle(tr("Imaging FCS/FCCS Wizard"));
-    addPage(InitPage, wizIntro=new QFRadioButtonListWizardPage(tr("Introduction"), this));
+    setPage(InitPage, wizIntro=new QFRadioButtonListWizardPage(tr("Introduction"), this));
     wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br><br><br><center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"));
     wizIntro->addItem(tr("imFCS / imFCCS evaluation"), true);
     wizIntro->addItem(tr("imFCS focus volume calibration"), false);
@@ -151,19 +151,19 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     setPage(CalibrationPage, wizCalibration=new QFImagePlotWizardPage(tr("Setup Calibration ..."), this));
     cmbCalibRegion=new QComboBox(wizCalibration);
     cmbCalibRegion->addItem(tr("all pixels"));
-    cmbCalibRegion->addItem(tr("left half"));
-    cmbCalibRegion->addItem(tr("right half"));
-    cmbCalibRegion->addItem(tr("top half"));
-    cmbCalibRegion->addItem(tr("bottom half"));
-    cmbCalibRegion->addItem(tr("center pixels"));
-    cmbCalibRegion->addItem(tr("left center"));
-    cmbCalibRegion->addItem(tr("right center"));
-    cmbCalibRegion->addItem(tr("top center"));
-    cmbCalibRegion->addItem(tr("bottom center"));
+    cmbCalibRegion->addItem(tr("left half (x = 0..w/2)"));
+    cmbCalibRegion->addItem(tr("right half (x = w/2..w)"));
+    cmbCalibRegion->addItem(tr("top half (y = 0..h/2)"));
+    cmbCalibRegion->addItem(tr("bottom half (y = h/2..h)"));
+    cmbCalibRegion->addItem(tr("center"));
+    cmbCalibRegion->addItem(tr("left center (around x = w/4)"));
+    cmbCalibRegion->addItem(tr("right center (around x = 3*w/4)"));
+    cmbCalibRegion->addItem(tr("top center (around y = h/4)"));
+    cmbCalibRegion->addItem(tr("bottom center (around y = 3*h/4)"));
     cmbCalibRegion->addItem(tr("user-defined crop"));
     wizCalibration->addRow(tr("calibration region:"), cmbCalibRegion);
     connect(cmbCalibRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(calibrationCropValuesChanged(int)));
-    calibrationCropValuesChanged(cmbCalibRegion->currentIndex());
+    calibrationCropValuesChanged();
     spinCalibrationCenterSize=new QSpinBox(wizCalibration);
     wizCalibration->addRow(tr("\"center\" region size:"), spinCalibrationCenterSize);
     connect(spinCalibrationCenterSize, SIGNAL(valueChanged(int)), this, SLOT(calibrationCropValuesChanged()));
@@ -298,7 +298,7 @@ void QFRDRImagingFCSWizard::calcPixelSize()
     delete dlg;
 }
 
-void QFRDRImagingFCSWizard::calibrationCropValuesChanged(int region)
+void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
 {
     spinCalibrationCenterSize->setEnabled(false);
     widCropCalibration->setEnabled(false);
@@ -383,7 +383,7 @@ void QFRDRImagingFCSWizard::calibrationCropValuesChanged(int region)
 
 void QFRDRImagingFCSWizard::calibrationCropValuesChanged()
 {
-    calibrationCropValuesChanged(cmbCalibRegion->currentIndex());
+    calibrationRegionChanged(cmbCalibRegion->currentIndex());
 }
 
 
@@ -429,7 +429,7 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
 
         wizard->wizImageProps->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
         wizard->wizCalibration->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
-        calibrationRegionChanged(cmbCalibRegion->currentIndex());
+        wizard->calibrationRegionChanged(wizard->cmbCalibRegion->currentIndex());
 
 
         if (wizard->frame_data_io) qfFree(wizard->frame_data_io);
@@ -458,8 +458,12 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
             return false;
         }
         if (wizard->frame_count_io<=10000) {
-            if (QMessageBox::warning(wizard, tr("Small image stack"),
-                                     tr("You selected an image stack with only %1 frames, which is unusually small for an imaging FCS evaluation.\nWe suggest correlating at least 10,000-100,000 frames for good statistics!\n\nDo you still want to use the selected image stack [Yes], or select another one [No]?").arg(wizard->frame_count_io), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)
+            if (QMessageBox::warning(wizard, QObject::tr("Small image stack"),
+                                     QObject::tr("You selected an image stack with only %1 frames, which is unusually small for an imaging FCS evaluation.\n"
+                                                 "We suggest correlating at least 10,000-100,000 frames for good statistics!\n\n"
+                                                 "Do you still want to \n"
+                                                 "   * use the selected image stack [Yes],\n"
+                                                 "   * or select another one [No]?").arg(wizard->frame_count_io), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)
                     ==QMessageBox::Yes) {
                 return true;
             } else {

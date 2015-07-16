@@ -8,7 +8,7 @@
 #include <QCheckBox>
 #include <QLabel>
 
-class QFCropPixelsEdit : public QWidget
+class QFWIDLIB_EXPORT QFCropPixelsEdit : public QWidget
 {
         Q_OBJECT
     public:
