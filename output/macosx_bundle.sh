@@ -9,8 +9,8 @@ QT_INFO_INSTALLDIR=`qmake -query QT_INSTALL_PREFIX`
 QT_INFO_VERSION=`qmake -query QT_VERSION`
 echo -e "\n\nbuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INFO_INSTALLDIR}\n\n"
 
-QTLIBPATH=$QT_INFO_LIBS
-QTPLUGINPATH=$QT_INFO_PLUGINS
+QTLIBPATH="${QT_INFO_LIBS}/"
+QTPLUGINPATH="${QT_INFO_PLUGINS}/"
 
 QTLIBS=(QtCore QtWidgets QtOpenGL QtSvg QtXml QtPrintSupport QtNetwork QtMultimedia QtMacExtras QtGui QtConcurrent)
 QTPLUGINS=(platforms imageformats iconengines printsupport bearer)
