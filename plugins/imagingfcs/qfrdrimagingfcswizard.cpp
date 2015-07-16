@@ -7,9 +7,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     QFWizard(QSize(600, 440), parent, QString("imaging_fcs/wizard/"))
 {
     QLabel* lab;
-
-    fctrBack=new QFRDRImagingFCSWizard_BackgroundIsValid(this);
-    fctrStack=new QFRDRImagingFCSWizard_ImagestackIsValid(this);
+    frame_data_io=NULL;
 
     channels=1;
     frame_count_io=0;
@@ -34,21 +32,23 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     qDebug()<<imageFormatIDs;*/
 
     setWindowTitle(tr("Imaging FCS/FCCS Wizard"));
-    addPage(wizIntro=new QFRadioButtonListWizardPage(tr("Introduction"), this));
+    addPage(InitPage, wizIntro=new QFRadioButtonListWizardPage(tr("Introduction"), this));
     wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br><br><br><center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"));
     wizIntro->addItem(tr("imFCS / imFCCS evaluation"), true);
     wizIntro->addItem(tr("imFCS focus volume calibration"), false);
+    wizIntro->setEnabled(1, QFPluginServices::getInstance()->getEvaluationItemFactory()->contains("imfcs_fit"));
     connect(wizIntro, SIGNAL(onValidate(QWizardPage*)), this, SLOT(finishedIntro()));
 
 
 
 
-    addPage(wizSelfiles=new QFFormWizardPage(tr("Select image stack files ..."), this));
+    setPage(FileSelectionPage, wizSelfiles=new QFFormWizardPage(tr("Select image stack files ..."), this));
     connect(wizSelfiles, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(initFileSelection()));
     wizSelfiles->setSubTitle(tr("Select the image stack that you want to correlate."));
     wizSelfiles->setExternalValidate(true);
     wizSelfiles->setExternalIsValid(false);
-    wizSelfiles->setValidator(fctrStack);
+    wizSelfiles->setValidateFunctor(new QFRDRImagingFCSWizard_ImagestackIsValid(this));
+    wizSelfiles->setFreeFunctors(true);
 
 
     edtFilename=new QFEnhancedLineEdit(wizSelfiles);
@@ -78,7 +78,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
 
 
-    addPage(wizImageProps=new QFImagePlotWizardPage(tr("Set image stack properties ..."), this));
+    setPage(ImagePage, wizImageProps=new QFImagePlotWizardPage(tr("Set image stack properties ..."), this));
     wizImageProps->setSubTitle(tr("Set/check the properties of the image stack.<br><small><i>The plot shows an average over the first 10 frames.</i></small>"));
     connect(wizImageProps, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(initImagePreview()));
 
@@ -121,8 +121,10 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
 
 
-    addPage(wizBackground=new QFFormWizardPage(tr("Background Correction Settings ..."), this));
-    wizBackground->setValidator(fctrBack);
+    setPage(BackgroundPage, wizBackground=new QFFormWizardPage(tr("Background Correction Settings ..."), this));
+    wizBackground->setValidateFunctor(new QFRDRImagingFCSWizard_BackgroundIsValid(this));
+    wizBackground->setNextIDFunctor(new QFRDRImagingFCSWizard_BackgroundNextId(this));
+    wizBackground->setFreeFunctors(true);
     cmbBackgroundMode=new QComboBox(wizBackground);
     cmbBackgroundMode->addItem(tr("none"));
     cmbBackgroundMode->addItem(tr("remove offset"));
@@ -146,47 +148,52 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
 
 
+    setPage(CalibrationPage, wizCalibration=new QFImagePlotWizardPage(tr("Setup Calibration ..."), this));
+    cmbCalibRegion=new QComboBox(wizCalibration);
+    cmbCalibRegion->addItem(tr("all pixels"));
+    cmbCalibRegion->addItem(tr("left half"));
+    cmbCalibRegion->addItem(tr("right half"));
+    cmbCalibRegion->addItem(tr("top half"));
+    cmbCalibRegion->addItem(tr("bottom half"));
+    cmbCalibRegion->addItem(tr("center pixels"));
+    cmbCalibRegion->addItem(tr("left center"));
+    cmbCalibRegion->addItem(tr("right center"));
+    cmbCalibRegion->addItem(tr("top center"));
+    cmbCalibRegion->addItem(tr("bottom center"));
+    cmbCalibRegion->addItem(tr("user-defined crop"));
+    wizCalibration->addRow(tr("calibration region:"), cmbCalibRegion);
+    connect(cmbCalibRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(calibrationCropValuesChanged(int)));
+    calibrationCropValuesChanged(cmbCalibRegion->currentIndex());
+    spinCalibrationCenterSize=new QSpinBox(wizCalibration);
+    wizCalibration->addRow(tr("\"center\" region size:"), spinCalibrationCenterSize);
+    connect(spinCalibrationCenterSize, SIGNAL(valueChanged(int)), this, SLOT(calibrationCropValuesChanged()));
+
+    widCropCalibration=new QFCropPixelsEdit(wizCalibration);
+    wizCalibration->addRow(tr("user-defined crop:"), widCropCalibration);
+    connect(widCropCalibration, SIGNAL(valueChanged(int,int,int,int)), this, SLOT(calibrationCropValuesChanged()));
+
+
+    setPage(CropAndBinPage, wizCropAndBin=new QFFormWizardPage(tr("Setup Crop & Bin ..."), this));
+    wizCropAndBin->setNextID(CropAndBinPage);
 
 
 
-//    addPage(wizLSAnalysisImgPreview=new QFImagePlotWizardPage(tr("Image preview ..."), this));
-//    wizLSAnalysisImgPreview->setSubTitle(tr("Please set the image properties below the overview plot!\nThe plot displays the first frame from the first file"));
-//    wizSelfiles->setUserOnValidatePage(wizLSAnalysisImgPreview);
-//    connect(wizSelfiles, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(wizLSAnalysisImgPreviewOnValidate(QWizardPage*,QWizardPage*)));
-//    wizLSAnalysisImgPreview->clear();
+    setPage(CorrelationPage, wizCorrelation=new QFFormWizardPage(tr("Setup Correlation ..."), this));
+    wizCropAndBin->setNextID(CorrelationPage);
 
 
 
 
-
-
-
-//    if (wizLSAnalysiscmbStackMode) {
-//        ProgramOptions::getConfigQComboBox(wizLSAnalysiscmbStackMode, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysiscmbStackMode");
-//        wizLSAnalysisImgPreview->addRow(tr("stack mode"), wizLSAnalysiscmbStackMode);
-//    }
-//    if (wizLSAnalysisedtPixelSize) {
-//        ProgramOptions::getConfigQDoubleSpinBox(wizLSAnalysisedtPixelSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisedtPixelSize");
-//        wizLSAnalysisImgPreview->addRow(tr("pixel size"), wizLSAnalysisedtPixelSize);
-//    }
-//    if (wizLSAnalysisedtStepSize) {
-//        ProgramOptions::getConfigQDoubleSpinBox(wizLSAnalysisedtStepSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisedtStepSize");
-//        wizLSAnalysisImgPreview->addRow(tr("step size"), wizLSAnalysisedtStepSize);
-//    }
-
-
-
-
-    addPage(lastPage=new QFFormWizardPage(tr("Finalize"), this));
+    setPage(LastPage, wizFinalizePage=new QFFormWizardPage(tr("Finalize"), this));
     labFinal=new QLabel(this);
     labFinal->setWordWrap(true);
-    lastPage->addRow(labFinal);
+    wizFinalizePage->addRow(labFinal);
     if (!isProject) {
         labFinal->setText(tr("You completed this wizard. The selected files will now be inserted as imaging FCS raw data records (RDR) into the project.<br><br>If not present yet, you can add evaluation items to the project now and start the evaluation."));
     } else {
         labFinal->setText(tr("You completed this wizard. The selected files will now be inserted as imaging FCS raw data records (RDR) into the project.<br><br><b>Please select the evaluation objects that should be added to the project below.</b>"));
         cmbImFCSFitMode=new QFEnhancedComboBox(this);
-        lastPage->addRow(tr("Fit Mode:"), cmbImFCSFitMode);
+        wizFinalizePage->addRow(tr("Fit Mode:"), cmbImFCSFitMode);
         cmbImFCSFitMode->addItem(tr("TIR-FCS: normal diffusion 1-component"));
         cmbImFCSFitMode->addItem(tr("TIR-FCS: normal diffusion 2-component"));
         cmbImFCSFitMode->addItem(tr("TIR-FCS: anomalous diffusion"));
@@ -201,20 +208,23 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
         cmbImFCSFitMode->addItem(tr("confocal FCS: diffusion + flow"));
         chkLastImFCSFit1=new QCheckBox(tr("single-curve FCS fit (e.g. ACF)"), this);
         chkLastImFCSFit1->setChecked(true);
-        lastPage->addRow(tr("Evaluations"), chkLastImFCSFit1);
+        wizFinalizePage->addRow(tr("Evaluations"), chkLastImFCSFit1);
         chkLastImFCCSFit=new QCheckBox(tr("global FCCS fit (2-color/2-pixel FCCS"), this);
-        chkLastImFCCSFit->setChecked(true);
-        lastPage->addRow(QString(), chkLastImFCCSFit);
+        chkLastImFCCSFit->setChecked(false);
+        wizFinalizePage->addRow(QString(), chkLastImFCCSFit);
     }
-    lastPage->setFinalPage(true);
 
+    setPage(ProcessCorrelationPage, wizProcessJobs=new QFFormWizardPage(tr("Process Correlation ..."), this));
+    wizCalibration->setNextID(ProcessCorrelationPage);
+    wizFinalizePage->setNextID(ProcessCorrelationPage);
+    wizProcessJobs->setFinalPage(true);
 
 }
 
 QFRDRImagingFCSWizard::~QFRDRImagingFCSWizard()
 {
-    delete fctrBack;
-    delete fctrStack;
+    if (frame_data_io) qfFree(frame_data_io);
+    frame_data_io=NULL;
 }
 
 void QFRDRImagingFCSWizard::selectFileClicked()
@@ -259,7 +269,7 @@ void QFRDRImagingFCSWizard::initFileSelection()
 
 void QFRDRImagingFCSWizard::finishedIntro()
 {
-    isCalibration=wizIntro->getChecked(1);
+    isCalibration=wizIntro->isChecked(1);
 }
 
 void QFRDRImagingFCSWizard::backgroundModeChanged(int mode)
@@ -288,14 +298,96 @@ void QFRDRImagingFCSWizard::calcPixelSize()
     delete dlg;
 }
 
-
-
-
-QFRDRImagingFCSWizard_BackgroundIsValid::QFRDRImagingFCSWizard_BackgroundIsValid(QFRDRImagingFCSWizard *wizard):
-    QFWizardValidateFunctor()
+void QFRDRImagingFCSWizard::calibrationCropValuesChanged(int region)
 {
-    this->wizard=wizard;
+    spinCalibrationCenterSize->setEnabled(false);
+    widCropCalibration->setEnabled(false);
+    switch(region) {
+        case 0: //all pixels
+            wizCalibration->setROI(0,0,image_width_io, image_height_io);
+            wizCalibration->resetROI2();
+            break;
+        case 1: // "left half"
+            wizCalibration->setROI(0,0,image_width_io/2, image_height_io);
+            wizCalibration->resetROI2();
+            break;
+        case 2: // "right half"
+            wizCalibration->setROI(image_width_io/2,0,image_width_io/2, image_height_io);
+            wizCalibration->resetROI2();
+            break;
+        case 3: // "top half"
+            wizCalibration->setROI(0,image_height_io/2,image_width_io, image_height_io/2);
+            wizCalibration->resetROI2();
+            break;
+        case 4: // "bottom half"
+            wizCalibration->setROI(0,0,image_width_io, image_height_io/2);
+            wizCalibration->resetROI2();
+            break;
+        case 5: // "center pixels"
+            {
+                spinCalibrationCenterSize->setEnabled(true);
+                int w=spinCalibrationCenterSize->value();
+                int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
+                int y=qBound(0, image_height_io/2-w/2, image_height_io-1);
+                wizCalibration->setROI(x,y,w,w);
+                wizCalibration->resetROI2();
+            }
+            break;
+        case 6: // "left center"
+            {
+                spinCalibrationCenterSize->setEnabled(true);
+                int w=spinCalibrationCenterSize->value();
+                int x=qBound(0, image_width_io/4-w/2, image_width_io-1);
+                int y=qBound(0, image_height_io/2-w/2, image_height_io-1);
+                wizCalibration->setROI(x,y,w,w);
+                wizCalibration->resetROI2();
+            }
+            break;
+        case 7: // "right center"
+            {
+                spinCalibrationCenterSize->setEnabled(true);
+                int w=spinCalibrationCenterSize->value();
+                int x=qBound(0, 3*image_width_io/4-w/2, image_width_io-1);
+                int y=qBound(0, image_height_io/2-w/2, image_height_io-1);
+                wizCalibration->setROI(x,y,w,w);
+                wizCalibration->resetROI2();
+            }
+            break;
+        case 8: // "top center"
+            {
+                spinCalibrationCenterSize->setEnabled(true);
+                int w=spinCalibrationCenterSize->value();
+                int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
+                int y=qBound(0, 3*image_height_io/4-w/2, image_height_io-1);
+                wizCalibration->setROI(x,y,w,w);
+                wizCalibration->resetROI2();
+            }
+            break;
+        case 9: // "bottom center"
+            {
+                spinCalibrationCenterSize->setEnabled(true);
+                int w=spinCalibrationCenterSize->value();
+                int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
+                int y=qBound(0, image_height_io/4-w/2, image_height_io-1);
+                wizCalibration->setROI(x,y,w,w);
+                wizCalibration->resetROI2();
+            }
+            break;
+        case 10: // "user-defined crop"
+            widCropCalibration->setEnabled(true);
+            wizCalibration->setROI(widCropCalibration->getX1(), widCropCalibration->getY1(),widCropCalibration->getWIDTH(), widCropCalibration->getHEIGHT());
+            wizCalibration->resetROI2();
+            break;
+    }
 }
+
+void QFRDRImagingFCSWizard::calibrationCropValuesChanged()
+{
+    calibrationCropValuesChanged(cmbCalibRegion->currentIndex());
+}
+
+
+
 
 bool QFRDRImagingFCSWizard_BackgroundIsValid::isValid(QFWizardPage *page)
 {
@@ -329,22 +421,21 @@ bool QFRDRImagingFCSWizard_BackgroundIsValid::isValid(QFWizardPage *page)
 }
 
 
-QFRDRImagingFCSWizard_ImagestackIsValid::QFRDRImagingFCSWizard_ImagestackIsValid(QFRDRImagingFCSWizard *wizard):
-    QFWizardValidateFunctor()
-{
-    this->wizard=wizard;
-}
 
 bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
 {
     if (wizard) {
         QString readerid=wizard->imageFormatIDs.value(wizard->cmbFileformat->currentIndex(), wizard->imageFormatIDs.value(0, ""));
 
-        wizard->wizImageProps->setImageAvg(wizard->edtFilename->text(), readerid, 0, 10);
+        wizard->wizImageProps->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
+        wizard->wizCalibration->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
+        calibrationRegionChanged(cmbCalibRegion->currentIndex());
 
 
-        double* frame_data_io=NULL;
-        QFRDRImagingFCSCorrelationDialog::readStackProperties(wizard->edtFilename->text(), wizard->cmbFileformat->currentIndex(), true, true, wizard, &(wizard->channels), &(wizard->frame_count_io), &(wizard->filesize_io), &(wizard->frametime_io), &(wizard->baseline_offset_io), &(wizard->backgroundF_io), &(wizard->pixel_width_io), &(wizard->pixel_height_io), &(wizard->hasPixel_io), &(wizard->dualViewMode_io), &(wizard->image_width_io), &(wizard->image_height_io), &(wizard->inputconfigfile_io), &(frame_data_io), &(wizard->background_width), &(wizard->background_height), &(wizard->background_count));
+        if (wizard->frame_data_io) qfFree(wizard->frame_data_io);
+        wizard->frame_data_io=NULL;
+        QFRDRImagingFCSCorrelationDialog::readStackProperties(wizard->edtFilename->text(), wizard->cmbFileformat->currentIndex(), true, true, wizard, &(wizard->channels), &(wizard->frame_count_io), &(wizard->filesize_io), &(wizard->frametime_io), &(wizard->baseline_offset_io), &(wizard->backgroundF_io), &(wizard->pixel_width_io), &(wizard->pixel_height_io), &(wizard->hasPixel_io), &(wizard->dualViewMode_io), &(wizard->image_width_io), &(wizard->image_height_io), &(wizard->inputconfigfile_io), &(wizard->frame_data_io), &(wizard->background_width), &(wizard->background_height), &(wizard->background_count));
+
 
         wizard->labImageProps->setText(QObject::tr("frames: %1,   frame-size: %2x%3").arg(wizard->frame_count_io).arg(wizard->image_width_io).arg(wizard->image_height_io));
         wizard->widPixSize->setPixelSize(wizard->pixel_width_io, wizard->pixel_height_io);
@@ -355,13 +446,27 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
         wizard->cmbBackgroundMode->setCurrentIndex(0);
         if (!wizard->backgroundF_io.isEmpty()) wizard->cmbBackgroundMode->setCurrentIndex(3);
         wizard->spinBackgroundOffset->setValue(0);
-        if (frame_data_io) qfFree(frame_data_io);
         wizard->backgroundModeChanged(wizard->cmbBackgroundMode->currentIndex());
+        wizard->spinCalibrationCenterSize->setRange(1,qMax(wizard->image_width_io, wizard->image_height_io));
+        wizard->spinCalibrationCenterSize->setValue(qMin(wizard->image_width_io, wizard->image_height_io));
+        wizard->widCropCalibration->setImageSize(wizard->image_width_io, wizard->image_height_io);
+        wizard->widCropCalibration->setFullImageSize();
 
         if (wizard->frame_count_io<=0) {
             wizard->labFileError->setText(QObject::tr("<font color=\"red\"><b><u>ERROR:</u> Image stack file does not contain frames or could not be read!</b></font>"));
             wizard->edtFilename->setFocus();
             return false;
+        }
+        if (wizard->frame_count_io<=10000) {
+            if (QMessageBox::warning(wizard, tr("Small image stack"),
+                                     tr("You selected an image stack with only %1 frames, which is unusually small for an imaging FCS evaluation.\nWe suggest correlating at least 10,000-100,000 frames for good statistics!\n\nDo you still want to use the selected image stack [Yes], or select another one [No]?").arg(wizard->frame_count_io), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)
+                    ==QMessageBox::Yes) {
+                return true;
+            } else {
+                wizard->labFileError->setText(QObject::tr("<font color=\"dark-orange\"><b><u>WARNING:</u> Image stack file contains only %1 frames, which might be too small for good imFCS statistics!</b></font>").arg(wizard->frame_count_io));
+                wizard->edtFilename->setFocus();
+                return false;
+            }
         }
         if (wizard->image_width_io*wizard->image_height_io<=0) {
             wizard->labFileError->setText(QObject::tr("<font color=\"red\"><b><u>ERROR:</u> Image stack does not contain frames with a size larger than 0x0!</b></font>"));
@@ -373,4 +478,16 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
     } else {
         return true;
     }
+}
+
+
+
+int QFRDRImagingFCSWizard_BackgroundNextId::nextID(const QFWizardPage *page) const
+{
+    if (wizard->wizIntro->isChecked(1)) {
+        return QFRDRImagingFCSWizard::CalibrationPage;
+    } else {
+        return QFRDRImagingFCSWizard::CropAndBinPage;
+    }
+
 }

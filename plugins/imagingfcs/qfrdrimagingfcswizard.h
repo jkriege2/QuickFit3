@@ -1,6 +1,7 @@
 #ifndef QFRDRIMAGINGFCSWIZARD_H
 #define QFRDRIMAGINGFCSWIZARD_H
 
+#include <QPointer>
 #include <QWidget>
 #include "qfwizard.h"
 #include "qfselectfileslistwidget.h"
@@ -13,15 +14,32 @@
 #include "qfframerangeedit.h"
 #include "qfrdrimagingfcscorrelationdialog.h"
 #include "qfrdrimagingfcspixelfromobjective.h"
+#include "qfevaluationitemfactory.h"
+#include "qfcroppixelsedit.h"
 
 class QFRDRImagingFCSWizard_BackgroundIsValid; // forward
 class QFRDRImagingFCSWizard_ImagestackIsValid;
+class QFRDRImagingFCSWizard_BackgroundNextId;
 
 class QFRDRImagingFCSWizard : public QFWizard {
         Q_OBJECT
     public:
-        QFRDRImagingFCSWizard(bool is_project=false, QWidget* parent=NULL);
+        explicit QFRDRImagingFCSWizard(bool is_project=false, QWidget* parent=NULL);
         ~QFRDRImagingFCSWizard();
+        enum Pages {
+            InitPage,
+            FileSelectionPage,
+            ImagePage,
+            BackgroundPage,
+            CalibrationPage,
+            CropAndBinPage,
+            CorrelationPage,
+
+
+            LastPage,
+            ProcessCorrelationPage,
+        };
+
     protected slots:
         void selectFileClicked();
         void edtFilenameTextChanged(const QString& filename);
@@ -30,7 +48,10 @@ class QFRDRImagingFCSWizard : public QFWizard {
         void finishedIntro();
         void backgroundModeChanged(int mode);
         void calcPixelSize();
+        void calibrationCropValuesChanged(int region);
+        void calibrationCropValuesChanged();
     protected:
+
         QFRadioButtonListWizardPage* wizIntro;
         QFFormWizardPage* wizSelfiles;
         QFImagePlotWizardPage* wizImageProps;
@@ -61,12 +82,24 @@ class QFRDRImagingFCSWizard : public QFWizard {
 
         QLabel* labImageProps;
 
-        QFFormWizardPage* lastPage;
+        QFFormWizardPage* wizProcessJobs;
+        QFFormWizardPage* wizFinalizePage;
         QLabel* labFinal;
         QPointer<QCheckBox> chkLastImFCSFit1;
         QPointer<QCheckBox> chkLastImFCCSFit;
         QPointer<QFEnhancedComboBox> cmbImFCSFitMode;
 
+
+        QFImagePlotWizardPage* wizCalibration;
+        QComboBox* cmbCalibRegion;
+        QSpinBox* spinCalibrationCenterSize;
+        QFCropPixelsEdit* widCropCalibration;
+
+
+
+        QFFormWizardPage* wizCropAndBin;
+
+        QFFormWizardPage* wizCorrelation;
 
         int channels;
         int frame_count_io;
@@ -84,10 +117,10 @@ class QFRDRImagingFCSWizard : public QFWizard {
         int image_height_io;
         QString inputconfigfile_io;
         bool hasPixel_io;
-        QFRDRImagingFCSWizard_BackgroundIsValid* fctrBack;
-        QFRDRImagingFCSWizard_ImagestackIsValid* fctrStack;
+        double* frame_data_io;
         friend class QFRDRImagingFCSWizard_BackgroundIsValid;
         friend class QFRDRImagingFCSWizard_ImagestackIsValid;
+        friend class QFRDRImagingFCSWizard_BackgroundNextId;
 
         bool isCalibration;
 
@@ -95,18 +128,38 @@ class QFRDRImagingFCSWizard : public QFWizard {
 
 class QFRDRImagingFCSWizard_BackgroundIsValid: public QFWizardValidateFunctor {
     public:
-        QFRDRImagingFCSWizard_BackgroundIsValid(QFRDRImagingFCSWizard* wizard);
+        inline QFRDRImagingFCSWizard_BackgroundIsValid(QFRDRImagingFCSWizard* wizard):
+            QFWizardValidateFunctor()
+        {
+            this->wizard=wizard;
+        }
         virtual bool isValid(QFWizardPage* page);
     protected:
-        QFRDRImagingFCSWizard* wizard;
+        QPointer<QFRDRImagingFCSWizard> wizard;
 };
 
 class QFRDRImagingFCSWizard_ImagestackIsValid: public QFWizardValidateFunctor {
     public:
-        QFRDRImagingFCSWizard_ImagestackIsValid(QFRDRImagingFCSWizard* wizard);
+        inline QFRDRImagingFCSWizard_ImagestackIsValid(QFRDRImagingFCSWizard* wizard):
+            QFWizardValidateFunctor()
+        {
+            this->wizard=wizard;
+        }
         virtual bool isValid(QFWizardPage* page);
     protected:
-        QFRDRImagingFCSWizard* wizard;
+        QPointer<QFRDRImagingFCSWizard> wizard;
+};
+
+class QFRDRImagingFCSWizard_BackgroundNextId: public QFWizardNextPageFunctor {
+    public:
+        inline QFRDRImagingFCSWizard_BackgroundNextId(QFRDRImagingFCSWizard* wizard):
+            QFWizardNextPageFunctor()
+        {
+            this->wizard=wizard;
+        }
+        virtual int nextID(const QFWizardPage* page) const;
+    protected:
+        QPointer<QFRDRImagingFCSWizard> wizard;
 };
 
 #endif // QFRDRIMAGINGFCSWIZARD_H

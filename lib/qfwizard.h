@@ -58,6 +58,7 @@ class QFLIB_EXPORT QFWizardFixedNextPageFunctor: public QFWizardNextPageFunctor 
     public:
         explicit inline QFWizardFixedNextPageFunctor(int id) { this->id=id; }
         inline virtual int nextID(const QFWizardPage* page) const {
+            Q_UNUSED(page)
             return id;
         }
     protected:
