@@ -45,7 +45,23 @@ class QFLIB_EXPORT QFWizardValidateFunctor {
 class QFLIB_EXPORT QFWizardIsCompleteFunctor {
     public:
         inline virtual ~QFWizardIsCompleteFunctor() {}
-        virtual bool isComplete(const QFWizardPage* page)=0;
+        virtual bool isComplete(const QFWizardPage* page) const=0;
+};
+
+class QFLIB_EXPORT QFWizardNextPageFunctor {
+    public:
+        inline virtual ~QFWizardNextPageFunctor() {}
+        virtual int nextID(const QFWizardPage* page) const=0;
+};
+
+class QFLIB_EXPORT QFWizardFixedNextPageFunctor: public QFWizardNextPageFunctor {
+    public:
+        explicit inline QFWizardFixedNextPageFunctor(int id) { this->id=id; }
+        inline virtual int nextID(const QFWizardPage* page) const {
+            return id;
+        }
+    protected:
+        int id;
 };
 
 class QFLIB_EXPORT QFWizard : public QWizard
@@ -74,10 +90,13 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         explicit QFWizardPage(QWidget *parent = 0);
         explicit QFWizardPage(const QString& title, QWidget *parent = 0);
 
+        virtual ~QFWizardPage();
+
 
         virtual void initializePage();
         virtual bool validatePage();
         virtual bool isComplete() const;
+        virtual int nextId() const;
 
         void setUserPreviousPage(QWizardPage* page);
         void setUserOnValidatePage(QWizardPage* page);
@@ -86,8 +105,20 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
 
         void setExternalValidate(bool enabled=true);
         void setExternalIsValid(bool valid=true);
-        void setValidator(QFWizardValidateFunctor* validator);
-        void setIsCompleteFunctor(QFWizardIsCompleteFunctor* validator);
+        /** \brief sets a QFWizardValidateFunctor that is called on validatePage().
+         *
+         * \note you have to free the functor by hand, if you don't set setFreeFunctors(true) */
+        void setValidateFunctor(QFWizardValidateFunctor* validateFunctor);
+        /** \brief sets a QFWizardIsCompleteFunctor that is called on isComplete().
+         *
+         * \note you have to free the functor by hand, if you don't set setFreeFunctors(true) */
+        void setIsCompleteFunctor(QFWizardIsCompleteFunctor* isCompleteFunctor);
+        /** \brief sets a QFWizardNextPageFunctor that is called on nextId().
+         *
+         * \note you have to free the functor by hand, if you don't set setFreeFunctors(true) */
+        void setNextIDFunctor(QFWizardNextPageFunctor* nextIDFunctor);
+        void setFreeFunctors(bool enabled=true);
+        void setNextID(int nextid);
     signals:
         void onInitialize(QWizardPage* page);
         void onInitialize(QWizardPage* page, QWizardPage* userPreviousPage);
@@ -103,8 +134,10 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         void* m_userValidateArg;
         bool m_externalvalidate;
         bool m_isvalid;
+        bool m_freeFunctors;
         QFWizardValidateFunctor* m_validator;
         QFWizardIsCompleteFunctor* m_iscomplete;
+        QFWizardNextPageFunctor* m_nextID;
 
 };
 
@@ -253,9 +286,11 @@ class QFLIB_EXPORT QFRadioButtonListWizardPage : public QFEnableableFormWizardPa
         void clear();
         void addItem(const QString& item, bool checked=false);
         void setChecked(int id);
+        void setChecked(int id, bool checked);
+        void setEnabled(int id, bool enabled);
 
-        bool getChecked(int id) const;
-        int getChecked() const;
+        bool isChecked(int id) const;
+        int isChecked() const;
         int count() const;
 
     signals:

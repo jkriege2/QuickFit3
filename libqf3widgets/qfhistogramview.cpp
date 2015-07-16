@@ -52,6 +52,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
 #include <QPdfWriter>
 #endif
+#include "flowlayout.h"
 
 QFHistogramView::QFHistogramView(QWidget *parent) :
     QWidget(parent)
@@ -138,30 +139,32 @@ void QFHistogramView::createWidgets() {
 
     chkHistogramRangeAuto=new QRadioButton("auto", grpHistogramSettings);
     chkHistogramRangeAuto->setChecked(true);
-    chkHistogramRangeRelaxAuto=new QRadioButton("relaxed auto: ", grpHistogramSettings);
+    chkHistogramRangeRelaxAuto=new QRadioButton("relaxed auto:", grpHistogramSettings);
     chkHistogramRangeManual=new QRadioButton("manual", grpHistogramSettings);
-    QHBoxLayout* layradAuto=new QHBoxLayout();
+    layradAuto=new QHBoxLayout();
     layradAuto->addWidget(chkHistogramRangeManual);
     layradAuto->addWidget(chkHistogramRangeAuto);
     layradAuto->addWidget(chkHistogramRangeRelaxAuto);
-    layradAuto->addWidget(edtHistogramRelaxedRangePercent);
-    layradAuto->addWidget(new QLabel(tr("  up:")));
-    layradAuto->addWidget(edtHistogramRelaxedRangePercentUp);
     layradAuto->addStretch();
     flHistSet->addRow(tr("range:"), layradAuto);
+    flHistSet->addRow(NULL, layradAuto2);
     edtHistogramMin=new QFDoubleEdit(this);
     edtHistogramMin->setCheckBounds(false, false);
     edtHistogramMin->setValue(0);
     edtHistogramMax=new QFDoubleEdit(this);
     edtHistogramMax->setCheckBounds(false, false);
     edtHistogramMax->setValue(10);
-    coll=new QHBoxLayout();
-    coll->addWidget(edtHistogramMin,1);
-    coll->addWidget(new QLabel(" ... "));
-    coll->addWidget(edtHistogramMax,1);
-    coll->addStretch();
-    coll->setContentsMargins(0,0,0,0);
-    flHistSet->addRow(QString(""), coll);
+    layradAuto2=new QHBoxLayout();
+    layradAuto2->addWidget(edtHistogramMin,1);
+    layradAuto2->addWidget(edtHistogramRelaxedRangePercent,1);
+    edtHistogramRelaxedRangePercent->setVisible(false);
+    layradAuto2->addWidget(labRelaxedRange=new QLabel(" ... "));
+    layradAuto2->addWidget(edtHistogramMax,1);
+    layradAuto2->addWidget(edtHistogramRelaxedRangePercentUp,1);
+    edtHistogramRelaxedRangePercentUp->setVisible(false);
+    layradAuto2->addStretch();
+    layradAuto2->setContentsMargins(0,0,0,0);
+    flHistSet->addRow(QString(""), layradAuto2);
 
 
     cmbFitFunction=new QFFitFunctionComboBox(this);
@@ -230,6 +233,7 @@ void QFHistogramView::createWidgets() {
     cmbFitFunction->setUpdatesEnabled(true);
     chkKey->setChecked(false);
 
+    histogramSettingsChanged(true);
 }
 
 
@@ -237,11 +241,15 @@ void QFHistogramView::setSpaceSavingMode(bool enabled)
 {
     laySplitterTable->removeWidget(grpHistogramSettings);
     layHist->removeWidget(grpHistogramSettings);
+
     if (enabled) {
         laySplitterTable->insertWidget(0, grpHistogramSettings);
+
+
     } else {
         layHist->addWidget(grpHistogramSettings, 0, 1);
         layHist->setColumnStretch(0,5);
+
     }
 }
 
@@ -498,10 +506,10 @@ void QFHistogramView::replotHistogram() {
 void QFHistogramView::updateHistogram(bool replot, int which) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-    edtHistogramMin->setEnabled(chkHistogramRangeManual->isChecked());
-    edtHistogramMax->setEnabled(chkHistogramRangeManual->isChecked());
-    edtHistogramRelaxedRangePercent->setEnabled(chkHistogramRangeRelaxAuto->isChecked());
-    edtHistogramRelaxedRangePercentUp->setEnabled(chkHistogramRangeRelaxAuto->isChecked());
+    edtHistogramMin->setVisible(chkHistogramRangeManual->isChecked());
+    edtHistogramMax->setVisible(chkHistogramRangeManual->isChecked());
+    edtHistogramRelaxedRangePercent->setVisible(chkHistogramRangeRelaxAuto->isChecked());
+    edtHistogramRelaxedRangePercentUp->setVisible(chkHistogramRangeRelaxAuto->isChecked());
 
     pltParamHistogram->set_doDrawing(false);
     tvHistogramParameters->setModel(NULL);
@@ -840,8 +848,10 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
 }
 
 void QFHistogramView::histogramSettingsChanged(bool update) {
-    edtHistogramMin->setEnabled(!chkHistogramRangeAuto->isChecked());
-    edtHistogramMax->setEnabled(!chkHistogramRangeAuto->isChecked());
+    edtHistogramMin->setVisible(chkHistogramRangeManual->isChecked());
+    edtHistogramMax->setVisible(chkHistogramRangeManual->isChecked());
+    edtHistogramRelaxedRangePercent->setVisible(chkHistogramRangeRelaxAuto->isChecked());
+    edtHistogramRelaxedRangePercentUp->setVisible(chkHistogramRangeRelaxAuto->isChecked());
     if (update) updateHistogram(true);
     emit settingsChanged();
 }

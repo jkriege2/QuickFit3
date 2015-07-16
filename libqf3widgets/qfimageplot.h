@@ -74,6 +74,13 @@ class QFWIDLIB_EXPORT QFImagePlotWizardPage : public QFWizardPage
         void setImage(const QString& filename, const QString& imageReaderID,  double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL);
         void clear();
 
+        void setROI(double x, double y, double width, double height);
+        void setROI(QRectF r);
+        void resetROI();
+        void setROI2(double x, double y, double width, double height);
+        void setROI2(QRectF r);
+        void resetROI2();
+
         virtual void initializePage();
         virtual bool validatePage();
     signals:

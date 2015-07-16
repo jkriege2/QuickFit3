@@ -420,6 +420,36 @@ void QFImagePlotWizardPage::clear()
     plot->clear();
 }
 
+void QFImagePlotWizardPage::setROI(double x, double y, double width, double height)
+{
+    plot->setROI(x,y,width,height);
+}
+
+void QFImagePlotWizardPage::setROI(QRectF r)
+{
+    plot->setROI(r);
+}
+
+void QFImagePlotWizardPage::resetROI()
+{
+    plot->resetROI();
+}
+
+void QFImagePlotWizardPage::setROI2(double x, double y, double width, double height)
+{
+    plot->setROI2(x,y,width,height);
+}
+
+void QFImagePlotWizardPage::setROI2(QRectF r)
+{
+    plot->setROI2(r);
+}
+
+void QFImagePlotWizardPage::resetROI2()
+{
+    plot->resetROI2();
+}
+
 void QFImagePlotWizardPage::initializePage()
 {
     QFWizardPage::initializePage();

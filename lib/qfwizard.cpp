@@ -71,6 +71,8 @@ void QFWizard::done(int result)
 QFWizardPage::QFWizardPage(QWidget *parent):
     QWizardPage(parent)
 {
+    m_freeFunctors=false;
+    m_nextID=NULL;
     m_validator=NULL;
     m_iscomplete=NULL;
     m_userLast=NULL;
@@ -84,6 +86,8 @@ QFWizardPage::QFWizardPage(QWidget *parent):
 QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
     QWizardPage(parent)
 {
+    m_freeFunctors=false;
+    m_nextID=NULL;
     m_validator=NULL;
     m_iscomplete=NULL;
     m_userLast=NULL;
@@ -93,6 +97,15 @@ QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
     m_externalvalidate=false;
     m_isvalid=false;
     setTitle(title);
+}
+
+QFWizardPage::~QFWizardPage()
+{
+    if (m_freeFunctors) {
+        if (m_nextID) delete m_nextID;
+        if (m_validator) delete m_validator;
+        if (m_iscomplete) delete m_iscomplete;
+    }
 }
 
 void QFWizardPage::initializePage()
@@ -121,6 +134,14 @@ bool QFWizardPage::isComplete() const
         return m_iscomplete->isComplete(this);
     }
     return QWizardPage::isComplete();
+}
+
+int QFWizardPage::?nextId() const
+{
+    if (m_nextID) {
+        return m_nextID->nextID(this);
+    }
+    return QWizard::nextId();
 }
 
 void QFWizardPage::setUserPreviousPage(QWizardPage *page)
@@ -155,16 +176,40 @@ void QFWizardPage::setExternalIsValid(bool valid)
     emit completeChanged();
 }
 
-void QFWizardPage::setValidator(QFWizardValidateFunctor *validator)
+void QFWizardPage::setValidateFunctor(QFWizardValidateFunctor *validator)
 {
+   if (m_freeFunctors && m_validator) {
+      delete m_validator;
+   }
     m_validator=validator;
     emit completeChanged();
 }
 
 void QFWizardPage::setIsCompleteFunctor(QFWizardIsCompleteFunctor *validator)
 {
+   if (m_freeFunctors && m_iscomplete) {
+      delete m_iscomplete;
+   }
     m_iscomplete=validator;
     emit completeChanged();
+}
+
+void QFWizardPage::setNextIDFunctor(QFWizardNextPageFunctor *nextIDFunctor)
+{
+    if (m_freeFunctors && m_nextID) {
+       delete m_nextID;
+    }
+    m_nextID=nextIDFunctor;
+}
+
+void QFWizardPage::setFreeFunctors(bool enabled)
+{
+    m_freeFunctors=enabled;
+}
+
+void QFWizardPage::setNextID(int nextid)
+{
+    setNextIDFunctor(new QFWizardFixedNextPageFunctor(nextid));
 }
 
 
@@ -767,7 +812,21 @@ void QFRadioButtonListWizardPage::setChecked(int id)
     }
 }
 
-bool QFRadioButtonListWizardPage::getChecked(int id) const
+void QFRadioButtonListWizardPage::setChecked(int id, bool checked)
+{
+    if (id>=0 && id<boxes.size()) {
+        boxes[id]->setChecked(checked);
+    }
+}
+
+void QFRadioButtonListWizardPage::setEnabled(int id, bool enabled)
+{
+    if (id>=0 && id<boxes.size()) {
+        boxes[id]->setEnabled(enabled);
+    }
+}
+
+bool QFRadioButtonListWizardPage::isChecked(int id) const
 {
     if (id>=0 && id<boxes.size()) {
         return boxes[id]->isChecked();
@@ -775,7 +834,7 @@ bool QFRadioButtonListWizardPage::getChecked(int id) const
     return false;
 }
 
-int QFRadioButtonListWizardPage::getChecked() const
+int QFRadioButtonListWizardPage::isChecked() const
 {
     for (int i=0; i<boxes.size(); i++) {
         if (boxes[i]->isChecked()) {

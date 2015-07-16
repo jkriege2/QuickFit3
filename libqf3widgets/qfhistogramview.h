@@ -193,6 +193,10 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         QAction* actSaveData;
         QAction* actHelp;
 
+        QHBoxLayout* layradAuto;
+        QHBoxLayout* layradAuto2;
+        QLabel* labRelaxedRange;
+
 
 
 };
