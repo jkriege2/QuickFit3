@@ -147,7 +147,6 @@ void QFHistogramView::createWidgets() {
     layradAuto->addWidget(chkHistogramRangeRelaxAuto);
     layradAuto->addStretch();
     flHistSet->addRow(tr("range:"), layradAuto);
-    flHistSet->addRow(NULL, layradAuto2);
     edtHistogramMin=new QFDoubleEdit(this);
     edtHistogramMin->setCheckBounds(false, false);
     edtHistogramMin->setValue(0);
