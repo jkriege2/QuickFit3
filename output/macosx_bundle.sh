@@ -2,8 +2,15 @@ unset DYLD_PRINT_LIBRARIES
 
 echo "--- MAKE INSTALL ---"
 
-QTLIBPATH=/Applications/Qt/5.4/clang_64/lib/
-QTPLUGINPATH=/Applications/Qt/5.4/clang_64/plugins/
+QT_INFO_LIBS=`qmake -query QT_INSTALL_LIBS`
+QT_INFO_BIN=`qmake -query QT_INSTALL_BINS`
+QT_INFO_PLUGINS=`qmake -query QT_INSTALL_PLUGINS`
+QT_INFO_INSTALLDIR=`qmake -query QT_INSTALL_PREFIX`
+QT_INFO_VERSION=`qmake -query QT_VERSION`
+echo -e "\n\nbuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INFO_INSTALLDIR}\n\n"
+
+QTLIBPATH=$QT_INFO_LIBS
+QTPLUGINPATH=$QT_INFO_PLUGINS
 
 QTLIBS=(QtCore QtWidgets QtOpenGL QtSvg QtXml QtPrintSupport QtNetwork QtMultimedia QtMacExtras QtGui QtConcurrent)
 QTPLUGINS=(platforms imageformats iconengines printsupport bearer)

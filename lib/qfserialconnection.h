@@ -24,9 +24,8 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 
-
 #ifndef __APPLE__
-#  if define(__APPLE__) || define(macintosh) || define(Macintosh) || define(__APPLE__ && __MACH__) || defined(__APPLE_CC__) || defined(__OSX__)
+#  if defined(__APPLE__) || defined(macintosh) || defined(Macintosh) || defined(__APPLE__ && __MACH__) || defined(__APPLE_CC__) || defined(__OSX__)
 #    define __APPLE__
 #  endif
 #endif
@@ -43,11 +42,11 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 # endif
 #endif
 
-#ifndef __WINDOWS__
-# ifndef __LINUX__
-#  error("this class needs to be compiled under win32 or linux")
-# endif
-#endif
+//#ifndef __WINDOWS__
+//# ifndef __LINUX__
+//#  error("this class needs to be compiled under win32 or linux")
+//# endif
+//#endif
 
 #if defined(__APPLE__) || defined(__LINUX__)
 #  define __APPLE_OR_LINUX__
