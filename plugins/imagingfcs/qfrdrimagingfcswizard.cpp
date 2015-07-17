@@ -71,7 +71,8 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
                                                  "as it can read larger files than the libTIFF reader!</i>"), wizSelfiles));
     lab->setWordWrap(true);
     labFileError=new QLabel(wizSelfiles);
-    wizSelfiles->addRow(QString(), labFileError);
+    labFileError->setWordWrap(true);
+    wizSelfiles->addRow(labFileError);
 
 
 
@@ -83,6 +84,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     connect(wizImageProps, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(initImagePreview()));
 
     labImageProps=new QLabel(wizImageProps);
+    labImageProps->setWordWrap(true);
     wizImageProps->addRow(tr("Image Stack Properties:"), labImageProps);
 
     cmbDualView = new QFEnhancedComboBox(wizImageProps);
@@ -144,7 +146,8 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     spinBackgroundOffset->setEnabled(false);
     wizBackground->addRow(tr("background offset:"), spinBackgroundOffset);
     labBackgroundError=new QLabel(wizBackground);
-    wizBackground->addRow(QString(), labBackgroundError);
+    labBackgroundError->setWordWrap(true);
+    wizBackground->addRow(labBackgroundError);
 
 
 
@@ -167,11 +170,12 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizCalibration->addRow(tr("\"center\" region size:"), spinCalibrationCenterSize);
 
     widCropCalibration=new QFCropPixelsEdit(wizCalibration);
+    widCropCalibration->addLayoutStretchAtEnd();
     wizCalibration->addRow(tr("user-defined crop:"), widCropCalibration);
 
     connect(spinCalibrationCenterSize, SIGNAL(valueChanged(int)), this, SLOT(calibrationCropValuesChanged()));
     connect(widCropCalibration, SIGNAL(valueChanged(int,int,int,int)), this, SLOT(calibrationCropValuesChanged()));
-    connect(cmbCalibRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(calibrationCropValuesChanged(int)));
+    connect(cmbCalibRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(calibrationRegionChanged(int)));
     calibrationCropValuesChanged();
 
 
@@ -476,7 +480,7 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
                     ==QMessageBox::Yes) {
                 return true;
             } else {
-                wizard->labFileError->setText(QObject::tr("<font color=\"dark-orange\"><b><u>WARNING:</u> Image stack file contains only %1 frames, which might be too small for good imFCS statistics!</b></font>").arg(wizard->frame_count_io));
+                wizard->labFileError->setText(QObject::tr("<font color=\"orange\"><b><u>WARNING:</u> Image stack file contains only %1 frames, which might be too small for good imFCS statistics!</b></font>").arg(wizard->frame_count_io));
                 wizard->edtFilename->setFocus();
                 return false;
             }

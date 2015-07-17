@@ -11,6 +11,8 @@ QFImagePlot::QFImagePlot(QWidget *parent, const QString &prefix):
     QWidget(parent),
     ui(new Ui::QFImagePlot)
 {
+    colROI=QColor("red");
+    colROI2=QColor("blue");
     plteImage=NULL;
     image_data=NULL;
     image_width=0;
@@ -108,6 +110,18 @@ void QFImagePlot::resetROI2()
     setROI2(QRectF());
 }
 
+void QFImagePlot::setROIColor(QColor col)
+{
+    colROI=col;
+    new_plots();
+}
+
+void QFImagePlot::setROI2Color(QColor col)
+{
+    colROI2=col;
+    new_plots();
+}
+
 void QFImagePlot::update_plot()
 {
     if (!plteImage || !image_data || image_width<=0 || image_height<=0) return;
@@ -197,12 +211,13 @@ void QFImagePlot::new_plots()
         plteMask->set_falseColor(Qt::transparent);
         plt->addGraph(plteMask);
     }
+    double roishift=0.1;
     if (roi.width()>0 && roi.height()>0) {
-        plteROI=new JKQTPgeoRectangle(plt, roi.center().x()+0.5, roi.center().y()+0.5, roi.width()-1.0, roi.height()-1.0, QColor("red"));
+        plteROI=new JKQTPgeoRectangle(plt, roi.center().x()+roishift, roi.center().y()+roishift, roi.width()-roishift*2.0, roi.height()-roishift*2.0, colROI);
         plt->addGraph(plteROI);
     }
     if (roi2.width()>0 && roi2.height()>0) {
-        plteROI2=new JKQTPgeoRectangle(plt, roi2.center().x()+0.5, roi2.center().y()+0.5, roi2.width()-1.0, roi2.height()-1.0, QColor("blue"));
+        plteROI2=new JKQTPgeoRectangle(plt, roi2.center().x()+roishift, roi2.center().y()+roishift, roi2.width()-roishift*2.0, roi2.height()-roishift*2.0, colROI2);
         plt->addGraph(plteROI2);
     }
 
@@ -448,6 +463,16 @@ void QFImagePlotWizardPage::setROI2(QRectF r)
 void QFImagePlotWizardPage::resetROI2()
 {
     plot->resetROI2();
+}
+
+void QFImagePlotWizardPage::setROIColor(QColor col)
+{
+    plot->setROIColor(col);
+}
+
+void QFImagePlotWizardPage::setROI2Color(QColor col)
+{
+    plot->setROI2Color(col);
 }
 
 void QFImagePlotWizardPage::initializePage()

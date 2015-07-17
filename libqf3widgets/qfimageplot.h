@@ -28,6 +28,8 @@ class QFWIDLIB_EXPORT QFImagePlot : public QWidget
         void setROI2(double x, double y, double width, double height);
         void setROI2(QRectF r);
         void resetROI2();
+        void setROIColor(QColor col);
+        void setROI2Color(QColor col);
     public slots:
         void update_plot();
         void clear();
@@ -47,6 +49,7 @@ class QFWIDLIB_EXPORT QFImagePlot : public QWidget
         int32_t image_width;
         int32_t image_height;
         QRectF roi, roi2;
+        QColor colROI, colROI2;
 };
 
 
@@ -80,6 +83,8 @@ class QFWIDLIB_EXPORT QFImagePlotWizardPage : public QFWizardPage
         void setROI2(double x, double y, double width, double height);
         void setROI2(QRectF r);
         void resetROI2();
+        void setROIColor(QColor col);
+        void setROI2Color(QColor col);
 
         virtual void initializePage();
         virtual bool validatePage();

@@ -126,8 +126,11 @@ void QFHistogramView::createWidgets() {
     flHistSet->addRow(tr("# bins:"), coll);
     QHBoxLayout* layHistogram=new QHBoxLayout();
     chkLogHistogram=new QCheckBox(tr("log-scale"), grpHistogramSettings);
+    chkLogHistogram->setToolTip(tr("show histogram with logarithmically scaled frequency"));
     chkNormalizedHistograms=new QCheckBox(tr("normalized"), grpHistogramSettings);
-    chkKey=new QCheckBox(tr("show key"),this);
+    chkNormalizedHistograms->setToolTip(tr("normalize histogram to an integrale/sum of 1"));
+    chkKey=new QCheckBox(tr("legend"),this);
+    chkKey->setToolTip(tr("toggle the visibility of the legend/key in the histogram plot"));
     chkKey->setChecked(true);
     layHistogram->addWidget(chkLogHistogram);
     layHistogram->addSpacing(15);
@@ -190,8 +193,8 @@ void QFHistogramView::createWidgets() {
     tabHistogramParameters->setCellCreate(0, 0, tr("data points N"));
     tabHistogramParameters->setCellCreate(1, 0, tr("average"));
     tabHistogramParameters->setCellCreate(2, 0, tr("median"));
-    tabHistogramParameters->setCellCreate(3, 0, tr("std. dev. &sigma;"));
-    tabHistogramParameters->setCellCreate(4, 0, tr("norm. median abs. dev. NMAD"));
+    tabHistogramParameters->setCellCreate(3, 0, tr("stdev. &sigma;"));
+    tabHistogramParameters->setCellCreate(4, 0, tr("median absdev. NMAD"));
     tabHistogramParameters->setCellCreate(5, 0, tr("min"));
     tabHistogramParameters->setCellCreate(6, 0, tr("25% quantile"));
     tabHistogramParameters->setCellCreate(7, 0, tr("75% quantile"));
@@ -509,6 +512,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
     edtHistogramMax->setVisible(chkHistogramRangeManual->isChecked());
     edtHistogramRelaxedRangePercent->setVisible(chkHistogramRangeRelaxAuto->isChecked());
     edtHistogramRelaxedRangePercentUp->setVisible(chkHistogramRangeRelaxAuto->isChecked());
+    labRelaxedRange->setVisible(chkHistogramRangeManual->isChecked()||chkHistogramRangeRelaxAuto->isChecked());
 
     pltParamHistogram->set_doDrawing(false);
     tvHistogramParameters->setModel(NULL);
@@ -851,6 +855,7 @@ void QFHistogramView::histogramSettingsChanged(bool update) {
     edtHistogramMax->setVisible(chkHistogramRangeManual->isChecked());
     edtHistogramRelaxedRangePercent->setVisible(chkHistogramRangeRelaxAuto->isChecked());
     edtHistogramRelaxedRangePercentUp->setVisible(chkHistogramRangeRelaxAuto->isChecked());
+    labRelaxedRange->setVisible(chkHistogramRangeManual->isChecked()||chkHistogramRangeRelaxAuto->isChecked());
     if (update) updateHistogram(true);
     emit settingsChanged();
 }
