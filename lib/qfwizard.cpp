@@ -304,6 +304,20 @@ QFFormWizardPage::QFFormWizardPage(const QString &title, QWidget *parent):
     createWidgets();
 }
 
+void QFFormWizardPage::addStretch()
+{
+    QSpacerItem* spc;
+    m_layout->addItem(spc=new QSpacerItem(2,2,QSizePolicy::Minimum,QSizePolicy::Expanding));
+
+}
+
+void QFFormWizardPage::addSpacer(int height)
+{
+    QSpacerItem* spc;
+    m_layout->addItem(spc=new QSpacerItem(2,height,QSizePolicy::Minimum,QSizePolicy::Fixed));
+
+}
+
 void QFFormWizardPage::addRow(QWidget *label, QWidget *field)
 {
     m_layout->addRow(label, field);
@@ -834,7 +848,7 @@ bool QFRadioButtonListWizardPage::isChecked(int id) const
     return false;
 }
 
-int QFRadioButtonListWizardPage::isChecked() const
+int QFRadioButtonListWizardPage::getChecked() const
 {
     for (int i=0; i<boxes.size(); i++) {
         if (boxes[i]->isChecked()) {

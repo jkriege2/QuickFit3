@@ -159,6 +159,9 @@ class QFLIB_EXPORT QFFormWizardPage : public QFWizardPage
             return widMain;
         }
 
+        void addStretch();
+        void addSpacer(int height=10);
+
         void addRow(QWidget *label, QWidget *field);
         void addRow(QWidget *label, QLayout *field);
         void addRow(const QString &labelText, QWidget *field);
@@ -291,7 +294,7 @@ class QFLIB_EXPORT QFRadioButtonListWizardPage : public QFEnableableFormWizardPa
         void setEnabled(int id, bool enabled);
 
         bool isChecked(int id) const;
-        int isChecked() const;
+        int getChecked() const;
         int count() const;
 
     signals:

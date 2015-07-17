@@ -30,6 +30,7 @@ class QFRDRImagingFCSWizard : public QFWizard {
             InitPage,
             FileSelectionPage,
             ImagePage,
+            MicroscopyPage,
             BackgroundPage,
             CalibrationPage,
             CropAndBinPage,
@@ -44,16 +45,31 @@ class QFRDRImagingFCSWizard : public QFWizard {
         void selectFileClicked();
         void edtFilenameTextChanged(const QString& filename);
         void initImagePreview();
+        void finishedImageProps();
         void initFileSelection();
         void finishedIntro();
         void backgroundModeChanged(int mode);
         void calcPixelSize();
         void calibrationRegionChanged(int region);
         void calibrationCropValuesChanged();
+        void cropRegionChanged(int region);
+        void cropValuesChanged();
+        void microscopyChoosen();
+        void calibrationSetupFinished();
+        void calibWxyTestChanged();
+        void cropSetupFinished();
+        void correlationValuesChanged();
     protected:
 
         QFRadioButtonListWizardPage* wizIntro;
         QFFormWizardPage* wizSelfiles;
+        QFFormWizardPage* wizMicroscopy;
+        QDoubleSpinBox* spinWz;
+        QComboBox* cmbMicroscopy;
+        QLabel* labWz;
+        QDoubleSpinBox* spinWxy;
+        QLabel* labWxy;
+
         QFImagePlotWizardPage* wizImageProps;
         QStringList imageFilters;
         QStringList imageFormatNames;
@@ -63,15 +79,14 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QPushButton* btnPixSize;
         QFFrameRangeEdit* widFrameRange;
         QDoubleSpinBox* spinFrametime;
-        QSpinBox* wizLSAnalysisspinMaskSize;
-        QComboBox* wizLSAnalysiscmbFitDir;
-        QComboBox* wizLSAnalysiscmbStackMode;
         QFEnhancedLineEdit* edtFilename;
         QFStyledButton* btnFilename;
         QFEnhancedComboBox* cmbDualView;
         QFEnhancedComboBox* cmbFileformat;
         QFPluginServices* pluginServices;
         QLabel* labFileError;
+
+
 
         QFFormWizardPage* wizBackground;
         QFEnhancedLineEdit* edtBackgroundFilename;
@@ -94,12 +109,29 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QComboBox* cmbCalibRegion;
         QSpinBox* spinCalibrationCenterSize;
         QFCropPixelsEdit* widCropCalibration;
+        QDoubleSpinBox* spinCalibExectedWxy;
+        QSpinBox* spinCalibExpectedWxyTests;
+        QDoubleSpinBox* spinCalibExpectedWxySteps;
+        QLabel* labCalibExpectedWxyTests;
+        QSpinBox* spinCalibBinMax;
+        QLabel* labCalibBinMax;
 
 
 
-        QFFormWizardPage* wizCropAndBin;
+        QFImagePlotWizardPage* wizCropAndBin;
+        QComboBox* cmbCropRegion;
+        QSpinBox* spinCropCenterSize;
+        QFCropPixelsEdit* widCrop;
+        QSpinBox* spinBinning;
+        QLabel* labBinning;
 
         QFFormWizardPage* wizCorrelation;
+        QCheckBox* chkACF;
+        QCheckBox* chk2ColorFCCS;
+        QComboBox* cmb2PixelFCCS;
+        QDoubleSpinBox* spinTauMax;
+        QSpinBox* spinSegments;
+        QLabel* labSegments;
 
         int channels;
         int frame_count_io;
@@ -118,6 +150,7 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QString inputconfigfile_io;
         bool hasPixel_io;
         double* frame_data_io;
+        QList<double> calibWxyTest;
         friend class QFRDRImagingFCSWizard_BackgroundIsValid;
         friend class QFRDRImagingFCSWizard_ImagestackIsValid;
         friend class QFRDRImagingFCSWizard_BackgroundNextId;

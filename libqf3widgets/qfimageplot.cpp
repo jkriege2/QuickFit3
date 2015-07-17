@@ -13,6 +13,9 @@ QFImagePlot::QFImagePlot(QWidget *parent, const QString &prefix):
 {
     colROI=QColor("red");
     colROI2=QColor("blue");
+    colFillROI=Qt::transparent;
+    colFillROI2=Qt::transparent;
+
     plteImage=NULL;
     image_data=NULL;
     image_width=0;
@@ -122,6 +125,18 @@ void QFImagePlot::setROI2Color(QColor col)
     new_plots();
 }
 
+void QFImagePlot::setROIFillColor(QColor col)
+{
+    colFillROI=col;
+    new_plots();
+}
+
+void QFImagePlot::setROI2FillColor(QColor col)
+{
+    colFillROI2=col;
+    new_plots();
+}
+
 void QFImagePlot::update_plot()
 {
     if (!plteImage || !image_data || image_width<=0 || image_height<=0) return;
@@ -213,11 +228,11 @@ void QFImagePlot::new_plots()
     }
     double roishift=0.1;
     if (roi.width()>0 && roi.height()>0) {
-        plteROI=new JKQTPgeoRectangle(plt, roi.center().x()+roishift, roi.center().y()+roishift, roi.width()-roishift*2.0, roi.height()-roishift*2.0, colROI);
+        plteROI=new JKQTPgeoRectangle(plt, roi.center().x(), roi.center().y(), roi.width()-roishift, roi.height()-roishift, colROI);
         plt->addGraph(plteROI);
     }
     if (roi2.width()>0 && roi2.height()>0) {
-        plteROI2=new JKQTPgeoRectangle(plt, roi2.center().x()+roishift, roi2.center().y()+roishift, roi2.width()-roishift*2.0, roi2.height()-roishift*2.0, colROI2);
+        plteROI2=new JKQTPgeoRectangle(plt, roi2.center().x(), roi2.center().y(), roi2.width()-roishift, roi2.height()-roishift, colROI2);
         plt->addGraph(plteROI2);
     }
 
@@ -259,6 +274,18 @@ QFImagePlotWizardPage::QFImagePlotWizardPage(const QString &title, QWidget *pare
     layout->addLayout(formLay);
     setLayout(layout);
 
+}
+
+void QFImagePlotWizardPage::addStretch()
+{
+    QSpacerItem* spc;
+    formLay->addItem(spc=new QSpacerItem(2,2,QSizePolicy::Minimum,QSizePolicy::Expanding));
+}
+
+void QFImagePlotWizardPage::addSpacer(int height)
+{
+    QSpacerItem* spc;
+    formLay->addItem(spc=new QSpacerItem(2,height,QSizePolicy::Minimum,QSizePolicy::Fixed));
 }
 
 void QFImagePlotWizardPage::addRow(const QString &label, QWidget *widget)
@@ -473,6 +500,16 @@ void QFImagePlotWizardPage::setROIColor(QColor col)
 void QFImagePlotWizardPage::setROI2Color(QColor col)
 {
     plot->setROI2Color(col);
+}
+
+void QFImagePlotWizardPage::setROIFillColor(QColor col)
+{
+    plot->setROIFillColor(col);
+}
+
+void QFImagePlotWizardPage::setROI2FillColor(QColor col)
+{
+    plot->setROI2FillColor(col);
 }
 
 void QFImagePlotWizardPage::initializePage()

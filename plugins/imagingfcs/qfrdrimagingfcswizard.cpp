@@ -33,10 +33,13 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
     setWindowTitle(tr("Imaging FCS/FCCS Wizard"));
     setPage(InitPage, wizIntro=new QFRadioButtonListWizardPage(tr("Introduction"), this));
-    wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br><br><br><center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"));
+    wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br>"
+                        "<u>Note:</u> It offers a simplified user-interface for processing imaging FCS correlations and calibrations. If you should need more options, please use the full correlator UI under the menu entry <tt>Data Items | Insert Raw Data | imFCS | correlate &amp; insert</tt>.<br><br>"
+                        "<center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"));
     wizIntro->addItem(tr("imFCS / imFCCS evaluation"), true);
     wizIntro->addItem(tr("imFCS focus volume calibration"), false);
     wizIntro->setEnabled(1, QFPluginServices::getInstance()->getEvaluationItemFactory()->contains("imfcs_fit"));
+    wizIntro->setChecked(ProgramOptions::getConfigValue("imaging_fcs/wizard/microscopy", 0).toInt());
     connect(wizIntro, SIGNAL(onValidate(QWizardPage*)), this, SLOT(finishedIntro()));
 
 
@@ -82,6 +85,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     setPage(ImagePage, wizImageProps=new QFImagePlotWizardPage(tr("Set image stack properties ..."), this));
     wizImageProps->setSubTitle(tr("Set/check the properties of the image stack.<br><small><i>The plot shows an average over the first 10 frames.</i></small>"));
     connect(wizImageProps, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(initImagePreview()));
+    connect(wizImageProps, SIGNAL(onValidate(QWizardPage*)), this, SLOT(finishedImageProps()));
 
     labImageProps=new QLabel(wizImageProps);
     labImageProps->setWordWrap(true);
@@ -117,7 +121,39 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizImageProps->addRow(tr("Correlated Frame &Range:"), widFrameRange);
 
 
+    setPage(MicroscopyPage, wizMicroscopy=new QFFormWizardPage(tr("Microscopy Type ..."), this));
+    wizMicroscopy->addRow(tr("Please select the type of microscopy that was used for the data acquisition and specify the focal propertiesa. The latter will be used as presets for any further evaluation, but can be changed at any point during the evaluation. They are also used during imaging FCS calibration, in which case they have to be accurate!"));
+    wizMicroscopy->addStretch();
+    wizMicroscopy->setSubTitle(tr("Select the type of microscopy used during the acquisition."));
+    cmbMicroscopy=new QComboBox(wizMicroscopy);
+    cmbMicroscopy->addItem(tr("lightsheet microscopy (SPIM/LSFM/...), camera-based"));
+    cmbMicroscopy->addItem(tr("TIRF microscopy, camera-based"));
+    cmbMicroscopy->addItem(tr("other microscopy, camera-based"));
+    cmbMicroscopy->addItem(tr("other microscopy, non-camera-based"));
+    cmbMicroscopy->setCurrentIndex(ProgramOptions::getConfigValue("imaging_fcs/wizard/microscopy", 0).toInt());
+    wizMicroscopy->addRow(tr("&Microscopy Technique:"), cmbMicroscopy);
+    wizMicroscopy->addStretch();
+    spinWz=new QDoubleSpinBox(wizMicroscopy);
+    spinWz->setDecimals(2);
+    spinWz->setRange(0.1, 10000);
+    spinWz->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_wz", 1200).toDouble());
+    spinWz->setSuffix(" nm");
+    wizMicroscopy->addRow(tr("PSF z-extent <i>w</i><sub>z</sub>:"), spinWz);
+    wizMicroscopy->addRow(QString(), labWz=new QLabel(tr("give as 1/e<sup>2</sup>-halfwidth<br><i><u>Note:</u> This is required for calibrating SPIM-microscopes and for data-fitting and can be determined e.g. by a bead-scan.</i>"), wizMicroscopy));
+    labWz->setWordWrap(true);
 
+    spinWxy=new QDoubleSpinBox(wizMicroscopy);
+    spinWxy->setDecimals(2);
+    spinWxy->setRange(0.1, 10000);
+    spinWxy->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_wxy", 600).toDouble());
+    spinWxy->setSuffix(" nm");
+    wizMicroscopy->addRow(tr("PSF xy-extent <i>w</i><sub>xy</sub>:"), spinWxy);
+    wizMicroscopy->addRow(QString(), labWxy=new QLabel(tr("give as 1/e<sup>2</sup>-halfwidth<br><i><u>Note:</u> This is required for data-fitting and can be determined by an imaging FCS calibration.</i>"), wizMicroscopy));
+    labWxy->setWordWrap(true);
+
+
+    connect(wizMicroscopy, SIGNAL(onValidate(QWizardPage*)), this, SLOT(microscopyChoosen()));
+    connect(cmbMicroscopy, SIGNAL(currentIndexChanged(int)), this, SLOT(microscopyChoosen()));
 
 
 
@@ -166,26 +202,143 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     cmbCalibRegion->addItem(tr("user-defined crop"));
     cmbCalibRegion->setCurrentIndex(0);
     wizCalibration->addRow(tr("calibration region:"), cmbCalibRegion);
+    cmbCalibRegion->setCurrentIndex(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_region", 0).toInt());
     spinCalibrationCenterSize=new QSpinBox(wizCalibration);
     wizCalibration->addRow(tr("\"center\" region size:"), spinCalibrationCenterSize);
 
     widCropCalibration=new QFCropPixelsEdit(wizCalibration);
     widCropCalibration->addLayoutStretchAtEnd();
     wizCalibration->addRow(tr("user-defined crop:"), widCropCalibration);
+    wizCalibration->addStretch();
+
+    spinCalibExectedWxy=new QDoubleSpinBox(wizCalibration);
+    spinCalibExectedWxy->setDecimals(2);
+    spinCalibExectedWxy->setRange(0.1, 10000);
+    spinCalibExectedWxy->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_wxy", 600).toDouble());
+    spinCalibExectedWxy->setSuffix(" nm");
+    wizCalibration->addRow(tr("expected PSF x/y-extent <i>w</i><sub>xy</sub>:"), spinCalibExectedWxy);
+
+    spinCalibExpectedWxyTests=new QSpinBox(wizCalibration);
+    spinCalibExpectedWxyTests->setRange(3,50);
+    spinCalibExpectedWxyTests->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_wxy_tests", 5).toInt());
+    spinCalibExpectedWxySteps=new QDoubleSpinBox(wizCalibration);
+    spinCalibExpectedWxySteps->setDecimals(2);
+    spinCalibExpectedWxySteps->setRange(0.1, 10000);
+    spinCalibExpectedWxySteps->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_wxy_steps", 100).toDouble());
+    spinCalibExpectedWxySteps->setSuffix(" nm");
+    labCalibExpectedWxyTests=new QLabel(wizCalibration);
+    labCalibExpectedWxyTests->setWordWrap(true);
+
+    wizCalibration->addRow(tr("<i>w</i><sub>xy</sub>-tests around expectation:"), qfBuildQHBoxLayoutWithFinalStretch(spinCalibExpectedWxyTests, new QLabel(tr("   in steps of "), wizCalibration), spinCalibExpectedWxySteps));
+    wizCalibration->addRow(QString(), labCalibExpectedWxyTests);
+
+    spinCalibBinMax=new QSpinBox(wizCalibration);
+    spinCalibBinMax->setRange(1,100);
+    spinCalibBinMax->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_maxbin", 5).toInt());
+    spinCalibBinMax->setSuffix(tr(" pixels"));
+    wizCalibration->addRow(tr("max. binning:"), spinCalibBinMax);
+    labCalibBinMax=new QLabel(wizCalibration);
+    labCalibBinMax->setWordWrap(true);
+    wizCalibration->addRow(QString(), labCalibBinMax);
+    wizCalibration->addStretch();
 
     connect(spinCalibrationCenterSize, SIGNAL(valueChanged(int)), this, SLOT(calibrationCropValuesChanged()));
+    connect(spinCalibBinMax, SIGNAL(valueChanged(int)), this, SLOT(calibWxyTestChanged()));
     connect(widCropCalibration, SIGNAL(valueChanged(int,int,int,int)), this, SLOT(calibrationCropValuesChanged()));
     connect(cmbCalibRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(calibrationRegionChanged(int)));
+    connect(wizCalibration, SIGNAL(onValidate(QWizardPage*)), this, SLOT(calibrationSetupFinished()));
+    connect(wizCalibration, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(calibWxyTestChanged()));
+    connect(wizCalibration, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(calibrationCropValuesChanged()));
+    connect(spinCalibExectedWxy, SIGNAL(valueChanged(double)), this, SLOT(calibWxyTestChanged()));
+    connect(spinCalibExpectedWxyTests, SIGNAL(valueChanged(int)), this, SLOT(calibWxyTestChanged()));
+    connect(spinCalibExpectedWxySteps, SIGNAL(valueChanged(int)), this, SLOT(calibWxyTestChanged()));
     calibrationCropValuesChanged();
 
 
-    setPage(CropAndBinPage, wizCropAndBin=new QFFormWizardPage(tr("Setup Crop & Bin ..."), this));
+    setPage(CropAndBinPage, wizCropAndBin=new QFImagePlotWizardPage(tr("Setup Crop & Bin ..."), this));
     wizCropAndBin->setNextID(CropAndBinPage);
+    cmbCropRegion=new QComboBox(wizCropAndBin);
+    cmbCropRegion->addItem(tr("all pixels"));
+    cmbCropRegion->addItem(tr("left half (x = 0..w/2)"));
+    cmbCropRegion->addItem(tr("right half (x = w/2..w)"));
+    cmbCropRegion->addItem(tr("top half (y = 0..h/2)"));
+    cmbCropRegion->addItem(tr("bottom half (y = h/2..h)"));
+    cmbCropRegion->addItem(tr("center"));
+    cmbCropRegion->addItem(tr("left center (around x = w/4)"));
+    cmbCropRegion->addItem(tr("right center (around x = 3*w/4)"));
+    cmbCropRegion->addItem(tr("top center (around y = h/4)"));
+    cmbCropRegion->addItem(tr("bottom center (around y = 3*h/4)"));
+    cmbCropRegion->addItem(tr("user-defined crop"));
+    cmbCropRegion->setCurrentIndex(0);
+    wizCropAndBin->addRow(tr("calibration region:"), cmbCropRegion);
+    cmbCropRegion->setCurrentIndex(ProgramOptions::getConfigValue("imaging_fcs/wizard/crop_region", 0).toInt());
+    spinCropCenterSize=new QSpinBox(wizCropAndBin);
+    wizCropAndBin->addRow(tr("\"center\" region size:"), spinCropCenterSize);
 
+    widCrop=new QFCropPixelsEdit(wizCropAndBin);
+    widCrop->addLayoutStretchAtEnd();
+    wizCropAndBin->addRow(tr("user-defined crop:"), widCrop);
+    wizCropAndBin->addStretch();
+    spinBinning=new QSpinBox(wizCropAndBin);
+    spinBinning->setRange(1,100);
+    spinBinning->setValue(1);
+    spinBinning->setSuffix(tr(" pixels"));
+    labBinning=new QLabel(wizCropAndBin);
+    labBinning->setWordWrap(true);
+    wizCropAndBin->addRow(tr("pixel-binning:"), spinBinning);
+    wizCropAndBin->addRow(QString(), labBinning);
+    wizCropAndBin->addStretch();
+    connect(spinCropCenterSize, SIGNAL(valueChanged(int)), this, SLOT(cropValuesChanged()));
+    connect(widCrop, SIGNAL(valueChanged(int,int,int,int)), this, SLOT(cropValuesChanged()));
+    connect(spinBinning, SIGNAL(valueChanged(int)), this, SLOT(cropValuesChanged()));
+    connect(cmbCropRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(cropRegionChanged(int)));
+    connect(wizCropAndBin, SIGNAL(onValidate(QWizardPage*)), this, SLOT(cropSetupFinished()));
+    cropValuesChanged();
 
 
     setPage(CorrelationPage, wizCorrelation=new QFFormWizardPage(tr("Setup Correlation ..."), this));
     wizCropAndBin->setNextID(CorrelationPage);
+    chkACF=new QCheckBox(wizCorrelation);
+    chkACF->setChecked(true);
+    wizCorrelation->addRow(tr("calculate autocorrelations (ACFs):"), chkACF);
+    chk2ColorFCCS=new QCheckBox(wizCorrelation);
+    chk2ColorFCCS->setChecked(false);
+    wizCorrelation->addRow(tr("calculate 2-color FCCS:"), chk2ColorFCCS);
+    cmb2PixelFCCS=new QComboBox(wizCorrelation);
+    cmb2PixelFCCS->addItem(tr("none"));
+    cmb2PixelFCCS->addItem(tr("4 direct neighbors"));
+    cmb2PixelFCCS->addItem(tr("8 direct neighbors"));
+    cmb2PixelFCCS->addItem(tr("right neighbor (dx=1)"));
+    cmb2PixelFCCS->addItem(tr("left neighbor (dx=-1)"));
+    cmb2PixelFCCS->addItem(tr("top neighbor (dy=1)"));
+    cmb2PixelFCCS->addItem(tr("bottom neighbor (dy=-1)"));
+    cmb2PixelFCCS->addItem(tr("2 right neighbors (dx=1..2)"));
+    cmb2PixelFCCS->addItem(tr("2 left neighbors (dx=-1..-2)"));
+    cmb2PixelFCCS->addItem(tr("2 top neighbors (dy=1..2)"));
+    cmb2PixelFCCS->addItem(tr("2 bottom neighbors (dy=-1..-2)"));
+    cmb2PixelFCCS->addItem(tr("5 right neighbors (dx=1..5)"));
+    cmb2PixelFCCS->addItem(tr("5 left neighbors (dx=-1..-5)"));
+    cmb2PixelFCCS->addItem(tr("5 top neighbors (dy=1..5)"));
+    cmb2PixelFCCS->addItem(tr("5 bottom neighbors (dy=-1..-5)"));
+    cmb2PixelFCCS->addItem(tr("10 right neighbors (dx=1..10)"));
+    cmb2PixelFCCS->addItem(tr("10 left neighbors (dx=-1..-10)"));
+    cmb2PixelFCCS->addItem(tr("10 top neighbors (dy=1..10)"));
+    cmb2PixelFCCS->addItem(tr("10 bottom neighbors (dy=-1..-10)"));
+    cmb2PixelFCCS->setCurrentIndex(0);
+    wizCorrelation->addRow(tr("calculate 2-pixel FCCS:"), cmb2PixelFCCS);
+    spinTauMax=new QDoubleSpinBox(wizCorrelation);
+    spinTauMax->setDecimals(3);
+    spinTauMax->setRange(0.001,1000000);
+    spinTauMax->setValue(10);
+    spinTauMax->setSuffix(tr(" s"));
+    wizCorrelation->addRow(tr("max. lag-time in correlations:"), spinTauMax);
+    spinSegments=new QSpinBox(wizCorrelation);
+    spinSegments->setRange(1,100);
+    spinSegments->setValue(5);
+    spinSegments->setSpecialValueText(tr("1 (use blocking for error estimate)"));
+    wizCorrelation->addRow(tr("number of correlated segments:"), spinSegments);
+    labSegments=new QLabel(wizCorrelation);
+    labSegments->setWordWarp(true);
 
 
 
@@ -200,18 +353,18 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
         labFinal->setText(tr("You completed this wizard. The selected files will now be inserted as imaging FCS raw data records (RDR) into the project.<br><br><b>Please select the evaluation objects that should be added to the project below.</b>"));
         cmbImFCSFitMode=new QFEnhancedComboBox(this);
         wizFinalizePage->addRow(tr("Fit Mode:"), cmbImFCSFitMode);
-        cmbImFCSFitMode->addItem(tr("TIR-FCS: normal diffusion 1-component"));
-        cmbImFCSFitMode->addItem(tr("TIR-FCS: normal diffusion 2-component"));
-        cmbImFCSFitMode->addItem(tr("TIR-FCS: anomalous diffusion"));
-        cmbImFCSFitMode->addItem(tr("TIR-FCS: diffusion + flow"));
-        cmbImFCSFitMode->addItem(tr("SPIM-FCS: normal diffusion 1-component"));
-        cmbImFCSFitMode->addItem(tr("SPIM-FCS: normal diffusion 2-component"));
-        cmbImFCSFitMode->addItem(tr("SPIM-FCS: anomalous diffusion"));
-        cmbImFCSFitMode->addItem(tr("SPIM-FCS: diffusion + flow"));
-        cmbImFCSFitMode->addItem(tr("confocal FCS: normal diffusion 1-component"));
-        cmbImFCSFitMode->addItem(tr("confocal FCS: normal diffusion 2-component"));
-        cmbImFCSFitMode->addItem(tr("confocal FCS: anomalous diffusion"));
-        cmbImFCSFitMode->addItem(tr("confocal FCS: diffusion + flow"));
+        cmbImFCSFitMode->addItem(tr("TIR-FCS/FCCS: normal diffusion 1-component"));
+        cmbImFCSFitMode->addItem(tr("TIR-FCS/FCCS: normal diffusion 2-component"));
+        cmbImFCSFitMode->addItem(tr("TIR-FCS/FCCS: anomalous diffusion"));
+        cmbImFCSFitMode->addItem(tr("TIR-FCS/FCCS: diffusion + flow"));
+        cmbImFCSFitMode->addItem(tr("SPIM-FCS/FCCS: normal diffusion 1-component"));
+        cmbImFCSFitMode->addItem(tr("SPIM-FCS/FCCS: normal diffusion 2-component"));
+        cmbImFCSFitMode->addItem(tr("SPIM-FCS/FCCS: anomalous diffusion"));
+        cmbImFCSFitMode->addItem(tr("SPIM-FCS/FCCS: diffusion + flow"));
+        cmbImFCSFitMode->addItem(tr("confocal FCS/FCCS: normal diffusion 1-component"));
+        cmbImFCSFitMode->addItem(tr("confocal FCS/FCCS: normal diffusion 2-component"));
+        cmbImFCSFitMode->addItem(tr("confocal FCS/FCCS: anomalous diffusion"));
+        cmbImFCSFitMode->addItem(tr("confocal FCS/FCCS: diffusion + flow"));
         chkLastImFCSFit1=new QCheckBox(tr("single-curve FCS fit (e.g. ACF)"), this);
         chkLastImFCSFit1->setChecked(true);
         wizFinalizePage->addRow(tr("Evaluations"), chkLastImFCSFit1);
@@ -263,7 +416,20 @@ void QFRDRImagingFCSWizard::edtFilenameTextChanged(const QString &filename)
 
 void QFRDRImagingFCSWizard::initImagePreview()
 {
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", cmbMicroscopy->currentIndex());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", wizIntro->getChecked());
+}
 
+void QFRDRImagingFCSWizard::finishedImageProps()
+{
+    chk2ColorFCCS->setEnabled(cmbDualView->currentIndex()>0);
+    if (cmbDualView->currentIndex()>0) {
+        chk2ColorFCCS->setChecked(true);
+        chk2ColorFCCS->setText("");
+    } else {
+        chk2ColorFCCS->setText("unavailable: you did not select a DualView mode on the previous pages!");
+    }
+    spinTauMax->setValue(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/3.0);
 }
 
 void QFRDRImagingFCSWizard::initFileSelection()
@@ -276,6 +442,8 @@ void QFRDRImagingFCSWizard::initFileSelection()
 void QFRDRImagingFCSWizard::finishedIntro()
 {
     isCalibration=wizIntro->isChecked(1);
+    spinWxy->setEnabled(!isCalibration);
+    labWxy->setEnabled(!isCalibration);
 }
 
 void QFRDRImagingFCSWizard::backgroundModeChanged(int mode)
@@ -308,6 +476,10 @@ void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
 {
     spinCalibrationCenterSize->setEnabled(false);
     widCropCalibration->setEnabled(false);
+    QColor col=QColor("red");
+    wizCalibration->setROIColor(col);
+    col.setAlphaF(0.2);
+    wizCalibration->setROIFillColor(col);
     switch(region) {
         case 0: //all pixels
             wizCalibration->setROI(0,0,image_width_io, image_height_io);
@@ -353,8 +525,8 @@ void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
             {
                 spinCalibrationCenterSize->setEnabled(true);
                 int w=spinCalibrationCenterSize->value();
-                int x=qBound(0, 3*image_width_io/4-w/2, image_width_io-1);
-                int y=qBound(0, image_height_io/2-w/2, image_height_io-1);
+                int x=qBound(0, (3*image_width_io-2*w)/4, image_width_io-1);
+                int y=qBound(0, (image_height_io-w)/2, image_height_io-1);
                 wizCalibration->setROI(x,y,w,w);
                 wizCalibration->resetROI2();
             }
@@ -390,6 +562,145 @@ void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
 void QFRDRImagingFCSWizard::calibrationCropValuesChanged()
 {
     calibrationRegionChanged(cmbCalibRegion->currentIndex());
+}
+
+void QFRDRImagingFCSWizard::cropRegionChanged(int region)
+{
+    spinCropCenterSize->setEnabled(false);
+    widCrop->setEnabled(false);
+    QColor col=QColor("red");
+    wizCropAndBin->setROIColor(col);
+    col.setAlphaF(0.2);
+    wizCropAndBin->setROIFillColor(col);
+    switch(region) {
+        case 0: //all pixels
+            wizCropAndBin->setROI(0,0,image_width_io, image_height_io);
+            wizCropAndBin->resetROI2();
+            break;
+        case 1: // "left half"
+            wizCropAndBin->setROI(0,0,image_width_io/2, image_height_io);
+            wizCropAndBin->resetROI2();
+            break;
+        case 2: // "right half"
+            wizCropAndBin->setROI(image_width_io/2,0,image_width_io/2, image_height_io);
+            wizCropAndBin->resetROI2();
+            break;
+        case 3: // "top half"
+            wizCropAndBin->setROI(0,image_height_io/2,image_width_io, image_height_io/2);
+            wizCropAndBin->resetROI2();
+            break;
+        case 4: // "bottom half"
+            wizCropAndBin->setROI(0,0,image_width_io, image_height_io/2);
+            wizCropAndBin->resetROI2();
+            break;
+        case 5: // "center pixels"
+            {
+                spinCropCenterSize->setEnabled(true);
+                int w=spinCropCenterSize->value();
+                int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
+                int y=qBound(0, image_height_io/2-w/2, image_height_io-1);
+                wizCropAndBin->setROI(x,y,w,w);
+                wizCropAndBin->resetROI2();
+            }
+            break;
+        case 6: // "left center"
+            {
+                spinCropCenterSize->setEnabled(true);
+                int w=spinCropCenterSize->value();
+                int x=qBound(0, image_width_io/4-w/2, image_width_io-1);
+                int y=qBound(0, image_height_io/2-w/2, image_height_io-1);
+                wizCropAndBin->setROI(x,y,w,w);
+                wizCropAndBin->resetROI2();
+            }
+            break;
+        case 7: // "right center"
+            {
+                spinCropCenterSize->setEnabled(true);
+                int w=spinCropCenterSize->value();
+                int x=qBound(0, (3*image_width_io-2*w)/4, image_width_io-1);
+                int y=qBound(0, (image_height_io-w)/2, image_height_io-1);
+                wizCropAndBin->setROI(x,y,w,w);
+                wizCropAndBin->resetROI2();
+            }
+            break;
+        case 8: // "top center"
+            {
+                spinCropCenterSize->setEnabled(true);
+                int w=spinCropCenterSize->value();
+                int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
+                int y=qBound(0, 3*image_height_io/4-w/2, image_height_io-1);
+                wizCropAndBin->setROI(x,y,w,w);
+                wizCropAndBin->resetROI2();
+            }
+            break;
+        case 9: // "bottom center"
+            {
+                spinCropCenterSize->setEnabled(true);
+                int w=spinCropCenterSize->value();
+                int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
+                int y=qBound(0, image_height_io/4-w/2, image_height_io-1);
+                wizCropAndBin->setROI(x,y,w,w);
+                wizCropAndBin->resetROI2();
+            }
+            break;
+        case 10: // "user-defined crop"
+            widCrop->setEnabled(true);
+            wizCropAndBin->setROI(widCrop->getX1(), widCrop->getY1(),widCrop->getWIDTH(), widCrop->getHEIGHT());
+            wizCropAndBin->resetROI2();
+            break;
+    }
+
+    labBinning->setText(tr("=> virtual pixel size: %1x%2 nm<sup>2</sup>").arg(widPixSize->getPixelWidth()*double(spinBinning->value())).arg(widPixSize->getPixelHeight()*double(spinBinning->value())));
+}
+
+void QFRDRImagingFCSWizard::cropValuesChanged()
+{
+    cropRegionChanged(cmbCropRegion->currentIndex());
+}
+
+void QFRDRImagingFCSWizard::microscopyChoosen()
+{
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wz", spinWz->value());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wxy", spinWxy->value());
+
+    spinWz->setEnabled(cmbMicroscopy->currentIndex()!=1);
+    labWz->setVisible(cmbMicroscopy->currentIndex()!=1);
+    spinWxy->setEnabled(wizIntro->isChecked(0) && !isCalibration);
+    labWxy->setEnabled(wizIntro->isChecked(0) && !isCalibration);
+
+}
+
+void QFRDRImagingFCSWizard::calibrationSetupFinished()
+{
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_region", cmbCalibRegion->currentIndex());
+}
+
+void QFRDRImagingFCSWizard::cropSetupFinished()
+{
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/crop_region", cmbCropRegion->currentIndex());
+}
+
+void QFRDRImagingFCSWizard::correlationValuesChanged()
+{
+    labSegments->setText(tr("=> segment length %1 s").arg(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/double(spinSegments->value())));
+}
+
+void QFRDRImagingFCSWizard::calibWxyTestChanged()
+{
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wxy", spinCalibExectedWxy->value());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wxy_tests", spinCalibExpectedWxyTests->value());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wxy_steps", spinCalibExpectedWxySteps->value());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_maxbin", spinCalibBinMax->value());
+
+    QStringList wxy;
+    calibWxyTest.clear();
+    for (int i=-spinCalibExpectedWxyTests->value()/2; i<(spinCalibExpectedWxyTests->value()-spinCalibExpectedWxyTests->value()/2); i++) {
+        calibWxyTest.append(spinCalibExectedWxy->value()+double(i)*spinCalibExpectedWxySteps->value());
+        wxy.append(QString("%1").arg(calibWxyTest.last()));
+    }
+
+    labCalibExpectedWxyTests->setText(tr("<i>testing w<sub>xy</sub> = %1 nm</i>").arg(wxy.join(", ")));
+    labCalibBinMax->setText(tr("=> virtual pixel size range: %3x%4 - %1x%2 nm<sup>2</sup>").arg(widPixSize->getPixelWidth()*double(spinCalibBinMax->value())).arg(widPixSize->getPixelHeight()*double(spinCalibBinMax->value())).arg(widPixSize->getPixelWidth()).arg(widPixSize->getPixelHeight()));
 }
 
 
@@ -435,7 +746,9 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
 
         wizard->wizImageProps->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
         wizard->wizCalibration->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
+        wizard->wizCropAndBin->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
         wizard->calibrationRegionChanged(wizard->cmbCalibRegion->currentIndex());
+        wizard->cropRegionChanged(wizard->cmbCropRegion->currentIndex());
 
 
         if (wizard->frame_data_io) qfFree(wizard->frame_data_io);
@@ -447,6 +760,8 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
         wizard->widPixSize->setPixelSize(wizard->pixel_width_io, wizard->pixel_height_io);
         wizard->widFrameRange->setRange(0, wizard->frame_count_io-1);
         wizard->cmbDualView->setCurrentIndex(wizard->dualViewMode_io);
+
+
         wizard->spinFrametime->setValue(wizard->frametime_io);
         wizard->edtBackgroundFilename->setText(wizard->backgroundF_io);
         wizard->cmbBackgroundMode->setCurrentIndex(0);
@@ -455,8 +770,12 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
         wizard->backgroundModeChanged(wizard->cmbBackgroundMode->currentIndex());
         wizard->spinCalibrationCenterSize->setRange(1,qMax(wizard->image_width_io, wizard->image_height_io));
         wizard->spinCalibrationCenterSize->setValue(qMin(wizard->image_width_io, wizard->image_height_io));
+        wizard->spinCropCenterSize->setRange(1,qMax(wizard->image_width_io, wizard->image_height_io));
+        wizard->spinCropCenterSize->setValue(qMin(wizard->image_width_io, wizard->image_height_io));
         wizard->widCropCalibration->setImageSize(wizard->image_width_io, wizard->image_height_io);
         wizard->widCropCalibration->setFullImageSize();
+        wizard->widCrop->setImageSize(wizard->image_width_io, wizard->image_height_io);
+        wizard->widCrop->setFullImageSize();
 
         if (wizard->cmbDualView->currentIndex()==1) {
             wizard->cmbCalibRegion->setCurrentIndex(1);

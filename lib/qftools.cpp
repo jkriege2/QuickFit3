@@ -1825,3 +1825,58 @@ QString qfSecondsDurationToMSString(double seconds) {
 
     return QString("%1:%2").arg(runMins,2,10,QLatin1Char('0')).arg(runSecs,2,10,QLatin1Char('0'));
 }
+
+QHBoxLayout* qfBuildQHBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3, QWidget* w4, QWidget* w5, QWidget* w6, QWidget* w7, QWidget* w8, QWidget* w9) {
+    QHBoxLayout* lay=qfBuildQHBoxLayout(w1,w2,w3,w4,w5,w6,w7,w8,w9);
+    lay->addStretch();
+    return lay;
+}
+
+QVBoxLayout* qfBuildQVBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3, QWidget* w4, QWidget* w5, QWidget* w6, QWidget* w7, QWidget* w8, QWidget* w9) {
+    QVBoxLayout* lay=qfBuildQVBoxLayout(w1,w2,w3,w4,w5,w6,w7,w8,w9);
+    lay->addStretch();
+    return lay;
+}
+
+QHBoxLayout* qfBuildQHBoxLayout(QWidget* w1, QWidget* w2, QWidget* w3, QWidget* w4, QWidget* w5, QWidget* w6, QWidget* w7, QWidget* w8, QWidget* w9) {
+    QHBoxLayout* lay=new QHBoxLayout();
+    if (w1) lay->addWidget(w1);
+    if (w2) lay->addWidget(w2);
+    if (w3) lay->addWidget(w3);
+    if (w4) lay->addWidget(w4);
+    if (w5) lay->addWidget(w5);
+    if (w6) lay->addWidget(w6);
+    if (w7) lay->addWidget(w7);
+    if (w8) lay->addWidget(w8);
+    if (w9) lay->addWidget(w9);
+    return lay;
+}
+
+QVBoxLayout* qfBuildQVBoxLayout(QWidget* w1, QWidget* w2, QWidget* w3, QWidget* w4, QWidget* w5, QWidget* w6, QWidget* w7, QWidget* w8, QWidget* w9) {
+    QVBoxLayout* lay=new QVBoxLayout();
+    if (w1) lay->addWidget(w1);
+    if (w2) lay->addWidget(w2);
+    if (w3) lay->addWidget(w3);
+    if (w4) lay->addWidget(w4);
+    if (w5) lay->addWidget(w5);
+    if (w6) lay->addWidget(w6);
+    if (w7) lay->addWidget(w7);
+    if (w8) lay->addWidget(w8);
+    if (w9) lay->addWidget(w9);
+    return lay;
+}
+
+QFormLayout* qfBuildQFormLayout(const QString& l1, QWidget* w1, const QString& l2, QWidget* w2, const QString& l3, QWidget* w3, const QString& l4, QWidget* w4, const QString& l5, QWidget* w5, const QString& l6, QWidget* w6, const QString& l7, QWidget* w7, const QString& l8, QWidget* w8, const QString& l9, QWidget* w9) {
+    QFormLayout* lay=new QFormLayout();
+    if (w1) lay->addRow(l1, w1);
+    if (w2) lay->addRow(l2, w2);
+    if (w3) lay->addRow(l3, w3);
+    if (w4) lay->addRow(l4, w4);
+    if (w5) lay->addRow(l5, w5);
+    if (w6) lay->addRow(l6, w6);
+    if (w7) lay->addRow(l7, w7);
+    if (w8) lay->addRow(l8, w8);
+    if (w9) lay->addRow(l9, w9);
+    return lay;
+
+}
