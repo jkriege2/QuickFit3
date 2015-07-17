@@ -88,14 +88,14 @@ class QFRDRImagingFCSWizard : public QFWizard {
 
 
 
-        QFFormWizardPage* wizBackground;
+        QFFormWizardPage* wizBackgroundAndBleach;
         QFEnhancedLineEdit* edtBackgroundFilename;
         QFStyledButton* btnBackgroundFilename;
         QComboBox* cmbBackgroundMode;
         QSpinBox* spinBackgroundOffset;
         QLabel* labBackgroundError;
-
         QLabel* labImageProps;
+        QComboBox* cmbBleachCorrection;
 
         QFFormWizardPage* wizProcessJobs;
         QFFormWizardPage* wizFinalizePage;

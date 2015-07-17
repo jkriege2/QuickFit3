@@ -159,31 +159,46 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
 
 
-    setPage(BackgroundPage, wizBackground=new QFFormWizardPage(tr("Background Correction Settings ..."), this));
-    wizBackground->setValidateFunctor(new QFRDRImagingFCSWizard_BackgroundIsValid(this));
-    wizBackground->setNextIDFunctor(new QFRDRImagingFCSWizard_BackgroundNextId(this));
-    wizBackground->setFreeFunctors(true);
-    cmbBackgroundMode=new QComboBox(wizBackground);
+    setPage(BackgroundPage, wizBackgroundAndBleach=new QFFormWizardPage(tr("Background and Bleach Correction Settings ..."), this));
+    wizBackgroundAndBleach->setValidateFunctor(new QFRDRImagingFCSWizard_BackgroundIsValid(this));
+    wizBackgroundAndBleach->setNextIDFunctor(new QFRDRImagingFCSWizard_BackgroundNextId(this));
+    wizBackgroundAndBleach->setFreeFunctors(true);
+    cmbBackgroundMode=new QComboBox(wizBackgroundAndBleach);
     cmbBackgroundMode->addItem(tr("none"));
     cmbBackgroundMode->addItem(tr("remove offset"));
     cmbBackgroundMode->addItem(tr("remove minimum counts & offset"));
     cmbBackgroundMode->addItem(tr("remove background image & offset"));
     connect(cmbBackgroundMode, SIGNAL(currentIndexChanged(int)), this, SLOT(backgroundModeChanged(int)));
-    wizBackground->addRow(tr("background correction mode:"), cmbBackgroundMode);
-    edtBackgroundFilename=new QFEnhancedLineEdit(wizBackground);
+    wizBackgroundAndBleach->addRow(tr("Background &Correction Mode:"), cmbBackgroundMode);
+    edtBackgroundFilename=new QFEnhancedLineEdit(wizBackgroundAndBleach);
     edtBackgroundFilename->addButton(btnBackgroundFilename=new QFStyledButton(QFStyledButton::SelectFile, edtBackgroundFilename, edtBackgroundFilename));
     btnBackgroundFilename->setFilter(imageFilters.join(";;"));
     edtBackgroundFilename->setEnabled(false);
-    wizBackground->addRow(tr("background image stack:"), edtBackgroundFilename);
-    spinBackgroundOffset=new QSpinBox(wizBackground);
+    wizBackgroundAndBleach->addRow(tr("Background Image Stack &File:"), edtBackgroundFilename);
+    spinBackgroundOffset=new QSpinBox(wizBackgroundAndBleach);
     spinBackgroundOffset->setSuffix(tr(" ADU"));
     spinBackgroundOffset->setRange(-100000000,100000000);
     spinBackgroundOffset->setValue(0);
     spinBackgroundOffset->setEnabled(false);
-    wizBackground->addRow(tr("background offset:"), spinBackgroundOffset);
-    labBackgroundError=new QLabel(wizBackground);
+    wizBackgroundAndBleach->addRow(tr("Background &Offset:"), spinBackgroundOffset);
+    labBackgroundError=new QLabel(wizBackgroundAndBleach);
     labBackgroundError->setWordWrap(true);
-    wizBackground->addRow(labBackgroundError);
+    wizBackgroundAndBleach->addRow(labBackgroundError);
+
+    wizBackgroundAndBleach->addStretch();
+    cmbBleachCorrection=new QComboBox(wizBackgroundAndBleach);
+    cmbBleachCorrection->addItem(tr("none"));
+    cmbBleachCorrection->addItem(tr("subtract average"));
+    cmbBleachCorrection->addItem(tr("1-exponential LM-fit"));
+    cmbBleachCorrection->addItem(tr("1-exponential regression"));
+    cmbBleachCorrection->addItem(tr("1-exponential(poly2) LM-fit"));
+    cmbBleachCorrection->addItem(tr("1-exponential(poly3) LM-fit"));
+    cmbBleachCorrection->addItem(tr("2-exponential LM-fit"));
+    cmbBleachCorrection->addItem(tr("1-exponential(poly4) LM-fit"));
+    cmbBleachCorrection->addItem(tr("1-exponential(poly5) LM-fit"));
+    cmbBleachCorrection->setCurrentIndex(ProgramOptions::getConfigValue("imaging_fcs/wizard/bleach_correction", 0).toInt());
+    wizBackgroundAndBleach->addRow(tr("&Bleach Correction:"), cmbBleachCorrection);
+    wizBackgroundAndBleach->addStretch();
 
 
 
@@ -709,6 +724,7 @@ void QFRDRImagingFCSWizard::calibWxyTestChanged()
 bool QFRDRImagingFCSWizard_BackgroundIsValid::isValid(QFWizardPage *page)
 {
     if (wizard) {
+        ProgramOptions::setConfigValue("imaging_fcs/wizard/bleach_correction", wizard->cmbBleachCorrection->currentIndex());
         wizard->labBackgroundError->setText("");
         QFRDRImagingFCSCorrelationDialog::readBackgroundProperties(wizard->edtBackgroundFilename->text(), wizard->cmbFileformat->currentIndex(), page, &(wizard->background_width), &(wizard->background_height), &(wizard->background_count));
         if (wizard->cmbBackgroundMode->currentIndex()==0) {
