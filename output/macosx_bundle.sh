@@ -86,10 +86,13 @@ ZIPFILE=quickfit3_macx${BITDEPTH}_${SVNVER}.zip
 
 DMGFILE=quickfit3_macx${BITDEPTH}_${SVNVER}.dmg
 
-echo "--- make install of QuickFit 3 ---"
-cd ..
-make install -j32
-cd output
+if [ "$simple" == "0" ]; then
+	echo "--- make install of QuickFit 3 ---"
+	cd ..
+	make -j4
+	make install -j32
+	cd output
+fi
 
 echo "--- installing QF plugins and libs into bundle ---"
 rm -r ./quickfit3.app/Contents/Frameworks/quickfit3lib.framework
