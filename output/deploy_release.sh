@@ -86,27 +86,13 @@ echo -e "DEPLOYING QUICKFIT\n  in order to deploy without recompiling, call with
 svn update
 svn update ../output
 echo -e "\n\ndetermining SVN version:"
-SVNVER=`svnversion`
-#if [ -z $SVNVER]
-#	SVNVER=newest
-#fi
+SVNVER=`git rev-list HEAD --count`
+SVNVER=$((2100 + SVNVER))
 echo -e "\n   SVN version: ${SVNVER}"
 echo -e "\n\ndetermining compile date:"
 COMPILEDATE=`date +%Y-%m-%d`
 echo -e "\n   compile date: ${COMPILEDATE}"
 echo -e "\n\ndetermining bit depth:"
-#echo '
-##include <stdio.h>
-#int main() {
-#	int i=sizeof(void*)*8;
-#	printf("%d\n", i);
-#	return 0;
-#}
-#' > test~.cpp
-#g++ -o a.out test~.cpp
-#BITDEPTH=`./a.out`
-#rm a.out 
-#rm test~.cpp
 BITDEPTH=`./quickfit3.exe --getbits`
 echo -e "\n   bit depth: ${BITDEPTH}\n\n"
 
