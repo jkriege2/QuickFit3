@@ -10,3 +10,6 @@
 [submodule "extlibsb040/libtiff_tools"]
 	path = extlibsb040/libtiff_tools
 	url = https://github.com/jkriege2/libtiff_tools.git
+[submodule "extlibsb040/TinyMAT"]
+	path = extlibsb040/TinyMAT
+	url = https://github.com/jkriege2/TinyMAT.git
