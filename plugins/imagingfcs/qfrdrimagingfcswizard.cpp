@@ -353,7 +353,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     spinSegments->setSpecialValueText(tr("1 (use blocking for error estimate)"));
     wizCorrelation->addRow(tr("number of correlated segments:"), spinSegments);
     labSegments=new QLabel(wizCorrelation);
-    labSegments->setWordWarp(true);
+    labSegments->setWordWrap(true);
 
 
 
