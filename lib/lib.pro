@@ -39,7 +39,7 @@ release {
 }
 
 
-INCLUDEPATH += .
+INCLUDEPATH += $(PWD)
 INCLUDEPATH += ../extlibsb040/StatisticsTools/
 INCLUDEPATH += ../extlibsb040/TinyMAT/
 
