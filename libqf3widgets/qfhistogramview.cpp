@@ -912,7 +912,7 @@ void QFHistogramView::copyDataMatlab()
     QStringList headers;
     fillDataArray(data, headers);
 
-    matlabCopy(data);
+    matlabCopyScript(data);
 }
 
 void QFHistogramView::showHelp()

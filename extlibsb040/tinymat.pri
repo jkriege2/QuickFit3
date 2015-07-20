@@ -19,7 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-DEFINES += QF_HAS_TINYMAT
+DEFINES += QF_HAS_TINYMAT TINYMAT_USES_QVARIANT
 
 HEADERS += $$PWD/TinyMAT/tinymatwriter.h
 SOURCES += $$PWD/TinyMAT/tinymatwriter.cpp

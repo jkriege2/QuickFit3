@@ -41,6 +41,7 @@ release {
 
 INCLUDEPATH += .
 INCLUDEPATH += ../extlibsb040/StatisticsTools/
+INCLUDEPATH += ../extlibsb040/TinyMAT/
 
 
 

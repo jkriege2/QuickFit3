@@ -28,39 +28,11 @@
 #include <QApplication>
 #include <QMimeData>
 #include <QClipboard>
+#include "datatools.h"
+#include "tinymatwriter.h"
 
 
-QString toMatlab(const QList<QList<double> >& data, bool noVarDef) {
-
-    QString matlab="M = [";
-    if (noVarDef) matlab="[";
-    int datas=0;
-    for (int r=0; r<data.size(); r++) {
-        if (data[r].size()>datas) datas=data[r].size();
-    }
-
-    for (int r=0; r<datas; r++) {
-        for (int c=0; c<data.size(); c++) {
-            if (c>0) {
-                matlab+=", ";
-            }
-            if (r<data[c].size()) {
-                double d=data[c].at(r);
-
-                matlab+=CDoubleToQString(d);
-            }
-        }
-        if (r<datas-1) matlab+=";   ";
-    }
-
-
-
-    if (noVarDef) matlab+="]";
-    else matlab+="];";
-    return matlab;
-}
-
-QString toMatlab(const QList<QVector<double> >& data, bool noVarDef) {
+QString toMatlabScript(const QList<QList<double> >& data, bool noVarDef) {
 
     QString matlab="M = [";
     if (noVarDef) matlab="[";
@@ -90,9 +62,39 @@ QString toMatlab(const QList<QVector<double> >& data, bool noVarDef) {
     return matlab;
 }
 
-void matlabCopy(const QList<QList<double> >& data) {
+QString toMatlabScript(const QList<QVector<double> >& data, bool noVarDef) {
 
-    QString matlab=toMatlab(data, false);
+    QString matlab="M = [";
+    if (noVarDef) matlab="[";
+    int datas=0;
+    for (int r=0; r<data.size(); r++) {
+        if (data[r].size()>datas) datas=data[r].size();
+    }
+
+    for (int r=0; r<datas; r++) {
+        for (int c=0; c<data.size(); c++) {
+            if (c>0) {
+                matlab+=", ";
+            }
+            if (r<data[c].size()) {
+                double d=data[c].at(r);
+
+                matlab+=CDoubleToQString(d);
+            }
+        }
+        if (r<datas-1) matlab+=";   ";
+    }
+
+
+
+    if (noVarDef) matlab+="]";
+    else matlab+="];";
+    return matlab;
+}
+
+void matlabCopyScript(const QList<QList<double> >& data) {
+
+    QString matlab=toMatlabScript(data, false);
     QClipboard *clipboard = QApplication::clipboard();
     QMimeData* mime=new QMimeData();
     mime->setText(matlab);
@@ -100,7 +102,7 @@ void matlabCopy(const QList<QList<double> >& data) {
 }
 
 
-QString toMatlab(const QList<QList<QVariant> >& data, bool noVarDef) {
+QString toMatlabScript(const QList<QList<QVariant> >& data, bool noVarDef) {
     bool isNumberOnly=true;
     for (int i=0; i<data.size(); i++) {
         for (int j=0; j<data[i].size(); j++) {
@@ -128,7 +130,7 @@ QString toMatlab(const QList<QList<QVariant> >& data, bool noVarDef) {
             }
             d.append(dd);
         }
-        return toMatlab(d, noVarDef);
+        return toMatlabScript(d, noVarDef);
     }
 
     QString matlab="C = {";
@@ -170,7 +172,7 @@ QString toMatlab(const QList<QList<QVariant> >& data, bool noVarDef) {
                                 if (d.type()==QVariant::List) {
                                     QList<QList<QVariant> > dd;
                                     dd.append(d.toList());
-                                    matlab+=toMatlab(dd, true);
+                                    matlab+=toMatlabScript(dd, true);
                                 } else if (d.type()==QVariant::Point) {
                                     matlab+=QString("[%1, %2]").arg(CDoubleToQString(d.toPoint().x())).arg(CDoubleToQString(d.toPoint().y()));
                                 } else if (d.type()==QVariant::PointF) {
@@ -205,8 +207,8 @@ QString toMatlab(const QList<QList<QVariant> >& data, bool noVarDef) {
 }
 
 
-void matlabCopy(const QList<QList<QVariant> >& data) {
-    QString matlab=toMatlab(data, false);
+void matlabCopyScript(const QList<QList<QVariant> >& data) {
+    QString matlab=toMatlabScript(data, false);
 
     QClipboard *clipboard = QApplication::clipboard();
     QMimeData* mime=new QMimeData();
@@ -215,18 +217,55 @@ void matlabCopy(const QList<QList<QVariant> >& data) {
 }
 
 
-void matlabCopy(const QList<QVector<double> >& data) {
+void matlabCopyScript(const QList<QVector<double> >& data) {
     QList<QList<double> > d;
     for (int i=0; i<data.size(); i++) {
         d.append(data[i].toList());
     }
-    matlabCopy(d);
+    matlabCopyScript(d);
 }
 
-void matlabCopy(const QList<QVector<QVariant> >& data) {
+void matlabCopyScript(const QList<QVector<QVariant> >& data) {
     QList<QList<QVariant> > d;
     for (int i=0; i<data.size(); i++) {
         d.append(data[i].toList());
     }
-    matlabCopy(d);
+    matlabCopyScript(d);
+}
+
+void saveToMatlabMATfile(const QString&filename, const QList<QList<QVariant> >& data, const QString& varname,  QStringList columnsNames,  QStringList rowNames, bool convertToNumberMatrix) {
+    TinyMATWriterFile* mat=TinyMATWriter_open(filename.toLocal8Bit().data());
+    if (mat) {
+        if (convertToNumberMatrix) {
+            QList<QVector<double> > datad=dataExpandToDouble(data, &columnsNames);
+            double* d=doubleDataToDoubleMatrix(datad);
+            TinyMATWriter_writeMatrix2D_rowmajor(mat, varname.toLocal8Bit().data(), d, datad.size(), dataGetRows(datad));
+            if (d) qfFree(d);
+        } else {
+            if (mayLossLesslyDoDoubleDataToDouble(data)) {
+                QList<QVector<double> > datad=dataToDouble(data, &columnsNames);
+                double* d=doubleDataToDoubleMatrix(datad);
+                TinyMATWriter_writeMatrix2D_rowmajor(mat, varname.toLocal8Bit().data(), d, datad.size(), dataGetRows(datad));
+                if (d) qfFree(d);
+            } else {
+                TinyMATWriter_writeQVariantMatrix_listofcols(mat, varname.toLocal8Bit().data(), data);
+            }
+        }
+        TinyMATWriter_writeQStringList(mat, "columnNames", columnsNames);
+        TinyMATWriter_writeQStringList(mat, "rowNames", rowNames);
+        TinyMATWriter_close(mat);
+    }
+}
+
+
+void saveToMatlabMATfile(const QString&filename, const QList<QVector<double> >& datad, const QString& varname,  QStringList columnsNames,  QStringList rowNames) {
+    TinyMATWriterFile* mat=TinyMATWriter_open(filename.toLocal8Bit().data());
+    if (mat) {
+        double* d=doubleDataToDoubleMatrix(datad);
+        TinyMATWriter_writeMatrix2D_rowmajor(mat, varname.toLocal8Bit().data(), d, datad.size(), dataGetRows(datad));
+        if (d) qfFree(d);
+        TinyMATWriter_writeQStringList(mat, "columnNames", columnsNames);
+        TinyMATWriter_writeQStringList(mat, "rowNames", rowNames);
+        TinyMATWriter_close(mat);
+    }
 }

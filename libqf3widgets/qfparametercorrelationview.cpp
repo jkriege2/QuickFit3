@@ -1609,7 +1609,7 @@ void QFParameterCorrelationView::copyDataMatlab()
     QStringList headers;
     fillDataArray(data, headers);
 
-    matlabCopy(data);
+    matlabCopyScript(data);
 }
 
 void QFParameterCorrelationView::showHelp()

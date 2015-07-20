@@ -485,6 +485,10 @@ QStringList QFDataExportHandler::getFormats()  {
     sl<<QObject::tr("Tab separated, flipped (*.dat *.txt *.tsv)");
     sl<<QObject::tr("SYLK dataformat (*.slk *.sylk)");
     sl<<QObject::tr("SYLK dataformat, flipped (*.slk *.sylk)");
+    sl<<QObject::tr("Matlab MAT datafile as Cell/Matrix (*.mat)");
+    sl<<QObject::tr("Matlab MAT datafile as Cell/Matrix, flipped (*.mat)");
+    sl<<QObject::tr("Matlab MAT datafile as Matrix (*.mat)");
+    sl<<QObject::tr("Matlab MAT datafile as Matrix, flipped (*.mat)");
     sl<<QObject::tr("Matlab script (*.m)");
     sl<<QObject::tr("Matlab script, flipped (*.m)");
     sl<<QObject::tr("QuickFit table XML (*.qftxml)");
@@ -532,10 +536,18 @@ void QFDataExportHandler::save(const QList<QVector<double> >& data, int format, 
         saveStringToFile(filename, toSYLK(data, columnHeaders, rowHeaders));
     } else if (format==f++) { // SYLK flipped
         saveStringToFile(filename, toSYLK(dataRotate(data), rowHeaders, columnHeaders));
-    } else if (format==f++) { // Matlab
-        saveStringToFile(filename, toMatlab(data, false));
-    } else if (format==f++) { // Matlab
-        saveStringToFile(filename, toMatlab(dataRotate(data), false));
+    } else if (format==f++) { // Matlab MAT as cel/matrix
+        saveToMatlabMATfile(filename, data, "M", columnHeaders, rowHeaders);
+    } else if (format==f++) { // Matlab MAT as cel/matrix, flipped
+        saveToMatlabMATfile(filename, dataRotate(data), "M", columnHeaders, rowHeaders);
+    } else if (format==f++) { // Matlab MAT as matrix
+        saveToMatlabMATfile(filename, data, "M", columnHeaders, rowHeaders);
+    } else if (format==f++) { // Matlab MAT as matrix, flipped
+        saveToMatlabMATfile(filename, dataRotate(data), "M", columnHeaders, rowHeaders);
+    } else if (format==f++) { // Matlab script
+        saveStringToFile(filename, toMatlabScript(data, false));
+    } else if (format==f++) { // Matlab script, flipped
+        saveStringToFile(filename, toMatlabScript(dataRotate(data), false));
     } else if (format==f++) { // QFTable XML
         saveStringToFile(filename, toQFTableModelXML(data, columnHeaders, rowHeaders), QString("UTF-8"));
     } else if (format==f++) { // QFTable XML, flipped
@@ -592,10 +604,18 @@ void QFDataExportHandler::save(const QList<QList<QVariant> >& data, int format, 
         saveStringToFile(filename, toSYLK(data, columnHeaders, rowHeaders));
     } else if (format==f++) { // SYLK flipped
         saveStringToFile(filename, toSYLK(dataRotate(data), rowHeaders, columnHeaders));
+    } else if (format==f++) { // Matlab MAT as cel/matrix
+        saveToMatlabMATfile(filename, data, "M", columnHeaders, rowHeaders);
+    } else if (format==f++) { // Matlab MAT as cel/matrix, flipped
+        saveToMatlabMATfile(filename, dataRotate(data), "M", columnHeaders, rowHeaders);
+    } else if (format==f++) { // Matlab MAT as matrix
+        saveToMatlabMATfile(filename, data, "M", columnHeaders, rowHeaders, true);
+    } else if (format==f++) { // Matlab MAT as matrix, flipped
+        saveToMatlabMATfile(filename, dataRotate(data), "M", columnHeaders, rowHeaders, true);
     } else if (format==f++) { // Matlab
-        saveStringToFile(filename, toMatlab(data, false));
+        saveStringToFile(filename, toMatlabScript(data, false));
     } else if (format==f++) { // Matlab
-        saveStringToFile(filename, toMatlab(dataRotate(data), false));
+        saveStringToFile(filename, toMatlabScript(dataRotate(data), false));
     } else if (format==f++) { // QFTable XML
         saveStringToFile(filename, toQFTableModelXML(data, columnHeaders, rowHeaders), QString("UTF-8"));
     } else if (format==f++) { // QFTable XML, flipped
@@ -640,17 +660,17 @@ void QFDataExportHandler::copyExcel(const QList<QList<QVariant> > &data, const Q
 
 void QFDataExportHandler::copyMatlab(const QList<QList<QVariant> > &data)
 {
-    matlabCopy(data);
+    matlabCopyScript(data);
 }
 
 void QFDataExportHandler::copyMatlab(const QList<QList<double> > &data)
 {
-    matlabCopy(data);
+    matlabCopyScript(data);
 }
 
 void QFDataExportHandler::copyMatlab(const QList<QVector<double> > &data)
 {
-    matlabCopy(data);
+    matlabCopyScript(data);
 }
 
 QList<QList<QVariant> > dataToVariant(const QList<QList<double> >& data) {
@@ -730,6 +750,20 @@ QList<QVector<double> > dataToDouble(const QList<QList<QVariant> >& data, QStrin
         }
     }
     return res;
+}
+
+bool mayLossLesslyDoDoubleDataToDouble(const QList<QList<QVariant> >& data) {
+    QList<QList<QVariant> > in=data;
+    for (int i=0; i<in.size(); i++) {
+        for (int j=0; j<in[i].size(); j++) {
+            bool ok=false;
+            double d=in[i].at(j).toDouble(&ok);
+            if (in[i].at(j).canConvert(QVariant::Double) && (!ok)) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 
@@ -857,4 +891,24 @@ int QFDataExportTool::getRowCount() const
 int QFDataExportTool::getColCount() const
 {
     return data.size();
+}
+
+double* doubleDataToDoubleMatrix(const QList<QVector<double> >& data) {
+    int rows=dataGetRows(data);
+    int cols=data.size();
+    double* m=NULL;
+    if (rows*cols>0) {
+        m=(double*)qfMalloc(rows*cols*sizeof(double));
+        // fill with NAN
+        for (int i=0; i<rows*cols; i++) {
+            m[i]=NAN;
+        }
+
+        for (int c=0; c<data.size(); c++) {
+            for (int r=0; r<data[c].size(); r++) {
+                m[r*cols+c]=data[c].at(r);
+            }
+        }
+    }
+    return m;
 }

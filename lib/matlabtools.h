@@ -34,43 +34,67 @@
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT QString toMatlab(const QList<QList<double> >& data, bool noVarDef=false);
+QFLIB_EXPORT QString toMatlabScript(const QList<QList<double> >& data, bool noVarDef=false);
 /*! \brief convert the given data columns as Matlab script
     \ingroup qf3lib_tools
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT QString toMatlab(const QList<QVector<double> >& data, bool noVarDef=false);
+QFLIB_EXPORT QString toMatlabScript(const QList<QVector<double> >& data, bool noVarDef=false);
 /*! \brief copy the given data columns as Matlab script to the clipboard
     \ingroup qf3lib_tools
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT void matlabCopy(const QList<QList<double> >& data);
+QFLIB_EXPORT void matlabCopyScript(const QList<QList<double> >& data);
 /*! \brief copy the given data columns as Matlab script to the clipboard
     \ingroup qf3lib_tools
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT void matlabCopy(const QList<QVector<double> >& data);
+QFLIB_EXPORT void matlabCopyScript(const QList<QVector<double> >& data);
 
 /*! \brief convert the given data columns as Matlab script
     \ingroup qf3lib_tools
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT QString toMatlab(const QList<QList<QVariant> >& data, bool noVarDef=false);
+QFLIB_EXPORT QString toMatlabScript(const QList<QList<QVariant> >& data, bool noVarDef=false);
 /*! \brief copy the given data columns as Matlab script to the clipboard
     \ingroup qf3lib_tools
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT void matlabCopy(const QList<QList<QVariant> >& data);
+QFLIB_EXPORT void matlabCopyScript(const QList<QList<QVariant> >& data);
 /*! \brief copy the given data columns as Matlab script to the clipboard
     \ingroup qf3lib_tools
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT void matlabCopy(const QList<QVector<QVariant> >& data);
+QFLIB_EXPORT void matlabCopyScript(const QList<QVector<QVariant> >& data);
+
+/*! \brief save the given \a data as a Matlab MAT file
+    \ingroup qf3lib_tools
+
+    \param filename output filename (*.mat)
+    \param data the data to write
+    \param varname name of the data variable in the Matlab file
+    \param convertToNumberMatrix if \c true, the input data is converted to a matrix of numbers and not stored as a cell array
+
+    \note this function uses the library TinyMAT from https://github.com/jkriege2/TinyMAT
+*/
+QFLIB_EXPORT void saveToMatlabMATfile(const QString&filename, const QList<QList<QVariant> >& data, const QString& varname=QString("M"),  QStringList columnsNames=QStringList(),  QStringList rowNames=QStringList(), bool convertToNumberMatrix=false);
+
+/*! \brief save the given \a data as a Matlab MAT file
+    \ingroup qf3lib_tools
+
+    \param filename output filename (*.mat)
+    \param data the data to write
+    \param varname name of the data variable in the Matlab file
+    \param convertToNumberMatrix if \c true, the input data is converted to a matrix of numbers and not stored as a cell array
+
+    \note this function uses the library TinyMAT from https://github.com/jkriege2/TinyMAT
+*/
+QFLIB_EXPORT void saveToMatlabMATfile(const QString&filename, const QList<QVector<double> >& datad, const QString& varname=QString("M"),  QStringList columnsNames=QStringList(),  QStringList rowNames=QStringList());
 
 #endif // MATLABTOOLS_H
