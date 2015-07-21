@@ -79,7 +79,8 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcs_parserfunctions.h \
     qfrdrimagingfcsdiffusionlawdialog.h \
     qfrdrimagingfcswizard.h \
-    qfrdrimagingfcspixelfromobjective.h
+    qfrdrimagingfcspixelfromobjective.h \
+    qfrdrimagingfcswizardcorrelationprogress.h
 #    ../base_classes/frawdataimageeditor.h \
 
 
@@ -118,7 +119,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcs_parserfunctions.cpp \
     qfrdrimagingfcsdiffusionlawdialog.cpp \
     qfrdrimagingfcswizard.cpp \
-    qfrdrimagingfcspixelfromobjective.cpp
+    qfrdrimagingfcspixelfromobjective.cpp \
+    qfrdrimagingfcswizardcorrelationprogress.cpp
 #    ../base_classes/frawdataimageeditor.cpp \
 
 FORMS = \
@@ -135,7 +137,8 @@ FORMS = \
     qfrdrimagingfcscopycorrasrdrdialog.ui \
     qfrdrimagingfcspostprocessbinningdialog.ui \
     qfrdrimagingfcsdiffusionlawdialog.ui \
-    qfrdrimagingfcspixelfromobjective.ui
+    qfrdrimagingfcspixelfromobjective.ui \
+    qfrdrimagingfcswizardcorrelationprogress.ui
 
 RESOURCES += qfrdrimagingfcs.qrc
 

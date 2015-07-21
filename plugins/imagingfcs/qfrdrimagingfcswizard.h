@@ -16,10 +16,12 @@
 #include "qfrdrimagingfcspixelfromobjective.h"
 #include "qfevaluationitemfactory.h"
 #include "qfcroppixelsedit.h"
+#include "qfrdrimagingfcswizardcorrelationprogress.h"
 
 class QFRDRImagingFCSWizard_BackgroundIsValid; // forward
 class QFRDRImagingFCSWizard_ImagestackIsValid;
 class QFRDRImagingFCSWizard_BackgroundNextId;
+class QFRDRImagingFCSWizard_ProcessNextId;
 
 class QFRDRImagingFCSWizard : public QFWizard {
         Q_OBJECT
@@ -35,10 +37,9 @@ class QFRDRImagingFCSWizard : public QFWizard {
             CalibrationPage,
             CropAndBinPage,
             CorrelationPage,
-
-
-            LastPage,
             ProcessCorrelationPage,
+            LastPage,
+            LastPageCalibration,
         };
 
     protected slots:
@@ -97,13 +98,16 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QLabel* labImageProps;
         QComboBox* cmbBleachCorrection;
 
-        QFFormWizardPage* wizProcessJobs;
+        QFGridWizardPage* wizProcessJobs;
+        QFRDRImagingFCSWizardCorrelationProgress* widProcess;
+
         QFFormWizardPage* wizFinalizePage;
         QLabel* labFinal;
         QPointer<QCheckBox> chkLastImFCSFit1;
         QPointer<QCheckBox> chkLastImFCCSFit;
         QPointer<QFEnhancedComboBox> cmbImFCSFitMode;
 
+        QFFormWizardPage* wizFinalizePageCalibration;
 
         QFImagePlotWizardPage* wizCalibration;
         QComboBox* cmbCalibRegion;
@@ -154,6 +158,7 @@ class QFRDRImagingFCSWizard : public QFWizard {
         friend class QFRDRImagingFCSWizard_BackgroundIsValid;
         friend class QFRDRImagingFCSWizard_ImagestackIsValid;
         friend class QFRDRImagingFCSWizard_BackgroundNextId;
+        friend class QFRDRImagingFCSWizard_ProcessNextId;
 
         bool isCalibration;
 
@@ -186,6 +191,17 @@ class QFRDRImagingFCSWizard_ImagestackIsValid: public QFWizardValidateFunctor {
 class QFRDRImagingFCSWizard_BackgroundNextId: public QFWizardNextPageFunctor {
     public:
         inline QFRDRImagingFCSWizard_BackgroundNextId(QFRDRImagingFCSWizard* wizard):
+            QFWizardNextPageFunctor()
+        {
+            this->wizard=wizard;
+        }
+        virtual int nextID(const QFWizardPage* page) const;
+    protected:
+        QPointer<QFRDRImagingFCSWizard> wizard;
+};
+class QFRDRImagingFCSWizard_ProcessNextId: public QFWizardNextPageFunctor {
+    public:
+        inline QFRDRImagingFCSWizard_ProcessNextId(QFRDRImagingFCSWizard* wizard):
             QFWizardNextPageFunctor()
         {
             this->wizard=wizard;

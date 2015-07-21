@@ -74,13 +74,15 @@ QFWizardPage::QFWizardPage(QWidget *parent):
     m_freeFunctors=false;
     m_nextID=NULL;
     m_validator=NULL;
-    m_iscomplete=NULL;
+    m_iscompleteFunctor=NULL;
     m_userLast=NULL;
     m_userValidatePage=NULL;
     m_userLastArg=NULL;
     m_userValidateArg=NULL;
-    m_externalvalidate=false;
-    m_isvalid=false;
+    m_externalIsComplete=false;
+    m_switchoffCancelButton=false;
+    m_switchoffPreviousButton=false;
+    m_iscomplete=false;
 }
 
 QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
@@ -89,13 +91,15 @@ QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
     m_freeFunctors=false;
     m_nextID=NULL;
     m_validator=NULL;
-    m_iscomplete=NULL;
+    m_iscompleteFunctor=NULL;
     m_userLast=NULL;
     m_userValidatePage=NULL;
     m_userLastArg=NULL;
     m_userValidateArg=NULL;
-    m_externalvalidate=false;
-    m_isvalid=false;
+    m_externalIsComplete=false;
+    m_switchoffCancelButton=false;
+    m_switchoffPreviousButton=false;
+    m_iscomplete=false;
     setTitle(title);
 }
 
@@ -104,13 +108,23 @@ QFWizardPage::~QFWizardPage()
     if (m_freeFunctors) {
         if (m_nextID) delete m_nextID;
         if (m_validator) delete m_validator;
-        if (m_iscomplete) delete m_iscomplete;
+        if (m_iscompleteFunctor) delete m_iscompleteFunctor;
     }
 }
 
 void QFWizardPage::initializePage()
 {
     QWizardPage::initializePage();
+    if (m_switchoffPreviousButton) {
+        wizard()->button(QWizard::BackButton)->setVisible(false);
+        wizard()->button(QWizard::BackButton)->hide();
+        qDebug()<<"switch off BackButton";
+    }
+    if (m_switchoffCancelButton) {
+        wizard()->button(QWizard::CancelButton)->setVisible(false);
+        wizard()->button(QWizard::CancelButton)->hide();
+        qDebug()<<"switch off CancelButton";
+    }
     emit onInitialize(this);
     emit onInitialize(this, m_userLast);
     emit onInitializeA(this, m_userLastArg);
@@ -121,17 +135,44 @@ bool QFWizardPage::validatePage()
     emit onValidate(this);
     emit onValidate(this, m_userValidatePage);
     emit onValidateA(this, m_userValidateArg);
-    if (m_validator) return m_validator->isValid(this);
-    else return QWizardPage::validatePage();
+    bool res=true;
+    if (m_externalIsComplete) {
+        res=m_iscomplete;
+    }
+    if (m_validator) {
+        res= m_validator->isValid(this);
+    } else res=QWizardPage::validatePage();
+    if (res) {
+        if (m_switchoffPreviousButton) {
+            wizard()->button(QWizard::BackButton)->setVisible(true);
+            qDebug()<<"switch back on BackButton";
+        }
+        if (m_switchoffCancelButton) {
+            wizard()->button(QWizard::CancelButton)->setVisible(true);
+            qDebug()<<"switch back on CancelButton";
+        }
+
+    }
+    return res;
 }
 
 bool QFWizardPage::isComplete() const
 {
-    if (m_externalvalidate) {
-        return m_isvalid;
+    if (m_switchoffPreviousButton) {
+        wizard()->button(QWizard::BackButton)->setVisible(false);
+        wizard()->button(QWizard::BackButton)->hide();
+        qDebug()<<"isComplete(): switch off BackButton";
     }
-    if (m_iscomplete) {
-        return m_iscomplete->isComplete(this);
+    if (m_switchoffCancelButton) {
+        wizard()->button(QWizard::CancelButton)->setVisible(false);
+        wizard()->button(QWizard::CancelButton)->hide();
+        qDebug()<<"isComplete(): switch off CancelButton";
+    }
+    if (m_externalIsComplete) {
+        return m_iscomplete;
+    }
+    if (m_iscompleteFunctor) {
+        return m_iscompleteFunctor->isComplete(this);
     }
     return QWizardPage::isComplete();
 }
@@ -164,15 +205,15 @@ void QFWizardPage::setUserOnValidateArgument(void *page)
     m_userValidateArg=page;
 }
 
-void QFWizardPage::setExternalValidate(bool enabled)
+void QFWizardPage::setUseExternalIsComplete(bool enabled)
 {
-    m_externalvalidate=enabled;
+    m_externalIsComplete=enabled;
     emit completeChanged();
 }
 
-void QFWizardPage::setExternalIsValid(bool valid)
+void QFWizardPage::setExternalIsComplete(bool valid)
 {
-    m_isvalid=valid;
+    m_iscomplete=valid;
     emit completeChanged();
 }
 
@@ -187,10 +228,10 @@ void QFWizardPage::setValidateFunctor(QFWizardValidateFunctor *validator)
 
 void QFWizardPage::setIsCompleteFunctor(QFWizardIsCompleteFunctor *validator)
 {
-   if (m_freeFunctors && m_iscomplete) {
-      delete m_iscomplete;
+   if (m_freeFunctors && m_iscompleteFunctor) {
+      delete m_iscompleteFunctor;
    }
-    m_iscomplete=validator;
+    m_iscompleteFunctor=validator;
     emit completeChanged();
 }
 
@@ -210,6 +251,19 @@ void QFWizardPage::setFreeFunctors(bool enabled)
 void QFWizardPage::setNextID(int nextid)
 {
     setNextIDFunctor(new QFWizardFixedNextPageFunctor(nextid));
+}
+
+void QFWizardPage::setNoPreviousButton(bool noPrevButton)
+{
+    m_switchoffPreviousButton=noPrevButton;
+    wizard()->button(QWizard::BackButton)->setVisible(!m_switchoffPreviousButton);
+}
+
+void QFWizardPage::setNoCancelButton(bool noCancelButton)
+{
+    m_switchoffCancelButton=noCancelButton;
+    wizard()->button(QWizard::CancelButton)->setVisible(!m_switchoffCancelButton);
+
 }
 
 
@@ -863,3 +917,48 @@ int QFRadioButtonListWizardPage::count() const
     return boxes.size();
 }
 
+
+
+QFGridWizardPage::QFGridWizardPage(QWidget *parent):
+    QFWizardPage(parent)
+{
+    createWidgets();
+}
+
+QFGridWizardPage::QFGridWizardPage(const QString &title, QWidget *parent):
+    QFWizardPage(title, parent)
+{
+    createWidgets();
+}
+
+void QFGridWizardPage::addLayout(QLayout *layout, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment)
+{
+    m_layout->addLayout(layout, row, column, rowSpan, columnSpan, alignment);
+}
+
+void QFGridWizardPage::addLayout(QLayout *layout, int row, int column, Qt::Alignment alignment)
+{
+    m_layout->addLayout(layout, row, column, alignment);
+}
+
+void QFGridWizardPage::addWidget(QWidget *widget, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment)
+{
+    m_layout->addWidget(widget, row, column, rowSpan, columnSpan, alignment);
+}
+
+void QFGridWizardPage::addWidget(QWidget *widget, int row, int column, Qt::Alignment alignment)
+{
+    m_layout->addWidget(widget, row, column, alignment);
+}
+
+void QFGridWizardPage::createWidgets()
+{
+    m_layout = new QGridLayout;
+    widMain=new QWidget(this);
+    m_mainlay=new QVBoxLayout();
+
+    widMain->setLayout(m_layout);
+    widMain->setEnabled(true);
+    m_mainlay->addWidget(widMain);
+    setLayout(m_mainlay);
+}

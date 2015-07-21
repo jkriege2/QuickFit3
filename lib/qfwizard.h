@@ -104,8 +104,6 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         void setUserPreviousArgument(void* page);
         void setUserOnValidateArgument(void* page);
 
-        void setExternalValidate(bool enabled=true);
-        void setExternalIsValid(bool valid=true);
         /** \brief sets a QFWizardValidateFunctor that is called on validatePage().
          *
          * \note you have to free the functor by hand, if you don't set setFreeFunctors(true) */
@@ -120,6 +118,13 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         void setNextIDFunctor(QFWizardNextPageFunctor* nextIDFunctor);
         void setFreeFunctors(bool enabled=true);
         void setNextID(int nextid);
+        void setNoPreviousButton(bool noPrevButton=true);
+        void setNoCancelButton(bool noCancelButton=true);
+        void setUseExternalIsComplete(bool enabled=true);
+
+    public slots:
+        void setExternalIsComplete(bool valid=true);
+
     signals:
         void onInitialize(QWizardPage* page);
         void onInitialize(QWizardPage* page, QWizardPage* userPreviousPage);
@@ -133,11 +138,14 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         QWizardPage* m_userValidatePage;
         void* m_userLastArg;
         void* m_userValidateArg;
-        bool m_externalvalidate;
-        bool m_isvalid;
+        bool m_externalIsComplete;
+        bool m_iscomplete;
         bool m_freeFunctors;
+        bool m_switchoffPreviousButton;
+        bool m_switchoffCancelButton;
+
         QFWizardValidateFunctor* m_validator;
-        QFWizardIsCompleteFunctor* m_iscomplete;
+        QFWizardIsCompleteFunctor* m_iscompleteFunctor;
         QFWizardNextPageFunctor* m_nextID;
 
 };
@@ -181,6 +189,41 @@ class QFLIB_EXPORT QFFormWizardPage : public QFWizardPage
     public slots:
     protected:
         QFormLayout* m_layout;
+        QVBoxLayout* m_mainlay;
+        QWidget* widMain;
+    private:
+        void createWidgets();
+
+};
+
+
+class QFLIB_EXPORT QFGridWizardPage : public QFWizardPage
+{
+        Q_OBJECT
+    public:
+        explicit QFGridWizardPage(QWidget *parent = 0);
+        explicit QFGridWizardPage(const QString& title, QWidget *parent = 0);
+
+        QGridLayout* getGridLayout() const {
+            return m_layout;
+        }
+        QVBoxLayout* getMainLayout() const {
+            return m_mainlay;
+        }
+        QWidget* getFormLayoutWidget() const {
+            return widMain;
+        }
+
+        void addLayout(QLayout* layout, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment=0);
+        void addLayout(QLayout* layout, int row, int column, Qt::Alignment alignment=0);
+        void addWidget(QWidget* widget, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment=0);
+        void addWidget(QWidget* widget, int row, int column, Qt::Alignment alignment=0);
+
+    signals:
+
+    public slots:
+    protected:
+        QGridLayout* m_layout;
         QVBoxLayout* m_mainlay;
         QWidget* widMain;
     private:

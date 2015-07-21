@@ -9,6 +9,10 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     QLabel* lab;
     frame_data_io=NULL;
 
+    setOption(QWizard::NoCancelButtonOnLastPage);
+    setOption(QWizard::NoBackButtonOnLastPage);
+    setOption(QWizard::NoBackButtonOnStartPage);
+
     channels=1;
     frame_count_io=0;
     filesize_io=0;
@@ -48,8 +52,8 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     setPage(FileSelectionPage, wizSelfiles=new QFFormWizardPage(tr("Select image stack files ..."), this));
     connect(wizSelfiles, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(initFileSelection()));
     wizSelfiles->setSubTitle(tr("Select the image stack that you want to correlate."));
-    wizSelfiles->setExternalValidate(true);
-    wizSelfiles->setExternalIsValid(false);
+    wizSelfiles->setUseExternalIsComplete(true);
+    wizSelfiles->setExternalIsComplete(false);
     wizSelfiles->setValidateFunctor(new QFRDRImagingFCSWizard_ImagestackIsValid(this));
     wizSelfiles->setFreeFunctors(true);
 
@@ -187,17 +191,20 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
     wizBackgroundAndBleach->addStretch();
     cmbBleachCorrection=new QComboBox(wizBackgroundAndBleach);
-    cmbBleachCorrection->addItem(tr("none"));
-    cmbBleachCorrection->addItem(tr("subtract average"));
-    cmbBleachCorrection->addItem(tr("1-exponential LM-fit"));
-    cmbBleachCorrection->addItem(tr("1-exponential regression"));
-    cmbBleachCorrection->addItem(tr("1-exponential(poly2) LM-fit"));
-    cmbBleachCorrection->addItem(tr("1-exponential(poly3) LM-fit"));
-    cmbBleachCorrection->addItem(tr("2-exponential LM-fit"));
-    cmbBleachCorrection->addItem(tr("1-exponential(poly4) LM-fit"));
-    cmbBleachCorrection->addItem(tr("1-exponential(poly5) LM-fit"));
+    cmbBleachCorrection->addItem(tr("none"), (int)BLEACH_NONE);
+    cmbBleachCorrection->addItem(tr("1-exponential LM-fit"), (int)BLEACH_EXP);
+    cmbBleachCorrection->addItem(tr("1-exponential(poly2) LM-fit"), (int)BLEACH_EXP_POLY2);
+    cmbBleachCorrection->addItem(tr("1-exponential(poly3) LM-fit"), (int)BLEACH_EXP_POLY3);
+    cmbBleachCorrection->addItem(tr("1-exponential(poly4) LM-fit"), (int)BLEACH_EXP_POLY4);
+    cmbBleachCorrection->addItem(tr("1-exponential(poly5) LM-fit"), (int)BLEACH_EXP_POLY5);
     cmbBleachCorrection->setCurrentIndex(ProgramOptions::getConfigValue("imaging_fcs/wizard/bleach_correction", 0).toInt());
     wizBackgroundAndBleach->addRow(tr("&Bleach Correction:"), cmbBleachCorrection);
+    wizBackgroundAndBleach->addRow(QString(), tr("We would propose to choose the bleach correction as follows:"
+                                                 "<ul>"
+                                                 "<li><b>none</b>: non-bleaching samples (e.g. fluorescent microspheres, QDots and other)</li>"
+                                                 "<li><b>1-exponential LM-fit</b> or <b>1-exponential(poly2) LM-fit</b>: weakly bleaching samples (e.g. chemical dyes)</li>"
+                                                 "<li><b>1-exponential(poly3-poly5) or higher: strongly bleaching samples (e.g. fluorescent proteins in cells)</li>"
+                                                 "</ul>"));
     wizBackgroundAndBleach->addStretch();
 
 
@@ -266,7 +273,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     connect(wizCalibration, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(calibrationCropValuesChanged()));
     connect(spinCalibExectedWxy, SIGNAL(valueChanged(double)), this, SLOT(calibWxyTestChanged()));
     connect(spinCalibExpectedWxyTests, SIGNAL(valueChanged(int)), this, SLOT(calibWxyTestChanged()));
-    connect(spinCalibExpectedWxySteps, SIGNAL(valueChanged(int)), this, SLOT(calibWxyTestChanged()));
+    connect(spinCalibExpectedWxySteps, SIGNAL(valueChanged(double)), this, SLOT(calibWxyTestChanged()));
     calibrationCropValuesChanged();
 
 
@@ -356,12 +363,28 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     labSegments->setWordWrap(true);
 
 
+    setPage(ProcessCorrelationPage, wizProcessJobs=new QFGridWizardPage(tr("Process Correlation ..."), this));
+    wizCalibration->setNextID(ProcessCorrelationPage);
+    wizCorrelation->setNextID(ProcessCorrelationPage);
+    wizProcessJobs->setNextIDFunctor(new QFRDRImagingFCSWizard_ProcessNextId(this));
+    widProcess=new QFRDRImagingFCSWizardCorrelationProgress(wizProcessJobs);
+    wizProcessJobs->addWidget(widProcess, 0, 0);
+    wizProcessJobs->setFinalPage(false);
+    wizProcessJobs->setNoPreviousButton(true);
+    wizProcessJobs->setNoCancelButton(true);
+    wizProcessJobs->setUseExternalIsComplete(true);
+    wizProcessJobs->setExternalIsComplete(false);
+    connect(widProcess, SIGNAL(correlationCompleted(bool)), wizProcessJobs, SLOT(setExternalIsComplete(bool)));
+
 
 
     setPage(LastPage, wizFinalizePage=new QFFormWizardPage(tr("Finalize"), this));
     labFinal=new QLabel(this);
     labFinal->setWordWrap(true);
     wizFinalizePage->addRow(labFinal);
+    wizFinalizePage->setFinalPage(true);
+    wizFinalizePage->setNoPreviousButton(true);
+    wizFinalizePage->setNoCancelButton(true);
     if (!isProject) {
         labFinal->setText(tr("You completed this wizard. The selected files will now be inserted as imaging FCS raw data records (RDR) into the project.<br><br>If not present yet, you can add evaluation items to the project now and start the evaluation."));
     } else {
@@ -388,10 +411,12 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
         wizFinalizePage->addRow(QString(), chkLastImFCCSFit);
     }
 
-    setPage(ProcessCorrelationPage, wizProcessJobs=new QFFormWizardPage(tr("Process Correlation ..."), this));
-    wizCalibration->setNextID(ProcessCorrelationPage);
-    wizFinalizePage->setNextID(ProcessCorrelationPage);
-    wizProcessJobs->setFinalPage(true);
+    setPage(LastPageCalibration, wizFinalizePageCalibration=new QFFormWizardPage(tr("Finalize Calibration"), this));
+    wizFinalizePageCalibration->setNoPreviousButton(true);
+    wizFinalizePageCalibration->setNoCancelButton(true);
+    wizFinalizePageCalibration->addRow(tr("You completed the imFCS correlation wizard for an imFCS calibration.<br><br>"
+                                          "The wizard will now insert the correlation result into the current project and start the imFCS calibration wizard. In this wizard, you will have to follow the proposed steps, which will finally give you an estimate of the lateral PSF-size."));
+    wizFinalizePageCalibration->setFinalPage(true);
 
 }
 
@@ -426,7 +451,7 @@ void QFRDRImagingFCSWizard::selectFileClicked()
 void QFRDRImagingFCSWizard::edtFilenameTextChanged(const QString &filename)
 {
     cmbFileformat->setEnabled(!filename.isEmpty());
-    wizSelfiles->setExternalIsValid(!filename.isEmpty());
+    wizSelfiles->setExternalIsComplete(!filename.isEmpty());
 }
 
 void QFRDRImagingFCSWizard::initImagePreview()
@@ -449,8 +474,8 @@ void QFRDRImagingFCSWizard::finishedImageProps()
 
 void QFRDRImagingFCSWizard::initFileSelection()
 {
-    wizSelfiles->setExternalValidate(true);
-    wizSelfiles->setExternalIsValid(!edtFilename->text().isEmpty());
+    wizSelfiles->setUseExternalIsComplete(true);
+    wizSelfiles->setExternalIsComplete(!edtFilename->text().isEmpty());
 
 }
 
@@ -840,6 +865,17 @@ int QFRDRImagingFCSWizard_BackgroundNextId::nextID(const QFWizardPage */*page*/)
         return QFRDRImagingFCSWizard::CalibrationPage;
     } else {
         return QFRDRImagingFCSWizard::CropAndBinPage;
+    }
+
+}
+
+
+int QFRDRImagingFCSWizard_ProcessNextId::nextID(const QFWizardPage */*page*/) const
+{
+    if (wizard->wizIntro->isChecked(1)) {
+        return QFRDRImagingFCSWizard::LastPageCalibration;
+    } else {
+        return QFRDRImagingFCSWizard::LastPage;
     }
 
 }
