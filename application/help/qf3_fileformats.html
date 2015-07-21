@@ -46,6 +46,9 @@ This format can be read by Matlab using the function <blockquote><tt>M = <a href
 <h3><a name="DIF">Data Interchange Format (*.dif)</h3>
 <p>This is a spreadsheet format and can be read by a variety of different software packages (Microsoft Excel, Libre Office, Open Office, ...). More information can be found in <a href="http://en.wikipedia.org/wiki/Data_Interchange_Format">Wikipedia</a></p>
 
+<h3><a name="MAT">Matlab MAT-files (*.mat)</h3>
+<p>Mathworks defined a binary file format for data storage in their Matlab numerics program. QuickFit $$version$$ can store data into this format. The data will be saved as a cell array, or (if possible) as a simple number matrix. A <tt>.mat</tt> file can be loaded into Matlab (or also GNU Octave) using the instruction <center><tt>load('<i>filename</i>');</tt></center></p>
+
 
 <h3><a name="QFTABLEXML">QuickFit table XML (*.qftxml)</h3>
 <p>Quickfit and especially the table plugin use this file format (XML dialect) to store tables to disk. The format does not only save the data in each cell, as well as column and row headers, but also additional properties and data, such as table expressions etc. A typical .qftxml file looks like this:

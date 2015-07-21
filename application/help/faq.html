@@ -66,6 +66,30 @@ $$faq_end$$
 
 
 
+
+$$faq_start$$
+  <a name="FAQ_Matlab"><b>How can I export data to Matlab(r)?</b>
+$$faq_answer$$
+  Generally you can use the context-menus to export the data of any plot (right-click the plot and choose <b>Save Data</b> or <b>Show Plot Data</b> and save from the table that opens up)
+  <center><a name="faq_pic002"><img src="./pic/faq_pic002.png" border="1">
+  </center>
+  and of any data table (select the data to export, right-click and choose <b>Save Selection | Save Selection</b>, or any of the other <i>Save Data</i> options).
+  <center><a name="faq_pic003"><img src="./pic/faq_pic003.png" border="1">
+  </center>
+  Then you can choose different file formats to save to. 
+  <center><a name="faq_pic004"><img src="./pic/faq_pic004.png" border="1">
+  </center>
+  Among these there are several options for Matlab:
+  <ul>
+      <li><b>Matlab MAT files (*.mat)</b> stores the data as a (binary) MAT-file that can be loaded in Matlab or GNU Octave using the instruction <center><tt>load('<i>filename</i>', '-v6')</tt></center>The options "as Cell/Matrix" try to save the data as a double-matrix, but if this does not succeed (e.g. because the table also contains text), data is stored as a cell array. This retains all data in the table. The options "as Matrix" convert data to a number-matrix and remove any text or other data that cannot be exported. Such cells will be saved as <tt>NAN</tt> (not a number).</li>
+      <li><b>Matlab script (*.m)</b> save a Matlab script that contains the single definition of a matrix/cell array with the data in plain text format. This is a simplified option, also used when "copy data to Matlab" is choosen from the table context menu.</li>
+  </ul>
+  
+$$faq_end$$
+
+
+
+
 $$faq_start$$
   <a name="FAQ_PlotExportImage"><b>How can I get the image data (without axes etc.) from a plot in QuickFit as an image, or copy them to the clipboard?</b>
 $$faq_answer$$

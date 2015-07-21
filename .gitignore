@@ -181,3 +181,4 @@ release
 *.exe
 /output/*.zip
 /extlibs/libjpeg/jpeg-9a
+*.mat
