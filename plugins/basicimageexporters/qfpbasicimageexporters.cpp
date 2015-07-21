@@ -24,6 +24,7 @@ Copyright (c) 2014
 #include <tiffio.h>
 #include "qfimagewriterlibtiff.h"
 #include "qfimagewriterrawdouble.h"
+#include "qfimagewritermatlab.h"
 #include "qfimagewriterrawfloat.h"
 #include "qfbasicimageexportersoptionswidget.h"
 #include "qfpluginservices.h"
@@ -98,6 +99,7 @@ QStringList QFPBasicImageExporters::getIDs() const {
 
     res<<"exporter_image_raw_double";
     res<<"exporter_image_raw_float";
+    res<<"exporter_image_matlab";
 
     return res;
 }
@@ -147,6 +149,8 @@ QFExporter* QFPBasicImageExporters::createExporter(QString id) const  {
         return new QFImageWriterRAWDouble();
     } else if (id=="exporter_image_raw_float") {
         return new QFImageWriterRAWFloat();
+    } else if (id=="exporter_image_matlab") {
+        return new QFImageWriterMatlab();
     }
     return NULL;
 }

@@ -32,18 +32,21 @@ include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibs/cimg.pri)
 include(../../extlibsb040/tinytiff.pri)
+include(../../extlibsb040/tinymat.pri)
 # Input
 HEADERS += qfpbasicimageexporters.h \
            qfimagewriterlibtiff.h \
     qfimagewriterrawdouble.h \
     qfimagewriterrawfloat.h \
-    qfbasicimageexportersoptionswidget.h
+    qfbasicimageexportersoptionswidget.h \
+    qfimagewritermatlab.h
 
 SOURCES += qfpbasicimageexporters.cpp\
            qfimagewriterlibtiff.cpp \
     qfimagewriterrawdouble.cpp \
     qfimagewriterrawfloat.cpp \
-    qfbasicimageexportersoptionswidget.cpp
+    qfbasicimageexportersoptionswidget.cpp \
+    qfimagewritermatlab.cpp
 
 FORMS = \
     qfbasicimageexportersoptionswidget.ui
