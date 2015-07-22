@@ -60,6 +60,8 @@ class QFRDRImagingFCSWizard : public QFWizard {
         void calibWxyTestChanged();
         void cropSetupFinished();
         void correlationValuesChanged();
+        void startProcessingJobs();
+        void calibrationValuesChanged();
     protected:
 
         QFRadioButtonListWizardPage* wizIntro;
@@ -92,11 +94,11 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QFFormWizardPage* wizBackgroundAndBleach;
         QFEnhancedLineEdit* edtBackgroundFilename;
         QFStyledButton* btnBackgroundFilename;
-        QComboBox* cmbBackgroundMode;
+        QFEnhancedComboBox* cmbBackgroundMode;
         QSpinBox* spinBackgroundOffset;
         QLabel* labBackgroundError;
         QLabel* labImageProps;
-        QComboBox* cmbBleachCorrection;
+        QFEnhancedComboBox* cmbBleachCorrection;
 
         QFGridWizardPage* wizProcessJobs;
         QFRDRImagingFCSWizardCorrelationProgress* widProcess;
@@ -110,7 +112,7 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QFFormWizardPage* wizFinalizePageCalibration;
 
         QFImagePlotWizardPage* wizCalibration;
-        QComboBox* cmbCalibRegion;
+        QComboBox* cmbCalibCropRegion;
         QSpinBox* spinCalibrationCenterSize;
         QFCropPixelsEdit* widCropCalibration;
         QDoubleSpinBox* spinCalibExectedWxy;
@@ -119,6 +121,9 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QLabel* labCalibExpectedWxyTests;
         QSpinBox* spinCalibBinMax;
         QLabel* labCalibBinMax;
+        QDoubleSpinBox* spinCalibTauMax;
+        QSpinBox* spinCalibSegments;
+        QLabel* labCalibSegments;
 
 
 
@@ -170,10 +175,14 @@ class QFRDRImagingFCSWizard_BackgroundIsValid: public QFWizardValidateFunctor {
             QFWizardValidateFunctor()
         {
             this->wizard=wizard;
+            lastFilename.clear();
+            lastReaderID.clear();
         }
         virtual bool isValid(QFWizardPage* page);
     protected:
         QPointer<QFRDRImagingFCSWizard> wizard;
+        QString lastFilename;
+        QString lastReaderID;
 };
 
 class QFRDRImagingFCSWizard_ImagestackIsValid: public QFWizardValidateFunctor {
@@ -182,10 +191,14 @@ class QFRDRImagingFCSWizard_ImagestackIsValid: public QFWizardValidateFunctor {
             QFWizardValidateFunctor()
         {
             this->wizard=wizard;
+            lastFilename.clear();
+            lastReaderID.clear();
         }
         virtual bool isValid(QFWizardPage* page);
     protected:
         QPointer<QFRDRImagingFCSWizard> wizard;
+        QString lastFilename;
+        QString lastReaderID;
 };
 
 class QFRDRImagingFCSWizard_BackgroundNextId: public QFWizardNextPageFunctor {

@@ -114,24 +114,18 @@ QFWizardPage::~QFWizardPage()
 
 void QFWizardPage::initializePage()
 {
+    //qDebug()<<"initializePage "<<title();
     QWizardPage::initializePage();
-    if (m_switchoffPreviousButton) {
-        wizard()->button(QWizard::BackButton)->setVisible(false);
-        wizard()->button(QWizard::BackButton)->hide();
-        qDebug()<<"switch off BackButton";
-    }
-    if (m_switchoffCancelButton) {
-        wizard()->button(QWizard::CancelButton)->setVisible(false);
-        wizard()->button(QWizard::CancelButton)->hide();
-        qDebug()<<"switch off CancelButton";
-    }
+    setButtonState(true);
     emit onInitialize(this);
     emit onInitialize(this, m_userLast);
     emit onInitializeA(this, m_userLastArg);
+    //qDebug()<<"initializePage "<<title()<<" done!";
 }
 
 bool QFWizardPage::validatePage()
 {
+    //qDebug()<<"validatePage "<<title();
     emit onValidate(this);
     emit onValidate(this, m_userValidatePage);
     emit onValidateA(this, m_userValidateArg);
@@ -143,38 +137,33 @@ bool QFWizardPage::validatePage()
         res= m_validator->isValid(this);
     } else res=QWizardPage::validatePage();
     if (res) {
-        if (m_switchoffPreviousButton) {
-            wizard()->button(QWizard::BackButton)->setVisible(true);
-            qDebug()<<"switch back on BackButton";
-        }
-        if (m_switchoffCancelButton) {
-            wizard()->button(QWizard::CancelButton)->setVisible(true);
-            qDebug()<<"switch back on CancelButton";
-        }
-
+        setButtonState(false);
     }
+    //qDebug()<<"validatePage "<<title()<<" done!";
     return res;
 }
 
 bool QFWizardPage::isComplete() const
 {
-    if (m_switchoffPreviousButton) {
-        wizard()->button(QWizard::BackButton)->setVisible(false);
-        wizard()->button(QWizard::BackButton)->hide();
-        qDebug()<<"isComplete(): switch off BackButton";
-    }
-    if (m_switchoffCancelButton) {
-        wizard()->button(QWizard::CancelButton)->setVisible(false);
-        wizard()->button(QWizard::CancelButton)->hide();
-        qDebug()<<"isComplete(): switch off CancelButton";
-    }
+    //qDebug()<<"isCOmplete "<<title();
     if (m_externalIsComplete) {
+        //qDebug()<<"isCOmplete "<<title()<< " done!";
         return m_iscomplete;
     }
     if (m_iscompleteFunctor) {
+        //qDebug()<<"isCOmplete "<<title()<< " done!";
         return m_iscompleteFunctor->isComplete(this);
     }
-    return QWizardPage::isComplete();
+    bool res=QWizardPage::isComplete();
+    //qDebug()<<"isCOmplete "<<title()<< " done!";
+    return res;
+}
+
+void QFWizardPage::cleanupPage()
+{
+    //qDebug()<<"cleanupPage "<<title();
+    QWizardPage::cleanupPage();
+    //qDebug()<<"cleanupPage "<<title()<<" done!";
 }
 
 int QFWizardPage::nextId() const
@@ -207,20 +196,66 @@ void QFWizardPage::setUserOnValidateArgument(void *page)
 
 void QFWizardPage::setUseExternalIsComplete(bool enabled)
 {
-    m_externalIsComplete=enabled;
-    emit completeChanged();
+    if ( m_externalIsComplete!=enabled) {
+        m_externalIsComplete=enabled;
+        emit completeChanged();
+    }
 }
 
 void QFWizardPage::setExternalIsComplete(bool valid)
 {
-    m_iscomplete=valid;
-    emit completeChanged();
+    if (m_iscomplete!=valid) {
+        m_iscomplete=valid;
+        emit completeChanged();
+    }
+}
+
+
+
+void QFWizardPage::setButtonState(bool entering)
+{
+    if (entering) {
+
+//        if (m_switchoffPreviousButton) {
+//            wizard()->button(QWizard::BackButton)->setVisible(false);
+//            //qDebug()<<"switch off BackButton";
+//        }
+//        if (m_switchoffCancelButton) {
+//            wizard()->button(QWizard::CancelButton)->setVisible(false);
+//            //qDebug()<<"switch off CancelButton";
+//        }
+        QList<QWizard::WizardButton> layout;
+        layout << QWizard::Stretch;
+        if (!m_switchoffPreviousButton) layout << QWizard::BackButton;
+        layout<< QWizard::NextButton;
+        if (!m_switchoffCancelButton) layout<< QWizard::CancelButton;
+        if (isFinalPage()) layout<< QWizard::FinishButton;
+        if (!m_switchoffPreviousButton || !m_switchoffCancelButton) wizard()->setButtonLayout(layout);
+    } else {
+//        if (m_switchoffPreviousButton) {
+//            wizard()->button(QWizard::BackButton)->setVisible(true);
+//            //qDebug()<<"switch back on BackButton";
+//        }
+//        if (m_switchoffCancelButton) {
+//            wizard()->button(QWizard::CancelButton)->setVisible(true);
+//            //qDebug()<<"switch back on CancelButton";
+//        }
+
+        QList<QWizard::WizardButton> layout;
+        layout << QWizard::Stretch;
+        layout << QWizard::BackButton;
+        layout<< QWizard::NextButton;
+        layout<< QWizard::CancelButton;
+        if (isFinalPage()) layout<< QWizard::FinishButton;
+        if (!m_switchoffPreviousButton || !m_switchoffCancelButton) wizard()->setButtonLayout(layout);
+    }
 }
 
 void QFWizardPage::setValidateFunctor(QFWizardValidateFunctor *validator)
 {
    if (m_freeFunctors && m_validator) {
       delete m_validator;
+       m_validator=NULL;
    }
     m_validator=validator;
     emit completeChanged();
@@ -230,6 +265,7 @@ void QFWizardPage::setIsCompleteFunctor(QFWizardIsCompleteFunctor *validator)
 {
    if (m_freeFunctors && m_iscompleteFunctor) {
       delete m_iscompleteFunctor;
+       m_iscompleteFunctor=NULL;
    }
     m_iscompleteFunctor=validator;
     emit completeChanged();
@@ -687,10 +723,12 @@ bool QFProcessingWizardPage::isComplete() const
 
 void QFProcessingWizardPage::setProcessingFinished(bool status)
 {
-    btnStart->setVisible(false);
-    m_done=status;
-    emit completeChanged();
-    QApplication::processEvents();
+    if (m_done!=status){
+        btnStart->setVisible(false);
+        m_done=status;
+        emit completeChanged();
+        QApplication::processEvents();
+    }
 }
 
 void QFProcessingWizardPage::setProgress(int value)

@@ -169,10 +169,10 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     }
 
     QString back="unknown";
-    if (job.backgroundCorrection==0) back="none";
-    if (job.backgroundCorrection==1) back="offset";
-    if (job.backgroundCorrection==2) back="offsetmin";
-    if (job.backgroundCorrection==3) back="imgoffset";
+    if (job.backgroundCorrection==BACKGROUND_NONE) back="none";
+    if (job.backgroundCorrection==BACKGROUND_REMOVEOFFSET) back="offset";
+    if (job.backgroundCorrection==BACKGROUND_REMOVEMINANDOFFSET) back="offsetmin";
+    if (job.backgroundCorrection==BACKGROUND_FILEANDOFFSET) back="imgoffset";
     QString corr="unknown";
     if (job.correlator==CORRELATOR_DIRECT) corr="direct";
     if (job.correlator==CORRELATOR_DIRECTAVG) corr="directavg";
@@ -808,7 +808,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 emit messageChanged(tr("could not create uncorrected statistics file %1!").arg(error));
                             }
 
-                            if (job.dualViewMode!=0) {
+                            if (job.dualViewMode!=DUALVIEW_NONE) {
                                 emit messageChanged(tr("saving DV 1 statistics ..."));
                                 if (!saveStatistics(statisticsFilename_dv1=outputFilenameBase+".statistics_dv1.dat", outputFilenameBase+".statistics_dv1.plt", dv_statistics[0], tr("Corrected Statistics, DV 1"), &error)) {
                                     m_status=-1; emit statusChanged(m_status);
@@ -1072,7 +1072,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create binary autocorrelation file '%1': %2!").arg(localFilename1).arg(error));
                             }
-                            if (job.addFCCSSeparately && job.dualViewMode!=0) {
+                            if (job.addFCCSSeparately && job.dualViewMode!=DUALVIEW_NONE) {
                                 if (QFile::exists(localFilename1)) {
                                     addFiles.append(getFileInfo(localFilename1, configFilename, "ACF0", 0, getGroupName()));
                                     addFiles.append(getFileInfo(localFilename1, configFilename, "ACF1", 1, getGroupName()));
@@ -1137,7 +1137,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 /*&& QFile::exists(backgroundFilename)
                                 && QFile::exists(backstdFilename)*/) {
 
-                            if (job.addFCCSSeparately && job.dualViewMode!=0) {
+                            if (job.addFCCSSeparately && job.dualViewMode!=DUALVIEW_NONE) {
                                 addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B1", 0, getGroupName()));
                                 addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B2", 1, getGroupName()));
                             } else {
@@ -2036,10 +2036,10 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_dv2_statistics(QFRDRImag
     int dv_height=frame_height;
     int shiftX1=0;
     int shiftY1=0;
-    if (job.dualViewMode==1) {
+    if (job.dualViewMode==DUALVIEW_HORICONTAL) {
         dv_width=dv_width/2;
         shiftX1=dv_width/2;
-    } else if (job.dualViewMode==2) {
+    } else if (job.dualViewMode==DUALVIEW_VERTICAL) {
         dv_height=dv_height/2;
         shiftY1=dv_height/2;
     } else {
@@ -3200,17 +3200,17 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
     if (backgroundImageStd) qfFree(backgroundImageStd);
     backgroundImage=(float*)qfMalloc(frame_width*frame_height*sizeof(float));
     backgroundImageStd=(float*)qfMalloc(frame_width*frame_height*sizeof(float));
-    if (job.backgroundCorrection==0) {
+    if (job.backgroundCorrection==BACKGROUND_NONE) {
         baseline=0;
-    } else if (job.backgroundCorrection==1) {
+    } else if (job.backgroundCorrection==BACKGROUND_REMOVEOFFSET) {
         baseline=job.backgroundOffset;
         //frames_max=frames_max-baseline;
         //frames_min=frames_min-baseline;
-    } else if (job.backgroundCorrection==2) {
+    } else if (job.backgroundCorrection==BACKGROUND_REMOVEMINANDOFFSET) {
         baseline=job.backgroundOffset+frames_min;
         //frames_max=frames_max-baseline;
         //frames_min=frames_min-baseline;
-    } else if (job.backgroundCorrection==3) {
+    } else if (job.backgroundCorrection==BACKGROUND_FILEANDOFFSET) {
         baseline=job.backgroundOffset;
         //frames_max=frames_max-baseline;
         //frames_min=frames_min-baseline;
@@ -3237,7 +3237,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
 
 
     // if we should use a background file for correction, we read it and create an averaged frame from it.
-    if (job.backgroundCorrection==3) {
+    if (job.backgroundCorrection==BACKGROUND_FILEANDOFFSET) {
         //qDebug()<<job.filenameBackground<<QFile::exists(job.filenameBackground);
         if (QFile::exists(job.filenameBackground)) {
             QFImporterImageSeries* reader=NULL;
@@ -3413,3 +3413,52 @@ QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state::~contribute
     qfFree(video_frame);
 }
 
+
+double QFRDRImagingFCSCorrelation_getCorrelatorTauMax(int corrType, double taumin, int S, int m, int P) {
+    double taumax=0;
+    if (corrType==CORRELATOR_MTAUALLMON) {
+        taumax=0;
+        for (int s=0; s<S; s++) {
+            if (s==0) {
+                taumax+=pow(m, s)*taumin*P;
+            } else {
+                taumax+=pow(m, s)*taumin*P*(m-1.0)/m;
+            }
+        }
+    } else {
+        taumax=0;
+        for (int s=0; s<S; s++) {
+            taumax+=pow(m, s)*taumin*P;
+        }
+    }
+    return taumax;
+}
+
+
+int IMFCSJob::getIdealS() const
+{
+    return getIdealS(-100.0);
+}
+
+int IMFCSJob::getIdealS(double forTauMax) const
+{
+    if (forTauMax<0.0) {
+        forTauMax=0.75*frameTime*double(range_max-range_min)/double(segments);
+    }
+    double taumin=frameTime;
+    double taumax=taumin;
+    int idealS=1;
+    while (idealS<200 && taumax<=forTauMax) {
+        taumax=QFRDRImagingFCSCorrelation_getCorrelatorTauMax(correlator, taumin, idealS, m, P);
+        idealS++;
+    }
+    return idealS;
+}
+
+void IMFCSJob::addDCCF(int dx, int dy)
+{
+    distanceCCF=true;
+    DCCFDeltaX.append(dx);
+    DCCFDeltaY.append(dy);
+    DCCFrole.append(QString("DCCF(%1,%2)").arg(dx).arg(dy));
+}

@@ -32,8 +32,8 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     imageFormatNames=QFRDRImagingFCSCorrelationJobThread::getImageFormatNameList();
     imageFormatIDs=QFRDRImagingFCSCorrelationJobThread::getImageFormatIDList();
     /*qDebug()<<imageFilters;
-    qDebug()<<imageFormatNames;
-    qDebug()<<imageFormatIDs;*/
+    //qDebug()<<imageFormatNames;
+    //qDebug()<<imageFormatIDs;*/
 
     setWindowTitle(tr("Imaging FCS/FCCS Wizard"));
     setPage(InitPage, wizIntro=new QFRadioButtonListWizardPage(tr("Introduction"), this));
@@ -43,7 +43,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizIntro->addItem(tr("imFCS / imFCCS evaluation"), true);
     wizIntro->addItem(tr("imFCS focus volume calibration"), false);
     wizIntro->setEnabled(1, QFPluginServices::getInstance()->getEvaluationItemFactory()->contains("imfcs_fit"));
-    wizIntro->setChecked(ProgramOptions::getConfigValue("imaging_fcs/wizard/microscopy", 0).toInt());
+    wizIntro->setChecked(ProgramOptions::getConfigValue("imaging_fcs/wizard/wizardmethod", 0).toInt());
     connect(wizIntro, SIGNAL(onValidate(QWizardPage*)), this, SLOT(finishedIntro()));
 
 
@@ -96,9 +96,9 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizImageProps->addRow(tr("Image Stack Properties:"), labImageProps);
 
     cmbDualView = new QFEnhancedComboBox(wizImageProps);
-    cmbDualView->addItem(QIcon(":/imaging_fcs/dvnone.png"), tr("no DualView"));
-    cmbDualView->addItem(QIcon(":/imaging_fcs/dvhor.png"), tr("horizontal DualView"));
-    cmbDualView->addItem(QIcon(":/imaging_fcs/dvver.png"), tr("vertical DualView"));
+    cmbDualView->addItem(QIcon(":/imaging_fcs/dvnone.png"), tr("no DualView"), (int)DUALVIEW_NONE);
+    cmbDualView->addItem(QIcon(":/imaging_fcs/dvhor.png"), tr("horizontal DualView"), (int)DUALVIEW_HORICONTAL);
+    cmbDualView->addItem(QIcon(":/imaging_fcs/dvver.png"), tr("vertical DualView"), (int)DUALVIEW_VERTICAL);
     wizImageProps->addRow(tr("&DualView mode:"), cmbDualView);
 
     widPixSize=new QFPixelSizeEdit(wizImageProps);
@@ -167,11 +167,11 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizBackgroundAndBleach->setValidateFunctor(new QFRDRImagingFCSWizard_BackgroundIsValid(this));
     wizBackgroundAndBleach->setNextIDFunctor(new QFRDRImagingFCSWizard_BackgroundNextId(this));
     wizBackgroundAndBleach->setFreeFunctors(true);
-    cmbBackgroundMode=new QComboBox(wizBackgroundAndBleach);
-    cmbBackgroundMode->addItem(tr("none"));
-    cmbBackgroundMode->addItem(tr("remove offset"));
-    cmbBackgroundMode->addItem(tr("remove minimum counts & offset"));
-    cmbBackgroundMode->addItem(tr("remove background image & offset"));
+    cmbBackgroundMode=new QFEnhancedComboBox(wizBackgroundAndBleach);
+    cmbBackgroundMode->addItem(tr("none"), (int)BACKGROUND_NONE);
+    cmbBackgroundMode->addItem(tr("remove offset"), (int)BACKGROUND_REMOVEOFFSET);
+    cmbBackgroundMode->addItem(tr("remove minimum counts & offset"), (int)BACKGROUND_REMOVEMINANDOFFSET);
+    cmbBackgroundMode->addItem(tr("remove background image & offset"), (int)BACKGROUND_FILEANDOFFSET);
     connect(cmbBackgroundMode, SIGNAL(currentIndexChanged(int)), this, SLOT(backgroundModeChanged(int)));
     wizBackgroundAndBleach->addRow(tr("Background &Correction Mode:"), cmbBackgroundMode);
     edtBackgroundFilename=new QFEnhancedLineEdit(wizBackgroundAndBleach);
@@ -190,7 +190,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizBackgroundAndBleach->addRow(labBackgroundError);
 
     wizBackgroundAndBleach->addStretch();
-    cmbBleachCorrection=new QComboBox(wizBackgroundAndBleach);
+    cmbBleachCorrection=new QFEnhancedComboBox(wizBackgroundAndBleach);
     cmbBleachCorrection->addItem(tr("none"), (int)BLEACH_NONE);
     cmbBleachCorrection->addItem(tr("1-exponential LM-fit"), (int)BLEACH_EXP);
     cmbBleachCorrection->addItem(tr("1-exponential(poly2) LM-fit"), (int)BLEACH_EXP_POLY2);
@@ -210,21 +210,21 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
 
     setPage(CalibrationPage, wizCalibration=new QFImagePlotWizardPage(tr("Setup Calibration ..."), this));
-    cmbCalibRegion=new QComboBox(wizCalibration);
-    cmbCalibRegion->addItem(tr("all pixels"));
-    cmbCalibRegion->addItem(tr("left half (x = 0..w/2)"));
-    cmbCalibRegion->addItem(tr("right half (x = w/2..w)"));
-    cmbCalibRegion->addItem(tr("top half (y = 0..h/2)"));
-    cmbCalibRegion->addItem(tr("bottom half (y = h/2..h)"));
-    cmbCalibRegion->addItem(tr("center"));
-    cmbCalibRegion->addItem(tr("left center (around x = w/4)"));
-    cmbCalibRegion->addItem(tr("right center (around x = 3*w/4)"));
-    cmbCalibRegion->addItem(tr("top center (around y = h/4)"));
-    cmbCalibRegion->addItem(tr("bottom center (around y = 3*h/4)"));
-    cmbCalibRegion->addItem(tr("user-defined crop"));
-    cmbCalibRegion->setCurrentIndex(0);
-    wizCalibration->addRow(tr("calibration region:"), cmbCalibRegion);
-    cmbCalibRegion->setCurrentIndex(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_region", 0).toInt());
+    cmbCalibCropRegion=new QComboBox(wizCalibration);
+    cmbCalibCropRegion->addItem(tr("all pixels"));
+    cmbCalibCropRegion->addItem(tr("left half (x = 0..w/2)"));
+    cmbCalibCropRegion->addItem(tr("right half (x = w/2..w)"));
+    cmbCalibCropRegion->addItem(tr("top half (y = 0..h/2)"));
+    cmbCalibCropRegion->addItem(tr("bottom half (y = h/2..h)"));
+    cmbCalibCropRegion->addItem(tr("center"));
+    cmbCalibCropRegion->addItem(tr("left center (around x = w/4)"));
+    cmbCalibCropRegion->addItem(tr("right center (around x = 3*w/4)"));
+    cmbCalibCropRegion->addItem(tr("top center (around y = h/4)"));
+    cmbCalibCropRegion->addItem(tr("bottom center (around y = 3*h/4)"));
+    cmbCalibCropRegion->addItem(tr("user-defined crop"));
+    cmbCalibCropRegion->setCurrentIndex(0);
+    wizCalibration->addRow(tr("calibration region:"), cmbCalibCropRegion);
+    cmbCalibCropRegion->setCurrentIndex(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_region", 0).toInt());
     spinCalibrationCenterSize=new QSpinBox(wizCalibration);
     wizCalibration->addRow(tr("\"center\" region size:"), spinCalibrationCenterSize);
 
@@ -232,6 +232,23 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     widCropCalibration->addLayoutStretchAtEnd();
     wizCalibration->addRow(tr("user-defined crop:"), widCropCalibration);
     wizCalibration->addStretch();
+
+
+    spinCalibTauMax=new QDoubleSpinBox(wizCalibration);
+    spinCalibTauMax->setDecimals(3);
+    spinCalibTauMax->setRange(0.001,1000000);
+    spinCalibTauMax->setValue(10);
+    spinCalibTauMax->setSuffix(tr(" s"));
+    wizCalibration->addRow(tr("max. lag-time in correlations:"), spinCalibTauMax);
+    spinCalibSegments=new QSpinBox(wizCalibration);
+    spinCalibSegments->setRange(1,100);
+    spinCalibSegments->setValue(5);
+    spinCalibSegments->setSpecialValueText(tr("1 (use blocking for error estimate)"));
+    wizCalibration->addRow(tr("number of correlated segments:"), spinCalibSegments);
+    labCalibSegments=new QLabel(wizCalibration);
+    labCalibSegments->setWordWrap(true);
+    wizCalibration->addRow(QString(), labCalibSegments);
+
 
     spinCalibExectedWxy=new QDoubleSpinBox(wizCalibration);
     spinCalibExectedWxy->setDecimals(2);
@@ -267,13 +284,15 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     connect(spinCalibrationCenterSize, SIGNAL(valueChanged(int)), this, SLOT(calibrationCropValuesChanged()));
     connect(spinCalibBinMax, SIGNAL(valueChanged(int)), this, SLOT(calibWxyTestChanged()));
     connect(widCropCalibration, SIGNAL(valueChanged(int,int,int,int)), this, SLOT(calibrationCropValuesChanged()));
-    connect(cmbCalibRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(calibrationRegionChanged(int)));
+    connect(cmbCalibCropRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(calibrationRegionChanged(int)));
     connect(wizCalibration, SIGNAL(onValidate(QWizardPage*)), this, SLOT(calibrationSetupFinished()));
     connect(wizCalibration, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(calibWxyTestChanged()));
     connect(wizCalibration, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(calibrationCropValuesChanged()));
     connect(spinCalibExectedWxy, SIGNAL(valueChanged(double)), this, SLOT(calibWxyTestChanged()));
     connect(spinCalibExpectedWxyTests, SIGNAL(valueChanged(int)), this, SLOT(calibWxyTestChanged()));
     connect(spinCalibExpectedWxySteps, SIGNAL(valueChanged(double)), this, SLOT(calibWxyTestChanged()));
+    connect(spinCalibSegments, SIGNAL(valueChanged(int)), this, SLOT(calibrationValuesChanged()));
+    connect(spinCalibTauMax, SIGNAL(valueChanged(double)), this, SLOT(calibrationValuesChanged()));
     calibrationCropValuesChanged();
 
 
@@ -358,9 +377,12 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     spinSegments->setRange(1,100);
     spinSegments->setValue(5);
     spinSegments->setSpecialValueText(tr("1 (use blocking for error estimate)"));
+    connect(spinSegments, SIGNAL(valueChanged(int)), this, SLOT(correlationValuesChanged()));
+    connect(spinTauMax, SIGNAL(valueChanged(double)), this, SLOT(correlationValuesChanged()));
     wizCorrelation->addRow(tr("number of correlated segments:"), spinSegments);
     labSegments=new QLabel(wizCorrelation);
     labSegments->setWordWrap(true);
+    wizCorrelation->addRow(QString(), labSegments);
 
 
     setPage(ProcessCorrelationPage, wizProcessJobs=new QFGridWizardPage(tr("Process Correlation ..."), this));
@@ -375,6 +397,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizProcessJobs->setUseExternalIsComplete(true);
     wizProcessJobs->setExternalIsComplete(false);
     connect(widProcess, SIGNAL(correlationCompleted(bool)), wizProcessJobs, SLOT(setExternalIsComplete(bool)));
+    connect(wizProcessJobs, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(startProcessingJobs()));
 
 
 
@@ -450,18 +473,21 @@ void QFRDRImagingFCSWizard::selectFileClicked()
 
 void QFRDRImagingFCSWizard::edtFilenameTextChanged(const QString &filename)
 {
+    //qDebug()<<"edtFilenameTextChanged";
     cmbFileformat->setEnabled(!filename.isEmpty());
     wizSelfiles->setExternalIsComplete(!filename.isEmpty());
 }
 
 void QFRDRImagingFCSWizard::initImagePreview()
 {
+    //qDebug()<<"initImagePreview";
     ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", cmbMicroscopy->currentIndex());
-    ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", wizIntro->getChecked());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/wizardmethod", wizIntro->getChecked());
 }
 
 void QFRDRImagingFCSWizard::finishedImageProps()
 {
+    //qDebug()<<"finishedImageProps";
     chk2ColorFCCS->setEnabled(cmbDualView->currentIndex()>0);
     if (cmbDualView->currentIndex()>0) {
         chk2ColorFCCS->setChecked(true);
@@ -469,25 +495,35 @@ void QFRDRImagingFCSWizard::finishedImageProps()
     } else {
         chk2ColorFCCS->setText("unavailable: you did not select a DualView mode on the previous pages!");
     }
-    spinTauMax->setValue(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/3.0);
+    spinTauMax->setValue(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/2.0);
+    spinTauMax->setMaximum(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6);
+    spinCalibTauMax->setValue(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/2.0);
+    spinCalibTauMax->setMaximum(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6);
 }
 
 void QFRDRImagingFCSWizard::initFileSelection()
 {
+    //qDebug()<<"initFileSelection";
     wizSelfiles->setUseExternalIsComplete(true);
     wizSelfiles->setExternalIsComplete(!edtFilename->text().isEmpty());
-
 }
 
 void QFRDRImagingFCSWizard::finishedIntro()
 {
+    //qDebug()<<"finishedIntro";
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/wizardmethod", wizIntro->getChecked());
     isCalibration=wizIntro->isChecked(1);
-    spinWxy->setEnabled(!isCalibration);
-    labWxy->setEnabled(!isCalibration);
+    spinWxy->setVisible(!isCalibration);
+    QWidget* lab=NULL;
+    if (lab=wizMicroscopy->getFormLayout()->labelForField(spinWxy)) {
+        lab->setVisible(!isCalibration);
+    }
+    labWxy->setVisible(!isCalibration);
 }
 
 void QFRDRImagingFCSWizard::backgroundModeChanged(int mode)
 {
+    //qDebug()<<"backgroundModeChanged";
     if (mode==0) {
         edtBackgroundFilename->setEnabled(false);
         spinBackgroundOffset->setEnabled(false);
@@ -514,6 +550,7 @@ void QFRDRImagingFCSWizard::calcPixelSize()
 
 void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
 {
+    //qDebug()<<"calibrationRegionChanged";
     spinCalibrationCenterSize->setEnabled(false);
     widCropCalibration->setEnabled(false);
     QColor col=QColor("red");
@@ -522,22 +559,27 @@ void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
     wizCalibration->setROIFillColor(col);
     switch(region) {
         case 0: //all pixels
+            widCropCalibration->setCropRange(0,image_width_io-1, 0,image_height_io-1);
             wizCalibration->setROI(0,0,image_width_io, image_height_io);
             wizCalibration->resetROI2();
             break;
         case 1: // "left half"
+            widCropCalibration->setCropRange(0,image_width_io/2, 0, image_height_io);
             wizCalibration->setROI(0,0,image_width_io/2, image_height_io);
             wizCalibration->resetROI2();
             break;
         case 2: // "right half"
+            widCropCalibration->setCropRange(image_width_io/2+1,image_width_io-1,0, image_height_io);
             wizCalibration->setROI(image_width_io/2,0,image_width_io/2, image_height_io);
             wizCalibration->resetROI2();
             break;
         case 3: // "top half"
+            widCropCalibration->setCropRange(0,image_width_io-1,image_height_io/2+1, image_height_io-1);
             wizCalibration->setROI(0,image_height_io/2,image_width_io, image_height_io/2);
             wizCalibration->resetROI2();
             break;
         case 4: // "bottom half"
+            widCropCalibration->setCropRange(0,image_width_io-1,0, image_height_io/2);
             wizCalibration->setROI(0,0,image_width_io, image_height_io/2);
             wizCalibration->resetROI2();
             break;
@@ -547,6 +589,7 @@ void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
                 int w=spinCalibrationCenterSize->value();
                 int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
                 int y=qBound(0, image_height_io/2-w/2, image_height_io-1);
+                widCropCalibration->setCropRange(x,x+w-1,y,y+w-1);
                 wizCalibration->setROI(x,y,w,w);
                 wizCalibration->resetROI2();
             }
@@ -557,6 +600,7 @@ void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
                 int w=spinCalibrationCenterSize->value();
                 int x=qBound(0, image_width_io/4-w/2, image_width_io-1);
                 int y=qBound(0, image_height_io/2-w/2, image_height_io-1);
+                widCropCalibration->setCropRange(x,x+w-1,y,y+w-1);
                 wizCalibration->setROI(x,y,w,w);
                 wizCalibration->resetROI2();
             }
@@ -567,6 +611,7 @@ void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
                 int w=spinCalibrationCenterSize->value();
                 int x=qBound(0, (3*image_width_io-2*w)/4, image_width_io-1);
                 int y=qBound(0, (image_height_io-w)/2, image_height_io-1);
+                widCropCalibration->setCropRange(x,x+w-1,y,y+w-1);
                 wizCalibration->setROI(x,y,w,w);
                 wizCalibration->resetROI2();
             }
@@ -578,6 +623,7 @@ void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
                 int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
                 int y=qBound(0, 3*image_height_io/4-w/2, image_height_io-1);
                 wizCalibration->setROI(x,y,w,w);
+                widCropCalibration->setCropRange(x,x+w-1,y,y+w-1);
                 wizCalibration->resetROI2();
             }
             break;
@@ -587,6 +633,7 @@ void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
                 int w=spinCalibrationCenterSize->value();
                 int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
                 int y=qBound(0, image_height_io/4-w/2, image_height_io-1);
+                widCropCalibration->setCropRange(x,x+w-1,y,y+w-1);
                 wizCalibration->setROI(x,y,w,w);
                 wizCalibration->resetROI2();
             }
@@ -601,11 +648,13 @@ void QFRDRImagingFCSWizard::calibrationRegionChanged(int region)
 
 void QFRDRImagingFCSWizard::calibrationCropValuesChanged()
 {
-    calibrationRegionChanged(cmbCalibRegion->currentIndex());
+    //qDebug()<<"calibrationCropValuesChanged";
+    calibrationRegionChanged(cmbCalibCropRegion->currentIndex());
 }
 
 void QFRDRImagingFCSWizard::cropRegionChanged(int region)
 {
+    //qDebug()<<"cropRegionChanged";
     spinCropCenterSize->setEnabled(false);
     widCrop->setEnabled(false);
     QColor col=QColor("red");
@@ -614,22 +663,27 @@ void QFRDRImagingFCSWizard::cropRegionChanged(int region)
     wizCropAndBin->setROIFillColor(col);
     switch(region) {
         case 0: //all pixels
+            widCrop->setCropRange(0,image_width_io-1, 0,image_height_io-1);
             wizCropAndBin->setROI(0,0,image_width_io, image_height_io);
             wizCropAndBin->resetROI2();
             break;
         case 1: // "left half"
+            widCrop->setCropRange(0,image_width_io/2, 0, image_height_io);
             wizCropAndBin->setROI(0,0,image_width_io/2, image_height_io);
             wizCropAndBin->resetROI2();
             break;
         case 2: // "right half"
+            widCrop->setCropRange(image_width_io/2+1,image_width_io-1,0, image_height_io);
             wizCropAndBin->setROI(image_width_io/2,0,image_width_io/2, image_height_io);
             wizCropAndBin->resetROI2();
             break;
         case 3: // "top half"
+            widCrop->setCropRange(0,image_width_io-1,image_height_io/2+1, image_height_io-1);
             wizCropAndBin->setROI(0,image_height_io/2,image_width_io, image_height_io/2);
             wizCropAndBin->resetROI2();
             break;
         case 4: // "bottom half"
+            widCrop->setCropRange(0,image_width_io-1,0, image_height_io/2);
             wizCropAndBin->setROI(0,0,image_width_io, image_height_io/2);
             wizCropAndBin->resetROI2();
             break;
@@ -639,6 +693,7 @@ void QFRDRImagingFCSWizard::cropRegionChanged(int region)
                 int w=spinCropCenterSize->value();
                 int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
                 int y=qBound(0, image_height_io/2-w/2, image_height_io-1);
+                widCrop->setCropRange(x,x+w-1,y,y+w-1);
                 wizCropAndBin->setROI(x,y,w,w);
                 wizCropAndBin->resetROI2();
             }
@@ -649,6 +704,7 @@ void QFRDRImagingFCSWizard::cropRegionChanged(int region)
                 int w=spinCropCenterSize->value();
                 int x=qBound(0, image_width_io/4-w/2, image_width_io-1);
                 int y=qBound(0, image_height_io/2-w/2, image_height_io-1);
+                widCrop->setCropRange(x,x+w-1,y,y+w-1);
                 wizCropAndBin->setROI(x,y,w,w);
                 wizCropAndBin->resetROI2();
             }
@@ -659,6 +715,7 @@ void QFRDRImagingFCSWizard::cropRegionChanged(int region)
                 int w=spinCropCenterSize->value();
                 int x=qBound(0, (3*image_width_io-2*w)/4, image_width_io-1);
                 int y=qBound(0, (image_height_io-w)/2, image_height_io-1);
+                widCrop->setCropRange(x,x+w-1,y,y+w-1);
                 wizCropAndBin->setROI(x,y,w,w);
                 wizCropAndBin->resetROI2();
             }
@@ -669,6 +726,7 @@ void QFRDRImagingFCSWizard::cropRegionChanged(int region)
                 int w=spinCropCenterSize->value();
                 int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
                 int y=qBound(0, 3*image_height_io/4-w/2, image_height_io-1);
+                widCrop->setCropRange(x,x+w-1,y,y+w-1);
                 wizCropAndBin->setROI(x,y,w,w);
                 wizCropAndBin->resetROI2();
             }
@@ -679,6 +737,7 @@ void QFRDRImagingFCSWizard::cropRegionChanged(int region)
                 int w=spinCropCenterSize->value();
                 int x=qBound(0, image_width_io/2-w/2, image_width_io-1);
                 int y=qBound(0, image_height_io/4-w/2, image_height_io-1);
+                widCrop->setCropRange(x,x+w-1,y,y+w-1);
                 wizCropAndBin->setROI(x,y,w,w);
                 wizCropAndBin->resetROI2();
             }
@@ -695,38 +754,225 @@ void QFRDRImagingFCSWizard::cropRegionChanged(int region)
 
 void QFRDRImagingFCSWizard::cropValuesChanged()
 {
+    //qDebug()<<"cropValuesChanged";
     cropRegionChanged(cmbCropRegion->currentIndex());
 }
 
 void QFRDRImagingFCSWizard::microscopyChoosen()
 {
+    //qDebug()<<"microscopyChoosen";
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", cmbMicroscopy->currentIndex());
     ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wz", spinWz->value());
     ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wxy", spinWxy->value());
 
-    spinWz->setEnabled(cmbMicroscopy->currentIndex()!=1);
     labWz->setVisible(cmbMicroscopy->currentIndex()!=1);
-    spinWxy->setEnabled(wizIntro->isChecked(0) && !isCalibration);
-    labWxy->setEnabled(wizIntro->isChecked(0) && !isCalibration);
+    spinWz->setVisible(cmbMicroscopy->currentIndex()!=1);
+    QWidget* lab=NULL;
+    if (lab=wizMicroscopy->getFormLayout()->labelForField(labWz)) {
+        lab->setVisible(spinWz->isVisible());
+    }
+
+    //spinWxy->setEnabled(reallyIsCalib);
+    //labWxy->setEnabled(reallyIsCalib);
+
+    bool reallyIsCalib=wizIntro->isChecked(0) && this->isCalibration;
+    spinWxy->setVisible(!reallyIsCalib);
+    lab=NULL;
+    if (lab=wizMicroscopy->getFormLayout()->labelForField(spinWxy)) {
+        lab->setVisible(spinWxy->isVisible());
+    }
+    labWxy->setVisible(!reallyIsCalib);
 
 }
 
 void QFRDRImagingFCSWizard::calibrationSetupFinished()
 {
-    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_region", cmbCalibRegion->currentIndex());
+    //qDebug()<<"calibrationSetupFinished";
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_region", cmbCalibCropRegion->currentIndex());
 }
 
 void QFRDRImagingFCSWizard::cropSetupFinished()
 {
+    //qDebug()<<"cropSetupFinished";
     ProgramOptions::setConfigValue("imaging_fcs/wizard/crop_region", cmbCropRegion->currentIndex());
 }
 
 void QFRDRImagingFCSWizard::correlationValuesChanged()
 {
+    //qDebug()<<"correlationValuesChanged";
     labSegments->setText(tr("=> segment length %1 s").arg(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/double(spinSegments->value())));
+}
+
+void QFRDRImagingFCSWizard::calibrationValuesChanged()
+{
+    //qDebug()<<"calibrationValuesChanged";
+    labSegments->setText(tr("=> segment length %1 s").arg(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/double(spinCalibSegments->value())));
+}
+
+void QFRDRImagingFCSWizard::startProcessingJobs()
+{
+
+    IMFCSJob basicjob;
+    basicjob.filename=edtFilename->text();
+    basicjob.filenameBackground=edtBackgroundFilename->text();
+    basicjob.fileFormat=cmbFileformat->currentIndex();
+    basicjob.correlator=CORRELATOR_DIRECTAVG;
+    basicjob.backgroundCorrection=cmbBackgroundMode->currentData().toInt();
+    basicjob.backgroundOffset=spinBackgroundOffset->value();
+    basicjob.P=16;
+    basicjob.m=2;
+    basicjob.segments=spinSegments->value();
+    basicjob.frameTime=spinFrametime->value();
+    basicjob.S=qBound(3, basicjob.getIdealS(), 200);
+    basicjob.range_min=widFrameRange->getFirst();
+    basicjob.range_max=widFrameRange->getLast();
+    basicjob.addToProject=true;
+    basicjob.prefix="./results/";
+    basicjob.postfix="_wizard_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%";
+    basicjob.acf=false;
+    basicjob.statistics_frames=qBound(10,frame_count_io/1000,2000);
+    basicjob.backstatistics_frames=qBound(10,background_count/100,2000);
+    basicjob.statistics=true;
+    basicjob.video=true;
+    basicjob.video_frames=basicjob.statistics_frames;
+    basicjob.binning=1;
+    basicjob.binAverage=false;
+    basicjob.use_cropping=false;
+    basicjob.crop_x0=0;
+    basicjob.crop_x1=image_width_io-1;
+    basicjob.crop_y0=0;
+    basicjob.crop_y1=image_height_io-1;
+
+    basicjob.distanceCCF=false;
+    basicjob.DCCFDeltaX.clear();
+    basicjob.DCCFDeltaY.clear();
+    basicjob.DCCFrole.clear();
+    basicjob.bleach=cmbBleachCorrection->currentData().toInt();
+    basicjob.bleachAvgFrames=basicjob.statistics_frames/10;
+    basicjob.interleaved_binning=false;
+    basicjob.cameraSettingsGiven=true;
+    basicjob.cameraPixelWidth=widPixSize->getPixelWidth();
+    basicjob.cameraPixelHeight=widPixSize->getPixelHeight();
+    basicjob.dualViewMode=cmbDualView->currentData().toInt();
+    basicjob.addFCCSSeparately=true;
+    basicjob.addNandB=false;
+    basicjob.useBlockingErrorEstimate=(basicjob.segments<=1);
+
+    if (wizIntro->isChecked(1)) { // calibration
+        basicjob.segments=spinCalibSegments->value();
+        basicjob.S=qBound(3, basicjob.getIdealS(), 200);
+        for (int b=0; b<spinCalibBinMax->value(); b++) {
+            IMFCSJob job=basicjob;
+            job.acf=true;
+            job.postfix="_wizardcalib_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%";
+            job.use_cropping=cmbCalibCropRegion->currentIndex()>0;
+            if (job.use_cropping) {
+                job.crop_x0=widCropCalibration->getX1();
+                job.crop_x1=widCropCalibration->getX2();
+                job.crop_y0=widCropCalibration->getY1();
+                job.crop_y1=widCropCalibration->getY2();
+            }
+            job.binning=b;
+            widProcess->addJob(job);
+        }
+    } else { // normal correlation
+        basicjob.postfix="_wizard_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%";
+        basicjob.binning=spinBinning->value();
+        basicjob.use_cropping=cmbCropRegion->currentIndex()>0;
+        basicjob.segments=spinSegments->value();
+        basicjob.S=qBound(3, basicjob.getIdealS(), 200);
+
+        if (basicjob.use_cropping) {
+            basicjob.crop_x0=widCrop->getX1();
+            basicjob.crop_x1=widCrop->getX2();
+            basicjob.crop_y0=widCrop->getY1();
+            basicjob.crop_y1=widCrop->getY2();
+        }
+        if (chkACF->isChecked()) {
+            IMFCSJob jobacf=basicjob;
+            jobacf.acf=true;
+            widProcess->addJob(jobacf);
+        }
+        if (chk2ColorFCCS->isChecked() && cmbDualView->currentData().toInt()>0) {
+            IMFCSJob jobfccs=basicjob;
+            jobfccs.distanceCCF=true;
+            if (cmbDualView->currentIndex()==DUALVIEW_HORICONTAL) {
+                jobfccs.DCCFDeltaX << image_width_io/2/jobfccs.binning;
+                jobfccs.DCCFDeltaY << 0;
+                jobfccs.DCCFrole<<QString("FCCS");
+                jobfccs.distanceCCF=true;
+            } else if (cmbDualView->currentIndex()==DUALVIEW_VERTICAL) {
+                jobfccs.DCCFDeltaX << 0;
+                jobfccs.DCCFDeltaY << image_height_io/2/jobfccs.binning;
+                jobfccs.DCCFrole<<QString("FCCS");
+                jobfccs.distanceCCF=true;
+            }
+            widProcess->addJob(jobfccs);
+        }
+        if (cmb2PixelFCCS->currentIndex()>0) {
+            IMFCSJob jobdccf=basicjob;
+            jobdccf.distanceCCF=true;
+            if (cmb2PixelFCCS->currentIndex()==1) {
+                jobdccf.addDCCF(-1,0);
+                jobdccf.addDCCF(1,0);
+                jobdccf.addDCCF(0,-1);
+                jobdccf.addDCCF(0,1);
+            } else if (cmb2PixelFCCS->currentIndex()==2) {
+                jobdccf.addDCCF(-1,0);
+                jobdccf.addDCCF(1,0);
+                jobdccf.addDCCF(0,-1);
+                jobdccf.addDCCF(0,1);
+                jobdccf.addDCCF(-1,-1);
+                jobdccf.addDCCF(-1,1);
+                jobdccf.addDCCF(1,-1);
+                jobdccf.addDCCF(1,1);
+            } else if (cmb2PixelFCCS->currentIndex()==3) {
+                jobdccf.addDCCF(1,0);
+            } else if (cmb2PixelFCCS->currentIndex()==4) {
+                jobdccf.addDCCF(-1,0);
+            } else if (cmb2PixelFCCS->currentIndex()==5) {
+                jobdccf.addDCCF(0,1);
+            } else if (cmb2PixelFCCS->currentIndex()==6) {
+                jobdccf.addDCCF(0,-1);
+            } else if (cmb2PixelFCCS->currentIndex()==7) {
+                jobdccf.addDCCF(1,0);
+                jobdccf.addDCCF(2,0);
+            } else if (cmb2PixelFCCS->currentIndex()==8) {
+                jobdccf.addDCCF(-1,0);
+                jobdccf.addDCCF(-2,0);
+            } else if (cmb2PixelFCCS->currentIndex()==9) {
+                jobdccf.addDCCF(0,1);
+                jobdccf.addDCCF(0,2);
+            } else if (cmb2PixelFCCS->currentIndex()==10) {
+                jobdccf.addDCCF(0,-1);
+                jobdccf.addDCCF(0,-2);
+            } else if (cmb2PixelFCCS->currentIndex()==11) {
+                for (int d=1; d<=5; d++) jobdccf.addDCCF(d,0);
+            } else if (cmb2PixelFCCS->currentIndex()==12) {
+                for (int d=1; d<=5; d++) jobdccf.addDCCF(-d,0);
+            } else if (cmb2PixelFCCS->currentIndex()==13) {
+                for (int d=1; d<=5; d++) jobdccf.addDCCF(0,d);
+            } else if (cmb2PixelFCCS->currentIndex()==14) {
+                for (int d=1; d<=5; d++) jobdccf.addDCCF(0,-d);
+            } else if (cmb2PixelFCCS->currentIndex()==15) {
+                for (int d=1; d<=10; d++) jobdccf.addDCCF(d,0);
+            } else if (cmb2PixelFCCS->currentIndex()==16) {
+                for (int d=1; d<=10; d++) jobdccf.addDCCF(-d,0);
+            } else if (cmb2PixelFCCS->currentIndex()==17) {
+                for (int d=1; d<=10; d++) jobdccf.addDCCF(0,d);
+            } else if (cmb2PixelFCCS->currentIndex()==18) {
+                for (int d=1; d<=10; d++) jobdccf.addDCCF(0,-d);
+            }
+            widProcess->addJob(jobdccf);
+        }
+    }
+
+
 }
 
 void QFRDRImagingFCSWizard::calibWxyTestChanged()
 {
+    //qDebug()<<"calibWxyTestChanged";
     ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wxy", spinCalibExectedWxy->value());
     ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wxy_tests", spinCalibExpectedWxyTests->value());
     ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wxy_steps", spinCalibExpectedWxySteps->value());
@@ -748,10 +994,17 @@ void QFRDRImagingFCSWizard::calibWxyTestChanged()
 
 bool QFRDRImagingFCSWizard_BackgroundIsValid::isValid(QFWizardPage *page)
 {
+    //qDebug()<<"QFRDRImagingFCSWizard_BackgroundIsValid::isValid(";
     if (wizard) {
         ProgramOptions::setConfigValue("imaging_fcs/wizard/bleach_correction", wizard->cmbBleachCorrection->currentIndex());
         wizard->labBackgroundError->setText("");
-        QFRDRImagingFCSCorrelationDialog::readBackgroundProperties(wizard->edtBackgroundFilename->text(), wizard->cmbFileformat->currentIndex(), page, &(wizard->background_width), &(wizard->background_height), &(wizard->background_count));
+        if ((wizard->cmbFileformat->currentText()!=lastReaderID && lastFilename!=wizard->edtBackgroundFilename->text()) || (wizard->background_count<=0) || (wizard->background_height*wizard->background_width<=0)) {
+            QFRDRImagingFCSCorrelationDialog::readBackgroundProperties(wizard->edtBackgroundFilename->text(), wizard->cmbFileformat->currentIndex(), page, &(wizard->background_width), &(wizard->background_height), &(wizard->background_count));
+            lastFilename=wizard->edtBackgroundFilename->text();
+            lastReaderID=wizard->cmbFileformat->currentText();
+        } else {
+            //qDebug()<<"skipped reading background";
+        }
         if (wizard->cmbBackgroundMode->currentIndex()==0) {
             return true;
         } else if (wizard->cmbBackgroundMode->currentIndex()==1) {
@@ -782,19 +1035,26 @@ bool QFRDRImagingFCSWizard_BackgroundIsValid::isValid(QFWizardPage *page)
 
 bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
 {
+    //qDebug()<<"QFRDRImagingFCSWizard_ImagestackIsValid::isValid";
     if (wizard) {
         QString readerid=wizard->imageFormatIDs.value(wizard->cmbFileformat->currentIndex(), wizard->imageFormatIDs.value(0, ""));
 
         wizard->wizImageProps->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
         wizard->wizCalibration->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
         wizard->wizCropAndBin->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
-        wizard->calibrationRegionChanged(wizard->cmbCalibRegion->currentIndex());
+        wizard->calibrationRegionChanged(wizard->cmbCalibCropRegion->currentIndex());
         wizard->cropRegionChanged(wizard->cmbCropRegion->currentIndex());
 
 
-        if (wizard->frame_data_io) qfFree(wizard->frame_data_io);
-        wizard->frame_data_io=NULL;
-        QFRDRImagingFCSCorrelationDialog::readStackProperties(wizard->edtFilename->text(), wizard->cmbFileformat->currentIndex(), true, true, wizard, &(wizard->channels), &(wizard->frame_count_io), &(wizard->filesize_io), &(wizard->frametime_io), &(wizard->baseline_offset_io), &(wizard->backgroundF_io), &(wizard->pixel_width_io), &(wizard->pixel_height_io), &(wizard->hasPixel_io), &(wizard->dualViewMode_io), &(wizard->image_width_io), &(wizard->image_height_io), &(wizard->inputconfigfile_io), &(wizard->frame_data_io), &(wizard->background_width), &(wizard->background_height), &(wizard->background_count));
+        if ((readerid!=lastReaderID && lastFilename!=wizard->edtFilename->text()) || (!wizard->frame_data_io) || (wizard->frame_count_io<=0) || (wizard->image_height_io*wizard->image_width_io<=0)) {
+            if (wizard->frame_data_io) qfFree(wizard->frame_data_io);
+            wizard->frame_data_io=NULL;
+            QFRDRImagingFCSCorrelationDialog::readStackProperties(wizard->edtFilename->text(), wizard->cmbFileformat->currentIndex(), true, true, wizard, &(wizard->channels), &(wizard->frame_count_io), &(wizard->filesize_io), &(wizard->frametime_io), &(wizard->baseline_offset_io), &(wizard->backgroundF_io), &(wizard->pixel_width_io), &(wizard->pixel_height_io), &(wizard->hasPixel_io), &(wizard->dualViewMode_io), &(wizard->image_width_io), &(wizard->image_height_io), &(wizard->inputconfigfile_io), &(wizard->frame_data_io), &(wizard->background_width), &(wizard->background_height), &(wizard->background_count));
+            lastReaderID=readerid;
+            lastFilename=wizard->edtFilename->text();
+        } else {
+            //qDebug()<<"skipped reading image stack";
+        }
 
 
         wizard->labImageProps->setText(QObject::tr("frames: %1,   frame-size: %2x%3").arg(wizard->frame_count_io).arg(wizard->image_width_io).arg(wizard->image_height_io));
@@ -819,10 +1079,10 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
         wizard->widCrop->setFullImageSize();
 
         if (wizard->cmbDualView->currentIndex()==1) {
-            wizard->cmbCalibRegion->setCurrentIndex(1);
+            wizard->cmbCalibCropRegion->setCurrentIndex(1);
         }
         if (wizard->cmbDualView->currentIndex()==2) {
-            wizard->cmbCalibRegion->setCurrentIndex(3);
+            wizard->cmbCalibCropRegion->setCurrentIndex(3);
         }
 
         if (wizard->frame_count_io<=0) {

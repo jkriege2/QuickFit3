@@ -59,6 +59,17 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
 #define BLEACH_EXP_POLY4 7
 #define BLEACH_EXP_POLY5 8
 
+#define BACKGROUND_NONE 0
+#define BACKGROUND_REMOVEOFFSET 1
+#define BACKGROUND_REMOVEMINANDOFFSET 2
+#define BACKGROUND_FILEANDOFFSET 3
+
+#define DUALVIEW_NONE 0
+#define DUALVIEW_HORICONTAL 1
+#define DUALVIEW_VERTICAL 2
+
+double QFRDRImagingFCSCorrelation_getCorrelatorTauMax(int corrType, double taumin, int S, int m, int P);
+
 
 /*! \brief job description for correlation
     \ingroup qf3rdrdp_imaging_fcs
@@ -73,6 +84,9 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
     the code that executed the job.
 */
 struct IMFCSJob {
+    int getIdealS() const;
+    int getIdealS(double forTauMax) const;
+    void addDCCF(int dx, int dy);
     /** \brief progress widget for this job */
     QPointer<QFRDRImagingFCSThreadProgress> progress;
     /** \brief thread object for this job */

@@ -97,6 +97,7 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         virtual void initializePage();
         virtual bool validatePage();
         virtual bool isComplete() const;
+        virtual void cleanupPage();
         virtual int nextId() const;
 
         void setUserPreviousPage(QWizardPage* page);
@@ -147,6 +148,9 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         QFWizardValidateFunctor* m_validator;
         QFWizardIsCompleteFunctor* m_iscompleteFunctor;
         QFWizardNextPageFunctor* m_nextID;
+
+        void setButtonState(bool entering=true);
+        QList<QWizard::WizardButton> lastButtonLayout;
 
 };
 

@@ -35,7 +35,7 @@ int QFRDRImagingFCSWizardCorrelationProgress::getLayoutIDForProgress(const QWidg
     return -1;
 }
 
-void QFRDRImagingFCSWizardCorrelationProgress::addJob(IMFCSJob jobin, bool /*ignoreDualView*/)
+void QFRDRImagingFCSWizardCorrelationProgress::addJob(const IMFCSJob& jobin)
 {
     IMFCSJob job=jobin;
     job.progress=new QFRDRImagingFCSThreadProgress(this);

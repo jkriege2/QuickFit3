@@ -19,7 +19,7 @@ class QFRDRImagingFCSWizardCorrelationProgress : public QWidget
 
         int getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const;
         int getLayoutIDForProgress(const QWidget* w) const;
-        void addJob(IMFCSJob jobin, bool ignoreDualView=false);
+        void addJob(const IMFCSJob &jobin);
 
         bool allThreadsDone() const;
     signals:

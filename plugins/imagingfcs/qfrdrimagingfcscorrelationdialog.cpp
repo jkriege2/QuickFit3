@@ -910,10 +910,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob(int biningForFCCS) {
             int dx=rxdccf.cap(1).toInt();
             int dy=rxdccf.cap(2).toInt();
             if (dx<image_width && dy<image_height) {
-                job.DCCFDeltaX << dx;
-                job.DCCFDeltaY << dy;
-                job.DCCFrole<<QString("DCCF(%1,%2)").arg(dx).arg(dy);
-                //qDebug()<<"DCCF: "<<dx<<", "<<dy;
+                job.addDCCF(dx, dy);
             }
             pos += rxdccf.matchedLength();
         }
@@ -1192,25 +1189,6 @@ void QFRDRImagingFCSCorrelationDialog::updateBlocking()
     ui->chkBlocking->setEnabled((ui->spinSegments->value()<=1) && ((ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECT) || (ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECT_INT) || (ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECTAVG) || (ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECTAVG_INT)));
 }
 
-double QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(int corrType, double taumin, int S, int m, int P) {
-    double taumax=0;
-    if (corrType==CORRELATOR_MTAUALLMON) {
-        taumax=0;
-        for (int s=0; s<S; s++) {
-            if (s==0) {
-                taumax+=pow(m, s)*taumin*P;
-            } else {
-                taumax+=pow(m, s)*taumin*P*(m-1.0)/m;
-            }
-        }
-    } else {
-        taumax=0;
-        for (int s=0; s<S; s++) {
-            taumax+=pow(m, s)*taumin*P;
-        }
-    }
-    return taumax;
-}
 
 void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
     int corrType=ui->cmbCorrelator->currentIndex();
@@ -1231,7 +1209,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
 
     int idealS=1;
     while (idealS<200 && taumax<double(segment_length)*taumin && segment_length>0) {
-        taumax=QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(corrType, taumin, idealS, m, P);
+        taumax=QFRDRImagingFCSCorrelation_getCorrelatorTauMax(corrType, taumin, idealS, m, P);
         //qDebug()<<idealS<<taumax/1e6<<double(segment_length)*taumin/1e6<<taumin<<(taumax<double(segment_length)*taumin);
         idealS++;
     }
@@ -1239,7 +1217,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
         S=idealS-1;
         ui->spinS->setValue(S);
     }
-    taumax=QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(corrType, taumin, S, m, P);
+    taumax=QFRDRImagingFCSCorrelation_getCorrelatorTauMax(corrType, taumin, S, m, P);
     ui->labCorrelator->setText(tr("<i>correlator lags:</i> &tau;<sub>min</sub> = %1&mu;s ...&tau;<sub>max</sub><i> = %2s</i>").arg(taumin).arg(taumax/1e6));
 }
 
