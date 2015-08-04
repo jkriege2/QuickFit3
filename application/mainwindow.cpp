@@ -219,6 +219,25 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     logFileMainWidget->log_text(tr("- productVersion: %1\n").arg(QSysInfo::productVersion()));
     logFileMainWidget->dec_indent();
 #endif
+    logFileMainWidget->log_header(tr("System directories:"));
+    logFileMainWidget->inc_indent();
+    logFileMainWidget->log_text(tr("- example temporary file: %1\n").arg(qfGetTempFilename()));
+    logFileMainWidget->log_text(tr("- temporary file path: %1\n").arg(QDir::tempPath()));
+    logFileMainWidget->log_text(tr("- home path: %1\n").arg(QDir::homePath()));
+    logFileMainWidget->log_text(tr("- root path: %1\n").arg(QDir::rootPath()));
+    logFileMainWidget->dec_indent();
+    logFileMainWidget->log_header(tr("QuickFit directories:"));
+    logFileMainWidget->inc_indent();
+    logFileMainWidget->log_text(tr("- aplication directory: %1\n").arg(settings->getApplicationDirectory()));
+    logFileMainWidget->log_text(tr("- assets directory: %1\n").arg(settings->getAssetsDirectory()));
+    logFileMainWidget->log_text(tr("- examples directory: %1\n").arg(settings->getExamplesDirectory()));
+    logFileMainWidget->log_text(tr("- global config directory: %1\n").arg(settings->getGlobalConfigFileDirectory()));
+    logFileMainWidget->log_text(tr("- QF home directory directory: %1\n").arg(settings->getHomeQFDirectory()));
+    logFileMainWidget->log_text(tr("- INI file: %1\n").arg(settings->getIniFilename()));
+    logFileMainWidget->log_text(tr("- main help directory: %1\n").arg(settings->getMainHelpDirectory()));
+    logFileMainWidget->log_text(tr("- plugins directory: %1\n").arg(settings->getPluginDirectory()));
+    logFileMainWidget->log_text(tr("- sources directory: %1\n").arg(settings->getSourceDirectory()));
+    logFileMainWidget->dec_indent();
 
     logFileMainWidget->log_header(tr("Qt info:"));
     logFileMainWidget->inc_indent();

@@ -9,9 +9,20 @@
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 <p> This dialog allows to set several options that change how QuickFit looks and operates.
 <ol>
-  <li><strong>View &amp; Language</strong><ul>
+  <li><strong>Network/Update Check</strong><ul>
+    <li><i>Network Proxy:</i> Set the proxy settings that QuickFit will use, when connecting to the internet (mostly to check for updates, see below, see also the menu entry <b>Help | Check for Updates ...</b>).</li>
+    <li><i>check for updates on startup:</i> If activated, QuickFit will automatically check for updates by connecting to the QuickFit homepage. If this is deactivated, you can still check manually with the menu entry <b>Help | Check for Updates ...</b></li>
+    <!--<li><i>:</i></li>-->
+
+  </ul></li>
+  <li><strong>View, Language, General Settings</strong><ul>
     <li><i>Language:</i> If translations of QuickFit are installed you can select one here. Note that you will have to restart QuickFit before the translation takes full effect.</li>
     <li><i>Style/Stylesheet:</i> Here you can select different styling options for QuickFit</li>
+    <li><i>font for online-help:</i> Here you can set the basic font and font-size used to display online-help pages. </li>
+    <li><i>font for math rendering:</i> Here you can set the basic font-size used when rendering equations for the online-help. </li>
+    <li><i>RDR/evaluation editor window title: </i> choose the text/information in the header of an evaluation/RDR dialog. </li>
+    <li><i>file dialogs:</i> Choose which file-select dialogs to use. In some cases you might want to use the standardized internal dialogs, instead of the standard system dialogs. Note however, that these internal dialogs may not offer the full functionality you are used to by the system dialogs. </li>
+	<li><i>welcome screen:</i> Here you can select whether to show the welcome screen on startup of QuickFit.</li>
     <!--<li><i>:</i></li>-->
 
   </ul></li>
@@ -25,6 +36,13 @@ $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$
   <li><strong>Debugging</strong><ul>
     <li><i>show additional debug messages in main window:</i> If this is activated, additional debug output (e.g. from the Qt library) is shown on the main window in an additional "Debug Log" tab. This debug outout is written to <tt>quickfit3_qdebug.log</tt> in the QuickFit user settings directory. If this function is deactivated these outputs are redirected to the standard console output. If you have stability problems with Quickfit, it might help to deactivate this function (especially on Linux).</li>
   </ul></li>
+  <li><strong>User Content/Directories</strong><ul>
+    <li><i>user fitfunctions folder\n(for parsed and library functions):</i> Give a folder in which QuickFit will search for <a href="userfitfunctions.html">user-defined fit functions</a> (either as a <a href="userfitfunctions_library.html">dynamically linked library</a> (<tt>.dll</tt> / <tt>.so</tt> / <tt>.dylib</tt>) or as a <a href="userfitfunctions_parsed.html">parsed user fit function</a>.</li>
+    <li><i>user settings folder:</i> Choose the folder, where QuickFit stores the user-settings. usually this is <tt>.quickfit3</tt> (hidden on some operating systems!) within the user's home directory.</li>
+    <li><i>global settings folder:</i> Choose the folder, where QuickFit searches for global settings, such as for hardware-control plugins. This folder can also be read-only, so you can configure some plugins in QuickFit globally for all users of a computer.</li>
+    <li><i>temporary files folder:</i> Here you can choose to overwrite the system's default temporary files folder. SOmetimes there are problems in gaining write-access to this folder. In these cases, you can choose another folder. $$warning:If there are no problems, it is NOT ADVISED to overwrite the system temporary folder!$$</li>
+ </ul>
+ $$note:You might have to restart QuickFit, so a changed folder takes full effect (especially the configuration fodlers!).$$</li>
   <li>further configuration possibilities are provided by plugins and are documented with them:
 	$$settings_contents$$
   </li>

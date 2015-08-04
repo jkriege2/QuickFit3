@@ -515,7 +515,7 @@ void QFRDRImagingFCSWizard::finishedIntro()
     isCalibration=wizIntro->isChecked(1);
     spinWxy->setVisible(!isCalibration);
     QWidget* lab=NULL;
-    if (lab=wizMicroscopy->getFormLayout()->labelForField(spinWxy)) {
+    if ((lab=wizMicroscopy->getFormLayout()->labelForField(spinWxy))) {
         lab->setVisible(!isCalibration);
     }
     labWxy->setVisible(!isCalibration);
@@ -768,7 +768,7 @@ void QFRDRImagingFCSWizard::microscopyChoosen()
     labWz->setVisible(cmbMicroscopy->currentIndex()!=1);
     spinWz->setVisible(cmbMicroscopy->currentIndex()!=1);
     QWidget* lab=NULL;
-    if (lab=wizMicroscopy->getFormLayout()->labelForField(labWz)) {
+    if ((lab=wizMicroscopy->getFormLayout()->labelForField(labWz))) {
         lab->setVisible(spinWz->isVisible());
     }
 
@@ -778,7 +778,7 @@ void QFRDRImagingFCSWizard::microscopyChoosen()
     bool reallyIsCalib=wizIntro->isChecked(0) && this->isCalibration;
     spinWxy->setVisible(!reallyIsCalib);
     lab=NULL;
-    if (lab=wizMicroscopy->getFormLayout()->labelForField(spinWxy)) {
+    if ((lab=wizMicroscopy->getFormLayout()->labelForField(spinWxy))) {
         lab->setVisible(spinWxy->isVisible());
     }
     labWxy->setVisible(!reallyIsCalib);

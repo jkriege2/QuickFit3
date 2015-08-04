@@ -602,7 +602,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
 
                             QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_cam1tmpsettings.ini");
 
-                            QTemporaryFile file1;
+                            QFTemporaryFile file1;
                             if (file1.open()) {
                                  tmpName1=file1.fileName();
                             }
@@ -635,7 +635,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                             QApplication::processEvents();
                             QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_cam2tmpsettings.ini");
 
-                            QTemporaryFile file1;
+                            QFTemporaryFile file1;
                             if (file1.open()) {
                                  tmpName1=file1.fileName();
                             }

@@ -55,11 +55,13 @@
       <li>added easter-egg (have fun finding it ;-)</li>
       <li>added an error message/dialog, when an evaluation editor window does not open after a project-tree double-click, because no applicable RDRs were found in the project.</li>
       <li>added functions to export data from tables into Matlab *.MAT files as matrices [if possible]/cell arrays [otherwise]</li>
+      <li>improved error reporting for the save-project and zip-project functions</li>
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>
         <li>bugfix: CSV import did not work, when tgegege is selected, but the file only contains 2 columns</li>
         <li>added support for reading PicoQuant exported ASCII FCS correlation curves (*.dat files) [thanks to Martin Seefeld, Uni Heidelberg]</li>
+        <li>improved error reporting while importing data: there will be error messages now, when trying to import a non-existent file.</li>
     </ul></li>
     <li><b>FCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>

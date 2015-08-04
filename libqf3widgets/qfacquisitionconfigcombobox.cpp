@@ -249,7 +249,7 @@ void QFAcquisitionConfigComboBox::addNew() {
     if (m_stopresume) m_stopresume->stop();
     QString tempFile="qf3b040spim_XXXXX.tmp";
     {
-        QTemporaryFile file;
+        QFTemporaryFile file;
         if (file.open()) {
             tempFile=file.fileName();
             file.close();

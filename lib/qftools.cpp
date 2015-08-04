@@ -1447,12 +1447,29 @@ QString qfCEscaped(const QString& data) {
     return res;
 }
 
-QString qfGetTempFilename(const QString& templateName) {
-    QTemporaryFile f(templateName);
-    f.setAutoRemove(true);
-    f.open();
-    QString fn=f.fileName();
-    f.close();
+QString qfGetTempFilename(const QString& templateName, bool usesSystemAlways) {
+    QString tempPath;
+    bool useDefaultTemp=true;
+
+    if (!usesSystemAlways){
+        tempPath=ProgramOptions::getConfigValue("quickfit/temp_folder", QFileInfo(qfGetTempFilename(templateName, true)).absolutePath()).toString();
+        useDefaultTemp=ProgramOptions::getConfigValue("quickfit/temp_folder_default", true).toBool();
+    }
+
+    QString fn="";
+    if (useDefaultTemp || usesSystemAlways || tempPath.isEmpty()) {
+        QTemporaryFile f(templateName);
+        f.setAutoRemove(true);
+        f.open();
+        fn=f.fileName();
+        f.close();
+    } else {
+        QTemporaryFile f(tempPath+"/"+templateName);
+        f.setAutoRemove(true);
+        f.open();
+        fn=f.fileName();
+        f.close();
+    }
     return fn;
 }
 
@@ -1879,4 +1896,42 @@ QFormLayout* qfBuildQFormLayout(const QString& l1, QWidget* w1, const QString& l
     if (w9) lay->addRow(l9, w9);
     return lay;
 
+}
+
+
+QFTemporaryFile::QFTemporaryFile():
+    QTemporaryFile(qfGetTempFilename())
+{
+    qDebug()<<"QFTemporaryFile()"<<fileTemplate();
+}
+
+QFTemporaryFile::QFTemporaryFile(const QString &templateName):
+    QTemporaryFile(qfGetTempFilename(templateName))
+{
+    qDebug()<<"QFTemporaryFile("<<templateName<<")"<<fileTemplate();
+}
+
+QFTemporaryFile::QFTemporaryFile(QObject *parent):
+    QTemporaryFile(qfGetTempFilename(), parent)
+{
+    qDebug()<<"QFTemporaryFile(parent)"<<fileTemplate();
+}
+
+QFTemporaryFile::QFTemporaryFile(const QString &templateName, QObject *parent):
+    QTemporaryFile(qfGetTempFilename(templateName), parent)
+{
+    qDebug()<<"QFTemporaryFile("<<templateName<<", parent)"<<fileTemplate();
+}
+
+void QFTemporaryFile::setFileTemplate(const QString &name)
+{
+    QTemporaryFile::setFileTemplate(qfGetTempFilename(name));
+}
+
+QByteArray qfGetCrytographicHashForFile(const QString& file, QCryptographicHash::Algorithm method) {
+    QFile f(file);
+    if (f.open(QFile::ReadOnly)) {
+        return QCryptographicHash::hash(f.readAll(), method);
+    }
+    return QByteArray();
 }

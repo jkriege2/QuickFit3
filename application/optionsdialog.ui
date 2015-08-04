@@ -186,7 +186,7 @@
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>5</number>
          </property>
          <widget class="QWidget" name="page_2">
           <layout class="QFormLayout" name="formLayout_6">
@@ -823,6 +823,36 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_27">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>temporary files folder:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QCheckBox" name="chkDefaultTempFolder">
+             <property name="text">
+              <string>use system default</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QFEnhancedLineEdit" name="edtTempFolder">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </widget>
@@ -849,8 +879,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>cmbLanguage</tabstop>
  </tabstops>
  <resources>
-  <include location="../lib/lib.qrc"/>
   <include location="quickfit3.qrc"/>
+  <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>
@@ -866,7 +896,7 @@ p, li { white-space: pre-wrap; }
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1045</x>
+     <x>1021</x>
      <y>589</y>
     </hint>
     <hint type="destinationlabel">
@@ -882,7 +912,7 @@ p, li { white-space: pre-wrap; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1045</x>
+     <x>1021</x>
      <y>589</y>
     </hint>
     <hint type="destinationlabel">
@@ -920,6 +950,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>1049</x>
      <y>160</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDefaultTempFolder</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtTempFolder</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>535</x>
+     <y>215</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>537</x>
+     <y>233</y>
     </hint>
    </hints>
   </connection>

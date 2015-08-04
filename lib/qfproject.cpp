@@ -800,6 +800,7 @@ void QFProject::writeXMLSubset(QIODevice *file, const QSet<int> &rdrSelected, co
 
 void QFProject::internalWriteXMLConst(QIODevice *file, const QString &projectFileName, bool copyFilesToSubfolder, const QString &rdrsubfoldername, const QString &evalsubfoldername, QList<QFProject::FileCopyList> *filecopylist, const QSet<int> &rdrSelected, const QSet<int> &evalSelected, bool writeRecordsOnly, int writeMode) const
 {
+    //if (!file || file->)
     QXmlStreamWriter w(file);
 
     w.setAutoFormatting(false);
@@ -858,6 +859,10 @@ void QFProject::internalWriteXMLConst(QIODevice *file, const QString &projectFil
 
     w.writeEndElement();
     w.writeEndDocument();
+
+    if (w.hasError()) {
+        setError(tr("ERROR while writing project XML-data."));
+    }
 }
 
 
@@ -885,7 +890,7 @@ void QFProject::writeXML(const QString& file_in, bool resetDataChanged, bool cha
     QString file=QFileInfo(file_in).canonicalFilePath();
     QString oldfile=this->file;
 
-    qDebug()<<file<<file_in;
+    //qDebug()<<file<<file_in;
 
     if (file.toLower().contains(".qfpz") || file.toLower().contains(".qfp.gz")) {
         QuaGzipFile gzf(file);
@@ -903,34 +908,37 @@ void QFProject::writeXML(const QString& file_in, bool resetDataChanged, bool cha
 
         QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
         f.setAutoRemove(false);
-        f.open();
-        f.setAutoRemove(false);
+        if (f.open()) {
+            f.setAutoRemove(false);
 
-        internalWriteXML(&f, resetDataChanged, namechanged, file);
+            internalWriteXML(&f, resetDataChanged, namechanged, file);
 
-        if (f.error()==QFile::NoError) {
+            if (f.error()==QFile::NoError) {
 
-            QFile f4(file+".backup_old");
-            if (f4.exists()) f4.remove();
+                QFile f4(file+".backup_old");
+                if (f4.exists()) f4.remove();
 
-            QFile f3(file+".backup");
-            f3.rename(file+".backup_old");
+                QFile f3(file+".backup");
+                f3.rename(file+".backup_old");
 
-            QFile f2(file+".backup");
-            if (f2.exists()) f2.remove();
+                QFile f2(file+".backup");
+                if (f2.exists()) f2.remove();
 
-            QFile f1(file);
-            if (f1.exists()) f1.rename(file+".backup");
+                QFile f1(file);
+                if (f1.exists()) f1.rename(file+".backup");
 
+            } else {
+                setError(tr("Error while writing project to file '%1'!\n Error description: %2.").arg(file).arg(f.errorString()));
+                return;
+            }
+
+
+            f.setAutoRemove(false);
+            if (!f.rename(file)) {
+                setError(tr("Could no open file '%1' for output (temp filename: %3)!\n Error description: %2.").arg(file).arg(f.errorString()).arg(f.fileName()));
+            }
         } else {
-            setError(tr("Error while writing project to file '%1'!\n Error description: %2.").arg(file).arg(f.errorString()));
-            return;
-        }
-
-
-        f.setAutoRemove(false);
-        if (!f.rename(file)) {
-            setError(tr("Could no open file '%1' for output (temp filename: %3)!\n Error description: %2.").arg(file).arg(f.errorString()).arg(f.fileName()));
+            setError(tr("Could no open temporary file '%1' for output!\n Error description: %2.").arg(f.fileName()).arg(f.errorString()));
         }
     }
     if (!changeInternalFile) {
@@ -997,6 +1005,10 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
             //qDebug()<<f.fileName();
             internalWriteXMLConst(&f, currentProjectLocation, copyFilesToSubfolder, rdrsubfoldername, evalsubfoldername, &filecopylist);
             f.close();
+        } else {
+            QString msg=tr("ERROR while writing temporary file '%1' during exportProjectToZIP('%2')").arg(tmpfn).arg(file);
+            setError(msg);
+            //pdlg->addMessage(msg);
         }
     }
 
@@ -1080,6 +1092,10 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
             setError(tr("Could not create ZIP-file '%1', error code: %2").arg(file).arg(QFProject_QuaZIPError(zip.getZipError())));
         }
         QFile::remove(tmpfn);
+    } else {
+        QString msg=tr("ERROR temporary file '%1' could not be written during exportProjectToZIP('%2')").arg(tmpfn).arg(file);
+        setError(msg);
+        //pdlg->addMessage(msg);
     }
     if (pdlg) {
         pdlg->setProgresComplete();

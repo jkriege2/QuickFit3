@@ -48,6 +48,7 @@
 #include "qtriple.h"
 #include <QXmlStreamWriter>
 #include <QBitArray>
+#include <QCryptographicHash>
 #ifndef QFMATHPARSER_MATHPARSERTEST
 #  include "qfpluginservices.h"
 #  include "qfversion.h"
@@ -1825,9 +1826,28 @@ QFLIB_EXPORT QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& f
 /*! \brief returns a filename for a temporary file
     \ingroup qf3lib_tools
 
+    \note templateName should not contain a path, as the path will be set to either be the system's temp-path, or the temp path given by the user in the options dialog (\c ProgramOptions::getConfigValue("quickfit/temp_folder") ).
+ */
+QFLIB_EXPORT QString qfGetTempFilename(const QString& templateName=QString("qf_temp_XXXXXX"), bool usesSystemAlways=false);
+
+class QFLIB_EXPORT QFTemporaryFile: public QTemporaryFile {
+        Q_OBJECT
+    public:
+        explicit QFTemporaryFile();
+        explicit QFTemporaryFile(const QString & templateName);
+        explicit QFTemporaryFile(QObject * parent);
+        explicit QFTemporaryFile(const QString & templateName, QObject * parent);
+
+        void setFileTemplate(const QString & name);
+};
+
+
+/*! \brief returns the crytographic hash value of a given file
+    \ingroup qf3lib_tools
 
  */
-QFLIB_EXPORT QString qfGetTempFilename(const QString& templateName=QString("qf_temp_XXXXXX"));
+QFLIB_EXPORT QByteArray qfGetCrytographicHashForFile(const QString& file, QCryptographicHash::Algorithm method=QCryptographicHash::Md5);
+
 
 /*! \brief copies data (in chunks) from one file to another
     \ingroup qf3lib_tools

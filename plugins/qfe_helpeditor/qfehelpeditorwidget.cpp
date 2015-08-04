@@ -554,7 +554,7 @@ void QFEHelpEditorWidget::documentWasModified()
 
 void QFEHelpEditorWidget::on_btnExecute_clicked()
 {
-    QTemporaryFile f;
+    QFTemporaryFile f;
     QFileInfo fi(currentScript);
     if (QFile::exists(currentScript)) {
         f.setFileTemplate(fi.absolutePath()+"/qfe_helpeditor_temp_XXXXXX.html.tmp");
