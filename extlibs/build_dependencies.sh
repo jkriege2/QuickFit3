@@ -153,9 +153,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		
 		MAKEFILE="Makefile.gcc"
 	else
-                export LDFLAGS="${MORELDFLAGS} "
-                export CFLAGS="${MORECFLAGS} "
-                export CPPFLAGS="${MORECFLAGS}"
+                export LDFLAGS="${MORELDFLAGS} ${PICFLAGS}"
+                export CFLAGS="${MORECFLAGS} ${PICFLAGS}"
+                export CPPFLAGS="${MORECFLAGS} ${PICFLAGS}"
 
 
 		./configure --static --prefix=${CURRENTDIR}/zlib
