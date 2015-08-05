@@ -471,9 +471,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	tar xvf libpng-1.5.4.tar.gz -C ./build/
 	cd build/libpng-1.5.4
 	if [ -e ../../../zlib/lib/libz.a ] ; then
-		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng LDFLAGS=-L${CURRENTDIR}/zlib/lib CFLAGS=-I${CURRENTDIR}/zlib/include CXXFLAGS=-I${CURRENTDIR}/zlib/include/ 
+		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -L${CURRENTDIR}/zlib/lib" CFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include" CXXFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include/ "
 	else
-		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng
+		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	fi
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
@@ -518,9 +518,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	tar xvf jpegsrc.v9a.tar.gz -C ./build/
 	cd build/jpeg-9a
 	if [ -e ../../../zlib/lib/libz.a ] ; then
-		./configure --enable-static --disable-shared --disable-dependency-tracking --prefix=${CURRENTDIR}/libjpeg LDFLAGS=-L${CURRENTDIR}/zlib/lib CFLAGS=-I${CURRENTDIR}/zlib/include CXXFLAGS=-I${CURRENTDIR}/zlib/include/
+		./configure --enable-static --disable-shared --disable-dependency-tracking --prefix=${CURRENTDIR}/libjpeg LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -L${CURRENTDIR}/zlib/lib" CFLAGS=" ${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include" CXXFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include/"
 	else
-		./configure --enable-static --disable-shared --disable-dependency-tracking --prefix=${CURRENTDIR}/libjpeg
+		./configure --enable-static --disable-shared --disable-dependency-tracking --prefix=${CURRENTDIR}/libjpeg CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	fi
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
@@ -570,9 +570,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	tar xvf tiff-4.0.3.tar.gz -C ./build/
 	cd build/tiff-4.0.3
 	if [ -e ${CURRENTDIR}/libjpeg/lib/libjpeg.a ] ; then
-		./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff
+		./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff   CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	else
-		./configure --enable-static --disable-shared  --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff
+		./configure --enable-static --disable-shared  --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff   CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	fi
 	
 	libOK=$?
