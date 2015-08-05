@@ -144,7 +144,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	cd build/zlib-1.2.8
 	ISMSYS=`uname -o`
 	echo $ISMSYS
-	if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+ 	if [[ $ISMSYS == *"Msys"* ]] ; then
 		BINARY_PATH='../../bin'
 		INCLUDE_PATH='../../include'
 		LIBRARY_PATH='../../lib'
@@ -153,7 +153,12 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		
 		MAKEFILE="Makefile.gcc"
 	else
-		./configure --static --prefix=${CURRENTDIR}/zlib  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}" LDFLAGS="${MORELDFLAGS}"
+                export LDFLAGS="${MORELDFLAGS} "
+                export CFLAGS="${MORECFLAGS} "
+                export CPPFLAGS="${MORECFLAGS}"
+
+
+		./configure --static --prefix=${CURRENTDIR}/zlib
 		MAKEFILE="Makefile"
 	fi
 	libOK=$?
