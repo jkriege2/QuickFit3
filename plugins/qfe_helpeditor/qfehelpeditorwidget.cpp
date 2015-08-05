@@ -520,12 +520,15 @@ void QFEHelpEditorWidget::autosave()
     QString ffn= d.absoluteFilePath(QString("helpeditor%1_autosave.html").arg(m_winID));
     if (!getScript().isEmpty() && !qfFileEqualsString(ffn, ui->edtScript->getEditor()->toPlainText().toUtf8())) {
         d.mkpath(d.absolutePath());
+        // copy _autosave_old.html --> _autosave_older.html
         QString fn= d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID));
         QString newfn= d.absoluteFilePath(QString("helpeditor%1_autosave_older.html").arg(m_winID));
         if (QFile::exists(fn)) {
             if (QFile::exists(newfn)) QFile::remove(newfn);
             QFile::copy(fn, newfn);
         }
+
+        // copy _autosave.html --> _autosave_old.html
         fn= ffn;
         newfn= d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID));
         if (QFile::exists(fn)) {
@@ -533,6 +536,8 @@ void QFEHelpEditorWidget::autosave()
             QFile::copy(fn, newfn);
         }
         saveFile(fn, false);
+    } else {
+        qDebug()<<"QFEHelpEditorWidget::autosave(): file contents didn't change!";
     }
     QTimer::singleShot(AUTOSAVE_INTERVAL_MSEC, this, SLOT(autosave()));
 }
@@ -602,9 +607,10 @@ bool QFEHelpEditorWidget::saveFile(const QString &filename, bool setFilename)
     QFile f(filename);
     //qDebug()<<"saving to "<<filename;
     if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
-        QTextStream s(&f);
+        /*QTextStream s(&f);
         s.setCodec(QTextCodec::codecForName("UTF-8"));
-        s<<ui->edtScript->getEditor()->toPlainText().toUtf8();
+        s<<ui->edtScript->getEditor()->toPlainText().toUtf8();*/
+        f.write(ui->edtScript->getEditor()->toPlainText().toUtf8());
         if (setFilename) lastScript=ui->edtScript->getEditor()->toPlainText();
         f.close();
         if (setFilename) newScript=false;

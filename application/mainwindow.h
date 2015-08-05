@@ -424,6 +424,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         void contactAuhtors();
         void contactMailinglist();
         void openWebpage();
+        void openWebpageSource();
 
         void fixFilesPathesInProject();
 
@@ -557,6 +558,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QAction* helpContactAuthors;
         QAction* helpContactMaillinglist;
         QAction* helpOpenWebpageAct;
+        QAction* helpOpenWebpageSourceAct;
         QAction* actCheckUpdate;
         QAction* helpWelcomeScreenAct;
         QAction* actEditGroupAndRole;
@@ -673,6 +675,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
 
         QMap<QString, QString> mathParserHelpCache;
 };
+
 
 
 

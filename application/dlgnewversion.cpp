@@ -31,7 +31,7 @@ DlgNewVersion::DlgNewVersion(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->labCite->setText(tr("%1<br><pre>%2</pre>").arg(qfInfoCitationHTML()).arg(qfInfoCitationBiBTeX()));
-    ui->labMailinglist->setText(tr("<a href=\"mailto:%1\">%1</a> (<a href=\"%2\">subscribe</a>)<br><a href=\"%3\">%3</a>").arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoWeblink()));
+    ui->labMailinglist->setText(tr("<a href=\"mailto:%1\">%1</a> (<a href=\"%2\">subscribe</a>)<br><a href=\"%3\">%3</a><br><a href=\"%4\">%4</a>").arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoWeblink()).arg(qfInfoSourceWeblink()));
     ui->labLicense->setText(qfInfoLicense());
     QFile f(":/quickfit3/releasenotes.html");
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {

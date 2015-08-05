@@ -36,6 +36,8 @@
       <li>plotter widgets:<ul>
         <li>every single image plot may be saved as a rendered image (PNG/JPEG/BMP/...) via the context-menu</li>
         <li>improved autoscaling/zoom behaviour if data contains NANs</li>
+        <li>bugfix: copy images didn't work in some cases</li>
+        <li>you can now also copy the color palettes of an image plot to the clipboard</li>
       </ul></li>
       <li>expression parser:<ul>
         <li>added vector creation functions ones(), zeros(), linspace(), logspace(), vector() meshgrid2d_x(), meshgrid2d_y()</li>
@@ -56,6 +58,8 @@
       <li>added an error message/dialog, when an evaluation editor window does not open after a project-tree double-click, because no applicable RDRs were found in the project.</li>
       <li>added functions to export data from tables into Matlab *.MAT files as matrices [if possible]/cell arrays [otherwise]</li>
       <li>improved error reporting for the save-project and zip-project functions</li>
+      <li>zipped-projects now also contain a <tt>.readme.txt</tt>-file, which explains the contents of the ZIP-archive</li>
+      <li>added link to GitHub repository to several places in QUickFit</li>
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>

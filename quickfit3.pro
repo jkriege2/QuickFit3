@@ -19,6 +19,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# NOTE: This shouldn't be built as a SHADOW build
+!equals(PWD, $${OUT_PWD}) {
+    warning(This project should not be built as a shadow build!!!)
+}
 
 include("quickfit3.pri")
 

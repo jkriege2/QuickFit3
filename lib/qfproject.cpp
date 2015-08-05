@@ -960,7 +960,7 @@ static QString QFProject_QuaZIPError(int error) {
 }
 
 static bool QFProject_compressFile(QuaZip* zip, QString fileName, QString fileDest, QString& error, QFProgressMinorProgress* pdlg) {
-    if (!QFile::exsits(fileName)) {
+    if (!QFile::exists(fileName)) {
         error=QObject::tr("file does not exist: '%1'").arg(fileName);
         return false;
     }
@@ -990,6 +990,29 @@ static bool QFProject_compressFile(QuaZip* zip, QString fileName, QString fileDe
         return false;
     }
     inFile.close();
+    return true;
+}
+
+
+static bool QFProject_writeCompressedTextFile(QuaZip* zip, QByteArray text, QString fileDest, QString& error, QFProgressMinorProgress* pdlg) {
+    QuaZipFile outFile(zip);
+    if(!outFile.open(QIODevice::WriteOnly|QIODevice::Text, QuaZipNewInfo(fileDest))) {
+        error=QObject::tr("error opening file '%1 in ZIP '%3':\n   error description: %2").arg(fileDest).arg(outFile.errorString()).arg(zip->getZipName());
+        return false;
+    }
+
+    outFile.write(text);
+    if (outFile.getZipError()!=UNZ_OK) {
+        if (outFile.getZipError()!=UNZ_OK) error=QObject::tr("error writing data into '%3' in ZIP '%2':\n   error description: %1").arg(QFProject_QuaZIPError(outFile.getZipError())).arg(zip->getZipName()).arg(fileDest);
+        else error=QObject::tr("error writing data into ZIP");
+        return false;
+    }
+
+    outFile.close();
+    if (outFile.getZipError()!=UNZ_OK) {
+        error=QObject::tr("error closing file '%3' in ZIP '%2':\n   error description: %1").arg(QFProject_QuaZIPError(outFile.getZipError())).arg(zip->getZipName()).arg(fileDest);
+        return false;
+    }
     return true;
 }
 
@@ -1028,6 +1051,34 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
         }
         QuaZip zip(file);
         if (zip.open(QuaZip::mdCreate)) {
+
+            QString desctxtFileName=QFileInfo(file).baseName()+".readme.txt";
+            QString descriptionText=tr("This ZIP-archive (%1) was automatically created by QuickFit %2 (SVN/GIT: %3, COMPILEDATE: %4).\n"
+                                       "See the following webpages for more details on QuickFit %1:\n"
+                                       "   %5\n"
+                                       "   %7\n"
+                                       "\n"
+                                       "To load the contained QuickFit project, you'll have to UNZIP the contents \n"
+                                       "of this ZIP-file into an empty directory, preserving the internal directory \n"
+                                       "structure. Then you can simply load the project-file \n"
+                                       "   %6\n"
+                                       "   %7\n"
+                                       "into QuickFit, which should then be able to find all important associated\n"
+                                       "datafiles in the new folder.\n"
+                                       "\n"
+                                       "\n"
+                                       "This ZIP-archive contains the following files:\n"
+                                       ).arg(QFileInfo(file).fileName())
+                                            .arg(qfInfoVersionFull())
+                                            .arg(qfInfoGITVersion())
+                                            .arg(qfInfoCompileDate())
+                                            .arg(qfInfoWeblink())
+                                            .arg(QFileInfo(pfn).fileName())
+                                            .arg(qfInfoSourceWeblink());
+            //qDebug()<<"\n     "<<ok<<errorStr;
+
+            descriptionText+=tr("  * (this) README text-file:\n      %1\n").arg(desctxtFileName);
+
             if (pdlg) {
                 pdlg->incProgress();
                 pdlg->addMessage(tr("adding project file '%1'...").arg(QFileInfo(pfn).fileName()));
@@ -1035,9 +1086,10 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
             //qDebug()<<tr("adding project file '%1'...").arg(QFileInfo(pfn).fileName());
             QString errorStr;
             bool ok=QFProject_compressFile(&zip, tmpfn, QFileInfo(pfn).fileName(), errorStr, pdlg);
-            //qDebug()<<"\n     "<<ok<<errorStr;
+            descriptionText+=tr("  * QuickFit Project file:\n      %1\n").arg(QFileInfo(pfn).fileName());
             if (ok && (!pdlg || (pdlg && !pdlg->wasCanceled()))) {
                 if (filecopylist.size()>0) {
+                    descriptionText+=tr("  * linked data files:\n");
 
                     //pdlg->addMessage(tr("removing from folder '%1'...").arg(remstart));
                     for (int i=0; i<filecopylist.size(); i++) {
@@ -1062,11 +1114,22 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
                             setError(tr("Compressing project to ZIP-file '%1' was canceled by the user").arg(file));
                             break;
                         }
+                        descriptionText+=tr("      - %1\n").arg(outf);
+
                     }
                 }
             } else {
                 setError(tr("Could not add project file '%1' to ZIP-file '%2',\n  error: %3").arg(pfn).arg(file).arg(errorStr));
             }
+
+            if (pdlg) {
+                pdlg->incProgress();
+                pdlg->addMessage(tr("adding description text '%1'...").arg(desctxtFileName));
+            }
+            if (!QFProject_writeCompressedTextFile(&zip, descriptionText.toLatin1(), desctxtFileName, errorStr, pdlg)) {
+                setError(tr("Could not add readme file '%1' to ZIP-file '%2',\n  error: %3").arg(desctxtFileName).arg(file).arg(errorStr));
+            }
+
             zip.close();
         } else {
             setError(tr("Could not create ZIP-file '%1',\n  error code: %2").arg(file).arg(QFProject_QuaZIPError(zip.getZipError())));

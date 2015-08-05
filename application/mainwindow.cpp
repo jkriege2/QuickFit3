@@ -355,6 +355,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("maillist"), QString(qfInfoMaillist())));
     htmlReplaceList.append(qMakePair(QString("maillistrequest"), QString(qfInfoMaillistRequest())));
     htmlReplaceList.append(qMakePair(QString("weblink"), QString(qfInfoWeblink())));
+    htmlReplaceList.append(qMakePair(QString("weblink_source"), QString(qfInfoSourceWeblink())));
     htmlReplaceList.append(qMakePair(QString("license"), qfInfoLicense()));
     htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
     htmlReplaceList.append(qMakePair(QString("pluginhelp_list"), createPluginDocHelp()));
@@ -1832,6 +1833,8 @@ void MainWindow::createActions() {
     connect(helpContactMaillinglist, SIGNAL(triggered()), this, SLOT(contactMailinglist()));
     helpOpenWebpageAct=new QAction(QIcon(":/lib/help/www.png"), tr("QuickFit &Webpage"), this);
     connect(helpOpenWebpageAct, SIGNAL(triggered()), this, SLOT(openWebpage()));
+    helpOpenWebpageSourceAct=new QAction(QIcon(":/lib/help/www.png"), tr("QuickFit &Sourcecode Repository"), this);
+    connect(helpOpenWebpageSourceAct, SIGNAL(triggered()), this, SLOT(openWebpageSource()));
     actCheckUpdate=new QAction(QIcon(":/lib/help/www.png"), tr("Check for updates ..."), this);
     connect(actCheckUpdate, SIGNAL(triggered()), this, SLOT(checkUpdates()));
 
@@ -2077,6 +2080,7 @@ void MainWindow::createMenus() {
     helpMenu->addAction(helpWelcomeScreenAct);
     helpMenu->addSeparator();
     helpMenu->addAction(helpOpenWebpageAct);
+    helpMenu->addAction(helpOpenWebpageSourceAct);
     helpMenu->addAction(helpContactAuthors);
     helpMenu->addAction(helpContactMaillinglist);
 
@@ -4021,6 +4025,12 @@ void MainWindow::contactMailinglist()
 void MainWindow::openWebpage()
 {
     QDesktopServices::openUrl(QUrl(qfInfoWeblink()));
+}
+
+void MainWindow::openWebpageSource()
+{
+    QDesktopServices::openUrl(QUrl(qfInfoSourceWeblink()));
+
 }
 
 QList<QPair<QString, QString> >* MainWindow::getHTMLReplacementList() {

@@ -204,6 +204,13 @@ $$faq_answer$$
 $$faq_end$$
 
 
+$$faq_start$$
+  <a name="FAQ_WRONGTEMP"><b>QuickFit repeatedly tries to create temporary files (and fails) in a strange directory. Can I tell QUickFit to use a different temporary directory?</b>
+$$faq_answer$$
+  Yes, you can override the system default for a temporary directory by opening the settings dialog (<b>File | Preferences ...</b> in the mainwindow). In this dialog you can find that option under the group <b>Directories</b>, where you first have to actiavte the checkbox to override the system default and then have to give an appropriate directory, where QUickFit will get write access.
+  $$warning:If QuickFit cannot gain qrite-access to this directory, several functions withing QuickFit may fail and you may experience data-loss. THerefore it is not adviced to change the temporary directory unless really necessary. Also note that QuickFit will extensively use this directory, but will also try and clean-up all temporary files when it closes.$$
+$$faq_end$$
+
 </body>
 </html>
 
