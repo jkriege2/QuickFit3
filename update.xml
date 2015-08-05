@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<updates>
+  <product name="QuickFit" version="3891">
+	  <date>2015-03-19</date>
+	  <link>http://www.dkfz.de/Macromol/quickfit/</link>
+	  <releasenotes>http://www.dkfz.de/Macromol/quickfit/qf3_release_notes.html#3891</releasenotes>
+	  <directlink os="win32">http://www.dkfz.de/Macromol/quickfit/quickfit3_32bit_3891_setup.exe</directlink>
+	  <directlink os="win64">http://www.dkfz.de/Macromol/quickfit/quickfit3_64bit_3891_setup.exe</directlink>
+	  <description>
+		<![CDATA[  ]]> 
+	  </description>
+	  <warning fromversion="3148">please update to the latest version, as a bug in SVN3148 prevents proper SPIM-FCCS evaluations!</warning>
+	  <!--<warning fromversion="2620">message 2620</warning>
+	  <warning fromversion="2623">message 2623</warning>-->
+  </product>
+</updates>
