@@ -19,8 +19,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/libjpeg/include/
-LIBS += -L$$PWD/libjpeg/lib/ -ljpeg
-DEFINES += QF_HAS_LIBJPEG cimg_use_jpeg
+!contains(DEFINES, QF_HAS_LIBJPEG) {
+    INCLUDEPATH += $$PWD/libjpeg/include/
+    LIBS += -L$$PWD/libjpeg/lib/ -ljpeg
+    DEFINES += QF_HAS_LIBJPEG cimg_use_jpeg
+}
 include(zlib.pri)
 

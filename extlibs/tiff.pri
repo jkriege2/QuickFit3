@@ -19,12 +19,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/libtiff/include/
-LIBS += -L$$PWD/libtiff/lib/ -ltiff
-DEFINES += QF_HAS_LIBTIFF cimg_use_tiff
+!contains (DEFINES, QF_HAS_LIBTIFF) {
+    INCLUDEPATH += $$PWD/libtiff/include/
+    LIBS += -L$$PWD/libtiff/lib/ -ltiff
+    DEFINES += QF_HAS_LIBTIFF cimg_use_tiff
+
+    HEADERS += $$PWD/../extlibsb040/libtiff_tools/libtiff_tools.h
+    SOURCES += $$PWD/../extlibsb040/libtiff_tools/libtiff_tools.cpp
+    INCLUDEPATH += $$PWD/../extlibsb040/libtiff_tools/
+}
 include(zlib.pri)
 include(jpeg.pri)
-
-HEADERS += $$PWD/../extlibsb040/libtiff_tools/libtiff_tools.h
-SOURCES += $$PWD/../extlibsb040/libtiff_tools/libtiff_tools.cpp
-INCLUDEPATH += $$PWD/../extlibsb040/libtiff_tools/

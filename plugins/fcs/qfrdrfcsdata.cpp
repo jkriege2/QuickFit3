@@ -820,7 +820,9 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QStringList filenames, int rateChannels
 
     for (int ii=0; ii<filenames.size(); ii++) {
         if (!QFile::exists(filenames[ii])) {
-            setError(tr("data file '%1' does not exist").arg(filenames[ii]));
+            QString msg;
+            setError(msg=tr("data file '%1' does not exist!\n").arg(filenames[ii]));
+            QFPluginServices::getInstance()->log_warning(msg);
             error=true;
             break;
         }
@@ -912,7 +914,9 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
         CSVDATA d;
         d.filename=filenames[ii];
         if (!QFile::exists(filenames[ii])) {
-            setError(tr("data file '%1' does not exist").arg(filenames[ii]));
+            QString msg;
+            setError(msg=tr("data file '%1' does not exist!\n").arg(filenames[ii]));
+            QFPluginServices::getInstance()->log_warning(msg);
             error=true;
             break;
         }
@@ -1010,7 +1014,9 @@ bool QFRDRFCSData::loadCorrelationCurvesFromALBA(QStringList filenames) {
     QList<ALBADATA> data;
     for (int ii=0; ii<filenames.size(); ii++) {
         if (!QFile::exists(filenames[ii])) {
-            setError(tr("data file '%1' does not exist").arg(filenames[ii]));
+            QString msg;
+            setError(msg=tr("data file '%1' does not exist!\n").arg(filenames[ii]));
+            QFPluginServices::getInstance()->log_warning(msg);
             return false;
         }
         ALBADATA d;
@@ -1110,7 +1116,9 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
         int channel=0;
         for (int i=0; i<filenames.size(); i++) {
             if (!QFile::exists(filenames[i])) {
-                setError(tr("data file '%1' does not exist").arg(filenames[i]));
+                QString msg;
+                setError(msg=tr("data file '%1' does not exist!\n").arg(filenames[i]));
+                QFPluginServices::getInstance()->log_warning(msg);
                 error=true;
                 break;
             }
@@ -1551,7 +1559,9 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
         int channel=0;
         for (int i=0; i<filenames.size(); i++) {
             if (!QFile::exists(filenames[i])) {
-                setError(tr("data file '%1' does not exist").arg(filenames[i]));
+                QString msg;
+                setError(msg=tr("data file '%1' does not exist!\n").arg(filenames[i]));
+                QFPluginServices::getInstance()->log_warning(msg);
                 error=true;
                 break;
             }
@@ -1958,7 +1968,9 @@ struct ALV7FILEDATA  {
 bool QFRDRFCSData::loadFromALV7000File(QString &filename)
 {
     if (!QFile::exists(filename)) {
-        setError(tr("data file '%1' does not exist").arg(filename));
+        QString msg;
+        setError(msg=tr("data file '%1' does not exist!\n").arg(filename));
+        QFPluginServices::getInstance()->log_warning(msg);
         return false;
     }
     try {
@@ -2753,7 +2765,9 @@ int QFRDRFCSData::getSimpleCountrateRuns() const
 bool QFRDRFCSData::loadOlegData(QString filename)
 {
     if (!QFile::exists(filename)) {
-        setError(tr("data file '%1' does not exist").arg(filename));
+        QString msg;
+        setError(msg=tr("data file '%1' does not exist!\n").arg(filename));
+        QFPluginServices::getInstance()->log_warning(msg);
         return false;
     }
 
@@ -2956,7 +2970,9 @@ bool QFRDRFCSData::loadOlegData(QString filename)
 bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantASCIIFCS(QString filename, bool weights)
 {
     if (!QFile::exists(filename)) {
-        setError(tr("data file '%1' does not exist").arg(filename));
+        QString msg;
+        setError(msg=tr("data file '%1' does not exist!\n").arg(filename));
+        QFPluginServices::getInstance()->log_warning(msg);
         return false;
     }
 
@@ -3101,7 +3117,9 @@ bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantASCIIFCSNoWeights(QString f
 bool QFRDRFCSData::loadCorrelatorComSIN(QString filename)
 {
     if (!QFile::exists(filename)) {
-        setError(tr("data file '%1' does not exist").arg(filename));
+        QString msg;
+        setError(msg=tr("data file '%1' does not exist!\n").arg(filename));
+        QFPluginServices::getInstance()->log_warning(msg);
         return false;
     }
     bool ok=true;
@@ -3168,7 +3186,9 @@ struct QFRDRFCSData_confocor3Data {
 bool QFRDRFCSData::loadConfocor3(QString filename)
 {
     if (!QFile::exists(filename)) {
-        setError(tr("data file '%1' does not exist").arg(filename));
+        QString msg;
+        setError(msg=tr("data file '%1' does not exist!\n").arg(filename));
+        QFPluginServices::getInstance()->log_warning(msg);
         return false;
     }
     bool ok=true;
@@ -3323,7 +3343,9 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
 bool QFRDRFCSData::loadQF3ASCII(QString filename)
 {
     if (!QFile::exists(filename)) {
-        setError(tr("data file '%1' does not exist").arg(filename));
+        QString msg;
+        setError(msg=tr("data file '%1' does not exist!\n").arg(filename));
+        QFPluginServices::getInstance()->log_warning(msg);
         return false;
     }
 

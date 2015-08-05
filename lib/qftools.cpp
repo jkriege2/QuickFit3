@@ -1902,30 +1902,31 @@ QFormLayout* qfBuildQFormLayout(const QString& l1, QWidget* w1, const QString& l
 QFTemporaryFile::QFTemporaryFile():
     QTemporaryFile(qfGetTempFilename())
 {
-    qDebug()<<"QFTemporaryFile()"<<fileTemplate();
+    //qDebug()<<"QFTemporaryFile()"<<fileTemplate();
 }
 
 QFTemporaryFile::QFTemporaryFile(const QString &templateName):
     QTemporaryFile(qfGetTempFilename(templateName))
 {
-    qDebug()<<"QFTemporaryFile("<<templateName<<")"<<fileTemplate();
+    //qDebug()<<"QFTemporaryFile("<<templateName<<")"<<fileTemplate();
 }
 
 QFTemporaryFile::QFTemporaryFile(QObject *parent):
     QTemporaryFile(qfGetTempFilename(), parent)
 {
-    qDebug()<<"QFTemporaryFile(parent)"<<fileTemplate();
+    //qDebug()<<"QFTemporaryFile(parent)"<<fileTemplate();
 }
 
 QFTemporaryFile::QFTemporaryFile(const QString &templateName, QObject *parent):
     QTemporaryFile(qfGetTempFilename(templateName), parent)
 {
-    qDebug()<<"QFTemporaryFile("<<templateName<<", parent)"<<fileTemplate();
+    //qDebug()<<"QFTemporaryFile("<<templateName<<", parent)"<<fileTemplate();
 }
 
 void QFTemporaryFile::setFileTemplate(const QString &name)
 {
     QTemporaryFile::setFileTemplate(qfGetTempFilename(name));
+    //qDebug()<<"QFTemporaryFile::setFileTemplate("<<name<<", parent)"<<fileTemplate();
 }
 
 QByteArray qfGetCrytographicHashForFile(const QString& file, QCryptographicHash::Algorithm method) {

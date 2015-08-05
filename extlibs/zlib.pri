@@ -19,7 +19,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-LIBS+= -L$$PWD/zlib/lib -lz
-INCLUDEPATH += $$PWD/zlib/include
+!contains(DEFINES, QF_HAS_LIBZ) {
+    LIBS+= -L$$PWD/zlib/lib -lz
+    INCLUDEPATH += $$PWD/zlib/include
 
-DEFINES += QF_HAS_LIBZ cimg_use_zlib
+    DEFINES += QF_HAS_LIBZ cimg_use_zlib
+}

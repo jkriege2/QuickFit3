@@ -159,7 +159,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     edtUserFitFunctions->setText(options->getConfigValue("quickfit/user_fitfunctions", options->getHomeQFDirectory()+"/userfitfunctions/").toString());
     edtUserSettings->setText(options->getHomeQFDirectory());
     edtGlobalSettings->setText(options->getGlobalConfigFileDirectory());
-    edtTempFolder->setText(options->getConfigValue("quickfit/temp_folder", QFileInfo(qfGetTempFilename()).absolutePath()).toString());
+    edtTempFolder->setText(options->getConfigValue("quickfit/temp_folder", QDir::tempPath()).toString());
     chkDefaultTempFolder->setChecked(options->getConfigValue("quickfit/temp_folder_default", true).toBool());
     spinHelpFontsize->setValue(options->getConfigValue("quickfit/help_pointsize", 11).toInt());
     spinMath->setValue(options->getConfigValue("quickfit/math_pointsize", 14).toInt());

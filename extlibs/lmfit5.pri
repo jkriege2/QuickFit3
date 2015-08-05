@@ -19,8 +19,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-LIBS += -L$$PWD/lmfit5/lib/ -L$$PWD/lmfit5/lib64/ -llmfit 
-INCLUDEPATH += $$PWD/lmfit5/include/
+!contains(DEFINES, QF_HAS_LMFIT5) {
+    LIBS += -L$$PWD/lmfit5/lib/ -L$$PWD/lmfit5/lib64/ -llmfit
+    INCLUDEPATH += $$PWD/lmfit5/include/
+    DEFINES += QF_HAS_LMFIT5
+}
 
 
 

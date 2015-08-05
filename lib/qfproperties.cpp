@@ -291,7 +291,13 @@ void QFProperties::readProperties(QDomElement& e) {
             QString pd=te.attribute("data", "");
             QVariant d=getQVariantFromString(t, pd);
             if (!d.isValid()) {
-                setPropertiesError(QString("Property '%1' has an unsupported type (%2) or a conversion error occured (data invalid)!\n Value is \"%3\".").arg(n).arg(t).arg(pd));
+                if (t.isEmpty() && ((t.toLower()=="date") || (t.toLower()=="datetime") || (t.toLower()=="time"))) {
+                    d=QString();
+                    QFPluginServices::getInstance()->log_warning(QString("Property '%1' has an unsupported type (%2) or a conversion error occured (data invalid)!\n   Value is \"%3\".\n   ==> resetting property to an empty STRING!!!.\n").arg(n).arg(t).arg(pd));
+                } else {
+                    //setPropertiesError(QString("Property '%1' has an unsupported type (%2) or a conversion error occured (data invalid)!\n Value is \"%3\".").arg(n).arg(t).arg(pd));
+                    QFPluginServices::getInstance()->log_warning(QString("Property '%1' has an unsupported type (%2) or a conversion error occured (data invalid)!\n Value is \"%3\".\n").arg(n).arg(t).arg(pd));
+                }
             }
 
             propertyItem pi;

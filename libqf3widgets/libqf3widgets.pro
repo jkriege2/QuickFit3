@@ -32,9 +32,7 @@ release {
 
 DEPENDPATH += .
 
-INCLUDEPATH += ../global_lib/ \
-               . \
-               ../lib/ \
+INCLUDEPATH += . \
                ../plugins/interfaces/ \
                ../extlibsb040/StatisticsTools/
 
