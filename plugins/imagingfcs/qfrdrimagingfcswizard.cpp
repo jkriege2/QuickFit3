@@ -1,7 +1,7 @@
 #include "qfrdrimagingfcswizard.h"
 #include "qfpluginservices.h"
 #include "programoptions.h"
-
+#include "qfrdrimagingfcs.h"
 
 QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     QFWizard(QSize(600, 440), parent, QString("imaging_fcs/wizard/"))
@@ -129,13 +129,18 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizMicroscopy->addRow(tr("Please select the type of microscopy that was used for the data acquisition and specify the focal propertiesa. The latter will be used as presets for any further evaluation, but can be changed at any point during the evaluation. They are also used during imaging FCS calibration, in which case they have to be accurate!"));
     wizMicroscopy->addStretch();
     wizMicroscopy->setSubTitle(tr("Select the type of microscopy used during the acquisition."));
-    cmbMicroscopy=new QComboBox(wizMicroscopy);
-    cmbMicroscopy->addItem(tr("lightsheet microscopy (SPIM/LSFM/...), camera-based"));
-    cmbMicroscopy->addItem(tr("TIRF microscopy, camera-based"));
-    cmbMicroscopy->addItem(tr("other microscopy, camera-based"));
-    cmbMicroscopy->addItem(tr("other microscopy, non-camera-based"));
-    cmbMicroscopy->setCurrentIndex(ProgramOptions::getConfigValue("imaging_fcs/wizard/microscopy", 0).toInt());
+    cmbMicroscopy=new QFEnhancedComboBox(wizMicroscopy);
+    cmbMicroscopy->addItem(tr("camera with rectangular pixels / lightsheet microscopy (SPIM/LSFM/...)"), 0);
+    cmbMicroscopy->addItem(tr("camera with rectangular pixels / TIRF microscopy"), 1);
+    cmbMicroscopy->addItem(tr("camera with rectangular pixels / other microscopy"), 2);
+    cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / lightsheet microscopy (SPIM/LSFM/...)"),3);
+    cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / TIRF microscopyl"),4);
+    cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / other microscopy"),5);
+    cmbMicroscopy->setCurrentFromModelData(ProgramOptions::getConfigValue("imaging_fcs/wizard/microscopy", 0).toInt());
     wizMicroscopy->addRow(tr("&Microscopy Technique:"), cmbMicroscopy);
+    labMicroscopy=new QLabel(this);
+    labMicroscopy->setWordWrap(true);
+    wizMicroscopy->addRow(QString(), labMicroscopy);
     wizMicroscopy->addStretch();
     spinWz=new QDoubleSpinBox(wizMicroscopy);
     spinWz->setDecimals(2);
@@ -143,7 +148,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     spinWz->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_wz", 1200).toDouble());
     spinWz->setSuffix(" nm");
     wizMicroscopy->addRow(tr("PSF z-extent <i>w</i><sub>z</sub>:"), spinWz);
-    wizMicroscopy->addRow(QString(), labWz=new QLabel(tr("give as 1/e<sup>2</sup>-halfwidth<br><i><u>Note:</u> This is required for calibrating SPIM-microscopes and for data-fitting and can be determined e.g. by a bead-scan.</i>"), wizMicroscopy));
+    wizMicroscopy->addRow(QString(), labWz=new QLabel(tr("give as 1/e<sup>2</sup>-halfwidth<br><i><u>Note:</u> This is required for calibrating SPIM-microscopes and for data-fitting and can be measured e.g. by a bead-scan.</i>"), wizMicroscopy));
     labWz->setWordWrap(true);
 
     spinWxy=new QDoubleSpinBox(wizMicroscopy);
@@ -156,6 +161,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     labWxy->setWordWrap(true);
 
 
+    connect(wizMicroscopy, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(microscopyChoosen()));
     connect(wizMicroscopy, SIGNAL(onValidate(QWizardPage*)), this, SLOT(microscopyChoosen()));
     connect(cmbMicroscopy, SIGNAL(currentIndexChanged(int)), this, SLOT(microscopyChoosen()));
 
@@ -397,11 +403,13 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizProcessJobs->setUseExternalIsComplete(true);
     wizProcessJobs->setExternalIsComplete(false);
     connect(widProcess, SIGNAL(correlationCompleted(bool)), wizProcessJobs, SLOT(setExternalIsComplete(bool)));
+    wizProcessJobs->setExternalIsComplete(false);
     connect(wizProcessJobs, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(startProcessingJobs()));
 
 
 
     setPage(LastPage, wizFinalizePage=new QFFormWizardPage(tr("Finalize"), this));
+    //connect(wizFinalizePage, SIGNAL())
     labFinal=new QLabel(this);
     labFinal->setWordWrap(true);
     wizFinalizePage->addRow(labFinal);
@@ -413,32 +421,44 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     } else {
         labFinal->setText(tr("You completed this wizard. The selected files will now be inserted as imaging FCS raw data records (RDR) into the project.<br><br><b>Please select the evaluation objects that should be added to the project below.</b>"));
         cmbImFCSFitMode=new QFEnhancedComboBox(this);
-        wizFinalizePage->addRow(tr("Fit Mode:"), cmbImFCSFitMode);
-        cmbImFCSFitMode->addItem(tr("TIR-FCS/FCCS: normal diffusion 1-component"));
-        cmbImFCSFitMode->addItem(tr("TIR-FCS/FCCS: normal diffusion 2-component"));
-        cmbImFCSFitMode->addItem(tr("TIR-FCS/FCCS: anomalous diffusion"));
-        cmbImFCSFitMode->addItem(tr("TIR-FCS/FCCS: diffusion + flow"));
-        cmbImFCSFitMode->addItem(tr("SPIM-FCS/FCCS: normal diffusion 1-component"));
-        cmbImFCSFitMode->addItem(tr("SPIM-FCS/FCCS: normal diffusion 2-component"));
-        cmbImFCSFitMode->addItem(tr("SPIM-FCS/FCCS: anomalous diffusion"));
-        cmbImFCSFitMode->addItem(tr("SPIM-FCS/FCCS: diffusion + flow"));
-        cmbImFCSFitMode->addItem(tr("confocal FCS/FCCS: normal diffusion 1-component"));
-        cmbImFCSFitMode->addItem(tr("confocal FCS/FCCS: normal diffusion 2-component"));
-        cmbImFCSFitMode->addItem(tr("confocal FCS/FCCS: anomalous diffusion"));
-        cmbImFCSFitMode->addItem(tr("confocal FCS/FCCS: diffusion + flow"));
-        chkLastImFCSFit1=new QCheckBox(tr("single-curve FCS fit (e.g. ACF)"), this);
+        cmbImFCSFitMode->addItem(tr("normal diffusion 1-component"));
+        cmbImFCSFitMode->addItem(tr("normal diffusion 2-component"));
+        cmbImFCSFitMode->addItem(tr("anomalous diffusion"));
+        cmbImFCSFitMode->addItem(tr("diffusion + flow"));
+        cmbIm2cFCCSFitMode=new QFEnhancedComboBox(this);
+        cmbIm2cFCCSFitMode->addItem(tr("normal diffusion 1-component"));
+        cmbIm2cFCCSFitMode->addItem(tr("normal diffusion 2-component"));
+        cmbIm2cFCCSFitMode->addItem(tr("anomalous diffusion"));
+        cmbIm2cFCCSFitMode->setEnabled(true);
+
+        chkLastImFCSFit1=new QCheckBox(tr("single-curve FCS fit:"), this);
         chkLastImFCSFit1->setChecked(true);
-        wizFinalizePage->addRow(tr("Evaluations"), chkLastImFCSFit1);
-        chkLastImFCCSFit=new QCheckBox(tr("global FCCS fit (2-color/2-pixel FCCS"), this);
-        chkLastImFCCSFit->setChecked(false);
-        wizFinalizePage->addRow(QString(), chkLastImFCCSFit);
+        //wizFinalizePage->addRow(tr("Evaluations"), chkLastImFCSFit1);
+        wizFinalizePage->addRow(chkLastImFCSFit1, cmbImFCSFitMode);
+        connect(chkLastImFCSFit1, SIGNAL(toggled(bool)), cmbImFCSFitMode, SLOT(setEnabled(bool)));
+        chkLastIm2cFCCSFit=new QCheckBox(tr("global FCCS fit 2-color FCCS:"), this);
+        chkLastIm2cFCCSFit->setChecked(false);
+        chkLastIm2cFCCSFit->setEnabled(false);
+        wizFinalizePage->addRow(chkLastIm2cFCCSFit, cmbIm2cFCCSFitMode);
+        connect(chkLastIm2cFCCSFit, SIGNAL(toggled(bool)), cmbIm2cFCCSFitMode, SLOT(setEnabled(bool)));
+        chkLastIm2fFCCSFit=new QCheckBox(tr("global FCCS fit 2-pixel FCCS"), this);
+        chkLastIm2fFCCSFit->setChecked(false);
+        chkLastIm2fFCCSFit->setEnabled(false);
+        wizFinalizePage->addRow(chkLastIm2fFCCSFit, NULL);
+        wizFinalizePage->addRow(QString(), tr("<u>Note:</u> This wizard will try to pre-configure the fit evaluation items in the project to meet your settings. In seldom cases, this will not be possible, so please check the fit model configuration before performing any fits.<br>Also you may wish to use differently configured models. In that case you can also reconfigure the presets before starting the fits!<br><br>"
+                                              "After finishing this wizard, it will load all records into the project and (possibly) add several fit evaluation objects. After this you are set to perform fits and evaluate their results. There are two major dialogs that you can use for this:<ol>"
+                                              "<li>The <b>imagingFCS RDR editor</b> can be reached by double-clicking any raw data record (RDR) in the project. On the second tab (\"Parameter Image\") of this dialog, you will find the parameter images (after the fits) and tools to evaluate them statistically and also to e.g. mask the image.</li>"
+                                              "<li>the <b>Fit Evaluation Editor</b> can be reached by double-clicking any evaluation object in the project and allows you to perform fits for the correlated data in the project.</li>"
+                                              "</ol>"
+                                              "<center><b>Please read the online-help and tutorials (Menu <tt>Help</tt> in the main menu) for further  information and detailed step-by-step tutorials on how to proceed with the fitting and further evaluation.</b></center>"));
     }
 
     setPage(LastPageCalibration, wizFinalizePageCalibration=new QFFormWizardPage(tr("Finalize Calibration"), this));
     wizFinalizePageCalibration->setNoPreviousButton(true);
     wizFinalizePageCalibration->setNoCancelButton(true);
     wizFinalizePageCalibration->addRow(tr("You completed the imFCS correlation wizard for an imFCS calibration.<br><br>"
-                                          "The wizard will now insert the correlation result into the current project and start the imFCS calibration wizard. In this wizard, you will have to follow the proposed steps, which will finally give you an estimate of the lateral PSF-size."));
+                                          "The wizard will now insert the correlation result into the current project and start the imFCS calibration wizard. In this wizard, you will have to follow the proposed steps (buttons on left hand side of the next wizard), which will finally give you an estimate of the lateral PSF-size.<br><br>"
+                                          "<center><img src=\":/imaging_fcs/imfcscalib.png\"></center>"));
     wizFinalizePageCalibration->setFinalPage(true);
 
 }
@@ -448,6 +468,169 @@ QFRDRImagingFCSWizard::~QFRDRImagingFCSWizard()
     if (frame_data_io) qfFree(frame_data_io);
     frame_data_io=NULL;
 }
+
+void QFRDRImagingFCSWizard::finalizeAndModifyProject(bool projectwizard, QFRDRImagingFCSPlugin *plugin)
+{
+    if (currentId()==QFRDRImagingFCSWizard::LastPageCalibration) { // calibration final page
+        widProcess->collectThreads();
+        plugin->addFiles(widProcess->getFilesToAdd());
+        QFPluginCommandsInterface* commandIntf=dynamic_cast<QFPluginCommandsInterface*>(QFPluginServices::getInstance()->getEvaluationItemFactory()->getPlugin("imfcs_fit"));
+        if (commandIntf) {
+            QVariantList wxylist;
+            for (int i=0; i<calibWxyTest.size(); i++) {
+                wxylist<<calibWxyTest[i];
+            }
+            QString model="fcs_spim_diffe2_newveff";//fcs_diff_d_wz";
+            if (cmbMicroscopy->currentData().isValid()) {
+                if (cmbMicroscopy->currentData().toInt()==0) model="fcs_spim_diffe2_newveff";
+                if (cmbMicroscopy->currentData().toInt()==1) model="fcs_tir_diffe2";
+                if (cmbMicroscopy->currentData().toInt()==2) model="fcs_spim_diffe2_newveff";
+                if (cmbMicroscopy->currentData().toInt()==3) model="fcs_diff_d_wz";
+                if (cmbMicroscopy->currentData().toInt()==4) model="fcs_tir_diff3de2";
+                if (cmbMicroscopy->currentData().toInt()==5) model="fcs_diff_d_wz";
+            }
+            commandIntf->sendPluginCommand("run_calibration", spinWz->value(), 0, false, model, wxylist);
+        } else {
+            QMessageBox::critical(NULL, tr("imaging FCS Wizard"), tr("No usable imaging FCS Fit plugin found!"), QMessageBox::Ok, QMessageBox::Ok);
+        }
+    } else if (currentId()==QFRDRImagingFCSWizard::LastPage) { // fit final page
+        widProcess->collectThreads();
+        plugin->addFiles(widProcess->getFilesToAdd());
+        QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
+        if (project && projectwizard) {
+            if (chkLastImFCSFit1 && chkLastImFCSFit1->isChecked()) {
+                QFEvaluationItem* e=project->addEvaluation("imfcs_fit", tr("Imaging FCS fit"));
+                if (e) {
+                    e->setQFProperty("FIT_REPEATS", 2, false, false);
+                    e->setQFProperty("PRESET_FOCUS_HEIGHT", spinWz->value(), false, false);
+                    e->setQFProperty("PRESET_FOCUS_HEIGHT_ERROR", 0, false, false);
+                    e->setQFProperty("PRESET_FOCUS_WIDTH", spinWxy->value(), false, false);
+                    e->setQFProperty("PRESET_N_COMPONENTS", 1, false, false);
+                    e->setQFProperty("PRESET_FOCUS_WIDTH_ERROR", 0, false, false);
+                    if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbImFCSFitMode->currentIndex()==0) { // 1-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_spim_diffe2_newveff", false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbImFCSFitMode->currentIndex()==1) { // 2-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_spim_diffe2_newveff", false, false);
+                        e->setQFProperty("PRESET_N_COMPONENTS", 2, false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbImFCSFitMode->currentIndex()==2) { // anomalous
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_spim_adiffe2", false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbImFCSFitMode->currentIndex()==3) { // normal+flow
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_spim_diffflowce2", false, false);
+
+
+                    } else if (cmbMicroscopy->currentData().toInt()==1 && cmbImFCSFitMode->currentIndex()==0) { // 1-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_tir_diffe2", false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==1 && cmbImFCSFitMode->currentIndex()==1) { // 2-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_tir_diffe2", false, false);
+                        e->setQFProperty("PRESET_N_COMPONENTS", 2, false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==1 && cmbImFCSFitMode->currentIndex()==2) { // anomalous
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_tir_adiffe2", false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==1 && cmbImFCSFitMode->currentIndex()==3) { // normal+flow
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_tir_diff_flowe2", false, false);
+
+
+                    } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbImFCSFitMode->currentIndex()==0) { // 1-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_diff", false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbImFCSFitMode->currentIndex()==1) { // 2-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_diff", false, false);
+                        e->setQFProperty("PRESET_N_COMPONENTS", 2, false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbImFCSFitMode->currentIndex()==2) { // anomalous
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_adiff2d", false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbImFCSFitMode->currentIndex()==3) { // normal+flow
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_diffflowv", false, false);
+
+
+                    } else if (cmbMicroscopy->currentData().toInt()==4 && cmbImFCSFitMode->currentIndex()==0) { // 1-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_tir_diff3de2", false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==4 && cmbImFCSFitMode->currentIndex()==1) { // 2-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_tir_diff3de2", false, false);
+                        e->setQFProperty("PRESET_N_COMPONENTS", 2, false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==4 && cmbImFCSFitMode->currentIndex()==2) { // anomalous
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_tir_adiff3de2", false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==4 && cmbImFCSFitMode->currentIndex()==3) { // normal+flow
+                        e->setQFProperty("PRESET_FIT_MODEL", "fcs_tir_diff_flowe2", false, false);
+
+                }
+            }
+        }
+        if (chkLastIm2cFCCSFit && chkLastIm2cFCCSFit->isChecked() && chk2ColorFCCS->isChecked()) {
+            QFEvaluationItem* e=project->addEvaluation("imfccs_fit", tr("Global 2-color Imaging FCCS fit"));
+
+            if (e) {
+                e->setQFProperty("FIT_REPEATS", 2, false, false);
+                e->setQFProperty("PRESET_FOCUS_HEIGHT", spinWz->value(), false, false);
+                e->setQFProperty("PRESET_FOCUS_HEIGHT_ERROR", 0, false, false);
+                e->setQFProperty("PRESET_FOCUS_WIDTH", spinWxy->value(), false, false);
+                e->setQFProperty("PRESET_N_COMPONENTS", 1, false, false);
+                e->setQFProperty("PRESET_FOCUS_WIDTH_ERROR", 0, false, false);
+                if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-SPIM-FCCS/NORMAL_1DPERSPECIES", false, false);
+                } else if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-SPIM-FCCS/NORMAL_2DPERCHANNEL", false, false);
+                } else if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-SPIM-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
+
+
+                } else if (cmbMicroscopy->currentData().toInt()==1 && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-TIR-FCCS/NORMAL_1DPERSPECIES", false, false);
+                } else if (cmbMicroscopy->currentData().toInt()==1 && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-TIR-FCCS/NORMAL_2DPERCHANNEL", false, false);
+                } else if (cmbMicroscopy->currentData().toInt()==1 && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-TIR-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
+
+
+                } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_1DPERSPECIES", false, false);
+                } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_2DPERCHANNEL", false, false);
+                } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
+
+
+                } else if (cmbMicroscopy->currentData().toInt()==4 && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_1DPERSPECIES", false, false);
+                    e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                } else if (cmbMicroscopy->currentData().toInt()==4 && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_2DPERCHANNEL", false, false);
+                    e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                } else if (cmbMicroscopy->currentData().toInt()==4 && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
+                    e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                }
+            }
+        }
+        if (chkLastIm2fFCCSFit && chkLastIm2fFCCSFit->isChecked() && cmb2PixelFCCS->currentIndex()>0) {
+            QFEvaluationItem* e=project->addEvaluation("imfccs_fit", tr("Global 2-pixel Imaging FCCS fit"));
+
+            if (e) {
+                e->setQFProperty("FIT_REPEATS", 2, false, false);
+                e->setQFProperty("PRESET_FOCUS_HEIGHT", spinWz->value(), false, false);
+                e->setQFProperty("PRESET_FOCUS_HEIGHT_ERROR", 0, false, false);
+                e->setQFProperty("PRESET_FOCUS_WIDTH", spinWxy->value(), false, false);
+                e->setQFProperty("PRESET_N_COMPONENTS", 1, false, false);
+                e->setQFProperty("PRESET_FOCUS_WIDTH_ERROR", 0, false, false);
+                if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) ) { // anomalous
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-PIXEL-SPIM-FCCS/NORMAL_FLOW", false, false);
+
+
+                } else if (cmbMicroscopy->currentData().toInt()==1 ) { // 1-comp, normal
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-PIXEL-TIR-FCCS/NORMAL+FLOW", false, false);
+
+
+                } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5))) { // anomalous
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-PIXEL-CONFOCAL-FCCS/NORMAL+FLOW", false, false);
+
+
+                } else if (cmbMicroscopy->currentData().toInt()==4 ) { // 1-comp, normal
+                    e->setQFProperty("PRESET_FIT_MODEL", "2-PIXEL-CONFOCAL-FCCS/NORMAL2D+FLOW", false, false);
+                    e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                }
+            }
+        }
+    }
+}
+
+
 
 void QFRDRImagingFCSWizard::selectFileClicked()
 {
@@ -481,7 +664,7 @@ void QFRDRImagingFCSWizard::edtFilenameTextChanged(const QString &filename)
 void QFRDRImagingFCSWizard::initImagePreview()
 {
     //qDebug()<<"initImagePreview";
-    ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", cmbMicroscopy->currentIndex());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", cmbMicroscopy->currentData().toInt());
     ProgramOptions::setConfigValue("imaging_fcs/wizard/wizardmethod", wizIntro->getChecked());
 }
 
@@ -514,11 +697,11 @@ void QFRDRImagingFCSWizard::finishedIntro()
     ProgramOptions::setConfigValue("imaging_fcs/wizard/wizardmethod", wizIntro->getChecked());
     isCalibration=wizIntro->isChecked(1);
     spinWxy->setVisible(!isCalibration);
+    labWxy->setVisible(!isCalibration);
     QWidget* lab=NULL;
     if ((lab=wizMicroscopy->getFormLayout()->labelForField(spinWxy))) {
-        lab->setVisible(!isCalibration);
+        lab->setVisible(spinWxy->isVisible());
     }
-    labWxy->setVisible(!isCalibration);
 }
 
 void QFRDRImagingFCSWizard::backgroundModeChanged(int mode)
@@ -761,27 +944,37 @@ void QFRDRImagingFCSWizard::cropValuesChanged()
 void QFRDRImagingFCSWizard::microscopyChoosen()
 {
     //qDebug()<<"microscopyChoosen";
-    ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", cmbMicroscopy->currentIndex());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", cmbMicroscopy->currentData().toInt());
     ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wz", spinWz->value());
     ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wxy", spinWxy->value());
 
-    labWz->setVisible(cmbMicroscopy->currentIndex()!=1);
-    spinWz->setVisible(cmbMicroscopy->currentIndex()!=1);
+    QString msg;
+
+
+    bool isNotTIRF=(cmbMicroscopy->currentData().toInt()!=1)&&(cmbMicroscopy->currentData().toInt()!=4);
+    labWz->setVisible(isNotTIRF);
+    spinWz->setEnabled(isNotTIRF);
     QWidget* lab=NULL;
-    if ((lab=wizMicroscopy->getFormLayout()->labelForField(labWz))) {
-        lab->setVisible(spinWz->isVisible());
+    if ((lab=wizMicroscopy->getFormLayout()->labelForField(spinWz))) {
+        lab->setEnabled(spinWz->isEnabled());
     }
 
     //spinWxy->setEnabled(reallyIsCalib);
     //labWxy->setEnabled(reallyIsCalib);
 
-    bool reallyIsCalib=wizIntro->isChecked(0) && this->isCalibration;
-    spinWxy->setVisible(!reallyIsCalib);
+    bool reallyIsCalib=wizIntro->isChecked(1) && this->isCalibration;
+    if (reallyIsCalib && cmbMicroscopy->currentData().toInt()>=3) {
+        msg+=tr("<br><center><b><u>Warning:</u> The microscopy technique you chose is not based on a pixelated detector. Therefore it cannot be used for imaging FCS calibration.</b> QuickFit uses a calibration method that stepwise increases the camera pixel binning to decouple the optical PSF-parameters (which are calibrated) from the focal volume size.</center>");
+    }
+
+    spinWxy->setEnabled(!reallyIsCalib);
+    labWxy->setVisible(!reallyIsCalib);
     lab=NULL;
     if ((lab=wizMicroscopy->getFormLayout()->labelForField(spinWxy))) {
-        lab->setVisible(spinWxy->isVisible());
+        lab->setEnabled(spinWxy->isEnabled());
     }
-    labWxy->setVisible(!reallyIsCalib);
+
+    labMicroscopy->setText(msg);
 
 }
 
@@ -822,7 +1015,7 @@ void QFRDRImagingFCSWizard::startProcessingJobs()
     basicjob.P=16;
     basicjob.m=2;
     basicjob.segments=spinSegments->value();
-    basicjob.frameTime=spinFrametime->value();
+    basicjob.frameTime=spinFrametime->value()*1e-6;
     basicjob.S=qBound(3, basicjob.getIdealS(), 200);
     basicjob.range_min=widFrameRange->getFirst();
     basicjob.range_max=widFrameRange->getLast();
@@ -861,7 +1054,7 @@ void QFRDRImagingFCSWizard::startProcessingJobs()
     if (wizIntro->isChecked(1)) { // calibration
         basicjob.segments=spinCalibSegments->value();
         basicjob.S=qBound(3, basicjob.getIdealS(), 200);
-        for (int b=0; b<spinCalibBinMax->value(); b++) {
+        for (int b=1; b<=spinCalibBinMax->value(); b++) {
             IMFCSJob job=basicjob;
             job.acf=true;
             job.postfix="_wizardcalib_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%";

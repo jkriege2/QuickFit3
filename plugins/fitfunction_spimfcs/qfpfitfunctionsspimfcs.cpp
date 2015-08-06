@@ -240,6 +240,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
     QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig res;
     if (i==c++) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
         res.groupLabel=spimfccslabel;
+        res.shortLabel=QString("2-COLOR-SPIM-FCCS/NORMAL_1DPERSPECIES");
         res.menuEntryLabel=tr("... 3D Normal Diffusion, species A+B+AB, c/D per species");
         res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
         res.roles<<"acf0"<<"acf1"<<"fccs";
@@ -342,6 +343,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
 
     } else    if (i==c++) { // fccs_spim_fw_sepdiff2coloracfg, fccs_spim_fw_sepdiff2coloracfr, fccs_spim_fw_sepdiff2colorccf
        res.groupLabel=spimfccslabel;
+       res.shortLabel=QString("2-COLOR-SPIM-FCCS/NORMAL_1DPERCHANNEL");
        res.menuEntryLabel=tr("... 3D Normal Diffusion, species A+B+AB, c per species, D per channel");
        res.models<<"fccs_spim_fw_sepdiff2coloracfg"<<"fccs_spim_fw_sepdiff2coloracfr"<<"fccs_spim_fw_sepdiff2colorccf";
        res.roles<<"acf0"<<"acf1"<<"fccs";
@@ -368,6 +370,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
 
     } else    if (i==c++) { // fccs_spim_fw_2cdiff2coloracfg, fccs_spim_fw_2cdiff2coloracfr, fccs_spim_fw_2cdiff2colorccf
        res.groupLabel=spimfccslabel;
+       res.shortLabel=QString("2-COLOR-SPIM-FCCS/NORMAL_2DPERSPECIES");
        res.menuEntryLabel=tr("... 2-comp. 3D Normal Diffusion, species A+B+AB, c/D1/D2 per species");
        res.roles<<"acf0"<<"acf1"<<"fccs";
        res.models<<"fccs_spim_fw_2cdiff2coloracfg"<<"fccs_spim_fw_2cdiff2coloracfr"<<"fccs_spim_fw_2cdiff2colorccf";
@@ -399,6 +402,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
 
     } else    if (i==c++) { // fccs_spim_fw_sepdiff2coloracfg, fccs_spim_fw_sepdiff2coloracfr, fccs_spim_fw_sepdiff2colorccf
        res.groupLabel=spimfccslabel;
+       res.shortLabel=QString("2-COLOR-SPIM-FCCS/ANOMALOUS_1DPERCHANNEL");
        res.menuEntryLabel=tr("... 3D Anomalous Diffusion, species A+B+AB, c per species, Gamma/alpha per channel");
        res.models<<"fccs_spim_fw_2csepadiff2coloracfg"<<"fccs_spim_fw_2csepadiff2coloracfr"<<"fccs_spim_fw_2csepadiff2colorccf";
        res.roles<<"acf0"<<"acf1"<<"fccs";
@@ -451,6 +455,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
 
     } else    if (i==c++) { // fccs_spim_fw_2csepdiff2coloracfg, fccs_spim_fw_2csepdiff2coloracfr, fccs_spim_fw_2csepdiff2colorccf
        res.groupLabel=spimfccslabel;
+       res.shortLabel=QString("2-COLOR-SPIM-FCCS/NORMAL_2DPERCHANNEL");
        res.menuEntryLabel=tr("... 2-comp. 3D Normal Diffusion, species A+B+AB, c per species, D1/D2 per channel");
        res.models<<"fccs_spim_fw_2csepdiff2coloracfg"<<"fccs_spim_fw_2csepdiff2coloracfr"<<"fccs_spim_fw_2csepdiff2colorccf";
        res.roles<<"acf0"<<"acf1"<<"fccs";
@@ -524,6 +529,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
 
     } else if (i==c++) { // fccs_spim_fw_adiff2coloracfg, fccs_spim_fw_adiff2coloracfr, fccs_spim_fw_adiff2colorccf
         res.groupLabel=spimfccslabel;
+        res.shortLabel=QString("2-COLOR-SPIM-FCCS/ANOMALOUS_1DPERSPECIES");
         res.menuEntryLabel=tr("... 3D Anomalous Diffusion, species A+B+AB, c/Gamma/alpha per species");
         res.models<<"fccs_spim_fw_adiff2coloracfg"<<"fccs_spim_fw_adiff2coloracfr"<<"fccs_spim_fw_adiff2colorccf";
         res.roles<<"acf0"<<"acf1"<<"fccs";
@@ -552,6 +558,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
 
     } else if (i==c++) { // fccs_spim_fw_adiff2coloracfg, fccs_spim_fw_adiff2coloracfr, fccs_spim_fw_adiff2colorccf
         res.groupLabel=spimfccslabel;
+        res.shortLabel=QString("2-PIXEL-SPIM-FCCS/NORMAL_FLOW");
         res.menuEntryLabel=tr("... 3D Normal Diffusion+Flow, ACF + 4 neighbors");
         res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
         res.models<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2";

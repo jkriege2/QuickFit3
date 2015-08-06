@@ -30,6 +30,7 @@
 #include <QList>
 #include <QVariant>
 #include <QSortFilterProxyModel>
+#include "qfenhancedcombobox.h"
 
 class  QFSimpleTreeModelItem; // forward
 /*! \brief this class implements a very simple tree model for Qt's model-view-framework, which may contain nodes (selectable) and selectable, as well as non-selectable folders
@@ -130,6 +131,22 @@ public:
  protected:
      bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 
+ };
+
+
+ class QFLIB_EXPORT QFSimpleTreeModelEnhancedComboBox: public QFEnhancedComboBox {
+         Q_OBJECT
+     public:
+         explicit QFSimpleTreeModelEnhancedComboBox(QWidget *parent = 0);
+         QFSimpleTreeModel* getModel() const;
+
+         QFSimpleTreeModelItem* itemForIndex(const QModelIndex& index) const;
+
+         QFSimpleTreeModelItem* addFolderedItem(const QString& name, const QVariant& userData, QChar separator=QLatin1Char('/'));
+         QFSimpleTreeModelItem* addFolderedItem(const QString& folder, const QString& name, const QVariant& userData);
+         QFSimpleTreeModelItem* addFolderedItem(const QStringList& folders, const QString& name, const QVariant& userData);
+     protected:
+         QFSimpleTreeModel* m_model;
  };
 
 #endif // QFSIMPLETREEMODEL_H

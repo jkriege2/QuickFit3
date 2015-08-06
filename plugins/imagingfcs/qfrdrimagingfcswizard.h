@@ -17,8 +17,11 @@
 #include "qfevaluationitemfactory.h"
 #include "qfcroppixelsedit.h"
 #include "qfrdrimagingfcswizardcorrelationprogress.h"
+#include "qfpseudotreemodel.h"
+#include "qffitfunctionconfigforglobalfitinterface.h"
 
-class QFRDRImagingFCSWizard_BackgroundIsValid; // forward
+class QFRDRImagingFCSPlugin; // forward
+class QFRDRImagingFCSWizard_BackgroundIsValid;
 class QFRDRImagingFCSWizard_ImagestackIsValid;
 class QFRDRImagingFCSWizard_BackgroundNextId;
 class QFRDRImagingFCSWizard_ProcessNextId;
@@ -29,7 +32,7 @@ class QFRDRImagingFCSWizard : public QFWizard {
         explicit QFRDRImagingFCSWizard(bool is_project=false, QWidget* parent=NULL);
         ~QFRDRImagingFCSWizard();
         enum Pages {
-            InitPage,
+            InitPage=0,
             FileSelectionPage,
             ImagePage,
             MicroscopyPage,
@@ -42,7 +45,11 @@ class QFRDRImagingFCSWizard : public QFWizard {
             LastPageCalibration,
         };
 
+    public slots:
+        void finalizeAndModifyProject(bool projectwizard, QFRDRImagingFCSPlugin* plugin);
+
     protected slots:
+
         void selectFileClicked();
         void edtFilenameTextChanged(const QString& filename);
         void initImagePreview();
@@ -68,7 +75,8 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QFFormWizardPage* wizSelfiles;
         QFFormWizardPage* wizMicroscopy;
         QDoubleSpinBox* spinWz;
-        QComboBox* cmbMicroscopy;
+        QFEnhancedComboBox* cmbMicroscopy;
+        QLabel* labMicroscopy;
         QLabel* labWz;
         QDoubleSpinBox* spinWxy;
         QLabel* labWxy;
@@ -106,8 +114,10 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QFFormWizardPage* wizFinalizePage;
         QLabel* labFinal;
         QPointer<QCheckBox> chkLastImFCSFit1;
-        QPointer<QCheckBox> chkLastImFCCSFit;
+        QPointer<QCheckBox> chkLastIm2cFCCSFit;
+        QPointer<QCheckBox> chkLastIm2fFCCSFit;
         QPointer<QFEnhancedComboBox> cmbImFCSFitMode;
+        QPointer<QFEnhancedComboBox> cmbIm2cFCCSFitMode;
 
         QFFormWizardPage* wizFinalizePageCalibration;
 

@@ -102,6 +102,37 @@ void QFRDRImagingFCSPlugin::imfcsCorrRemoteAddJobSeries(const QString &parameter
     dlgCorrelate->clickAddJobSeries(parameter, start, end, inc);
 }
 
+void QFRDRImagingFCSPlugin::addFiles(const QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> &list)
+{
+    QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo>::ConstIterator it = list.begin();
+    services->setProgressRange(0, list.size());
+    services->setProgress(0);
+    int i=0;
+    QModernProgressDialog progress(tr("Loading imFCS Data ..."), "", NULL);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setHasCancel(false);
+    progress.open();
+    while(it != list.end()) {
+        i++;
+        services->log_text(tr("loading '%1' [%2] ...\n").arg(it->filename).arg(it->role));
+        progress.setLabelText(tr("loading '%1' [%2] ...\n").arg(it->filename).arg(it->role));
+        QString filename=it->filename;
+        QString overview="";
+        QApplication::processEvents();
+        if (it->filetype==QFRDRImagingFCSCorrelationJobThread::ftCorrelation) {
+            insertVideoCorrelatorFile(filename, overview, QString(""), filename.toLower().endsWith(".bin"), it->role, it->internalDualViewMode, it->dualViewID, true, true, it->group);
+        } else if (it->filetype==QFRDRImagingFCSCorrelationJobThread::ftNandB) {
+            insertNandBFromVideoCorrelatorFile(it->filenameEvalSettings, it->filename, it->filenameVar, it->filenameBack, it->filenameBackVar, it->internalDualViewMode, it->dualViewID, it->role, it->group);
+        }
+        settings->setCurrentRawDataDir(QFileInfo(it->filename).dir().absolutePath());
+        services->setProgress(i);
+        QApplication::processEvents();
+        ++it;
+    }
+    progress.accept();
+    services->setProgress(0);
+}
+
 QFRawDataRecord* QFRDRImagingFCSPlugin::createRecord(QFProject* parent) {
     // factory method: create a QFRawDataRecord objectof the type of this plugin (QFRDRImagingFCSData)
     return new QFRDRImagingFCSData(parent);
@@ -163,35 +194,9 @@ void QFRDRImagingFCSPlugin::importCorrelationsFromDialog() {
 
     disconnect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(importCorrelationsFromDialog()));
 
-    QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> list=dlgCorrelate->getFilesToAdd();
+    //QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> list=;
 
-    QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo>::Iterator it = list.begin();
-    services->setProgressRange(0, list.size());
-    services->setProgress(0);
-    int i=0;
-    QModernProgressDialog progress(tr("Loading imFCS Data ..."), "", NULL);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setHasCancel(false);
-    progress.open();
-    while(it != list.end()) {
-        i++;
-        services->log_text(tr("loading '%1' [%2] ...\n").arg(it->filename).arg(it->role));
-        progress.setLabelText(tr("loading '%1' [%2] ...\n").arg(it->filename).arg(it->role));
-        QString filename=it->filename;
-        QString overview="";
-        QApplication::processEvents();
-        if (it->filetype==QFRDRImagingFCSCorrelationJobThread::ftCorrelation) {
-            insertVideoCorrelatorFile(filename, overview, QString(""), filename.toLower().endsWith(".bin"), it->role, it->internalDualViewMode, it->dualViewID, true, true, it->group);
-        } else if (it->filetype==QFRDRImagingFCSCorrelationJobThread::ftNandB) {
-            insertNandBFromVideoCorrelatorFile(it->filenameEvalSettings, it->filename, it->filenameVar, it->filenameBack, it->filenameBackVar, it->internalDualViewMode, it->dualViewID, it->role, it->group);
-        }
-        settings->setCurrentRawDataDir(QFileInfo(it->filename).dir().absolutePath());
-        services->setProgress(i);
-        QApplication::processEvents();
-        ++it;
-    }
-    progress.accept();
-    services->setProgress(0);
+    addFiles(dlgCorrelate->getFilesToAdd());
 
     dlgCorrelate->deleteLater();
     dlgCorrelate=NULL;
@@ -262,7 +267,8 @@ void QFRDRImagingFCSPlugin::startWizard(bool isProject)
 {
     QFRDRImagingFCSWizard* wiz=new QFRDRImagingFCSWizard(isProject, parentWidget);
     if (wiz->exec()) {
-
+        //qDebug()<<"FINAL PAGE: "<<wiz->currentId();
+        wiz->finalizeAndModifyProject(isProject, this);
     }
 
     delete wiz;

@@ -22,6 +22,8 @@ class QFRDRImagingFCSWizardCorrelationProgress : public QWidget
         void addJob(const IMFCSJob &jobin);
 
         bool allThreadsDone() const;
+
+        QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> getFilesToAdd() const;
     signals:
         void correlationCompleted(bool complete);
 
@@ -29,6 +31,7 @@ class QFRDRImagingFCSWizardCorrelationProgress : public QWidget
     public slots:
         void updateProgress();
         void cancelThreads();
+        void collectThreads();
     private:
         Ui::QFRDRImagingFCSWizardCorrelationProgress *ui;
     protected:

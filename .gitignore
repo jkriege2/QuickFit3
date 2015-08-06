@@ -182,3 +182,5 @@ release
 /output/*.zip
 /extlibs/libjpeg/jpeg-9a
 *.mat
+*.backup
+*.backup_old

@@ -27,6 +27,7 @@
 #include <QIcon>
 #include <QString>
 #include <QtPlugin>
+#include <QVariant>
 
 class QFPluginEvaluationItem; // forward
 class QFPluginRawDataRecord; // forward
@@ -99,6 +100,23 @@ class QFPluginAdditionalPluginsInterface {
 
 Q_DECLARE_INTERFACE(QFPluginAdditionalPluginsInterface,
                      "www.dkfz.de.b040.quickfit3.QFPluginAdditionalPluginsInterface/1.0")
+
+
+/** \brief this interface allows to send text-encoded commands to other plugins
+    \ingroup qf3plugins
+*/
+class QFPluginCommandsInterface {
+    public:
+        /** Default destructor */
+        virtual ~QFPluginCommandsInterface() {}
+
+        /** \brief send a text command to another plugin */
+        virtual void sendPluginCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant())=0;
+
+};
+
+Q_DECLARE_INTERFACE(QFPluginCommandsInterface,
+                     "www.dkfz.de.b040.quickfit3.QFPluginCommandsInterface/1.0")
 
 
 

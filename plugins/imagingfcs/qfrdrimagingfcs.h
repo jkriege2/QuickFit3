@@ -98,6 +98,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, 
         virtual void imfcsCorrRemoteAddJob();
         virtual void imfcsCorrRemoteAddJobSeries(const QString& parameter, double start, double end, double inc=1);
 
+        void addFiles(const QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo>& list);
+
     protected slots:
         /** \brief insertdata from file*/
         void insertRecord();
@@ -137,6 +139,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, 
 
         /** \brief returns the number of columns of the supplied CSV file (searches for the first row with more than 0 columns!) */
         int checkColumns(QString filename);
+
+
 
         QFRDRImagingFCSCorrelationDialog* dlgCorrelate;
         QFRDRImagingFCSSimulator* dlgSimulate;

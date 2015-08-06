@@ -117,7 +117,7 @@ struct IMFCSJob {
     int32_t range_max;
     /** \brief add job results to project */
     bool addToProject;
-    /** \brief duration of a single frame */
+    /** \brief duration of a single frame in seconds */
     double frameTime;
     /** \brief output prefix */
     QString prefix;

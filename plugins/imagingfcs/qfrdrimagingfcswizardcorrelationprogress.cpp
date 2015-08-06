@@ -90,7 +90,8 @@ void QFRDRImagingFCSWizardCorrelationProgress::updateProgress() {
 
 
     }
-    if (waitingThreads()<=0) emit correlationCompleted(true);
+    if (waitingThreads()<=0) emit correlationCompleted(allThreadsDone());
+    else emit correlationCompleted(false);
     QTimer::singleShot(UPDATE_TIMEOUT, this, SLOT(updateProgress()));
 }
 
@@ -124,7 +125,7 @@ void QFRDRImagingFCSWizardCorrelationProgress::cancelThreads()
             prg.close();
             allOK=true;
 
-            emit correlationCompleted(true);
+            emit correlationCompleted(allThreadsDone());
 
         } else {
             closing=false;
@@ -133,29 +134,42 @@ void QFRDRImagingFCSWizardCorrelationProgress::cancelThreads()
 
     if (closing) {
         // add jobs to project
-        QModernProgressDialog prg(this);
-        prg.setLabelText(tr("add job results to project ..."));
-        prg.open();
-        for (int i=0; i<jobs.size(); i++) {
-            if (jobs[i].addToProject && (jobs[i].thread->status()==2)) {
-                for (int j=0; j<jobs[i].thread->getAddFiles().size(); j++) {
-                    filesToAdd.append(jobs[i].thread->getAddFiles().at(j));
-                }
+        collectThreads();
+    }
+}
+
+void QFRDRImagingFCSWizardCorrelationProgress::collectThreads()
+{
+    QModernProgressDialog prg(this);
+    prg.setLabelText(tr("add job results to project ..."));
+    prg.open();
+    for (int i=jobs.size()-1; i>=0; i--) {
+        if (jobs[i].addToProject && (jobs[i].thread->status()==2)) {
+            for (int j=0; j<jobs[i].thread->getAddFiles().size(); j++) {
+                filesToAdd.prepend(jobs[i].thread->getAddFiles().at(j));
+                //qDebug()<<"added file "<<jobs[i].thread->getAddFiles().at(j).filename;
             }
             jobs[i].progress->close();
             delete jobs[i].progress;
             delete jobs[i].thread;
+            jobs.removeAt(i);
         }
-        prg.close();
     }
+    prg.close();
 }
 
 bool QFRDRImagingFCSWizardCorrelationProgress::allThreadsDone() const
 {
+
     for (int i=0; i<jobs.size(); i++) {
         if ((jobs[i].thread->isRunning()) || (jobs[i].thread->status()==1)) return false;
     }
     return true;
+}
+
+QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> QFRDRImagingFCSWizardCorrelationProgress::getFilesToAdd() const
+{
+    return filesToAdd;
 }
 
 int QFRDRImagingFCSWizardCorrelationProgress::runningThreads() const

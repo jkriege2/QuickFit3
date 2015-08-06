@@ -434,3 +434,36 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
      }
      return true;
  }
+
+
+ QFSimpleTreeModelEnhancedComboBox::QFSimpleTreeModelEnhancedComboBox(QWidget *parent):
+     QFEnhancedComboBox(parent)
+ {
+     m_model=new QFSimpleTreeModel(this);
+     setModel(m_model);
+ }
+
+ QFSimpleTreeModel *QFSimpleTreeModelEnhancedComboBox::getModel() const
+ {
+     return m_model;
+ }
+
+ QFSimpleTreeModelItem *QFSimpleTreeModelEnhancedComboBox::itemForIndex(const QModelIndex &index) const
+ {
+     return m_model->itemForIndex(index);
+ }
+
+ QFSimpleTreeModelItem *QFSimpleTreeModelEnhancedComboBox::addFolderedItem(const QString &name, const QVariant &userData, QChar separator)
+ {
+     return m_model->addFolderedItem(name, userData, separator);
+ }
+
+ QFSimpleTreeModelItem *QFSimpleTreeModelEnhancedComboBox::addFolderedItem(const QString &folder, const QString &name, const QVariant &userData)
+ {
+     return m_model->addFolderedItem(folder, name, userData);
+ }
+
+ QFSimpleTreeModelItem *QFSimpleTreeModelEnhancedComboBox::addFolderedItem(const QStringList &folders, const QString &name, const QVariant &userData)
+ {
+     return m_model->addFolderedItem(folders, name, userData);
+ }

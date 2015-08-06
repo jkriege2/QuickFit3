@@ -230,7 +230,9 @@ void QFWizardPage::setButtonState(bool entering)
         layout<< QWizard::NextButton;
         if (!m_switchoffCancelButton) layout<< QWizard::CancelButton;
         if (isFinalPage()) layout<< QWizard::FinishButton;
-        if (!m_switchoffPreviousButton || !m_switchoffCancelButton) wizard()->setButtonLayout(layout);
+        //if (!m_switchoffPreviousButton || !m_switchoffCancelButton) wizard()->setButtonLayout(layout);
+        wizard()->setButtonLayout(layout);
+        //qDebug()<<"finisheg set buttons is final="<<isFinalPage();
     } else {
 //        if (m_switchoffPreviousButton) {
 //            wizard()->button(QWizard::BackButton)->setVisible(true);
@@ -246,8 +248,10 @@ void QFWizardPage::setButtonState(bool entering)
         layout << QWizard::BackButton;
         layout<< QWizard::NextButton;
         layout<< QWizard::CancelButton;
+        //qDebug()<<"finisheg set buttons is final="<<isFinalPage();
         if (isFinalPage()) layout<< QWizard::FinishButton;
-        if (!m_switchoffPreviousButton || !m_switchoffCancelButton) wizard()->setButtonLayout(layout);
+        //if (!m_switchoffPreviousButton || !m_switchoffCancelButton) wizard()->setButtonLayout(layout);
+        wizard()->setButtonLayout(layout);
     }
 }
 
@@ -292,13 +296,13 @@ void QFWizardPage::setNextID(int nextid)
 void QFWizardPage::setNoPreviousButton(bool noPrevButton)
 {
     m_switchoffPreviousButton=noPrevButton;
-    wizard()->button(QWizard::BackButton)->setVisible(!m_switchoffPreviousButton);
+    //wizard()->button(QWizard::BackButton)->setVisible(!m_switchoffPreviousButton);
 }
 
 void QFWizardPage::setNoCancelButton(bool noCancelButton)
 {
     m_switchoffCancelButton=noCancelButton;
-    wizard()->button(QWizard::CancelButton)->setVisible(!m_switchoffCancelButton);
+    //wizard()->button(QWizard::CancelButton)->setVisible(!m_switchoffCancelButton);
 
 }
 

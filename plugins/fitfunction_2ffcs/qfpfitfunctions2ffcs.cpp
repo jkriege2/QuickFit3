@@ -66,6 +66,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
     QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig res;
     int c=0;
     if (i==c++) {
+        res.shortLabel=QString("2-PIXEL-CONFOCAL-FCCS/NORMAL2D+FLOW");
         res.groupLabel=menulabel;
         res.menuEntryLabel=tr("... 2D Normal Diffusion+Flow, ACF + 4 neighbors");
         res.models<<"fccs_2f_diff2dflowfccs_2f_diff2dflow"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff2dflow";
@@ -80,6 +81,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
 
     } else if (i==c++) {
         res.groupLabel=menulabel;
+        res.shortLabel=QString("2-PIXEL-CONFOCAL-FCCS/NORMAL+FLOW");
         res.menuEntryLabel=tr("... 3D Normal Diffusion+Flow, ACF + 4 neighbors");
         res.models<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow";
         res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";

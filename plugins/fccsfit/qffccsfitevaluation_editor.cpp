@@ -387,6 +387,27 @@ void QFFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEval
         updatingData=false;
     }
 
+    if (item && current->propertyExists("PRESET_FIT_MODEL")) {
+        QString model=current->getProperty("PRESET_FIT_MODEL", "").toString();
+        if (model.size()>0) {
+            QList<QFFitFunctionConfigForGlobalFitInterface*> modelPlugins;
+            for (int i=0; i<models.size(); i++) {
+                QFFitFunctionConfigForGlobalFitInterface* intf=qobject_cast<QFFitFunctionConfigForGlobalFitInterface*>(QFFitFunctionManager::getInstance()->getPluginObject(QFFitFunctionManager::getInstance()->getPluginForID(models[i])));
+                if (intf && !modelPlugins.contains(intf)) modelPlugins<<intf;
+            }
+            for (int i=0; i<modelPlugins.size(); i++) {
+                QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig c=QFFitFunctionConfigForGlobalFitInterface_GlobalFitConfig_get(modelPlugins[i], model);
+                if (c.shortLabel==model) {
+                    configureFitFromGlobal(c, false);
+                    break;
+                }
+            }
+
+//
+        }
+        current->deleteProperty("PRESET_FIT_MODEL");
+    }
+
     ensureCorrectParamaterModelDisplay();
     displayEvaluation();
 }

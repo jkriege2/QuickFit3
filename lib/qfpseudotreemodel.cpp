@@ -434,3 +434,31 @@ bool QFPseudoTreeModelSortFilterProxyModel::filterAcceptsRow(int sourceRow, cons
     }
     return true;
 }
+
+
+QFPseudoTreeModelEnhancedComboBox::QFPseudoTreeModelEnhancedComboBox(QWidget *parent):
+    QFEnhancedComboBox(parent)
+{
+    m_model=new QFPseudoTreeModel(this);
+    setModel(m_model);
+}
+
+QFPseudoTreeModel *QFPseudoTreeModelEnhancedComboBox::getTreeModel() const
+{
+    return m_model;
+}
+
+QFPseudoTreeModelItem *QFPseudoTreeModelEnhancedComboBox::itemForIndex(const QModelIndex &index) const
+{
+    return m_model->itemForIndex(index);
+}
+
+QFPseudoTreeModelItem *QFPseudoTreeModelEnhancedComboBox::addFolderedItem(const QString &name, const QVariant &userData, QChar separator)
+{
+    return  m_model->addFolderedItem(name, userData, separator);
+}
+
+QFPseudoTreeModelItem *QFPseudoTreeModelEnhancedComboBox::addFolderedItem(const QString &folder, const QString &name, const QVariant &userData)
+{
+    return m_model->addFolderedItem(folder, name, userData);
+}

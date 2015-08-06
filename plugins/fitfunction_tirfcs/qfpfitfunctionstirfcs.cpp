@@ -115,6 +115,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
     QString tirfccslabel=tr("configure for TIR-FCCS ...");
     
     if (i==c++) {
+        res.shortLabel=QString("2-COLOR-TIR-FCCS/NORMAL_1DPERSPECIES");
         res.groupLabel=tirfccslabel;
         res.menuEntryLabel=tr("... Normal Diffusion, species A+B+AB, c/D per species");
         res.models<<"fccs_tir_fw_2ddiffxy2coloracfg"<<"fccs_tir_fw_2ddiffxy2coloracfr"<<"fccs_tir_fw_2ddiffxy2colorccf";
@@ -182,6 +183,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
         res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
     } else  if (i==c++) {
         res.groupLabel=tirfccslabel;
+        res.shortLabel=QString("2-COLOR-TIR-FCCS/ANOMALOUS_1DPERSPECIES");
         res.menuEntryLabel=tr("... Anomalous Diffusion, species A+B+AB, c/D per species");
         res.models<<"fccs_tir_fw_2dadiffxy2coloracfg"<<"fccs_tir_fw_2dadiffxy2coloracfr"<<"fccs_tir_fw_2dadiffxy2colorccf";
         res.roles<<"acf0"<<"acf1"<<"fccs";
@@ -210,6 +212,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
     } else if (i==c++) {
 
        res.groupLabel=tirfccslabel;
+       res.shortLabel=QString("2-COLOR-TIR-FCCS/NORMAL_2DPERCHANNEL");
        res.menuEntryLabel=tr("... 2-comp. 2D Normal Diffusion (xy), species A+B+AB, c per species, D1/D2 per channel");
        res.models<<"fccs_tir_fw_2csep2ddiffxy2coloracfg"<<"fccs_tir_fw_2csep2ddiffxy2coloracfr"<<"fccs_tir_fw_2csep2ddiffxy2colorccf";
        res.roles<<"acf0"<<"acf1"<<"fccs";
@@ -232,6 +235,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
 
     } else if (i==c++) { // fccs_tir_diff_flowe2, fccs_tir_diff_flowe2, fccs_tir_diff_flowe2
         res.groupLabel=tirfccslabel;
+        res.shortLabel=QString("2-PIXEL-TIR-FCCS/NORMAL+FLOW");
         res.menuEntryLabel=tr("... 2D Normal Diffusion+Flow, ACF + 4 neighbors");
         res.models<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2";
         res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
