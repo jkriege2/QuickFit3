@@ -37,6 +37,10 @@ class ImFCSCalibrationWizard : public QWidget
         explicit ImFCSCalibrationWizard(QWidget *parent = 0);
         ~ImFCSCalibrationWizard();
         QFPlotter* getPltD() const;
+        QFPlotter* getPltWxy() const;
+
+        void enableStep2();
+        void hideStep01(bool hide=true);
 
     signals:
         void run1();

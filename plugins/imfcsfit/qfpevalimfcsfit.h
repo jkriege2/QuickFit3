@@ -40,9 +40,9 @@
 /*! \brief plugin class for imaging FCS least-square fits
     \ingroup qf3evalp_imfcsfit
 */
-class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, public QFPluginOptionsDialogInterface {
+class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, public QFPluginOptionsDialogInterface, public QFPluginCommandsInterface {
         Q_OBJECT
-        Q_INTERFACES(QFPluginEvaluationItem QFPluginOptionsDialogInterface)
+        Q_INTERFACES(QFPluginEvaluationItem QFPluginOptionsDialogInterface QFPluginCommandsInterface)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
         Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFPEvalIMFCSFit")
 #endif
@@ -94,6 +94,20 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
         QString pluginOptionsName() const;
         QIcon pluginOptionsIcon() const;
         QFPluginOptionsWidget *createOptionsWidget(QWidget *parent);
+
+        /** \brief execute text-encoded commands in this plugin
+         *
+         *  This function understands these commands:
+         *    - \c 'run_calibration'. Parameters are (note: if any of the parameters is given, steps 0 and 1 will be hidden!):
+         *        - \c focus_height
+         *        - \c focus_height_error
+         *        - \c fixOffset
+         *        - \c model
+         *        - \c list of wxy_test_values
+         *    .
+         *  .
+         */
+        virtual void sendPluginCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
     protected slots:
         /** \brief insert FCS data from file*/
         void insertFCSFit();
@@ -101,6 +115,7 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
         void insertFCSCalibrationWizard();
 
         void insertFCSFitForCalibration();
+        void insertFCSFitForCalibration(QFEvaluationItem* edummy, double height, double err_height, bool fixOffset, const QString& model, const QList<double>& vals);
         void imFCSCalibrationSelectFile();
         void imFCSCalibrationCorrelate();
 

@@ -53,6 +53,32 @@ QFPlotter *ImFCSCalibrationWizard::getPltD() const
     return ui->pltD;
 }
 
+QFPlotter *ImFCSCalibrationWizard::getPltWxy() const
+{
+    return ui->pltWxy;
+}
+
+void ImFCSCalibrationWizard::enableStep2()
+{
+    ui->widget2->setEnabled(true);
+}
+
+void ImFCSCalibrationWizard::hideStep01(bool hide)
+{
+    ui->widStep01->setVisible(!hide);
+    if (hide) {
+        ui->lab2->setText("1.");
+        ui->lab3->setText("2.");
+        ui->lab4->setText("3.");
+        ui->lab5->setText("4.");
+    } else {
+        ui->lab2->setText("2.");
+        ui->lab3->setText("3.");
+        ui->lab4->setText("4.");
+        ui->lab5->setText("5.");
+    }
+}
+
 
 void ImFCSCalibrationWizard::on_btnClose_clicked()
 {
