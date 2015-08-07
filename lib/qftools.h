@@ -728,6 +728,15 @@ inline QList<T> constructQListFromItems(const T& item1, const T& item2, const T&
 }
 
 
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+inline QList<T> constructQListFromItems(const T& item1, const QList<T>& item2) {
+    QList<T> out;
+    out<<item1<<item2;
+    return out;
+}
 
 
 
@@ -815,6 +824,15 @@ inline QVector<T> constructQVectorFromItems(const T& item1, const T& item2, cons
 }
 
 
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+inline QVector<T> constructQVectorFromItems(const T& item1, const QVector<T>& item2) {
+    QVector<T> out;
+    out<<item1<<item2;
+    return out;
+}
 
 
 
@@ -870,6 +888,27 @@ inline QStringList constructQStringListFromItems(const QString& item1, const QSt
     return out;
 }
 
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+
+inline QStringList constructQStringListFromItems(const QString& item1, const QStringList& item2) {
+    QStringList out;
+    out<<item1<<item2;
+    return out;
+}
+
+/*! \brief constructs a list with \A N copies of the given item
+    \ingroup qf3lib_tools
+*/
+
+inline QStringList constructQStringListWithMultipleItems(const QString& item1, int N=1) {
+    QStringList out;
+    for (int i=0; i<N; i++) {
+        out<<item1;
+    }
+    return out;
+}
 
 
 

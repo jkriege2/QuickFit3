@@ -391,6 +391,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
 
     if (item && current->propertyExists("PRESET_FIT_MODEL")) {
         QString model=current->getProperty("PRESET_FIT_MODEL", "").toString();
+        QStringList models=QFFitFunctionManager::getInstance()->getIDList();
         if (model.size()>0) {
             QList<QFFitFunctionConfigForGlobalFitInterface*> modelPlugins;
             for (int i=0; i<models.size(); i++) {
@@ -408,6 +409,28 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
 //
         }
         current->deleteProperty("PRESET_FIT_MODEL");
+    }
+
+    if (item && current->propertyExists("PRESET_FIT_MODELS_LIST")) {
+        QString modelliststr=current->getProperty("PRESET_FIT_MODELS_LIST", "").toString();
+        QString globalparamsstr=current->getProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST", "").toString();
+        QString rolesstr=current->getProperty("PRESET_FIT_MODELS_ROLES_LIST", "").toString();
+        QStringList fitmodels=modelliststr.split(";");
+        QStringList globalparams=globalparamsstr.split(";");
+        QStringList roles=rolesstr.split(";");
+        if (fitmodels.size()>0) {
+            QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig c;
+            c.models=fitmodels;
+            c.roles=roles;
+            for (int i=0; i<globalparams.size(); i++) {
+                c.globalParams.append(constructQListWithMultipleItems(QStringList(globalparams[i]), fitmodels[i].size()));
+            }
+
+            configureFitFromGlobal(c, false);
+        }
+        current->deleteProperty("PRESET_FIT_MODELS_LIST");
+        current->deleteProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST");
+        current->deleteProperty("PRESET_FIT_MODELS_ROLES_LIST");
     }
 
     ensureCorrectParamaterModelDisplay();

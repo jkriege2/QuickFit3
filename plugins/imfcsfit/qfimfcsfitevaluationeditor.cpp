@@ -431,6 +431,9 @@ void QFImFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEva
 
     }
 
+
+
+
     connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
     connect(widFitErrorEstimate, SIGNAL(parametersChanged()), this, SLOT(errorEstimateModeChanged()));
 
