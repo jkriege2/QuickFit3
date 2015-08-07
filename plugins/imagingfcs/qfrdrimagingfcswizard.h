@@ -69,6 +69,7 @@ class QFRDRImagingFCSWizard : public QFWizard {
         void correlationValuesChanged();
         void startProcessingJobs();
         void calibrationValuesChanged();
+        void validateCorrelation();
     protected:
 
         QFRadioButtonListWizardPage* wizIntro;

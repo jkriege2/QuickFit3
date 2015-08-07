@@ -948,7 +948,7 @@ int QFRadioButtonListWizardPage::getChecked() const
 {
     for (int i=0; i<boxes.size(); i++) {
         if (boxes[i]->isChecked()) {
-            return true;
+            return i;
         }
     }
     return -1;

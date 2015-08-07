@@ -130,12 +130,12 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizMicroscopy->addStretch();
     wizMicroscopy->setSubTitle(tr("Select the type of microscopy used during the acquisition."));
     cmbMicroscopy=new QFEnhancedComboBox(wizMicroscopy);
-    cmbMicroscopy->addItem(tr("camera with rectangular pixels / lightsheet microscopy (SPIM/LSFM/...)"), 0);
+    cmbMicroscopy->addItem(tr("camera with rectangular pixels / lightsheet microscopy (SPIM/LSFM)"), 0);
     cmbMicroscopy->addItem(tr("camera with rectangular pixels / TIRF microscopy"), 1);
-    cmbMicroscopy->addItem(tr("camera with rectangular pixels / other microscopy"), 2);
-    cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / lightsheet microscopy (SPIM/LSFM/...)"),3);
-    cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / TIRF microscopyl"),4);
-    cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / other microscopy"),5);
+    //cmbMicroscopy->addItem(tr("camera with rectangular pixels / other microscopy"), 2);
+    cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / lightsheet microscopy (SPIM/LSFM/other)"),3);
+    //cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / TIRF microscopyl"),4);
+    //cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / other microscopy"),5);
     cmbMicroscopy->setCurrentFromModelData(ProgramOptions::getConfigValue("imaging_fcs/wizard/microscopy", 0).toInt());
     wizMicroscopy->addRow(tr("&Microscopy Technique:"), cmbMicroscopy);
     labMicroscopy=new QLabel(this);
@@ -330,6 +330,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     spinBinning->setRange(1,100);
     spinBinning->setValue(1);
     spinBinning->setSuffix(tr(" pixels"));
+    spinBinning->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/binning", 1).toInt());
     labBinning=new QLabel(wizCropAndBin);
     labBinning->setWordWrap(true);
     wizCropAndBin->addRow(tr("pixel-binning:"), spinBinning);
@@ -344,6 +345,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
 
     setPage(CorrelationPage, wizCorrelation=new QFFormWizardPage(tr("Setup Correlation ..."), this));
+    connect(wizCorrelation, SIGNAL(onValidate(QWizardPage*)), this, SLOT(validateCorrelation()));
     wizCropAndBin->setNextID(CorrelationPage);
     chkACF=new QCheckBox(wizCorrelation);
     chkACF->setChecked(true);
@@ -352,37 +354,39 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     chk2ColorFCCS->setChecked(false);
     wizCorrelation->addRow(tr("calculate 2-color FCCS:"), chk2ColorFCCS);
     cmb2PixelFCCS=new QComboBox(wizCorrelation);
-    cmb2PixelFCCS->addItem(tr("none"));
-    cmb2PixelFCCS->addItem(tr("4 direct neighbors"));
-    cmb2PixelFCCS->addItem(tr("8 direct neighbors"));
-    cmb2PixelFCCS->addItem(tr("right neighbor (dx=1)"));
-    cmb2PixelFCCS->addItem(tr("left neighbor (dx=-1)"));
-    cmb2PixelFCCS->addItem(tr("top neighbor (dy=1)"));
-    cmb2PixelFCCS->addItem(tr("bottom neighbor (dy=-1)"));
-    cmb2PixelFCCS->addItem(tr("2 right neighbors (dx=1..2)"));
-    cmb2PixelFCCS->addItem(tr("2 left neighbors (dx=-1..-2)"));
-    cmb2PixelFCCS->addItem(tr("2 top neighbors (dy=1..2)"));
-    cmb2PixelFCCS->addItem(tr("2 bottom neighbors (dy=-1..-2)"));
-    cmb2PixelFCCS->addItem(tr("5 right neighbors (dx=1..5)"));
-    cmb2PixelFCCS->addItem(tr("5 left neighbors (dx=-1..-5)"));
-    cmb2PixelFCCS->addItem(tr("5 top neighbors (dy=1..5)"));
-    cmb2PixelFCCS->addItem(tr("5 bottom neighbors (dy=-1..-5)"));
-    cmb2PixelFCCS->addItem(tr("10 right neighbors (dx=1..10)"));
-    cmb2PixelFCCS->addItem(tr("10 left neighbors (dx=-1..-10)"));
-    cmb2PixelFCCS->addItem(tr("10 top neighbors (dy=1..10)"));
-    cmb2PixelFCCS->addItem(tr("10 bottom neighbors (dy=-1..-10)"));
+    cmb2PixelFCCS->addItem(tr("none"),0);
+    cmb2PixelFCCS->addItem(tr("4 direct neighbors"), 4); // user data is number of CCFs
+    cmb2PixelFCCS->addItem(tr("8 direct neighbors"), 8);
+    cmb2PixelFCCS->addItem(tr("right neighbor (dx=1)"), 1);
+    cmb2PixelFCCS->addItem(tr("left neighbor (dx=-1)"), 1);
+    cmb2PixelFCCS->addItem(tr("top neighbor (dy=1)"), 1);
+    cmb2PixelFCCS->addItem(tr("bottom neighbor (dy=-1)"), 1);
+    cmb2PixelFCCS->addItem(tr("2 right neighbors (dx=1..2)"), 2);
+    cmb2PixelFCCS->addItem(tr("2 left neighbors (dx=-1..-2)"),2);
+    cmb2PixelFCCS->addItem(tr("2 top neighbors (dy=1..2)"),2);
+    cmb2PixelFCCS->addItem(tr("2 bottom neighbors (dy=-1..-2)"), 2);
+    cmb2PixelFCCS->addItem(tr("5 right neighbors (dx=1..5)"), 5);
+    cmb2PixelFCCS->addItem(tr("5 left neighbors (dx=-1..-5)"),5);
+    cmb2PixelFCCS->addItem(tr("5 top neighbors (dy=1..5)"),5);
+    cmb2PixelFCCS->addItem(tr("5 bottom neighbors (dy=-1..-5)"),5);
+    cmb2PixelFCCS->addItem(tr("10 right neighbors (dx=1..10)"),10);
+    cmb2PixelFCCS->addItem(tr("10 left neighbors (dx=-1..-10)"),10);
+    cmb2PixelFCCS->addItem(tr("10 top neighbors (dy=1..10)"),10);
+    cmb2PixelFCCS->addItem(tr("10 bottom neighbors (dy=-1..-10)"),10);
     cmb2PixelFCCS->setCurrentIndex(0);
     wizCorrelation->addRow(tr("calculate 2-pixel FCCS:"), cmb2PixelFCCS);
     spinTauMax=new QDoubleSpinBox(wizCorrelation);
     spinTauMax->setDecimals(3);
     spinTauMax->setRange(0.001,1000000);
     spinTauMax->setValue(10);
+    spinTauMax->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/taumax", 10).toInt());
     spinTauMax->setSuffix(tr(" s"));
     wizCorrelation->addRow(tr("max. lag-time in correlations:"), spinTauMax);
     spinSegments=new QSpinBox(wizCorrelation);
     spinSegments->setRange(1,100);
     spinSegments->setValue(5);
     spinSegments->setSpecialValueText(tr("1 (use blocking for error estimate)"));
+    spinSegments->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/segments", 5).toInt());
     connect(spinSegments, SIGNAL(valueChanged(int)), this, SLOT(correlationValuesChanged()));
     connect(spinTauMax, SIGNAL(valueChanged(double)), this, SLOT(correlationValuesChanged()));
     wizCorrelation->addRow(tr("number of correlated segments:"), spinSegments);
@@ -410,6 +414,8 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
     setPage(LastPage, wizFinalizePage=new QFFormWizardPage(tr("Finalize"), this));
     //connect(wizFinalizePage, SIGNAL())
+    connect(wizFinalizePage, SIGNAL(onInitialize(QWizardPage*)), this, SLOT(validateCorrelation()));
+
     labFinal=new QLabel(this);
     labFinal->setWordWrap(true);
     wizFinalizePage->addRow(labFinal);
@@ -429,7 +435,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
         cmbIm2cFCCSFitMode->addItem(tr("normal diffusion 1-component"));
         cmbIm2cFCCSFitMode->addItem(tr("normal diffusion 2-component"));
         cmbIm2cFCCSFitMode->addItem(tr("anomalous diffusion"));
-        cmbIm2cFCCSFitMode->setEnabled(true);
+        cmbIm2cFCCSFitMode->setEnabled(false);
 
         chkLastImFCSFit1=new QCheckBox(tr("single-curve FCS fit:"), this);
         chkLastImFCSFit1->setChecked(true);
@@ -444,7 +450,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
         chkLastIm2fFCCSFit=new QCheckBox(tr("global FCCS fit 2-pixel FCCS"), this);
         chkLastIm2fFCCSFit->setChecked(false);
         chkLastIm2fFCCSFit->setEnabled(false);
-        wizFinalizePage->addRow(chkLastIm2fFCCSFit, NULL);
+        wizFinalizePage->addRow((QWidget*)(chkLastIm2fFCCSFit.data()), (QWidget*)NULL);
         wizFinalizePage->addRow(QString(), tr("<u>Note:</u> This wizard will try to pre-configure the fit evaluation items in the project to meet your settings. In seldom cases, this will not be possible, so please check the fit model configuration before performing any fits.<br>Also you may wish to use differently configured models. In that case you can also reconfigure the presets before starting the fits!<br><br>"
                                               "After finishing this wizard, it will load all records into the project and (possibly) add several fit evaluation objects. After this you are set to perform fits and evaluate their results. There are two major dialogs that you can use for this:<ol>"
                                               "<li>The <b>imagingFCS RDR editor</b> can be reached by double-clicking any raw data record (RDR) in the project. On the second tab (\"Parameter Image\") of this dialog, you will find the parameter images (after the fits) and tools to evaluate them statistically and also to e.g. mask the image.</li>"
@@ -460,6 +466,9 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
                                           "The wizard will now insert the correlation result into the current project and start the imFCS calibration wizard. In this wizard, you will have to follow the proposed steps (buttons on left hand side of the next wizard), which will finally give you an estimate of the lateral PSF-size.<br><br>"
                                           "<center><img src=\":/imaging_fcs/imfcscalib.png\"></center>"));
     wizFinalizePageCalibration->setFinalPage(true);
+
+    wizFinalizePage->setNextID(-1);
+    wizFinalizePage->setFinalPage(true);
 
 }
 
@@ -550,80 +559,96 @@ void QFRDRImagingFCSWizard::finalizeAndModifyProject(bool projectwizard, QFRDRIm
                     } else if (cmbMicroscopy->currentData().toInt()==4 && cmbImFCSFitMode->currentIndex()==3) { // normal+flow
                         e->setQFProperty("PRESET_FIT_MODEL", "fcs_tir_diff_flowe2", false, false);
 
+                    }
                 }
             }
-        }
-        if (chkLastIm2cFCCSFit && chkLastIm2cFCCSFit->isChecked() && chk2ColorFCCS->isChecked()) {
-            QFEvaluationItem* e=project->addEvaluation("imfccs_fit", tr("Global 2-color Imaging FCCS fit"));
+            if (chkLastIm2cFCCSFit && chkLastIm2cFCCSFit->isChecked() && chk2ColorFCCS->isChecked()) {
+                QFEvaluationItem* e=project->addEvaluation("imfccs_fit", tr("Global 2-color Imaging FCCS fit"));
 
-            if (e) {
-                e->setQFProperty("FIT_REPEATS", 2, false, false);
-                e->setQFProperty("PRESET_FOCUS_HEIGHT", spinWz->value(), false, false);
-                e->setQFProperty("PRESET_FOCUS_HEIGHT_ERROR", 0, false, false);
-                e->setQFProperty("PRESET_FOCUS_WIDTH", spinWxy->value(), false, false);
-                e->setQFProperty("PRESET_N_COMPONENTS", 1, false, false);
-                e->setQFProperty("PRESET_FOCUS_WIDTH_ERROR", 0, false, false);
-                if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-SPIM-FCCS/NORMAL_1DPERSPECIES", false, false);
-                } else if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-SPIM-FCCS/NORMAL_2DPERCHANNEL", false, false);
-                } else if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-SPIM-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
-
-
-                } else if (cmbMicroscopy->currentData().toInt()==1 && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-TIR-FCCS/NORMAL_1DPERSPECIES", false, false);
-                } else if (cmbMicroscopy->currentData().toInt()==1 && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-TIR-FCCS/NORMAL_2DPERCHANNEL", false, false);
-                } else if (cmbMicroscopy->currentData().toInt()==1 && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-TIR-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
+                if (e) {
+                    e->setQFProperty("FIT_REPEATS", 2, false, false);
+                    e->setQFProperty("PRESET_FOCUS_HEIGHT", spinWz->value(), false, false);
+                    e->setQFProperty("PRESET_FOCUS_HEIGHT_ERROR", 0, false, false);
+                    e->setQFProperty("PRESET_FOCUS_WIDTH", spinWxy->value(), false, false);
+                    e->setQFProperty("PRESET_N_COMPONENTS", 1, false, false);
+                    e->setQFProperty("PRESET_FOCUS_WIDTH_ERROR", 0, false, false);
+                    if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-SPIM-FCCS/NORMAL_1DPERSPECIES", false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-SPIM-FCCS/NORMAL_2DPERCHANNEL", false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-SPIM-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
 
 
-                } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_1DPERSPECIES", false, false);
-                } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_2DPERCHANNEL", false, false);
-                } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==1 && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-TIR-FCCS/NORMAL_1DPERSPECIES", false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==1 && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-TIR-FCCS/NORMAL_2DPERCHANNEL", false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==1 && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-TIR-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
 
 
-                } else if (cmbMicroscopy->currentData().toInt()==4 && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_1DPERSPECIES", false, false);
-                    e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
-                } else if (cmbMicroscopy->currentData().toInt()==4 && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_2DPERCHANNEL", false, false);
-                    e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
-                } else if (cmbMicroscopy->currentData().toInt()==4 && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
-                    e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_1DPERSPECIES", false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_2DPERCHANNEL", false, false);
+                    } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5)) && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
+
+
+                    } else if (cmbMicroscopy->currentData().toInt()==4 && cmbIm2cFCCSFitMode->currentIndex()==0) { // 1-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_1DPERSPECIES", false, false);
+                        e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==4 && cmbIm2cFCCSFitMode->currentIndex()==1) { // 2-comp, normal
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/NORMAL_2DPERCHANNEL", false, false);
+                        e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                    } else if (cmbMicroscopy->currentData().toInt()==4 && cmbIm2cFCCSFitMode->currentIndex()==2) { // anomalous
+                        e->setQFProperty("PRESET_FIT_MODEL", "2-COLOR-CONFOCAL-FCCS/ANOMALOUS_1DPERSPECIES", false, false);
+                        e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                    }
                 }
             }
-        }
-        if (chkLastIm2fFCCSFit && chkLastIm2fFCCSFit->isChecked() && cmb2PixelFCCS->currentIndex()>0) {
-            QFEvaluationItem* e=project->addEvaluation("imfccs_fit", tr("Global 2-pixel Imaging FCCS fit"));
+            if (chkLastIm2fFCCSFit && chkLastIm2fFCCSFit->isChecked() && cmb2PixelFCCS->currentIndex()>0) {
+                QFEvaluationItem* e=project->addEvaluation("imfccs_fit", tr("Global 2-pixel Imaging FCCS fit"));
 
-            if (e) {
-                e->setQFProperty("FIT_REPEATS", 2, false, false);
-                e->setQFProperty("PRESET_FOCUS_HEIGHT", spinWz->value(), false, false);
-                e->setQFProperty("PRESET_FOCUS_HEIGHT_ERROR", 0, false, false);
-                e->setQFProperty("PRESET_FOCUS_WIDTH", spinWxy->value(), false, false);
-                e->setQFProperty("PRESET_N_COMPONENTS", 1, false, false);
-                e->setQFProperty("PRESET_FOCUS_WIDTH_ERROR", 0, false, false);
-                if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) ) { // anomalous
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-PIXEL-SPIM-FCCS/NORMAL_FLOW", false, false);
+                if (e) {
+                    e->setQFProperty("FIT_REPEATS", 2, false, false);
+                    e->setQFProperty("PRESET_FOCUS_HEIGHT", spinWz->value(), false, false);
+                    e->setQFProperty("PRESET_FOCUS_HEIGHT_ERROR", 0, false, false);
+                    e->setQFProperty("PRESET_FOCUS_WIDTH", spinWxy->value(), false, false);
+                    e->setQFProperty("PRESET_N_COMPONENTS", 1, false, false);
+                    e->setQFProperty("PRESET_FOCUS_WIDTH_ERROR", 0, false, false);
+                    QString acfmodel="";
+                    QString ccfmodel="";
+                    int Nccf=cmb2PixelFCCS->currentData().toInt();
+                    QStringList globalparams;
+                    if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) ) { // anomalous
+                        acfmodel=ccfmodel="fccs_spim_diffflowce2";
+                        globalparams<<"n_particle"<<"diff_coeff1"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
+                    } else if (cmbMicroscopy->currentData().toInt()==1 ) { // 1-comp, normal
+                        acfmodel=ccfmodel="fccs_tir_diff_flowe2";
+                        globalparams<<"n_particle"<<"diff_coeff1"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
+                    } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5))) { // anomalous
+                        acfmodel=ccfmodel="fccs_2f_diff3dflow";
+                        globalparams<<"n_particle"<<"diff_coeff1"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
+                    } else if (cmbMicroscopy->currentData().toInt()==4 ) { // 1-comp, normal
+                        acfmodel=ccfmodel="fccs_2f_diff2dflow";
+                        e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                        globalparams<<"n_particle"<<"diff_coeff1"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
+                    }
 
 
-                } else if (cmbMicroscopy->currentData().toInt()==1 ) { // 1-comp, normal
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-PIXEL-TIR-FCCS/NORMAL+FLOW", false, false);
 
 
-                } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5))) { // anomalous
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-PIXEL-CONFOCAL-FCCS/NORMAL+FLOW", false, false);
+                    if (!acfmodel.isEmpty()) {
+                        e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListFromItems(acfmodel, constructQStringListWithMultipleItems(ccfmodel, Nccf)).join(';'), false, false);
+                        e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListFromItems("acf", constructQStringListWithMultipleItems("dccf", Nccf)).join(';'), false, false);
+                    } else {
+                        e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListWithMultipleItems(ccfmodel, Nccf).join(';'), false, false);
+                        e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListWithMultipleItems("dccf", Nccf).join(';'), false, false);
+                    }
+                    e->setQFProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST", globalparams.join(';'), false, false);
 
-
-                } else if (cmbMicroscopy->currentData().toInt()==4 ) { // 1-comp, normal
-                    e->setQFProperty("PRESET_FIT_MODEL", "2-PIXEL-CONFOCAL-FCCS/NORMAL2D+FLOW", false, false);
-                    e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
                 }
             }
         }
@@ -696,11 +721,11 @@ void QFRDRImagingFCSWizard::finishedIntro()
     //qDebug()<<"finishedIntro";
     ProgramOptions::setConfigValue("imaging_fcs/wizard/wizardmethod", wizIntro->getChecked());
     isCalibration=wizIntro->isChecked(1);
-    spinWxy->setVisible(!isCalibration);
+    spinWxy->setEnabled(!isCalibration);
     labWxy->setVisible(!isCalibration);
     QWidget* lab=NULL;
     if ((lab=wizMicroscopy->getFormLayout()->labelForField(spinWxy))) {
-        lab->setVisible(spinWxy->isVisible());
+        lab->setEnabled(spinWxy->isVisible());
     }
 }
 
@@ -837,6 +862,7 @@ void QFRDRImagingFCSWizard::calibrationCropValuesChanged()
 
 void QFRDRImagingFCSWizard::cropRegionChanged(int region)
 {
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/binning", spinBinning->value());
     //qDebug()<<"cropRegionChanged";
     spinCropCenterSize->setEnabled(false);
     widCrop->setEnabled(false);
@@ -964,8 +990,10 @@ void QFRDRImagingFCSWizard::microscopyChoosen()
 
     bool reallyIsCalib=wizIntro->isChecked(1) && this->isCalibration;
     if (reallyIsCalib && cmbMicroscopy->currentData().toInt()>=3) {
-        msg+=tr("<br><center><b><u>Warning:</u> The microscopy technique you chose is not based on a pixelated detector. Therefore it cannot be used for imaging FCS calibration.</b> QuickFit uses a calibration method that stepwise increases the camera pixel binning to decouple the optical PSF-parameters (which are calibrated) from the focal volume size.</center>");
+        msg+=tr("<br><center><b><u>Warning:</u> The microscopy technique you chose is not based on a pixelated detector. Therefore it cannot be used for imaging FCS calibration.</b> QuickFit uses a calibration method that stepwise increases the camera pixel binning to decouple the optical PSF-parameters (which are calibrated) from the focal volume size.</center><br>");
     }
+
+    msg+=QString("<center><img src=\":/imaging_fcs/wizmicroscopy%1.png\"></center>").arg(cmbMicroscopy->currentData().toInt());
 
     spinWxy->setEnabled(!reallyIsCalib);
     labWxy->setVisible(!reallyIsCalib);
@@ -992,6 +1020,7 @@ void QFRDRImagingFCSWizard::cropSetupFinished()
 
 void QFRDRImagingFCSWizard::correlationValuesChanged()
 {
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/segments", spinSegments->value());
     //qDebug()<<"correlationValuesChanged";
     labSegments->setText(tr("=> segment length %1 s").arg(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/double(spinSegments->value())));
 }
@@ -1002,9 +1031,16 @@ void QFRDRImagingFCSWizard::calibrationValuesChanged()
     labSegments->setText(tr("=> segment length %1 s").arg(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/double(spinCalibSegments->value())));
 }
 
+void QFRDRImagingFCSWizard::validateCorrelation()
+{
+    chkLastImFCSFit1->setEnabled(true);
+    chkLastIm2cFCCSFit->setEnabled(chk2ColorFCCS->isChecked());
+    chkLastIm2fFCCSFit->setEnabled(cmb2PixelFCCS->currentIndex()>0);
+}
+
 void QFRDRImagingFCSWizard::startProcessingJobs()
 {
-
+    validateCorrelation();
     IMFCSJob basicjob;
     basicjob.filename=edtFilename->text();
     basicjob.filenameBackground=edtBackgroundFilename->text();
@@ -1082,82 +1118,148 @@ void QFRDRImagingFCSWizard::startProcessingJobs()
             basicjob.crop_y1=widCrop->getY2();
         }
         if (chkACF->isChecked()) {
-            IMFCSJob jobacf=basicjob;
-            jobacf.acf=true;
-            widProcess->addJob(jobacf);
+            //IMFCSJob jobacf=basicjob;
+            //jobacf.acf=true;
+            //widProcess->addJob(jobacf);
+            basicjob.acf=true;
         }
         if (chk2ColorFCCS->isChecked() && cmbDualView->currentData().toInt()>0) {
-            IMFCSJob jobfccs=basicjob;
-            jobfccs.distanceCCF=true;
+//            IMFCSJob jobfccs=basicjob;
+//            jobfccs.distanceCCF=true;
+//            if (cmbDualView->currentIndex()==DUALVIEW_HORICONTAL) {
+//                jobfccs.DCCFDeltaX << image_width_io/2/jobfccs.binning;
+//                jobfccs.DCCFDeltaY << 0;
+//                jobfccs.DCCFrole<<QString("FCCS");
+//                jobfccs.distanceCCF=true;
+//            } else if (cmbDualView->currentIndex()==DUALVIEW_VERTICAL) {
+//                jobfccs.DCCFDeltaX << 0;
+//                jobfccs.DCCFDeltaY << image_height_io/2/jobfccs.binning;
+//                jobfccs.DCCFrole<<QString("FCCS");
+//                jobfccs.distanceCCF=true;
+//            }
+//            widProcess->addJob(jobfccs);
+            basicjob.distanceCCF=true;
             if (cmbDualView->currentIndex()==DUALVIEW_HORICONTAL) {
-                jobfccs.DCCFDeltaX << image_width_io/2/jobfccs.binning;
-                jobfccs.DCCFDeltaY << 0;
-                jobfccs.DCCFrole<<QString("FCCS");
-                jobfccs.distanceCCF=true;
+                basicjob.DCCFDeltaX << image_width_io/2/basicjob.binning;
+                basicjob.DCCFDeltaY << 0;
+                basicjob.DCCFrole<<QString("FCCS");
+                basicjob.distanceCCF=true;
             } else if (cmbDualView->currentIndex()==DUALVIEW_VERTICAL) {
-                jobfccs.DCCFDeltaX << 0;
-                jobfccs.DCCFDeltaY << image_height_io/2/jobfccs.binning;
-                jobfccs.DCCFrole<<QString("FCCS");
-                jobfccs.distanceCCF=true;
+                basicjob.DCCFDeltaX << 0;
+                basicjob.DCCFDeltaY << image_height_io/2/basicjob.binning;
+                basicjob.DCCFrole<<QString("FCCS");
+                basicjob.distanceCCF=true;
             }
-            widProcess->addJob(jobfccs);
         }
         if (cmb2PixelFCCS->currentIndex()>0) {
-            IMFCSJob jobdccf=basicjob;
-            jobdccf.distanceCCF=true;
+//            IMFCSJob jobdccf=basicjob;
+//            jobdccf.distanceCCF=true;
+//            if (cmb2PixelFCCS->currentIndex()==1) {
+//                jobdccf.addDCCF(-1,0);
+//                jobdccf.addDCCF(1,0);
+//                jobdccf.addDCCF(0,-1);
+//                jobdccf.addDCCF(0,1);
+//            } else if (cmb2PixelFCCS->currentIndex()==2) {
+//                jobdccf.addDCCF(-1,0);
+//                jobdccf.addDCCF(1,0);
+//                jobdccf.addDCCF(0,-1);
+//                jobdccf.addDCCF(0,1);
+//                jobdccf.addDCCF(-1,-1);
+//                jobdccf.addDCCF(-1,1);
+//                jobdccf.addDCCF(1,-1);
+//                jobdccf.addDCCF(1,1);
+//            } else if (cmb2PixelFCCS->currentIndex()==3) {
+//                jobdccf.addDCCF(1,0);
+//            } else if (cmb2PixelFCCS->currentIndex()==4) {
+//                jobdccf.addDCCF(-1,0);
+//            } else if (cmb2PixelFCCS->currentIndex()==5) {
+//                jobdccf.addDCCF(0,1);
+//            } else if (cmb2PixelFCCS->currentIndex()==6) {
+//                jobdccf.addDCCF(0,-1);
+//            } else if (cmb2PixelFCCS->currentIndex()==7) {
+//                jobdccf.addDCCF(1,0);
+//                jobdccf.addDCCF(2,0);
+//            } else if (cmb2PixelFCCS->currentIndex()==8) {
+//                jobdccf.addDCCF(-1,0);
+//                jobdccf.addDCCF(-2,0);
+//            } else if (cmb2PixelFCCS->currentIndex()==9) {
+//                jobdccf.addDCCF(0,1);
+//                jobdccf.addDCCF(0,2);
+//            } else if (cmb2PixelFCCS->currentIndex()==10) {
+//                jobdccf.addDCCF(0,-1);
+//                jobdccf.addDCCF(0,-2);
+//            } else if (cmb2PixelFCCS->currentIndex()==11) {
+//                for (int d=1; d<=5; d++) jobdccf.addDCCF(d,0);
+//            } else if (cmb2PixelFCCS->currentIndex()==12) {
+//                for (int d=1; d<=5; d++) jobdccf.addDCCF(-d,0);
+//            } else if (cmb2PixelFCCS->currentIndex()==13) {
+//                for (int d=1; d<=5; d++) jobdccf.addDCCF(0,d);
+//            } else if (cmb2PixelFCCS->currentIndex()==14) {
+//                for (int d=1; d<=5; d++) jobdccf.addDCCF(0,-d);
+//            } else if (cmb2PixelFCCS->currentIndex()==15) {
+//                for (int d=1; d<=10; d++) jobdccf.addDCCF(d,0);
+//            } else if (cmb2PixelFCCS->currentIndex()==16) {
+//                for (int d=1; d<=10; d++) jobdccf.addDCCF(-d,0);
+//            } else if (cmb2PixelFCCS->currentIndex()==17) {
+//                for (int d=1; d<=10; d++) jobdccf.addDCCF(0,d);
+//            } else if (cmb2PixelFCCS->currentIndex()==18) {
+//                for (int d=1; d<=10; d++) jobdccf.addDCCF(0,-d);
+//            }
+//            widProcess->addJob(jobdccf);
+            basicjob.distanceCCF=true;
             if (cmb2PixelFCCS->currentIndex()==1) {
-                jobdccf.addDCCF(-1,0);
-                jobdccf.addDCCF(1,0);
-                jobdccf.addDCCF(0,-1);
-                jobdccf.addDCCF(0,1);
+                basicjob.addDCCF(-1,0);
+                basicjob.addDCCF(1,0);
+                basicjob.addDCCF(0,-1);
+                basicjob.addDCCF(0,1);
             } else if (cmb2PixelFCCS->currentIndex()==2) {
-                jobdccf.addDCCF(-1,0);
-                jobdccf.addDCCF(1,0);
-                jobdccf.addDCCF(0,-1);
-                jobdccf.addDCCF(0,1);
-                jobdccf.addDCCF(-1,-1);
-                jobdccf.addDCCF(-1,1);
-                jobdccf.addDCCF(1,-1);
-                jobdccf.addDCCF(1,1);
+                basicjob.addDCCF(-1,0);
+                basicjob.addDCCF(1,0);
+                basicjob.addDCCF(0,-1);
+                basicjob.addDCCF(0,1);
+                basicjob.addDCCF(-1,-1);
+                basicjob.addDCCF(-1,1);
+                basicjob.addDCCF(1,-1);
+                basicjob.addDCCF(1,1);
             } else if (cmb2PixelFCCS->currentIndex()==3) {
-                jobdccf.addDCCF(1,0);
+                basicjob.addDCCF(1,0);
             } else if (cmb2PixelFCCS->currentIndex()==4) {
-                jobdccf.addDCCF(-1,0);
+                basicjob.addDCCF(-1,0);
             } else if (cmb2PixelFCCS->currentIndex()==5) {
-                jobdccf.addDCCF(0,1);
+                basicjob.addDCCF(0,1);
             } else if (cmb2PixelFCCS->currentIndex()==6) {
-                jobdccf.addDCCF(0,-1);
+                basicjob.addDCCF(0,-1);
             } else if (cmb2PixelFCCS->currentIndex()==7) {
-                jobdccf.addDCCF(1,0);
-                jobdccf.addDCCF(2,0);
+                basicjob.addDCCF(1,0);
+                basicjob.addDCCF(2,0);
             } else if (cmb2PixelFCCS->currentIndex()==8) {
-                jobdccf.addDCCF(-1,0);
-                jobdccf.addDCCF(-2,0);
+                basicjob.addDCCF(-1,0);
+                basicjob.addDCCF(-2,0);
             } else if (cmb2PixelFCCS->currentIndex()==9) {
-                jobdccf.addDCCF(0,1);
-                jobdccf.addDCCF(0,2);
+                basicjob.addDCCF(0,1);
+                basicjob.addDCCF(0,2);
             } else if (cmb2PixelFCCS->currentIndex()==10) {
-                jobdccf.addDCCF(0,-1);
-                jobdccf.addDCCF(0,-2);
+                basicjob.addDCCF(0,-1);
+                basicjob.addDCCF(0,-2);
             } else if (cmb2PixelFCCS->currentIndex()==11) {
-                for (int d=1; d<=5; d++) jobdccf.addDCCF(d,0);
+                for (int d=1; d<=5; d++) basicjob.addDCCF(d,0);
             } else if (cmb2PixelFCCS->currentIndex()==12) {
-                for (int d=1; d<=5; d++) jobdccf.addDCCF(-d,0);
+                for (int d=1; d<=5; d++) basicjob.addDCCF(-d,0);
             } else if (cmb2PixelFCCS->currentIndex()==13) {
-                for (int d=1; d<=5; d++) jobdccf.addDCCF(0,d);
+                for (int d=1; d<=5; d++) basicjob.addDCCF(0,d);
             } else if (cmb2PixelFCCS->currentIndex()==14) {
-                for (int d=1; d<=5; d++) jobdccf.addDCCF(0,-d);
+                for (int d=1; d<=5; d++) basicjob.addDCCF(0,-d);
             } else if (cmb2PixelFCCS->currentIndex()==15) {
-                for (int d=1; d<=10; d++) jobdccf.addDCCF(d,0);
+                for (int d=1; d<=10; d++) basicjob.addDCCF(d,0);
             } else if (cmb2PixelFCCS->currentIndex()==16) {
-                for (int d=1; d<=10; d++) jobdccf.addDCCF(-d,0);
+                for (int d=1; d<=10; d++) basicjob.addDCCF(-d,0);
             } else if (cmb2PixelFCCS->currentIndex()==17) {
-                for (int d=1; d<=10; d++) jobdccf.addDCCF(0,d);
+                for (int d=1; d<=10; d++) basicjob.addDCCF(0,d);
             } else if (cmb2PixelFCCS->currentIndex()==18) {
-                for (int d=1; d<=10; d++) jobdccf.addDCCF(0,-d);
+                for (int d=1; d<=10; d++) basicjob.addDCCF(0,-d);
             }
-            widProcess->addJob(jobdccf);
         }
+        widProcess->addJob(basicjob);
     }
 
 

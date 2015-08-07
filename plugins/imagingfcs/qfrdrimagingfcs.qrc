@@ -16,6 +16,9 @@
         <file alias="imaging_fcs/dualview_fccs.png">icons/dualview_fccs.png</file>
         <file alias="imaging_fcs/microscope.png">icons/microscope.png</file>
         <file alias="imaging_fcs/imfcscalib.png">icons/imfcscalib.png</file>
+        <file alias="imaging_fcs/wizmicroscopy0.png">icons/wizmicroscopy0.png</file>
+        <file alias="imaging_fcs/wizmicroscopy1.png">icons/wizmicroscopy1.png</file>
+        <file alias="imaging_fcs/wizmicroscopy3.png">icons/wizmicroscopy3.png</file>
     </qresource>
     <qresource prefix="/imaging_fcs">
         <file alias="abs.png">icons/abs.png</file>
