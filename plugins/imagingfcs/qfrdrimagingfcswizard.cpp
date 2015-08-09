@@ -317,7 +317,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     cmbCropRegion->addItem(tr("bottom center (around y = 3*h/4)"));
     cmbCropRegion->addItem(tr("user-defined crop"));
     cmbCropRegion->setCurrentIndex(0);
-    wizCropAndBin->addRow(tr("calibration region:"), cmbCropRegion);
+    wizCropAndBin->addRow(tr("crop region:"), cmbCropRegion);
     cmbCropRegion->setCurrentIndex(ProgramOptions::getConfigValue("imaging_fcs/wizard/crop_region", 0).toInt());
     spinCropCenterSize=new QSpinBox(wizCropAndBin);
     wizCropAndBin->addRow(tr("\"center\" region size:"), spinCropCenterSize);
@@ -374,6 +374,11 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     cmb2PixelFCCS->addItem(tr("10 top neighbors (dy=1..10)"),10);
     cmb2PixelFCCS->addItem(tr("10 bottom neighbors (dy=-1..-10)"),10);
     cmb2PixelFCCS->setCurrentIndex(0);
+    cmb2PixelFCCS->setCurrentIndex(ProgramOptions::getConfigValue("imaging_fcs/wizard/2pixelfccs", 0).toInt());
+    chk2ColorFCCS->setChecked(ProgramOptions::getConfigValue("imaging_fcs/wizard/2colorfccs", false).toBool());
+    chkACF->setChecked(ProgramOptions::getConfigValue("imaging_fcs/wizard/acf", true).toBool());
+
+
     wizCorrelation->addRow(tr("calculate 2-pixel FCCS:"), cmb2PixelFCCS);
     spinTauMax=new QDoubleSpinBox(wizCorrelation);
     spinTauMax->setDecimals(3);
@@ -389,6 +394,9 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     spinSegments->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/segments", 5).toInt());
     connect(spinSegments, SIGNAL(valueChanged(int)), this, SLOT(correlationValuesChanged()));
     connect(spinTauMax, SIGNAL(valueChanged(double)), this, SLOT(correlationValuesChanged()));
+    connect(cmb2PixelFCCS, SIGNAL(currentIndexChanged(int)), this, SLOT(correlationValuesChanged()));
+    connect(chk2ColorFCCS, SIGNAL(toggled(bool)), this, SLOT(correlationValuesChanged()));
+    connect(chkACF, SIGNAL(toggled(bool)), this, SLOT(correlationValuesChanged()));
     wizCorrelation->addRow(tr("number of correlated segments:"), spinSegments);
     labSegments=new QLabel(wizCorrelation);
     labSegments->setWordWrap(true);
@@ -562,9 +570,10 @@ void QFRDRImagingFCSWizard::finalizeAndModifyProject(bool projectwizard, QFRDRIm
                     }
                 }
             }
+            qDebug()<<chkLastIm2cFCCSFit << chkLastIm2cFCCSFit->isChecked() << chk2ColorFCCS->isChecked();
             if (chkLastIm2cFCCSFit && chkLastIm2cFCCSFit->isChecked() && chk2ColorFCCS->isChecked()) {
                 QFEvaluationItem* e=project->addEvaluation("imfccs_fit", tr("Global 2-color Imaging FCCS fit"));
-
+                qDebug()<<" adding 2-color FCCS fit "<<e;
                 if (e) {
                     e->setQFProperty("FIT_REPEATS", 2, false, false);
                     e->setQFProperty("PRESET_FOCUS_HEIGHT", spinWz->value(), false, false);
@@ -700,6 +709,7 @@ void QFRDRImagingFCSWizard::finishedImageProps()
     if (cmbDualView->currentIndex()>0) {
         chk2ColorFCCS->setChecked(true);
         chk2ColorFCCS->setText("");
+        cmb2PixelFCCS->setCurrentIndex(0);
     } else {
         chk2ColorFCCS->setText("unavailable: you did not select a DualView mode on the previous pages!");
     }
@@ -965,6 +975,7 @@ void QFRDRImagingFCSWizard::cropValuesChanged()
 {
     //qDebug()<<"cropValuesChanged";
     cropRegionChanged(cmbCropRegion->currentIndex());
+    wizCropAndBin->setBinning(spinBinning->value());
 }
 
 void QFRDRImagingFCSWizard::microscopyChoosen()
@@ -1021,6 +1032,11 @@ void QFRDRImagingFCSWizard::cropSetupFinished()
 void QFRDRImagingFCSWizard::correlationValuesChanged()
 {
     ProgramOptions::setConfigValue("imaging_fcs/wizard/segments", spinSegments->value());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/2pixelfccs", cmb2PixelFCCS->currentIndex());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/2colorfccs", chk2ColorFCCS->isChecked());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/taumax", spinTauMax->value());
+    ProgramOptions::setConfigValue("imaging_fcs/wizard/acf", chkACF->isChecked());
+
     //qDebug()<<"correlationValuesChanged";
     labSegments->setText(tr("=> segment length %1 s").arg(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/double(spinSegments->value())));
 }

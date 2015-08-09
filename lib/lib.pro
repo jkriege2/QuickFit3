@@ -271,7 +271,6 @@ SOURCES += dlgnewproperty.cpp \
     qfmathparsertools.cpp \
     qfmathparserdefaultlib.cpp \
     qfevaluationpropertyeditorprivate.cpp \
-    imagetools.cpp \
     qfenhancedtabwidget.cpp \
     qfenhancedcombobox.cpp \
     qffitalgorithmparameterstorage.cpp \
