@@ -4696,7 +4696,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     rxMeta.setMinimal(false);
     int count = 0;
     int pos = 0;
-    while ((pos = rxMeta.indexIn(result, pos)) != -1) {
+    while ((pos = rxMeta.indexIn(result, pos)) != -1 && count<1000) {
 
         QString name=rxMeta.cap(2);
         QString content=rxMeta.cap(1);
@@ -4716,7 +4716,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     rxLink.setMinimal(false);
     count = 0;
     pos = 0;
-    while ((pos = rxLink.indexIn(result, pos)) != -1) {
+    while ((pos = rxLink.indexIn(result, pos)) != -1 && count<1000) {
 
         QString rel=rxLink.cap(1).toLower();
         QString href=rxLink.cap(2);
@@ -4925,8 +4925,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 rxTT.setCaseSensitivity(Qt::CaseInsensitive);
                 QRegExp rxTooltip("href\\s*\\=\\s*\\\"tooltip\\:");
                 pos = 0;
+                count=0;
                 //qDebug()<<"-------------------------------- "<<key<<" -------------------------";
-                while ((pos = rxTT.indexIn(result, pos)) != -1) {
+                while ((pos = rxTT.indexIn(result, pos)) != -1 && count<1000) {
                     //qDebug()<<rxTT.cap()<<"\n   "<<rxTT.cap(1)<<rxTT.cap(2)<<rxTT.cap(3)<<rxTT.cap(4);
                     QString img="qrc:/lib/help/autolink.png";
                     if (val.toLower().startsWith("http://") || val.toLower().startsWith("https://") || val.toLower().startsWith("ftp://") || val.toLower().startsWith("ftps://")) {
@@ -4949,6 +4950,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         //qDebug()<<"  skipped";
                     }
                     //qDebug()<<pos;
+                    count++;
                 }
 
             }
@@ -4993,7 +4995,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             rxList.setMinimal(true);
             int count = 0;
             int pos = 0;
-            while ((pos = rxList.indexIn(result, pos)) != -1) {
+            while ((pos = rxList.indexIn(result, pos)) != -1 && count<1000) {
                 QApplication::processEvents();
                 bool replaced=false;
                 QString list=rxList.cap(1).toLower().trimmed();
@@ -5339,7 +5341,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
-            while ((pos = rxInsert.indexIn(result, pos)) != -1) {
+            while ((pos = rxInsert.indexIn(result, pos)) != -1 && count<1000) {
                 QApplication::processEvents();
                 bool replaced=false;
                 QString command=rxInsert.cap(1).toLower().trimmed();
@@ -5447,7 +5449,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             count = 0;
             pos = 0;
             //qDebug()<<result.contains("$(")<<result;
-            while ((pos = rxLaTeX.indexIn(result, pos)) != -1) {
+            while ((pos = rxLaTeX.indexIn(result, pos)) != -1 && count<1000) {
                 QApplication::processEvents();
                 bool replaced=false;
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
@@ -5577,7 +5579,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             rxPluginInfo.setMinimal(true);
             count = 0;
             pos = 0;
-            while ((pos = rxPluginInfo.indexIn(result, pos)) != -1) {
+            while ((pos = rxPluginInfo.indexIn(result, pos)) != -1 && count<1000) {
                 QApplication::processEvents();
                 QString command=rxPluginInfo.cap(1).toLower().trimmed();
                 QString param1=rxPluginInfo.cap(2).toLower().trimmed();
@@ -5719,7 +5721,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             int minHeaderLevel=0;
             QList<ContentsEntry> contents;
             bool first=true;
-            while ((pos = rxHeader.indexIn(result, pos)) != -1) {
+            while ((pos = rxHeader.indexIn(result, pos)) != -1 && count<1000) {
                 QApplication::processEvents();
 
                 int level=rxHeader.cap(1).toInt();
@@ -5780,7 +5782,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             rxHeader1.setMinimal(true);
             count = 0;
             pos = 0;
-            while ((pos = rxHeader.indexIn(result, pos)) != -1) {
+            while ((pos = rxHeader.indexIn(result, pos)) != -1 && count<1000) {
                 QApplication::processEvents();
 
                 int level=rxHeader.cap(1).toInt();
@@ -5846,7 +5848,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             rxRef.setMinimal(true);
             count = 0;
             pos = 0;
-            while ((pos = rxRef.indexIn(result, pos)) != -1) {
+            while ((pos = rxRef.indexIn(result, pos)) != -1 && count<500) {
                 QApplication::processEvents();
 
                 QString inst=rxRef.cap(1).toLower();
@@ -5937,7 +5939,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         rxImages.setMinimal(true);
         rxImages.setCaseSensitivity(Qt::CaseInsensitive);
         pos = 0;
-        while ((pos = rxImages.indexIn(result, pos)) != -1) {
+        int cnt=0;
+        while ((pos = rxImages.indexIn(result, pos)) != -1 && cnt<1000) {
             QString file=rxImages.cap(1).trimmed();
             if (file.startsWith("qrc:/") || file.startsWith("http:/") || file.startsWith("https:/")) {
                 pos=pos+rxImages.matchedLength();
@@ -5954,6 +5957,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                 pos += rxImages.matchedLength()+(news.size()-old.size());
             }
+            cnt++;
         }
 
 
@@ -5971,7 +5975,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 rxTT.setMinimal(true);
                 pos = 0;
                 //qDebug()<<"----- "<<key<<" ------";
-                while ((pos = rxTT.indexIn(result, pos)) != -1) {
+                int cnt=0;
+                while ((pos = rxTT.indexIn(result, pos)) != -1 && cnt<1000) {
                     //qDebug()<<rxTT.cap()<<rxTT.cap(1)<<rxTT.cap(2);
                     QString rep=QString("<a href=\"tooltip:%1\">%2 <img src=\"qrc:/lib/help/tooltip.png\" border=\"0\" width=\"12\" height=\"12\" alt=\"get more information about %2\"></a>").arg(key).arg(rxTT.cap(2));
                     QString tag=rxTT.cap(1).toLower();
@@ -5981,6 +5986,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     } else {
                         pos += rxTT.matchedLength();
                     }
+                    cnt++;
                 }
 
             }

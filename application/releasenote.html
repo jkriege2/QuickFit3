@@ -27,8 +27,11 @@
   
 -->
 <!--
-    <li><a name="3891"><b>2015-03-18 (SVN: 3891)</b>-->
+    <li><a name="3891"><b>2015-03-18 (GIT: 3891)</b>-->
     <ul>
+    <li><b>new code repository:</b><ul>
+          <li>moved QuickFit 3.0 to GitHub: <a href="https://github.com/jkriege2/QuickFit3.git">https://github.com/jkriege2/QuickFit3.git</a>.</li>
+    </ul></li>
     <li><b>new plugins:</b><ul>
           <li><b>fit_nlopt</b>:  makes the global optimizaton algorithms from the NLopt library available in QuickFit as (least-squares) fit algorithms</li>
     </ul></li>
@@ -46,6 +49,7 @@
       <li>online-help:<ul>
           <li>bugfix: the DOI's in the help texts should be linked now again!</li>
           <li>bugfix: in some cases the equations in a tooltip were displayed wrong (mixed up with old renderings!)</li>
+          <li>bugfix: fixed an endless loop of the preparation of online-help pages in some cases</li>
       </ul></li>
       <li>QF 3 now compiles with Qt 5.4 on MacOS X!</li>
       <li>added Faddeeva Package to support real-valued Faddeeva-Function, which is required by some TIR-FCS fit modelss</li>
@@ -59,7 +63,7 @@
       <li>added functions to export data from tables into Matlab *.MAT files as matrices [if possible]/cell arrays [otherwise]</li>
       <li>improved error reporting for the save-project and zip-project functions</li>
       <li>zipped-projects now also contain a <tt>.readme.txt</tt>-file, which explains the contents of the ZIP-archive</li>
-      <li>added link to GitHub repository to several places in QUickFit</li>
+      <li>added link to GitHub repository to several places in QuickFit</li>
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>
