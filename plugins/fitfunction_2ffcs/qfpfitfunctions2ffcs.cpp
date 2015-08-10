@@ -25,12 +25,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunction2ffccsnormaldiff3dflow.h"
 #include "qffitfunction2ffccsnormaldiff2d.h"
 #include "qffitfunction2ffccsnormaldiff2dflow.h"
+#include "qffitfunction2ffccsanomalousdiff3d.h"
 #include "qftools.h"
 
 QStringList QFPFitFunctions2FFCS::getIDs() const {
     QStringList res;
     res<<"fccs_2f_diff3d"<<"fccs_2f_diff3d_wz"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow_wz"
-       <<"fccs_2f_diff2d"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff3d_wz_c"<<"fccs_2f_diff3d_gamma_c";
+       <<"fccs_2f_diff2d"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff3d_wz_c"<<"fccs_2f_diff3d_gamma_c"<<"fccs_2f_adiff3d"<<"fccs_2f_adiff3d_wz";
     return res;
 }
 
@@ -41,6 +42,10 @@ QFFitFunction* QFPFitFunctions2FFCS::get(const QString &id) const  {
         return new QFFitFunctionFCCSNormalDiff2D2Focus();
     } else if (id=="fccs_2f_diff3d_wz") {
         return new QFFitFunctionFCCSNormalDiff3D2Focus(false);
+    } else if (id=="fccs_2f_adiff3d") {
+        return new QFFitFunctionFCCSAnomalousDiff3D2Focus();
+    } else if (id=="fccs_2f_adiff3d_wz") {
+        return new QFFitFunctionFCCSAnomalousDiff3D2Focus(false);
     } else if (id=="fccs_2f_diff3d_wz_c") {
         return new QFFitFunctionFCCSNormalDiff3D2Focus_c(false);
     } else if (id=="fccs_2f_diff3d_gamma_c") {
@@ -104,6 +109,26 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
         res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
         res.paramValues << constructQListWithMultipleItems(QMap<QString, QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter>(), res.models.size());
         res.singleFixes << constructQListWithMultipleItems(QMap<QString,bool>(), res.models.size());
+        res.paramValues[0].insert("n_nonfluorescent", QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get(0,0));
+        for (int j=0; j<res.singleFixes.size(); j++) { res.singleFixes[j].insert("focus_width", false); };
+
+    } else if (i==c++) {
+        res.groupLabel=menulabel;
+        res.menuEntryLabel=tr("... 3D Anomalous Diffusion ACF + 4 neighbors");
+        res.models<<"fccs_2f_adiff3d_wz"<<"fccs_2f_adiff3d_wz"<<"fccs_2f_adiff3d_wz"<<"fccs_2f_adiff3d_wz"<<"fccs_2f_adiff3d_wz";
+        res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
+        res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("n_components"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_acoeff1"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_alpha1"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_acoeff2"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_alpha2"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_rho22"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_acoeff3"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_alpha3"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_rho3"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
         res.paramValues[0].insert("n_nonfluorescent", QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get(0,0));
         for (int j=0; j<res.singleFixes.size(); j++) { res.singleFixes[j].insert("focus_width", false); };
     }

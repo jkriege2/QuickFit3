@@ -38,6 +38,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionstirffccsfw2dadiffxy2coloracfg.h"
 #include "qffitfunctionstirffccsfw2dadiffxy2coloracfr.h"
 #include "qftools.h"
+#include "qffitfunctionstirfccsadiffe2.h"
 
 QStringList QFPFitFunctionsTIRFCS::getIDs() const {
     QStringList res;
@@ -48,6 +49,7 @@ QStringList QFPFitFunctionsTIRFCS::getIDs() const {
      res<<"fcs_tir_diff3de2";
      res<<"fcs_tir_diff3de2_diffbright";
      res<<"fccs_tir_diff_flowe2";
+     res<<"fccs_tir_adiffe2";
      res<<"fcs_tir_diff_flowe2";
      res<<"fccs_tir_fw_2csep2ddiffxy2coloracfg";
      res<<"fccs_tir_fw_2csep2ddiffxy2coloracfr";
@@ -76,6 +78,8 @@ QFFitFunction* QFPFitFunctionsTIRFCS::get(const QString &id) const  {
         return new QFFitFunctionsTIRFCSDiffE2Diffbright();
     } else if (id=="fccs_tir_diff_flowe2") {
         return new QFFitFunctionsTIRFCCSDiffFlowE2();
+    } else if (id=="fccs_tir_adiffe2") {
+        return new QFFitFunctionsTIRFCCSADiffE2();
     } else if (id=="fcs_tir_diff_flowe2") {
         return new QFFitFunctionsTIRFCSDiffFlowE2();
     } else if (id=="fccs_tir_fw_2csep2ddiffxy2coloracfg") {
@@ -105,7 +109,7 @@ QFFitFunction* QFPFitFunctionsTIRFCS::get(const QString &id) const  {
 
 int QFPFitFunctionsTIRFCS::getGlobalFitConfigCount() const
 {
-    return 6;
+    return 7;
 }
 
 QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS::getGlobalFitConfig(int i) const
@@ -240,9 +244,33 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
         res.models<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2";
         res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("n_components"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff1"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff2"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff3"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_rho2"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_rho3"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("vflowx"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("vflowy"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
+
+    } else if (i==c++) { // fccs_tir_diff_flowe2, fccs_tir_diff_flowe2, fccs_tir_diff_flowe2
+        res.groupLabel=tirfccslabel;
+        res.shortLabel=QString("2-PIXEL-TIR-FCCS/ANOMALOUS");
+        res.menuEntryLabel=tr("... 2D Anomalous Diffusion, ACF + 4 neighbors");
+        res.models<<"fccs_tir_adiffe2"<<"fccs_tir_adiffe2"<<"fccs_tir_adiffe2"<<"fccs_tir_adiffe2"<<"fccs_tir_adiffe2";
+        res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
+        res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("n_components"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_acoeff1"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_alpha1"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_acoeff2"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_rho2"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_alpha2"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_rho3"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_acoeff3"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_alpha3"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("focus_height"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
 
