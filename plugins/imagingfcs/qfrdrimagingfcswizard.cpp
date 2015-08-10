@@ -444,6 +444,14 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
         cmbIm2cFCCSFitMode->addItem(tr("normal diffusion 2-component"));
         cmbIm2cFCCSFitMode->addItem(tr("anomalous diffusion"));
         cmbIm2cFCCSFitMode->setEnabled(false);
+        cmbIm2fFCCSFitMode=new QFEnhancedComboBox(this);
+        cmbIm2fFCCSFitMode->addItem(tr("1-component normal diffusion + flow"));
+        cmbIm2fFCCSFitMode->addItem(tr("2-component normal diffusion + flow"));
+        cmbIm2fFCCSFitMode->addItem(tr("1-component normal diffusion"));
+        cmbIm2fFCCSFitMode->addItem(tr("2-component normal diffusion"));
+        cmbIm2fFCCSFitMode->addItem(tr("1-component anomalous diffusion"));
+        cmbIm2fFCCSFitMode->addItem(tr("2-component anomalous diffusion"));
+        cmbIm2fFCCSFitMode->setEnabled(false);
 
         chkLastImFCSFit1=new QCheckBox(tr("single-curve FCS fit:"), this);
         chkLastImFCSFit1->setChecked(true);
@@ -458,7 +466,8 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
         chkLastIm2fFCCSFit=new QCheckBox(tr("global FCCS fit 2-pixel FCCS"), this);
         chkLastIm2fFCCSFit->setChecked(false);
         chkLastIm2fFCCSFit->setEnabled(false);
-        wizFinalizePage->addRow((QWidget*)(chkLastIm2fFCCSFit.data()), (QWidget*)NULL);
+        connect(chkLastIm2fFCCSFit, SIGNAL(toggled(bool)), cmbIm2fFCCSFitMode, SLOT(setEnabled(bool)));
+        wizFinalizePage->addRow(chkLastIm2fFCCSFit, cmbIm2fFCCSFitMode);
         wizFinalizePage->addRow(QString(), tr("<u>Note:</u> This wizard will try to pre-configure the fit evaluation items in the project to meet your settings. In seldom cases, this will not be possible, so please check the fit model configuration before performing any fits.<br>Also you may wish to use differently configured models. In that case you can also reconfigure the presets before starting the fits!<br><br>"
                                               "After finishing this wizard, it will load all records into the project and (possibly) add several fit evaluation objects. After this you are set to perform fits and evaluate their results. There are two major dialogs that you can use for this:<ol>"
                                               "<li>The <b>imagingFCS RDR editor</b> can be reached by double-clicking any raw data record (RDR) in the project. On the second tab (\"Parameter Image\") of this dialog, you will find the parameter images (after the fits) and tools to evaluate them statistically and also to e.g. mask the image.</li>"
@@ -631,19 +640,56 @@ void QFRDRImagingFCSWizard::finalizeAndModifyProject(bool projectwizard, QFRDRIm
                     QString ccfmodel="";
                     int Nccf=cmb2PixelFCCS->currentData().toInt();
                     QStringList globalparams;
-                    if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) ) { // anomalous
-                        acfmodel=ccfmodel="fccs_spim_diffflowce2";
-                        globalparams<<"n_particle"<<"diff_coeff1"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
-                    } else if (cmbMicroscopy->currentData().toInt()==1 ) { // 1-comp, normal
-                        acfmodel=ccfmodel="fccs_tir_diff_flowe2";
-                        globalparams<<"n_particle"<<"diff_coeff1"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
-                    } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5))) { // anomalous
-                        acfmodel=ccfmodel="fccs_2f_diff3dflow";
-                        globalparams<<"n_particle"<<"diff_coeff1"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
-                    } else if (cmbMicroscopy->currentData().toInt()==4 ) { // 1-comp, normal
-                        acfmodel=ccfmodel="fccs_2f_diff2dflow";
-                        e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
-                        globalparams<<"n_particle"<<"diff_coeff1"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
+                    if (cmbIm2fFCCSFitMode->currentIndex()==0 || cmbIm2fFCCSFitMode->currentIndex()==1 || cmbIm2fFCCSFitMode->currentIndex()==2 || cmbIm2fFCCSFitMode->currentIndex()==3) {
+                        if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) ) { // anomalous
+                            acfmodel=ccfmodel="fccs_spim_diffflowce2";
+                            globalparams<<"n_particle"<<"n_components"<<"diff_coeff1"<<"diff_coeff2"<<"diff_coeff3"<<"diff_rho2"<<"diff_rho3"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
+                        } else if (cmbMicroscopy->currentData().toInt()==1 ) { // 1-comp, normal
+                            acfmodel=ccfmodel="fccs_tir_diff_flowe2";
+                            globalparams<<"n_particle"<<"n_components"<<"diff_coeff1"<<"diff_coeff2"<<"diff_coeff3"<<"diff_rho2"<<"diff_rho3"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
+                        } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5))) { // anomalous
+                            acfmodel=ccfmodel="fccs_2f_diff3dflow";
+                            globalparams<<"n_particle"<<"n_components"<<"diff_coeff1"<<"diff_coeff2"<<"diff_coeff3"<<"diff_rho2"<<"diff_rho3"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
+                        } else if (cmbMicroscopy->currentData().toInt()==4 ) { // 1-comp, normal
+                            acfmodel=ccfmodel="fccs_2f_diff2dflow";
+                            e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                            globalparams<<"n_particle"<<"n_components"<<"diff_coeff1"<<"diff_coeff2"<<"diff_coeff3"<<"diff_rho2"<<"diff_rho3"<<"vflowx"<<"vflowy"<<"focus_height"<<"focus_width";
+                        }
+
+                        if (cmbIm2fFCCSFitMode->currentIndex()==1 || cmbIm2fFCCSFitMode->currentIndex()==3) {
+                            e->setQFProperty("PRESET_N_COMPONENTS", 2, false, false);
+                        } else {
+                            e->setQFProperty("PRESET_N_COMPONENTS", 1, false, false);
+                        }
+
+                        if (cmbIm2fFCCSFitMode->currentIndex()==2 || cmbIm2fFCCSFitMode->currentIndex()==3) {
+                            e->setQFProperty("PRESET_VFLOWX", 0, false, false);
+                            e->setQFProperty("PRESET_VFLOWY", 0, false, false);
+                            e->setQFProperty("PRESET_VFLOWX_FIX", true, false, false);
+                            e->setQFProperty("PRESET_VFLOWY_FIX", true, false, false);
+                        }
+                    } else if (cmbIm2fFCCSFitMode->currentIndex()==4 || cmbIm2fFCCSFitMode->currentIndex()==5) {
+                        if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) ) { // anomalous
+                            acfmodel=ccfmodel="fccs_spim_adiffce2";
+                            globalparams<<"n_particle"<<"n_components"<<"diff_acoeff1"<<"diff_acoeff2"<<"diff_acoeff3"<<"diff_alpha1"<<"diff_alpha2"<<"diff_alpha3"<<"diff_rho2"<<"diff_rho3"<<"focus_height"<<"focus_width";
+                        } else if (cmbMicroscopy->currentData().toInt()==1 ) { // 1-comp, normal
+                            acfmodel=ccfmodel="fccs_tir_adiffe2";
+                            globalparams<<"n_particle"<<"n_components"<<"diff_acoeff1"<<"diff_acoeff2"<<"diff_acoeff3"<<"diff_alpha1"<<"diff_alpha2"<<"diff_alpha3"<<"diff_rho2"<<"diff_rho3"<<"focus_height"<<"focus_width";
+                        } else if (((cmbMicroscopy->currentData().toInt()==3)||(cmbMicroscopy->currentData().toInt()==5))) { // anomalous
+                            acfmodel=ccfmodel="fccs_2f_adiff3d_wz";
+                            globalparams<<"n_particle"<<"n_components"<<"diff_acoeff1"<<"diff_acoeff2"<<"diff_acoeff3"<<"diff_alpha1"<<"diff_alpha2"<<"diff_alpha3"<<"diff_rho2"<<"diff_rho3"<<"focus_height"<<"focus_width";
+                        } else if (cmbMicroscopy->currentData().toInt()==4 ) { // 1-comp, normal
+                            acfmodel=ccfmodel="fccs_2f_adiff3d_wz";
+                            e->setQFProperty("PRESET_FOCUS_HEIGHT", 1e6, false, false);
+                            globalparams<<"n_particle"<<"n_components"<<"diff_acoeff1"<<"diff_acoeff2"<<"diff_acoeff3"<<"diff_alpha1"<<"diff_alpha2"<<"diff_alpha3"<<"diff_rho2"<<"diff_rho3"<<"focus_height"<<"focus_width";
+                        }
+
+                        if (cmbIm2fFCCSFitMode->currentIndex()==1) {
+                            e->setQFProperty("PRESET_N_COMPONENTS", 2, false, false);
+                        } else {
+                            e->setQFProperty("PRESET_N_COMPONENTS", 1, false, false);
+                        }
+
                     }
 
 

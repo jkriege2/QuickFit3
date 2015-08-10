@@ -5939,8 +5939,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         rxImages.setMinimal(true);
         rxImages.setCaseSensitivity(Qt::CaseInsensitive);
         pos = 0;
-        int cnt=0;
-        while ((pos = rxImages.indexIn(result, pos)) != -1 && cnt<1000) {
+        count=0;
+        while ((pos = rxImages.indexIn(result, pos)) != -1 && count<1000) {
             QString file=rxImages.cap(1).trimmed();
             if (file.startsWith("qrc:/") || file.startsWith("http:/") || file.startsWith("https:/")) {
                 pos=pos+rxImages.matchedLength();
@@ -5957,7 +5957,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                 pos += rxImages.matchedLength()+(news.size()-old.size());
             }
-            cnt++;
+            count++;
         }
 
 
@@ -5975,8 +5975,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 rxTT.setMinimal(true);
                 pos = 0;
                 //qDebug()<<"----- "<<key<<" ------";
-                int cnt=0;
-                while ((pos = rxTT.indexIn(result, pos)) != -1 && cnt<1000) {
+                count=0;
+                while ((pos = rxTT.indexIn(result, pos)) != -1 && count<1000) {
                     //qDebug()<<rxTT.cap()<<rxTT.cap(1)<<rxTT.cap(2);
                     QString rep=QString("<a href=\"tooltip:%1\">%2 <img src=\"qrc:/lib/help/tooltip.png\" border=\"0\" width=\"12\" height=\"12\" alt=\"get more information about %2\"></a>").arg(key).arg(rxTT.cap(2));
                     QString tag=rxTT.cap(1).toLower();
@@ -5986,7 +5986,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     } else {
                         pos += rxTT.matchedLength();
                     }
-                    cnt++;
+                    count++;
                 }
 
             }

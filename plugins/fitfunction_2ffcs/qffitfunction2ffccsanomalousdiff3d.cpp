@@ -143,21 +143,21 @@ double QFFitFunctionFCCSAnomalousDiff3D2Focus::evaluate(double t, const double* 
     //qDebug()<<"OLD: wxy="<<wxy<<" ,wz="<<wz<<", gamma="<<gamma<<" ,D="<<D1;
 
     double relD1=0;
-    if (D1!=0) relD1=4.0*G1*pow(t,alpah1)/wxy2;
+    if (G1!=0) relD1=4.0*G1*pow(t,a1)/wxy2;
     double rho1=1.0;
-    double d1=1.0/(1.0+relD1)/sqrt(1.0+relD1/gamma2)*exp(-1.0*dxy2/(wxy2+4.0*G1*pow(t,alpah1)));
+    double d1=1.0/(1.0+relD1)/sqrt(1.0+relD1/gamma2)*exp(-1.0*dxy2/(wxy2+4.0*G1*pow(t,a1)));
     double d2=0;
     double d3=0;
     if (comp>1) {
         double relD2=0;
-        if (D2!=0) relD2=4.0*G2*pow(t,alpah2)/wxy2;
-        d2=rho2/(1.0+relD2)/sqrt(1.0+relD2/gamma2)*exp(-1.0*dxy2/(wxy2+4.0*G2*pow(t,alpah2)));
+        if (G2!=0) relD2=4.0*G2*pow(t,a2)/wxy2;
+        d2=rho2/(1.0+relD2)/sqrt(1.0+relD2/gamma2)*exp(-1.0*dxy2/(wxy2+4.0*G2*pow(t,a2)));
         rho1=1.0-rho2;
     }
     if (comp>2) {
         double relD3=0;
-        if (D3!=0) relD3=4.0*G3*pow(t,alpah3)/wxy2;
-        d3=rho3/(1.0+relD3)/sqrt(1.0+relD3/gamma2)*exp(-1.0*dxy2/(wxy2+4.0*G3*pow(t,alpah3)));
+        if (G3!=0) relD3=4.0*G3*pow(t,a3)/wxy2;
+        d3=rho3/(1.0+relD3)/sqrt(1.0+relD3/gamma2)*exp(-1.0*dxy2/(wxy2+4.0*G3*pow(t,a3)));
         rho1=1.0-rho2-rho3;
     }
     return offset+1.0/N*(rho1*d1+d2+d3)*backfactor;

@@ -107,7 +107,7 @@ double QFFitFunctionsTIRFCCSDiffFlowE2::evaluate(double t, const double* data) c
 
     const double wxy=data[FCSSDiff_focus_width]/1.0e3;
     const double a=data[FCSSDiff_pixel_width]/1.0e3;
-    const double offset=data[FCSSDiff_offset];
+    const double offset=data[FCCSDiff_offset];
     const double background=data[FCSSDiff_background];
     const double cr=data[FCSSDiff_count_rate];
     double backfactor=sqr(cr-background)/sqr(cr);
@@ -135,7 +135,7 @@ void QFFitFunctionsTIRFCCSDiffFlowE2::calcParameter(double* data, double* error)
     double ewxy=0;
     double a=data[FCSSDiff_pixel_width]/1.0e3;
     double ea=0;
-    //double offset=data[FCSSDiff_offset];
+    //double offset=data[FCCSDiff_offset];
     double eoffset=0;
 
     int comp=data[FCSSDiff_n_components];
@@ -168,7 +168,7 @@ void QFFitFunctionsTIRFCCSDiffFlowE2::calcParameter(double* data, double* error)
         eD1=error[FCSSDiff_diff_coeff1];
         ewxy=error[FCSSDiff_focus_width]/1.0e3;
         ea=error[FCSSDiff_pixel_width]/1.0e3;
-        eoffset=error[FCSSDiff_offset];
+        eoffset=error[FCCSDiff_offset];
 
         ecps=error[FCSSDiff_count_rate];
         ecpm=error[FCSSDiff_cpm];

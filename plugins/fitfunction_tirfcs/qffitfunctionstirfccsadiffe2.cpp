@@ -103,13 +103,13 @@ double QFFitFunctionsTIRFCCSADiffE2::evaluate(double t, const double* data) cons
     }
     const double dx=data[FCCSDiff_focus_distancex]/1000.0;
     const double dy=data[FCCSDiff_focus_distancey]/1000.0;
-    const double vx=data[FCCSDiff_vflowx];
-    const double vy=data[FCCSDiff_vflowy];
+//    const double vx=data[FCCSDiff_vflowx];
+//    const double vy=data[FCCSDiff_vflowy];
 
 
     const double wxy=data[FCSSDiff_focus_width]/1.0e3;
     const double a=data[FCSSDiff_pixel_width]/1.0e3;
-    const double offset=data[FCSSDiff_offset];
+    const double offset=data[FCCSDiff_offset];
     const double background=data[FCSSDiff_background];
     const double cr=data[FCSSDiff_count_rate];
     double backfactor=sqr(cr-background)/sqr(cr);
@@ -137,7 +137,7 @@ void QFFitFunctionsTIRFCCSADiffE2::calcParameter(double* data, double* error) co
     double ewxy=0;
     double a=data[FCSSDiff_pixel_width]/1.0e3;
     double ea=0;
-    //double offset=data[FCSSDiff_offset];
+    //double offset=data[FCCSDiff_offset];
     double eoffset=0;
 
     int comp=data[FCSSDiff_n_components];
@@ -170,7 +170,7 @@ void QFFitFunctionsTIRFCCSADiffE2::calcParameter(double* data, double* error) co
         //eD1=error[FCSSDiff_diff_coeff1];
         ewxy=error[FCSSDiff_focus_width]/1.0e3;
         ea=error[FCSSDiff_pixel_width]/1.0e3;
-        eoffset=error[FCSSDiff_offset];
+//        eoffset=error[FCCSDiff_offset];
 
         ecps=error[FCSSDiff_count_rate];
         ecpm=error[FCSSDiff_cpm];

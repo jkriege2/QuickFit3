@@ -119,6 +119,7 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QPointer<QCheckBox> chkLastIm2fFCCSFit;
         QPointer<QFEnhancedComboBox> cmbImFCSFitMode;
         QPointer<QFEnhancedComboBox> cmbIm2cFCCSFitMode;
+        QPointer<QFEnhancedComboBox> cmbIm2fFCCSFitMode;
 
         QFFormWizardPage* wizFinalizePageCalibration;
 

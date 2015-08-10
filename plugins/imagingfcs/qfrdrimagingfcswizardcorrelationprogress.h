@@ -32,6 +32,8 @@ class QFRDRImagingFCSWizardCorrelationProgress : public QWidget
         void updateProgress();
         void cancelThreads();
         void collectThreads();
+    protected slots:
+        void on_btnCancel_clicked();
     private:
         Ui::QFRDRImagingFCSWizardCorrelationProgress *ui;
     protected:

@@ -43,7 +43,7 @@ QFFitFunction* QFPFitFunctions2FFCS::get(const QString &id) const  {
     } else if (id=="fccs_2f_diff3d_wz") {
         return new QFFitFunctionFCCSNormalDiff3D2Focus(false);
     } else if (id=="fccs_2f_adiff3d") {
-        return new QFFitFunctionFCCSAnomalousDiff3D2Focus();
+        return new QFFitFunctionFCCSAnomalousDiff3D2Focus(true);
     } else if (id=="fccs_2f_adiff3d_wz") {
         return new QFFitFunctionFCCSAnomalousDiff3D2Focus(false);
     } else if (id=="fccs_2f_diff3d_wz_c") {
@@ -62,7 +62,7 @@ QFFitFunction* QFPFitFunctions2FFCS::get(const QString &id) const  {
 
 int QFPFitFunctions2FFCS::getGlobalFitConfigCount() const
 {
-    return 3;
+    return 4;
 }
 
 QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::getGlobalFitConfig(int i) const

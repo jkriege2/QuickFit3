@@ -158,6 +158,11 @@ void QFRDRImagingFCSWizardCorrelationProgress::collectThreads()
     prg.close();
 }
 
+void QFRDRImagingFCSWizardCorrelationProgress::on_btnCancel_clicked()
+{
+    cancelThreads();
+}
+
 bool QFRDRImagingFCSWizardCorrelationProgress::allThreadsDone() const
 {
 
