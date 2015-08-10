@@ -1093,7 +1093,8 @@ void QFRDRImagingFCSWizard::startProcessingJobs()
     basicjob.DCCFDeltaY.clear();
     basicjob.DCCFrole.clear();
     basicjob.bleach=cmbBleachCorrection->currentData().toInt();
-    basicjob.bleachAvgFrames=basicjob.statistics_frames/10;
+    basicjob.bleachAvgFrames=qMax(20u,basicjob.statistics_frames/10);
+    qDebug()<<"BLEACH_CORRECTION: "<<basicjob.bleach<<"  frames="<<basicjob.bleachAvgFrames;
     basicjob.interleaved_binning=false;
     basicjob.cameraSettingsGiven=true;
     basicjob.cameraPixelWidth=widPixSize->getPixelWidth();
@@ -1125,7 +1126,7 @@ void QFRDRImagingFCSWizard::startProcessingJobs()
         basicjob.binning=spinBinning->value();
         basicjob.use_cropping=cmbCropRegion->currentIndex()>0;
         basicjob.segments=spinSegments->value();
-        basicjob.S=qBound(3, basicjob.getIdealS(), 200);
+        basicjob.S=qBound(3, basicjob.getIdealS(spinTauMax->value()), 200);
 
         if (basicjob.use_cropping) {
             basicjob.crop_x0=widCrop->getX1();
@@ -1134,26 +1135,9 @@ void QFRDRImagingFCSWizard::startProcessingJobs()
             basicjob.crop_y1=widCrop->getY2();
         }
         if (chkACF->isChecked()) {
-            //IMFCSJob jobacf=basicjob;
-            //jobacf.acf=true;
-            //widProcess->addJob(jobacf);
             basicjob.acf=true;
         }
         if (chk2ColorFCCS->isChecked() && cmbDualView->currentData().toInt()>0) {
-//            IMFCSJob jobfccs=basicjob;
-//            jobfccs.distanceCCF=true;
-//            if (cmbDualView->currentIndex()==DUALVIEW_HORICONTAL) {
-//                jobfccs.DCCFDeltaX << image_width_io/2/jobfccs.binning;
-//                jobfccs.DCCFDeltaY << 0;
-//                jobfccs.DCCFrole<<QString("FCCS");
-//                jobfccs.distanceCCF=true;
-//            } else if (cmbDualView->currentIndex()==DUALVIEW_VERTICAL) {
-//                jobfccs.DCCFDeltaX << 0;
-//                jobfccs.DCCFDeltaY << image_height_io/2/jobfccs.binning;
-//                jobfccs.DCCFrole<<QString("FCCS");
-//                jobfccs.distanceCCF=true;
-//            }
-//            widProcess->addJob(jobfccs);
             basicjob.distanceCCF=true;
             if (cmbDualView->currentIndex()==DUALVIEW_HORICONTAL) {
                 basicjob.DCCFDeltaX << image_width_io/2/basicjob.binning;
@@ -1168,60 +1152,6 @@ void QFRDRImagingFCSWizard::startProcessingJobs()
             }
         }
         if (cmb2PixelFCCS->currentIndex()>0) {
-//            IMFCSJob jobdccf=basicjob;
-//            jobdccf.distanceCCF=true;
-//            if (cmb2PixelFCCS->currentIndex()==1) {
-//                jobdccf.addDCCF(-1,0);
-//                jobdccf.addDCCF(1,0);
-//                jobdccf.addDCCF(0,-1);
-//                jobdccf.addDCCF(0,1);
-//            } else if (cmb2PixelFCCS->currentIndex()==2) {
-//                jobdccf.addDCCF(-1,0);
-//                jobdccf.addDCCF(1,0);
-//                jobdccf.addDCCF(0,-1);
-//                jobdccf.addDCCF(0,1);
-//                jobdccf.addDCCF(-1,-1);
-//                jobdccf.addDCCF(-1,1);
-//                jobdccf.addDCCF(1,-1);
-//                jobdccf.addDCCF(1,1);
-//            } else if (cmb2PixelFCCS->currentIndex()==3) {
-//                jobdccf.addDCCF(1,0);
-//            } else if (cmb2PixelFCCS->currentIndex()==4) {
-//                jobdccf.addDCCF(-1,0);
-//            } else if (cmb2PixelFCCS->currentIndex()==5) {
-//                jobdccf.addDCCF(0,1);
-//            } else if (cmb2PixelFCCS->currentIndex()==6) {
-//                jobdccf.addDCCF(0,-1);
-//            } else if (cmb2PixelFCCS->currentIndex()==7) {
-//                jobdccf.addDCCF(1,0);
-//                jobdccf.addDCCF(2,0);
-//            } else if (cmb2PixelFCCS->currentIndex()==8) {
-//                jobdccf.addDCCF(-1,0);
-//                jobdccf.addDCCF(-2,0);
-//            } else if (cmb2PixelFCCS->currentIndex()==9) {
-//                jobdccf.addDCCF(0,1);
-//                jobdccf.addDCCF(0,2);
-//            } else if (cmb2PixelFCCS->currentIndex()==10) {
-//                jobdccf.addDCCF(0,-1);
-//                jobdccf.addDCCF(0,-2);
-//            } else if (cmb2PixelFCCS->currentIndex()==11) {
-//                for (int d=1; d<=5; d++) jobdccf.addDCCF(d,0);
-//            } else if (cmb2PixelFCCS->currentIndex()==12) {
-//                for (int d=1; d<=5; d++) jobdccf.addDCCF(-d,0);
-//            } else if (cmb2PixelFCCS->currentIndex()==13) {
-//                for (int d=1; d<=5; d++) jobdccf.addDCCF(0,d);
-//            } else if (cmb2PixelFCCS->currentIndex()==14) {
-//                for (int d=1; d<=5; d++) jobdccf.addDCCF(0,-d);
-//            } else if (cmb2PixelFCCS->currentIndex()==15) {
-//                for (int d=1; d<=10; d++) jobdccf.addDCCF(d,0);
-//            } else if (cmb2PixelFCCS->currentIndex()==16) {
-//                for (int d=1; d<=10; d++) jobdccf.addDCCF(-d,0);
-//            } else if (cmb2PixelFCCS->currentIndex()==17) {
-//                for (int d=1; d<=10; d++) jobdccf.addDCCF(0,d);
-//            } else if (cmb2PixelFCCS->currentIndex()==18) {
-//                for (int d=1; d<=10; d++) jobdccf.addDCCF(0,-d);
-//            }
-//            widProcess->addJob(jobdccf);
             basicjob.distanceCCF=true;
             if (cmb2PixelFCCS->currentIndex()==1) {
                 basicjob.addDCCF(-1,0);

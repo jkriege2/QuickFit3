@@ -184,3 +184,5 @@ release
 *.mat
 *.backup
 *.backup_old
+/extlibs/levmar/LICENSE
+/extlibs/lmfit5/COPYING
