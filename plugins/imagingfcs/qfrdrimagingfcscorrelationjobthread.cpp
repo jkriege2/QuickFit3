@@ -912,9 +912,9 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text<<"frame count                 : "<<outLocale.toString(frames) << "\n";
                                 text<<"first frame                 : "<<outLocale.toString(first_frame) << "\n";
                                 text<<"last frame                  : "<<outLocale.toString(first_frame+frames-1) << "\n";
-                                text<<"correlation segments        : "<<outLocale.toString(double(frames)/double(job.segments)*job.frameTime) << "\n";
+                                text<<"correlation segments        : "<<outLocale.toString(job.segments) << "\n";
                                 text<<"correlation use blocking    : "<<boolToQString(job.useBlockingErrorEstimate) << "\n";
-                                text<<"segments length (s)         : "<<outLocale.toString(job.segments) << "\n";
+                                text<<"segments length (s)         : "<<outLocale.toString(double(frames)/double(job.segments)*job.frameTime) << "\n";
                                 text<<"correlator S                : "<<outLocale.toString(job.S) << "\n";
                                 text<<"correlator m                : "<<outLocale.toString(job.m) << "\n";
                                 text<<"correlator P                : "<<outLocale.toString(job.P) << "\n";
@@ -2774,7 +2774,10 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                     double pA=0, pB=0;
 
-
+                    if (!statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
+                        pA=fit_I[0];
+                        pB=-1.0/(fit_t[NFitFramesInt-2]/(fit_I[0]-fit_I[NFitFramesInt-2]));
+                    }
 
                     double par[4]={pA, -1.0/pB,0,0};
                     int npar=3;
@@ -2789,10 +2792,9 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
 
                     } else {
-                        if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
-                            par[0]=pA;
-                            par[1]=-1.0/pB;
-                        }
+                        par[0]=pA;
+                        par[1]=-1.0/pB;
+
                         npar=3;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
                         npar++;
@@ -2866,34 +2868,51 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 bleachFitOK[i]=0;
+                qDebug()<<i<<"NFitFramesInt="<<NFitFramesInt<<"  NFitFrames="<<NFitFrames<<"  fit_t[NFitFramesInt-1]="<<fit_t[NFitFramesInt-1]<<"  fit_tin[(NFitFrames-1)/2]="<<fit_tin[(NFitFrames-1)/2];
                 if (NFitFramesInt>5*4 && (NFitFramesInt>NFitFrames/5) && (fit_t[NFitFramesInt-1]>fit_tin[(NFitFrames-1)/2])) {
 
                     double pA=0, pB=0;
+
+                    if (!statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
+                        pA=fit_I[0];
+                        pB=-1.0/(fit_t[NFitFramesInt-2]/(fit_I[0]-fit_I[NFitFramesInt-2]));
+                    }
 
                     double par[5]={pA, -1.0/pB,0,0,0};
                     int npar=4;
 
                     QVector<double> pFit(5,0.0);
                     if (statisticsPolyFit(fit_t, fit_I, NFitFramesInt, 4, pFit.data())) {
+                        qDebug()<<i<<" PolyFit: "<<pFit[0]<<pFit[1]<<pFit[2]<<pFit[3]<<pFit[4];
+
                         par[0]=pFit[0];
                         par[1]=-1.0/pFit[1];
                         par[2]=-pFit[2]/pFit[1];
                         par[3]=-pFit[3]/pFit[1];
                         par[4]=-pFit[4]/pFit[1];
                         npar=5;
+
+                        qDebug()<<i<<" before LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
 
+                        qDebug()<<i<<" LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+
                     } else {
-                        if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
-                            par[0]=pA;
-                            par[1]=-1.0/pB;
-                        }
+                        par[0]=pA;
+                        par[1]=-1.0/pB;
+
+                        qDebug()<<i<<" before LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+
                         npar=3;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                        qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
                         npar++;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+                        qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
                         npar++;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
+                        qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
 
                     }
                     //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
