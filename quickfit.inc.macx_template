@@ -28,6 +28,8 @@ QF3CONFIG+=bits64
 # activate special hardware drivers for the FFM!
 #QF3CONFIG+=ffmdrivers
 
+# if you only want to build the basic plugins (with a permissive LGPL license), uncomment the following line:
+#QF3CONFIG+=basicqfpluginsonly
 
 
 ##################################################################################

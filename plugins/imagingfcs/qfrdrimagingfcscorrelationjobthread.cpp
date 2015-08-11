@@ -19,7 +19,7 @@
 
 #include <QTextStream>
 
-#define STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_noeigen
+//#define STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_noeigen
 //#define STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_jacobiSvd
 #include "statistics_tools.h"
 #include "qfrdrimagingfcscorrelationjobthread.h"
