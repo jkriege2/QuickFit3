@@ -71,8 +71,9 @@ void QFRDRImagingFCSPlugin::init()
     QFPluginServices::getInstance()->addQFMathParserRefernceDir(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
 
 
-    services->registerWizard("project_wizards", tr("Imaging FCS/FCCS Project Wizard"), QIcon(getIconFilename()), this, SLOT(startProjectWizard()));
-    services->registerWizard("rdr_wizards", tr("Imaging FCS/FCCS Correlation Wizard"), QIcon(getIconFilename()), this, SLOT(startWizard()));
+    services->registerWizard("project_wizards", tr("Imaging FCS/FCCS Project Wizard"), QIcon(":/imaging_fcs/projectwizard.png"), this, SLOT(startProjectWizard()));
+    services->registerWizard("rdr_wizards", tr("Imaging FCS/FCCS Correlation Wizard"), QIcon(":/imaging_fcs/rdrwizard.png"), this, SLOT(startWizard()));
+    services->registerWizard("eval_wizards", tr("Imaging FCS/FCCS Correlation Wizard"), QIcon(":/imaging_fcs/evalwizard.png"), this, SLOT(startFitWizard()));
 
     QFMathParser::addGlobalFunction("rdr_isimfcs", fRDR_isimfcs);
 
@@ -266,6 +267,8 @@ void QFRDRImagingFCSPlugin::startProjectWizard()
 void QFRDRImagingFCSPlugin::startWizard(bool isProject)
 {
     QFRDRImagingFCSWizard* wiz=new QFRDRImagingFCSWizard(isProject, parentWidget);
+    if (isProject) wiz->setWindowIcon(QIcon(":/imaging_fcs/projectwizard.png"));
+    else wiz->setWindowIcon(QIcon(":/imaging_fcs/rdrwizard.png"));
     if (wiz->exec()) {
         //qDebug()<<"FINAL PAGE: "<<wiz->currentId();
         wiz->finalizeAndModifyProject(isProject, this);
@@ -273,6 +276,18 @@ void QFRDRImagingFCSPlugin::startWizard(bool isProject)
 
     delete wiz;
 }
+void QFRDRImagingFCSPlugin::startFitWizard()
+{
+    QFRDRImagingFCSFitWizard* wiz=new QFRDRImagingFCSFitWizard( parentWidget);
+    wiz->setWindowIcon(QIcon(":/imaging_fcs/evalwizard.png"));
+    if (wiz->exec()) {
+        //qDebug()<<"FINAL PAGE: "<<wiz->currentId();
+        wiz->finalizeAndModifyProject(this);
+    }
+
+    delete wiz;
+}
+
 
 
 void QFRDRImagingFCSPlugin::insertRecord() {

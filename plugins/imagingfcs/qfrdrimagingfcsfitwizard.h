@@ -25,11 +25,11 @@ class QFRDRImagingFCFitSWizard_ImagestackIsValid;
 class QFRDRImagingFCFitSWizard_BackgroundNextId;
 class QFRDRImagingFCFitSWizard_ProcessNextId;
 
-class QFRDRImagingFCFitSWizard : public QFWizard {
+class QFRDRImagingFCSFitWizard : public QFWizard {
         Q_OBJECT
     public:
-        explicit QFRDRImagingFCFitSWizard(QWidget* parent=NULL);
-        ~QFRDRImagingFCFitSWizard();
+        explicit QFRDRImagingFCSFitWizard(QWidget* parent=NULL);
+        ~QFRDRImagingFCSFitWizard();
         enum Pages {
             InitPage=0,
             MicroscopyPage,
@@ -37,7 +37,7 @@ class QFRDRImagingFCFitSWizard : public QFWizard {
         };
 
     public slots:
-        void finalizeAndModifyProject(bool projectwizard, QFRDRImagingFCSPlugin* plugin);
+        void finalizeAndModifyProject(QFRDRImagingFCSPlugin* plugin);
 
     protected slots:
 

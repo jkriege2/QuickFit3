@@ -3,7 +3,7 @@
 #include "programoptions.h"
 #include "qfrdrimagingfcs.h"
 
-QFRDRImagingFCFitSWizard::QFRDRImagingFCFitSWizard(QWidget *parent):
+QFRDRImagingFCSFitWizard::QFRDRImagingFCSFitWizard(QWidget *parent):
     QFWizard(QSize(600, 440), parent, QString("imaging_fcs/wizard/"))
 {
     QLabel* lab;
@@ -118,15 +118,15 @@ QFRDRImagingFCFitSWizard::QFRDRImagingFCFitSWizard(QWidget *parent):
 
 }
 
-QFRDRImagingFCFitSWizard::~QFRDRImagingFCFitSWizard()
+QFRDRImagingFCSFitWizard::~QFRDRImagingFCSFitWizard()
 {
 }
 
-void QFRDRImagingFCFitSWizard::finalizeAndModifyProject(bool projectwizard, QFRDRImagingFCSPlugin *plugin)
+void QFRDRImagingFCSFitWizard::finalizeAndModifyProject(QFRDRImagingFCSPlugin */*plugin*/)
 {
 
     QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
-    if (project && projectwizard) {
+    if (project) {
         if (chkLastImFCSFit1 && chkLastImFCSFit1->isChecked()) {
             QFEvaluationItem* e=project->addEvaluation("imfcs_fit", tr("Imaging FCS fit"));
             if (e) {
@@ -316,7 +316,7 @@ void QFRDRImagingFCFitSWizard::finalizeAndModifyProject(bool projectwizard, QFRD
 
 
 
-void QFRDRImagingFCFitSWizard::finishedIntro()
+void QFRDRImagingFCSFitWizard::finishedIntro()
 {
     //qDebug()<<"finishedIntro";
     spinWxy->setEnabled(true);
@@ -331,7 +331,7 @@ void QFRDRImagingFCFitSWizard::finishedIntro()
 
 
 
-void QFRDRImagingFCFitSWizard::microscopyChoosen()
+void QFRDRImagingFCSFitWizard::microscopyChoosen()
 {
     //qDebug()<<"microscopyChoosen";
     ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", cmbMicroscopy->currentData().toInt());
@@ -367,7 +367,7 @@ void QFRDRImagingFCFitSWizard::microscopyChoosen()
 
 
 
-void QFRDRImagingFCFitSWizard::validateCorrelation()
+void QFRDRImagingFCSFitWizard::validateCorrelation()
 {
     chkLastImFCSFit1->setEnabled(true);
     chkLastIm2cFCCSFit->setEnabled(true);

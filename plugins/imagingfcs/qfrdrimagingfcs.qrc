@@ -21,6 +21,11 @@
         <file alias="imaging_fcs/wizmicroscopy3.png">icons/wizmicroscopy3.png</file>
     </qresource>
     <qresource prefix="/imaging_fcs">
+    <file alias="projectwizard.png">icons/projectwizard.png</file>
+    <file alias="rdrwizard.png">icons/rdr_wizard.png</file>
+    <file alias="evalwizard.png">icons/evalwizard.png</file>
+
+
         <file alias="abs.png">icons/abs.png</file>
         <file alias="log.png">icons/log.png</file>
         <file alias="reci.png">icons/reci.png</file>

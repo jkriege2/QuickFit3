@@ -3096,12 +3096,13 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
 
                     //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
-                    double par[4]={exp(par[0]), -1.0/pB,0,0};
+                    double par[4]={exp(par[0]), -1.0/pB,0,0}; // A, tau, A2, tau2
                     //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
                     lmcurve_fit(2, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExp, &control, &status);
-                    par[2]=par[0]/2.0;
-                    par[0]=par[0]/2.0;
-                    par[3]=par[1];
+                    par[0]=par[0]*0.98;
+                    par[1]=par[1];
+                    par[2]=par[0]*0.02;
+                    par[3]=par[1]/10.0;
                     lmcurve_fit(4, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fDblExp, &control, &status);
                     //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 

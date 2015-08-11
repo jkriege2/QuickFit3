@@ -26,6 +26,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrimagingfcscorrelationdialog.h"
 #include "qfrdrimagingfcssimulator.h"
 #include "qfrdrimfcscorrelatorremote.h"
+#include "qfrdrimagingfcsfitwizard.h"
 #include "qfrdrimagingfcswizard.h"
 #include <QPointer>
 /*!
@@ -113,6 +114,7 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, 
         void importCorrelationsFromSimulation();
 
         void correctOffset();
+        void startFitWizard();
 
         void startWizard(bool isProject=false);
         void startProjectWizard();
