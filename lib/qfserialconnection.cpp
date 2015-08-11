@@ -283,8 +283,7 @@ bool QFSerialConnection::open() {
         return connectionOpen=false;
     }
 
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
   struct termios options;
 
   /* open port */
@@ -496,41 +495,41 @@ bool QFSerialConnection::open() {
       lastError="unable to set baudrate "+inttostr(baudrate);
       return false; /* Fehler beim �ffnen der Schnittstelle ist aufgetreten */
   }
-    if (parity==JKSCevenParity) {
+    if (parity==QFSCevenParity) {
         options.c_cflag |= PARENB;
         options.c_cflag &= ~PARODD;
-    } else if (parity==JKSCoddParity) {
+    } else if (parity==QFSCoddParity) {
         options.c_cflag |= PARENB;
         options.c_cflag |= PARODD;
-    } else if (parity==JKSCnoParity) {
+    } else if (parity==QFSCnoParity) {
         options.c_cflag &= ~PARENB;
         options.c_cflag &= ~PARODD;
     }
-    if (stopbits==JKSConeStopbit) {
+    if (stopbits==QFSConeStopbit) {
         options.c_cflag &= ~CSTOPB;
-    } else if (stopbits==JKSCone5Stopbits) {
+    } else if (stopbits==QFSCone5Stopbits) {
       errorOccured=true;
       lastError="unable to set 1.5 stopbits on Linux!";
       return false; /* Fehler beim �ffnen der Schnittstelle ist aufgetreten */
-    } else if (stopbits==JKSCtwoStopbits) {
+    } else if (stopbits==QFSCtwoStopbits) {
         options.c_cflag |= CSTOPB;
     }
     options.c_cflag &= ~CSIZE;
 
-    if (databits==JKSC5databits) options.c_cflag |= CS5;
-    else if (databits==JKSC6databits) options.c_cflag |= CS6;
-    else if (databits==JKSC7databits) options.c_cflag |= CS7;
-    else if (databits==JKSC8databits) options.c_cflag |= CS8;
+    if (databits==QFSC5databits) options.c_cflag |= CS5;
+    else if (databits==QFSC6databits) options.c_cflag |= CS6;
+    else if (databits==QFSC7databits) options.c_cflag |= CS7;
+    else if (databits==QFSC8databits) options.c_cflag |= CS8;
 #ifdef CS9
-    else if (databits==JKSC9databits) options.c_cflag |= CS9;
+    else if (databits==QFSC9databits) options.c_cflag |= CS9;
 #endif
 
     switch (handshaking) {
-    case JKSCnoHandshaking:
+    case QFSCnoHandshaking:
         options.c_cflag &= ~CRTSCTS;
         break;
 
-    case JKSChardwareHandshakingRTS:
+    case QFSChardwareHandshakingRTS:
 #ifdef CRTSCTS
         options.c_cflag |= CRTSCTS;
 #else
@@ -541,7 +540,7 @@ bool QFSerialConnection::open() {
 #endif
         break;
 
-    case JKSChardwareHandshakingDTRRTS:
+    case QFSChardwareHandshakingDTRRTS:
 #ifdef CRTSCTS
         #warning("There is no support for DTRRTS handshaking ... fallback to CRT/RTS handshaking!!!")
         options.c_cflag |= CRTSCTS;
@@ -553,7 +552,7 @@ bool QFSerialConnection::open() {
 #endif
         break;
 
-    case JKSCxonXoffHandshaking:
+    case QFSCxonXoffHandshaking:
         errorOccured=true;
         lastError="unable to set XON/XOFF handshaking on Linux! (not yet implemented)";
         return false;
@@ -581,7 +580,11 @@ bool QFSerialConnection::open() {
   //options.c_cc[] = 0;
 
   // switch off post-processing ...
-  options.c_oflag &= ~(OPOST | OPOST | OLCUC | ONLCR | OCRNL |  ONLRET | OFILL | OFDEL);
+  options.c_oflag &= ~(OPOST | OPOST | ONLCR | OCRNL |  ONLRET | OFILL | OFDEL
+#ifdef OLCUC
+                       | OLCUC
+#endif
+                       );
   // write options
   tcsetattr(unixPortHandle, TCSANOW, &options);
 
@@ -604,8 +607,7 @@ bool QFSerialConnection::close() {
         CloseHandle(portHandle);
         portHandle=INVALID_HANDLE_VALUE;
     }
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     if (unixPortHandle) ::close(unixPortHandle);
     unixPortHandle=0;
 
@@ -643,8 +645,7 @@ bool QFSerialConnection::write(std::string data) {
         }
     }
 
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     if (data.size()>0) {
         int num= ::write(unixPortHandle, data.c_str(), data.size());
         if (num!=(int64_t)data.size()) {
@@ -693,8 +694,7 @@ bool JKSerialConnection::write(uint8_t *data, int count) {
         }
     }
 
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     if (count>0) {
         int num= ::write(unixPortHandle, data, count);
         if (num!=count) {
@@ -768,8 +768,7 @@ bool QFSerialConnection::write(uint8_t *data, int count) {
         }
     }*/
 
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     if (count>0) {
         int num= ::write(unixPortHandle, data, count);
         if (num!=count) {
@@ -821,8 +820,7 @@ bool QFSerialConnection::read(uint8_t *data, size_t num_bytes) {
         }
     }
 
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
 
     char b=0;
     unsigned long dwNumberOfBytesRecvd = 0;
@@ -901,8 +899,7 @@ std::string QFSerialConnection::read(size_t num_bytes, bool* ok) {
         }
     }
 
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     /*char b=0;
     int bytes=0;
     std::string res;
@@ -982,8 +979,7 @@ bool QFSerialConnection::read(char* ch) {
         return false;
     }
 
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     fd_set set;
     struct timeval timeout;
 
@@ -1089,8 +1085,7 @@ bool QFSerialConnection::read_nowait(char *ch) {
     commTimeout.WriteTotalTimeoutMultiplier = 10;
     SetCommTimeouts(portHandle, &commTimeout);
 
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     if (::read(unixPortHandle, ch, 1) <= 0) {
         ok= false;
     } else {
@@ -1159,8 +1154,7 @@ std::string QFSerialConnection::readUntil(std::string end_string, bool* ok) {
         std::cout<<"   okloop="<<okloop<<std::endl;*/
 
     }
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     char b=0;
     int bytes=0;
     std::string res="";
@@ -1256,8 +1250,7 @@ int QFSerialConnection::readUntil(char *result, int result_maxsize, const char *
         }
 
     }
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     char b=0;
     int bytes=0;
     int cnt=0;
@@ -1346,8 +1339,7 @@ std::string QFSerialConnection::readUntil(char end_char, bool* ok) {
             return res;
         }
     }
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     char b=0;
     int bytes=0;
     std::string res="";
@@ -1402,8 +1394,7 @@ bool QFSerialConnection::clearBuffer() {
         return false;
     }
 
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     if (logToFile && (log==NULL)) log=fopen("rs232.log", "w");
     if (logToFile) {
         fprintf(log, "<<!! clearing buffer\n");
@@ -1449,8 +1440,7 @@ std::vector<std::string> QFSerialConnection::listPorts() {
          }
          CloseHandle(hFile);
      }
-#endif
-#ifdef __LINUX__
+#elif defined(__APPLE_OR_LINUX__)
     std::vector<std::string> res1=listfiles_wildcard("/dev/*tty*");
     /*for (int i=res.size()-1; i>=0; i--)  {
         FILE* test=fopen(res[i].c_str(), "r+");

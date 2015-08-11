@@ -14,10 +14,13 @@
     \defgroup qf3lib_tools Tool Functions and Classes
     \ingroup qf3lib
 
+    \defgroup qf3lib_hardware Hardware Control Functions and Classes
+    \ingroup qf3lib
+
     \defgroup qf3lib_mathtools Math Tool Functions and Classes
     \ingroup qf3lib
 
-    \defgroup qf3lib_fitting Tools for Fitting
+    \defgroup qf3lib_fitting Tools for Data Fitting
     \ingroup qf3lib_mathtools
 
     \defgroup qf3lib_settings Settings/Options Management

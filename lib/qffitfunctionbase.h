@@ -29,6 +29,7 @@
 #include <cmath>
 #include "qfmathtools.h"
 #include "lib_imexport.h"
+#include <QObject>
 
 /*! \brief base class for fit functions
     \ingroup qf3lib_fitting

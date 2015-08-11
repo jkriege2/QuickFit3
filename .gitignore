@@ -186,3 +186,7 @@ release
 *.backup_old
 /extlibs/levmar/LICENSE
 /extlibs/lmfit5/COPYING
+/extlibs/libjpeg/jpeg-9a
+/output/*.zip
+/output/*.nsi
+/output/*.exe
