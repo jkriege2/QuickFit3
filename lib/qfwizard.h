@@ -266,10 +266,15 @@ class QFLIB_EXPORT QFTextWizardPage : public QFWizardPage
         Q_OBJECT
     public:
         explicit QFTextWizardPage(const QString &title, const QString& text, QWidget *parent = 0);
-
+        explicit QFTextWizardPage(const QString &title, QWidget *parent = 0);
+    public slots:
+        void setText(const QString& text);
     signals:
 
     public slots:
+
+    protected:
+        QLabel* label;
 
 };
 

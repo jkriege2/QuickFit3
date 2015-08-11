@@ -155,11 +155,6 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
 
     m->addSeparator();
 
-    QAction* action=new QAction(QIcon(getIconFilename()), tr("&load imFCS dataset"), parentWidget);
-    action->setStatusTip(tr("Insert a new imaging FCS record"));
-    connect(action, SIGNAL(triggered()), this, SLOT(insertRecord()));
-    m->addAction(action);
-
     QAction* actCorrelate=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_correlate.png"), tr("&correlate images and insert"), parentWidget);
     actCorrelate->setStatusTip(tr("Correlate an image series and insert the result into the current project"));
     connect(actCorrelate, SIGNAL(triggered()), this, SLOT(correlateAndInsert()));
@@ -169,6 +164,11 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
     actSimulate->setStatusTip(tr("Simulates an image series for ImFCS that can afterwards be correlated"));
     connect(actSimulate, SIGNAL(triggered()), this, SLOT(simulateForCorrelation()));
     m->addAction(actSimulate);
+
+    QAction* actionLoadDataset=new QAction(QIcon(getIconFilename()), tr("&load imFCS dataset"), parentWidget);
+    actionLoadDataset->setStatusTip(tr("Insert a new imaging FCS record"));
+    connect(actionLoadDataset, SIGNAL(triggered()), this, SLOT(insertRecord()));
+    m->addAction(actionLoadDataset);
     //actSimulate->setEnabled(false);
 
 }

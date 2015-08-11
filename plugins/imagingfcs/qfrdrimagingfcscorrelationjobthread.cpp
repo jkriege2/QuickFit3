@@ -19,6 +19,8 @@
 
 #include <QTextStream>
 
+#define STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_noeigen
+//#define STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_jacobiSvd
 #include "statistics_tools.h"
 #include "qfrdrimagingfcscorrelationjobthread.h"
 #include "qfrdrimagingfcscorrelationdialog.h"
@@ -2877,12 +2879,16 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                         pA=fit_I[0];
                         pB=-1.0/(fit_t[NFitFramesInt-2]/(fit_I[0]-fit_I[NFitFramesInt-2]));
                     }
+                    qDebug()<<i<<" pA= "<<pA;
+                    qDebug()<<i<<" pB= "<<pB;
 
                     double par[5]={pA, -1.0/pB,0,0,0};
                     int npar=4;
-
                     QVector<double> pFit(5,0.0);
+                    qDebug()<<i<<" fit_t= "<<arrayToString(fit_t, NFitFramesInt);
+                    qDebug()<<i<<" fit_I= "<<arrayToString(fit_I, NFitFramesInt);
                     if (statisticsPolyFit(fit_t, fit_I, NFitFramesInt, 4, pFit.data())) {
+                        std::cout.flush();
                         qDebug()<<i<<" PolyFit: "<<pFit[0]<<pFit[1]<<pFit[2]<<pFit[3]<<pFit[4];
 
                         par[0]=pFit[0];

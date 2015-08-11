@@ -80,7 +80,8 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcsdiffusionlawdialog.h \
     qfrdrimagingfcswizard.h \
     qfrdrimagingfcspixelfromobjective.h \
-    qfrdrimagingfcswizardcorrelationprogress.h
+    qfrdrimagingfcswizardcorrelationprogress.h \
+    qfrdrimagingfcsfitwizard.h
 #    ../base_classes/frawdataimageeditor.h \
 
 
@@ -120,7 +121,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcsdiffusionlawdialog.cpp \
     qfrdrimagingfcswizard.cpp \
     qfrdrimagingfcspixelfromobjective.cpp \
-    qfrdrimagingfcswizardcorrelationprogress.cpp
+    qfrdrimagingfcswizardcorrelationprogress.cpp \
+    qfrdrimagingfcsfitwizard.cpp
 #    ../base_classes/frawdataimageeditor.cpp \
 
 FORMS = \

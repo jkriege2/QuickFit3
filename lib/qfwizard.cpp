@@ -310,12 +310,29 @@ void QFWizardPage::setNoCancelButton(bool noCancelButton)
 QFTextWizardPage::QFTextWizardPage(const QString& title, const QString &text, QWidget *parent):
     QFWizardPage(title, parent)
 {
-    QLabel *label = new QLabel(text, this);
+    label = new QLabel(text, this);
     label->setWordWrap(true);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(label);
     setLayout(layout);
+}
+
+QFTextWizardPage::QFTextWizardPage(const QString &title, QWidget *parent):
+    QFWizardPage(title, parent)
+{
+    label = new QLabel( this);
+    label->setWordWrap(true);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(label);
+    setLayout(layout);
+}
+
+void QFTextWizardPage::setText(const QString &text)
+{
+    label->setText(text);
+    label->setWordWrap(true);
 }
 
 
