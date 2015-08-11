@@ -149,8 +149,12 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
 
     // create menu entries to insert data with this type
 
-    QAction* actWizard=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_correlate.png"), tr("imaging FCS Correlation &Wizard ..."), parentWidget);
+    QAction* actWizard=new QAction(QIcon(":/imaging_fcs/rdrwizard.png"), tr("imaging FCS Correlation &Wizard (don't add fits) ..."), parentWidget);
     actWizard->setStatusTip(tr("Correlate an image series and insert the result into the current project. This wizard simplifies the process, but the option \"correlate images and insert\" will offer finer control and more options."));
+    connect(actWizard, SIGNAL(triggered()), this, SLOT(startWizard()));
+    m->addAction(actWizard);
+    actWizard=new QAction(QIcon(":/imaging_fcs/projectwizard.png"), tr("imaging FCS Project &Wizard (also add fits) ..."), parentWidget);
+    actWizard->setStatusTip(tr("Correlate an image series and insert the result into the current project. This wizard simplifies the process, but the option \"correlate images and insert\" will offer finer control and more options.\n\nIn addition, this wizard also allows you to add relevant fitting objects to the project, based on your selection during the wizard."));
     connect(actWizard, SIGNAL(triggered()), this, SLOT(startWizard()));
     m->addAction(actWizard);
 

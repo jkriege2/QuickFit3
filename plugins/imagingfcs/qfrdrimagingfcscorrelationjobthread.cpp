@@ -1365,10 +1365,10 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
         ccf[nn]=1.0;
     }
     bool useBlocking=(job.segments<=1 && job.useBlockingErrorEstimate && ((job.correlator==CORRELATOR_DIRECT) || (job.correlator==CORRELATOR_DIRECT_INT) || (job.correlator==CORRELATOR_DIRECTAVG) || (job.correlator==CORRELATOR_DIRECTAVG_INT)));
-    qDebug()<<"useBLocking="<<useBlocking<<" segs="<<job.segments<<"  useBlock="<<job.useBlockingErrorEstimate<<"  corr="<<job.correlator;
+    //qDebug()<<"useBlocking="<<useBlocking<<" segs="<<job.segments<<"  useBlock="<<job.useBlockingErrorEstimate<<"  corr="<<job.correlator;
     if (job.segments>1 || useBlocking) {
         ccf_std=(double*)qfCalloc(ccf_N*frame_width*frame_height,sizeof(double));
-        qDebug()<<"created ccf_std="<<ccf_std;
+        //qDebug()<<"created ccf_std="<<ccf_std;
     }
 
     if (useBlocking) {
@@ -2870,7 +2870,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 bleachFitOK[i]=0;
-                qDebug()<<i<<"NFitFramesInt="<<NFitFramesInt<<"  NFitFrames="<<NFitFrames<<"  fit_t[NFitFramesInt-1]="<<fit_t[NFitFramesInt-1]<<"  fit_tin[(NFitFrames-1)/2]="<<fit_tin[(NFitFrames-1)/2];
+                //qDebug()<<i<<"NFitFramesInt="<<NFitFramesInt<<"  NFitFrames="<<NFitFrames<<"  fit_t[NFitFramesInt-1]="<<fit_t[NFitFramesInt-1]<<"  fit_tin[(NFitFrames-1)/2]="<<fit_tin[(NFitFrames-1)/2];
                 if (NFitFramesInt>5*4 && (NFitFramesInt>NFitFrames/5) && (fit_t[NFitFramesInt-1]>fit_tin[(NFitFrames-1)/2])) {
 
                     double pA=0, pB=0;
@@ -2879,17 +2879,17 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                         pA=fit_I[0];
                         pB=-1.0/(fit_t[NFitFramesInt-2]/(fit_I[0]-fit_I[NFitFramesInt-2]));
                     }
-                    qDebug()<<i<<" pA= "<<pA;
-                    qDebug()<<i<<" pB= "<<pB;
+                    //qDebug()<<i<<" pA= "<<pA;
+                    //qDebug()<<i<<" pB= "<<pB;
 
                     double par[5]={pA, -1.0/pB,0,0,0};
                     int npar=4;
                     QVector<double> pFit(5,0.0);
-                    qDebug()<<i<<" fit_t= "<<arrayToString(fit_t, NFitFramesInt);
-                    qDebug()<<i<<" fit_I= "<<arrayToString(fit_I, NFitFramesInt);
+                    //qDebug()<<i<<" fit_t= "<<arrayToString(fit_t, NFitFramesInt);
+                    //qDebug()<<i<<" fit_I= "<<arrayToString(fit_I, NFitFramesInt);
                     if (statisticsPolyFit(fit_t, fit_I, NFitFramesInt, 4, pFit.data())) {
-                        std::cout.flush();
-                        qDebug()<<i<<" PolyFit: "<<pFit[0]<<pFit[1]<<pFit[2]<<pFit[3]<<pFit[4];
+                        //std::cout.flush();
+                        //qDebug()<<i<<" PolyFit: "<<pFit[0]<<pFit[1]<<pFit[2]<<pFit[3]<<pFit[4];
 
                         par[0]=pFit[0];
                         par[1]=-1.0/pFit[1];
@@ -2898,27 +2898,27 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                         par[4]=-pFit[4]/pFit[1];
                         npar=5;
 
-                        qDebug()<<i<<" before LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+                        //qDebug()<<i<<" before LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
 
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
 
-                        qDebug()<<i<<" LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+                        //qDebug()<<i<<" LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
 
                     } else {
                         par[0]=pA;
                         par[1]=-1.0/pB;
 
-                        qDebug()<<i<<" before LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+                        //qDebug()<<i<<" before LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
 
                         npar=3;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
-                        qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+                        //qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
                         npar++;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
-                        qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+                        //qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
                         npar++;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
-                        qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+                        //qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
 
                     }
                     //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];

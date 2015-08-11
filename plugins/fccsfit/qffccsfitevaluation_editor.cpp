@@ -421,7 +421,7 @@ void QFFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEval
             c.models=fitmodels;
             c.roles=roles;
             for (int i=0; i<globalparams.size(); i++) {
-                c.globalParams.append(constructQListWithMultipleItems(QStringList(globalparams[i]), fitmodels[i].size()));
+                c.globalParams.append(constructQListWithMultipleItems(QStringList(globalparams[i]), fitmodels.size()));
             }
 
             configureFitFromGlobal(c, false);

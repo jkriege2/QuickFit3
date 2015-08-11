@@ -74,15 +74,38 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
                                                  "image reader will be selected automatically."
                                                  "<br><br>After selecting an image stack and clicking on <b>Next</b>, the file will be analyzed and you can set all necessary"
                                                  "metadata on the next wizard page. Afterwards you can configure the imaging FCS/FCCS correlation process and finish the wizard."
-                                                 "<br><br><u>Note:</u>If you want to read an uncompressed TIFF file, we propose to use the <b>tinyTIFF</b> image reader, "
+                                                 "<br><br><u>Note:</u> If you want to read an uncompressed TIFF file, we propose to use the <b>tinyTIFF</b> image reader, "
                                                  "as it can read larger files than the libTIFF reader!</i>"), wizSelfiles));
     lab->setWordWrap(true);
     labFileError=new QLabel(wizSelfiles);
     labFileError->setWordWrap(true);
     wizSelfiles->addRow(labFileError);
 
+    chkMoreFiles=new QCheckBox(tr("correlate additional files (\"batch mode\")"), this);
+    chkMoreFiles->setChecked(false);
 
-
+    wizSelfiles->addRow(chkMoreFiles);
+    lstMoreFiles=new QListWidget(this);
+    QLabel* labAF=NULL;
+    wizSelfiles->addRow(labAF=new QLabel(tr("additional files:")), lstMoreFiles);
+    labAF->setEnabled(false);
+    lstMoreFiles->setEnabled(false);
+    connect(chkMoreFiles, SIGNAL(toggled(bool)), lstMoreFiles, SLOT(setEnabled(bool)));
+    connect(chkMoreFiles, SIGNAL(toggled(bool)), labAF, SLOT(setEnabled(bool)));
+    btnAddMoreFiles=new QPushButton(tr("add file ..."), this);
+    btnRemoveMoreFiles=new QPushButton(tr("remove selected"), this);
+    btnAddMoreFiles->setEnabled(false);
+    btnRemoveMoreFiles->setEnabled(false);
+    QLabel* labMore;
+    wizSelfiles->addRow(QString(), qfBuildQHBoxLayoutWithFinalStretch(btnAddMoreFiles, btnRemoveMoreFiles));
+    wizSelfiles->addRow(QString(), labMore=new QLabel(tr("<u>Note</u>: additional files will be processed with EXACTLY the same settings, as the main file (selected above)! Therefore make sure that they have the same properties (width, height, frametime/-rate, ...). Also the same file will be used for background correction (if given at all). The number of frames does not necessarily have to be the same, but if more frames are available, some properties of the result (e.g. length/statistics of the segments) may differ."), this));
+    labMore->setWordWrap(true);
+    labMore->setEnabled(false);
+    connect(chkMoreFiles, SIGNAL(toggled(bool)), btnAddMoreFiles, SLOT(setEnabled(bool)));
+    connect(chkMoreFiles, SIGNAL(toggled(bool)), btnRemoveMoreFiles, SLOT(setEnabled(bool)));
+    connect(chkMoreFiles, SIGNAL(toggled(bool)), labMore, SLOT(setEnabled(bool)));
+    connect(btnAddMoreFiles, SIGNAL(clicked()), this, SLOT(addFile()));
+    connect(btnRemoveMoreFiles, SIGNAL(clicked()), this, SLOT(removeFiles()));
 
 
 
@@ -300,6 +323,8 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     connect(spinCalibSegments, SIGNAL(valueChanged(int)), this, SLOT(calibrationValuesChanged()));
     connect(spinCalibTauMax, SIGNAL(valueChanged(double)), this, SLOT(calibrationValuesChanged()));
     calibrationCropValuesChanged();
+    calibWxyTestChanged();
+    calibrationCropValuesChanged();
 
 
     setPage(CropAndBinPage, wizCropAndBin=new QFImagePlotWizardPage(tr("Setup Crop & Bin ..."), this));
@@ -401,6 +426,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     labSegments=new QLabel(wizCorrelation);
     labSegments->setWordWrap(true);
     wizCorrelation->addRow(QString(), labSegments);
+    correlationValuesChanged();
 
 
     setPage(ProcessCorrelationPage, wizProcessJobs=new QFGridWizardPage(tr("Process Correlation ..."), this));
@@ -579,10 +605,10 @@ void QFRDRImagingFCSWizard::finalizeAndModifyProject(bool projectwizard, QFRDRIm
                     }
                 }
             }
-            qDebug()<<chkLastIm2cFCCSFit << chkLastIm2cFCCSFit->isChecked() << chk2ColorFCCS->isChecked();
+            //qDebug()<<chkLastIm2cFCCSFit << chkLastIm2cFCCSFit->isChecked() << chk2ColorFCCS->isChecked();
             if (chkLastIm2cFCCSFit && chkLastIm2cFCCSFit->isChecked() && chk2ColorFCCS->isChecked()) {
                 QFEvaluationItem* e=project->addEvaluation("imfccs_fit", tr("Global 2-color Imaging FCCS fit"));
-                qDebug()<<" adding 2-color FCCS fit "<<e;
+                //qDebug()<<" adding 2-color FCCS fit "<<e;
                 if (e) {
                     e->setQFProperty("FIT_REPEATS", 2, false, false);
                     e->setQFProperty("PRESET_FOCUS_HEIGHT", spinWz->value(), false, false);
@@ -770,6 +796,10 @@ void QFRDRImagingFCSWizard::initFileSelection()
     //qDebug()<<"initFileSelection";
     wizSelfiles->setUseExternalIsComplete(true);
     wizSelfiles->setExternalIsComplete(!edtFilename->text().isEmpty());
+    if (wizIntro->isChecked(1)) {
+        chkMoreFiles->setChecked(false);
+        chkMoreFiles->setEnabled(false);
+    }
 }
 
 void QFRDRImagingFCSWizard::finishedIntro()
@@ -1095,163 +1125,205 @@ void QFRDRImagingFCSWizard::calibrationValuesChanged()
 
 void QFRDRImagingFCSWizard::validateCorrelation()
 {
-    chkLastImFCSFit1->setEnabled(true);
-    chkLastIm2cFCCSFit->setEnabled(chk2ColorFCCS->isChecked());
-    chkLastIm2fFCCSFit->setEnabled(cmb2PixelFCCS->currentIndex()>0);
+    if (chkLastImFCSFit1) chkLastImFCSFit1->setEnabled(true);
+    if (chkLastIm2cFCCSFit) chkLastIm2cFCCSFit->setEnabled(chk2ColorFCCS->isChecked());
+    if (chkLastIm2fFCCSFit) chkLastIm2fFCCSFit->setEnabled(cmb2PixelFCCS->currentIndex()>0);
+}
+
+void QFRDRImagingFCSWizard::addFile()
+{
+    if (edtFilename->text().isEmpty()) {
+        QMessageBox::critical(this, tr("add additional file for processing"), tr("you can only add additional files for processing once, you selected the major file at the top of this wizard page!"), QMessageBox::Ok, QMessageBox::Ok);
+    } else {
+        QString lastImagefileDir=QDir::homePath();
+        QString lastImagefileFilter="TIFF File [tinyTIFF] (*.tiff *.tif)";
+
+        lastImagefileDir=ProgramOptions::getConfigValue("imaging_fcs/wizard/last_imagefile_dir", lastImagefileDir).toString();
+        lastImagefileFilter=ProgramOptions::getConfigValue("imaging_fcs/wizard/last_imagefile_filter", lastImagefileFilter).toString();
+
+
+        QString fileName = qfGetOpenFileName(this, tr("Select Image Stack File ..."), lastImagefileDir, imageFilters.value(cmbFileformat->currentIndex()), &lastImagefileFilter);
+        if (!fileName.isEmpty()) {
+            lastImagefileDir=QFileInfo(fileName).dir().absolutePath();
+            lstMoreFiles->addItem(fileName);
+            ProgramOptions::setConfigValue("imaging_fcs/wizard/last_imagefile_dir", lastImagefileDir);
+            ProgramOptions::setConfigValue("imaging_fcs/wizard/last_imagefile_filter", lastImagefileFilter);
+        }
+    }
+}
+
+void QFRDRImagingFCSWizard::removeFiles()
+{
+    if (!chkMoreFiles->isChecked()) return;
+    QList<QListWidgetItem *> itemList = lstMoreFiles->selectedItems();
+    for (int i=0; i<itemList.size(); i++) {
+        lstMoreFiles->takeItem(lstMoreFiles->row(itemList[i]));
+        delete itemList[i];
+    }
 }
 
 void QFRDRImagingFCSWizard::startProcessingJobs()
 {
+    QStringList files;
+    files<<edtFilename->text();
+    if (chkMoreFiles->isChecked() && lstMoreFiles->count()>0 && wizIntro->isChecked(0)) {
+        for (int i=0; i<lstMoreFiles->count(); i++) {
+            if (QFile::exists(lstMoreFiles->item(i)->text())) files<<lstMoreFiles->item(i)->text();
+        }
+    }
     validateCorrelation();
-    IMFCSJob basicjob;
-    basicjob.filename=edtFilename->text();
-    basicjob.filenameBackground=edtBackgroundFilename->text();
-    basicjob.fileFormat=cmbFileformat->currentIndex();
-    basicjob.correlator=CORRELATOR_DIRECTAVG;
-    basicjob.backgroundCorrection=cmbBackgroundMode->currentData().toInt();
-    basicjob.backgroundOffset=spinBackgroundOffset->value();
-    basicjob.P=16;
-    basicjob.m=2;
-    basicjob.segments=spinSegments->value();
-    basicjob.frameTime=spinFrametime->value()*1e-6;
-    basicjob.S=qBound(3, basicjob.getIdealS(), 200);
-    basicjob.range_min=widFrameRange->getFirst();
-    basicjob.range_max=widFrameRange->getLast();
-    basicjob.addToProject=true;
-    basicjob.prefix="./results/";
-    basicjob.postfix="_wizard_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%";
-    basicjob.acf=false;
-    basicjob.statistics_frames=qBound(10,frame_count_io/1000,2000);
-    basicjob.backstatistics_frames=qBound(10,background_count/100,2000);
-    basicjob.statistics=true;
-    basicjob.video=true;
-    basicjob.video_frames=basicjob.statistics_frames;
-    basicjob.binning=1;
-    basicjob.binAverage=false;
-    basicjob.use_cropping=false;
-    basicjob.crop_x0=0;
-    basicjob.crop_x1=image_width_io-1;
-    basicjob.crop_y0=0;
-    basicjob.crop_y1=image_height_io-1;
 
-    basicjob.distanceCCF=false;
-    basicjob.DCCFDeltaX.clear();
-    basicjob.DCCFDeltaY.clear();
-    basicjob.DCCFrole.clear();
-    basicjob.bleach=cmbBleachCorrection->currentData().toInt();
-    basicjob.bleachAvgFrames=qMax(20u,basicjob.statistics_frames/10);
-    qDebug()<<"BLEACH_CORRECTION: "<<basicjob.bleach<<"  frames="<<basicjob.bleachAvgFrames;
-    basicjob.interleaved_binning=false;
-    basicjob.cameraSettingsGiven=true;
-    basicjob.cameraPixelWidth=widPixSize->getPixelWidth();
-    basicjob.cameraPixelHeight=widPixSize->getPixelHeight();
-    basicjob.dualViewMode=cmbDualView->currentData().toInt();
-    basicjob.addFCCSSeparately=true;
-    basicjob.addNandB=false;
-    basicjob.useBlockingErrorEstimate=(basicjob.segments<=1);
-
-    if (wizIntro->isChecked(1)) { // calibration
-        basicjob.segments=spinCalibSegments->value();
-        basicjob.S=qBound(3, basicjob.getIdealS(), 200);
-        for (int b=1; b<=spinCalibBinMax->value(); b++) {
-            IMFCSJob job=basicjob;
-            job.acf=true;
-            job.postfix="_wizardcalib_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%";
-            job.use_cropping=cmbCalibCropRegion->currentIndex()>0;
-            if (job.use_cropping) {
-                job.crop_x0=widCropCalibration->getX1();
-                job.crop_x1=widCropCalibration->getX2();
-                job.crop_y0=widCropCalibration->getY1();
-                job.crop_y1=widCropCalibration->getY2();
-            }
-            job.binning=b;
-            widProcess->addJob(job);
-        }
-    } else { // normal correlation
-        basicjob.postfix="_wizard_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%";
-        basicjob.binning=spinBinning->value();
-        basicjob.use_cropping=cmbCropRegion->currentIndex()>0;
+    for (int f=0; f<files.size(); f++) {
+        IMFCSJob basicjob;
+        basicjob.filename=files[f];
+        basicjob.filenameBackground=edtBackgroundFilename->text();
+        basicjob.fileFormat=cmbFileformat->currentIndex();
+        basicjob.correlator=CORRELATOR_DIRECTAVG;
+        basicjob.backgroundCorrection=cmbBackgroundMode->currentData().toInt();
+        basicjob.backgroundOffset=spinBackgroundOffset->value();
+        basicjob.P=16;
+        basicjob.m=2;
         basicjob.segments=spinSegments->value();
-        basicjob.S=qBound(3, basicjob.getIdealS(spinTauMax->value()), 200);
+        basicjob.frameTime=spinFrametime->value()*1e-6;
+        basicjob.S=qBound(3, basicjob.getIdealS(), 200);
+        basicjob.range_min=widFrameRange->getFirst();
+        basicjob.range_max=widFrameRange->getLast();
+        basicjob.addToProject=true;
+        basicjob.prefix="./results/";
+        basicjob.postfix="_wizard_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%";
+        basicjob.acf=false;
+        basicjob.statistics_frames=qBound(10,frame_count_io/1000,2000);
+        basicjob.backstatistics_frames=qBound(10,background_count/100,2000);
+        basicjob.statistics=true;
+        basicjob.video=true;
+        basicjob.video_frames=basicjob.statistics_frames;
+        basicjob.binning=1;
+        basicjob.binAverage=false;
+        basicjob.use_cropping=false;
+        basicjob.crop_x0=0;
+        basicjob.crop_x1=image_width_io-1;
+        basicjob.crop_y0=0;
+        basicjob.crop_y1=image_height_io-1;
 
-        if (basicjob.use_cropping) {
-            basicjob.crop_x0=widCrop->getX1();
-            basicjob.crop_x1=widCrop->getX2();
-            basicjob.crop_y0=widCrop->getY1();
-            basicjob.crop_y1=widCrop->getY2();
-        }
-        if (chkACF->isChecked()) {
-            basicjob.acf=true;
-        }
-        if (chk2ColorFCCS->isChecked() && cmbDualView->currentData().toInt()>0) {
-            basicjob.distanceCCF=true;
-            if (cmbDualView->currentIndex()==DUALVIEW_HORICONTAL) {
-                basicjob.DCCFDeltaX << image_width_io/2/basicjob.binning;
-                basicjob.DCCFDeltaY << 0;
-                basicjob.DCCFrole<<QString("FCCS");
-                basicjob.distanceCCF=true;
-            } else if (cmbDualView->currentIndex()==DUALVIEW_VERTICAL) {
-                basicjob.DCCFDeltaX << 0;
-                basicjob.DCCFDeltaY << image_height_io/2/basicjob.binning;
-                basicjob.DCCFrole<<QString("FCCS");
-                basicjob.distanceCCF=true;
+        basicjob.distanceCCF=false;
+        basicjob.DCCFDeltaX.clear();
+        basicjob.DCCFDeltaY.clear();
+        basicjob.DCCFrole.clear();
+        basicjob.bleach=cmbBleachCorrection->currentData().toInt();
+        basicjob.bleachAvgFrames=qMax(20u,basicjob.statistics_frames/10);
+        //qDebug()<<"BLEACH_CORRECTION: "<<basicjob.bleach<<"  frames="<<basicjob.bleachAvgFrames;
+        basicjob.interleaved_binning=false;
+        basicjob.cameraSettingsGiven=true;
+        basicjob.cameraPixelWidth=widPixSize->getPixelWidth();
+        basicjob.cameraPixelHeight=widPixSize->getPixelHeight();
+        basicjob.dualViewMode=cmbDualView->currentData().toInt();
+        basicjob.addFCCSSeparately=true;
+        basicjob.addNandB=false;
+        basicjob.useBlockingErrorEstimate=(basicjob.segments<=1);
+
+        if (wizIntro->isChecked(1)) { // calibration
+            basicjob.segments=spinCalibSegments->value();
+            basicjob.S=qBound(3, basicjob.getIdealS(), 200);
+            for (int b=1; b<=spinCalibBinMax->value(); b++) {
+                IMFCSJob job=basicjob;
+                job.acf=true;
+                job.postfix="_wizardcalib_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%";
+                job.use_cropping=cmbCalibCropRegion->currentIndex()>0;
+                if (job.use_cropping) {
+                    job.crop_x0=widCropCalibration->getX1();
+                    job.crop_x1=widCropCalibration->getX2();
+                    job.crop_y0=widCropCalibration->getY1();
+                    job.crop_y1=widCropCalibration->getY2();
+                }
+                job.binning=b;
+                widProcess->addJob(job);
             }
-        }
-        if (cmb2PixelFCCS->currentIndex()>0) {
-            basicjob.distanceCCF=true;
-            if (cmb2PixelFCCS->currentIndex()==1) {
-                basicjob.addDCCF(-1,0);
-                basicjob.addDCCF(1,0);
-                basicjob.addDCCF(0,-1);
-                basicjob.addDCCF(0,1);
-            } else if (cmb2PixelFCCS->currentIndex()==2) {
-                basicjob.addDCCF(-1,0);
-                basicjob.addDCCF(1,0);
-                basicjob.addDCCF(0,-1);
-                basicjob.addDCCF(0,1);
-                basicjob.addDCCF(-1,-1);
-                basicjob.addDCCF(-1,1);
-                basicjob.addDCCF(1,-1);
-                basicjob.addDCCF(1,1);
-            } else if (cmb2PixelFCCS->currentIndex()==3) {
-                basicjob.addDCCF(1,0);
-            } else if (cmb2PixelFCCS->currentIndex()==4) {
-                basicjob.addDCCF(-1,0);
-            } else if (cmb2PixelFCCS->currentIndex()==5) {
-                basicjob.addDCCF(0,1);
-            } else if (cmb2PixelFCCS->currentIndex()==6) {
-                basicjob.addDCCF(0,-1);
-            } else if (cmb2PixelFCCS->currentIndex()==7) {
-                basicjob.addDCCF(1,0);
-                basicjob.addDCCF(2,0);
-            } else if (cmb2PixelFCCS->currentIndex()==8) {
-                basicjob.addDCCF(-1,0);
-                basicjob.addDCCF(-2,0);
-            } else if (cmb2PixelFCCS->currentIndex()==9) {
-                basicjob.addDCCF(0,1);
-                basicjob.addDCCF(0,2);
-            } else if (cmb2PixelFCCS->currentIndex()==10) {
-                basicjob.addDCCF(0,-1);
-                basicjob.addDCCF(0,-2);
-            } else if (cmb2PixelFCCS->currentIndex()==11) {
-                for (int d=1; d<=5; d++) basicjob.addDCCF(d,0);
-            } else if (cmb2PixelFCCS->currentIndex()==12) {
-                for (int d=1; d<=5; d++) basicjob.addDCCF(-d,0);
-            } else if (cmb2PixelFCCS->currentIndex()==13) {
-                for (int d=1; d<=5; d++) basicjob.addDCCF(0,d);
-            } else if (cmb2PixelFCCS->currentIndex()==14) {
-                for (int d=1; d<=5; d++) basicjob.addDCCF(0,-d);
-            } else if (cmb2PixelFCCS->currentIndex()==15) {
-                for (int d=1; d<=10; d++) basicjob.addDCCF(d,0);
-            } else if (cmb2PixelFCCS->currentIndex()==16) {
-                for (int d=1; d<=10; d++) basicjob.addDCCF(-d,0);
-            } else if (cmb2PixelFCCS->currentIndex()==17) {
-                for (int d=1; d<=10; d++) basicjob.addDCCF(0,d);
-            } else if (cmb2PixelFCCS->currentIndex()==18) {
-                for (int d=1; d<=10; d++) basicjob.addDCCF(0,-d);
+        } else { // normal correlation
+            basicjob.postfix="_wizard_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%";
+            basicjob.binning=spinBinning->value();
+            basicjob.use_cropping=cmbCropRegion->currentIndex()>0;
+            basicjob.segments=spinSegments->value();
+            basicjob.S=qBound(3, basicjob.getIdealS(spinTauMax->value()), 200);
+
+            if (basicjob.use_cropping) {
+                basicjob.crop_x0=widCrop->getX1();
+                basicjob.crop_x1=widCrop->getX2();
+                basicjob.crop_y0=widCrop->getY1();
+                basicjob.crop_y1=widCrop->getY2();
             }
+            if (chkACF->isChecked()) {
+                basicjob.acf=true;
+            }
+            if (chk2ColorFCCS->isChecked() && cmbDualView->currentData().toInt()>0) {
+                basicjob.distanceCCF=true;
+                if (cmbDualView->currentIndex()==DUALVIEW_HORICONTAL) {
+                    basicjob.DCCFDeltaX << image_width_io/2/basicjob.binning;
+                    basicjob.DCCFDeltaY << 0;
+                    basicjob.DCCFrole<<QString("FCCS");
+                    basicjob.distanceCCF=true;
+                } else if (cmbDualView->currentIndex()==DUALVIEW_VERTICAL) {
+                    basicjob.DCCFDeltaX << 0;
+                    basicjob.DCCFDeltaY << image_height_io/2/basicjob.binning;
+                    basicjob.DCCFrole<<QString("FCCS");
+                    basicjob.distanceCCF=true;
+                }
+            }
+            if (cmb2PixelFCCS->currentIndex()>0) {
+                basicjob.distanceCCF=true;
+                if (cmb2PixelFCCS->currentIndex()==1) {
+                    basicjob.addDCCF(-1,0);
+                    basicjob.addDCCF(1,0);
+                    basicjob.addDCCF(0,-1);
+                    basicjob.addDCCF(0,1);
+                } else if (cmb2PixelFCCS->currentIndex()==2) {
+                    basicjob.addDCCF(-1,0);
+                    basicjob.addDCCF(1,0);
+                    basicjob.addDCCF(0,-1);
+                    basicjob.addDCCF(0,1);
+                    basicjob.addDCCF(-1,-1);
+                    basicjob.addDCCF(-1,1);
+                    basicjob.addDCCF(1,-1);
+                    basicjob.addDCCF(1,1);
+                } else if (cmb2PixelFCCS->currentIndex()==3) {
+                    basicjob.addDCCF(1,0);
+                } else if (cmb2PixelFCCS->currentIndex()==4) {
+                    basicjob.addDCCF(-1,0);
+                } else if (cmb2PixelFCCS->currentIndex()==5) {
+                    basicjob.addDCCF(0,1);
+                } else if (cmb2PixelFCCS->currentIndex()==6) {
+                    basicjob.addDCCF(0,-1);
+                } else if (cmb2PixelFCCS->currentIndex()==7) {
+                    basicjob.addDCCF(1,0);
+                    basicjob.addDCCF(2,0);
+                } else if (cmb2PixelFCCS->currentIndex()==8) {
+                    basicjob.addDCCF(-1,0);
+                    basicjob.addDCCF(-2,0);
+                } else if (cmb2PixelFCCS->currentIndex()==9) {
+                    basicjob.addDCCF(0,1);
+                    basicjob.addDCCF(0,2);
+                } else if (cmb2PixelFCCS->currentIndex()==10) {
+                    basicjob.addDCCF(0,-1);
+                    basicjob.addDCCF(0,-2);
+                } else if (cmb2PixelFCCS->currentIndex()==11) {
+                    for (int d=1; d<=5; d++) basicjob.addDCCF(d,0);
+                } else if (cmb2PixelFCCS->currentIndex()==12) {
+                    for (int d=1; d<=5; d++) basicjob.addDCCF(-d,0);
+                } else if (cmb2PixelFCCS->currentIndex()==13) {
+                    for (int d=1; d<=5; d++) basicjob.addDCCF(0,d);
+                } else if (cmb2PixelFCCS->currentIndex()==14) {
+                    for (int d=1; d<=5; d++) basicjob.addDCCF(0,-d);
+                } else if (cmb2PixelFCCS->currentIndex()==15) {
+                    for (int d=1; d<=10; d++) basicjob.addDCCF(d,0);
+                } else if (cmb2PixelFCCS->currentIndex()==16) {
+                    for (int d=1; d<=10; d++) basicjob.addDCCF(-d,0);
+                } else if (cmb2PixelFCCS->currentIndex()==17) {
+                    for (int d=1; d<=10; d++) basicjob.addDCCF(0,d);
+                } else if (cmb2PixelFCCS->currentIndex()==18) {
+                    for (int d=1; d<=10; d++) basicjob.addDCCF(0,-d);
+                }
+            }
+            widProcess->addJob(basicjob);
         }
-        widProcess->addJob(basicjob);
     }
 
 

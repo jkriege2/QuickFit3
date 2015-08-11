@@ -4,7 +4,7 @@
 #include "qfrdrimagingfcs.h"
 
 QFRDRImagingFCSFitWizard::QFRDRImagingFCSFitWizard(QWidget *parent):
-    QFWizard(QSize(600, 440), parent, QString("imaging_fcs/wizard/"))
+    QFWizard(QSize(600, 440), parent, QString("imaging_fcs/fitwizard/"))
 {
     QLabel* lab;
 
@@ -16,7 +16,7 @@ QFRDRImagingFCSFitWizard::QFRDRImagingFCSFitWizard(QWidget *parent):
     setWindowTitle(tr("Imaging FCS/FCCS Fit Wizard"));
     setPage(InitPage, wizIntro=new QFTextWizardPage(tr("Introduction"), this));
     wizIntro->setText(tr("This wizard will help you set up a project for imaging (2-pixel/2-color) FCS or FCCS fitting.<br>"
-                        "<u>Note:</u> This wizard assumes that you have already correlated the data. If not, use one of the other imaging FCS wizards, which also allow to fit data.<br><br>"
+                        "<u>Note:</u> This wizard assumes that you have already correlated the data and helps you to set up the fitting objects for such data.<br><br>If you haven't yet correlated the data, use one of the other imaging FCS wizards or the \"correlate images\" dialog, which also allow to correlate data.<br><br>"
                         ));
 
 
@@ -31,7 +31,7 @@ QFRDRImagingFCSFitWizard::QFRDRImagingFCSFitWizard(QWidget *parent):
     cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / lightsheet microscopy (SPIM/LSFM/other)"),3);
     //cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / TIRF microscopyl"),4);
     //cmbMicroscopy->addItem(tr("camera with non-rectangular pixels / other microscopy"),5);
-    cmbMicroscopy->setCurrentFromModelData(ProgramOptions::getConfigValue("imaging_fcs/wizard/microscopy", 0).toInt());
+    cmbMicroscopy->setCurrentFromModelData(ProgramOptions::getConfigValue("imaging_fcs/fitwizard/microscopy", 0).toInt());
     wizMicroscopy->addRow(tr("&Microscopy Technique:"), cmbMicroscopy);
     labMicroscopy=new QLabel(this);
     labMicroscopy->setWordWrap(true);
@@ -40,7 +40,7 @@ QFRDRImagingFCSFitWizard::QFRDRImagingFCSFitWizard(QWidget *parent):
     spinWz=new QDoubleSpinBox(wizMicroscopy);
     spinWz->setDecimals(2);
     spinWz->setRange(0.1, 10000);
-    spinWz->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_wz", 1200).toDouble());
+    spinWz->setValue(ProgramOptions::getConfigValue("imaging_fcs/fitwizard/calib_wz", 1200).toDouble());
     spinWz->setSuffix(" nm");
     wizMicroscopy->addRow(tr("PSF z-extent <i>w</i><sub>z</sub>:"), spinWz);
     wizMicroscopy->addRow(QString(), labWz=new QLabel(tr("give as 1/e<sup>2</sup>-halfwidth<br><i><u>Note:</u> This is required for calibrating SPIM-microscopes and for data-fitting and can be measured e.g. by a bead-scan.</i>"), wizMicroscopy));
@@ -49,7 +49,7 @@ QFRDRImagingFCSFitWizard::QFRDRImagingFCSFitWizard(QWidget *parent):
     spinWxy=new QDoubleSpinBox(wizMicroscopy);
     spinWxy->setDecimals(2);
     spinWxy->setRange(0.1, 10000);
-    spinWxy->setValue(ProgramOptions::getConfigValue("imaging_fcs/wizard/calib_wxy", 600).toDouble());
+    spinWxy->setValue(ProgramOptions::getConfigValue("imaging_fcs/fitwizard/calib_wxy", 600).toDouble());
     spinWxy->setSuffix(" nm");
     wizMicroscopy->addRow(tr("PSF xy-extent <i>w</i><sub>xy</sub>:"), spinWxy);
     wizMicroscopy->addRow(QString(), labWxy=new QLabel(tr("give as 1/e<sup>2</sup>-halfwidth<br><i><u>Note:</u> This is required for data-fitting and can be determined by an imaging FCS calibration.</i>"), wizMicroscopy));
@@ -92,6 +92,11 @@ QFRDRImagingFCSFitWizard::QFRDRImagingFCSFitWizard(QWidget *parent):
     cmbIm2fFCCSFitMode->addItem(tr("2-component anomalous diffusion"));
     cmbIm2fFCCSFitMode->setEnabled(false);
 
+    spinCCFs=new QSpinBox(this);
+    spinCCFs->setRange(1,100);
+    spinCCFs->setValue(ProgramOptions::getConfigValue("imaging_fcs/fitwizard/ccfs", 4).toInt());
+    spinCCFs->setEnabled(false);
+
     chkLastImFCSFit1=new QCheckBox(tr("single-curve FCS fit:"), this);
     chkLastImFCSFit1->setChecked(true);
     //wizFinalizePage->addRow(tr("Evaluations"), chkLastImFCSFit1);
@@ -106,7 +111,11 @@ QFRDRImagingFCSFitWizard::QFRDRImagingFCSFitWizard(QWidget *parent):
     chkLastIm2fFCCSFit->setChecked(false);
     chkLastIm2fFCCSFit->setEnabled(false);
     connect(chkLastIm2fFCCSFit, SIGNAL(toggled(bool)), cmbIm2fFCCSFitMode, SLOT(setEnabled(bool)));
+    connect(chkLastIm2fFCCSFit, SIGNAL(toggled(bool)), spinCCFs, SLOT(setEnabled(bool)));
+    connect(chkLastIm2fFCCSFit, SIGNAL(toggled(bool)), wizFinalizePage->getFormLayout()->labelForField(spinCCFs), SLOT(setEnabled(bool)));
+    if (wizFinalizePage->getFormLayout()->labelForField(spinCCFs)) wizFinalizePage->getFormLayout()->labelForField(spinCCFs)->setEnabled(spinCCFs->isEnabled());
     wizFinalizePage->addRow(chkLastIm2fFCCSFit, cmbIm2fFCCSFitMode);
+    wizFinalizePage->addRow(tr("number of CCF-curves"), spinCCFs);
     wizFinalizePage->addRow(QString(), tr("<u>Note:</u> This wizard will try to pre-configure the fit evaluation items in the project to meet your settings. In seldom cases, this will not be possible, so please check the fit model configuration before performing any fits.<br>Also you may wish to use differently configured models. In that case you can also reconfigure the presets before starting the fits!<br><br>"
                                           "After finishing this wizard, it will load all records into the project and (possibly) add several fit evaluation objects. After this you are set to perform fits and evaluate their results. There are two major dialogs that you can use for this:<ol>"
                                           "<li>The <b>imagingFCS RDR editor</b> can be reached by double-clicking any raw data record (RDR) in the project. On the second tab (\"Parameter Image\") of this dialog, you will find the parameter images (after the fits) and tools to evaluate them statistically and also to e.g. mask the image.</li>"
@@ -124,7 +133,7 @@ QFRDRImagingFCSFitWizard::~QFRDRImagingFCSFitWizard()
 
 void QFRDRImagingFCSFitWizard::finalizeAndModifyProject(QFRDRImagingFCSPlugin */*plugin*/)
 {
-
+    ProgramOptions::setConfigValue("imaging_fcs/fitwizard/ccfs", spinCCFs->value());
     QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
     if (project) {
         if (chkLastImFCSFit1 && chkLastImFCSFit1->isChecked()) {
@@ -239,7 +248,7 @@ void QFRDRImagingFCSFitWizard::finalizeAndModifyProject(QFRDRImagingFCSPlugin */
                 e->setQFProperty("PRESET_FOCUS_WIDTH_ERROR", 0, false, false);
                 QString acfmodel="";
                 QString ccfmodel="";
-                int Nccf=4;
+                int Nccf=spinCCFs->value();
                 QStringList globalparams;
                 if (cmbIm2fFCCSFitMode->currentIndex()==0 || cmbIm2fFCCSFitMode->currentIndex()==1 || cmbIm2fFCCSFitMode->currentIndex()==2 || cmbIm2fFCCSFitMode->currentIndex()==3) {
                     if (((cmbMicroscopy->currentData().toInt()==0)||(cmbMicroscopy->currentData().toInt()==2)) ) { // anomalous
@@ -334,9 +343,9 @@ void QFRDRImagingFCSFitWizard::finishedIntro()
 void QFRDRImagingFCSFitWizard::microscopyChoosen()
 {
     //qDebug()<<"microscopyChoosen";
-    ProgramOptions::setConfigValue("imaging_fcs/wizard/microscopy", cmbMicroscopy->currentData().toInt());
-    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wz", spinWz->value());
-    ProgramOptions::setConfigValue("imaging_fcs/wizard/calib_wxy", spinWxy->value());
+    ProgramOptions::setConfigValue("imaging_fcs/fitwizard/microscopy", cmbMicroscopy->currentData().toInt());
+    ProgramOptions::setConfigValue("imaging_fcs/fitwizard/calib_wz", spinWz->value());
+    ProgramOptions::setConfigValue("imaging_fcs/fitwizard/calib_wxy", spinWxy->value());
 
     QString msg;
 

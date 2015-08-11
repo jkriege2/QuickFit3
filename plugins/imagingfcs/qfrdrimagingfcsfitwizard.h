@@ -54,6 +54,7 @@ class QFRDRImagingFCSFitWizard : public QFWizard {
         QLabel* labWz;
         QDoubleSpinBox* spinWxy;
         QLabel* labWxy;
+        QSpinBox* spinCCFs;
 
         QFFormWizardPage* wizFinalizePage;
         //QLabel* labFinal;

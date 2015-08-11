@@ -19,6 +19,8 @@
 #include "qfrdrimagingfcswizardcorrelationprogress.h"
 #include "qfpseudotreemodel.h"
 #include "qffitfunctionconfigforglobalfitinterface.h"
+#include <QListWidget>
+#include <QListWidgetItem>
 
 class QFRDRImagingFCSPlugin; // forward
 class QFRDRImagingFCSWizard_BackgroundIsValid;
@@ -70,6 +72,9 @@ class QFRDRImagingFCSWizard : public QFWizard {
         void startProcessingJobs();
         void calibrationValuesChanged();
         void validateCorrelation();
+
+        void addFile();
+        void removeFiles();
     protected:
 
         QFRadioButtonListWizardPage* wizIntro;
@@ -97,6 +102,11 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QFEnhancedComboBox* cmbFileformat;
         QFPluginServices* pluginServices;
         QLabel* labFileError;
+
+        QCheckBox* chkMoreFiles;
+        QListWidget* lstMoreFiles;
+        QPushButton* btnAddMoreFiles;
+        QPushButton* btnRemoveMoreFiles;
 
 
 
