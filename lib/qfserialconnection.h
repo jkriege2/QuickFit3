@@ -25,7 +25,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 #ifndef __APPLE__
-#  if defined(__APPLE__) || defined(macintosh) || defined(Macintosh) || defined(__APPLE__ && __MACH__) || defined(__APPLE_CC__) || defined(__OSX__)
+#  if defined(__APPLE__) || defined(macintosh) || defined(Macintosh) || (defined(__APPLE__) && defined(__MACH__)) || defined(__APPLE_CC__) || defined(__OSX__)
 #    define __APPLE__
 #  endif
 #endif

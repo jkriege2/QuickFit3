@@ -148,7 +148,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	cd build/zlib-1.2.8
 	ISMSYS=`uname -o`
 	echo $ISMSYS
-	if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+ 	if [[ $ISMSYS == *"Msys"* ]] ; then
 		BINARY_PATH='../../bin'
 		INCLUDE_PATH='../../include'
 		LIBRARY_PATH='../../lib'
@@ -157,20 +157,12 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		
 		MAKEFILE="Makefile.gcc"
 	else
-		if [ -z "$MORECFLAGS" ]; then
-			if [ -z "$MORELDFLAGS" ]; then
-				./configure --static --prefix=${CURRENTDIR}/zlib
-			else
-				./configure --static --prefix=${CURRENTDIR}/zlib  LDFLAGS="${MORELDFLAGS}"
-			fi
-		else
-			if [ -z "$MORELDFLAGS" ]; then
-				./configure --static --prefix=${CURRENTDIR}/zlib  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}"
-			else
-				./configure --static --prefix=${CURRENTDIR}/zlib  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}"  LDFLAGS="${MORELDFLAGS}"
-			fi
-		fi
-		./configure --static --prefix=${CURRENTDIR}/zlib  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}" LDFLAGS="${MORELDFLAGS}"
+                export LDFLAGS="${MORELDFLAGS} ${PICFLAGS}"
+                export CFLAGS="${MORECFLAGS} ${PICFLAGS}"
+                export CPPFLAGS="${MORECFLAGS} ${PICFLAGS}"
+
+
+		./configure --static --prefix=${CURRENTDIR}/zlib
 		MAKEFILE="Makefile"
 	fi
 	libOK=$?
@@ -483,9 +475,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	tar xvf libpng-1.5.4.tar.gz -C ./build/
 	cd build/libpng-1.5.4
 	if [ -e ../../../zlib/lib/libz.a ] ; then
-		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng LDFLAGS=-L${CURRENTDIR}/zlib/lib CFLAGS=-I${CURRENTDIR}/zlib/include CXXFLAGS=-I${CURRENTDIR}/zlib/include/ 
+		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -L${CURRENTDIR}/zlib/lib" CFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include" CXXFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include/ "
 	else
-		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng
+		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	fi
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
@@ -530,9 +522,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	tar xvf jpegsrc.v9a.tar.gz -C ./build/
 	cd build/jpeg-9a
 	if [ -e ../../../zlib/lib/libz.a ] ; then
-		./configure --enable-static --disable-shared --disable-dependency-tracking --prefix=${CURRENTDIR}/libjpeg LDFLAGS=-L${CURRENTDIR}/zlib/lib CFLAGS=-I${CURRENTDIR}/zlib/include CXXFLAGS=-I${CURRENTDIR}/zlib/include/
+		./configure --enable-static --disable-shared --disable-dependency-tracking --prefix=${CURRENTDIR}/libjpeg LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -L${CURRENTDIR}/zlib/lib" CFLAGS=" ${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include" CXXFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include/"
 	else
-		./configure --enable-static --disable-shared --disable-dependency-tracking --prefix=${CURRENTDIR}/libjpeg
+		./configure --enable-static --disable-shared --disable-dependency-tracking --prefix=${CURRENTDIR}/libjpeg CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	fi
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
@@ -582,9 +574,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	tar xvf tiff-4.0.4.tar.gz -C ./build/
 	cd build/tiff-4.0.4
 	if [ -e ${CURRENTDIR}/libjpeg/lib/libjpeg.a ] ; then
-		./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff
+		./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff   CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	else
-		./configure --enable-static --disable-shared  --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff
+		./configure --enable-static --disable-shared  --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff   CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	fi
 	
 	libOK=$?
