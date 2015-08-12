@@ -109,7 +109,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
         res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
         res.paramValues << constructQListWithMultipleItems(QMap<QString, QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter>(), res.models.size());
         res.singleFixes << constructQListWithMultipleItems(QMap<QString,bool>(), res.models.size());
-        res.paramValues[0].insert("n_nonfluorescent", QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get(0,0));
+        if (res.paramValues.size()>0) res.paramValues[0].insert("n_nonfluorescent", QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get(0,0));
         for (int j=0; j<res.singleFixes.size(); j++) { res.singleFixes[j].insert("focus_width", false); };
 
     } else if (i==c++) {
@@ -129,7 +129,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
         res.globalParams << constructQListWithMultipleItems(QStringList("diff_rho3"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("focus_height"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
-        res.paramValues[0].insert("n_nonfluorescent", QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get(0,0));
+        if (res.paramValues.size()>0) res.paramValues[0].insert("n_nonfluorescent", QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get(0,0));
         for (int j=0; j<res.singleFixes.size(); j++) { res.singleFixes[j].insert("focus_width", false); };
     }
     return res;

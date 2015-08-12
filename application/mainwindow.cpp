@@ -4626,7 +4626,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
     QModernProgressDialog progress;
     progress.setHasCancel(false);
-    progress.setLabelText(tr("rendering onine-help page ..."));
+    progress.setLabelText(tr("transforming & rendering online-help page ..."));
     progress.setMode(true, false);
     progress.openDelayed(1000);
     progress.raise();
@@ -4688,6 +4688,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
 
+    progress.setLabelText(tr("transforming & rendering online-help page ...\n collect information"));
+    QApplication::processEvents();
     // find special information in file
     QRegExp rxTitle("<title>(.*)</title>", Qt::CaseInsensitive);
     if (rxTitle.indexIn(result) != -1) fromHTML_replaces.append(qMakePair(QString("title"), rxTitle.cap(1)));
@@ -4735,6 +4737,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         pos += rxLink.matchedLength();
     }
 
+
+    progress.setLabelText(tr("transforming & rendering online-help page ...\n interpreting help commands ..."));
+    QApplication::processEvents();
     // collectspecial replaces based on current directory
     bool foundPlugin=false;
     if (pluginList) {
@@ -4915,6 +4920,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             // insert autolinks
             QStringList ttids=helpdata.autolinks.keys();
             qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n inserting autolinks ..."));
 
             for (int ti=0; ti<ttids.size(); ti++){
                 QApplication::processEvents();
@@ -4956,6 +4962,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             }
         }
 
+        progress.setLabelText(tr("transforming & rendering online-help page ...\n replacing help commands ..."));
         bool replaced=true;
         int cnt=0;
         while (replaced && (cnt<15)) {
@@ -5337,6 +5344,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n inserting other files ..."));
             QRegExp rxInsert("\\$\\$(insert|include|insertglobal|includeglobal|tooltip|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode|startbox|main_fontsize)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
@@ -5444,6 +5452,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$math:<latex>$$ items
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n rendering math expressions (LaTeX) ..."));
             QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:(.*)\\$\\$|\\$\\((.*)\\)\\$|\\$\\[(.*)\\]\\$", Qt::CaseInsensitive);
             rxLaTeX.setMinimal(true);
             count = 0;
@@ -5573,7 +5582,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             }
 
 
-
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n inserting plugin info ..."));
             // interpret $$plugin_info:<name>:<id>$$, $$fig:file:caption$$,  $$figure:file:caption$$ items, etc.
             QRegExp rxPluginInfo("\\$\\$(plugin_info|fig|figure|startbox|fitfunction|fitalgorithm|importer|exporter)\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxPluginInfo.setMinimal(true);
@@ -5712,7 +5721,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
         if (isMainHelp) {
 
-
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n building table of contents ..."));
             // extract table of contents from header tags
             QRegExp rxHeader("<\\s*h([123456789])([^>]*)>(.*)<\\/\\s*h\\1\\s*>", Qt::CaseInsensitive);
             rxHeader.setMinimal(true);
@@ -5842,6 +5851,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // extract references tags $$ref:<ID>:Text$$
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n interpreting literature references ..."));
             QStringList refList;
             QMap<QString, int> refIDMap;
             QRegExp rxRef("\\$\\$(invisibleref|ref)\\:(\\w*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
@@ -5905,6 +5915,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
         // try and find DOIs in the text
+        progress.setLabelText(tr("transforming & rendering online-help page ...\n adding DOI links ..."));
         QRegExp rxDOI("(doi)?[\\:]?\\s*(10\\.\\d{3,4}[\\d\\:\\.\\-\\_\\/a-z]+)[\\,\\;\\:\\.\\s\\n\\r\\t\\v\\)\\]\\}\\<\\>\\(\\[\\{\\\\\\?\\\"]+", Qt::CaseInsensitive);
         rxDOI.setMinimal(false);
 
@@ -5965,6 +5976,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             // insert tooltips: search all occurences of the tooltip keywords that are not inside a tag (i.e. surrounded by a closing tag on
             // the left and an opening tag on the right) and where the tag is not something special (like headers or links).
             //QMapIterator<QString, QFToolTipsData> itTT(helpdata.tooltips);
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n inserting tooltips ..."));
             QStringList ttids=helpdata.tooltips.keys();
             qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
 
