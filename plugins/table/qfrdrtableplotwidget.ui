@@ -234,13 +234,13 @@
   <customwidget>
    <class>QFTableGraphSettings</class>
    <extends>QWidget</extends>
-   <header>../qftablegraphsettings.h</header>
+   <header>qftablegraphsettings.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QFRDRTablePlotSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>../qfrdrtableplotsettingswidget.h</header>
+   <header>qfrdrtableplotsettingswidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

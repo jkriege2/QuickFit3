@@ -1300,7 +1300,7 @@
   <customwidget>
    <class>QFRDRTableAxisSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>../qfrdrtableaxissettingswidget.h</header>
+   <header>qfrdrtableaxissettingswidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

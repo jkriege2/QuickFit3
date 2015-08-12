@@ -19,9 +19,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#include "ui_qfrdrtableplotwidget.h"
 #include "qfrdrtableplotwidget.h"
+#include "ui_qfrdrtableplotwidget.h"
 #include "programoptions.h"
 #include "qfrdrtable.h"
 #include "qftools.h"
