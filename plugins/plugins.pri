@@ -37,7 +37,7 @@ MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/
 OBJECTS_DIR = ./.objs/
-QFOUTPUT = ../../$${OUTPUTDIR_NAME}
+QFOUTPUT = $$PWD/../$${OUTPUTDIR_NAME}
 DESTDIR = $$QFOUTPUT/plugins
 
 GPL3LICENSE = $$PWD/../doc/gpl-3.0.txt \
