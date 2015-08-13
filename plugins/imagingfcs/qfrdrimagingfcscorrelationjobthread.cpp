@@ -19,6 +19,8 @@
 
 #include <QTextStream>
 
+//#define STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_noeigen
+//#define STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_jacobiSvd
 #include "statistics_tools.h"
 #include "qfrdrimagingfcscorrelationjobthread.h"
 #include "qfrdrimagingfcscorrelationdialog.h"
@@ -100,10 +102,17 @@ QStringList QFRDRImagingFCSCorrelationJobThread::getImageFormatNameList(QFPlugin
      return l;
 }
 
+QStringList QFRDRImagingFCSCorrelationJobThread::getImageFormatIDList(QFPluginServices *pluginservices)
+{
+    QStringList imp=pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
+    return imp;
+}
+
 QFImporterImageSeries* QFRDRImagingFCSCorrelationJobThread::getImageReader(int idx, QFPluginServices* pluginservices)  {
     QFImporterImageSeries* r=NULL;
 
     QStringList imp=pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
+    //qDebug()<<imp;
 
     if (idx>=0 && idx<imp.size()) {
         r=dynamic_cast<QFImporterImageSeries*>(pluginservices->getImporterManager()->createImporter(imp[idx]));
@@ -162,10 +171,10 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     }
 
     QString back="unknown";
-    if (job.backgroundCorrection==0) back="none";
-    if (job.backgroundCorrection==1) back="offset";
-    if (job.backgroundCorrection==2) back="offsetmin";
-    if (job.backgroundCorrection==3) back="imgoffset";
+    if (job.backgroundCorrection==BACKGROUND_NONE) back="none";
+    if (job.backgroundCorrection==BACKGROUND_REMOVEOFFSET) back="offset";
+    if (job.backgroundCorrection==BACKGROUND_REMOVEMINANDOFFSET) back="offsetmin";
+    if (job.backgroundCorrection==BACKGROUND_FILEANDOFFSET) back="imgoffset";
     QString corr="unknown";
     if (job.correlator==CORRELATOR_DIRECT) corr="direct";
     if (job.correlator==CORRELATOR_DIRECTAVG) corr="directavg";
@@ -801,7 +810,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 emit messageChanged(tr("could not create uncorrected statistics file %1!").arg(error));
                             }
 
-                            if (job.dualViewMode!=0) {
+                            if (job.dualViewMode!=DUALVIEW_NONE) {
                                 emit messageChanged(tr("saving DV 1 statistics ..."));
                                 if (!saveStatistics(statisticsFilename_dv1=outputFilenameBase+".statistics_dv1.dat", outputFilenameBase+".statistics_dv1.plt", dv_statistics[0], tr("Corrected Statistics, DV 1"), &error)) {
                                     m_status=-1; emit statusChanged(m_status);
@@ -905,9 +914,9 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text<<"frame count                 : "<<outLocale.toString(frames) << "\n";
                                 text<<"first frame                 : "<<outLocale.toString(first_frame) << "\n";
                                 text<<"last frame                  : "<<outLocale.toString(first_frame+frames-1) << "\n";
-                                text<<"correlation segments        : "<<outLocale.toString(double(frames)/double(job.segments)*job.frameTime) << "\n";
+                                text<<"correlation segments        : "<<outLocale.toString(job.segments) << "\n";
                                 text<<"correlation use blocking    : "<<boolToQString(job.useBlockingErrorEstimate) << "\n";
-                                text<<"segments length (s)         : "<<outLocale.toString(job.segments) << "\n";
+                                text<<"segments length (s)         : "<<outLocale.toString(double(frames)/double(job.segments)*job.frameTime) << "\n";
                                 text<<"correlator S                : "<<outLocale.toString(job.S) << "\n";
                                 text<<"correlator m                : "<<outLocale.toString(job.m) << "\n";
                                 text<<"correlator P                : "<<outLocale.toString(job.P) << "\n";
@@ -1065,7 +1074,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create binary autocorrelation file '%1': %2!").arg(localFilename1).arg(error));
                             }
-                            if (job.addFCCSSeparately && job.dualViewMode!=0) {
+                            if (job.addFCCSSeparately && job.dualViewMode!=DUALVIEW_NONE) {
                                 if (QFile::exists(localFilename1)) {
                                     addFiles.append(getFileInfo(localFilename1, configFilename, "ACF0", 0, getGroupName()));
                                     addFiles.append(getFileInfo(localFilename1, configFilename, "ACF1", 1, getGroupName()));
@@ -1130,7 +1139,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 /*&& QFile::exists(backgroundFilename)
                                 && QFile::exists(backstdFilename)*/) {
 
-                            if (job.addFCCSSeparately && job.dualViewMode!=0) {
+                            if (job.addFCCSSeparately && job.dualViewMode!=DUALVIEW_NONE) {
                                 addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B1", 0, getGroupName()));
                                 addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B2", 1, getGroupName()));
                             } else {
@@ -1356,10 +1365,10 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
         ccf[nn]=1.0;
     }
     bool useBlocking=(job.segments<=1 && job.useBlockingErrorEstimate && ((job.correlator==CORRELATOR_DIRECT) || (job.correlator==CORRELATOR_DIRECT_INT) || (job.correlator==CORRELATOR_DIRECTAVG) || (job.correlator==CORRELATOR_DIRECTAVG_INT)));
-    qDebug()<<"useBLocking="<<useBlocking<<" segs="<<job.segments<<"  useBlock="<<job.useBlockingErrorEstimate<<"  corr="<<job.correlator;
+    //qDebug()<<"useBlocking="<<useBlocking<<" segs="<<job.segments<<"  useBlock="<<job.useBlockingErrorEstimate<<"  corr="<<job.correlator;
     if (job.segments>1 || useBlocking) {
         ccf_std=(double*)qfCalloc(ccf_N*frame_width*frame_height,sizeof(double));
-        qDebug()<<"created ccf_std="<<ccf_std;
+        //qDebug()<<"created ccf_std="<<ccf_std;
     }
 
     if (useBlocking) {
@@ -2029,10 +2038,10 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_dv2_statistics(QFRDRImag
     int dv_height=frame_height;
     int shiftX1=0;
     int shiftY1=0;
-    if (job.dualViewMode==1) {
+    if (job.dualViewMode==DUALVIEW_HORICONTAL) {
         dv_width=dv_width/2;
         shiftX1=dv_width/2;
-    } else if (job.dualViewMode==2) {
+    } else if (job.dualViewMode==DUALVIEW_VERTICAL) {
         dv_height=dv_height/2;
         shiftY1=dv_height/2;
     } else {
@@ -2767,7 +2776,10 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                     double pA=0, pB=0;
 
-
+                    if (!statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
+                        pA=fit_I[0];
+                        pB=-1.0/(fit_t[NFitFramesInt-2]/(fit_I[0]-fit_I[NFitFramesInt-2]));
+                    }
 
                     double par[4]={pA, -1.0/pB,0,0};
                     int npar=3;
@@ -2782,10 +2794,9 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
 
                     } else {
-                        if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
-                            par[0]=pA;
-                            par[1]=-1.0/pB;
-                        }
+                        par[0]=pA;
+                        par[1]=-1.0/pB;
+
                         npar=3;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
                         npar++;
@@ -2859,34 +2870,55 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 bleachFitOK[i]=0;
+                //qDebug()<<i<<"NFitFramesInt="<<NFitFramesInt<<"  NFitFrames="<<NFitFrames<<"  fit_t[NFitFramesInt-1]="<<fit_t[NFitFramesInt-1]<<"  fit_tin[(NFitFrames-1)/2]="<<fit_tin[(NFitFrames-1)/2];
                 if (NFitFramesInt>5*4 && (NFitFramesInt>NFitFrames/5) && (fit_t[NFitFramesInt-1]>fit_tin[(NFitFrames-1)/2])) {
 
                     double pA=0, pB=0;
 
+                    if (!statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
+                        pA=fit_I[0];
+                        pB=-1.0/(fit_t[NFitFramesInt-2]/(fit_I[0]-fit_I[NFitFramesInt-2]));
+                    }
+                    //qDebug()<<i<<" pA= "<<pA;
+                    //qDebug()<<i<<" pB= "<<pB;
+
                     double par[5]={pA, -1.0/pB,0,0,0};
                     int npar=4;
-
                     QVector<double> pFit(5,0.0);
+                    //qDebug()<<i<<" fit_t= "<<arrayToString(fit_t, NFitFramesInt);
+                    //qDebug()<<i<<" fit_I= "<<arrayToString(fit_I, NFitFramesInt);
                     if (statisticsPolyFit(fit_t, fit_I, NFitFramesInt, 4, pFit.data())) {
+                        //std::cout.flush();
+                        //qDebug()<<i<<" PolyFit: "<<pFit[0]<<pFit[1]<<pFit[2]<<pFit[3]<<pFit[4];
+
                         par[0]=pFit[0];
                         par[1]=-1.0/pFit[1];
                         par[2]=-pFit[2]/pFit[1];
                         par[3]=-pFit[3]/pFit[1];
                         par[4]=-pFit[4]/pFit[1];
                         npar=5;
+
+                        //qDebug()<<i<<" before LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
 
+                        //qDebug()<<i<<" LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+
                     } else {
-                        if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
-                            par[0]=pA;
-                            par[1]=-1.0/pB;
-                        }
+                        par[0]=pA;
+                        par[1]=-1.0/pB;
+
+                        //qDebug()<<i<<" before LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
+
                         npar=3;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                        //qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
                         npar++;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+                        //qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
                         npar++;
                         lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
+                        //qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
 
                     }
                     //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
@@ -3064,12 +3096,13 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
 
                     //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
-                    double par[4]={exp(par[0]), -1.0/pB,0,0};
+                    double par[4]={exp(par[0]), -1.0/pB,0,0}; // A, tau, A2, tau2
                     //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
                     lmcurve_fit(2, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExp, &control, &status);
-                    par[2]=par[0]/2.0;
-                    par[0]=par[0]/2.0;
-                    par[3]=par[1];
+                    par[0]=par[0]*0.98;
+                    par[1]=par[1];
+                    par[2]=par[0]*0.02;
+                    par[3]=par[1]/10.0;
                     lmcurve_fit(4, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fDblExp, &control, &status);
                     //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
@@ -3193,17 +3226,17 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
     if (backgroundImageStd) qfFree(backgroundImageStd);
     backgroundImage=(float*)qfMalloc(frame_width*frame_height*sizeof(float));
     backgroundImageStd=(float*)qfMalloc(frame_width*frame_height*sizeof(float));
-    if (job.backgroundCorrection==0) {
+    if (job.backgroundCorrection==BACKGROUND_NONE) {
         baseline=0;
-    } else if (job.backgroundCorrection==1) {
+    } else if (job.backgroundCorrection==BACKGROUND_REMOVEOFFSET) {
         baseline=job.backgroundOffset;
         //frames_max=frames_max-baseline;
         //frames_min=frames_min-baseline;
-    } else if (job.backgroundCorrection==2) {
+    } else if (job.backgroundCorrection==BACKGROUND_REMOVEMINANDOFFSET) {
         baseline=job.backgroundOffset+frames_min;
         //frames_max=frames_max-baseline;
         //frames_min=frames_min-baseline;
-    } else if (job.backgroundCorrection==3) {
+    } else if (job.backgroundCorrection==BACKGROUND_FILEANDOFFSET) {
         baseline=job.backgroundOffset;
         //frames_max=frames_max-baseline;
         //frames_min=frames_min-baseline;
@@ -3230,7 +3263,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
 
 
     // if we should use a background file for correction, we read it and create an averaged frame from it.
-    if (job.backgroundCorrection==3) {
+    if (job.backgroundCorrection==BACKGROUND_FILEANDOFFSET) {
         //qDebug()<<job.filenameBackground<<QFile::exists(job.filenameBackground);
         if (QFile::exists(job.filenameBackground)) {
             QFImporterImageSeries* reader=NULL;
@@ -3406,3 +3439,52 @@ QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state::~contribute
     qfFree(video_frame);
 }
 
+
+double QFRDRImagingFCSCorrelation_getCorrelatorTauMax(int corrType, double taumin, int S, int m, int P) {
+    double taumax=0;
+    if (corrType==CORRELATOR_MTAUALLMON) {
+        taumax=0;
+        for (int s=0; s<S; s++) {
+            if (s==0) {
+                taumax+=pow(m, s)*taumin*P;
+            } else {
+                taumax+=pow(m, s)*taumin*P*(m-1.0)/m;
+            }
+        }
+    } else {
+        taumax=0;
+        for (int s=0; s<S; s++) {
+            taumax+=pow(m, s)*taumin*P;
+        }
+    }
+    return taumax;
+}
+
+
+int IMFCSJob::getIdealS() const
+{
+    return getIdealS(-100.0);
+}
+
+int IMFCSJob::getIdealS(double forTauMax) const
+{
+    if (forTauMax<0.0) {
+        forTauMax=0.75*frameTime*double(range_max-range_min)/double(segments);
+    }
+    double taumin=frameTime;
+    double taumax=taumin;
+    int idealS=1;
+    while (idealS<200 && taumax<=forTauMax) {
+        taumax=QFRDRImagingFCSCorrelation_getCorrelatorTauMax(correlator, taumin, idealS, m, P);
+        idealS++;
+    }
+    return idealS;
+}
+
+void IMFCSJob::addDCCF(int dx, int dy)
+{
+    distanceCCF=true;
+    DCCFDeltaX.append(dx);
+    DCCFDeltaY.append(dy);
+    DCCFrole.append(QString("DCCF(%1,%2)").arg(dx).arg(dy));
+}

@@ -2,12 +2,12 @@
     Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     German Cancer Research Center/University Heidelberg
 
-    
+
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
     This software is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Lesser General Public License (LGPL) as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
@@ -19,6 +19,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 
 #include "qfehelpeditorwidget.h"
 #include "ui_qfehelpeditorwidget.h"
@@ -520,12 +521,15 @@ void QFEHelpEditorWidget::autosave()
     QString ffn= d.absoluteFilePath(QString("helpeditor%1_autosave.html").arg(m_winID));
     if (!getScript().isEmpty() && !qfFileEqualsString(ffn, ui->edtScript->getEditor()->toPlainText().toUtf8())) {
         d.mkpath(d.absolutePath());
+        // copy _autosave_old.html --> _autosave_older.html
         QString fn= d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID));
         QString newfn= d.absoluteFilePath(QString("helpeditor%1_autosave_older.html").arg(m_winID));
         if (QFile::exists(fn)) {
             if (QFile::exists(newfn)) QFile::remove(newfn);
             QFile::copy(fn, newfn);
         }
+
+        // copy _autosave.html --> _autosave_old.html
         fn= ffn;
         newfn= d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID));
         if (QFile::exists(fn)) {
@@ -533,6 +537,8 @@ void QFEHelpEditorWidget::autosave()
             QFile::copy(fn, newfn);
         }
         saveFile(fn, false);
+    } else {
+        qDebug()<<"QFEHelpEditorWidget::autosave(): file contents didn't change!";
     }
     QTimer::singleShot(AUTOSAVE_INTERVAL_MSEC, this, SLOT(autosave()));
 }
@@ -554,7 +560,7 @@ void QFEHelpEditorWidget::documentWasModified()
 
 void QFEHelpEditorWidget::on_btnExecute_clicked()
 {
-    QTemporaryFile f;
+    QFTemporaryFile f;
     QFileInfo fi(currentScript);
     if (QFile::exists(currentScript)) {
         f.setFileTemplate(fi.absolutePath()+"/qfe_helpeditor_temp_XXXXXX.html.tmp");
@@ -602,9 +608,10 @@ bool QFEHelpEditorWidget::saveFile(const QString &filename, bool setFilename)
     QFile f(filename);
     //qDebug()<<"saving to "<<filename;
     if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
-        QTextStream s(&f);
+        /*QTextStream s(&f);
         s.setCodec(QTextCodec::codecForName("UTF-8"));
-        s<<ui->edtScript->getEditor()->toPlainText().toUtf8();
+        s<<ui->edtScript->getEditor()->toPlainText().toUtf8();*/
+        f.write(ui->edtScript->getEditor()->toPlainText().toUtf8());
         if (setFilename) lastScript=ui->edtScript->getEditor()->toPlainText();
         f.close();
         if (setFilename) newScript=false;

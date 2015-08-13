@@ -20,6 +20,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 */
 
 #include "qfwizard.h"
+#include "programoptions.h"
 #include<QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets>
@@ -29,46 +30,148 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 
-QFWizard::QFWizard(QWidget *parent) :
+QFWizard::QFWizard(QWidget *parent, const QString &config_prefix) :
     QWizard(parent)
 {
+    configPrefix=config_prefix;
     setWizardStyle(QWizard::ModernStyle);
+    if (!configPrefix.isEmpty()) {
+        ProgramOptions::getConfigWindowGeometry(this, configPrefix+"wizard_geometry/");
+    }
+}
+
+QFWizard::QFWizard(QSize windowSize, QWidget *parent, const QString &config_prefix):
+    QWizard(parent)
+{
+    configPrefix=config_prefix;
+    setWizardStyle(QWizard::ModernStyle);
+    if (windowSize.isValid()) resize(windowSize);
+    if (!configPrefix.isEmpty()) {
+        ProgramOptions::getConfigWindowGeometry(this, configPrefix+"wizard_geometry/");
+    }
+}
+
+void QFWizard::closeEvent(QCloseEvent *e)
+{
+    if (!configPrefix.isEmpty()) {
+        ProgramOptions::setConfigWindowGeometry(this, configPrefix+"wizard_geometry/");
+    }
+    QWizard::closeEvent(e);
+}
+
+void QFWizard::done(int result)
+{
+    if (!configPrefix.isEmpty()) {
+        ProgramOptions::setConfigWindowGeometry(this, configPrefix+"wizard_geometry/");
+    }
+    QWizard::done(result);
 }
 
 
 QFWizardPage::QFWizardPage(QWidget *parent):
     QWizardPage(parent)
 {
+    m_freeFunctors=false;
+    m_nextID=NULL;
+    m_validator=NULL;
+    m_iscompleteFunctor=NULL;
     m_userLast=NULL;
     m_userValidatePage=NULL;
     m_userLastArg=NULL;
     m_userValidateArg=NULL;
+    m_externalIsComplete=false;
+    m_switchoffCancelButton=false;
+    m_switchoffPreviousButton=false;
+    m_iscomplete=false;
 }
 
 QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
     QWizardPage(parent)
 {
+    m_freeFunctors=false;
+    m_nextID=NULL;
+    m_validator=NULL;
+    m_iscompleteFunctor=NULL;
     m_userLast=NULL;
     m_userValidatePage=NULL;
     m_userLastArg=NULL;
     m_userValidateArg=NULL;
+    m_externalIsComplete=false;
+    m_switchoffCancelButton=false;
+    m_switchoffPreviousButton=false;
+    m_iscomplete=false;
     setTitle(title);
+}
+
+QFWizardPage::~QFWizardPage()
+{
+    if (m_freeFunctors) {
+        if (m_nextID) delete m_nextID;
+        if (m_validator) delete m_validator;
+        if (m_iscompleteFunctor) delete m_iscompleteFunctor;
+    }
 }
 
 void QFWizardPage::initializePage()
 {
+    //qDebug()<<"initializePage "<<title();
     QWizardPage::initializePage();
+    setButtonState(true);
     emit onInitialize(this);
     emit onInitialize(this, m_userLast);
     emit onInitializeA(this, m_userLastArg);
+    //qDebug()<<"initializePage "<<title()<<" done!";
 }
 
 bool QFWizardPage::validatePage()
 {
+    //qDebug()<<"validatePage "<<title();
     emit onValidate(this);
     emit onValidate(this, m_userValidatePage);
     emit onValidateA(this, m_userValidateArg);
-    return QWizardPage::validatePage();
+    bool res=true;
+    if (m_externalIsComplete) {
+        res=m_iscomplete;
+    }
+    if (m_validator) {
+        res= m_validator->isValid(this);
+    } else res=QWizardPage::validatePage();
+    if (res) {
+        setButtonState(false);
+    }
+    //qDebug()<<"validatePage "<<title()<<" done!";
+    return res;
+}
+
+bool QFWizardPage::isComplete() const
+{
+    //qDebug()<<"isCOmplete "<<title();
+    if (m_externalIsComplete) {
+        //qDebug()<<"isCOmplete "<<title()<< " done!";
+        return m_iscomplete;
+    }
+    if (m_iscompleteFunctor) {
+        //qDebug()<<"isCOmplete "<<title()<< " done!";
+        return m_iscompleteFunctor->isComplete(this);
+    }
+    bool res=QWizardPage::isComplete();
+    //qDebug()<<"isCOmplete "<<title()<< " done!";
+    return res;
+}
+
+void QFWizardPage::cleanupPage()
+{
+    //qDebug()<<"cleanupPage "<<title();
+    QWizardPage::cleanupPage();
+    //qDebug()<<"cleanupPage "<<title()<<" done!";
+}
+
+int QFWizardPage::nextId() const
+{
+    if (m_nextID) {
+        return m_nextID->nextID(this);
+    }
+    return QWizardPage::nextId();
 }
 
 void QFWizardPage::setUserPreviousPage(QWizardPage *page)
@@ -91,16 +194,145 @@ void QFWizardPage::setUserOnValidateArgument(void *page)
     m_userValidateArg=page;
 }
 
+void QFWizardPage::setUseExternalIsComplete(bool enabled)
+{
+    if ( m_externalIsComplete!=enabled) {
+        m_externalIsComplete=enabled;
+        emit completeChanged();
+    }
+}
+
+void QFWizardPage::setExternalIsComplete(bool valid)
+{
+    if (m_iscomplete!=valid) {
+        m_iscomplete=valid;
+        emit completeChanged();
+    }
+}
+
+
+
+void QFWizardPage::setButtonState(bool entering)
+{
+    if (entering) {
+
+//        if (m_switchoffPreviousButton) {
+//            wizard()->button(QWizard::BackButton)->setVisible(false);
+//            //qDebug()<<"switch off BackButton";
+//        }
+//        if (m_switchoffCancelButton) {
+//            wizard()->button(QWizard::CancelButton)->setVisible(false);
+//            //qDebug()<<"switch off CancelButton";
+//        }
+        QList<QWizard::WizardButton> layout;
+        layout << QWizard::Stretch;
+        if (!m_switchoffPreviousButton) layout << QWizard::BackButton;
+        layout<< QWizard::NextButton;
+        if (!m_switchoffCancelButton) layout<< QWizard::CancelButton;
+        if (isFinalPage()) layout<< QWizard::FinishButton;
+        //if (!m_switchoffPreviousButton || !m_switchoffCancelButton) wizard()->setButtonLayout(layout);
+        wizard()->setButtonLayout(layout);
+        //qDebug()<<"finisheg set buttons is final="<<isFinalPage();
+    } else {
+//        if (m_switchoffPreviousButton) {
+//            wizard()->button(QWizard::BackButton)->setVisible(true);
+//            //qDebug()<<"switch back on BackButton";
+//        }
+//        if (m_switchoffCancelButton) {
+//            wizard()->button(QWizard::CancelButton)->setVisible(true);
+//            //qDebug()<<"switch back on CancelButton";
+//        }
+
+        QList<QWizard::WizardButton> layout;
+        layout << QWizard::Stretch;
+        layout << QWizard::BackButton;
+        layout<< QWizard::NextButton;
+        layout<< QWizard::CancelButton;
+        //qDebug()<<"finisheg set buttons is final="<<isFinalPage();
+        if (isFinalPage()) layout<< QWizard::FinishButton;
+        //if (!m_switchoffPreviousButton || !m_switchoffCancelButton) wizard()->setButtonLayout(layout);
+        wizard()->setButtonLayout(layout);
+    }
+}
+
+void QFWizardPage::setValidateFunctor(QFWizardValidateFunctor *validator)
+{
+   if (m_freeFunctors && m_validator) {
+      delete m_validator;
+       m_validator=NULL;
+   }
+    m_validator=validator;
+    emit completeChanged();
+}
+
+void QFWizardPage::setIsCompleteFunctor(QFWizardIsCompleteFunctor *validator)
+{
+   if (m_freeFunctors && m_iscompleteFunctor) {
+      delete m_iscompleteFunctor;
+       m_iscompleteFunctor=NULL;
+   }
+    m_iscompleteFunctor=validator;
+    emit completeChanged();
+}
+
+void QFWizardPage::setNextIDFunctor(QFWizardNextPageFunctor *nextIDFunctor)
+{
+    if (m_freeFunctors && m_nextID) {
+       delete m_nextID;
+    }
+    m_nextID=nextIDFunctor;
+}
+
+void QFWizardPage::setFreeFunctors(bool enabled)
+{
+    m_freeFunctors=enabled;
+}
+
+void QFWizardPage::setNextID(int nextid)
+{
+    setNextIDFunctor(new QFWizardFixedNextPageFunctor(nextid));
+}
+
+void QFWizardPage::setNoPreviousButton(bool noPrevButton)
+{
+    m_switchoffPreviousButton=noPrevButton;
+    //wizard()->button(QWizard::BackButton)->setVisible(!m_switchoffPreviousButton);
+}
+
+void QFWizardPage::setNoCancelButton(bool noCancelButton)
+{
+    m_switchoffCancelButton=noCancelButton;
+    //wizard()->button(QWizard::CancelButton)->setVisible(!m_switchoffCancelButton);
+
+}
+
 
 QFTextWizardPage::QFTextWizardPage(const QString& title, const QString &text, QWidget *parent):
     QFWizardPage(title, parent)
 {
-    QLabel *label = new QLabel(text, this);
+    label = new QLabel(text, this);
     label->setWordWrap(true);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(label);
     setLayout(layout);
+}
+
+QFTextWizardPage::QFTextWizardPage(const QString &title, QWidget *parent):
+    QFWizardPage(title, parent)
+{
+    label = new QLabel( this);
+    label->setWordWrap(true);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(label);
+    setLayout(layout);
+}
+
+void QFTextWizardPage::setText(const QString &text)
+{
+    label->setText(text);
+    label->setWordWrap(true);
 }
 
 
@@ -183,6 +415,20 @@ QFFormWizardPage::QFFormWizardPage(const QString &title, QWidget *parent):
     createWidgets();
 }
 
+void QFFormWizardPage::addStretch()
+{
+    QSpacerItem* spc;
+    m_layout->addItem(spc=new QSpacerItem(2,2,QSizePolicy::Minimum,QSizePolicy::Expanding));
+
+}
+
+void QFFormWizardPage::addSpacer(int height)
+{
+    QSpacerItem* spc;
+    m_layout->addItem(spc=new QSpacerItem(2,height,QSizePolicy::Minimum,QSizePolicy::Fixed));
+
+}
+
 void QFFormWizardPage::addRow(QWidget *label, QWidget *field)
 {
     m_layout->addRow(label, field);
@@ -212,6 +458,34 @@ void QFFormWizardPage::addRow(QLayout *layout)
 {
     m_layout->addRow(layout);
 }
+
+QLabel *QFFormWizardPage::addRow(const QString &text)
+{
+    QLabel* lab=new QLabel(this);
+    lab->setWordWrap(true);
+    lab->setText(text);
+    addRow(lab);
+    return lab;
+}
+
+QLabel *QFFormWizardPage::addRow(const QString &labelText, const QString &text)
+{
+    QLabel* lab=new QLabel(this);
+    lab->setWordWrap(true);
+    lab->setText(text);
+    addRow(labelText, lab);
+    return lab;
+}
+
+QLabel *QFFormWizardPage::addRow(QWidget *label, const QString &text)
+{
+    QLabel* lab=new QLabel(this);
+    lab->setWordWrap(true);
+    lab->setText(text);
+    addRow(label, lab);
+    return lab;
+}
+
 
 void QFFormWizardPage::setRowEnabled(int row, bool enabled)
 {
@@ -341,10 +615,11 @@ void QFCheckboxListWizardPage::clear()
     }
 }
 
-void QFCheckboxListWizardPage::addItem(const QString &item)
+void QFCheckboxListWizardPage::addItem(const QString &item, bool checked)
 {
     QCheckBox* chk=new QCheckBox(item, this);
     boxes.append(chk);
+    chk->setChecked(checked);
     addRow("", chk);
 }
 
@@ -469,10 +744,12 @@ bool QFProcessingWizardPage::isComplete() const
 
 void QFProcessingWizardPage::setProcessingFinished(bool status)
 {
-    btnStart->setVisible(false);
-    m_done=status;
-    emit completeChanged();
-    QApplication::processEvents();
+    if (m_done!=status){
+        btnStart->setVisible(false);
+        m_done=status;
+        emit completeChanged();
+        QApplication::processEvents();
+    }
 }
 
 void QFProcessingWizardPage::setProgress(int value)
@@ -622,4 +899,125 @@ void QFProcessingWizardPage::addSubProgressWidgets()
     }
     labSubMessage<<l;
     progressSub<<p;
+}
+
+
+QFRadioButtonListWizardPage::QFRadioButtonListWizardPage(const QString &title, QWidget *parent):
+    QFEnableableFormWizardPage(title, parent)
+{
+    setEnableable(false);
+}
+
+void QFRadioButtonListWizardPage::setItems(const QStringList &items)
+{
+    clear();
+    for (int i=0; i<items.size(); i++)  {
+        addItem(items[i]);
+    }
+}
+
+void QFRadioButtonListWizardPage::clear()
+{
+    for (int i=0; i<boxes.size(); i++) {
+        m_layout->removeWidget(boxes[i]);
+        delete boxes[i];
+    }
+}
+
+void QFRadioButtonListWizardPage::addItem(const QString &item, bool checked)
+{
+    QRadioButton* chk=new QRadioButton(item, this);
+    boxes.append(chk);
+    chk->setChecked(checked);
+    addRow("", chk);
+}
+
+void QFRadioButtonListWizardPage::setChecked(int id)
+{
+    if (id>=0 && id<boxes.size()) {
+        boxes[id]->setChecked(true);
+    }
+}
+
+void QFRadioButtonListWizardPage::setChecked(int id, bool checked)
+{
+    if (id>=0 && id<boxes.size()) {
+        boxes[id]->setChecked(checked);
+    }
+}
+
+void QFRadioButtonListWizardPage::setEnabled(int id, bool enabled)
+{
+    if (id>=0 && id<boxes.size()) {
+        boxes[id]->setEnabled(enabled);
+    }
+}
+
+bool QFRadioButtonListWizardPage::isChecked(int id) const
+{
+    if (id>=0 && id<boxes.size()) {
+        return boxes[id]->isChecked();
+    }
+    return false;
+}
+
+int QFRadioButtonListWizardPage::getChecked() const
+{
+    for (int i=0; i<boxes.size(); i++) {
+        if (boxes[i]->isChecked()) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int QFRadioButtonListWizardPage::count() const
+{
+    return boxes.size();
+}
+
+
+
+QFGridWizardPage::QFGridWizardPage(QWidget *parent):
+    QFWizardPage(parent)
+{
+    createWidgets();
+}
+
+QFGridWizardPage::QFGridWizardPage(const QString &title, QWidget *parent):
+    QFWizardPage(title, parent)
+{
+    createWidgets();
+}
+
+void QFGridWizardPage::addLayout(QLayout *layout, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment)
+{
+    m_layout->addLayout(layout, row, column, rowSpan, columnSpan, alignment);
+}
+
+void QFGridWizardPage::addLayout(QLayout *layout, int row, int column, Qt::Alignment alignment)
+{
+    m_layout->addLayout(layout, row, column, alignment);
+}
+
+void QFGridWizardPage::addWidget(QWidget *widget, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment)
+{
+    m_layout->addWidget(widget, row, column, rowSpan, columnSpan, alignment);
+}
+
+void QFGridWizardPage::addWidget(QWidget *widget, int row, int column, Qt::Alignment alignment)
+{
+    m_layout->addWidget(widget, row, column, alignment);
+}
+
+void QFGridWizardPage::createWidgets()
+{
+    m_layout = new QGridLayout;
+    widMain=new QWidget(this);
+    m_mainlay=new QVBoxLayout();
+
+    widMain->setLayout(m_layout);
+    widMain->setEnabled(true);
+    m_mainlay->addWidget(widMain);
+    setLayout(m_mainlay);
 }

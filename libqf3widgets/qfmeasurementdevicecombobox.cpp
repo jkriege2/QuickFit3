@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfmeasurementdevicecombobox.h"
 
 QFMeasurementDeviceComboBox::QFMeasurementDeviceComboBox(QFExtensionManager* extManager, QWidget* parent):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     m_extManager=extManager;
     setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -33,7 +33,7 @@ QFMeasurementDeviceComboBox::QFMeasurementDeviceComboBox(QFExtensionManager* ext
 }
 
 QFMeasurementDeviceComboBox::QFMeasurementDeviceComboBox(QWidget* parent):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     m_extManager=NULL;
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(comboIndexChanged(int)));

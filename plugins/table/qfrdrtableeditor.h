@@ -2,12 +2,12 @@
     Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     German Cancer Research Center/University Heidelberg
 
-    
+
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
     This software is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Lesser General Public License (LGPL) as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
@@ -19,6 +19,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 
 #ifndef QFRDRTABLEEDITOR_H
 #define QFRDRTABLEEDITOR_H
@@ -137,6 +138,9 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slAutoSetColumnWidth();
         void delayedStartSearch();
         void preScriptChanged();
+
+        void slColumnsBoxplots();
+        void updateScripts();
     signals:
         void enableActions(bool enabled);
         void disableActions(bool enabled);
@@ -182,6 +186,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actDelete;
         QAction* actAutosetColumnWidth;
         QAction* actIndexedStat;
+        QAction* actColumnsBoxplots;
 
         QAction* actSetDatatypeString;
         QAction* actSetDatatypeInteger;
@@ -210,6 +215,8 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actLoadTableTemplate;
         QAction* actCopyTemplate;
         QAction* actPasteTemplate;
+
+
 
         QAction* actUndo;
         QAction* actRedo;

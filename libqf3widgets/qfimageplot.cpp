@@ -6,12 +6,19 @@
 #include "qfimporterimageseries.h"
 #include "qfimportermanager.h"
 #include "qfimporter.h"
+#include "image_tools.h"
 
 QFImagePlot::QFImagePlot(QWidget *parent, const QString &prefix):
     QWidget(parent),
     ui(new Ui::QFImagePlot)
 {
+    colROI=QColor("red");
+    colROI2=QColor("blue");
+    colFillROI=Qt::transparent;
+    colFillROI2=Qt::transparent;
+
     plteImage=NULL;
+    binning=1;
     image_data=NULL;
     image_width=0;
     image_height=0;
@@ -108,13 +115,49 @@ void QFImagePlot::resetROI2()
     setROI2(QRectF());
 }
 
+void QFImagePlot::setROIColor(QColor col)
+{
+    colROI=col;
+    new_plots();
+}
+
+void QFImagePlot::setROI2Color(QColor col)
+{
+    colROI2=col;
+    new_plots();
+}
+
+void QFImagePlot::setROIFillColor(QColor col)
+{
+    colFillROI=col;
+    new_plots();
+}
+
+void QFImagePlot::setROI2FillColor(QColor col)
+{
+    colFillROI2=col;
+    new_plots();
+}
+
+void QFImagePlot::setBinning(int bin)
+{
+    binning=qMax(1,bin);
+    new_plots();
+}
+
 void QFImagePlot::update_plot()
 {
     if (!plteImage || !image_data || image_width<=0 || image_height<=0) return;
     plteImage->set_palette(ui->cmbCOlorbar->currentColorPalette());
     if (ui->chkRangeFull->isChecked()) {
         double imin=0, imax=0;
-        statisticsMinMax(image_data, image_width*image_height, imin, imax);
+        if (binning>1) {
+            double* imgb=qfBinImageCreate(image_data, image_width, image_height, binning);
+            statisticsMinMax(imgb, (image_width/binning)*(image_height/binning), imin, imax);
+            qfFree(imgb);
+        } else {
+            statisticsMinMax(image_data, image_width*image_height, imin, imax);
+        }
         ui->edtRangeMin->setValue(imin);
         ui->edtRangeMax->setValue(imax);
         plteImage->set_imageMin(imin);
@@ -167,14 +210,21 @@ void QFImagePlot::new_plots()
     if (image_data) {
         plteImage=new JKQTPColumnMathImage(plt);
         plteImage->set_autoImageRange(false);
-        plteImage->set_imageColumn(ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image")));
+        if (binning<=1){
+            plteImage->set_imageColumn(ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image")));
+        } else {
+            double* tmp=NULL;
+            plteImage->set_imageColumn(ds->addCopiedImageAsColumn(tmp=qfBinImageCreate(image_data, image_width, image_height, binning), image_width/binning, image_height/binning, tr("image, %1x%1 binned").arg(binning)));
+            qfFree(tmp);
+            ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image"));
+        }
         plteImage->set_x(0);
         plteImage->set_y(0);
-        plteImage->set_width(image_width);
-        plteImage->set_height(image_height);
+        plteImage->set_width(image_width/binning);
+        plteImage->set_height(image_height/binning);
         plteImage->set_autoImageRange(false);
-        plteImage->set_Nx(image_width);
-        plteImage->set_Ny(image_height);
+        plteImage->set_Nx(image_width/binning);
+        plteImage->set_Ny(image_height/binning);
         plteImage->set_palette(ui->cmbCOlorbar->currentColorPalette());
         plteImage->set_imageMin(0);
         plteImage->set_imageMax(1);
@@ -182,48 +232,75 @@ void QFImagePlot::new_plots()
         plt->set_axisAspectRatio(double(image_width)/double(image_height));
         plt->set_aspectRatio(double(image_width)/double(image_height));
         plt->set_maintainAspectRatio(true);
-        plt->setAbsoluteXY(0,image_width,0,image_height);
+        plt->setAbsoluteXY(0,image_width/binning,0,image_height/binning);
     }
     if (mask) {
         plteMask=new JKQTPColumnOverlayImageEnhanced(plt);
-        plteMask->set_imageColumn(ds->addCopiedImageAsColumn(mask, image_width, image_height, tr("mask")));
+        if (binning<=1){
+            plteImage->set_imageColumn(ds->addCopiedImageAsColumn(mask, image_width, image_height, tr("mask")));
+        } else {
+            bool* tmp=NULL;
+            plteImage->set_imageColumn(ds->addCopiedImageAsColumn(tmp=qfBinMaskImageCreate(mask, image_width, image_height, binning), image_width/binning, image_height/binning, tr("mask, %1x%1 binned").arg(binning)));
+            qfFree(tmp);
+            ds->addCopiedImageAsColumn(mask, image_width, image_height, tr("mask"));
+        }
         plteMask->set_x(0);
         plteMask->set_y(0);
-        plteMask->set_width(image_width);
-        plteMask->set_height(image_height);
-        plteMask->set_Nx(image_width);
-        plteMask->set_Ny(image_height);
+        plteMask->set_width(image_width/binning);
+        plteMask->set_height(image_height/binning);
+        plteMask->set_Nx(image_width/binning);
+        plteMask->set_Ny(image_height/binning);
         plteMask->set_trueColor(Qt::darkGray);
         plteMask->set_falseColor(Qt::transparent);
         plt->addGraph(plteMask);
     }
-    if (roi.width()>0 && roi.height()>0) {
-        plteROI=new JKQTPgeoRectangle(plt, roi.center().x()+0.5, roi.center().y()+0.5, roi.width()-1.0, roi.height()-1.0, QColor("red"));
+    double roishift=0.1;
+    if (int(roi.width())/binning>0 && int(roi.height())/binning>0) {
+        plteROI=new JKQTPgeoRectangle(plt, roi.center().x()/binning, roi.center().y()/binning, roi.width()/binning-roishift, roi.height()/binning-roishift, colROI);
         plt->addGraph(plteROI);
     }
     if (roi2.width()>0 && roi2.height()>0) {
-        plteROI2=new JKQTPgeoRectangle(plt, roi2.center().x()+0.5, roi2.center().y()+0.5, roi2.width()-1.0, roi2.height()-1.0, QColor("blue"));
+        plteROI2=new JKQTPgeoRectangle(plt, roi2.center().x()/binning, roi2.center().y()/binning, roi2.width()/binning-roishift, roi2.height()/binning-roishift, colROI2);
         plt->addGraph(plteROI2);
     }
 
     ui->image->set_doDrawing(true);
     ui->image->set_emitSignals(true);
     ui->image->zoomToFit();
-    ui->labInfo->setText(tr("image: %1x%2 pixels").arg(image_width).arg(image_height));
+    if (binning>1) {
+        ui->labInfo->setText(tr("image: %1x%2 pixels,   binned: %3x%4 superpixels").arg(image_width).arg(image_height).arg(image_width/binning).arg(image_height/binning));
+    } else {
+        ui->labInfo->setText(tr("image: %1x%2 pixels").arg(image_width).arg(image_height));
+    }
     update_plot();
 }
 
 void QFImagePlot::plotMouseMove(double x, double y)
 {
     if (image_data) {
-        int xx=floor(x);
-        int yy=floor(y);
-        double v=0;
-        if (xx>=0 && xx<image_width && yy>=0 && yy<image_height) {
-            v=image_data[yy*image_width+xx];
-            ui->labMouse->setText(tr("image(%1, %2) = %3").arg(xx).arg(yy).arg(v));
+        if (binning>1) {
+            double* img=qfBinImageCreate(image_data, image_width, image_height, binning);
+            int xx=floor(x);
+            int yy=floor(y);
+            double v=0;
+            if (xx>=0 && xx<image_width/binning && yy>=0 && yy<image_height/binning) {
+                v=image_data[yy*(image_width/binning)+xx];
+                ui->labMouse->setText(tr("image(%1, %2) = %3").arg(xx).arg(yy).arg(v));
+            } else {
+                ui->labMouse->setText("");
+            }
+            qfFree(img);
         } else {
-            ui->labMouse->setText("");
+
+            int xx=floor(x);
+            int yy=floor(y);
+            double v=0;
+            if (xx>=0 && xx<image_width && yy>=0 && yy<image_height) {
+                v=image_data[yy*image_width+xx];
+                ui->labMouse->setText(tr("image(%1, %2) = %3").arg(xx).arg(yy).arg(v));
+            } else {
+                ui->labMouse->setText("");
+            }
         }
     } else {
         ui->labMouse->setText("");
@@ -244,6 +321,18 @@ QFImagePlotWizardPage::QFImagePlotWizardPage(const QString &title, QWidget *pare
     layout->addLayout(formLay);
     setLayout(layout);
 
+}
+
+void QFImagePlotWizardPage::addStretch()
+{
+    QSpacerItem* spc;
+    formLay->addItem(spc=new QSpacerItem(2,2,QSizePolicy::Minimum,QSizePolicy::Expanding));
+}
+
+void QFImagePlotWizardPage::addSpacer(int height)
+{
+    QSpacerItem* spc;
+    formLay->addItem(spc=new QSpacerItem(2,height,QSizePolicy::Minimum,QSizePolicy::Fixed));
 }
 
 void QFImagePlotWizardPage::addRow(const QString &label, QWidget *widget)
@@ -395,6 +484,16 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
     }
 }
 
+void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &imageReaderID, int frameStart, int frameCount, QFImporter::FileInfo *fileinfo)
+{
+    double* image=NULL;
+    int width;
+    int height;
+    setImageAvg(filename, imageReaderID, frameStart, frameCount, image, width, height, fileinfo);
+    if (image) qfFree(image);
+
+}
+
 void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, QFImporter::FileInfo *fileinfo)
 {
     setImage(filename, imageReaderID, 0, fileinfo);
@@ -408,6 +507,61 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
 void QFImagePlotWizardPage::clear()
 {
     plot->clear();
+}
+
+void QFImagePlotWizardPage::setROI(double x, double y, double width, double height)
+{
+    plot->setROI(x,y,width,height);
+}
+
+void QFImagePlotWizardPage::setROI(QRectF r)
+{
+    plot->setROI(r);
+}
+
+void QFImagePlotWizardPage::resetROI()
+{
+    plot->resetROI();
+}
+
+void QFImagePlotWizardPage::setROI2(double x, double y, double width, double height)
+{
+    plot->setROI2(x,y,width,height);
+}
+
+void QFImagePlotWizardPage::setROI2(QRectF r)
+{
+    plot->setROI2(r);
+}
+
+void QFImagePlotWizardPage::resetROI2()
+{
+    plot->resetROI2();
+}
+
+void QFImagePlotWizardPage::setROIColor(QColor col)
+{
+    plot->setROIColor(col);
+}
+
+void QFImagePlotWizardPage::setROI2Color(QColor col)
+{
+    plot->setROI2Color(col);
+}
+
+void QFImagePlotWizardPage::setROIFillColor(QColor col)
+{
+    plot->setROIFillColor(col);
+}
+
+void QFImagePlotWizardPage::setROI2FillColor(QColor col)
+{
+    plot->setROI2FillColor(col);
+}
+
+void QFImagePlotWizardPage::setBinning(int bin)
+{
+    plot->setBinning(bin);
 }
 
 void QFImagePlotWizardPage::initializePage()

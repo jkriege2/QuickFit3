@@ -49,7 +49,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QVBoxLayout>
-#include "qenhancedlineedit.h"
+#include "qfenhancedlineedit.h"
 #include <QToolButton>
 #include <QCheckBox>
 #include "jkstyledbutton.h"
@@ -79,7 +79,7 @@ class QFWIDLIB_EXPORT QtLogFile : public QWidget {
         QTextBrowser* browser;
         QVBoxLayout* lay;
         QWidget* widFind;
-        QEnhancedLineEdit* edtFind;
+        QFEnhancedLineEdit* edtFind;
         QToolButton* btnFindNext;
         QToolButton* btnFindPrev;
         QCheckBox* chkCaseSensitive;

@@ -241,7 +241,7 @@ p, li { white-space: pre-wrap; }
                 </widget>
                </item>
                <item>
-                <widget class="QEnhancedLineEdit" name="edtPrefix">
+                <widget class="QFEnhancedLineEdit" name="edtPrefix">
                  <property name="text">
                   <string>./results/</string>
                  </property>
@@ -274,7 +274,7 @@ p, li { white-space: pre-wrap; }
                 </widget>
                </item>
                <item>
-                <widget class="QEnhancedLineEdit" name="edtPostfix">
+                <widget class="QFEnhancedLineEdit" name="edtPostfix">
                  <property name="text">
                   <string>_corr%correlator%_%COUNTER%</string>
                  </property>
@@ -1267,9 +1267,9 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QEnhancedLineEdit</class>
+   <class>QFEnhancedLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>qenhancedlineedit.h</header>
+   <header>qfenhancedlineedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

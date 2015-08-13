@@ -71,6 +71,10 @@ void QFRDRImagingFCSPlugin::init()
     QFPluginServices::getInstance()->addQFMathParserRefernceDir(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
 
 
+    services->registerWizard("project_wizards", tr("Imaging FCS/FCCS Project Wizard"), QIcon(":/imaging_fcs/projectwizard.png"), this, SLOT(startProjectWizard()));
+    services->registerWizard("rdr_wizards", tr("Imaging FCS/FCCS Correlation Wizard"), QIcon(":/imaging_fcs/rdrwizard.png"), this, SLOT(startWizard()));
+    services->registerWizard("eval_wizards", tr("Imaging FCS/FCCS Correlation Wizard"), QIcon(":/imaging_fcs/evalwizard.png"), this, SLOT(startFitWizard()));
+
     QFMathParser::addGlobalFunction("rdr_isimfcs", fRDR_isimfcs);
 
 }
@@ -99,62 +103,9 @@ void QFRDRImagingFCSPlugin::imfcsCorrRemoteAddJobSeries(const QString &parameter
     dlgCorrelate->clickAddJobSeries(parameter, start, end, inc);
 }
 
-QFRawDataRecord* QFRDRImagingFCSPlugin::createRecord(QFProject* parent) {
-    // factory method: create a QFRawDataRecord objectof the type of this plugin (QFRDRImagingFCSData)
-    return new QFRDRImagingFCSData(parent);
-}
-
-void QFRDRImagingFCSPlugin::setProject(QFProject* project) {
-    QFPluginRawDataRecordBase::setProject(project);
-}
-
-
-void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
-    QMenu* m=menu->addMenu(QIcon(getIconFilename()), tr("&imFCS: Imaging FCS"));
-
-    // create menu entries to insert data with this type
-    QAction* action=new QAction(QIcon(getIconFilename()), tr("&load imFCS dataset"), parentWidget);
-    action->setStatusTip(tr("Insert a new imaging FCS record"));
-    connect(action, SIGNAL(triggered()), this, SLOT(insertRecord()));
-    m->addAction(action);
-
-    QAction* actCorrelate=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_correlate.png"), tr("&correlate images and insert"), parentWidget);
-    actCorrelate->setStatusTip(tr("Correlate an image series and insert the result into the current project"));
-    connect(actCorrelate, SIGNAL(triggered()), this, SLOT(correlateAndInsert()));
-    m->addAction(actCorrelate);
-
-    QAction* actSimulate=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_simulate.png"), tr("&simulate images for correlation"), parentWidget);
-    actSimulate->setStatusTip(tr("Simulates an image series for ImFCS that can afterwards be correlated"));
-    connect(actSimulate, SIGNAL(triggered()), this, SLOT(simulateForCorrelation()));
-    m->addAction(actSimulate);
-    //actSimulate->setEnabled(false);
-
-}
-
-void QFRDRImagingFCSPlugin::correlateAndInsert() {
-    if (dlgCorrelate) {
-        dlgCorrelate->show();
-        dlgCorrelate->setProject(project);
-    } else if (project && settings) {
-        dlgCorrelate=new QFRDRImagingFCSCorrelationDialog(services, settings, parentWidget);
-        dlgCorrelate->setProject(project);
-        dlgCorrelate->setWindowModality(Qt::NonModal);
-        //qDebug()<<parentWidget,
-        dlgCorrelate->show();
-
-        connect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(importCorrelationsFromDialog()));
-        connect(dlgCorrelate, SIGNAL(runSimulation()), this, SLOT(simulateForCorrelation()));
-
-    }
-}
-
-void QFRDRImagingFCSPlugin::importCorrelationsFromDialog() {
-
-    disconnect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(importCorrelationsFromDialog()));
-
-    QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> list=dlgCorrelate->getFilesToAdd();
-
-    QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo>::Iterator it = list.begin();
+void QFRDRImagingFCSPlugin::addFiles(const QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> &list)
+{
+    QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo>::ConstIterator it = list.begin();
     services->setProgressRange(0, list.size());
     services->setProgress(0);
     int i=0;
@@ -181,6 +132,76 @@ void QFRDRImagingFCSPlugin::importCorrelationsFromDialog() {
     }
     progress.accept();
     services->setProgress(0);
+}
+
+QFRawDataRecord* QFRDRImagingFCSPlugin::createRecord(QFProject* parent) {
+    // factory method: create a QFRawDataRecord objectof the type of this plugin (QFRDRImagingFCSData)
+    return new QFRDRImagingFCSData(parent);
+}
+
+void QFRDRImagingFCSPlugin::setProject(QFProject* project) {
+    QFPluginRawDataRecordBase::setProject(project);
+}
+
+
+void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
+    QMenu* m=menu->addMenu(QIcon(getIconFilename()), tr("&imFCS: Imaging FCS"));
+
+    // create menu entries to insert data with this type
+
+    QAction* actWizard=new QAction(QIcon(":/imaging_fcs/rdrwizard.png"), tr("imaging FCS Correlation &Wizard (don't add fits) ..."), parentWidget);
+    actWizard->setStatusTip(tr("Correlate an image series and insert the result into the current project. This wizard simplifies the process, but the option \"correlate images and insert\" will offer finer control and more options."));
+    connect(actWizard, SIGNAL(triggered()), this, SLOT(startWizard()));
+    m->addAction(actWizard);
+    actWizard=new QAction(QIcon(":/imaging_fcs/projectwizard.png"), tr("imaging FCS Project &Wizard (also add fits) ..."), parentWidget);
+    actWizard->setStatusTip(tr("Correlate an image series and insert the result into the current project. This wizard simplifies the process, but the option \"correlate images and insert\" will offer finer control and more options.\n\nIn addition, this wizard also allows you to add relevant fitting objects to the project, based on your selection during the wizard."));
+    connect(actWizard, SIGNAL(triggered()), this, SLOT(startWizard()));
+    m->addAction(actWizard);
+
+    m->addSeparator();
+
+    QAction* actCorrelate=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_correlate.png"), tr("&correlate images and insert"), parentWidget);
+    actCorrelate->setStatusTip(tr("Correlate an image series and insert the result into the current project"));
+    connect(actCorrelate, SIGNAL(triggered()), this, SLOT(correlateAndInsert()));
+    m->addAction(actCorrelate);
+
+    QAction* actSimulate=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_simulate.png"), tr("&simulate images for correlation"), parentWidget);
+    actSimulate->setStatusTip(tr("Simulates an image series for ImFCS that can afterwards be correlated"));
+    connect(actSimulate, SIGNAL(triggered()), this, SLOT(simulateForCorrelation()));
+    m->addAction(actSimulate);
+
+    QAction* actionLoadDataset=new QAction(QIcon(getIconFilename()), tr("&load imFCS dataset"), parentWidget);
+    actionLoadDataset->setStatusTip(tr("Insert a new imaging FCS record"));
+    connect(actionLoadDataset, SIGNAL(triggered()), this, SLOT(insertRecord()));
+    m->addAction(actionLoadDataset);
+    //actSimulate->setEnabled(false);
+
+}
+
+void QFRDRImagingFCSPlugin::correlateAndInsert() {
+    if (dlgCorrelate) {
+        dlgCorrelate->show();
+        dlgCorrelate->setProject(project);
+    } else if (project && settings) {
+        dlgCorrelate=new QFRDRImagingFCSCorrelationDialog(services, settings, parentWidget);
+        dlgCorrelate->setProject(project);
+        dlgCorrelate->setWindowModality(Qt::NonModal);
+        //qDebug()<<parentWidget,
+        dlgCorrelate->show();
+
+        connect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(importCorrelationsFromDialog()));
+        connect(dlgCorrelate, SIGNAL(runSimulation()), this, SLOT(simulateForCorrelation()));
+
+    }
+}
+
+void QFRDRImagingFCSPlugin::importCorrelationsFromDialog() {
+
+    disconnect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(importCorrelationsFromDialog()));
+
+    //QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> list=;
+
+    addFiles(dlgCorrelate->getFilesToAdd());
 
     dlgCorrelate->deleteLater();
     dlgCorrelate=NULL;
@@ -241,6 +262,36 @@ void QFRDRImagingFCSPlugin::correctOffset()
 
     }
 }
+
+void QFRDRImagingFCSPlugin::startProjectWizard()
+{
+    startWizard(true);
+}
+
+void QFRDRImagingFCSPlugin::startWizard(bool isProject)
+{
+    QFRDRImagingFCSWizard* wiz=new QFRDRImagingFCSWizard(isProject, parentWidget);
+    if (isProject) wiz->setWindowIcon(QIcon(":/imaging_fcs/projectwizard.png"));
+    else wiz->setWindowIcon(QIcon(":/imaging_fcs/rdrwizard.png"));
+    if (wiz->exec()) {
+        //qDebug()<<"FINAL PAGE: "<<wiz->currentId();
+        wiz->finalizeAndModifyProject(isProject, this);
+    }
+
+    delete wiz;
+}
+void QFRDRImagingFCSPlugin::startFitWizard()
+{
+    QFRDRImagingFCSFitWizard* wiz=new QFRDRImagingFCSFitWizard( parentWidget);
+    wiz->setWindowIcon(QIcon(":/imaging_fcs/evalwizard.png"));
+    if (wiz->exec()) {
+        //qDebug()<<"FINAL PAGE: "<<wiz->currentId();
+        wiz->finalizeAndModifyProject(this);
+    }
+
+    delete wiz;
+}
+
 
 
 void QFRDRImagingFCSPlugin::insertRecord() {

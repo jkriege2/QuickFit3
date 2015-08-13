@@ -8,6 +8,7 @@
 *.lai
 *.so
 *.dll
+*.d
 *.dylib
 
 # Qt-es
@@ -163,6 +164,10 @@ Thumbs.db
 /output/examples
 /output/globalconfig_templates
 /quickfit.inc
+/plugins/imagingfcs/release
+/plugins/imagingfcs/debug
+debug
+release
 /extlibs/andor_win64/err.txt
 /extlibs/andor_win64/err1.txt
 /extlibs/andor_win64/err2.txt
@@ -172,6 +177,15 @@ Thumbs.db
 /extlibs/andor_win64/err6.txt
 /extlibs/andor_win64/test1.cpp
 *.bak
+*.nsi
+*.exe
+/output/*.zip
+/extlibs/libjpeg/jpeg-9a
+*.mat
+*.backup
+*.backup_old
+/extlibs/levmar/LICENSE
+/extlibs/lmfit5/COPYING
 /extlibs/libjpeg/jpeg-9a
 /output/*.zip
 /output/*.nsi

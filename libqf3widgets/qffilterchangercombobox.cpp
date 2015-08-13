@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffilterchangercombobox.h"
 
 QFFilterChangerComboBox::QFFilterChangerComboBox(QFExtensionManager* extManager, QWidget* parent):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     m_extManager=extManager;
     setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -33,7 +33,7 @@ QFFilterChangerComboBox::QFFilterChangerComboBox(QFExtensionManager* extManager,
 }
 
 QFFilterChangerComboBox::QFFilterChangerComboBox(QWidget* parent):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     m_extManager=NULL;
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(comboIndexChanged(int)));

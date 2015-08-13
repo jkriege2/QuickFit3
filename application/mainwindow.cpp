@@ -52,6 +52,8 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
+#define transformQF3HelpHTML_MAXCOUNT 200
+
 
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -219,6 +221,25 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     logFileMainWidget->log_text(tr("- productVersion: %1\n").arg(QSysInfo::productVersion()));
     logFileMainWidget->dec_indent();
 #endif
+    logFileMainWidget->log_header(tr("System directories:"));
+    logFileMainWidget->inc_indent();
+    logFileMainWidget->log_text(tr("- example temporary file: %1\n").arg(qfGetTempFilename()));
+    logFileMainWidget->log_text(tr("- temporary file path: %1\n").arg(QDir::tempPath()));
+    logFileMainWidget->log_text(tr("- home path: %1\n").arg(QDir::homePath()));
+    logFileMainWidget->log_text(tr("- root path: %1\n").arg(QDir::rootPath()));
+    logFileMainWidget->dec_indent();
+    logFileMainWidget->log_header(tr("QuickFit directories:"));
+    logFileMainWidget->inc_indent();
+    logFileMainWidget->log_text(tr("- aplication directory: %1\n").arg(settings->getApplicationDirectory()));
+    logFileMainWidget->log_text(tr("- assets directory: %1\n").arg(settings->getAssetsDirectory()));
+    logFileMainWidget->log_text(tr("- examples directory: %1\n").arg(settings->getExamplesDirectory()));
+    logFileMainWidget->log_text(tr("- global config directory: %1\n").arg(settings->getGlobalConfigFileDirectory()));
+    logFileMainWidget->log_text(tr("- QF home directory directory: %1\n").arg(settings->getHomeQFDirectory()));
+    logFileMainWidget->log_text(tr("- INI file: %1\n").arg(settings->getIniFilename()));
+    logFileMainWidget->log_text(tr("- main help directory: %1\n").arg(settings->getMainHelpDirectory()));
+    logFileMainWidget->log_text(tr("- plugins directory: %1\n").arg(settings->getPluginDirectory()));
+    logFileMainWidget->log_text(tr("- sources directory: %1\n").arg(settings->getSourceDirectory()));
+    logFileMainWidget->dec_indent();
 
     logFileMainWidget->log_header(tr("Qt info:"));
     logFileMainWidget->inc_indent();
@@ -336,6 +357,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("maillist"), QString(qfInfoMaillist())));
     htmlReplaceList.append(qMakePair(QString("maillistrequest"), QString(qfInfoMaillistRequest())));
     htmlReplaceList.append(qMakePair(QString("weblink"), QString(qfInfoWeblink())));
+    htmlReplaceList.append(qMakePair(QString("weblink_source"), QString(qfInfoSourceWeblink())));
     htmlReplaceList.append(qMakePair(QString("license"), qfInfoLicense()));
     htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
     htmlReplaceList.append(qMakePair(QString("pluginhelp_list"), createPluginDocHelp()));
@@ -1813,6 +1835,8 @@ void MainWindow::createActions() {
     connect(helpContactMaillinglist, SIGNAL(triggered()), this, SLOT(contactMailinglist()));
     helpOpenWebpageAct=new QAction(QIcon(":/lib/help/www.png"), tr("QuickFit &Webpage"), this);
     connect(helpOpenWebpageAct, SIGNAL(triggered()), this, SLOT(openWebpage()));
+    helpOpenWebpageSourceAct=new QAction(QIcon(":/lib/help/www.png"), tr("QuickFit &Sourcecode Repository"), this);
+    connect(helpOpenWebpageSourceAct, SIGNAL(triggered()), this, SLOT(openWebpageSource()));
     actCheckUpdate=new QAction(QIcon(":/lib/help/www.png"), tr("Check for updates ..."), this);
     connect(actCheckUpdate, SIGNAL(triggered()), this, SLOT(checkUpdates()));
 
@@ -2058,6 +2082,7 @@ void MainWindow::createMenus() {
     helpMenu->addAction(helpWelcomeScreenAct);
     helpMenu->addSeparator();
     helpMenu->addAction(helpOpenWebpageAct);
+    helpMenu->addAction(helpOpenWebpageSourceAct);
     helpMenu->addAction(helpContactAuthors);
     helpMenu->addAction(helpContactMaillinglist);
 
@@ -4004,6 +4029,12 @@ void MainWindow::openWebpage()
     QDesktopServices::openUrl(QUrl(qfInfoWeblink()));
 }
 
+void MainWindow::openWebpageSource()
+{
+    QDesktopServices::openUrl(QUrl(qfInfoSourceWeblink()));
+
+}
+
 QList<QPair<QString, QString> >* MainWindow::getHTMLReplacementList() {
     return &htmlReplaceList;
 }
@@ -4597,7 +4628,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
     QModernProgressDialog progress;
     progress.setHasCancel(false);
-    progress.setLabelText(tr("rendering onine-help page ..."));
+    progress.setLabelText(tr("transforming & rendering online-help page ..."));
     progress.setMode(true, false);
     progress.openDelayed(1000);
     progress.raise();
@@ -4659,6 +4690,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
 
+    progress.setLabelText(tr("transforming & rendering online-help page ...\n   collect information ..."));
+    QApplication::processEvents();
     // find special information in file
     QRegExp rxTitle("<title>(.*)</title>", Qt::CaseInsensitive);
     if (rxTitle.indexIn(result) != -1) fromHTML_replaces.append(qMakePair(QString("title"), rxTitle.cap(1)));
@@ -4667,7 +4700,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     rxMeta.setMinimal(false);
     int count = 0;
     int pos = 0;
-    while ((pos = rxMeta.indexIn(result, pos)) != -1) {
+    while ((pos = rxMeta.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
 
         QString name=rxMeta.cap(2);
         QString content=rxMeta.cap(1);
@@ -4687,7 +4720,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     rxLink.setMinimal(false);
     count = 0;
     pos = 0;
-    while ((pos = rxLink.indexIn(result, pos)) != -1) {
+    while ((pos = rxLink.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
 
         QString rel=rxLink.cap(1).toLower();
         QString href=rxLink.cap(2);
@@ -4706,6 +4739,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         pos += rxLink.matchedLength();
     }
 
+
+    progress.setLabelText(tr("transforming & rendering online-help page ...\n   interpreting plugin help commands ..."));
+    QApplication::processEvents();
     // collectspecial replaces based on current directory
     bool foundPlugin=false;
     if (pluginList) {
@@ -4886,6 +4922,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             // insert autolinks
             QStringList ttids=helpdata.autolinks.keys();
             qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n   inserting autolinks ..."));
 
             for (int ti=0; ti<ttids.size(); ti++){
                 QApplication::processEvents();
@@ -4896,8 +4933,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 rxTT.setCaseSensitivity(Qt::CaseInsensitive);
                 QRegExp rxTooltip("href\\s*\\=\\s*\\\"tooltip\\:");
                 pos = 0;
+                count=0;
                 //qDebug()<<"-------------------------------- "<<key<<" -------------------------";
-                while ((pos = rxTT.indexIn(result, pos)) != -1) {
+                while ((pos = rxTT.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
                     //qDebug()<<rxTT.cap()<<"\n   "<<rxTT.cap(1)<<rxTT.cap(2)<<rxTT.cap(3)<<rxTT.cap(4);
                     QString img="qrc:/lib/help/autolink.png";
                     if (val.toLower().startsWith("http://") || val.toLower().startsWith("https://") || val.toLower().startsWith("ftp://") || val.toLower().startsWith("ftps://")) {
@@ -4920,11 +4958,13 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         //qDebug()<<"  skipped";
                     }
                     //qDebug()<<pos;
+                    count++;
                 }
 
             }
         }
 
+        progress.setLabelText(tr("transforming & rendering online-help page ...\n   replacing help commands ..."));
         bool replaced=true;
         int cnt=0;
         while (replaced && (cnt<15)) {
@@ -4964,7 +5004,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             rxList.setMinimal(true);
             int count = 0;
             int pos = 0;
-            while ((pos = rxList.indexIn(result, pos)) != -1) {
+            while ((pos = rxList.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
                 QApplication::processEvents();
                 bool replaced=false;
                 QString list=rxList.cap(1).toLower().trimmed();
@@ -5306,11 +5346,12 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n   inserting other files ..."));
             QRegExp rxInsert("\\$\\$(insert|include|insertglobal|includeglobal|tooltip|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode|startbox|main_fontsize)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
-            while ((pos = rxInsert.indexIn(result, pos)) != -1) {
+            while ((pos = rxInsert.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
                 QApplication::processEvents();
                 bool replaced=false;
                 QString command=rxInsert.cap(1).toLower().trimmed();
@@ -5413,12 +5454,13 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$math:<latex>$$ items
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n   rendering math expressions (LaTeX) ..."));
             QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:(.*)\\$\\$|\\$\\((.*)\\)\\$|\\$\\[(.*)\\]\\$", Qt::CaseInsensitive);
             rxLaTeX.setMinimal(true);
             count = 0;
             pos = 0;
             //qDebug()<<result.contains("$(")<<result;
-            while ((pos = rxLaTeX.indexIn(result, pos)) != -1) {
+            while ((pos = rxLaTeX.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
                 QApplication::processEvents();
                 bool replaced=false;
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
@@ -5542,13 +5584,13 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             }
 
 
-
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n   inserting plugin info ..."));
             // interpret $$plugin_info:<name>:<id>$$, $$fig:file:caption$$,  $$figure:file:caption$$ items, etc.
             QRegExp rxPluginInfo("\\$\\$(plugin_info|fig|figure|startbox|fitfunction|fitalgorithm|importer|exporter)\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxPluginInfo.setMinimal(true);
             count = 0;
             pos = 0;
-            while ((pos = rxPluginInfo.indexIn(result, pos)) != -1) {
+            while ((pos = rxPluginInfo.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
                 QApplication::processEvents();
                 QString command=rxPluginInfo.cap(1).toLower().trimmed();
                 QString param1=rxPluginInfo.cap(2).toLower().trimmed();
@@ -5681,7 +5723,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
         if (isMainHelp) {
 
-
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n   building table of contents ..."));
             // extract table of contents from header tags
             QRegExp rxHeader("<\\s*h([123456789])([^>]*)>(.*)<\\/\\s*h\\1\\s*>", Qt::CaseInsensitive);
             rxHeader.setMinimal(true);
@@ -5690,7 +5732,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             int minHeaderLevel=0;
             QList<ContentsEntry> contents;
             bool first=true;
-            while ((pos = rxHeader.indexIn(result, pos)) != -1) {
+            while ((pos = rxHeader.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
                 QApplication::processEvents();
 
                 int level=rxHeader.cap(1).toInt();
@@ -5751,7 +5793,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             rxHeader1.setMinimal(true);
             count = 0;
             pos = 0;
-            while ((pos = rxHeader.indexIn(result, pos)) != -1) {
+            while ((pos = rxHeader.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
                 QApplication::processEvents();
 
                 int level=rxHeader.cap(1).toInt();
@@ -5811,13 +5853,14 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // extract references tags $$ref:<ID>:Text$$
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n   interpreting literature references ..."));
             QStringList refList;
             QMap<QString, int> refIDMap;
             QRegExp rxRef("\\$\\$(invisibleref|ref)\\:(\\w*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxRef.setMinimal(true);
             count = 0;
             pos = 0;
-            while ((pos = rxRef.indexIn(result, pos)) != -1) {
+            while ((pos = rxRef.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
                 QApplication::processEvents();
 
                 QString inst=rxRef.cap(1).toLower();
@@ -5874,26 +5917,39 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
         // try and find DOIs in the text
-        QRegExp rxDOI("(doi)?[\\:]?\\s*(10\\.\\d{3,4}[\\d\\:\\.\\-\\_\\/a-z]+)[\\,\\;\\:\\.\\s\\n\\r\\t\\v\\)\\]\\}\\<\\>\\(\\[\\{\\\\\\?\\\"]+", Qt::CaseInsensitive);
+        progress.setLabelText(tr("transforming & rendering online-help page ...\n   adding DOI links ..."));
+        QRegExp rxDOI("(doi|http\\:\\/\\/dx\\.doi\\.org\\/|href\\s*=\\s*\\\"[^\\\"]*)?[\\:]?\\s*(10\\.\\d{3,4}[\\d\\:\\.\\-\\_\\/a-z]+)[\\,\\;\\:\\.\\s\\n\\r\\t\\v\\)\\]\\}\\<\\>\\(\\[\\{\\\\\\?\\\"]+", Qt::CaseInsensitive);
         rxDOI.setMinimal(false);
 
         //qDebug()<<"SEARCHING FOR DOIs"<<result<<rxDOI;
 
         count = 0;
         pos = 0;
-        while ((pos = rxDOI.indexIn(result, pos)) != -1) {
-            QString rep=QString("<a href=\"http://dx.doi.org/%1\">%2</a>").arg(rxDOI.cap(2)).arg(rxDOI.cap(2));
-            result=result.replace(rxDOI.cap(2), rep);
+        while (((pos = rxDOI.indexIn(result, pos)) != -1) && (count<transformQF3HelpHTML_MAXCOUNT*2) ) {
+            if (rxDOI.matchedLength()<50 && (rxDOI.cap(1).toLower().simplified()!="http://dx.doi.org/")  && (!rxDOI.cap(1).toLower().simplified().contains("href"))) {
+                QString rep=QString("<a href=\"http://dx.doi.org/%1\">%2</a>").arg(rxDOI.cap(2)).arg(rxDOI.cap(2));
+                //result=result.replace(rxDOI.cap(2), rep);
+                //result=result.left(pos);
+                //QString tmp=result.mid(pos);
+                int offsetb=0;
+                if (rxDOI.cap().endsWith('<')) offsetb=1;
+                result=result.replace(pos, rxDOI.matchedLength()-offsetb, rep);
 
-            //qDebug()<<"found: "<<count<<rxDOI.cap(0);
-            //qDebug()<<"     -1-> "<<rxDOI.cap(1);
-            //qDebug()<<"     -2-> "<<rxDOI.cap(2);
-            //qDebug()<<"       => "<<rep;
+//                qDebug()<<"found: "<<count<<rxDOI.cap(0);
+//                qDebug()<<"     -1-> "<<rxDOI.cap(1);
+//                qDebug()<<"     -2-> "<<rxDOI.cap(2);
+//                qDebug()<<"       => "<<rep;
 
 
+                pos += rep.size();
+            } else {
+                pos += rxDOI.matchedLength();
+
+            }
             ++count;
-            pos += rep.size();
-            if (count>100) break;
+            //qDebug()<<count<<pos;
+
+            if (count%10==0) QApplication::processEvents();
         }
 
         // remove all unreplaces $$name$$ sequences
@@ -5908,7 +5964,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         rxImages.setMinimal(true);
         rxImages.setCaseSensitivity(Qt::CaseInsensitive);
         pos = 0;
-        while ((pos = rxImages.indexIn(result, pos)) != -1) {
+        count=0;
+        while ((pos = rxImages.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
             QString file=rxImages.cap(1).trimmed();
             if (file.startsWith("qrc:/") || file.startsWith("http:/") || file.startsWith("https:/")) {
                 pos=pos+rxImages.matchedLength();
@@ -5925,6 +5982,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                 pos += rxImages.matchedLength()+(news.size()-old.size());
             }
+            count++;
         }
 
 
@@ -5932,6 +5990,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             // insert tooltips: search all occurences of the tooltip keywords that are not inside a tag (i.e. surrounded by a closing tag on
             // the left and an opening tag on the right) and where the tag is not something special (like headers or links).
             //QMapIterator<QString, QFToolTipsData> itTT(helpdata.tooltips);
+            progress.setLabelText(tr("transforming & rendering online-help page ...\n   inserting tooltips ..."));
             QStringList ttids=helpdata.tooltips.keys();
             qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
 
@@ -5942,7 +6001,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 rxTT.setMinimal(true);
                 pos = 0;
                 //qDebug()<<"----- "<<key<<" ------";
-                while ((pos = rxTT.indexIn(result, pos)) != -1) {
+                count=0;
+                while ((pos = rxTT.indexIn(result, pos)) != -1 && count<transformQF3HelpHTML_MAXCOUNT) {
                     //qDebug()<<rxTT.cap()<<rxTT.cap(1)<<rxTT.cap(2);
                     QString rep=QString("<a href=\"tooltip:%1\">%2 <img src=\"qrc:/lib/help/tooltip.png\" border=\"0\" width=\"12\" height=\"12\" alt=\"get more information about %2\"></a>").arg(key).arg(rxTT.cap(2));
                     QString tag=rxTT.cap(1).toLower();
@@ -5952,6 +6012,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     } else {
                         pos += rxTT.matchedLength();
                     }
+                    count++;
                 }
 
             }

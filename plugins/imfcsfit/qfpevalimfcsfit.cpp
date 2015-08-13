@@ -81,10 +81,10 @@ void QFPEvalIMFCSFit::init()
         QMenu* menu=new QMenu(tr("imFCS &Calibration Tool"));
         menu->setIcon(QIcon(":/imfcsfit/imfcs_fitcalib.png"));
 
-        QAction* actHelp=new QAction(QIcon(":/lib/help.png"), tr("Calbration Tutorial"), this);
+        QAction* actHelp=new QAction(QIcon(":/lib/help.png"), tr("Calibration Tutorial"), this);
         connect(actHelp, SIGNAL(triggered()), this, SLOT(showCalibrationTutorial()));
         menu->addAction(actHelp);
-        QAction* actWizard=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("Calbration Wizard"), this);
+        QAction* actWizard=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("Calibration Wizard"), this);
         connect(actWizard, SIGNAL(triggered()), this, SLOT(insertFCSCalibrationWizard()));
         menu->addAction(actWizard);
         QMenu* menu1=menu->addMenu("steps ...");
@@ -132,6 +132,21 @@ QFPluginOptionsWidget *QFPEvalIMFCSFit::createOptionsWidget(QWidget *parent)
     return new OptionsWidget(this, parent);
 }
 
+void QFPEvalIMFCSFit::sendPluginCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
+{
+    if (command.trimmed().toLower()=="run_calibration") {
+        insertFCSCalibrationWizard();
+        QList<double> vals;
+        QVariantList vlist=param5.toList();
+        for (int i=0; i<vlist.size(); i++) {
+            vals<<vlist[i].toDouble();
+        }
+        insertFCSFitForCalibration(NULL, param1.toDouble(), param2.toDouble(), param3.toBool(), param4.toString(), vals);
+        calibrationWizard->enableStep2();
+        calibrationWizard->hideStep01(true);
+    }
+}
+
 
 
 void QFPEvalIMFCSFit::insertFCSFit() {
@@ -153,6 +168,7 @@ void QFPEvalIMFCSFit::insertFCSCalibrationWizard()
         connect(calibrationWizard, SIGNAL(loadFile()), this, SLOT(imFCSCalibrationSelectFile()));
         connect(calibrationWizard, SIGNAL(correlate()), this, SLOT(imFCSCalibrationCorrelate()));
     }
+    calibrationWizard->hideStep01(false);
     calibrationWizard->show();
     calibrationWizard->activateWindow();
     calibrationWizard->raise();
@@ -161,48 +177,64 @@ void QFPEvalIMFCSFit::insertFCSCalibrationWizard()
 void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
     if (project) {
 
+
         ImFCSCalibrationDialog* dlg=new ImFCSCalibrationDialog(NULL);
         QFEvaluationItem* edummy=project->addEvaluation(getID(), "imFCS Fit");
         QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(edummy);
         if (imFCS) dlg->setFitModels(imFCS->getAvailableFitFunctions(), imFCS->getFitFunctionID());
         if (dlg->exec()) {
             QList<double> vals=dlg->getValues();
-            for (int i=0; i<vals.size(); i++) {
-                QFEvaluationItem* e=edummy;
-                if (i>0) e=project->addEvaluation(getID(), "imFCS Fit");
-                QFImFCSFitEvaluation* eimFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
-                e->setQFProperty("FIT_REPEATS", 2, false, false);
-                e->setQFProperty("PRESET_N_PARTICLE", 1, false, false);
-                e->setQFProperty("PRESET_FOCUS_WIDTH", vals[i], false, false);
-                e->setQFProperty("PRESET_FOCUS_HEIGHT", dlg->getFocusHeight(), false, false);
-                e->setQFProperty("PRESET_FOCUS_HEIGHT_ERROR", dlg->getFocusHeightError(), false, false);
-                e->setQFProperty("PRESET_FOCUS_WIDTH_FIX", true, false, false);
-                e->setQFProperty("PRESET_FOCUS_HEIGHT_FIX", true, false, false);
-                e->setQFProperty("PRESET_FOCUS_DISTANCE_X_FIX", true, false, false);
-                e->setQFProperty("PRESET_FOCUS_DISTANCE_Y_FIX", true, false, false);
-                e->setQFProperty("PRESET_VFLOWX", 0, false, false);
-                e->setQFProperty("PRESET_VFLOWY", 0, false, false);
-                e->setQFProperty("PRESET_VFLOWX_FIX", true, false, false);
-                e->setQFProperty("PRESET_VFLOWY_FIX", true, false, false);
-                e->setQFProperty("PRESET_D1_FIX", false, false, false);
-                e->setQFProperty("PRESET_OFFSET_FIX", dlg->getFixOffset(), false, false);
-                e->setQFProperty("PRESET_DIFF_COEFF1_FIX", false, false, false);
-                e->setQFProperty("IMFCS_CALIBRATION_FOCUSWIDTH", vals[i], false, false);
-                e->setQFProperty("IMFCS_CALIBRATION_FOCUSHEIGHT", dlg->getFocusHeight(), false, false);
-                e->setQFProperty("IMFCS_CALIBRATION_FOCUSHEIGHT_ERROR", dlg->getFocusHeightError(), false, false);
-                e->setQFProperty("IMFCS_CALIBRATION_MODEL", dlg->getFitModel(), false, false);
-                e->setName(tr("wxy=%1 nm").arg(vals[i]));
-                if (eimFCS) eimFCS->setFitFunction(dlg->getFitModel());
-            }
+            insertFCSFitForCalibration(edummy, dlg->getFocusHeight(), dlg->getFocusHeightError(), dlg->getFixOffset(), dlg->getFitModel(), vals);
+
             if (vals.size()<=0) delete edummy;
-            QFRawDataRecord* et=project->addRawData("table", "imFCS Calibration results");
-            et->setQFProperty("IMFCS_CALIBRATION_RESULTTABLE", true, false, false);
+
 
          } else {
             delete edummy;
         }
         delete dlg;
+
     }
+}
+
+void QFPEvalIMFCSFit::insertFCSFitForCalibration(QFEvaluationItem* edummy, double height, double err_height, bool fixOffset, const QString &model, const QList<double> &vals)
+{
+    for (int i=0; i<vals.size(); i++) {
+        QFEvaluationItem* e=edummy;
+        if ((i>0) || (edummy==NULL)) e=project->addEvaluation(getID(), "imaging FCS Fit for calibration");
+        QFImFCSFitEvaluation* eimFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
+        e->setQFProperty("FIT_REPEATS", 2, false, false);
+        e->setQFProperty("PRESET_N_PARTICLE", 1, false, false);
+        e->setQFProperty("PRESET_FOCUS_WIDTH", vals[i], false, false);
+        e->setQFProperty("PRESET_FOCUS_HEIGHT", height, false, false);
+        e->setQFProperty("PRESET_FOCUS_HEIGHT_ERROR", err_height, false, false);
+        e->setQFProperty("PRESET_FOCUS_WIDTH_FIX", true, false, false);
+        e->setQFProperty("PRESET_FOCUS_HEIGHT_FIX", true, false, false);
+        e->setQFProperty("PRESET_FOCUS_DISTANCE_X_FIX", true, false, false);
+        e->setQFProperty("PRESET_FOCUS_DISTANCE_Y_FIX", true, false, false);
+        e->setQFProperty("PRESET_VFLOWX", 0, false, false);
+        e->setQFProperty("PRESET_VFLOWY", 0, false, false);
+        e->setQFProperty("PRESET_VFLOWX_FIX", true, false, false);
+        e->setQFProperty("PRESET_VFLOWY_FIX", true, false, false);
+        e->setQFProperty("PRESET_D1_FIX", false, false, false);
+        e->setQFProperty("PRESET_OFFSET_FIX", fixOffset, false, false);
+        e->setQFProperty("PRESET_DIFF_COEFF1_FIX", false, false, false);
+        e->setQFProperty("IMFCS_CALIBRATION_FOCUSWIDTH", vals[i], false, false);
+        e->setQFProperty("IMFCS_CALIBRATION_FOCUSHEIGHT", height, false, false);
+        e->setQFProperty("IMFCS_CALIBRATION_FOCUSHEIGHT_ERROR", err_height, false, false);
+        e->setQFProperty("IMFCS_CALIBRATION_MODEL", model, false, false);
+        e->setQFProperty("PRESET_FIT_MODEL", model, false, false);
+        e->setName(tr("wxy=%1 nm").arg(vals[i]));
+        if (eimFCS) {
+            eimFCS->setFitDataWeighting(QFFCSWeightingTools::RunErrorWeighting);
+            eimFCS->setFitFunction(model);
+        }
+    }
+
+
+
+    QFRawDataRecord* et=project->addRawData("table", "imFCS Calibration results");
+    et->setQFProperty("IMFCS_CALIBRATION_RESULTTABLE", true, false, false);
 }
 
 void QFPEvalIMFCSFit::imFCSCalibrationSelectFile()
@@ -230,21 +262,39 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
         return;
     }
     log_text(tr("imFCS calibration tool 1: fitting D's ... \n"));
-    for (int i=0; i<project->getEvaluationCount(); i++) {
-        QFEvaluationItem* e=project->getEvaluationByNum(i);
-        QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
-        if (imFCS) {
-            log_text(tr("   - fitting %1 \n").arg(e->getName()));
-            QFEvaluationPropertyEditor* pedt=services->openEvaluationEditor(e);
-            QFEvaluationEditor* edt=pedt->getEditor();
-            QFImFCSFitEvaluationEditor* eedt=qobject_cast<QFImFCSFitEvaluationEditor*>(edt);
-            if (eedt && e->getName().toLower().contains("wxy")) {
-                eedt->fitEverythingThreadedWriter();
-            }
-            if (pedt) pedt->close();
-            log_text(tr("        DONE!\n"));
-        }
+
+    if (calibrationWizard)  {
+        calibrationWizard->getPltD()->set_doDrawing(false);
+        JKQTPdatastore* ds=calibrationWizard->getPltD()->getDatastore();
+        ds->clear();
+        calibrationWizard->getPltD()->clearGraphs();
+        calibrationWizard->getPltD()->set_doDrawing(true);
+        calibrationWizard->getPltD()->update_plot();
+        calibrationWizard->getPltWxy()->set_doDrawing(false);
+        ds=calibrationWizard->getPltWxy()->getDatastore();
+        ds->clear();
+        calibrationWizard->getPltWxy()->clearGraphs();
+        calibrationWizard->getPltWxy()->set_doDrawing(true);
+        calibrationWizard->getPltWxy()->update_plot();
     }
+
+
+        for (int i=0; i<project->getEvaluationCount(); i++) {
+            QFEvaluationItem* e=project->getEvaluationByNum(i);
+            QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
+            if (imFCS) {
+                log_text(tr("   - fitting %1 \n").arg(e->getName()));
+                QFEvaluationPropertyEditor* pedt=services->openEvaluationEditor(e);
+                QFEvaluationEditor* edt=pedt->getEditor();
+                QFImFCSFitEvaluationEditor* eedt=qobject_cast<QFImFCSFitEvaluationEditor*>(edt);
+                if (eedt && e->getName().toLower().contains("wxy")) {
+                    eedt->fitEverythingThreadedWriter();
+                }
+                if (pedt) pedt->close();
+                log_text(tr("        DONE!\n"));
+            }
+        }
+
     log_text(tr("imFCS calibration tool 1: fitting D's ... DONE!\n"));
 }
 
@@ -304,6 +354,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
     QVector<double> pixwidths, pixshifts;
     QList<QVector<double> > Dvals, Derrs;
     bool isshifted=false;
+
     for (int i=0; i<project->getEvaluationCount(); i++) {
         QFEvaluationItem* e=project->getEvaluationByNum(i);
         QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
@@ -420,6 +471,14 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
         }
     }
     if (calibrationWizard)  {
+        calibrationWizard->getPltWxy()->set_doDrawing(false);
+        JKQTPdatastore* ds=calibrationWizard->getPltWxy()->getDatastore();
+        ds->clear();
+        calibrationWizard->getPltWxy()->clearGraphs();
+        calibrationWizard->getPltWxy()->set_doDrawing(true);
+        calibrationWizard->getPltWxy()->update_plot();
+    }
+    if (calibrationWizard)  {
         calibrationWizard->getPltD()->set_doDrawing(false);
         JKQTPdatastore* ds=calibrationWizard->getPltD()->getDatastore();
         ds->clear();
@@ -450,7 +509,9 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
                 plt->set_yColumn(c_D);
                 plt->set_yErrorColumn(c_ED);
                 plt->set_xErrorStyle(JKQTPnoError);
-                plt->set_yErrorStyle(JKQTPnoError);
+                plt->set_yErrorStyle(JKQTPerrorBars);
+                plt->set_symbolSize(10);
+                plt->set_symbol(JKQTPfilledCircle);
                 calibrationWizard->getPltD()->get_plotter()->addGraph(plt);
             }
         }
@@ -513,7 +574,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
 
         double Dcalib=Ds.value(DItem, 0);
         double DcalibE=Ds2.value(DItem, 0);
-        QFEvaluationItem* e=project->addEvaluation(getID(), QString::fromLatin1("calibration D=%1\xB5m^2/s").arg(Dcalib));
+        QFEvaluationItem* e=project->addEvaluation(getID(), QString::fromLatin1("calibration D= %1 \xB5m^2/s").arg(Dcalib));
         e->setQFProperty("FIT_REPEATS", 2, false, false);
         e->setQFProperty("PRESET_N_PARTICLE", 1, false, false);
         e->setQFProperty("PRESET_D1", Dcalib, false, false);
@@ -535,9 +596,11 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
         e->setQFProperty("PRESET_VFLOWY", 0, false, false);
         e->setQFProperty("PRESET_VFLOWX_FIX", true, false, false);
         e->setQFProperty("PRESET_VFLOWY_FIX", true, false, false);
-        e->setName(tr("calibration D=%1\xB5m^2/s").arg(Dcalib));
+        e->setQFProperty("PRESET_FIT_MODEL", model, false, false);
+        e->setName(QString(QLatin1String("calibration D=%1\xB5m^2/s")).arg(Dcalib));
         QFImFCSFitEvaluation* eimFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
         if (eimFCS && (!model.isEmpty())) eimFCS->setFitFunction(model);
+        if (eimFCS) eimFCS->setFitDataWeighting(QFFCSWeightingTools::RunErrorWeighting);
     }
 
     log_text(tr("imFCS calibration tool 2: collecting D data ... DONE!\n"));
@@ -564,6 +627,14 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool3()
             if (pedt) pedt->close();
             log_text(tr("        DONE!\n"));
         }
+    }
+    if (calibrationWizard)  {
+        calibrationWizard->getPltWxy()->set_doDrawing(false);
+        JKQTPdatastore* ds=calibrationWizard->getPltWxy()->getDatastore();
+        ds->clear();
+        calibrationWizard->getPltWxy()->clearGraphs();
+        calibrationWizard->getPltWxy()->set_doDrawing(true);
+        calibrationWizard->getPltWxy()->update_plot();
     }
     log_text(tr("imFCS calibration tool 3: fitting wxy's ... DONE!\n"));
 }
@@ -602,6 +673,14 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
         QMessageBox::critical(parentWidget, tr("imFCS Calibration"), tr("Could not create or find proper results table in project!"));
         return;
     }
+
+    if (calibrationWizard)  {
+        calibrationWizard->getPltWxy()->set_doDrawing(false);
+        JKQTPdatastore* ds=calibrationWizard->getPltWxy()->getDatastore();
+        ds->clear();
+        calibrationWizard->getPltWxy()->clearGraphs();
+    }
+
     QFRDRColumnGraphsInterface* graph=qobject_cast<QFRDRColumnGraphsInterface*>(etab);
     int gr=-1;
 
@@ -626,6 +705,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
             DcalibE=e->getProperty("IMFCS_CALIBRATION_D_ERROR", DcalibE).toDouble();
             QString colName=tr("wxy [nm]");
             QString colNameE=tr("wxy_error [nm]");
+            QVector<double> wxys, wxyerrors;
             if (fitwxy) {
                 int cols=e->getProperty("IMFCS_CALIBRATION_COLS", tab->tableGetColumnCount()).toInt();
                 e->setQFProperty("IMFCS_CALIBRATION_COLS", cols);
@@ -680,7 +760,9 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
                         wxymean=qfstatisticsAverageVariance(wxyvar, wxy);
                         tab->tableSetData(rcounter, cols+1, wxymean);
                         tab->tableSetData(rcounter, cols+2, sqrt(wxyvar));
+                        wxys<<wxymean;
                         wxyvec<<wxymean;
+                        wxyerrors<<sqrt(wxyvar);
                         //qDebug()<<rcounter<<cols+1<<wxymean<<sqrt(wxyvar);
 
                         if (wxymean+sqrt(wxyvar)>ymax) ymax=(wxymean+sqrt(wxyvar))*1.1;
@@ -713,7 +795,11 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
                             }
                             ggraph=graph->colgraphGetPlotCount()-1;
                         } else {
-                            graph->colgraphSetPlotTitle(ggraph, tr("pixel size vs. lat. focus size, D=%2{\\mu}m^2/s").arg(Dcalib));
+                            if (!isshifted) {
+                                graph->colgraphSetPlotTitle(ggraph, tr("pixel size vs. lat. focus size, D=%2{\\mu}m^2/s").arg(Dcalib));
+                            } else {
+                                graph->colgraphSetPlotTitle(ggraph, tr("pixel shift vs. lat. focus size, D=%2{\\mu}m^2/s").arg(Dcalib));
+                            }
                         }
                         e->setQFProperty("IMFCS_CALIBRATION_GRAPHS", ggraph);
                         graph->colgraphSetPlotTitle(ggraph, tr("pixel size vs. lat. focus size"));
@@ -733,20 +819,91 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
                         graph->colgraphSetDoEmitSignals(emitSigG);
 
                     }
+
+
+
+
+
+                    if (calibrationWizard)  {
+                        JKQTPdatastore* ds=calibrationWizard->getPltWxy()->getDatastore();
+                        if (!isshifted) {
+                            calibrationWizard->getPltWxy()->get_plotter()->set_plotLabel(tr("pixel size vs. lat. focus size, D=%2{\\mu}m^2/s").arg(Dcalib));
+                            calibrationWizard->getPltWxy()->getXAxis()->set_axisLabel(tr("pixel size [nm]"));
+                        } else {
+                            calibrationWizard->getPltWxy()->get_plotter()->set_plotLabel(tr("pixel shift vs. lat. focus size, D=%2{\\mu}m^2/s").arg(Dcalib));
+                            calibrationWizard->getPltWxy()->getXAxis()->set_axisLabel(tr("pixel shift [nm]"));
+                        }
+                        calibrationWizard->getPltWxy()->getYAxis()->set_axisLabel(tr("lateral focus size w_{xy} [nm]"));
+
+                        JKQTPhorizontalRange* range=new JKQTPhorizontalRange(calibrationWizard->getPltWxy());
+                        range->set_title(tr("\\overline{w_{xy}}=( %1 \\pm %2 ) nm for D=%3{\\mu}m^2/s").arg(roundWithError(qfstatisticsAverage(wxys), qfstatisticsStd(wxys), 2)).arg(roundError(qfstatisticsStd(wxys),2)).arg(Dcalib));
+                        range->set_plotCenterLine(true);
+                        range->set_rangeCenter(qfstatisticsAverage(wxys));
+                        range->set_rangeMin(qfstatisticsAverage(wxys)-qfstatisticsStd(wxys));
+                        range->set_rangeMax(qfstatisticsAverage(wxys)+qfstatisticsStd(wxys));
+                        range->set_unlimitedSizeMin(true);
+                        range->set_unlimitedSizeMax(true);
+                        calibrationWizard->getPltWxy()->addGraph(range);
+
+                        JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(calibrationWizard->getPltWxy());
+                        g->set_drawLine(false);
+                        g->set_symbol(JKQTPfilledCircle);
+                        g->set_symbolSize(12);
+                        calibrationWizard->getPltWxy()->addGraph(g);
+                        if (!isshifted) {
+                            g->set_xColumn(ds->addCopiedColumn(pixwidths, tr("pixel size a [nm], D=%2{\\mu}m^2/s").arg(Dcalib) ));
+                            g->set_yColumn(ds->addCopiedColumn(wxys, tr("wxy [nm], D=%2{\\mu}m^2/s").arg(Dcalib)));
+                            g->set_yErrorColumn(ds->addCopiedColumn(wxyerrors, tr("wxy_error [nm], D=%2{\\mu}m^2/s").arg(Dcalib)));
+                            int ismall=0;
+                            if (pixwidths.size()>1) {
+                                for (int i=1; i<pixwidths.size(); i++) {
+                                    if (pixwidths[i]<pixwidths[ismall]) ismall=i;
+                                }
+                            }
+                            calibrationWizard->getPltWxy()->addGraph(new JKQTPgeoText(calibrationWizard->getPltWxy(), pixwidths.value(ismall), wxys.value(ismall), tr("\\ \\ \\leftarrow\\ \\textbf{w_{xy}=( %1 \\pm %2 ) nm}").arg(roundWithError(wxys.value(ismall),wxyerrors.value(ismall),2)).arg(roundError(wxyerrors.value(ismall),2)), 12));
+                        } else {
+                            g->set_xColumn(ds->addCopiedColumn(pixshifts, tr("pixel shift \\delta [nm], D=%2{\\mu}m^2/s").arg(Dcalib) ));
+                            g->set_yColumn(ds->addCopiedColumn(wxys, tr("wxy [nm], D=%2{\\mu}m^2/s").arg(Dcalib)));
+                            g->set_yErrorColumn(ds->addCopiedColumn(wxyerrors, tr("wxy_error [nm], D=%2{\\mu}m^2/s").arg(Dcalib)));
+                            int ismall=0;
+                            if (pixshifts.size()>1) {
+                                for (int i=1; i<pixshifts.size(); i++) {
+                                    if (pixshifts[i]<pixshifts[ismall]) ismall=i;
+                                }
+                            }
+                            calibrationWizard->getPltWxy()->addGraph(new JKQTPgeoText(calibrationWizard->getPltWxy(), pixshifts.value(ismall), wxys.value(ismall), tr("\\ \\ \\leftarrow\\ \\textbf{w_{xy}=( %1 \\pm %2 ) nm}").arg(roundWithError(wxys.value(ismall),wxyerrors.value(ismall),2)).arg(roundError(wxyerrors.value(ismall),2)), 12));
+                        }
+                        g->set_yErrorStyle(JKQTPerrorBars);
+                        g->set_title(tr("w_{xy}(a) for D=%2{\\mu}m^2/s").arg(Dcalib));
+
+
+                    }
                 }
+
             }
+
+
+
+
         }
 
 
     }
 
-    QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(etab, false);
-    if (editor) {
-        if (gr>=0) editor->sendEditorCommand("showPlot", gr);
-        editor->showTab(2);
-        editor->raise();
-    }
+//    QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(etab, false);
+//    if (editor) {
+//        if (gr>=0) editor->sendEditorCommand("showPlot", gr);
+//        editor->showTab(2);
+//        editor->raise();
+//    }
 
+    if (calibrationWizard)  {
+        calibrationWizard->getPltWxy()->zoomToFit();
+        calibrationWizard->getPltWxy()->getYAxis()->setRange(-0.02*calibrationWizard->getPltWxy()->getYMax(), calibrationWizard->getPltWxy()->getYMax());
+        calibrationWizard->getPltWxy()->set_doDrawing(true);
+        calibrationWizard->getPltWxy()->update_plot();
+        calibrationWizard->raise();
+    }
 
     log_text(tr("imFCS calibration tool 4: collecting wxy data ... DONE!\n"));
 

@@ -4,6 +4,9 @@
 #include <QStringListModel>
 #include <QSet>
 #include "libwid_imexport.h"
+#include <QList>
+#include <QVector>
+#include <QVariant>
 
 class QFWIDLIB_EXPORT QCheckableStringListModel : public QStringListModel {
     Q_OBJECT
@@ -24,6 +27,9 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
     Qt::ItemFlags flags(const QModelIndex &index) const;
+
+    QList<int> getChecked() const;
+    QVector<bool> getIsChecked() const;
 
 
 protected:

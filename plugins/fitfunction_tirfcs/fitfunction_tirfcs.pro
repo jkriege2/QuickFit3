@@ -49,7 +49,9 @@ qffitfunctionstirfcsdiffe2_relbright.h \
     qffitfunctionstirfcsadiff3de2.h \
     qffitfunctionstirfcsdiffflowe2.h \
 qffitfunctionstirfcsdiff3de2.h \
-qffitfunctionstirfcsdiff3de2_relbright.h
+qffitfunctionstirfcsdiff3de2_relbright.h \
+    qffitfunctionstirfccsadiffe2.h \
+    qffitfunctionstirfccsdiff.h
 #\
 #    qffitfunctionstirfcsdiff3de2.h \
 #    qffitfunctionstirfcsdiff3de2_relbright.h \
@@ -76,7 +78,9 @@ qffitfunctionstirfcsdiffe2_relbright.cpp \
     qffitfunctionstirfcsadiff3de2.cpp \
     qffitfunctionstirfcsdiffflowe2.cpp \
 qffitfunctionstirfcsdiff3de2.cpp\
-qffitfunctionstirfcsdiff3de2_relbright.cpp
+qffitfunctionstirfcsdiff3de2_relbright.cpp \
+    qffitfunctionstirfccsadiffe2.cpp \
+    qffitfunctionstirfccsdiff.cpp
 # \
 #    qffitfunctionstirfcsdiff3de2.cpp \
 #    qffitfunctionstirfcsdiff3de2_relbright.cpp \

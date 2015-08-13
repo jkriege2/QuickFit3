@@ -30,6 +30,7 @@
 #include <QSortFilterProxyModel>
 #include <QIcon>
 #include <QColor>
+#include "qfenhancedcombobox.h"
 
 class QFPseudoTreeModelItem; // forward
 
@@ -103,5 +104,20 @@ public:
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 
+};
+
+
+class QFLIB_EXPORT QFPseudoTreeModelEnhancedComboBox: public QFEnhancedComboBox {
+        Q_OBJECT
+    public:
+        explicit QFPseudoTreeModelEnhancedComboBox(QWidget *parent = 0);
+        QFPseudoTreeModel* getTreeModel() const;
+
+        QFPseudoTreeModelItem* itemForIndex(const QModelIndex& index) const;
+
+        QFPseudoTreeModelItem* addFolderedItem(const QString& name, const QVariant& userData, QChar separator=QLatin1Char('/'));
+        QFPseudoTreeModelItem* addFolderedItem(const QString& folder, const QString& name, const QVariant& userData);
+    protected:
+        QFPseudoTreeModel* m_model;
 };
 #endif // QFPSEUDOTREEMODEL_H

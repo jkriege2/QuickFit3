@@ -144,11 +144,11 @@ class QFRDRColumnGraphsInterface {
         virtual void colgraphSetDoEmitSignals(bool doEmit)=0;
 
         /** \brief add a plot of  columnX against columnY to the given plot */
-        virtual void colgraphAddGraph(int plot, int columnX, int columnY, ColumnGraphTypes type, const QString&  title)=0;
+        virtual int colgraphAddGraph(int plot, int columnX, int columnY, ColumnGraphTypes type, const QString&  title)=0;
         /** \brief add a boxplot */
-        virtual void colgraphAddBoxPlot(int plot, Orientation orientation, int columnX, int columnMin, int columnQ25, int columnMedian, int columnMean, int columnQ75, int columnMax, const QString&  title)=0;
+        virtual int colgraphAddBoxPlot(int plot, Orientation orientation, int columnX, int columnMin, int columnQ25, int columnMedian, int columnMean, int columnQ75, int columnMax, const QString&  title)=0;
         /** \brief add a plot of  columnX against columnY to the given plot */
-        virtual void colgraphAddErrorGraph(int plot, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title, ErrorGraphTypes errorStyle=egtBars)=0;
+        virtual int colgraphAddErrorGraph(int plot, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title, ErrorGraphTypes errorStyle=egtBars)=0;
         /** \brief set the errorbar properties of a graph */
         virtual void colgraphSetErrorGraphProperties(int plot, int graph, int columnXError, int columnYError, ErrorGraphTypes errorStyle=egtBars)=0;
         /** \brief set the x-error column of a graph */
@@ -164,7 +164,7 @@ class QFRDRColumnGraphsInterface {
         /** \brief set the errorbar type of a graph */
         virtual void colgraphSetErrorGraphStyle(int plot, int graphid, ErrorGraphTypes errorStyle)=0;
         /** \brief add a new plot */
-        virtual void colgraphAddPlot(const QString&  title, const QString& xLabel=QString("x"), const QString& yLabel=QString("y"), bool logX=false, bool logY=false)=0;
+        virtual int colgraphAddPlot(const QString&  title, const QString& xLabel=QString("x"), const QString& yLabel=QString("y"), bool logX=false, bool logY=false)=0;
         /** \brief returns number of graphs in a plot */
         virtual int colgraphGetGraphCount(int plot) const=0;
         /** \brief returns number of pplots */
@@ -232,7 +232,7 @@ class QFRDRColumnGraphsInterface {
          *        For the special cases cgtPolynomial, cgtExponential, cgtPowerLaw, the expression is ignored!
          *        If any non-function type is used, the the type is automatically set to be cgtExpression.
          */
-        virtual void colgraphAddFunctionGraph(int plot, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1)=0;
+        virtual int colgraphAddFunctionGraph(int plot, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1)=0;
         /** \brief add a function graph which takes it's parameters from a vector of numbers
          *
          *  \note This function only works with typ==cgtExpression, cgtPolynomial, cgtExponential, cgtPowerLaw, cgtQFFitFunction. Depending on
@@ -240,7 +240,7 @@ class QFRDRColumnGraphsInterface {
          *        For the special cases cgtPolynomial, cgtExponential, cgtPowerLaw, the expression is ignored!
          *        If any non-function type is used, the the type is automatically set to be cgtExpression.
          */
-        virtual void colgraphAddFunctionGraph(int plot, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params)=0;
+        virtual int colgraphAddFunctionGraph(int plot, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params)=0;
 
         /** \brief sets the given graph to be  a function graph which takes it's parameters from a column, or doesn't have parameters
          *
@@ -261,16 +261,16 @@ class QFRDRColumnGraphsInterface {
 
         /** \brief add an image graph which
          */
-        virtual void colgraphAddImageGraph(int plot, int imageColumn, ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString& title)=0;
+        virtual int colgraphAddImageGraph(int plot, int imageColumn, ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString& title)=0;
         /** \brief add a mask image graph which
          */
-        virtual void colgraphAddImageMaskGraph(int plot, int imageColumn, double x, double y, double width, double height, int Nx, const QString& title, QColor trueColor=QColor("black"), QColor falseColor=QColor("transparent"))=0;
+        virtual int colgraphAddImageMaskGraph(int plot, int imageColumn, double x, double y, double width, double height, int Nx, const QString& title, QColor trueColor=QColor("black"), QColor falseColor=QColor("transparent"))=0;
         /** \brief add a range graph
          */
-        virtual void colgraphAddRangeGraph(int plot, Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString& title, bool invertRange=false, bool fillrange=true, bool drawRangeLines=true, bool drawRangeCenter=true, QColor centerColor=QColor("red"),  Qt::PenStyle centerStyle=Qt::SolidLine, double centerWidth=1.0)=0;
+        virtual int colgraphAddRangeGraph(int plot, Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString& title, bool invertRange=false, bool fillrange=true, bool drawRangeLines=true, bool drawRangeCenter=true, QColor centerColor=QColor("red"),  Qt::PenStyle centerStyle=Qt::SolidLine, double centerWidth=1.0)=0;
         /** \brief add an RGB image graph which
          */
-        virtual void colgraphAddRGBImageGrph(int plot, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString& title)=0;
+        virtual int colgraphAddRGBImageGrph(int plot, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString& title)=0;
         /** \brief set the modifier channel of the given image graph
          */
         virtual void colgraphSetImageGraphModifier(int plot, int graph, int imageModifierColumn, ImageModifierMode mode)=0;

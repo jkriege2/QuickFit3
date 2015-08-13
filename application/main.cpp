@@ -78,6 +78,10 @@ int main(int argc, char * argv[])
     QStringList macoslibpaths;
     macoslibpaths<<"../QtPlugIns";
     macoslibpaths<<(QFileInfo(argv[0]).absolutePath()+"/../QtPlugIns");
+
+    if (!QDir::exists(macoslibpaths[0]) && !QDir::exists(macoslibpaths[1])){
+        macoslibpaths<<"../../../QtPlugIns";
+    }
     QCoreApplication::setLibraryPaths(macoslibpaths);
     qDebug()<<"lib paths:"<<QCoreApplication::libraryPaths();
 #endif

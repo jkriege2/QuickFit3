@@ -64,6 +64,7 @@ class QFFitFunctionConfigForGlobalFitInterface
         };
 
         struct GlobalFitConfig {
+            QString shortLabel;
             QString groupLabel;
             QString menuEntryLabel;
             QStringList models;
@@ -78,6 +79,17 @@ class QFFitFunctionConfigForGlobalFitInterface
         virtual GlobalFitConfig getGlobalFitConfig(int i) const=0;
 
 };
+
+inline QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFFitFunctionConfigForGlobalFitInterface_GlobalFitConfig_get(const QFFitFunctionConfigForGlobalFitInterface* intf, const QString& shortlabel) {
+    if (intf) {
+        for (int i=0; i<intf->getGlobalFitConfigCount(); i++) {
+            if (intf->getGlobalFitConfig(i).shortLabel==shortlabel) {
+                return intf->getGlobalFitConfig(i);
+            }
+        }
+    }
+    return QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig();
+}
 
 inline QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get() {
     QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter p;

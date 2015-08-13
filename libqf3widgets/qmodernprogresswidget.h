@@ -28,6 +28,7 @@
 #include <QDialog>
 #include <QLabel>
 #include <QPushButton>
+#include <QApplication>
 #include "libwid_imexport.h"
 
 /*! \brief a progress indicator widget
@@ -57,85 +58,85 @@ class QFWIDLIB_EXPORT QModernProgressWidget : public QWidget {
          virtual ~QModernProgressWidget();
 
          /** \brief suffix for progress display */
-         QString suffix() { return m_suffix; }
+         inline QString suffix() { return m_suffix; }
          /** \brief precision for progress display */
-         int precision() { return m_precision; }
+         inline int precision() { return m_precision; }
          /** \brief range minimum */
-         double minimum() const { return m_rangeMin; };
+         inline double minimum() const { return m_rangeMin; }
          /** \brief range maximum */
-         double maximum() const { return m_rangeMax; };
+         inline double maximum() const { return m_rangeMax; }
          /** \brief progress value */
-         double value() const { return m_value; };
+         inline double value() const { return m_value; }
          /** \brief outer radius (0..1) of the displayed circle/stroke ring */
-         double outerRadius() { return m_outerRadius; };
+         inline double outerRadius() { return m_outerRadius; }
          /** \brief inner radius (0..1) of the displayed circle/stroke ring */
-         double innerRadius() const { return m_innerRadius; };
+         inline double innerRadius() const { return m_innerRadius; }
          /** \brief color of an indicator, when inactive (usually a bit darker than the widget background color) */
-         QColor backgroundColor() const { return m_backgroundColor; };
+         inline QColor backgroundColor() const { return m_backgroundColor; }
          /** \brief color of the indicator the furthest away from the main indicator (usually the same as backgroundColor() ) */
-         QColor startColor() const { return m_startColor; };
+         inline QColor startColor() const { return m_startColor; }
          /** \brief color just before the current indicator (usually darker than startColor() ) */
-         QColor stopColor() const { return m_stopColor; };
+         inline QColor stopColor() const { return m_stopColor; }
          /** \brief color of the current item */
-         QColor indicatorColor() const { return  m_indicatorColor; };
+         inline QColor indicatorColor() const { return  m_indicatorColor; }
          /** \brief how many of the indicators (fraction 0..1 of items() ) should follow current indicator with a different color than backgroundColor() ) */
-         double nonBackgroundRange() const { return m_nonBackgroundRange; };
+         inline double nonBackgroundRange() const { return m_nonBackgroundRange; }
          /** \brief is an automatic spin going on? */
-         bool spin() const { return m_spin; }
+         inline bool spin() const { return m_spin; }
          /** \brief interval (milliseconds) of the movement if spin() is \c true */
-         int spinInterval() const { return m_spinInterval; };
+         inline int spinInterval() const { return m_spinInterval; }
          /** \brief number of indicators making up the circle */
-         int items() const { return m_items; };
+         inline int items() const { return m_items; }
          /** \brief type of widget: display a ring of strokes or circles, ...) */
-         Mode mode() const { return m_mode; }
+         inline Mode mode() const { return m_mode; }
          /** \brief display the current percentage of progress as text */
-         bool displayPercent() const { return m_displayPercent; };
+         inline bool displayPercent() const { return m_displayPercent; }
          /** \brief color of the progress text */
-         QColor textColor() const { return m_textColor; };
+         inline QColor textColor() const { return m_textColor; }
          /** \brief type of percentage mode */
-         PercentageMode percentageMode() const { return m_percentageMode; }
+         inline PercentageMode percentageMode() const { return m_percentageMode; }
 
          /** \brief suffix for progress display */
-         void setSuffix(QString s) { m_suffix=s; updateWidget(); }
+         inline void setSuffix(const QString& s) { m_suffix=s; updateWidget(); }
          /** \brief precision for progress display */
-         void setPrecision(int p) { m_precision=p; updateWidget(); }
+         inline void setPrecision(int p) { m_precision=p; updateWidget(); }
          /** \brief display the current percentage of progress as text */
-         void setDisplayPercent(bool display) { m_displayPercent=display; updateWidget(); };
+         inline void setDisplayPercent(bool display) { m_displayPercent=display; updateWidget(); }
          /** \brief color of the progress text */
-         void setTextColor(QColor col) { m_textColor=col; updateWidget();};
+         inline void setTextColor(QColor col) { m_textColor=col; updateWidget();}
          /** \brief outer radius (0..1) of the displayed circle/stroke ring */
-         void setOuterRadius(int val) { m_outerRadius =val; updateWidget(); }
+         inline void setOuterRadius(int val) { m_outerRadius =val; updateWidget(); }
          /** \brief inner radius (0..1) of the displayed circle/stroke ring */
-         void setInnerRadius(int val) { m_innerRadius =val; updateWidget(); }
+         inline void setInnerRadius(int val) { m_innerRadius =val; updateWidget(); }
          /** \brief how many of the indicators (fraction 0..1 of items() ) should follow current indicator with a different color than backgroundColor() ) */
-         void setNonBackgroundRange(double val) { m_nonBackgroundRange=val; updateWidget();};
+         inline void setNonBackgroundRange(double val) { m_nonBackgroundRange=val; updateWidget();}
          /** \brief color of the indicator the furthest away from the main indicator (usually the same as backgroundColor() ) */
-         void setStartColor(QColor col) { m_startColor=col; updateWidget();};
+         inline void setStartColor(QColor col) { m_startColor=col; updateWidget();}
          /** \brief color just before the current indicator (usually darker than startColor() ) */
-         void setStopColor(QColor col) { m_stopColor=col; updateWidget();};
+         inline void setStopColor(QColor col) { m_stopColor=col; updateWidget();}
          /** \brief color of the current item */
-         void setIndicatorColor(QColor col) { m_indicatorColor=col; updateWidget();};
+         inline void setIndicatorColor(QColor col) { m_indicatorColor=col; updateWidget();}
          /** \brief color of an indicator, when inactive (usually a bit darker than the widget background color) */
-         void setBackgroundColor(QColor col) { m_backgroundColor=col; updateWidget();};
+         inline void setBackgroundColor(QColor col) { m_backgroundColor=col; updateWidget();}
          /** \brief is an automatic spin going on? */
          void setSpin(bool enabled);
          /** \brief interval (milliseconds) of the movement if spin() is \c true */
-         void setSpinInterval(int msec) { m_spinInterval=msec; timer.setInterval(msec); };
+         inline void setSpinInterval(int msec) { m_spinInterval=msec; timer.setInterval(msec); }
          /** \brief number of indicators making up the circle */
-         void setItems(int i) { m_items=i; updateWidget();}
+         inline void setItems(int i) { m_items=i; updateWidget();}
          /** \brief type of widget: display a ring of strokes or circles, ...) */
-         void setMode(Mode m) { m_mode=m; updateWidget(); }
+         inline void setMode(Mode m) { m_mode=m; updateWidget(); }
          /** \brief type of percentage mode */
-         void setPercentageMode(PercentageMode m) { m_percentageMode=m; updateWidget(); }
+         inline void setPercentageMode(PercentageMode m) { m_percentageMode=m; updateWidget(); }
      public slots:
          /** \brief range minimum */
-         void setMinimum(double val) { m_rangeMin =val; updateWidget(); }
+         inline void setMinimum(double val) { m_rangeMin =val; updateWidget(); }
          /** \brief range maximum */
-         void setMaximum(double val) { m_rangeMax =val; updateWidget(); }
+         inline void setMaximum(double val) { m_rangeMax =val; updateWidget(); }
          /** \brief progress value */
-         void setValue(double val) { m_value =val; updateWidget(); }
+         inline void setValue(double val) { m_value =val; updateWidget(); }
          /** \brief set range of progress */
-         void setRange(double min, double max) { m_rangeMin=min; m_rangeMax=max; updateWidget(); }
+         inline void setRange(double min, double max) { m_rangeMin=min; m_rangeMax=max; updateWidget(); }
      protected:
          virtual void paintEvent(QPaintEvent *event);
          virtual void resizeEvent(QResizeEvent* event);
@@ -190,30 +191,30 @@ class QFWIDLIB_EXPORT QModernProgressDialog: public QDialog {
         virtual ~QModernProgressDialog();
 
         /** \brief text in the label of the dialog */
-        QString labelText() { return label->text(); };
+        inline QString labelText() { return label->text(); }
         /** \brief text on the "Cancel" button of the dialog */
-        QString cancelButtonText() { return cancel->text(); }
+        inline QString cancelButtonText() { return cancel->text(); }
 
         /** \brief text in the label of the dialog */
-        void setLabelText(const QString& t) { label->setText(t); };
+        inline void setLabelText(const QString& t) { label->setText(t); QApplication::processEvents(); }
         /** \brief text on the "Cancel" button of the dialog */
-        void setCancelButtonText(const QString& t) { cancel->setText(t); }
+        inline void setCancelButtonText(const QString& t) { cancel->setText(t); QApplication::processEvents(); }
         /** \brief indicate whetehr the dialog has a Cancel button (default: \c true )*/
-        void setHasCancel(bool has=true) { cancel->setVisible(has); }
+        inline void setHasCancel(bool has=true) { cancel->setVisible(has); QApplication::processEvents(); }
         /*! \brief display the progress dialog after a delay of \a minimumDuration milliseconds
 
             If the dialog has beend closed before the delay runs out, it is never displayed.
          */
         void openDelayed(int minimumDuration=2500);
         /** \brief returns \c true if the "Cancel" button has been clicked */
-        bool wasCanceled() { return m_wasCancel; }
-        double value() const { return progress->value(); }
-        double minimum() const { return progress->minimum(); }
-        double maximum() const { return progress->maximum(); }
-        bool spin() const { return progress->spin(); }
-        QModernProgressWidget* progressWidget() const { return progress; }
-        QLabel* textLabel() const { return label; }
-        QPushButton* cancelButton() const { return cancel; }
+        inline bool wasCanceled() { return m_wasCancel; }
+        inline double value() const { return progress->value(); }
+        inline double minimum() const { return progress->minimum(); }
+        inline double maximum() const { return progress->maximum(); }
+        inline bool spin() const { return progress->spin(); }
+        inline QModernProgressWidget* progressWidget() const { return progress; }
+        inline QLabel* textLabel() const { return label; }
+        inline QPushButton* cancelButton() const { return cancel; }
         /** \brief en-/disable spin and progress mode */
         void setMode(bool enabledSpin=true, bool enabledProgress=true);
     public slots:

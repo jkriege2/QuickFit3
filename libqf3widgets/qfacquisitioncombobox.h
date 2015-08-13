@@ -26,7 +26,7 @@
 #include "qfextensionacquisition.h"
 #include "qfextension.h"
 #include "libwid_imexport.h"
-#include "qenhancedcombobox.h"
+#include "qfenhancedcombobox.h"
 
 /*! \brief QComboBox which is filled with all available acquisition devices
     \ingroup qf3lib_widgets
@@ -34,7 +34,7 @@
     If this QComboBox is initialized with a valid QFExtensionManager object, it will be automatically
     filled with all available acquisition plugins.
  */
-class QFWIDLIB_EXPORT QFAcquisitionComboBox : public QEnhancedComboBox {
+class QFWIDLIB_EXPORT QFAcquisitionComboBox : public QFEnhancedComboBox {
         Q_OBJECT
     public:
         QFAcquisitionComboBox(QFExtensionManager* extManager, QWidget* parent=NULL);

@@ -2,12 +2,12 @@
     Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     German Cancer Research Center/University Heidelberg
 
-    
+
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
     This software is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Lesser General Public License (LGPL) as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
@@ -19,6 +19,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 
 #include "qfrdrtableeditor.h"
 #include "qfrdrtablecolumnvaluesdialog.h"
@@ -36,6 +37,7 @@
 #include <QHBoxLayout>
 #include "qfrdrtablemulticolumneditor.h"
 #include "qfrdrtablesetcellsdialog.h"
+#include "qfrdrtablecolumnsboxplotdialog.h"
 
 QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
@@ -402,6 +404,10 @@ void QFRDRTableEditor::createWidgets() {
     connect(this, SIGNAL(enableActions(bool)), actIndexedStat, SLOT(setEnabled(bool)));
 
 
+    actColumnsBoxplots=new QAction(tr("calculate boxplots from columns"), this);
+    connect(actColumnsBoxplots, SIGNAL(triggered()), this, SLOT(slColumnsBoxplots()));
+    connect(this, SIGNAL(enableActions(bool)), actColumnsBoxplots, SLOT(setEnabled(bool)));
+
 
     tbMain->addAction(actLoadTable);
     tbMain->addAction(actImportTable);
@@ -471,6 +477,7 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actHistogram);
     tvMain->addAction(actHistogram2D);
+    tvMain->addAction(actColumnsBoxplots);
     tvMain->addAction(actSort);
 
     propertyEditor->setMenuBarVisible(true);
@@ -521,6 +528,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actSort);
     menuTab->addAction(actHistogram);
     menuTab->addAction(actHistogram2D);
+    menuTab->addAction(actColumnsBoxplots);
     menuTab->addSeparator();
     menuTab->addAction(actClear);
     menuTab->addAction(actResize);
@@ -554,6 +562,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTools->addAction(actQuickHistogram);
     menuTools->addAction(actHistogram);
     menuTools->addAction(actHistogram2D);
+    menuTools->addAction(actColumnsBoxplots);
 
 
     QMenu*menuView =propertyEditor->addMenu("&View", 0);
@@ -590,6 +599,7 @@ void QFRDRTableEditor::preScriptChanged()
 }
 
 
+
 void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
         QFRDRTable* m=qobject_cast<QFRDRTable*>(old);
@@ -623,6 +633,7 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
         connect(actRedo, SIGNAL(triggered()), m->model(), SLOT(redo()));
         connect(m->model(), SIGNAL(redoAvailable(bool)), actRedo, SLOT(setEnabled(bool)));
         connect(tvMain->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged()));
+        connect(m, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(updateScripts()));
         m->model()->setReadonly(m->model()->isReadonly());
         m->model()->emitUndoRedoSignals(true);
         actPreScript->setChecked(m->getParserPreScript().size()>0);
@@ -2068,6 +2079,79 @@ void QFRDRTableEditor::slSort() {
 
             }
         }
+    }
+}
+
+
+void QFRDRTableEditor::slColumnsBoxplots()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m && m->model()) {
+        QItemSelectionModel* smod=tvMain->selectionModel();
+        QList<int> sel;
+        if (smod->hasSelection()) {
+            QModelIndexList idxs=smod->selectedIndexes();
+            for (int i=0; i<idxs.size(); i++) {
+                if (!sel.contains(idxs[i].column())) {
+                    sel.append(idxs[i].column());
+                }
+            }
+            qSort(sel);
+        } else {
+            sel<<tvMain->currentIndex().column();
+        }
+        QFRDRTableColumnsBoxplotDialog* dlg=new QFRDRTableColumnsBoxplotDialog(this);
+        dlg->setTable(m);
+        dlg->setSelectedColumns(sel);
+        if (dlg->exec()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            m->model()->disableSignals();
+            QStringList names;
+            QString addToPre;
+            QStringList ex=dlg->getExpressions(names, addToPre);
+            m->setParserPreScript(m->getParserPreScript()+"\n"+addToPre);
+            int startCol=dlg->getResultStartColumn();
+            if (startCol<0) startCol=m->model()->columnCount();
+            for (int i=0; i<ex.size(); i++) {
+                m->model()->setColumnTitleCreate(startCol+i, names.value(i, ""));
+                m->model()->setColumnHeaderData(startCol+i, QFRDRTable::ColumnExpressionRole , ex.value(i, ""));
+            }
+            m->model()->enableSignals();
+
+            m->colgraphSetDoEmitSignals(false);
+            int g=dlg->addToGraph();
+            if (dlg->addNewGraph() || g>= m->colgraphGetPlotCount()) {
+                g=m->colgraphAddPlot(tr("Boxplot"));
+            }
+            if (g>=0) {
+                if (dlg->getPlotBoxplot()) {
+                    m->colgraphAddBoxPlot(g, QFRDRColumnGraphsInterface::cgoVertical, startCol, startCol+3, startCol+4, startCol+6, startCol+5, startCol+7, startCol+8, tr("Boxplot"));
+                }
+                if (dlg->getPlotSymbols()) {
+                    m->colgraphAddErrorGraph(g, startCol, -1, startCol+3, startCol+4, QFRDRColumnGraphsInterface::cgtPoints, tr("Mean \\pm Std.Dev."));
+                }
+                if (dlg->getPlot2Symbols()) {
+                    m->colgraphAddErrorGraph(g, startCol, -1, startCol+3, startCol+5, QFRDRColumnGraphsInterface::cgtPoints, tr("Mean \\pm Std.Dev."));
+                    m->colgraphAddErrorGraph(g, startCol, -1, startCol+4, startCol+6, QFRDRColumnGraphsInterface::cgtPoints, tr("Median \\pm NMAD"));
+                }
+
+            }
+
+            m->colgraphSetDoEmitSignals(true);
+            slRecalcAll();
+            updateScripts();
+            QApplication::restoreOverrideCursor();
+
+        }
+        delete dlg;
+    }
+}
+
+void QFRDRTableEditor::updateScripts()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (edtPreScript->toPlainText()!=m->getParserPreScript()) edtPreScript->setText(m->getParserPreScript());
     }
 }
 

@@ -285,20 +285,24 @@ void QFProperties::readProperties(QDomElement& e) {
         QDomElement te=e.firstChildElement("property");
         props.clear();
         while (!te.isNull()) {
+            bool ok=true;
             QString n=te.attribute("name", "");
 
             QString t=te.attribute("type", "string").toLower();
             QString pd=te.attribute("data", "");
             QVariant d=getQVariantFromString(t, pd);
             if (!d.isValid()) {
-                setPropertiesError(QString("Property '%1' has an unsupported type (%2) or a conversion error occured (data invalid)!\n Value is \"%3\".").arg(n).arg(t).arg(pd));
+                //setPropertiesError(QString("Property '%1' has an unsupported type (%2) or a conversion error occured (data invalid)!\n Value is \"%3\".").arg(n).arg(t).arg(pd));
+                QFPluginServices::getInstance()->log_warning(QString("Property '%1' has an unsupported type (%2) or a conversion error occured (data invalid)!\n Value is \"%3\".\n   ==> removing invalid property '%1' from project (to revert this change, close the project without saving!)\n").arg(n).arg(t).arg(pd));
+                ok=false;
             }
-
-            propertyItem pi;
-            pi.data=d;
-            pi.usereditable=QVariant(te.attribute("usereditable", "true")).toBool();
-            pi.visible=QVariant(te.attribute("visible", "true")).toBool();
-            props[n]=pi;
+            if (ok) {
+                propertyItem pi;
+                pi.data=d;
+                pi.usereditable=QVariant(te.attribute("usereditable", "true")).toBool();
+                pi.visible=QVariant(te.attribute("visible", "true")).toBool();
+                props[n]=pi;
+            }
             te = te.nextSiblingElement("property");
         }
     }

@@ -684,7 +684,7 @@ QFRawDataRecord *QFRDRNumberAndBrightnessPlugin::insertPreprocessedFiles(const Q
 
 void QFRDRNumberAndBrightnessPlugin::startNANDBFromPreprocessedFilesWizard()
 {
-    QFWizard* wiz=new QFWizard(parentWidget);
+    QFWizard* wiz=new QFWizard(parentWidget, QString("number_and_brightness/wizard_preprocfiles/"));
     wiz->setWindowTitle(tr("Number and Brightness Wizard"));
 
 
@@ -801,7 +801,7 @@ void QFRDRNumberAndBrightnessPlugin::startNANDBFromPreprocessedFilesWizard()
 
 void QFRDRNumberAndBrightnessPlugin::startWizardImageStack()
 {
-    QFWizard* wiz=new QFWizard(parentWidget);
+    QFWizard* wiz=new QFWizard(parentWidget, QString("number_and_brightness/wizard_imagestack/"));
     wiz->setWindowTitle(tr("Number and Brightness from Image Stacks Wizard"));
 
 
@@ -845,7 +845,7 @@ void QFRDRNumberAndBrightnessPlugin::startWizardImageStack()
     wizSelfilesList->setAddOnStartup(false);
     wizSelfilesList->setOnlyOneFormatAllowed(true);
 
-    edtBackgroundFile=new QEnhancedLineEdit(wizSelfilesList);
+    edtBackgroundFile=new QFEnhancedLineEdit(wizSelfilesList);
     QFStyledButton* btn;
     edtBackgroundFile->addButton(btn=new QFStyledButton(QFStyledButton::None, edtBackgroundFile, edtBackgroundFile));
     btn->setDefaultIcon(QFStyledButton::SelectFile);

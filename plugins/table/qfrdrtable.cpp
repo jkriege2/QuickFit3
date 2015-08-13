@@ -2,12 +2,12 @@
     Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     German Cancer Research Center/University Heidelberg
 
-    
+
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
     This software is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Lesser General Public License (LGPL) as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
@@ -19,6 +19,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 
 #include "qfrdrtable.h"
 #include "qfdlgcsvparameters.h"
@@ -406,7 +407,7 @@ void QFRDRTable::colgraphSetDoEmitSignals(bool doEmit)
     if (doEmit) emitRebuildPlotWidgets();
 }
 
-void QFRDRTable::colgraphAddBoxPlot(int plotid, QFRDRColumnGraphsInterface::Orientation orientation, int columnX, int columnMin, int columnQ25, int columnMedian, int columnMean, int columnQ75, int columnMax, const QString &title)
+int QFRDRTable::colgraphAddBoxPlot(int plotid, QFRDRColumnGraphsInterface::Orientation orientation, int columnX, int columnMin, int columnQ25, int columnMedian, int columnMean, int columnQ75, int columnMax, const QString &title)
 {
     if (plotid>=0 && plotid<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(plotid);
@@ -428,8 +429,11 @@ void QFRDRTable::colgraphAddBoxPlot(int plotid, QFRDRColumnGraphsInterface::Orie
 
         setPlot(plotid, plt);
         emitRebuildPlotWidgets();
+        return plt.graphs.size()-1;
+
 
     }
+    return -1;
 
 }
 
@@ -635,7 +639,7 @@ void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumn
     }
 }
 
-void QFRDRTable::colgraphAddGraph(int plotid, int columnX, int columnY, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title)
+int QFRDRTable::colgraphAddGraph(int plotid, int columnX, int columnY, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title)
 {
     if (plotid>=0 && plotid<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(plotid);
@@ -651,11 +655,12 @@ void QFRDRTable::colgraphAddGraph(int plotid, int columnX, int columnY, QFRDRCol
 
         setPlot(plotid, plt);
         emitRebuildPlotWidgets();
-
+        return plt.graphs.size()-1;
     }
+    return -1;
 }
 
-void QFRDRTable::colgraphAddFunctionGraph(int plotid, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, int columnParam)
+int QFRDRTable::colgraphAddFunctionGraph(int plotid, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, int columnParam)
 {
     if (plotid>=0 && plotid<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(plotid);
@@ -683,11 +688,12 @@ void QFRDRTable::colgraphAddFunctionGraph(int plotid, const QString &expression,
 
         setPlot(plotid, plt);
         emitRebuildPlotWidgets();
-
+        return plt.graphs.size()-1;
     }
+    return -1;
 }
 
-void QFRDRTable::colgraphAddFunctionGraph(int plotid, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, const QVector<double> &params)
+int QFRDRTable::colgraphAddFunctionGraph(int plotid, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, const QVector<double> &params)
 {
     if (plotid>=0 && plotid<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(plotid);
@@ -716,7 +722,9 @@ void QFRDRTable::colgraphAddFunctionGraph(int plotid, const QString &expression,
         setPlot(plotid, plt);
         emitRebuildPlotWidgets();
 
+        return plt.graphs.size()-1;
     }
+    return -1;
 }
 
 void QFRDRTable::colgraphSetFunctionGraph(int plotid, int graphid, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, int columnParam)
@@ -780,7 +788,7 @@ void QFRDRTable::colgraphSetFunctionGraph(int plotid, int graphid, const QString
     }
 }
 
-void QFRDRTable::colgraphAddErrorGraph(int plotid, int columnX, int columnXError, int columnY, int columnYError, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, ErrorGraphTypes errorStyle)
+int QFRDRTable::colgraphAddErrorGraph(int plotid, int columnX, int columnXError, int columnY, int columnYError, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, ErrorGraphTypes errorStyle)
 {
     if (plotid>=0 && plotid<plots.size()) {
 
@@ -792,7 +800,9 @@ void QFRDRTable::colgraphAddErrorGraph(int plotid, int columnX, int columnXError
         plt.graphs.last().errorStyle=(JKQTPerrorPlotstyle)errorStyle;
         setPlot(plotid, plt);
         emitRebuildPlotWidgets();
+        return plt.graphs.size()-1;
     }
+    return -1;
 
 }
 
@@ -871,7 +881,7 @@ void QFRDRTable::colgraphSetErrorGraphErrorColumnYAsymmetric(int plotid, int gra
     }
 }
 
-void QFRDRTable::colgraphAddImageGraph(int plotid, int imageColumn, QFRDRColumnGraphsInterface::ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString &title)
+int QFRDRTable::colgraphAddImageGraph(int plotid, int imageColumn, QFRDRColumnGraphsInterface::ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString &title)
 {
     if (plotid>=0 && plotid<plots.size()) {
 
@@ -890,10 +900,12 @@ void QFRDRTable::colgraphAddImageGraph(int plotid, int imageColumn, QFRDRColumnG
 
         setPlot(plotid, plt);
         emitRebuildPlotWidgets();
-     }
+        return plt.graphs.size()-1;
+    }
+    return -1;
 }
 
-void QFRDRTable::colgraphAddImageMaskGraph(int plotid, int imageColumn, double x, double y, double width, double height, int Nx, const QString &title, QColor trueColor, QColor falseColor)
+int QFRDRTable::colgraphAddImageMaskGraph(int plotid, int imageColumn, double x, double y, double width, double height, int Nx, const QString &title, QColor trueColor, QColor falseColor)
 {
     if (plotid>=0 && plotid<plots.size()) {
 
@@ -915,10 +927,12 @@ void QFRDRTable::colgraphAddImageMaskGraph(int plotid, int imageColumn, double x
 
         setPlot(plotid, plt);
         emitRebuildPlotWidgets();
-     }
+        return plt.graphs.size()-1;
+    }
+    return -1;
 }
 
-void QFRDRTable::colgraphAddRGBImageGrph(int plotid, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString &title)
+int QFRDRTable::colgraphAddRGBImageGrph(int plotid, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString &title)
 {
     if (plotid>=0 && plotid<plots.size()) {
 
@@ -938,10 +952,12 @@ void QFRDRTable::colgraphAddRGBImageGrph(int plotid, int imageRColumn, int image
 
         setPlot(plotid, plt);
         emitRebuildPlotWidgets();
+        return plt.graphs.size()-1;
     }
+    return -1;
 }
 
-void QFRDRTable::colgraphAddRangeGraph(int plotid, QFRDRTable::Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString &title, bool invertRange, bool fillrange, bool drawRangeLines, bool drawRangeCenter, QColor centerColor, Qt::PenStyle centerStyle, double centerWidth)
+int QFRDRTable::colgraphAddRangeGraph(int plotid, QFRDRTable::Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString &title, bool invertRange, bool fillrange, bool drawRangeLines, bool drawRangeCenter, QColor centerColor, Qt::PenStyle centerStyle, double centerWidth)
 {
     if (plotid>=0 && plotid<plots.size()) {
 
@@ -965,7 +981,9 @@ void QFRDRTable::colgraphAddRangeGraph(int plotid, QFRDRTable::Orientation orien
 
         setPlot(plotid, plt);
         emitRebuildPlotWidgets();
+        return plt.graphs.size()-1;
     }
+    return -1;
 }
 
 void QFRDRTable::colgraphSetImageGraphModifier(int plotid, int graphid, int imageModifierColumn, QFRDRColumnGraphsInterface::ImageModifierMode mode)
@@ -1024,7 +1042,7 @@ QVariant QFRDRTable::colgraphGetGraphProperty(int plotid, int graphid, const QSt
     return defaultValue;
 }
 
-void QFRDRTable::colgraphAddPlot(const QString &title, const QString &xLabel, const QString &yLabel, bool logX, bool logY)
+int QFRDRTable::colgraphAddPlot(const QString &title, const QString &xLabel, const QString &yLabel, bool logX, bool logY)
 {
     PlotInfo info;
     info.title=title;
@@ -1034,6 +1052,7 @@ void QFRDRTable::colgraphAddPlot(const QString &title, const QString &xLabel, co
     info.yAxis.log=logY;
     addPlot(info);
     emitRebuildPlotWidgets();
+    return plots.size()-1;
 }
 
 int QFRDRTable::colgraphGetGraphCount(int plotid) const

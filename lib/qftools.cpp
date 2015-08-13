@@ -287,37 +287,47 @@ void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
 }
 
 void loadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosition, QSize defaultSize, QString prefix) {
-    QPoint pos = settings.value(prefix+"pos", defaultPosition).toPoint();
     QSize size = settings.value(prefix+"size", defaultSize).toSize();
 
-    if (pos.x()<0 || pos.x()>QApplication::desktop()->screenGeometry(widget).width()) pos.setX(0);
-    if (pos.y()<0 || pos.y()>QApplication::desktop()->screenGeometry(widget).height()) pos.setY(0);
-    widget->move(pos);
+    if (settings.contains(prefix+"pos")){
+        QPoint pos = settings.value(prefix+"pos", defaultPosition).toPoint();
+        if (pos.x()<0 || pos.x()>QApplication::desktop()->screenGeometry(widget).width()) pos.setX(0);
+        if (pos.y()<0 || pos.y()>QApplication::desktop()->screenGeometry(widget).height()) pos.setY(0);
+        widget->move(pos);
+    }
 
-    widget->resize(size.boundedTo(QApplication::desktop()->screenGeometry(widget).size()));
+    if (settings.contains(prefix+"size")){
+        QSize size = settings.value(prefix+"size", defaultSize).toSize();
+        widget->resize(size.boundedTo(QApplication::desktop()->screenGeometry(widget).size()));
+    }
 }
 
 
 void saveWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix) {
+    if (!widget) return;
     if (settings) saveWidgetGeometry(*settings,widget, prefix);
 }
 void saveWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix) {
+    if (!widget) return;
 #ifndef QFMATHPARSER_MATHPARSERTEST
     if (settings) saveWidgetGeometry(*settings->getQSettings(),widget, prefix);
 #endif
 }
 
 void loadWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix) {
-    if (settings) loadWidgetGeometry(*settings,widget, prefix);
+    if (!widget) return;
+    if (settings) loadWidgetGeometry(*settings,widget, widget->pos(), widget->size(), prefix);
 }
 void loadWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix) {
+    if (!widget) return;
 #ifndef QFMATHPARSER_MATHPARSERTEST
-    if (settings) loadWidgetGeometry(*settings->getQSettings(),widget, prefix);
+    if (settings) loadWidgetGeometry(*settings->getQSettings(),widget, widget->pos(), widget->size(), prefix);
 #endif
 }
 
 void loadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
-    loadWidgetGeometry(settings, widget, QPoint(10, 10), QSize(100, 100), prefix);
+    if (!widget) return;
+    loadWidgetGeometry(settings, widget, widget->pos(), widget->size(), prefix);
 }
 
 void saveSplitter(QSettings& settings, QSplitter* splitter, QString prefix) {
@@ -1437,12 +1447,29 @@ QString qfCEscaped(const QString& data) {
     return res;
 }
 
-QString qfGetTempFilename(const QString& templateName) {
-    QTemporaryFile f(templateName);
-    f.setAutoRemove(true);
-    f.open();
-    QString fn=f.fileName();
-    f.close();
+QString qfGetTempFilename(const QString& templateName, bool usesSystemAlways) {
+    QString tempPath;
+    bool useDefaultTemp=true;
+
+    if (!usesSystemAlways){
+        tempPath=ProgramOptions::getConfigValue("quickfit/temp_folder", QFileInfo(qfGetTempFilename(templateName, true)).absolutePath()).toString();
+        useDefaultTemp=ProgramOptions::getConfigValue("quickfit/temp_folder_default", true).toBool();
+    }
+
+    QString fn="";
+    if (useDefaultTemp || usesSystemAlways || tempPath.isEmpty()) {
+        QTemporaryFile f(templateName);
+        f.setAutoRemove(true);
+        f.open();
+        fn=f.fileName();
+        f.close();
+    } else {
+        QTemporaryFile f(tempPath+"/"+templateName);
+        f.setAutoRemove(true);
+        f.open();
+        fn=f.fileName();
+        f.close();
+    }
     return fn;
 }
 
@@ -1814,4 +1841,98 @@ QString qfSecondsDurationToMSString(double seconds) {
     int64_t runSecs=ceil((seconds-(double)runMins*60.0));
 
     return QString("%1:%2").arg(runMins,2,10,QLatin1Char('0')).arg(runSecs,2,10,QLatin1Char('0'));
+}
+
+QHBoxLayout* qfBuildQHBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3, QWidget* w4, QWidget* w5, QWidget* w6, QWidget* w7, QWidget* w8, QWidget* w9) {
+    QHBoxLayout* lay=qfBuildQHBoxLayout(w1,w2,w3,w4,w5,w6,w7,w8,w9);
+    lay->addStretch();
+    return lay;
+}
+
+QVBoxLayout* qfBuildQVBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3, QWidget* w4, QWidget* w5, QWidget* w6, QWidget* w7, QWidget* w8, QWidget* w9) {
+    QVBoxLayout* lay=qfBuildQVBoxLayout(w1,w2,w3,w4,w5,w6,w7,w8,w9);
+    lay->addStretch();
+    return lay;
+}
+
+QHBoxLayout* qfBuildQHBoxLayout(QWidget* w1, QWidget* w2, QWidget* w3, QWidget* w4, QWidget* w5, QWidget* w6, QWidget* w7, QWidget* w8, QWidget* w9) {
+    QHBoxLayout* lay=new QHBoxLayout();
+    if (w1) lay->addWidget(w1);
+    if (w2) lay->addWidget(w2);
+    if (w3) lay->addWidget(w3);
+    if (w4) lay->addWidget(w4);
+    if (w5) lay->addWidget(w5);
+    if (w6) lay->addWidget(w6);
+    if (w7) lay->addWidget(w7);
+    if (w8) lay->addWidget(w8);
+    if (w9) lay->addWidget(w9);
+    return lay;
+}
+
+QVBoxLayout* qfBuildQVBoxLayout(QWidget* w1, QWidget* w2, QWidget* w3, QWidget* w4, QWidget* w5, QWidget* w6, QWidget* w7, QWidget* w8, QWidget* w9) {
+    QVBoxLayout* lay=new QVBoxLayout();
+    if (w1) lay->addWidget(w1);
+    if (w2) lay->addWidget(w2);
+    if (w3) lay->addWidget(w3);
+    if (w4) lay->addWidget(w4);
+    if (w5) lay->addWidget(w5);
+    if (w6) lay->addWidget(w6);
+    if (w7) lay->addWidget(w7);
+    if (w8) lay->addWidget(w8);
+    if (w9) lay->addWidget(w9);
+    return lay;
+}
+
+QFormLayout* qfBuildQFormLayout(const QString& l1, QWidget* w1, const QString& l2, QWidget* w2, const QString& l3, QWidget* w3, const QString& l4, QWidget* w4, const QString& l5, QWidget* w5, const QString& l6, QWidget* w6, const QString& l7, QWidget* w7, const QString& l8, QWidget* w8, const QString& l9, QWidget* w9) {
+    QFormLayout* lay=new QFormLayout();
+    if (w1) lay->addRow(l1, w1);
+    if (w2) lay->addRow(l2, w2);
+    if (w3) lay->addRow(l3, w3);
+    if (w4) lay->addRow(l4, w4);
+    if (w5) lay->addRow(l5, w5);
+    if (w6) lay->addRow(l6, w6);
+    if (w7) lay->addRow(l7, w7);
+    if (w8) lay->addRow(l8, w8);
+    if (w9) lay->addRow(l9, w9);
+    return lay;
+
+}
+
+
+QFTemporaryFile::QFTemporaryFile():
+    QTemporaryFile(qfGetTempFilename())
+{
+    //qDebug()<<"QFTemporaryFile()"<<fileTemplate();
+}
+
+QFTemporaryFile::QFTemporaryFile(const QString &templateName):
+    QTemporaryFile(qfGetTempFilename(templateName))
+{
+    //qDebug()<<"QFTemporaryFile("<<templateName<<")"<<fileTemplate();
+}
+
+QFTemporaryFile::QFTemporaryFile(QObject *parent):
+    QTemporaryFile(qfGetTempFilename(), parent)
+{
+    //qDebug()<<"QFTemporaryFile(parent)"<<fileTemplate();
+}
+
+QFTemporaryFile::QFTemporaryFile(const QString &templateName, QObject *parent):
+    QTemporaryFile(qfGetTempFilename(templateName), parent)
+{
+    //qDebug()<<"QFTemporaryFile("<<templateName<<", parent)"<<fileTemplate();
+}
+
+void QFTemporaryFile::setFileTemplate(const QString &name)
+{
+    QTemporaryFile::setFileTemplate(qfGetTempFilename(name));
+    //qDebug()<<"QFTemporaryFile::setFileTemplate("<<name<<", parent)"<<fileTemplate();
+}
+
+QByteArray qfGetCrytographicHashForFile(const QString& file, QCryptographicHash::Algorithm method) {
+    QFile f(file);
+    if (f.open(QFile::ReadOnly)) {
+        return QCryptographicHash::hash(f.readAll(), method);
+    }
+    return QByteArray();
 }

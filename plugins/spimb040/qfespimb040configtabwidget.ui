@@ -68,7 +68,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QEnhancedLineEdit" name="edtOptSetup"/>
+        <widget class="QFEnhancedLineEdit" name="edtOptSetup"/>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_2">
@@ -78,7 +78,7 @@
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QEnhancedLineEdit" name="edtOptSetupGlobalConfig"/>
+        <widget class="QFEnhancedLineEdit" name="edtOptSetupGlobalConfig"/>
        </item>
        <item row="5" column="0">
         <widget class="QLabel" name="label_3">
@@ -88,7 +88,7 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QEnhancedLineEdit" name="edtOptSetupUserConfig"/>
+        <widget class="QFEnhancedLineEdit" name="edtOptSetupUserConfig"/>
        </item>
        <item row="2" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -129,9 +129,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QEnhancedLineEdit</class>
+   <class>QFEnhancedLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>qenhancedlineedit.h</header>
+   <header>qfenhancedlineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

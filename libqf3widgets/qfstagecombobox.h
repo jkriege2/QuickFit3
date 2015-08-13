@@ -31,14 +31,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfextensionlinearstage.h"
 #include "qfextension.h"
 #include "libwid_imexport.h"
-#include "qenhancedcombobox.h"
+#include "qfenhancedcombobox.h"
 #include "qfmanyfilessettings.h"
 /*! \brief QComboBox which is filled with all available stages
     \ingroup qf3lib_widgets
 
 
  */
-class QFWIDLIB_EXPORT QFStageComboBox : public QEnhancedComboBox {
+class QFWIDLIB_EXPORT QFStageComboBox : public QFEnhancedComboBox {
         Q_OBJECT
     public:
         /** \briefclass cosntructor which does NOT initialize the contents (call init() separately!!!) */

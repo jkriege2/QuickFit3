@@ -46,7 +46,7 @@ QFCameraConfigComboBoxNotifier* QFCameraConfigComboBox::m_notifier=NULL;
 
 
 QFCameraConfigComboBox::QFCameraConfigComboBox(QWidget* parent, QString configDirectory):
-    QEnhancedComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     m_configDirectory=configDirectory;
     m_cam=NULL;
@@ -268,7 +268,7 @@ void QFCameraConfigComboBox::addNew() {
     if (m_stopresume) m_stopresume->stop();
     QString tempFile="qf3b040spim_XXXXX.tmp";
     {
-        QTemporaryFile file;
+        QFTemporaryFile file;
         if (file.open()) {
             tempFile=file.fileName();
             file.close();

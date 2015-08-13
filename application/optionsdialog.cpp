@@ -36,6 +36,8 @@ OptionsDialog::OptionsDialog(QWidget* parent):
     edtUserSettings->addButton(btn);
     btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtGlobalSettings, edtGlobalSettings);
     edtGlobalSettings->addButton(btn);
+    btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtTempFolder, edtTempFolder);
+    edtTempFolder->addButton(btn);
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
     label_9->setVisible(false);
@@ -157,6 +159,8 @@ void OptionsDialog::open(ProgramOptions* options) {
     edtUserFitFunctions->setText(options->getConfigValue("quickfit/user_fitfunctions", options->getHomeQFDirectory()+"/userfitfunctions/").toString());
     edtUserSettings->setText(options->getHomeQFDirectory());
     edtGlobalSettings->setText(options->getGlobalConfigFileDirectory());
+    edtTempFolder->setText(options->getConfigValue("quickfit/temp_folder", QDir::tempPath()).toString());
+    chkDefaultTempFolder->setChecked(options->getConfigValue("quickfit/temp_folder_default", true).toBool());
     spinHelpFontsize->setValue(options->getConfigValue("quickfit/help_pointsize", 11).toInt());
     spinMath->setValue(options->getConfigValue("quickfit/math_pointsize", 14).toInt());
     cmbHelpFont->setCurrentFont(QFont(options->getConfigValue("quickfit/help_font", font().family()).toString()));
@@ -214,6 +218,10 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setConfigValue("quickfit/help_pointsize", spinHelpFontsize->value());
         options->setConfigValue("quickfit/help_font", cmbHelpFont->currentFont().family());
         options->setConfigValue("quickfit/windowheadermode", cmbWindowHeader->currentIndex());
+
+        options->setConfigValue("quickfit/temp_folder", edtTempFolder->text());
+        options->setConfigValue("quickfit/temp_folder_default", chkDefaultTempFolder->isChecked());
+
         //options->setUserSaveAfterFirstEdit(chkAskSaveNewProject->isChecked());
 
         {

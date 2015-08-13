@@ -66,6 +66,9 @@ QString qfInfoWeblink() {
     return QLatin1String(QF_WEBLINK);
 }
 
+QString qfInfoSourceWeblink() {
+    return QLatin1String(QF_SOURCEWEBLINK);
+}
 QString qfInfoLicense() {
     return QLatin1String(QF_LICENSE);
 }

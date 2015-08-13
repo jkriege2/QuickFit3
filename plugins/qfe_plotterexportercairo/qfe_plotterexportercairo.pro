@@ -63,7 +63,7 @@ CAIRO4QTv2_FILES.files = qcairopaintdevice.cpp \
                          qcairopaintengine.h \
                          cairoQPaintDevice_test.cpp \
                          cairoQPaintDevice_test.pro \
-                         $$GPL3LICENSE
+                         $$LGPL2LICENSE
 CAIRO4QTv2_FILES.path = $${QFOUTPUT}/source/cairo4qtv2/
 
 INSTALLS += CAIRO4QTv2_FILES

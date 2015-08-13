@@ -26,7 +26,7 @@
 #include "qfextensionmeasurementdevice.h"
 #include "qfextension.h"
 #include "libwid_imexport.h"
-#include "qenhancedcombobox.h"
+#include "qfenhancedcombobox.h"
 #include "qfmanyfilessettings.h"
 
 /*! \brief QComboBox which is filled with all available measurement devices
@@ -35,7 +35,7 @@
     If this QComboBox is initialized with a valid QFExtensionManager object, it will be automatically
     filled with all available cameras.
  */
-class QFWIDLIB_EXPORT QFMeasurementDeviceComboBox : public QEnhancedComboBox {
+class QFWIDLIB_EXPORT QFMeasurementDeviceComboBox : public QFEnhancedComboBox {
         Q_OBJECT
     public:
         QFMeasurementDeviceComboBox(QFExtensionManager* extManager, QWidget* parent=NULL);

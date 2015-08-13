@@ -19,8 +19,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/gsl/include/
-LIBS += -L$$PWD/gsl/lib/ -lgsl -lgslcblas
+#!contains(DEFINES, QF_HAS_GSL) {
+    DEFINES += QF_HAS_GSL
+    INCLUDEPATH += $$PWD/gsl/include/
+    LIBS += -L$$PWD/gsl/lib/ -lgsl -lgslcblas
 
-HEADERS += \
-    $$PWD/gsl_tools.h
+    HEADERS += \
+        $$PWD/gsl_tools.h
+#}

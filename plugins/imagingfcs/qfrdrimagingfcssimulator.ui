@@ -43,7 +43,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QEnhancedLineEdit" name="edtFilename">
+           <widget class="QFEnhancedLineEdit" name="edtFilename">
             <property name="toolTip">
              <string>give a filename for the main output file (with extension &lt;tt&gt;.tif&lt;/tt&gt; or &lt;tt&gt;.tiff&lt;/tt&gt;) on the hard-disk.&lt;br&gt;
 You can use some special substrings to add information from the simulation into the filename:
@@ -1230,9 +1230,9 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QEnhancedLineEdit</class>
+   <class>QFEnhancedLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>qenhancedlineedit.h</header>
+   <header>qfenhancedlineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -51,3 +51,6 @@ QF3CONFIG+=nowebkit
 
 # if you don't want to use the EIgen library, uncomment the following line:
 #QF3CONFIG+=noeigen3lib
+
+# if you only want to build the basic plugins (with a permissive LGPL license), uncomment the following line:
+#QF3CONFIG+=basicqfpluginsonly

@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="4" column="3">
-    <widget class="QEnhancedLineEdit" name="edtPrefix1">
+    <widget class="QFEnhancedLineEdit" name="edtPrefix1">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -690,7 +690,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item row="6" column="3">
-    <widget class="QEnhancedLineEdit" name="edtPrefix2">
+    <widget class="QFEnhancedLineEdit" name="edtPrefix2">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1283,9 +1283,9 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QEnhancedLineEdit</class>
+   <class>QFEnhancedLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>qenhancedlineedit.h</header>
+   <header>qfenhancedlineedit.h</header>
   </customwidget>
   <customwidget>
    <class>QFCameraConfigEditorWidget</class>

@@ -42,6 +42,7 @@ DESTDIR = $$QFOUTPUT/plugins
 
 GPL3LICENSE = $$PWD/../doc/gpl-3.0.txt \
               $$PWD/../doc/lgpl-2.1.txt
+LGPL2LICENSE = $$PWD/../doc/lgpl-2.1.txt
 
 #release {
 #    QFOUTPUT = ../../output_release

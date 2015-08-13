@@ -48,6 +48,7 @@
 #include "qtriple.h"
 #include <QXmlStreamWriter>
 #include <QBitArray>
+#include <QCryptographicHash>
 #ifndef QFMATHPARSER_MATHPARSERTEST
 #  include "qfpluginservices.h"
 #  include "qfversion.h"
@@ -727,6 +728,15 @@ inline QList<T> constructQListFromItems(const T& item1, const T& item2, const T&
 }
 
 
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+inline QList<T> constructQListFromItems(const T& item1, const QList<T>& item2) {
+    QList<T> out;
+    out<<item1<<item2;
+    return out;
+}
 
 
 
@@ -814,6 +824,15 @@ inline QVector<T> constructQVectorFromItems(const T& item1, const T& item2, cons
 }
 
 
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+inline QVector<T> constructQVectorFromItems(const T& item1, const QVector<T>& item2) {
+    QVector<T> out;
+    out<<item1<<item2;
+    return out;
+}
 
 
 
@@ -869,6 +888,27 @@ inline QStringList constructQStringListFromItems(const QString& item1, const QSt
     return out;
 }
 
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+
+inline QStringList constructQStringListFromItems(const QString& item1, const QStringList& item2) {
+    QStringList out;
+    out<<item1<<item2;
+    return out;
+}
+
+/*! \brief constructs a list with \A N copies of the given item
+    \ingroup qf3lib_tools
+*/
+
+inline QStringList constructQStringListWithMultipleItems(const QString& item1, int N=1) {
+    QStringList out;
+    for (int i=0; i<N; i++) {
+        out<<item1;
+    }
+    return out;
+}
 
 
 
@@ -1825,9 +1865,28 @@ QFLIB_EXPORT QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& f
 /*! \brief returns a filename for a temporary file
     \ingroup qf3lib_tools
 
+    \note templateName should not contain a path, as the path will be set to either be the system's temp-path, or the temp path given by the user in the options dialog (\c ProgramOptions::getConfigValue("quickfit/temp_folder") ).
+ */
+QFLIB_EXPORT QString qfGetTempFilename(const QString& templateName=QString("qf_temp_XXXXXX"), bool usesSystemAlways=false);
+
+class QFLIB_EXPORT QFTemporaryFile: public QTemporaryFile {
+        Q_OBJECT
+    public:
+        explicit QFTemporaryFile();
+        explicit QFTemporaryFile(const QString & templateName);
+        explicit QFTemporaryFile(QObject * parent);
+        explicit QFTemporaryFile(const QString & templateName, QObject * parent);
+
+        void setFileTemplate(const QString & name);
+};
+
+
+/*! \brief returns the crytographic hash value of a given file
+    \ingroup qf3lib_tools
 
  */
-QFLIB_EXPORT QString qfGetTempFilename(const QString& templateName=QString("qf_temp_XXXXXX"));
+QFLIB_EXPORT QByteArray qfGetCrytographicHashForFile(const QString& file, QCryptographicHash::Algorithm method=QCryptographicHash::Md5);
+
 
 /*! \brief copies data (in chunks) from one file to another
     \ingroup qf3lib_tools
@@ -2000,6 +2059,12 @@ QFLIB_EXPORT QImage cropTopBottom(const QImage& pix);
 QFLIB_EXPORT QString qfCanonicalOrAbsoluteFilePath(const QString& file);
 
 QFLIB_EXPORT QString qfHTMLEscape(const QString& input);
+
+QFLIB_EXPORT QHBoxLayout* qfBuildQHBoxLayout(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
+QFLIB_EXPORT QVBoxLayout* qfBuildQVBoxLayout(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
+QFLIB_EXPORT QHBoxLayout* qfBuildQHBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
+QFLIB_EXPORT QVBoxLayout* qfBuildQVBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
+QFLIB_EXPORT QFormLayout* qfBuildQFormLayout(const QString& l1, QWidget* w1, const QString& l2, QWidget* w2, const QString& l3=QString(), QWidget* w3=NULL, const QString& l4=QString(), QWidget* w4=NULL, const QString& l5=QString(), QWidget* w5=NULL, const QString& l6=QString(), QWidget* w6=NULL, const QString& l7=QString(), QWidget* w7=NULL, const QString& l8=QString(), QWidget* w8=NULL, const QString& l9=QString(), QWidget* w9=NULL);
 
 #endif // QFTOOLS_H
 

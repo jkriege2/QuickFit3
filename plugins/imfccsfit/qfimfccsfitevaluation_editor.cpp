@@ -316,6 +316,7 @@ void QFImFCCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newx
 
 void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) {
     // called when this widget should be connected to a new QFEvaluationItem
+    //qDebug()<<"QFImFCCSFitEvaluationEditor::connectWidgets("<<current<<old;
 
     QFImFCCSFitEvaluationItem* item=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     QFImFCCSFitEvaluationItem* item_old=qobject_cast<QFImFCCSFitEvaluationItem*>(old);
@@ -383,8 +384,58 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
                 break;
             }
         }
+
+
         ui->pltOverview->setRDR(ovr);
         updatingData=false;
+    }
+
+    if (item && current->propertyExists("PRESET_FIT_MODEL")) {
+        QString model=current->getProperty("PRESET_FIT_MODEL", "").toString();
+        QStringList models=QFFitFunctionManager::getInstance()->getIDList();
+        if (model.size()>0) {
+            QList<QFFitFunctionConfigForGlobalFitInterface*> modelPlugins;
+            for (int i=0; i<models.size(); i++) {
+                QFFitFunctionConfigForGlobalFitInterface* intf=qobject_cast<QFFitFunctionConfigForGlobalFitInterface*>(QFFitFunctionManager::getInstance()->getPluginObject(QFFitFunctionManager::getInstance()->getPluginForID(models[i])));
+                if (intf && !modelPlugins.contains(intf)) modelPlugins<<intf;
+            }
+            for (int i=0; i<modelPlugins.size(); i++) {
+                QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig c=QFFitFunctionConfigForGlobalFitInterface_GlobalFitConfig_get(modelPlugins[i], model);
+                if (c.shortLabel==model) {
+                    configureFitFromGlobal(c, false);
+                    break;
+                }
+            }
+
+//
+        }
+        current->deleteProperty("PRESET_FIT_MODEL");
+    }
+
+    if (item && current->propertyExists("PRESET_FIT_MODELS_LIST")) {
+        QString modelliststr=current->getProperty("PRESET_FIT_MODELS_LIST", "").toString();
+        QString globalparamsstr=current->getProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST", "").toString();
+        QString rolesstr=current->getProperty("PRESET_FIT_MODELS_ROLES_LIST", "").toString();
+        QStringList fitmodels=modelliststr.split(";");
+        QStringList globalparams=globalparamsstr.split(";");
+        QStringList roles=rolesstr.split(";");
+        if (fitmodels.size()>0) {
+            QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig c;
+            c.models=fitmodels;
+            c.roles=roles;
+            //qDebug()<<fitmodels<<"\n"<<roles<<"\n"<<globalparams;
+            for (int i=0; i<globalparams.size(); i++) {
+                c.globalParams.append(constructQListWithMultipleItems(QStringList(globalparams[i]), fitmodels.size()));
+                //qDebug()<<i<<QStringList(globalparams[i])<<fitmodels.size();
+            }
+            //qDebug()<<"configureFitFromGlobal start";
+            configureFitFromGlobal(c, false);
+            //qDebug()<<"configureFitFromGlobal done";
+        }
+        current->deleteProperty("PRESET_FIT_MODELS_LIST");
+        current->deleteProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST");
+        current->deleteProperty("PRESET_FIT_MODELS_ROLES_LIST");
+        //qDebug()<<"deleted properties";
     }
 
     ensureCorrectParamaterModelDisplay();
@@ -394,46 +445,63 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
 
 void QFImFCCSFitEvaluationEditor::buildGlobalConfigs(QFImFCCSFitEvaluationItem* current)
 {
+    //qDebug()<<" QFImFCCSFitEvaluationEditor::buildGlobalConfigs";
+    //qDebug()<<1;
     for (int i=0; i<actsGlobalConfig.size(); i++) {
         actsGlobalConfig[i]->disconnect();
         delete actsGlobalConfig[i];
     }
+    //qDebug()<<2;
     for (int i=0; i<menusGlobalConfig.size(); i++) {
         menuImFCCSFit->removeAction(menusGlobalConfig[i]->menuAction());
         delete menusGlobalConfig[i];
     }
+    //qDebug()<<3;
     globalConfig.clear();
     actsGlobalConfig.clear();
     menusGlobalConfig.clear();
 
     QStringList models=current->getAvailableFitFunctions();
+    //qDebug()<<4<<models;
     QList<QFFitFunctionConfigForGlobalFitInterface*> modelPlugins;
     for (int i=0; i<models.size(); i++) {
         QFFitFunctionConfigForGlobalFitInterface* intf=qobject_cast<QFFitFunctionConfigForGlobalFitInterface*>(QFFitFunctionManager::getInstance()->getPluginObject(QFFitFunctionManager::getInstance()->getPluginForID(models[i])));
         if (intf && !modelPlugins.contains(intf)) modelPlugins<<intf;
     }
+    //qDebug()<<5<<modelPlugins.size();
     for (int i=0; i<modelPlugins.size(); i++) {
+        //qDebug()<<5.1<<i<<modelPlugins[i]->getGlobalFitConfigCount();
         for (int j=0; j<modelPlugins[i]->getGlobalFitConfigCount(); j++) {
-            QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig c=modelPlugins[i]->getGlobalFitConfig(j);
-            QMenu* menu=NULL;
-            for (int k=0; k<menusGlobalConfig.size(); k++) {
-                if (menusGlobalConfig[k]->title()==c.groupLabel) {
-                    menu=menusGlobalConfig[k];
-                    break;
+            //qDebug()<<5.1<<i<<j<<"START"<<modelPlugins[i];
+            if (modelPlugins[i]) {
+                //qDebug()<<5.1<<i<<j<<modelPlugins[i]->getGlobalFitConfigCount();
+                QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig c=modelPlugins[i]->getGlobalFitConfig(j);
+                QMenu* menu=NULL;
+                //qDebug()<<5.1<<i<<j<<menusGlobalConfig.size();
+                for (int k=0; k<menusGlobalConfig.size(); k++) {
+                    if (menusGlobalConfig[k]->title()==c.groupLabel) {
+                        menu=menusGlobalConfig[k];
+                        break;
+                    }
+                }
+                //qDebug()<<5.1<<i<<j<<menu;
+                if (!menu) {
+                    menu=menuImFCCSFit->addMenu(c.groupLabel);
+                    menusGlobalConfig<<menu;
+                }
+                //qDebug()<<5.1<<i<<j<<menu;
+                if (menu) {
+                    QAction * act=menu->addAction(c.menuEntryLabel);
+                    connect(act, SIGNAL(triggered()), this, SLOT(onConfigureGlobalItemClicked()));
+                    actsGlobalConfig<<act;
+                    globalConfig<<c;
                 }
             }
-            if (!menu) {
-                menu=menuImFCCSFit->addMenu(c.groupLabel);
-                menusGlobalConfig<<menu;
-            }
-            if (menu) {
-                QAction * act=menu->addAction(c.menuEntryLabel);
-                connect(act, SIGNAL(triggered()), this, SLOT(onConfigureGlobalItemClicked()));
-                actsGlobalConfig<<act;
-                globalConfig<<c;
-            }
+            //qDebug()<<5.1<<i<<j<<"DONE";
         }
+        //qDebug()<<5.1<<i<<"DONE";
     }
+    //qDebug()<<" QFImFCCSFitEvaluationEditor::buildGlobalConfigs done";
 }
 
 void QFImFCCSFitEvaluationEditor::resultsChanged() {

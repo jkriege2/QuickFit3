@@ -54,9 +54,27 @@ bool QCheckableStringListModel::setData(const QModelIndex &index, const QVariant
     }
 }
 
-Qt::ItemFlags QCheckableStringListModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QCheckableStringListModel::flags(const QModelIndex &/*index*/) const {
     if (m_editable) return Qt::ItemIsUserCheckable|Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
     else return Qt::ItemIsUserCheckable|Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+}
+
+QList<int> QCheckableStringListModel::getChecked() const
+{
+    QList<int> res;
+    for (int i=0; i<rowCount(); i++) {
+        if (isChecked(i)) res<<i;
+    }
+    return res;
+}
+
+QVector<bool> QCheckableStringListModel::getIsChecked() const
+{
+    QVector<bool> res;
+    for (int i=0; i<rowCount(); i++) {
+        res<<isChecked(i);
+    }
+    return res;
 }
 
 void QCheckableStringListModel::setEditable(bool editable) {

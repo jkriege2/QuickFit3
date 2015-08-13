@@ -425,11 +425,15 @@ void QFImFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEva
 
         if (current->propertyExists("PRESET_FIT_MODEL")) {
             cmbModel->setCurrentFitFunction(current->getProperty("PRESET_FIT_MODEL", fcs->getFitFunctionID()).toString());
+            fcs->setFitFunction(current->getProperty("PRESET_FIT_MODEL", fcs->getFitFunctionID()).toString());
             current->deleteProperty("PRESET_FIT_MODEL");
         }
 
 
     }
+
+
+
 
     connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
     connect(widFitErrorEstimate, SIGNAL(parametersChanged()), this, SLOT(errorEstimateModeChanged()));

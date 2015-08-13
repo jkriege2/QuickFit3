@@ -24,6 +24,7 @@ TARGET = quickfit3lib
 DEPENDPATH += .
 
 include(../extlibs/zlib.pri)
+include(../extlibsb040/tinymat.pri)
 include(../quickfit3.pri)
 include(../quickfit3_configqtwidgets.pri)
 include(../extlibs/quazip.pri)
@@ -38,8 +39,9 @@ release {
 }
 
 
-INCLUDEPATH += .
+INCLUDEPATH += $(PWD)
 INCLUDEPATH += ../extlibsb040/StatisticsTools/
+INCLUDEPATH += ../extlibsb040/TinyMAT/
 
 
 
@@ -48,6 +50,7 @@ DESTDIR = $$QFOUTPUT
 
 # Input
 HEADERS += dlgnewproperty.h \
+           qehtreeview.h \
            dlgqffitalgorithmprogressdialog.h \
            qenhancedtableview.h \
            programoptions.h \
@@ -193,6 +196,7 @@ HEADERS += dlgnewproperty.h \
 
 
 SOURCES += dlgnewproperty.cpp \
+           qehtreeview.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
            qenhancedtableview.cpp \
            programoptions.cpp \
@@ -267,7 +271,6 @@ SOURCES += dlgnewproperty.cpp \
     qfmathparsertools.cpp \
     qfmathparserdefaultlib.cpp \
     qfevaluationpropertyeditorprivate.cpp \
-    imagetools.cpp \
     qfenhancedtabwidget.cpp \
     qfenhancedcombobox.cpp \
     qffitalgorithmparameterstorage.cpp \

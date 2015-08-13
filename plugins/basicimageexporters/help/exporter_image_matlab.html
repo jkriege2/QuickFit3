@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Matlab MAT file [image series as matrix]</title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<p>This exporter saves an image series <tt>I(x, y, z, c)</tt> as a Matlab matrix with dimensions (X,Y,Z,C), or if a single multi-color frame is written as (X,Y,C), or if a single-channel image series is written as (X,Y,Z) into a Matlab <tt>.mat</tt> data file. You can open the file in Matlab (or also GNU Octave) with a script, such as this (for a single-channel image stack):
+		<blockquote>
+		<pre>
+load('<i>filename</i>');
+imagesc(image(:,:,50)); % QuickFit saves the image stack as a variable 
+                        % named "image", here we display the 50-th frame!
+		</pre>
+		</blockquote>
+		The following script reads a multi-channel and multi-frame image stack and displays the 50th frame from the first and second channe:
+		<blockquote>
+		<pre>
+load('<i>filename</i>');
+subplot(1,2,1)
+imagesc(image(:,:,50,1))
+colormap gray
+colorbar
+
+subplot(1,2,2)
+imagesc(image(:,:,50,2))
+colormap gray
+colorbar		
+		</pre>
+		</blockquote>
+		
+		$$note:This exporter uses the TinyMAT library from <a href="https://github.com/jkriege2/TinyMAT">https://github.com/jkriege2/TinyMAT</a>$$
+	</body>
+</html>

@@ -139,7 +139,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QEnhancedLineEdit" name="edtCurrentSampleName">
+       <widget class="QFEnhancedLineEdit" name="edtCurrentSampleName">
         <property name="placeholderText">
          <string>current sample ...</string>
         </property>
@@ -178,14 +178,14 @@
        </widget>
       </item>
       <item row="2" column="10" colspan="2">
-       <widget class="QEnhancedLineEdit" name="edtComment">
+       <widget class="QFEnhancedLineEdit" name="edtComment">
         <property name="placeholderText">
          <string>comment ...</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1" colspan="10">
-       <widget class="QEnhancedLineEdit" name="edtPrefix">
+       <widget class="QFEnhancedLineEdit" name="edtPrefix">
         <property name="placeholderText">
          <string>prefix ...</string>
         </property>
@@ -198,9 +198,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QEnhancedLineEdit</class>
+   <class>QFEnhancedLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>qenhancedlineedit.h</header>
+   <header>qfenhancedlineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -32,19 +32,56 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QCheckBox>
 #include <QProgressBar>
 #include <QTextEdit>
+#include <QRadioButton>
+
+class QFWizardPage; // forward
+
+class QFLIB_EXPORT QFWizardValidateFunctor {
+    public:
+        inline virtual ~QFWizardValidateFunctor() {}
+        virtual bool isValid(QFWizardPage* page)=0;
+};
+
+class QFLIB_EXPORT QFWizardIsCompleteFunctor {
+    public:
+        inline virtual ~QFWizardIsCompleteFunctor() {}
+        virtual bool isComplete(const QFWizardPage* page) const=0;
+};
+
+class QFLIB_EXPORT QFWizardNextPageFunctor {
+    public:
+        inline virtual ~QFWizardNextPageFunctor() {}
+        virtual int nextID(const QFWizardPage* page) const=0;
+};
+
+class QFLIB_EXPORT QFWizardFixedNextPageFunctor: public QFWizardNextPageFunctor {
+    public:
+        explicit inline QFWizardFixedNextPageFunctor(int id) { this->id=id; }
+        inline virtual int nextID(const QFWizardPage* page) const {
+            Q_UNUSED(page)
+            return id;
+        }
+    protected:
+        int id;
+};
 
 class QFLIB_EXPORT QFWizard : public QWizard
 {
         Q_OBJECT
     public:
-        explicit QFWizard(QWidget *parent = 0);
+        explicit QFWizard(QWidget *parent = 0, const QString& config_prefix=QString());
+        explicit QFWizard(QSize windowSize, QWidget *parent = 0, const QString& config_prefix=QString());
 
     signals:
 
     public slots:
 
-};
+    protected:
+        virtual void closeEvent(QCloseEvent * e);
+        virtual void done(int result);
+        QString configPrefix;
 
+};
 
 
 class QFLIB_EXPORT QFWizardPage : public QWizardPage
@@ -54,14 +91,41 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         explicit QFWizardPage(QWidget *parent = 0);
         explicit QFWizardPage(const QString& title, QWidget *parent = 0);
 
+        virtual ~QFWizardPage();
+
 
         virtual void initializePage();
         virtual bool validatePage();
+        virtual bool isComplete() const;
+        virtual void cleanupPage();
+        virtual int nextId() const;
 
         void setUserPreviousPage(QWizardPage* page);
         void setUserOnValidatePage(QWizardPage* page);
         void setUserPreviousArgument(void* page);
         void setUserOnValidateArgument(void* page);
+
+        /** \brief sets a QFWizardValidateFunctor that is called on validatePage().
+         *
+         * \note you have to free the functor by hand, if you don't set setFreeFunctors(true) */
+        void setValidateFunctor(QFWizardValidateFunctor* validateFunctor);
+        /** \brief sets a QFWizardIsCompleteFunctor that is called on isComplete().
+         *
+         * \note you have to free the functor by hand, if you don't set setFreeFunctors(true) */
+        void setIsCompleteFunctor(QFWizardIsCompleteFunctor* isCompleteFunctor);
+        /** \brief sets a QFWizardNextPageFunctor that is called on nextId().
+         *
+         * \note you have to free the functor by hand, if you don't set setFreeFunctors(true) */
+        void setNextIDFunctor(QFWizardNextPageFunctor* nextIDFunctor);
+        void setFreeFunctors(bool enabled=true);
+        void setNextID(int nextid);
+        void setNoPreviousButton(bool noPrevButton=true);
+        void setNoCancelButton(bool noCancelButton=true);
+        void setUseExternalIsComplete(bool enabled=true);
+
+    public slots:
+        void setExternalIsComplete(bool valid=true);
+
     signals:
         void onInitialize(QWizardPage* page);
         void onInitialize(QWizardPage* page, QWizardPage* userPreviousPage);
@@ -69,15 +133,24 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         void onValidate(QWizardPage* page);
         void onValidate(QWizardPage* page, QWizardPage* userPage);
         void onValidateA(QWizardPage* page, void* userArg);
-
-
-
     public slots:
     protected:
         QWizardPage* m_userLast;
         QWizardPage* m_userValidatePage;
         void* m_userLastArg;
         void* m_userValidateArg;
+        bool m_externalIsComplete;
+        bool m_iscomplete;
+        bool m_freeFunctors;
+        bool m_switchoffPreviousButton;
+        bool m_switchoffCancelButton;
+
+        QFWizardValidateFunctor* m_validator;
+        QFWizardIsCompleteFunctor* m_iscompleteFunctor;
+        QFWizardNextPageFunctor* m_nextID;
+
+        void setButtonState(bool entering=true);
+        QList<QWizard::WizardButton> lastButtonLayout;
 
 };
 
@@ -98,12 +171,18 @@ class QFLIB_EXPORT QFFormWizardPage : public QFWizardPage
             return widMain;
         }
 
+        void addStretch();
+        void addSpacer(int height=10);
+
         void addRow(QWidget *label, QWidget *field);
         void addRow(QWidget *label, QLayout *field);
         void addRow(const QString &labelText, QWidget *field);
         void addRow(const QString &labelText, QLayout *field);
         void addRow(QWidget *widget);
         void addRow(QLayout *layout);
+        QLabel* addRow(const QString& text);
+        QLabel* addRow(const QString &labelText, const QString& text);
+        QLabel* addRow(QWidget *label, const QString& text);
         void setRowEnabled(int row, bool enabled=true);
         void setWidgetEnabled(QWidget* wid, bool enabled=true);
         void setRowVisible(int row, bool enabled=true);
@@ -114,6 +193,41 @@ class QFLIB_EXPORT QFFormWizardPage : public QFWizardPage
     public slots:
     protected:
         QFormLayout* m_layout;
+        QVBoxLayout* m_mainlay;
+        QWidget* widMain;
+    private:
+        void createWidgets();
+
+};
+
+
+class QFLIB_EXPORT QFGridWizardPage : public QFWizardPage
+{
+        Q_OBJECT
+    public:
+        explicit QFGridWizardPage(QWidget *parent = 0);
+        explicit QFGridWizardPage(const QString& title, QWidget *parent = 0);
+
+        QGridLayout* getGridLayout() const {
+            return m_layout;
+        }
+        QVBoxLayout* getMainLayout() const {
+            return m_mainlay;
+        }
+        QWidget* getFormLayoutWidget() const {
+            return widMain;
+        }
+
+        void addLayout(QLayout* layout, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment=0);
+        void addLayout(QLayout* layout, int row, int column, Qt::Alignment alignment=0);
+        void addWidget(QWidget* widget, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment=0);
+        void addWidget(QWidget* widget, int row, int column, Qt::Alignment alignment=0);
+
+    signals:
+
+    public slots:
+    protected:
+        QGridLayout* m_layout;
         QVBoxLayout* m_mainlay;
         QWidget* widMain;
     private:
@@ -152,10 +266,15 @@ class QFLIB_EXPORT QFTextWizardPage : public QFWizardPage
         Q_OBJECT
     public:
         explicit QFTextWizardPage(const QString &title, const QString& text, QWidget *parent = 0);
-
+        explicit QFTextWizardPage(const QString &title, QWidget *parent = 0);
+    public slots:
+        void setText(const QString& text);
     signals:
 
     public slots:
+
+    protected:
+        QLabel* label;
 
 };
 
@@ -194,7 +313,7 @@ class QFLIB_EXPORT QFCheckboxListWizardPage : public QFEnableableFormWizardPage
         explicit QFCheckboxListWizardPage(const QString &title, QWidget *parent = 0);
         void setItems(const QStringList& items);
         void clear();
-        void addItem(const QString& item);
+        void addItem(const QString& item, bool checked=false);
         void setChecked(const QList<bool>& checked);
         void setChecked(int id, bool checked);
 
@@ -211,6 +330,30 @@ class QFLIB_EXPORT QFCheckboxListWizardPage : public QFEnableableFormWizardPage
     protected:
         QList<QCheckBox*> boxes;
         QWizardPage* nextIfAllDisabled;
+
+};
+
+class QFLIB_EXPORT QFRadioButtonListWizardPage : public QFEnableableFormWizardPage
+{
+        Q_OBJECT
+    public:
+        explicit QFRadioButtonListWizardPage(const QString &title, QWidget *parent = 0);
+        void setItems(const QStringList& items);
+        void clear();
+        void addItem(const QString& item, bool checked=false);
+        void setChecked(int id);
+        void setChecked(int id, bool checked);
+        void setEnabled(int id, bool enabled);
+
+        bool isChecked(int id) const;
+        int getChecked() const;
+        int count() const;
+
+    signals:
+
+    public slots:
+    protected:
+        QList<QRadioButton*> boxes;
 
 };
 

@@ -32,9 +32,7 @@ release {
 
 DEPENDPATH += .
 
-INCLUDEPATH += ../global_lib/ \
-               . \
-               ../lib/ \
+INCLUDEPATH += . \
                ../plugins/interfaces/ \
                ../extlibsb040/StatisticsTools/
 
@@ -57,11 +55,9 @@ HEADERS += jkqttools.h \
            jkverticalscrollarea.h \
            colorcombobox.h \
            jkstyledbutton.h \
-           qenhancedlineedit.h \
            qspecialtoolbutton.h \
            qmodernprogresswidget.h \
            qmoretextobject.h \
-           qehtreeview.h \
            datacutslider.h \
            qffitparameterwidget.h \
     qfstagecombobox.h \
@@ -74,7 +70,6 @@ HEADERS += jkqttools.h \
     ../plugins/interfaces/qfextensioncamera.h \
     libwid_imexport.h \
     filters.h \
-    qenhancedcombobox.h \
     qfshuttercombobox.h \
     qrecentfilesmenu.h \
     qfplayercontrols.h \
@@ -140,7 +135,11 @@ HEADERS += jkqttools.h \
     qftableview.h \
     qfrdrmaskbyoverviewimagedlg.h\
     numberedit.h \
-    qfasttablelabel.h
+    qfasttablelabel.h \
+    qfpixelsizeedit.h \
+    qfframerangeedit.h \
+    qfcroppixelsedit.h \
+    qcheckablestringlistmodel.h
 
 
 SOURCES +=  \
@@ -150,11 +149,9 @@ SOURCES +=  \
            jkverticalscrollarea.cpp \
            colorcombobox.cpp \
            jkstyledbutton.cpp \
-           qenhancedlineedit.cpp \
            qspecialtoolbutton.cpp \
            qmodernprogresswidget.cpp \
            qmoretextobject.cpp \
-           qehtreeview.cpp \
            datacutslider.cpp \
            qffitparameterwidget.cpp \
     qfstagecombobox.cpp \
@@ -162,7 +159,6 @@ SOURCES +=  \
     qfcameracombobox.cpp \
     objectives.cpp \
     filters.cpp \
-    qenhancedcombobox.cpp \
     qfshuttercombobox.cpp \
     qrecentfilesmenu.cpp \
     qfplayercontrols.cpp \
@@ -224,7 +220,11 @@ SOURCES +=  \
     qftableview.cpp \
     qfrdrmaskbyoverviewimagedlg.cpp \
     numberedit.cpp \
-    qfasttablelabel.cpp
+    qfasttablelabel.cpp \
+    qfpixelsizeedit.cpp \
+    qfframerangeedit.cpp \
+    qfcroppixelsedit.cpp \
+    qcheckablestringlistmodel.cpp
 
 
 FORMS += qf3objectiveeditor.ui \

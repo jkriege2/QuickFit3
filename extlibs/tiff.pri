@@ -22,9 +22,10 @@
 INCLUDEPATH += $$PWD/libtiff/include/
 LIBS += -L$$PWD/libtiff/lib/ -ltiff
 DEFINES += QF_HAS_LIBTIFF cimg_use_tiff
-include(zlib.pri)
-include(jpeg.pri)
 
 HEADERS += $$PWD/../extlibsb040/libtiff_tools/libtiff_tools.h
 SOURCES += $$PWD/../extlibsb040/libtiff_tools/libtiff_tools.cpp
 INCLUDEPATH += $$PWD/../extlibsb040/libtiff_tools/
+
+include(zlib.pri)
+include(jpeg.pri)

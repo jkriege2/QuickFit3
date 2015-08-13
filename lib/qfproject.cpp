@@ -800,6 +800,7 @@ void QFProject::writeXMLSubset(QIODevice *file, const QSet<int> &rdrSelected, co
 
 void QFProject::internalWriteXMLConst(QIODevice *file, const QString &projectFileName, bool copyFilesToSubfolder, const QString &rdrsubfoldername, const QString &evalsubfoldername, QList<QFProject::FileCopyList> *filecopylist, const QSet<int> &rdrSelected, const QSet<int> &evalSelected, bool writeRecordsOnly, int writeMode) const
 {
+    //if (!file || file->)
     QXmlStreamWriter w(file);
 
     w.setAutoFormatting(false);
@@ -858,6 +859,10 @@ void QFProject::internalWriteXMLConst(QIODevice *file, const QString &projectFil
 
     w.writeEndElement();
     w.writeEndDocument();
+
+    if (w.hasError()) {
+        setError(tr("ERROR while writing project XML-data."));
+    }
 }
 
 
@@ -885,7 +890,7 @@ void QFProject::writeXML(const QString& file_in, bool resetDataChanged, bool cha
     QString file=QFileInfo(file_in).canonicalFilePath();
     QString oldfile=this->file;
 
-    qDebug()<<file<<file_in;
+    //qDebug()<<file<<file_in;
 
     if (file.toLower().contains(".qfpz") || file.toLower().contains(".qfp.gz")) {
         QuaGzipFile gzf(file);
@@ -902,35 +907,39 @@ void QFProject::writeXML(const QString& file_in, bool resetDataChanged, bool cha
         this->file=file;
 
         QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
+        //QTemporaryFile f();
         f.setAutoRemove(false);
-        f.open();
-        f.setAutoRemove(false);
+        if (f.open()) {
+            f.setAutoRemove(false);
 
-        internalWriteXML(&f, resetDataChanged, namechanged, file);
+            internalWriteXML(&f, resetDataChanged, namechanged, file);
 
-        if (f.error()==QFile::NoError) {
+            if (f.error()==QFile::NoError) {
 
-            QFile f4(file+".backup_old");
-            if (f4.exists()) f4.remove();
+                QFile f4(file+".backup_old");
+                if (f4.exists()) f4.remove();
 
-            QFile f3(file+".backup");
-            f3.rename(file+".backup_old");
+                QFile f3(file+".backup");
+                f3.rename(file+".backup_old");
 
-            QFile f2(file+".backup");
-            if (f2.exists()) f2.remove();
+                QFile f2(file+".backup");
+                if (f2.exists()) f2.remove();
 
-            QFile f1(file);
-            if (f1.exists()) f1.rename(file+".backup");
+                QFile f1(file);
+                if (f1.exists()) f1.rename(file+".backup");
 
+            } else {
+                setError(tr("Error while writing project to file '%1'!\n Error description: %2.\n").arg(file).arg(f.errorString()));
+                return;
+            }
+
+
+            f.setAutoRemove(false);
+            if (!f.rename(file)) {
+                setError(tr("Could not open file '%1' for output (temp filename: %3)!\n Error description: %2.\n==> Project could not be written!").arg(file).arg(f.errorString()).arg(f.fileName()));
+            }
         } else {
-            setError(tr("Error while writing project to file '%1'!\n Error description: %2.").arg(file).arg(f.errorString()));
-            return;
-        }
-
-
-        f.setAutoRemove(false);
-        if (!f.rename(file)) {
-            setError(tr("Could no open file '%1' for output (temp filename: %3)!\n Error description: %2.").arg(file).arg(f.errorString()).arg(f.fileName()));
+            setError(tr("Could not open temporary file in folder '%1' for output!\n Error description: %2.\n==> Project could not be written!").arg(QFileInfo(file).absolutePath()).arg(f.errorString()));
         }
     }
     if (!changeInternalFile) {
@@ -951,32 +960,59 @@ static QString QFProject_QuaZIPError(int error) {
 }
 
 static bool QFProject_compressFile(QuaZip* zip, QString fileName, QString fileDest, QString& error, QFProgressMinorProgress* pdlg) {
+    if (!QFile::exists(fileName)) {
+        error=QObject::tr("file does not exist: '%1'").arg(fileName);
+        return false;
+    }
     error="";
     QFile inFile;
     inFile.setFileName(fileName);
     if(!inFile.open(QIODevice::ReadOnly)) {
-        error=QObject::tr("error opening file %1: %2").arg(fileName).arg(inFile.errorString());
+        error=QObject::tr("error opening file '%1':\n   error description: %2").arg(fileName).arg(inFile.errorString());
         return false;
     }
 
     QuaZipFile outFile(zip);
     if(!outFile.open(QIODevice::WriteOnly, QuaZipNewInfo(fileDest, inFile.fileName()))) {
-        error=QObject::tr("error opening file %1 in ZIP: %2").arg(fileDest).arg(outFile.errorString());
+        error=QObject::tr("error opening file '%1 in ZIP '%3':\n   error description: %2").arg(fileDest).arg(outFile.errorString()).arg(zip->getZipName());
         return false;
     }
 
     if (!qfCopyData(&inFile, &outFile, pdlg) || outFile.getZipError()!=UNZ_OK) {
-        if (outFile.getZipError()!=UNZ_OK) error=QObject::tr("error writing data into ZIP: %1").arg(QFProject_QuaZIPError(outFile.getZipError()));
+        if (outFile.getZipError()!=UNZ_OK) error=QObject::tr("error writing data into '%3' in ZIP '%2':\n   error description: %1").arg(QFProject_QuaZIPError(outFile.getZipError())).arg(zip->getZipName()).arg(fileDest);
         else error=QObject::tr("error writing data into ZIP");
         return false;
     }
 
     outFile.close();
     if (outFile.getZipError()!=UNZ_OK) {
-        error=QObject::tr("error closing file in ZIP: %1").arg(QFProject_QuaZIPError(outFile.getZipError()));
+        error=QObject::tr("error closing file '%3' in ZIP '%2':\n   error description: %1").arg(QFProject_QuaZIPError(outFile.getZipError())).arg(zip->getZipName()).arg(fileDest);
         return false;
     }
     inFile.close();
+    return true;
+}
+
+
+static bool QFProject_writeCompressedTextFile(QuaZip* zip, QByteArray text, QString fileDest, QString& error, QFProgressMinorProgress* pdlg) {
+    QuaZipFile outFile(zip);
+    if(!outFile.open(QIODevice::WriteOnly|QIODevice::Text, QuaZipNewInfo(fileDest))) {
+        error=QObject::tr("error opening file '%1 in ZIP '%3':\n   error description: %2").arg(fileDest).arg(outFile.errorString()).arg(zip->getZipName());
+        return false;
+    }
+
+    outFile.write(text);
+    if (outFile.getZipError()!=UNZ_OK) {
+        if (outFile.getZipError()!=UNZ_OK) error=QObject::tr("error writing data into '%3' in ZIP '%2':\n   error description: %1").arg(QFProject_QuaZIPError(outFile.getZipError())).arg(zip->getZipName()).arg(fileDest);
+        else error=QObject::tr("error writing data into ZIP");
+        return false;
+    }
+
+    outFile.close();
+    if (outFile.getZipError()!=UNZ_OK) {
+        error=QObject::tr("error closing file '%3' in ZIP '%2':\n   error description: %1").arg(QFProject_QuaZIPError(outFile.getZipError())).arg(zip->getZipName()).arg(fileDest);
+        return false;
+    }
     return true;
 }
 
@@ -997,6 +1033,10 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
             //qDebug()<<f.fileName();
             internalWriteXMLConst(&f, currentProjectLocation, copyFilesToSubfolder, rdrsubfoldername, evalsubfoldername, &filecopylist);
             f.close();
+        } else {
+            QString msg=tr("ERROR while writing temporary file '%1' during exportProjectToZIP('%2')").arg(tmpfn).arg(file);
+            setError(msg);
+            //pdlg->addMessage(msg);
         }
     }
 
@@ -1011,6 +1051,34 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
         }
         QuaZip zip(file);
         if (zip.open(QuaZip::mdCreate)) {
+
+            QString desctxtFileName=QFileInfo(file).baseName()+".readme.txt";
+            QString descriptionText=tr("This ZIP-archive (%1) was automatically created by QuickFit %2 (SVN/GIT: %3, COMPILEDATE: %4).\n"
+                                       "See the following webpages for more details on QuickFit %1:\n"
+                                       "   %5\n"
+                                       "   %7\n"
+                                       "\n"
+                                       "To load the contained QuickFit project, you'll have to UNZIP the contents \n"
+                                       "of this ZIP-file into an empty directory, preserving the internal directory \n"
+                                       "structure. Then you can simply load the project-file \n"
+                                       "   %6\n"
+                                       "   %7\n"
+                                       "into QuickFit, which should then be able to find all important associated\n"
+                                       "datafiles in the new folder.\n"
+                                       "\n"
+                                       "\n"
+                                       "This ZIP-archive contains the following files:\n"
+                                       ).arg(QFileInfo(file).fileName())
+                                            .arg(qfInfoVersionFull())
+                                            .arg(qfInfoGITVersion())
+                                            .arg(qfInfoCompileDate())
+                                            .arg(qfInfoWeblink())
+                                            .arg(QFileInfo(pfn).fileName())
+                                            .arg(qfInfoSourceWeblink());
+            //qDebug()<<"\n     "<<ok<<errorStr;
+
+            descriptionText+=tr("  * (this) README text-file:\n      %1\n").arg(desctxtFileName);
+
             if (pdlg) {
                 pdlg->incProgress();
                 pdlg->addMessage(tr("adding project file '%1'...").arg(QFileInfo(pfn).fileName()));
@@ -1018,35 +1086,11 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
             //qDebug()<<tr("adding project file '%1'...").arg(QFileInfo(pfn).fileName());
             QString errorStr;
             bool ok=QFProject_compressFile(&zip, tmpfn, QFileInfo(pfn).fileName(), errorStr, pdlg);
-            //qDebug()<<"\n     "<<ok<<errorStr;
+            descriptionText+=tr("  * QuickFit Project file:\n      %1\n").arg(QFileInfo(pfn).fileName());
             if (ok && (!pdlg || (pdlg && !pdlg->wasCanceled()))) {
                 if (filecopylist.size()>0) {
-                    /*QString remstart="";
-                    for (int j=0; j<10; j++) {
-                        QString start="";
-                        for (int i=0; i<filecopylist.size(); i++) {
-                            QStringList sl=filecopylist[i].outFile.split("/");
-                            if (j+1<sl.size()) {
-                                start=sl[j];
-                                break;
-                            }
-                        }
-                        bool allStartEqual=true;
-                        if (!start.isEmpty()) {
-                            for (int i=0; i<filecopylist.size(); i++) {
-                                QStringList sl=filecopylist[i].outFile.split("/");
-                                if (!(sl.size()>j+1 && start==sl[j])) {
-                                    allStartEqual=false;
-                                    break;
-                                }
-                            }
-                        }
-                        if (allStartEqual && !start.isEmpty()) {
-                            remstart=remstart+start+"/";
-                        } else{
-                            break;
-                        }
-                    }*/
+                    descriptionText+=tr("  * linked data files:\n");
+
                     //pdlg->addMessage(tr("removing from folder '%1'...").arg(remstart));
                     for (int i=0; i<filecopylist.size(); i++) {
                         QString outf=filecopylist[i].outFile;
@@ -1063,23 +1107,38 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
                         pdlg->setMinorProgressEnabled(false);
                         //qDebug()<<tr("adding data file %1 -> %2...").arg(filecopylist[i].inFile).arg(filecopylist[i].outFile)<<"\n     "<<ok<<errorStr;
                         if (!ok) {
-                            setError(tr("Could not add file '%1' to ZIP-file '%2', error: %3").arg(filecopylist[i].outFile).arg(file).arg(errorStr));
+                            setError(tr("Could not add file '%1' to ZIP-file '%2'\n  error: %3").arg(filecopylist[i].outFile).arg(file).arg(errorStr));
                             break;
                         }
                         if (pdlg && pdlg->wasCanceled()) {
                             setError(tr("Compressing project to ZIP-file '%1' was canceled by the user").arg(file));
                             break;
                         }
+                        descriptionText+=tr("      - %1\n").arg(outf);
+
                     }
                 }
             } else {
-                setError(tr("Could not add project file '%1' to ZIP-file '%2', error: %3").arg(pfn).arg(file).arg(errorStr));
+                setError(tr("Could not add project file '%1' to ZIP-file '%2',\n  error: %3").arg(pfn).arg(file).arg(errorStr));
             }
+
+            if (pdlg) {
+                pdlg->incProgress();
+                pdlg->addMessage(tr("adding description text '%1'...").arg(desctxtFileName));
+            }
+            if (!QFProject_writeCompressedTextFile(&zip, descriptionText.toLatin1(), desctxtFileName, errorStr, pdlg)) {
+                setError(tr("Could not add readme file '%1' to ZIP-file '%2',\n  error: %3").arg(desctxtFileName).arg(file).arg(errorStr));
+            }
+
             zip.close();
         } else {
-            setError(tr("Could not create ZIP-file '%1', error code: %2").arg(file).arg(QFProject_QuaZIPError(zip.getZipError())));
+            setError(tr("Could not create ZIP-file '%1',\n  error code: %2").arg(file).arg(QFProject_QuaZIPError(zip.getZipError())));
         }
         QFile::remove(tmpfn);
+    } else {
+        QString msg=tr("ERROR temporary file '%1' could not be written during exportProjectToZIP('%2')").arg(tmpfn).arg(file);
+        setError(msg);
+        //pdlg->addMessage(msg);
     }
     if (pdlg) {
         pdlg->setProgresComplete();
@@ -1151,14 +1210,14 @@ void QFProject::readXMLSubSet(const QString &file, const QSet<int> &rdrSelected,
     if (file.toLower().contains(".qfpz") || file.toLower().contains(".qfp.gz")) {
         QuaGzipFile f(file);
         if (!f.open(QIODevice::ReadOnly)) {
-            setError(tr("Could no open GZipped project file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
+            setError(tr("Could not open GZipped project file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
             return;
         }
         readXMLSubSet(&f, file, rdrSelected, evalSelected);
     } else{
         QFile f(file);
         if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
+            setError(tr("Could not open file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
             return;
         }
         readXMLSubSet(&f, file, rdrSelected, evalSelected);
@@ -1188,6 +1247,7 @@ void QFProject::readXMLDummy(QIODevice *file, const QString &filename)
 
 void QFProject::internalReadXML(QIODevice *f, const QString &filename_in)
 {
+    bool ignoreAllErrorsWhenReadingRDR=false;
     QString filename=filename_in;
     QFile* ffile=qobject_cast<QFile*>(f);
     if (filename.isEmpty() && ffile) {
@@ -1267,10 +1327,29 @@ void QFProject::internalReadXML(QIODevice *f, const QString &filename_in)
                         if (loadRec) {
                             try {
                                 QFRawDataRecord* e=getRawDataRecordFactory()->createRecord(t, this);
-                                if (e) e->init(rd, m_dummy);
-                                else {
+                                if (e) {
+                                    e->init(rd, m_dummy);
+                                    if (e->error()) {
+                                        QString msg=tr("error while reading RDR '%1':\n  %2\n").arg(e->getName()).arg(e->errorDescription());
+//                                        if (!ignoreAllErrorsWhenReadingRDR) {
+//                                            int userRes=QMessageBox::critical(NULL, tr("Error while opening file for project"), tr("%1\n\nDo you want to ignore this error:\n  *  [Yes] ignore this error\n  * [Yes to All] ignore all comparable errors\n  * [Cancel] loading the project").arg(msg),
+//                                                                  QMessageBox::Yes|QMessageBox::YesToAll|QMessageBox::Cancel, QMessageBox::Cancel);
+//                                            if (userRes==QMessageBox::Yes) {
+//                                                QFPluginServices::getInstance()->log_warning(msg);
+//                                            } else if (userRes==QMessageBox::YesToAll) {
+//                                                ignoreAllErrorsWhenReadingRDR=true;
+//                                            } else {
+//                                                setError(msg);
+//                                            }
+//                                        }
+                                        if (true||ignoreAllErrorsWhenReadingRDR) {
+                                            QFPluginServices::getInstance()->log_warning(msg);
+                                        }
+                                    }
+                                } else {
                                     setError(tr("Error while creating raw data element: no raw data record plugin of type '%2' was found in your QF3 version!").arg(t));
                                 }
+
 
                             } catch(std::exception& E) {
                                 setError(tr("Error while opening raw data element: %2").arg(E.what()));
@@ -1367,14 +1446,14 @@ void QFProject::internalReadXML(const QString& file) {
     if (file.toLower().contains(".qfpz") || file.toLower().contains(".qfp.gz")) {
         f=&fz;
         if (!fz.open(QIODevice::ReadOnly)) {
-            setError(tr("Could no open GZipped project file '%1' for input!\n Error description: %2.").arg(file).arg(fz.errorString()));
+            setError(tr("Could not open GZipped project file '%1' for input!\n Error description: %2.").arg(file).arg(fz.errorString()));
             this->reading=false;
             return;
         }
     } else {
         f=&ff;
         if (!ff.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(ff.errorString()));
+            setError(tr("Could not open file '%1' for input!\n Error description: %2.").arg(file).arg(ff.errorString()));
             this->reading=false;
             return;
         }
@@ -1417,6 +1496,7 @@ QFRawDataRecord* QFProject::addRawData(const QString& type, const QString& name,
     return addRawData(type, name, "", inputFiles, initParams, initParamsReadonly, inputFilesTypes, inputFilesDescriptions);
 }
 
+
 QFRawDataRecord *QFProject::addRawData(const QString &type, const QString &name, const QString &role, const QStringList &inputFiles, const qfp_param_type &initParams, const QStringList &initParamsReadonly, const QStringList &inputFilesTypes, const QStringList &inputFilesDescriptions)
 {
     QFProjectWriteLocker locker(p->lock);
@@ -1429,6 +1509,20 @@ QFRawDataRecord *QFProject::addRawData(const QString &type, const QString &name,
         }
         rde->setRole(role);
         rde->init(name, inputFiles, inputFilesTypes,inputFilesDescriptions);
+        if (rde->error()) {
+            QString msg=tr("error while reading RDR '%1':\n  %2").arg(rde->getName()).arg(rde->errorDescription());
+
+            int userRes=QMessageBox::critical(NULL, tr("Error while opening file for project"), tr("%1\n\nDo you want to ignore this error:\n  *  [Yes] ignore this error\n  * [Cancel] loading the project").arg(msg),
+                                      QMessageBox::Yes|QMessageBox::Cancel, QMessageBox::Cancel);
+            if (userRes==QMessageBox::Yes) {
+                QFPluginServices::getInstance()->log_warning(msg);
+            } else {
+                setError(msg);
+                delete rde;
+                return NULL;
+            }
+
+        }
     } else {
         setError(tr("error while trying to initialize an object for datatype '%1' in the QuickFit Project '%2'").arg(type).arg(getName()));
         return NULL;
@@ -1446,6 +1540,20 @@ QFEvaluationItem* QFProject::addEvaluation(const QString &type, const QString &n
     rde=getEvaluationItemFactory()->createRecord(type, services, this);
     if (rde) {
         rde->init(name);
+        if (rde->error()) {
+            QString msg=tr("error while reading RDR '%1':\n  %2").arg(rde->getName()).arg(rde->errorDescription());
+
+            int userRes=QMessageBox::critical(NULL, tr("Error while opening file for project"), tr("%1\n\nDo you want to ignore this error:\n  *  [Yes] ignore this error\n  * [Cancel] loading the project").arg(msg),
+                                      QMessageBox::Yes|QMessageBox::Cancel, QMessageBox::Cancel);
+            if (userRes==QMessageBox::Yes) {
+                QFPluginServices::getInstance()->log_warning(msg);
+            } else {
+                setError(msg);
+                delete rde;
+                return NULL;
+            }
+
+        }
     } else {
         setError(tr("error while trying to initialize an object for datatype '%1' in the QuickFit Project '%2'").arg(type).arg(getName()));
         return NULL;
@@ -2009,6 +2117,7 @@ void QFProject::setError(const QString &description) {
     QFProjectWriteLocker locker(p->lock);
     errorOcc=true;
     errorDesc=description;
+    if (errorDesc.size()>0 && errorDesc.right(1)!="\n") errorDesc+=QString("\n");
     emit errorOccured(description);
 }
 
@@ -2016,6 +2125,7 @@ void QFProject::setError(const QString &description) const {
     QFProjectWriteLocker locker(p->lock);
     errorOcc=true;
     errorDesc=description;
+    if (errorDesc.size()>0 && errorDesc.right(1)!="\n") errorDesc+=QString("\n");
     //emit errorOccured(description);
 }
 

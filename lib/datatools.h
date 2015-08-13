@@ -90,6 +90,23 @@ QFLIB_EXPORT QList<QVector<double> > dataReduceToDouble(const QList<QList<QVaria
 */
 QFLIB_EXPORT QList<QVector<double> > dataExpandToDouble(const QList<QList<QVariant> >& data, QStringList* columnsNames=NULL);
 
+/*! \brief convert a QList<QVector<double> > to a new (with qfMalloc(), so free with qfFree() ) row-major data tyble of type double
+    \ingroup qf3lib_tools
+
+    \note Empty cells will contain \c NAN!
+    \note data is given as a list of columns
+*/
+QFLIB_EXPORT double* doubleDataToDoubleMatrix(const QList<QVector<double> >& data);
+
+
+/*! \brief returns \c true, if the given dataset may be converted to a double matrix without a loss (using dataToDouble() )
+    \ingroup qf3lib_tools
+
+    \note Empty cells will contain \c NAN!
+    \note data is given as a list of columns
+*/
+QFLIB_EXPORT bool mayLossLesslyDoDoubleDataToDouble(const QList<QList<QVariant> >& data);
+
 /*! \brief convert a variant table to double
     \ingroup qf3lib_tools
 

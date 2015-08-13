@@ -105,7 +105,7 @@ QtLogFile::QtLogFile(QWidget *parent):
     QHBoxLayout* layFind=new QHBoxLayout;
     widFind->setLayout(layFind);
     layFind->addWidget(new QLabel(tr("     phrase: ")));
-    edtFind=new QEnhancedLineEdit(this);
+    edtFind=new QFEnhancedLineEdit(this);
     edtFind->addButton(new JKStyledButton(JKStyledButton::ClearLineEdit, edtFind, edtFind));
     edtFind->setMinimumWidth(150);
     edtFind->setToolTip(tr("simply enter a search phrase\n\nthe search begins immediately after typing the first letter. If no match was found, the field will change its background color to a light red."));
@@ -177,7 +177,7 @@ void QtLogFile::open_logfile(const QString& filename, bool writeStore) {
   if (filename!=log_filename) close_logfile();
   log_to_file=false;
   log_file=new QFile(filename);
-  if (log_file==NULL) log_error(tr("Could not open LOG file '%1' ...").arg(filename));
+  if (log_file==NULL) log_error(tr("Could not open LOG file '%1' ...\n").arg(filename));
   else {
     bool r=false;
     if (log_file_append) {
@@ -208,9 +208,9 @@ void QtLogFile::open_logfile(const QString& filename, bool writeStore) {
         r=log_file->open(QIODevice::WriteOnly);
     }
     if (!r) {
+        log_error(tr("Could not open LOG file '%1' ...\n   description: %2\n").arg(filename).arg(log_file->errorString()));
         delete log_file;
         log_file=NULL;
-        log_error(tr("Could not open LOG file '%1' ...").arg(filename));
     }
   }
   if (log_file!=NULL) {

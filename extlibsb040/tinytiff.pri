@@ -19,11 +19,13 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-DEFINES += QF_HAS_TINYTIFF
+!contains(DEFINES, QF_HAS_TINYTIFF) {
+    DEFINES += QF_HAS_TINYTIFF
 
-HEADERS += $$PWD/TinyTIFF/tinytiffwriter.h \
-           $$PWD/TinyTIFF/tinytiffreader.h
-SOURCES += $$PWD/TinyTIFF/tinytiffwriter.cpp \
-           $$PWD/TinyTIFF/tinytiffreader.cpp
+    HEADERS += $$PWD/TinyTIFF/tinytiffwriter.h \
+               $$PWD/TinyTIFF/tinytiffreader.h
+    SOURCES += $$PWD/TinyTIFF/tinytiffwriter.cpp \
+               $$PWD/TinyTIFF/tinytiffreader.cpp
 
-INCLUDEPATH += $$PWD/TinyTIFF/ 
+    INCLUDEPATH += $$PWD/TinyTIFF/
+}

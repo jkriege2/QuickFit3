@@ -272,14 +272,14 @@
     </widget>
    </item>
    <item row="2" column="4">
-    <widget class="QEnhancedLineEdit" name="edtPrefix1">
+    <widget class="QFEnhancedLineEdit" name="edtPrefix1">
      <property name="enabled">
       <bool>false</bool>
      </property>
     </widget>
    </item>
    <item row="4" column="4">
-    <widget class="QEnhancedLineEdit" name="edtPrefix2">
+    <widget class="QFEnhancedLineEdit" name="edtPrefix2">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1354,9 +1354,9 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QEnhancedLineEdit</class>
+   <class>QFEnhancedLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>qenhancedlineedit.h</header>
+   <header>qfenhancedlineedit.h</header>
   </customwidget>
   <customwidget>
    <class>QFCameraConfigEditorWidget</class>

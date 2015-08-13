@@ -59,6 +59,17 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
 #define BLEACH_EXP_POLY4 7
 #define BLEACH_EXP_POLY5 8
 
+#define BACKGROUND_NONE 0
+#define BACKGROUND_REMOVEOFFSET 1
+#define BACKGROUND_REMOVEMINANDOFFSET 2
+#define BACKGROUND_FILEANDOFFSET 3
+
+#define DUALVIEW_NONE 0
+#define DUALVIEW_HORICONTAL 1
+#define DUALVIEW_VERTICAL 2
+
+double QFRDRImagingFCSCorrelation_getCorrelatorTauMax(int corrType, double taumin, int S, int m, int P);
+
 
 /*! \brief job description for correlation
     \ingroup qf3rdrdp_imaging_fcs
@@ -73,6 +84,9 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
     the code that executed the job.
 */
 struct IMFCSJob {
+    int getIdealS() const;
+    int getIdealS(double forTauMax) const;
+    void addDCCF(int dx, int dy);
     /** \brief progress widget for this job */
     QPointer<QFRDRImagingFCSThreadProgress> progress;
     /** \brief thread object for this job */
@@ -103,7 +117,7 @@ struct IMFCSJob {
     int32_t range_max;
     /** \brief add job results to project */
     bool addToProject;
-    /** \brief duration of a single frame */
+    /** \brief duration of a single frame in seconds */
     double frameTime;
     /** \brief output prefix */
     QString prefix;
@@ -253,10 +267,11 @@ class QFRDRImagingFCSCorrelationJobThread : public QThread {
         ~QFRDRImagingFCSCorrelationJobThread();
         int status() const;
         void init(IMFCSJob job);
-        static QStringList getImageFilterList(QFPluginServices* pluginservices);
-        static QStringList getImageFormatNameList(QFPluginServices *pluginservices);
-        static QFImporterImageSeries* getImageReader(int idx, QFPluginServices* pluginservices);
-        static int getImageReaderCount(QFPluginServices* pluginservices);
+        static QStringList getImageFilterList(QFPluginServices* pluginservices=QFPluginServices::getInstance());
+        static QStringList getImageFormatNameList(QFPluginServices *pluginservices=QFPluginServices::getInstance());
+        static QStringList getImageFormatIDList(QFPluginServices *pluginservices=QFPluginServices::getInstance());
+        static QFImporterImageSeries* getImageReader(int idx, QFPluginServices* pluginservices=QFPluginServices::getInstance());
+        static int getImageReaderCount(QFPluginServices* pluginservices=QFPluginServices::getInstance());
         QList<Fileinfo> getAddFiles() const;
         IMFCSJob getJob() const;
         double durationMS() const;

@@ -229,50 +229,17 @@ void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
 
 void QFRDRImagingFCSCorrelationDialog::readBackgroundFramesize()
 {
-    QModernProgressDialog prg(this);
-    prg.setWindowTitle(tr("imFCS: Correlator"));
-    prg.setLabelText(tr("Reading background image series information ... reading config file ..."));
-    prg.open();
-    QApplication::processEvents();
-    QApplication::processEvents();
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-    QString backgroundF=ui->edtBackgroundFile->text();
-
-    //////////////////////////////////////////////////////////////////////////////////
-    // we also try to open the file with an appropriate reader and read th number of frames in it
-    //////////////////////////////////////////////////////////////////////////////////
-    prg.setLabelText(tr("Reading background image series information ... counting frames ..."));
-    QApplication::processEvents();
-    QApplication::processEvents();
-    QFImporterImageSeries* reader=NULL;
-    bool OK=false;
-    if (ui->cmbFileformat->currentIndex()>=0 && ui->cmbFileformat->currentIndex()<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount(pluginServices)) {
-        reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex(), pluginServices);
-    }
-    if (reader && QFile::exists(backgroundF)) {
-        OK=reader->open(backgroundF);
-        if (OK)  {
-            QApplication::processEvents();
-            background_width=reader->frameWidth();
-            background_height=reader->frameHeight();
-            background_frame_count=reader->countFrames();
-            QString err="";
-            if ((image_width!=background_width) || (image_height!=background_height)) {
-                err=tr("<br><font color=\"red\"><b>background and image file have different sizes!!!</b></font>");
-            }
-            ui->labBackgroundProps->setText(tr("size: %1&times;%2 pixels, frames: %3%4").arg(background_width).arg(background_height).arg(background_frame_count).arg(err));
-
-        } else {
-            ui->labBackgroundProps->setText("");
+    readBackgroundProperties(ui->edtBackgroundFile->text(), ui->cmbFileformat->currentIndex(), this,  &background_width, &background_height, &background_frame_count);
+    QString err="";
+    if (background_frame_count>0) {
+        if ((image_width!=background_width) || (image_height!=background_height)) {
+            err=tr("<br><font color=\"red\"><b>background and image file have different sizes!!!</b></font>");
         }
-        reader->close();
-        delete reader;
+        ui->labBackgroundProps->setText(tr("size: %1&times;%2 pixels, frames: %3%4").arg(background_width).arg(background_height).arg(background_frame_count).arg(err));
+
+    } else {
+        ui->labBackgroundProps->setText("");
     }
-
-
-    prg.close();
-    QApplication::restoreOverrideCursor();
 }
 
 void QFRDRImagingFCSCorrelationDialog::cropCenter()
@@ -410,6 +377,14 @@ int QFRDRImagingFCSCorrelationDialog::waitingThreads() const  {
 }
 
 void QFRDRImagingFCSCorrelationDialog::ensureTiffReader() {
+    if (!ui->cmbFileformat->currentText().toUpper().contains("TINYTIFF")) {
+        for (int i=0; i<ui->cmbFileformat->currentIndex(); i++) {
+            if (ui->cmbFileformat->itemText(i).toUpper().contains("TINYTIFF")) {
+                ui->cmbFileformat->setCurrentIndex(i);
+                break;
+            }
+        }
+    }
     if (!ui->cmbFileformat->currentText().toUpper().contains("TIFF")) {
         for (int i=0; i<ui->cmbFileformat->currentIndex(); i++) {
             if (ui->cmbFileformat->itemText(i).toUpper().contains("TIFF")) {
@@ -819,7 +794,7 @@ void QFRDRImagingFCSCorrelationDialog::updateProgress() {
         ////////////////////////////////////////////////////////////////////////////////////
         int max=1;
         int p=0;
-        bool allDone=true;
+        bool allDone=(jobs.size()>0);
         for (int i=0; i<jobs.size(); i++) {
             if (jobs[i].progress) {
                 max=max+jobs[i].progress->getRangeMax()-jobs[i].progress->getRangeMin();
@@ -935,10 +910,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob(int biningForFCCS) {
             int dx=rxdccf.cap(1).toInt();
             int dy=rxdccf.cap(2).toInt();
             if (dx<image_width && dy<image_height) {
-                job.DCCFDeltaX << dx;
-                job.DCCFDeltaY << dy;
-                job.DCCFrole<<QString("DCCF(%1,%2)").arg(dx).arg(dy);
-                //qDebug()<<"DCCF: "<<dx<<", "<<dy;
+                job.addDCCF(dx, dy);
             }
             pos += rxdccf.matchedLength();
         }
@@ -1217,25 +1189,6 @@ void QFRDRImagingFCSCorrelationDialog::updateBlocking()
     ui->chkBlocking->setEnabled((ui->spinSegments->value()<=1) && ((ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECT) || (ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECT_INT) || (ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECTAVG) || (ui->cmbCorrelator->currentIndex()==CORRELATOR_DIRECTAVG_INT)));
 }
 
-double QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(int corrType, double taumin, int S, int m, int P) {
-    double taumax=0;
-    if (corrType==CORRELATOR_MTAUALLMON) {
-        taumax=0;
-        for (int s=0; s<S; s++) {
-            if (s==0) {
-                taumax+=pow(m, s)*taumin*P;
-            } else {
-                taumax+=pow(m, s)*taumin*P*(m-1.0)/m;
-            }
-        }
-    } else {
-        taumax=0;
-        for (int s=0; s<S; s++) {
-            taumax+=pow(m, s)*taumin*P;
-        }
-    }
-    return taumax;
-}
 
 void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
     int corrType=ui->cmbCorrelator->currentIndex();
@@ -1256,7 +1209,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
 
     int idealS=1;
     while (idealS<200 && taumax<double(segment_length)*taumin && segment_length>0) {
-        taumax=QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(corrType, taumin, idealS, m, P);
+        taumax=QFRDRImagingFCSCorrelation_getCorrelatorTauMax(corrType, taumin, idealS, m, P);
         //qDebug()<<idealS<<taumax/1e6<<double(segment_length)*taumin/1e6<<taumin<<(taumax<double(segment_length)*taumin);
         idealS++;
     }
@@ -1264,7 +1217,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
         S=idealS-1;
         ui->spinS->setValue(S);
     }
-    taumax=QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(corrType, taumin, S, m, P);
+    taumax=QFRDRImagingFCSCorrelation_getCorrelatorTauMax(corrType, taumin, S, m, P);
     ui->labCorrelator->setText(tr("<i>correlator lags:</i> &tau;<sub>min</sub> = %1&mu;s ...&tau;<sub>max</sub><i> = %2s</i>").arg(taumin).arg(taumax/1e6));
 }
 
@@ -1499,6 +1452,265 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
 
 QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> QFRDRImagingFCSCorrelationDialog::getFilesToAdd() const {
     return filesToAdd;
+}
+
+void QFRDRImagingFCSCorrelationDialog::readStackProperties(const QString& filename, int fileFormat, bool readFiles, bool countFrames, QWidget *parentWid, int *channels, int *frame_count_io, qint64* filesize_io, double* frametime_io, double* baseline_offset_io, QString* backgroundF_io, double* pixel_width_io, double* pixel_height_io, bool *hasPixel_io, int* dualViewMode_io, int* image_width_io, int* image_height_io, QString *inputconfigfile_io, double **frame_data_io, int *background_width_io, int *background_height_io, int *background_frame_count_io)
+{
+    QModernProgressDialog prg(parentWid);
+    prg.setWindowTitle(tr("imFCS: Correlator"));
+    prg.setLabelText(tr("Reading image series information ... reading config file ..."));
+    prg.open();
+    QApplication::processEvents();
+    QApplication::processEvents();
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    qint64 filesize=QFileInfo(filename).size();
+    if (filesize_io) *filesize_io=filesize;
+    QApplication::processEvents();
+
+    double frametime=1;
+    double baseline_offset=0;
+    QString backgroundF="";
+    QString inputconfigfile="";
+    double* frame_data=NULL;
+
+    double pixel_width=1;
+    double pixel_height=1;
+    bool hasPixel=false;
+
+    int dualViewMode=0;
+
+    int image_width=0;
+    int image_height=0;
+    int frame_count=0;
+
+    if (frametime_io) frametime=*frametime_io;
+    if (baseline_offset_io) baseline_offset=*baseline_offset_io;
+    if (backgroundF_io) backgroundF=*backgroundF_io;
+    if (pixel_width_io) pixel_width=*pixel_width_io;
+    if (pixel_height_io) pixel_height=*pixel_height_io;
+    if (dualViewMode_io) dualViewMode=*dualViewMode_io;
+    if (hasPixel_io) hasPixel=*hasPixel_io;
+    if (image_width_io) image_width=*image_width_io;
+    if (image_height_io) image_height=*image_height_io;
+    if (frame_count_io) frame_count=*frame_count_io;
+    if (inputconfigfile_io) inputconfigfile=*inputconfigfile_io;
+    if (frame_data_io) frame_data=*frame_data_io;
+
+    //////////////////////////////////////////////////////////////////////////////////
+    // now we search for a .configuration.ini file describing the selected file
+    //////////////////////////////////////////////////////////////////////////////////
+    QDir d=QFileInfo(filename).absoluteDir();
+    QStringList nameFilters;
+    nameFilters<<"*.ini";
+    nameFilters<<"*.cfg";
+    nameFilters<<"*.txt";
+    inputconfigfile="";
+    d.setNameFilters(nameFilters);
+    // could be that the absolute pathes are wrong. In this case we try to get a second guess by finding a file which
+    // equals in the name, but not the directory ... the user can correct the data anyways. This second guess is stored
+    // in these variables:
+    double sframetime=frametime;
+    double sbaseline_offset=baseline_offset;
+    QString sbackgroundF=backgroundF;
+    bool hasSecond=false;
+    bool hasFirst=false;
+    //bool sIsTiff=false;
+
+    foreach (QString iniFile, d.entryList(QDir::Files)) {
+        //QApplication::processEvents();
+        inputconfigfile=d.absoluteFilePath(iniFile);
+        QSettings set(d.absoluteFilePath(iniFile), QSettings::IniFormat);
+        int fcnt=set.value("files/count", 0).toInt();
+        if (fcnt>0) {
+            bool foundSecond=false;
+            for (int f=0; f<fcnt; f++) {
+                QString fn=set.value("files/name"+QString::number(f), "").toString();
+                QString ft=set.value("files/type"+QString::number(f), "").toString();
+                QString fd=set.value("files/description"+QString::number(f), "").toString();
+                if (!fn.isEmpty()) {
+                    QString fnAbs=d.absoluteFilePath(fn);
+                    //qDebug()<<"fn="<<fn<<"  fnAbs="<<fnAbs<<"  fn(filename)="<<QFileInfo(filename).fileName()<<"  fn(fnAbs)="<<QFileInfo(fnAbs).fileName();
+                    if (fnAbs==filename) {
+                        hasFirst=true;
+                        //if (ft.toLower().simplified().startsWith("tiff")) sIsTiff=true;
+                    } else if (QFileInfo(fnAbs).fileName()==QFileInfo(filename).fileName()) {
+                        foundSecond=true;
+                        //if (ft.toLower().simplified().startsWith("tiff")) sIsTiff=true;
+                    }
+                }
+            }
+
+            if (hasFirst) {
+                readB040SPIMExperimentConfigFile(set, frametime, baseline_offset, backgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height, dualViewMode);
+                //qDebug()<<"read first  "<<frametime<<baseline_offset<<backgroundF<<image_width<<image_height;
+            } else if (foundSecond) {
+                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height, dualViewMode);
+                //qDebug()<<"read second  "<<sframetime<<sbaseline_offset<<sbackgroundF<<image_width<<image_height;
+                hasSecond=true;
+            }
+        }
+        if (hasFirst) break;
+    }
+
+    // if we didn't find a second guess, we try to find a config file with the same
+    // basename + one of a set of extensions (newsuffix list) and try to read info from
+    // that.
+    if (!hasSecond) {
+        QString suffix=QFileInfo(filename).suffix();
+        QString cfgname;
+
+        QStringList newsuffix;
+        newsuffix<<"ini"
+                 <<"configuration.ini"
+                 <<"settings.ini"
+                 <<"settings.txt"
+                 <<"cfg";
+        for (int i=0; i<newsuffix.size(); i++) {
+            cfgname=filename.left(filename.size()-suffix.size())+newsuffix[i];
+            if (QFile::exists(cfgname)) {
+                QSettings set(cfgname, QSettings::IniFormat);
+                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height, dualViewMode);
+                //qDebug()<<"read third  "<<sframetime<<sbaseline_offset<<sbackgroundF<<image_width<<image_height;
+                break;
+            }
+        }
+
+
+    }
+
+    // if there is no direct match, we take the second best, if there is one
+    if (!hasFirst && hasSecond)  {
+        frametime=sframetime;
+        baseline_offset=sbaseline_offset;
+        backgroundF=sbackgroundF;
+        //if (sIsTiff) ensureTiffReader();//ui->cmbFileformat->setCurrentIndex(0);
+    }
+
+
+
+
+
+
+
+
+    if (readFiles) {
+
+        //////////////////////////////////////////////////////////////////////////////////
+        // we also try to open the file with an appropriate reader and read th number of frames in it
+        //////////////////////////////////////////////////////////////////////////////////
+        prg.setLabelText(tr("Reading image series information ... counting frames ..."));
+        QApplication::processEvents();
+        QApplication::processEvents();
+        QFImporterImageSeries* reader=NULL;
+        bool OK=false;
+        if (fileFormat>=0 && fileFormat<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount(QFPluginServices::getInstance())) {
+            reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(fileFormat, QFPluginServices::getInstance());
+        }
+        if (reader) {
+            OK=reader->open(filename);
+            if (OK)  {
+                QApplication::processEvents();
+                image_width=reader->frameWidth();
+                image_height=reader->frameHeight();
+                if (channels) *channels=reader->frameChannels();
+                if (frame_data) qfFree(frame_data);
+                frame_data=NULL;
+                frame_data=qfMallocT<double>(image_width*image_height);
+                reader->readFrameDouble(frame_data);
+                QVariant v=reader->getFileProperty("FRAMERATE");
+                if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
+                    frametime=1.0/v.toDouble()*1e6;
+
+                }
+                v=reader->getFileProperty("FRAMETIME");
+                if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
+                    frametime=v.toDouble()*1e6;
+                }
+                v=reader->getFileProperty("PIXEL_SIZE");
+                if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
+                    pixel_width=v.toDouble();
+                    pixel_height=v.toDouble();
+                }
+                v=reader->getFileProperty("PIXEL_WIDTH");
+                if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
+                    pixel_width=v.toDouble();
+                }
+                v=reader->getFileProperty("PIXEL_HEIGHT");
+                if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
+                    pixel_height=v.toDouble();
+                }
+                if (countFrames) frame_count=reader->countFrames();
+            }
+            reader->close();
+
+        }
+
+        //readBackgroundFramesize();
+        readBackgroundProperties(backgroundF, fileFormat, parentWid, background_width_io, background_height_io, background_frame_count_io);
+    }
+
+    prg.close();
+    QApplication::restoreOverrideCursor();
+
+    if (image_width<=1) image_width=1;
+    if (image_height<=1) image_height=1;
+
+    // SET THE FRAMETIME/RATE
+    if (frametime_io) *frametime_io=frametime;
+    if (baseline_offset_io) *baseline_offset_io=baseline_offset;
+    if (backgroundF_io) *backgroundF_io=backgroundF;
+    if (pixel_width_io) *pixel_width_io=pixel_width;
+    if (pixel_height_io) *pixel_height_io=pixel_height;
+    if (dualViewMode_io) *dualViewMode_io=dualViewMode;
+    if (hasPixel_io) *hasPixel_io=hasPixel;
+    if (image_width_io) *image_width_io=image_width;
+    if (image_height_io) *image_height_io=image_height;
+    if (frame_count_io) *frame_count_io=frame_count;
+    if (inputconfigfile_io) *inputconfigfile_io=inputconfigfile;
+    if (frame_data_io) *frame_data_io=frame_data;
+    //if (_io) *_io=;
+}
+
+void QFRDRImagingFCSCorrelationDialog::readBackgroundProperties(const QString &backgroundF, int fileFormat, QWidget* parentWid, int* background_width_io, int* background_height_io, int* background_frame_count_io)
+{
+    QModernProgressDialog prg(parentWid);
+    prg.setWindowTitle(tr("imFCS: Correlator"));
+    prg.setLabelText(tr("Reading background image series information ... reading config file ..."));
+    prg.open();
+    QApplication::processEvents();
+    QApplication::processEvents();
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+
+    //////////////////////////////////////////////////////////////////////////////////
+    // we also try to open the file with an appropriate reader and read th number of frames in it
+    //////////////////////////////////////////////////////////////////////////////////
+    prg.setLabelText(tr("Reading background image series information ... counting frames ..."));
+    QApplication::processEvents();
+    QApplication::processEvents();
+    QFImporterImageSeries* reader=NULL;
+    bool OK=false;
+    if (fileFormat>=0 && fileFormat<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount(QFPluginServices::getInstance())) {
+        reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(fileFormat, QFPluginServices::getInstance());
+    }
+    if (reader && QFile::exists(backgroundF)) {
+        OK=reader->open(backgroundF);
+        if (OK)  {
+            QApplication::processEvents();
+            if (background_width_io) *background_width_io=reader->frameWidth();
+            if (background_height_io) *background_height_io=reader->frameHeight();
+            if (background_frame_count_io) *background_frame_count_io=reader->countFrames();
+
+        } else {
+        }
+        reader->close();
+        delete reader;
+    }
+
+
+    prg.close();
+    QApplication::restoreOverrideCursor();
+
 }
 
 void QFRDRImagingFCSCorrelationDialog::openFile(const QString &file, const QString &filter)

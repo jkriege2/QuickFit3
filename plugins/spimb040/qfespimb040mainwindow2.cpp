@@ -899,7 +899,7 @@ void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QStr
 
         QProgressDialog progress(tr("Acquiring image series ..."), tr("&Cancel"), 0, frames, this);
         QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_preview_camtmpsettings.ini");
-        QTemporaryFile file1;
+        QFTemporaryFile file1;
         if (file1.open()) {
              tmpName1=file1.fileName();
         }
@@ -1182,7 +1182,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
 {
     QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_cam1tmpsettings.ini");
 
-    QTemporaryFile file1;
+    QFTemporaryFile file1;
     if (file1.open()) {
          tmpName1=file1.fileName();
     }
@@ -1218,7 +1218,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
 
     QString tmpName2=QDir::temp().absoluteFilePath("qf3spimb040_cam2tmpsettings.ini");
 
-    QTemporaryFile file2;
+    QFTemporaryFile file2;
     if (file2.open()) {
          tmpName2=file2.fileName();
     }

@@ -36,8 +36,12 @@ ImFCSCalibrationDialog::ImFCSCalibrationDialog(QWidget *parent) :
         ui->spinFocusHeight->setValue(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/focusheight", ui->spinFocusHeight->value()).toDouble());
         ui->spinFocusHeightError->setValue(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/focusheight_error", ui->spinFocusHeightError->value()).toDouble());
         ui->chkFixOffset->setChecked(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/fixoffset", ui->chkFixOffset->isChecked()).toBool());
+        ui->cmbMicroscopy->setCurrentIndex(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/microscopy", ui->cmbMicroscopy->currentIndex()).toInt());
+        ui->radByPixelShift->setChecked(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/bypixelshift", ui->radByPixelShift->isChecked()).toBool());
+        ui->radByPixelSize->setChecked(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/bypixelsize", ui->radByPixelSize->isChecked()).toBool());
     }
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
+    on_cmbMicroscopy_currentIndexChanged();
 }
 
 ImFCSCalibrationDialog::~ImFCSCalibrationDialog()
@@ -47,6 +51,9 @@ ImFCSCalibrationDialog::~ImFCSCalibrationDialog()
         ProgramOptions::setConfigValue("ImFCSCalibrationDialog/focusheight", ui->spinFocusHeight->value());
         ProgramOptions::setConfigValue("ImFCSCalibrationDialog/focusheight_error", ui->spinFocusHeightError->value());
         ProgramOptions::setConfigValue("ImFCSCalibrationDialog/fixoffset", ui->chkFixOffset->isChecked());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/microscopy", ui->cmbMicroscopy->currentIndex());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/bypixelshift", ui->radByPixelShift->isChecked());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/bypixelsize", ui->radByPixelSize->isChecked());
     }
     delete ui;
 }
@@ -57,6 +64,9 @@ void ImFCSCalibrationDialog::closeEvent(QCloseEvent *event) {
         ProgramOptions::setConfigValue("ImFCSCalibrationDialog/focusheight", ui->spinFocusHeight->value());
         ProgramOptions::setConfigValue("ImFCSCalibrationDialog/focusheight_error", ui->spinFocusHeightError->value());
         ProgramOptions::setConfigValue("ImFCSCalibrationDialog/fixoffset", ui->chkFixOffset->isChecked());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/microscopy", ui->cmbMicroscopy->currentIndex());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/bypixelshift", ui->radByPixelShift->isChecked());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/bypixelsize", ui->radByPixelSize->isChecked());
     }
     QDialog::closeEvent(event);
 }
@@ -102,6 +112,7 @@ void ImFCSCalibrationDialog::setFitModels(const QStringList& models, const QStri
         if (f) ui->cmbFitModel->addItem(f->name(), models[i]);
     }
     ui->cmbFitModel->setCurrentIndex(ui->cmbFitModel->findData(defaultModel));
+    on_cmbMicroscopy_currentIndexChanged();
 }
 
 QString ImFCSCalibrationDialog::getFitModel() const
@@ -113,4 +124,41 @@ void ImFCSCalibrationDialog::on_btnHelp_clicked()
 {
         QFPluginServices::getInstance()->displayPluginHelpWindow("imfcs_fit", "calibration.html");
 
+}
+
+void ImFCSCalibrationDialog::on_cmbMicroscopy_currentIndexChanged()
+{
+    switch (ui->cmbMicroscopy->currentIndex()) {
+        case 0: // SPIM, camera, 3D
+            if (ui->radByPixelSize->isChecked()) { ui->labError->clear(); ui->cmbFitModel->setCurrentIndex(ui->cmbFitModel->findData("fcs_spim_diffe2_newveff"));}
+            if (ui->radByPixelShift->isChecked()) { ui->labError->clear(); ui->cmbFitModel->setCurrentIndex(ui->cmbFitModel->findData("fccs_spim_diffce2"));}
+            break;
+        case 1: // TIRF, camera, 2D
+            if (ui->radByPixelSize->isChecked()) { ui->labError->clear(); ui->cmbFitModel->setCurrentIndex(ui->cmbFitModel->findData("fcs_tir_diffe2"));}
+            if (ui->radByPixelShift->isChecked()) { ui->labError->clear(); ui->cmbFitModel->setCurrentIndex(ui->cmbFitModel->findData("fccs_tir_diffe2"));}
+            break;
+        case 2: // confocal, point, 3D
+            if (ui->radByPixelSize->isChecked()) { ui->labError->clear(); ui->labError->setText(tr("<font color=\"red\"><b>!!! ERROR: This combination is impossible, as the pixel-size cannot be set on a point-detector !!!</b></font>"));}
+            if (ui->radByPixelShift->isChecked()) { ui->labError->clear(); ui->cmbFitModel->setCurrentIndex(ui->cmbFitModel->findData("fccs_2f_diff3d_wz")); }
+            break;
+
+    }
+    if (ui->radManual->isChecked()) {
+        ui->labError->clear();
+    }
+}
+
+void ImFCSCalibrationDialog::on_radManual_toggled()
+{
+    on_cmbMicroscopy_currentIndexChanged();
+}
+
+void ImFCSCalibrationDialog::on_radByPixelSize_toggled()
+{
+    on_cmbMicroscopy_currentIndexChanged();
+}
+
+void ImFCSCalibrationDialog::on_radByPixelShift_toggled()
+{
+    on_cmbMicroscopy_currentIndexChanged();
 }

@@ -21,6 +21,8 @@ class QFWIDLIB_EXPORT QFImagePlot : public QWidget
         ~QFImagePlot();
 
         void setImage(const double *image, int32_t width, int32_t height);
+
+    public slots:
         void setMaskAround(int size);
         void setROI(double x, double y, double width, double height);
         void setROI(QRectF r);
@@ -28,7 +30,11 @@ class QFWIDLIB_EXPORT QFImagePlot : public QWidget
         void setROI2(double x, double y, double width, double height);
         void setROI2(QRectF r);
         void resetROI2();
-    public slots:
+        void setROIColor(QColor col);
+        void setROI2Color(QColor col);
+        void setROIFillColor(QColor col);
+        void setROI2FillColor(QColor col);
+        void setBinning(int bin);
         void update_plot();
         void clear();
     protected slots:
@@ -47,6 +53,9 @@ class QFWIDLIB_EXPORT QFImagePlot : public QWidget
         int32_t image_width;
         int32_t image_height;
         QRectF roi, roi2;
+        QColor colROI, colROI2;
+        QColor colFillROI, colFillROI2;
+        int binning;
 };
 
 
@@ -62,6 +71,8 @@ class QFWIDLIB_EXPORT QFImagePlotWizardPage : public QFWizardPage
             return formLay;
         }
 
+        void addStretch();
+        void addSpacer(int height=10);
         void addRow(const QString& label, QWidget* widget);
         void addRow(const QString& label, QLayout* layout);
 
@@ -69,10 +80,24 @@ class QFWIDLIB_EXPORT QFImagePlotWizardPage : public QFWizardPage
         void setImage(const QString& filename, const QString& imageReaderID, int frameNum=0, QFImporter::FileInfo *fileinfo=NULL);
         void setImage(const QString& filename, const QString& imageReaderID, int frameNum, double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL, int *frames=NULL);
         void setImageAvg(const QString& filename, const QString& imageReaderID, int frameStart, int frameCount, double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL, int *frames=NULL);
+        void setImageAvg(const QString& filename, const QString& imageReaderID, int frameStart, int frameCount, QFImporter::FileInfo *fileinfo=NULL);
         void setImage(const QString& filename, const QString& imageReaderID,  QFImporter::FileInfo *fileinfo=NULL);
         void setImage(const QString& filename, const QString& imageReaderID,  double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL);
-        void clear();
 
+    public slots:
+        void clear();
+        void setROI(double x, double y, double width, double height);
+        void setROI(QRectF r);
+        void resetROI();
+        void setROI2(double x, double y, double width, double height);
+        void setROI2(QRectF r);
+        void resetROI2();
+        void setROIColor(QColor col);
+        void setROI2Color(QColor col);
+        void setROIFillColor(QColor col);
+        void setROI2FillColor(QColor col);
+        void setBinning(int bin);
+    public:
         virtual void initializePage();
         virtual bool validatePage();
     signals:

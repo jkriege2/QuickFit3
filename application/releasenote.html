@@ -27,8 +27,11 @@
   
 -->
 <!--
-    <li><a name="3891"><b>2015-03-18 (SVN: 3891)</b>-->
+    <li><a name="3891"><b>2015-03-18 (GIT: 3891)</b>-->
     <ul>
+    <li><b>new code repository:</b><ul>
+          <li>moved QuickFit 3.0 to GitHub: <a href="https://github.com/jkriege2/QuickFit3.git">https://github.com/jkriege2/QuickFit3.git</a>.</li>
+    </ul></li>
     <li><b>new plugins:</b><ul>
           <li><b>fit_nlopt</b>:  makes the global optimizaton algorithms from the NLopt library available in QuickFit as (least-squares) fit algorithms</li>
     </ul></li>
@@ -36,14 +39,18 @@
       <li>plotter widgets:<ul>
         <li>every single image plot may be saved as a rendered image (PNG/JPEG/BMP/...) via the context-menu</li>
         <li>improved autoscaling/zoom behaviour if data contains NANs</li>
+        <li>bugfix: copy images didn't work in some cases</li>
+        <li>you can now also copy the color palettes of an image plot to the clipboard</li>
       </ul></li>
       <li>expression parser:<ul>
         <li>added vector creation functions ones(), zeros(), linspace(), logspace(), vector() meshgrid2d_x(), meshgrid2d_y()</li>
         <li>added function for real-values Faddeeva function used in TIR-FCS fit models: faddeeva_real()</li>
+        <li>added function comment(), which does nothing and ignores any number of parameters</li>
       </ul></li>
       <li>online-help:<ul>
           <li>bugfix: the DOI's in the help texts should be linked now again!</li>
           <li>bugfix: in some cases the equations in a tooltip were displayed wrong (mixed up with old renderings!)</li>
+          <li>bugfix: fixed an endless loop of the preparation of online-help pages in some cases</li>
       </ul></li>
       <li>QF 3 now compiles with Qt 5.4 on MacOS X!</li>
       <li>added Faddeeva Package to support real-valued Faddeeva-Function, which is required by some TIR-FCS fit modelss</li>
@@ -54,11 +61,16 @@
       <li>added option to settings dialog that allows to choose between native and Qt/QuickFit-specific file-open dialogs</li>
       <li>added easter-egg (have fun finding it ;-)</li>
       <li>added an error message/dialog, when an evaluation editor window does not open after a project-tree double-click, because no applicable RDRs were found in the project.</li>
+      <li>added functions to export data from tables into Matlab *.MAT files as matrices [if possible]/cell arrays [otherwise]</li>
+      <li>improved error reporting for the save-project and zip-project functions</li>
+      <li>zipped-projects now also contain a <tt>.readme.txt</tt>-file, which explains the contents of the ZIP-archive</li>
+      <li>added link to GitHub repository to several places in QuickFit</li>
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>
         <li>bugfix: CSV import did not work, when tgegege is selected, but the file only contains 2 columns</li>
         <li>added support for reading PicoQuant exported ASCII FCS correlation curves (*.dat files) [thanks to Martin Seefeld, Uni Heidelberg]</li>
+        <li>improved error reporting while importing data: there will be error messages now, when trying to import a non-existent file.</li>
     </ul></li>
     <li><b>FCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
@@ -75,6 +87,7 @@
         <li>bugfix: the "show key" checkbox works now</li>
         <li>added overlay plots of the runs in a single RDR</li>
         <li>the fit statistics now display the var-cov-matrix of the fit with color-coded entries</li>
+        <li>The imFCS Calibration Wizard now shows an additional plot with the final wxy(a)/wxy(delta) curves and indicates the final result for wxy in the plot.</li>
     </ul></li>
     <li><b>FCCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
@@ -105,6 +118,9 @@
         <li>added model comparison function to "imagingFCS Tools" menu, entry "Annotate Model Comparison", which can also calculate model probability maps from (non-normalized) Bayesian model probabilities</li>
         <li>implemented blocking method to estimate the standard error of the correlation function for some correlators and segments=1</li>
         <li>several results of the correlation process (e.g. bleach correction fit results, blocking transform results, ...) are now readable as RDR results and thus displayable as parameter images. Note: If you delete one of these results, it will be regereated/reread when reopening the project!!!</li>
+        <li>bugfix: segment number and length were switched in evalsettings.txt files</li>
+        <li>aded a wizard that allows to correlate (several) files and add the results to the project, also may add evaluation objects</li>
+        <li>added wizard to add imaging FCS evaluation objects to the project</li>
     </ul></li>
 
     <li><b>number and brightness</b><ul>
@@ -138,6 +154,7 @@
     <li><b>SPIM-FCS fit models</b><ul>
         <li>added model for SPIM-FCS autocorrelation with diffusion and flow</li>
         <li>added 2-color FCCS model for 3D anomalous diffusion</li>
+        <li>added 2-pixel FCCS 3D anomalous diffusion model</li>
     </ul></li>
     <li><b>TIR-FCS fit models</b><ul>
     <li><font color="red"><b>MAJOR BUGFIX:</b> The TIR-FCS fit models with square-pixels had an additional factor 1/a<sup>2</sup>, which was wrong in the code (NOT IN THE DOCUMENTATION!). This is fixed now!</li>
@@ -145,6 +162,11 @@
         <li>added 3D/2D anomalous diffusion model for confocal TIR-FCS</li>
         <li>added 3D/2D normal diffusion model for confocal TIR-FCS</li>
         <li>added 3D/2D normal diffusion model with variable moleculr brightnesses for confocal TIR-FCS</li>
+        <li>added 2-pixel FCCS 2D anomalous diffusion model</li>
+        <li>added 2-pixel FCCS 2D normal diffusion model</li>
+    </ul></li>
+    <li><b>2-focus Confocal FCCS fit models</b><ul>
+        <li>added 2-focus FCCS 3D anomalous diffusion models</li>
     </ul></li>
     <li><b>TCSPC importer</b><ul>
         <li>added fluorescence liftetime (TCSPC microtime) histogram preview</li>
@@ -152,15 +174,19 @@
         <li>bugfix: countrate is now saved in the correct units (kHz instead of Hz) in the correlator output file (before it was a factor 1000 too high!)</li>
         <li>bugfix: fixed a small bug in the normalization of the TTTR correlator that could have an influence at low count rates</li>
     </ul></li>
+    <li><b>Table</b><ul>
+        <li>added menu entry to quickly calculate and plot boxplots from columned data</li>
+        <li></li>
+    </ul></li>
 
     <li><b>cairo graph exporter plugin</b><ul>
         <li>added finer grained export options for different subformats (e.g. SVG 1.1&amp;1.2, PDF 1.4&amp;1.5, EPS2&amp;3)</li>
-        <li></li>
+        <li>license is now LGPL 2.1</li>
     </ul></li>
 
     <li><b>lmfit fit algorithm plugin</b><ul>
         <li>some of the lmfit fit algorithms now estimate errors from the variance/covariance matrix of the fit (estimated numerically)</li>
-        <li></li>
+        <li>fitalgorithm_lmfit is now licensed under the permissive BSD 3-clause license (taken from the underlying library)</li>
     </ul></li>
     <li><b>GSL fit algorithm plugin</b><ul>
         <li>some of the GSL fit algorithms now estimate errors from the variance/covariance matrix of the fit (estimated numerically)</li>
@@ -173,7 +199,31 @@
     <li><b>fit_levmar</b><ul>
       <li>this fit algorithm is deprecated now, since fit_lmfit is a faster replacement, which has essentially the same features!</li>
     </ul></li>
+    <li><b>basicimageexporter</b><ul>
+      <li>added exporter for Matlab MAT-files (using TinyMAT)</li>
+    </ul></li>
 
+    <li><b>qfe_dataexportbasics</b><ul>
+      <li>license is now LGPL 2.1</li>
+    </ul></li>
+    <li><b>rdrsettings</b><ul>
+      <li>license is now LGPL 2.1</li>
+    </ul></li>
+    <li><b>fitfunctions_general</b><ul>
+      <li>license is now LGPL 2.1</li>
+    </ul></li>
+    <li><b>fitalgorithm_simanneal</b><ul>
+      <li>license is now LGPL 2.1</li>
+    </ul></li>
+    <li><b>Table</b><ul>
+      <li>license is now LGPL 2.1</li>
+    </ul></li>
+    <li><b>qfe_calculator</b><ul>
+      <li>license is now LGPL 2.1</li>
+    </ul></li>
+    <li><b>qfe_helpeditor</b><ul>
+      <li>license is now LGPL 2.1</li>
+    </ul></li>
     </li>
 
 

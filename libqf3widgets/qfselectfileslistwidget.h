@@ -26,7 +26,7 @@
 #include <QWidget>
 #include "libwid_imexport.h"
 #include "qfwizard.h"
-#include "qenhancedlineedit.h"
+#include "qfenhancedlineedit.h"
 #include "qfstyledbutton.h"
 
 namespace Ui {
@@ -150,7 +150,7 @@ class QFWIDLIB_EXPORT QFSelectFilesWizardPage : public QFWizardPage
         struct FileData {
             QStringList filterids;
             QStringList filters;
-            QEnhancedLineEdit* edit;
+            QFEnhancedLineEdit* edit;
             QLabel* label;
             QFStyledButton* button;
             bool required;

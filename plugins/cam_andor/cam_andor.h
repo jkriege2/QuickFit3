@@ -28,7 +28,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfextension.h"
 #include "qfextensioncamera.h"
 #include "highrestimer.h"
-#include "qenhancedlineedit.h"
+#include "qfenhancedlineedit.h"
 #include "jkstyledbutton.h"
 #include "camandoracquisitionthread.h"
 #include <QMap>

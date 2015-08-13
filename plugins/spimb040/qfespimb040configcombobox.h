@@ -27,7 +27,7 @@
 #include <QIcon>
 #include <QString>
 #include "qtriple.h"
-#include "qenhancedcombobox.h"
+#include "qfenhancedcombobox.h"
 
 #include "qfespimb040opticssetup.h"
 
@@ -40,7 +40,7 @@
     the QIcon, specified in \a icon are used
 
   */
-class QFESPIMB040ConfigComboBox : public QEnhancedComboBox {
+class QFESPIMB040ConfigComboBox : public QFEnhancedComboBox {
         Q_OBJECT
     public:
         explicit QFESPIMB040ConfigComboBox(QWidget *parent = 0);
