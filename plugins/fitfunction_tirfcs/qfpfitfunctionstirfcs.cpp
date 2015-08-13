@@ -39,6 +39,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionstirffccsfw2dadiffxy2coloracfr.h"
 #include "qftools.h"
 #include "qffitfunctionstirfccsadiffe2.h"
+#include "qffitfunctionstirfccsdiff.h"
 
 QStringList QFPFitFunctionsTIRFCS::getIDs() const {
     QStringList res;
@@ -50,6 +51,7 @@ QStringList QFPFitFunctionsTIRFCS::getIDs() const {
      res<<"fcs_tir_diff3de2_diffbright";
      res<<"fccs_tir_diff_flowe2";
      res<<"fccs_tir_adiffe2";
+     res<<"fccs_tir_diffe2";
      res<<"fcs_tir_diff_flowe2";
      res<<"fccs_tir_fw_2csep2ddiffxy2coloracfg";
      res<<"fccs_tir_fw_2csep2ddiffxy2coloracfr";
@@ -70,6 +72,8 @@ QFFitFunction* QFPFitFunctionsTIRFCS::get(const QString &id) const  {
         return new QFFitFunctionsTIRFCSADiffE2();
     } else if (id=="fcs_tir_adiff3de2") {
         return new QFFitFunctionsTIRFCSADiff3DE2();
+    } else if (id=="fccs_tir_diffe2") {
+        return new QFFitFunctionsTIRFCCSDiffE2();
     } else if (id=="fcs_tir_diff3de2") {
         return new QFFitFunctionsTIRFCSDiff3DE2();
     } else if (id=="fcs_tir_diff3de2_diffbright") {
