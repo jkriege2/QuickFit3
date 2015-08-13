@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>ImFCS Calibration</title>
+  </head>
+  <body>
+    $$invisibleref:Bag2012:N. Bag, J. Sankaran, A. Paul, R. S. Kraut, and T. Wohland (2012): <b>"Calibration and limits of camera-based fluorescence correlation spectroscopy: a supported lipid bilayer study."</b> <i>Chemphyschem</i> 13, 2784-94$$
+    $$INVISIBLEREF_SPIMFCS_CAM$$
+$$jankrieger_phdthesis_invisibleref$$
+$$INVISIBLEREF_SPIMFCCS$$
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
+
+$$startbox_note$$
+See the <a href="calibration.html">help page on calibration</a> for details on the theory of imaging FCS calibration. Also see the references given at the end of this page.
+$$endbox$$
+
+<h2>Tutorial: SPIM/TIRF-FCS</h2>
+    
+ <h3>Acquiring Data</h3>
+ <p>First perform a measurement of the calibration sample, e.g. 0.5nM fluorescent latex spheres (diameter 100nm) in water with your lightsheet microscope, or a supported bilayer with a fluorescent dye on a TIRF microscope. You should acquire about 20x20 pixels in the center of the field of view (FOV) of you microscope. </p>
+$$warning:Ensure, that no aggregates were present during the measurement of the beads, since these might lead to problems and wronlgy estimated parameters in the calibration!$$
+<p>On a SPIM you will also have to determine the axial PSF-size $$math:w_z$$, e.g. by a bead scan (see <a href="http://www.dkfz.de/Macromol/quickfit/beadscan.html">http://www.dkfz.de/Macromol/quickfit/beadscan.html</a>). YOu can also use the QuickFit-plugin <a href="$$plugin_info:help:eval_beadscanpsf$$">PSF Beadscan</a> to evaluate such a stack.</p>
+ $$startbox_note$$For testing purposes, a dataset for calibration is available from <a href="http://www.dkfz.de/Macromol/quickfit/examples.html">http://www.dkfz.de/Macromol/quickfit/examples.html</a> as <b>calibration_tetraspec_2014_04_03.zip</b>. This package contains a SPIM-FCS measurement with 100nm TetraSpec beads, which can be used for this tutorial. The longitudinal PSF-size was determined to be $$math:w_z=1552nm$$. The camera pixel size was $$math:a=400nm$$.
+ $$endbox$$
+ <h3>Image Series Correlation "by hand"</h3>
+ <p>Then create an empty project and use the <a href="$$plugin_info:helpdir:imaging_fcs$$/imfcs_usage.html#correlating">imFCS correlation tool</a> to calculate the ACFs of the acquired image series for different binnings. In this tool the "Add Series" button allows to add several binnings (typically use binning=1,2,3,4,5) with one click. Finally return to your QuickFit project and check the imported data. If everything is fine (good curves, few outliers, mask the outliers, ...) you may proceed with the next step.</p>
+ <p>For the data, mentioned above you can use a setting of the correlator as follows:
+ <ul>
+     <li>tinyTIFF image reader</li>         
+     <li>no bleach correction (beads don't bleach)</li>
+     <li>binning 1-5</li>
+     <li>crop the central 20x6 pixels</li>
+     <li>direct correlation, with averaging and 5 segments</li>
+     
+ </ul>
+ <center><a name="calibration_pic003"><img src="./pic/calibration_pic003.png" border="1">
+ </center>
+ Then click on <b>add series job</b> and set it to binning=1..5 as follows:
+ <center><a name="calibration_pic004"><img src="./pic/calibration_pic004.png" border="1">
+ </center>
+ </p>
+ 
+ <h3><i>Alternative:</i> Image Series Correlation with ImFCS Wizard</h3>
+ <p>
+ Alternatively to the steps in the last section, you can also use the <b>imaging FCS/FCCS wizard</b> provided by the <a href="$$plugin_info:help:imaging_fcs$$">imaging_fcs plugin</a>. To do so, follow these steps:
+<ol>
+    <li>Start a new project and start the <b>imaging FCS/FCCS wizard</b> from the menu entry <img src=":imaging_fcs/projectwizard.png"> <tt>File | Project Wizards | Imaging FCS/FCCS Project Wizard</tt>.</li>
+    <li>On the first wizard page, choose <b>imFCS focus volume calibration</b>:
+    <center><a name="tutorial_calibration_pic000"><img src="./pic/tutorial_calibration_pic000.png" border="1">
+    </center>
+    Finally click on <b>Next</b>.
+    </li>
+    <li>Now select the file with the calibration measurement at the top of the next wizard window:
+    <center><a name="tutorial_calibration_pic001"><img src="./pic/tutorial_calibration_pic001.png" border="1">
+    </center>
+    Finally click on <b>Next</b>.
+    $$note:You should use the import filter <tt>tinyTIFF</tt> in most cases (if your TIFF-files are not compressed), which is faster and can read more frames than the <tt>libTIFF</tt> importer!$$
+    </li>
+    <li>Now make sure, that all camera properties (pixel size, frame-time) are set correctly:
+    <center><a name="tutorial_calibration_pic002"><img src="./pic/tutorial_calibration_pic002.png" border="1">
+    </center>
+    For the example dataset, proposed above, the pixel size should be $(400\times 400\;\mathrm {nm^2})$ and the frametime should be $(530\;\mathrm{\mu s})$.
+    Finally click on <b>Next</b>.</li>
+    <li>Now select the microscopy method, you used for the acquisition and provide the required PSF-parameters (for the given example dataset: use <b>"camera with rectangular pixels / lightsheet microscopy"</b> and set $(w_z=1552\;\mathrm{nm})$):
+<center><a name="tutorial_calibration_pic003"><img src="./pic/tutorial_calibration_pic003.png" border="1">
+</center>
+Finally click on <b>Next</b>.
+</li>
+    <li>Select the background file and background correction that should be used (for the test dataset: use <tt>TetraSPec___laser1_488nm_60mW_s01_c01__emccd_000_background.tif</tt> and the method <b>remove background image &amp; offset</b>). Bleach-correction is only required if you sample bleaches (fluorescent beads, which we propose as test sample, usually don't show bleaching!):
+<center><a name="tutorial_calibration_pic004"><img src="./pic/tutorial_calibration_pic004.png" border="1">
+</center>
+    Finally click on <b>Next</b>.</li>
+
+    <li>Select the region of the image stack that you want to correlate: 
+<ul>
+    <li>For a normal imaging FCS correlation, the central 20x20 pixels are usually enough, i.e. choose <b>calibration region=center</b> and set the region size to the height of the full image, or as large as desired.</li>
+    <li>For an imaging FCCS setup with two color channels, you should use either the left, or the right central 20x20 pixels (i.e. in the center of the two color channels separately). So choose <b>calibration region=left center/right center</b> and set the region size to the height of the full image, or as large as desired. </li>
+</ul>
+    In addition you will also have to setup all other options for the calibration:
+    <ul>
+        <li>set the max. lag-time in the resulting correlation curves. Usually chosing 10s, or the (preset) half length of the acquisition are good choices. Note that this value should not be shorter than about 5-10&times; the anticipated correlation time $(\tau_D)$.</li>
+      <li>you should cut the full measurement into several segments(usually 3-5, but make sure to keep each segment at least 10&times; as long as the anticipated correlation time $(\tau_D)$) to estimate the error on the correlation curve. Alternatively you can use a single segment, as then QuickFit will estimate the error, using the "blocking method".</li>
+      <li>Choose the test-values of $(w_{xy})$ to use. Ideally you should have an idea of the expected value of $(w_{xy})$ which you can provide. Then choose to test ~5 tests around this value with step sizes between 50 and 100nm. E.g. use <b>expected w<sub>xy</sub>=600, tests=5, steps=100nm</b></li>
+      <li>choose the binnings to test, e.g. for a 20x20 image region, choose 1..5</li>
+    </ul>
+    <center><a name="tutorial_calibration_pic010"><img src="./pic/tutorial_calibration_pic010.png" border="1">
+    </center>
+    
+    Finally click on <b>Next</b>.</li>
+    <li>Now the correlation starts. Wait until it has finished (all files show a check-mark). If you have a multi-core processor, you can use several <b>parallel jobs</b> to increase the correlation speed:
+<center><a name="tutorial_calibration_pic006"><img src="./pic/tutorial_calibration_pic006.png" border="1">
+</center>
+Finally click on <b>Next</b>.</li>
+<li><b>Finish</b> the wizard. It will now insert all files into the project (you may save the project if you wish/are asked to). The project will look like this:
+<center><a name="tutorial_calibration_pic007"><img src="./pic/tutorial_calibration_pic007.png" border="1">
+</center>
+<u>Note</u> that the wizard already inserte the <a href="$$plugin_info:help:imfcs_fit$$">imfcs_fit evaluation objects</a> for the test-values of $(w_{xy})$ into the project.
+</li>
+</ol>
+</p>
+<h3>Calibration</h3>
+<p>
+The following steps can conveniently be controlled by the <b>"imFCS calibration Wizard"</b>, which leads you step-by-step through the calibration. It is available in the menu <code>Tools|imFCS Calibration Tool|<b>imFCS Calbration Wizard</b></code>. The wizard dialog will look like this:
+<center><a name="tutorial_calibration_pic008"><img src="./pic/tutorial_calibration_pic008.png" border="1">
+</center>
+
+$$startbox_note$$
+This wizard is also <u>automatically</u> started by the <b>imaging FCS/FCCS wizard</b> from the last section ("Alternative ..."). This wizard also already performs the first step of the calibration, so start this section at step 2, if you used the imaging FCS/FCCS project wizard and already have the evaluation objects for the test-values of $(w_{xy})$!$$endbox$$
+</p>
+<p>
+<ol>
+   <li>Now you'll have to add imFCS fit objects that fits $$math:D(a, w_{xy})$$: Use <code>Data Items|Insert Evaluation|imagingFCS Calibration Tool|<b>0: add imFCS calibration fits</b></code> and enter a series of test-$$math:w_{xy}$$ values surrounding the expected $$math:w_{xy}$$ value (e.g. if we expect $$math:w_{xy}\approx 600nm$$, you could use $$math:w_{xy}= 400nm, 500nm, 600nm, 700nm, 800nm$$. Also enter the value of $$math:w_z$$ you determined before.<center><a name="calibration_pic005"><img src="./pic/calibration_pic005.png" border="1">
+</center>Then a click on "OK" will create one imFCS fit object for each $$math:w_{xy}$$ you entered. Now you'll have to fit every run/pixel in each of these fit evaluations. Check in each that a proper model is selected and $$math:w_{xy}$$ and $$math:a$$ are set properly and fixed. 
+$$startbox_note$$
+For the calibration of a SPIM-FCS measurement you should use the model <a href="$$fitfunction:help:fcs_spim_diffe2_newveff$$">$$fitfunction:name:fcs_spim_diffe2_newveff$$</a><br>and for TIRF-FCS calibration the model <a href="$$fitfunction:help:fcs_tir_diffe2$$">$$fitfunction:name:fcs_tir_diffe2$$</a>. In the TIRF case you won't have to supply $$math:w_z$$, so ignore this input widget.
+$$endbox$$</li>
+   <li>The fitting can be done automatically with <b>step: Fit D's</b> in the wizard (<small>or with the menu entry <code>Data Items|Insert Evaluation|imagingFCS Calibration Tool|<b>1: fit all D's</b></code></small>) which will open one evaluation object after the other and perform the fit!</li>
+   <li>Now you can use <b>step: collect D Data</b> in the wizard (or <small><code>Tools|imagingFCS Calibration Tool|<b>2 Collect D data</b></code></small>) to create <a href="#calibration_pic000">the plot</a> of  $$math:D(a, w_{xy})$$. The plot will be shown in the wizard dialog and will be inserted as <a href="../qfrdrtable/table.html">table object</a> with an associated plot into the project (for later reference). 
+<center><a name="tutorial_calibration_pic012"><img src="./pic/tutorial_calibration_pic012.png" border="1">
+</center>
+<!--<center><img src="pic/calibration_pic000.png"></center>--></li>
+   <li>The tool will then give you the possibility to select a binning at which to take the average $$math:D$$ for the final fit and insert an object for the final $$math:w_{xy}$$-fit. You should use the $$math:D$$-value at a pixel size, where the $$math:D(a)$$-curves have nearly converged (and the averages do not change much). This step is illustrated in the screenshot in the last step! FOr the example dataset given above, $(a=2000\mathrm{nm})$ should give $(D\approx 4.5\mathrm{\mu m^2/s})$ and is a good choice.<br>
+<small>
+If you add the required fit evaluation by hand, make sure that $$math:D, a$$ are fixed and $$math:w_{xy}$$ is free, but the wizard will do that for you.</small></li>
+   <li> Then fit all runs/pixels in the new evaluation, by clicking on <b>step: Fit w<sub>xy</sub></b> of the wizard. </li>
+   <li>A final click on <b>step: Collect w<sub>xy</sub> data</b> of the wizard (<small> or <code>Tools|imagingFCS Calibration Tool|<b>4 Collect wxy data</b></code></small>) will then create the plot of $(w_{xy}(a))$ and display it in the wizard's dialog. From this plot you can then read the calibrated $$math_w_{xy}$$.
+
+<center><a name="tutorial_calibration_pic013"><img src="./pic/tutorial_calibration_pic013.png" border="1">
+</center>
+Usually the best estimate for $$math:w_{xy}$$ is the value, determined at the smallest binning (in the given example $(a=400\mathrm{nm})$, since there the fit model is most sensitive to $$math:w_{xy}$$. Again this plot is also added to the table RDR in the project for later reference.<br>For the given example the final result will be $[w_{xy}=(687\pm110)\mathrm{nm}.]$</li>
+</ol>
+</p>
+$$startbox_note$$
+The two tools used above will scan the currently opened project and find those evaluation objects and raw data records used for the calibration. Tool 1 (step 2) extracts the average and standard deviation of the $$math:D$$ extracted from the fit. It also leaves out masked pixels! To offer a list of binnings to choose from the true $$math:D$$ it then averages the $$math:D$$ resulting from the fits at different binnings. The second tool averages over the $$math:w_{xy}$$ obtained from the last fits. It also ignores the masked pixels.
+$$endbox$$
+
+
+
+<h2>Tutorial: SPIM/TIRF-FCCS, or dual-color microscope</h2>
+<p>In the case of a dual-color microscope (as e.g. used for SPIM-FCCS), the two color channels are often imaged in parallel, using a dual-view optics, or two cameras. Here the two color channels are usually calibrated separately. For a dual-view, a single frame form a measurement usually looks like this:
+<center><a name="calibration_pic006"><img src="./pic/calibration_pic006.png" border="1">
+</center>
+The calibration is done exactly, as described above, but the cropping should select the central region (20x20 pixels) in the left image half for the green channel and the central region (20x20 pixels) in the right image half, i.e.:
+<ul>
+<li>green/left: x=22...41, y=0..19</li>
+<li>red/right: x=86...105, y=0..19</li>
+</ul>
+As an additional test of your microscope alignment, you can check whether the reference diffusion coefficients determined in step 4 (see above) are equal (within their errors) for both clor channels.
+</p>
+
+<h2>Reference</h2>
+$$references$$
+  </body>
+</html>

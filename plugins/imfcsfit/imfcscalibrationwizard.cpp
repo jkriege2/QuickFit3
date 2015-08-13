@@ -67,17 +67,18 @@ void ImFCSCalibrationWizard::hideStep01(bool hide)
 {
     ui->widStep01->setVisible(!hide);
     if (hide) {
-        ui->lab2->setText("1.");
-        ui->lab3->setText("2.");
-        ui->lab4->setText("3.");
-        ui->lab5->setText("4.");
+        ui->lab2->setText("<font size=\"+4\">1.</font>");
+        ui->lab3->setText("<font size=\"+4\">2.</font>");
+        ui->lab4->setText("<font size=\"+4\">3.</font>");
+        ui->lab5->setText("<font size=\"+4\">4.</font>");
     } else {
-        ui->lab2->setText("2.");
-        ui->lab3->setText("3.");
-        ui->lab4->setText("4.");
-        ui->lab5->setText("5.");
+        ui->lab2->setText("<font size=\"+4\">2.</font>");
+        ui->lab3->setText("<font size=\"+4\">3.</font>");
+        ui->lab4->setText("<font size=\"+4\">4.</font>");
+        ui->lab5->setText("<font size=\"+4\">5.</font>");
     }
 }
+
 
 
 void ImFCSCalibrationWizard::on_btnClose_clicked()
@@ -137,6 +138,7 @@ void ImFCSCalibrationWizard::on_btnReset_clicked()
     ui->widget4->setEnabled(false);
     ui->widget5->setEnabled(false);
     ui->pltD->clearGraphs(true);
+    ui->pltWxy->clearGraphs(true);
 }
 
 void ImFCSCalibrationWizard::on_btnUnlock_clicked()

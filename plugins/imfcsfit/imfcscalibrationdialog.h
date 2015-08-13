@@ -47,6 +47,10 @@ public:
 protected slots:
 
     void on_btnHelp_clicked();
+    void on_cmbMicroscopy_currentIndexChanged();
+    void on_radManual_toggled();
+    void on_radByPixelSize_toggled();
+    void on_radByPixelShift_toggled();
 protected:
     void closeEvent(QCloseEvent *event);
 private:

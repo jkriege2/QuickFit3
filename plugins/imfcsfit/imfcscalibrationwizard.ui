@@ -345,16 +345,6 @@ p, li { white-space: pre-wrap; }
       <item row="2" column="0" colspan="3">
        <widget class="QWidget" name="widget1" native="true">
         <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="0,1">
-         <item row="1" column="0" rowspan="2">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>&lt;font size=&quot;+4&quot;&gt;1.&lt;/font&gt;</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="1">
           <widget class="QLabel" name="label_6">
            <property name="text">
@@ -369,6 +359,16 @@ p, li { white-space: pre-wrap; }
           <widget class="QPushButton" name="btnStep1">
            <property name="text">
             <string>run step &amp;1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" rowspan="2">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>&lt;font size=&quot;+4&quot;&gt;1.&lt;/font&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
            </property>
           </widget>
          </item>
@@ -494,14 +494,14 @@ p, li { white-space: pre-wrap; }
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="../imagingfcs/qfrdrimagingfcs.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="qfevalimfcsfit.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections/>
 </ui>

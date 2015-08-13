@@ -1120,7 +1120,7 @@ void QFRDRImagingFCSWizard::correlationValuesChanged()
 void QFRDRImagingFCSWizard::calibrationValuesChanged()
 {
     //qDebug()<<"calibrationValuesChanged";
-    labSegments->setText(tr("=> segment length %1 s").arg(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/double(spinCalibSegments->value())));
+    labCalibSegments->setText(tr("=> segment length %1 s").arg(double(widFrameRange->getLast()-widFrameRange->getFirst()+1)*spinFrametime->value()/1.0e6/double(spinCalibSegments->value())));
 }
 
 void QFRDRImagingFCSWizard::validateCorrelation()
@@ -1419,7 +1419,16 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
         wizard->labImageProps->setText(QObject::tr("frames: %1,   frame-size: %2x%3").arg(wizard->frame_count_io).arg(wizard->image_width_io).arg(wizard->image_height_io));
         wizard->widPixSize->setPixelSize(wizard->pixel_width_io, wizard->pixel_height_io);
         wizard->widFrameRange->setRange(0, wizard->frame_count_io-1);
-        wizard->cmbDualView->setCurrentIndex(wizard->dualViewMode_io);
+        if (wizard->wizIntro->isChecked(1)) {
+            wizard->cmbDualView->setCurrentIndex(0);
+            wizard->cmbDualView->setEnabled(false);
+        } else {
+            wizard->cmbDualView->setCurrentIndex(wizard->dualViewMode_io);
+            wizard->cmbDualView->setEnabled(true);
+        }
+        if (wizard->wizImageProps->getFormLayout()->labelForField(wizard->cmbDualView)) {
+            wizard->wizImageProps->getFormLayout()->labelForField(wizard->cmbDualView)->setEnabled(wizard->cmbDualView->isEnabled());
+        }
 
 
         wizard->spinFrametime->setValue(wizard->frametime_io);

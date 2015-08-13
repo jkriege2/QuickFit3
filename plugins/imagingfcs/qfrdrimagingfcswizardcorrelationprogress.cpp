@@ -146,7 +146,7 @@ void QFRDRImagingFCSWizardCorrelationProgress::collectThreads()
     for (int i=jobs.size()-1; i>=0; i--) {
         if (jobs[i].addToProject && (jobs[i].thread->status()==2)) {
             for (int j=0; j<jobs[i].thread->getAddFiles().size(); j++) {
-                filesToAdd.append(jobs[i].thread->getAddFiles().at(j));
+                filesToAdd.prepend(jobs[i].thread->getAddFiles().at(j));
                 //qDebug()<<"added file "<<jobs[i].thread->getAddFiles().at(j).filename;
             }
             jobs[i].progress->close();

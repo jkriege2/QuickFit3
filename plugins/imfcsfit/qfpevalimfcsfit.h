@@ -77,7 +77,7 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
         virtual QString getAuthor() const  { return tr("Jan Krieger"); }
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2012 by Jan Krieger"); }
+        virtual QString getCopyright() const  { return tr("(c) 2012-2015 by Jan Krieger"); }
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
@@ -115,7 +115,7 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
         void insertFCSCalibrationWizard();
 
         void insertFCSFitForCalibration();
-        void insertFCSFitForCalibration(QFEvaluationItem* edummy, double height, double err_height, bool fixOffset, const QString& model, const QList<double>& vals);
+        void insertFCSFitForCalibration(QFEvaluationItem* edummy, double height, double err_height, bool fixOffset, const QString& model, const QList<double>& vals=QList<double>());
         void imFCSCalibrationSelectFile();
         void imFCSCalibrationCorrelate();
 

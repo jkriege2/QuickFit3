@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>419</width>
-    <height>443</height>
+    <width>521</width>
+    <height>591</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,22 +17,8 @@
    <iconset resource="qfevalimfcsfit.qrc">
     <normaloff>:/imfcsfit/fit.png</normaloff>:/imfcsfit/fit.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;For a SPIM-FCS calibration several fits with different w&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt; vertical-align:sub;&quot;&gt;xy&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt; are necessary. Please enter the w&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt; vertical-align:sub;&quot;&gt;xy&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt; values you want to use below and give all other necessary parameters.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="2" column="1">
     <widget class="QPlainTextEdit" name="edtValues">
      <property name="plainText">
       <string>400
@@ -43,7 +29,61 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item>
+   <item row="5" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;&lt;font size=&quot;+2&quot;&gt;&lt;b&gt;1.&lt;/b&gt;&lt;/font&gt; For a SPIM-FCS calibration several fits with different w&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt; vertical-align:sub;&quot;&gt;xy&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt; are necessary. Please enter the w&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt; vertical-align:sub;&quot;&gt;xy&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt; values you want to use below and give all other necessary parameters.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;&lt;font size=&quot;+2&quot;&gt;&lt;b&gt;2.&lt;/b&gt;&lt;/font&gt; Select the fit model to use, either from the pre-sets or manually from the list. IN both cases the lowest combobox displays the fit model that will finally be used!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
     <widget class="QWidget" name="horizontalWidget" native="true">
      <property name="minimumSize">
       <size>
@@ -51,31 +91,180 @@ p, li { white-space: pre-wrap; }
        <height>10</height>
       </size>
      </property>
-     <layout class="QFormLayout" name="formLayout">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
-      <property name="margin">
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="leftMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>fit model:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="cmbFitModel"/>
-      </item>
-      <item row="1" column="0">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="2" column="1">
        <widget class="QLabel" name="label_2">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
          <string>focus height:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="0" column="2">
+       <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0">
+        <item row="0" column="0" colspan="2">
+         <widget class="QRadioButton" name="radByPixelSize">
+          <property name="text">
+           <string>calibrate by pixel size</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <widget class="QRadioButton" name="radManual">
+          <property name="text">
+           <string>manual model selection:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>model:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="QLabel" name="labError">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="cmbMicroscopy">
+          <property name="maximumSize">
+           <size>
+            <width>400</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string>SPIM with camera, 3D diffusion</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>TIRF with camera, 2D diffusion</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>SPIM/confocal with point-detectors, 3D diffusion</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QComboBox" name="cmbFitModel">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>400</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>          microscopy:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QRadioButton" name="radByPixelShift">
+          <property name="text">
+           <string>calibrate by pixel shift</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="2">
+       <widget class="QCheckBox" name="chkFixOffset">
+        <property name="text">
+         <string>fix</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_3">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>fit model:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QDoubleSpinBox" name="spinFocusHeight">
@@ -125,34 +314,64 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
-      <item row="2" column="0">
+      <item row="4" column="1">
        <widget class="QLabel" name="label_5">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
          <string>offset:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QCheckBox" name="chkFixOffset">
-        <property name="text">
-         <string>fix</string>
+      <item row="0" column="0">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="checked">
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="0" colspan="3">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;&lt;font size=&quot;+2&quot;&gt;&lt;b&gt;3.&lt;/b&gt;&lt;/font&gt; For 3D microscopy (all except TIRF), a 3D-extent of the PSF has to be determined with an independent method (e.g. a beadscan). Enter the result for the PSF z-extent here:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="3">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;&lt;font size=&quot;+2&quot;&gt;&lt;b&gt;4.&lt;/b&gt;&lt;/font&gt; Choose whether to fix the offset G&lt;sub&gt;&amp;infty;&lt;/sub&gt; of the fit models, or not. Unfixing often gives better fit-results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
-     </property>
     </widget>
    </item>
   </layout>
@@ -168,8 +387,8 @@ p, li { white-space: pre-wrap; }
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>433</y>
+     <x>266</x>
+     <y>473</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -184,8 +403,8 @@ p, li { white-space: pre-wrap; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>433</y>
+     <x>334</x>
+     <y>473</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -200,12 +419,76 @@ p, li { white-space: pre-wrap; }
    <slot>on_btnHelp_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>132</x>
-     <y>417</y>
+     <x>141</x>
+     <y>473</y>
     </hint>
     <hint type="destinationlabel">
      <x>29</x>
      <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radManual</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_7</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>193</x>
+     <y>330</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>156</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radManual</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbFitModel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>334</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>235</x>
+     <y>354</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radManual</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_6</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>124</x>
+     <y>326</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>124</x>
+     <y>307</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radManual</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbMicroscopy</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>175</x>
+     <y>331</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>250</x>
+     <y>303</y>
     </hint>
    </hints>
   </connection>

@@ -42,6 +42,7 @@ class ImFCSCalibrationWizard : public QWidget
         void enableStep2();
         void hideStep01(bool hide=true);
 
+
     signals:
         void run1();
         void run2();

@@ -177,6 +177,7 @@ void QFPEvalIMFCSFit::insertFCSCalibrationWizard()
 void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
     if (project) {
 
+
         ImFCSCalibrationDialog* dlg=new ImFCSCalibrationDialog(NULL);
         QFEvaluationItem* edummy=project->addEvaluation(getID(), "imFCS Fit");
         QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(edummy);
@@ -192,6 +193,7 @@ void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
             delete edummy;
         }
         delete dlg;
+
     }
 }
 
@@ -199,7 +201,7 @@ void QFPEvalIMFCSFit::insertFCSFitForCalibration(QFEvaluationItem* edummy, doubl
 {
     for (int i=0; i<vals.size(); i++) {
         QFEvaluationItem* e=edummy;
-        if ((i>0) || (edummy==NULL)) e=project->addEvaluation(getID(), "imFCS Fit");
+        if ((i>0) || (edummy==NULL)) e=project->addEvaluation(getID(), "imaging FCS Fit for calibration");
         QFImFCSFitEvaluation* eimFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
         e->setQFProperty("FIT_REPEATS", 2, false, false);
         e->setQFProperty("PRESET_N_PARTICLE", 1, false, false);
@@ -223,8 +225,13 @@ void QFPEvalIMFCSFit::insertFCSFitForCalibration(QFEvaluationItem* edummy, doubl
         e->setQFProperty("IMFCS_CALIBRATION_MODEL", model, false, false);
         e->setQFProperty("PRESET_FIT_MODEL", model, false, false);
         e->setName(tr("wxy=%1 nm").arg(vals[i]));
-        if (eimFCS) eimFCS->setFitFunction(model);
+        if (eimFCS) {
+            eimFCS->setFitDataWeighting(QFFCSWeightingTools::RunErrorWeighting);
+            eimFCS->setFitFunction(model);
+        }
     }
+
+
 
     QFRawDataRecord* et=project->addRawData("table", "imFCS Calibration results");
     et->setQFProperty("IMFCS_CALIBRATION_RESULTTABLE", true, false, false);
@@ -271,21 +278,23 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
         calibrationWizard->getPltWxy()->update_plot();
     }
 
-    for (int i=0; i<project->getEvaluationCount(); i++) {
-        QFEvaluationItem* e=project->getEvaluationByNum(i);
-        QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
-        if (imFCS) {
-            log_text(tr("   - fitting %1 \n").arg(e->getName()));
-            QFEvaluationPropertyEditor* pedt=services->openEvaluationEditor(e);
-            QFEvaluationEditor* edt=pedt->getEditor();
-            QFImFCSFitEvaluationEditor* eedt=qobject_cast<QFImFCSFitEvaluationEditor*>(edt);
-            if (eedt && e->getName().toLower().contains("wxy")) {
-                eedt->fitEverythingThreadedWriter();
+
+        for (int i=0; i<project->getEvaluationCount(); i++) {
+            QFEvaluationItem* e=project->getEvaluationByNum(i);
+            QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
+            if (imFCS) {
+                log_text(tr("   - fitting %1 \n").arg(e->getName()));
+                QFEvaluationPropertyEditor* pedt=services->openEvaluationEditor(e);
+                QFEvaluationEditor* edt=pedt->getEditor();
+                QFImFCSFitEvaluationEditor* eedt=qobject_cast<QFImFCSFitEvaluationEditor*>(edt);
+                if (eedt && e->getName().toLower().contains("wxy")) {
+                    eedt->fitEverythingThreadedWriter();
+                }
+                if (pedt) pedt->close();
+                log_text(tr("        DONE!\n"));
             }
-            if (pedt) pedt->close();
-            log_text(tr("        DONE!\n"));
         }
-    }
+
     log_text(tr("imFCS calibration tool 1: fitting D's ... DONE!\n"));
 }
 
@@ -500,7 +509,9 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
                 plt->set_yColumn(c_D);
                 plt->set_yErrorColumn(c_ED);
                 plt->set_xErrorStyle(JKQTPnoError);
-                plt->set_yErrorStyle(JKQTPnoError);
+                plt->set_yErrorStyle(JKQTPerrorBars);
+                plt->set_symbolSize(10);
+                plt->set_symbol(JKQTPfilledCircle);
                 calibrationWizard->getPltD()->get_plotter()->addGraph(plt);
             }
         }
@@ -589,6 +600,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
         e->setName(QString(QLatin1String("calibration D=%1\xB5m^2/s")).arg(Dcalib));
         QFImFCSFitEvaluation* eimFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
         if (eimFCS && (!model.isEmpty())) eimFCS->setFitFunction(model);
+        if (eimFCS) eimFCS->setFitDataWeighting(QFFCSWeightingTools::RunErrorWeighting);
     }
 
     log_text(tr("imFCS calibration tool 2: collecting D data ... DONE!\n"));
@@ -837,20 +849,32 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
                         g->set_drawLine(false);
                         g->set_symbol(JKQTPfilledCircle);
                         g->set_symbolSize(12);
+                        calibrationWizard->getPltWxy()->addGraph(g);
                         if (!isshifted) {
                             g->set_xColumn(ds->addCopiedColumn(pixwidths, tr("pixel size a [nm], D=%2{\\mu}m^2/s").arg(Dcalib) ));
                             g->set_yColumn(ds->addCopiedColumn(wxys, tr("wxy [nm], D=%2{\\mu}m^2/s").arg(Dcalib)));
                             g->set_yErrorColumn(ds->addCopiedColumn(wxyerrors, tr("wxy_error [nm], D=%2{\\mu}m^2/s").arg(Dcalib)));
-                            calibrationWizard->getPltWxy()->addGraph(new JKQTPgeoText(calibrationWizard->getPltWxy(), pixwidths.value(0), wxys.value(0), tr("\\ \\ \\leftarrow\\ \\textbf{w_{xy}=( %1 \\pm %2 ) nm}").arg(roundWithError(wxys.value(0),wxyerrors.value(0),2)).arg(roundError(wxyerrors.value(0),2)), 12));
+                            int ismall=0;
+                            if (pixwidths.size()>1) {
+                                for (int i=1; i<pixwidths.size(); i++) {
+                                    if (pixwidths[i]<pixwidths[ismall]) ismall=i;
+                                }
+                            }
+                            calibrationWizard->getPltWxy()->addGraph(new JKQTPgeoText(calibrationWizard->getPltWxy(), pixwidths.value(ismall), wxys.value(ismall), tr("\\ \\ \\leftarrow\\ \\textbf{w_{xy}=( %1 \\pm %2 ) nm}").arg(roundWithError(wxys.value(ismall),wxyerrors.value(ismall),2)).arg(roundError(wxyerrors.value(ismall),2)), 12));
                         } else {
                             g->set_xColumn(ds->addCopiedColumn(pixshifts, tr("pixel shift \\delta [nm], D=%2{\\mu}m^2/s").arg(Dcalib) ));
                             g->set_yColumn(ds->addCopiedColumn(wxys, tr("wxy [nm], D=%2{\\mu}m^2/s").arg(Dcalib)));
                             g->set_yErrorColumn(ds->addCopiedColumn(wxyerrors, tr("wxy_error [nm], D=%2{\\mu}m^2/s").arg(Dcalib)));
-                            calibrationWizard->getPltWxy()->addGraph(new JKQTPgeoText(calibrationWizard->getPltWxy(), pixshifts.value(0), wxys.value(0), tr("\\ \\ \\leftarrow\\ \\textbf{w_{xy}=( %1 \\pm %2 ) nm}").arg(roundWithError(wxys.value(0),wxyerrors.value(0),2)).arg(roundError(wxyerrors.value(0),2)), 12));
+                            int ismall=0;
+                            if (pixshifts.size()>1) {
+                                for (int i=1; i<pixshifts.size(); i++) {
+                                    if (pixshifts[i]<pixshifts[ismall]) ismall=i;
+                                }
+                            }
+                            calibrationWizard->getPltWxy()->addGraph(new JKQTPgeoText(calibrationWizard->getPltWxy(), pixshifts.value(ismall), wxys.value(ismall), tr("\\ \\ \\leftarrow\\ \\textbf{w_{xy}=( %1 \\pm %2 ) nm}").arg(roundWithError(wxys.value(ismall),wxyerrors.value(ismall),2)).arg(roundError(wxyerrors.value(ismall),2)), 12));
                         }
                         g->set_yErrorStyle(JKQTPerrorBars);
                         g->set_title(tr("w_{xy}(a) for D=%2{\\mu}m^2/s").arg(Dcalib));
-                        calibrationWizard->getPltWxy()->addGraph(g);
 
 
                     }
