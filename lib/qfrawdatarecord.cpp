@@ -135,6 +135,26 @@ void QFRawDataRecord::writeLock() const
     dstore->lock->lockForWrite();
 }
 
+bool QFRawDataRecord::writeTryLock(int timeout_ms) const
+{
+    if (timeout_ms<0) {
+        return dstore->lock->tryLockForWrite();
+    } else {
+        return dstore->lock->tryLockForWrite(timeout_ms);
+    }
+}
+
+bool QFRawDataRecord::writeTryLock(int timeout_ms, int repeats) const
+{
+    for (int i=0; i<repeats; i++) {
+        if (writeTryLock(timeout_ms)) {
+            return true;
+        }
+        QThread::currentThread()->sleep(10);
+    }
+    return false;
+}
+
 void QFRawDataRecord::readUnLock() const
 {
     dstore->lock->unlock();
@@ -234,7 +254,8 @@ int QFRawDataRecord::getID() const {
 
 QString QFRawDataRecord::getName() const {
     QFRDRReadLocker locker(dstore->lock);
-    return name; }
+    return name;
+}
 
 QString QFRawDataRecord::getRole() const {
     QFRDRReadLocker locker(dstore->lock);

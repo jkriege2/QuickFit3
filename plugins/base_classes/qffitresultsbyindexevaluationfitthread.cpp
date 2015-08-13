@@ -23,7 +23,7 @@
 #include "qffitresultsbyindexevaluation.h"
 #include "qffitresultsbyindexevaluationfittools.h"
 
-#define ACCUMULATE_RUNS_BEFORE_WRITE 256
+#define ACCUMULATE_RUNS_BEFORE_WRITE 128
 
 QFFitResultsByIndexEvaluationFitThread::QFFitResultsByIndexEvaluationFitThread(bool stopWhenEmpty, QObject *parent) :
     QThread(parent)
@@ -827,13 +827,18 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
 
                     if (setResults.size()>0) {
                         QMapIterator<QString, QMap<QString, QFRawDataRecord::evaluationResult> > setResultsI(setResults);
-                        rdr->writeLock();
-                        while (setResultsI.hasNext()) {
-                            setResultsI.next();
-                            //qDebug()<<"    -> "<<setResultsI.value().size();
-                            rdr->resultsSet(setResultsI.key(), setResultsI.value());
+                        if (rdr->writeTryLock(100,100)) {
+                            int count=1;
+                            while (setResultsI.hasNext()) {
+                                setResultsI.next();
+                                //qDebug()<<"    -> "<<setResultsI.value().size();
+                                rdr->resultsSet(setResultsI.key(), setResultsI.value());
+                                count++;
+                            }
+                            rdr->writeUnLock();
+                        } else {
+                            log_error(tr("could not gain write-access to project. SOme fit results may be lost! Repeat fit!!!"));
                         }
-                        rdr->writeUnLock();
                         //qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done<<"  ... SETTING AFTER "<<double(timer.nsecsElapsed())/1e6<<"ms  setResults.size="<<setResults.size()<<"  ";
                     }
                     localfitresults.first().fitresults.clear();

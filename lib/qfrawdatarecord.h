@@ -826,6 +826,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
         void readLock() const;
         void writeLock() const;
+        bool writeTryLock(int timeout_ms=-1) const;
+        bool writeTryLock(int timeout_ms, int repeats) const;
         void readUnLock() const;
         void writeUnLock() const;
 

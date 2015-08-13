@@ -43,10 +43,22 @@ $$faq_end$$
 $$faq_start$$
   <a name="FAQ_FILTER"><b>How can I filter the list of raw data records, displayed in the plugin screen?</b>
 $$faq_answer$$
-  Above the list (rhs of the evaluation window), there are two fields, that allow to filter the displayed RDRs 
+  Above the list (rhs of the evaluation window), there are two fields, that allow to filter the displayed RDRs
 <center><a name="faq_pic000"><img src="./pic/faq_pic000.png" border="1">
 </center>
 You can enter a simple filter expression there. then only those files will be displayed, which contain the given expression. As an example, if your project contains a full FCCS measurement with three RDRs per measurement (ACF0,ACF1 and FCCS), but you only want to fit ACF0-RDRs with this evaluation, simply enter ACF0 into the left field. the rhs filter-field allows to exclude all records, that do NOT contain the specified filter string. In addition you can use <a href="$$mainhelpdir$$qf3_qtregexp.html">regular expressions</a> for the filter strings.
+$$faq_end$$
+
+
+$$faq_start$$
+  <a name="FAQ_FREEZE"><b>What can I do if a multi-threaded fit freezes my QuickFit?</b>
+$$faq_answer$$
+  This situation should not occur, but if: This may sometimes happen, if the multi-threaded fit ends up in an (unintended) dead-lock. You can do several things:
+  <ol>
+    <li>set the maximum number of threads (in QuickFit's settings dialog) to a lower value (usually 2-4 works fine).</li>
+    <li>if this happens for the <b>newMT</b> default variant of the fits, use the <b>MT</b> variant instead (click on the down-arrow on the rhs of the fit buttons to select a different method), which is slower but uses a different scheme for coordination between the different threads.</li>
+    <li>use the slower non-threaded fit (click on the down-arrow on the rhs of the fit buttons to select a different method)</li>
+  </ol>
 $$faq_end$$
   </body>
 </html>
