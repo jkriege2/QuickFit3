@@ -138,6 +138,9 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slAutoSetColumnWidth();
         void delayedStartSearch();
         void preScriptChanged();
+
+        void slColumnsBoxplots();
+        void updateScripts();
     signals:
         void enableActions(bool enabled);
         void disableActions(bool enabled);
@@ -183,6 +186,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actDelete;
         QAction* actAutosetColumnWidth;
         QAction* actIndexedStat;
+        QAction* actColumnsBoxplots;
 
         QAction* actSetDatatypeString;
         QAction* actSetDatatypeInteger;
@@ -211,6 +215,8 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actLoadTableTemplate;
         QAction* actCopyTemplate;
         QAction* actPasteTemplate;
+
+
 
         QAction* actUndo;
         QAction* actRedo;

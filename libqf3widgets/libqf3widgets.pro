@@ -138,7 +138,8 @@ HEADERS += jkqttools.h \
     qfasttablelabel.h \
     qfpixelsizeedit.h \
     qfframerangeedit.h \
-    qfcroppixelsedit.h
+    qfcroppixelsedit.h \
+    qcheckablestringlistmodel.h
 
 
 SOURCES +=  \
@@ -222,7 +223,8 @@ SOURCES +=  \
     qfasttablelabel.cpp \
     qfpixelsizeedit.cpp \
     qfframerangeedit.cpp \
-    qfcroppixelsedit.cpp
+    qfcroppixelsedit.cpp \
+    qcheckablestringlistmodel.cpp
 
 
 FORMS += qf3objectiveeditor.ui \

@@ -101,6 +101,7 @@ bool QFMathParser_DefaultLib::hasDefaultFunctions(QFMathParser* p)
 
 void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
 {
+    p->addFunction("comment", QFMathParser_DefaultLib::fComment);
     p->addFunction("struct", QFMathParser_DefaultLib::fStruct);
     p->addFunction("structkeys", QFMathParser_DefaultLib::fStructKeys);
     p->addFunction("structget", QFMathParser_DefaultLib::fStructGet);
@@ -6194,6 +6195,11 @@ namespace QFMathParser_DefaultLib {
                 return;
             }
         }
+    }
+
+    void fComment(qfmpResult &r, const qfmpResult */*params*/, unsigned int /*n*/, QFMathParser */*p*/)
+    {
+        r.setVoid();
     }
 
 #endif

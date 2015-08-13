@@ -559,13 +559,13 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
         virtual bool colgraphGetDoEmitSignals() const;
         virtual void colgraphSetDoEmitSignals(bool doEmit);
-        virtual void colgraphAddBoxPlot(int plotid, Orientation orientation, int columnX, int columnMin, int columnQ25, int columnMedian, int columnMean, int columnQ75, int columnMax, const QString&  title);
-        virtual void colgraphAddGraph(int plotid, int columnX, int columnY, ColumnGraphTypes type, const QString&  title);
-        virtual void colgraphAddFunctionGraph(int plotid, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1);
-        virtual void colgraphAddFunctionGraph(int plotid, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params);
+        virtual int colgraphAddBoxPlot(int plotid, Orientation orientation, int columnX, int columnMin, int columnQ25, int columnMedian, int columnMean, int columnQ75, int columnMax, const QString&  title);
+        virtual int colgraphAddGraph(int plotid, int columnX, int columnY, ColumnGraphTypes type, const QString&  title);
+        virtual int colgraphAddFunctionGraph(int plotid, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1);
+        virtual int colgraphAddFunctionGraph(int plotid, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params);
         virtual void colgraphSetFunctionGraph(int plotid, int graphid, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1);
         virtual void colgraphSetFunctionGraph(int plotid, int graphid, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params);
-        virtual void colgraphAddErrorGraph(int plotid, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title, ErrorGraphTypes errorStyle=egtBars);
+        virtual int colgraphAddErrorGraph(int plotid, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title, ErrorGraphTypes errorStyle=egtBars);
         virtual void colgraphSetErrorGraphProperties(int plot, int graphid, int columnXError, int columnYError, ErrorGraphTypes errorStyle=egtBars);
         virtual void colgraphSetErrorGraphErrorColumnX(int plot, int graphid, int columnXError);
         virtual void colgraphSetErrorGraphErrorColumnY(int plot, int graphid, int columnYError);
@@ -573,16 +573,16 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphSetErrorGraphErrorColumnXAsymmetric(int plot, int graphid, bool xErrorAsyymetric, int columnXErrorAsymmetric=-1);
         virtual void colgraphSetErrorGraphErrorColumnYAsymmetric(int plot, int graphid, bool yErrorAsyymetric, int columnYErrorAsymmetric=-1);
 
-        virtual void colgraphAddImageGraph(int plotid, int imageColumn, ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString& title);
-        virtual void colgraphAddImageMaskGraph(int plotid, int imageColumn, double x, double y, double width, double height, int Nx, const QString& title, QColor trueColor=QColor("black"), QColor falseColor=QColor("transparent"));
-        virtual void colgraphAddRGBImageGrph(int plotid, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString& title);
-        virtual void colgraphAddRangeGraph(int plotid, Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString& title, bool invertRange=false, bool fillrange=true, bool drawRangeLines=true, bool drawRangeCenter=true, QColor centerColor=QColor("red"),  Qt::PenStyle centerStyle=Qt::SolidLine, double centerWidth=1.0);
+        virtual int colgraphAddImageGraph(int plotid, int imageColumn, ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString& title);
+        virtual int colgraphAddImageMaskGraph(int plotid, int imageColumn, double x, double y, double width, double height, int Nx, const QString& title, QColor trueColor=QColor("black"), QColor falseColor=QColor("transparent"));
+        virtual int colgraphAddRGBImageGrph(int plotid, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString& title);
+        virtual int colgraphAddRangeGraph(int plotid, Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString& title, bool invertRange=false, bool fillrange=true, bool drawRangeLines=true, bool drawRangeCenter=true, QColor centerColor=QColor("red"),  Qt::PenStyle centerStyle=Qt::SolidLine, double centerWidth=1.0);
         virtual void colgraphSetImageGraphModifier(int plotid, int graphid, int imageModifierColumn, ImageModifierMode mode);
         virtual void colgraphSetImageGraphRange(int plotid, int graphid, ImageGraphRangeChannel channel, bool autoRange, double min=0, double max=0);
         virtual void colgraphSetGraphProperty(int plotid, int graphid, const QString& name, const QVariant& value);
         virtual QVariant colgraphGetGraphProperty(int plotid, int raphid, const QString& name, const QVariant& defaultValue=QVariant());
 
-        virtual void colgraphAddPlot(const QString&  title, const QString& xLabel=QString("x"), const QString& yLabel=QString("y"), bool logX=false, bool logY=false);
+        virtual int colgraphAddPlot(const QString&  title, const QString& xLabel=QString("x"), const QString& yLabel=QString("y"), bool logX=false, bool logY=false);
         virtual int colgraphGetGraphCount(int plotid) const;
         virtual int colgraphGetPlotCount() const;
         virtual void colgraphRemovePlot(int plotid) ;

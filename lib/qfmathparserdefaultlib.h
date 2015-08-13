@@ -154,6 +154,7 @@ namespace QFMathParser_DefaultLib {
     void fShuffle(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
 
+    void fComment(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fAllTrue(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     void fAllFalse(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
