@@ -124,32 +124,32 @@ QWidget *QFRDRTableDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 }
 
 void QFRDRTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-    QLineEdit *edit = qobject_cast<QLineEdit*>(editor);
-    if (edit) {
-        edit->setText(index.model()->data(index, Qt::EditRole).toString());
-    } else {
-         QDateTimeEdit *dateEditor = qobject_cast<QDateTimeEdit *>(editor);
-         if (dateEditor) {
-             dateEditor->setDateTime(index.model()->data(index, Qt::EditRole).toDateTime());
+
+     QDateTimeEdit *dateEditor = qobject_cast<QDateTimeEdit *>(editor);
+     if (dateEditor) {
+         dateEditor->setDateTime(index.model()->data(index, Qt::EditRole).toDateTime());
+     } else {
+         QFDoubleEdit *dEditor = qobject_cast<QFDoubleEdit *>(editor);
+         if (dEditor) {
+             dEditor->setValue(index.model()->data(index, Qt::EditRole).toDouble());
          } else {
-             QFDoubleEdit *dEditor = qobject_cast<QFDoubleEdit *>(editor);
-             if (dEditor) {
-                 dEditor->setValue(index.model()->data(index, Qt::EditRole).toDouble());
+             QSpinBox *sEditor = qobject_cast<QSpinBox *>(editor);
+             if (sEditor) {
+                 sEditor->setValue(index.model()->data(index, Qt::EditRole).toLongLong());
              } else {
-                 QSpinBox *sEditor = qobject_cast<QSpinBox *>(editor);
-                 if (sEditor) {
-                     sEditor->setValue(index.model()->data(index, Qt::EditRole).toLongLong());
+                 QCheckBox *check = qobject_cast<QCheckBox *>(editor);
+                 if (check) {
+                     check->setChecked(index.model()->data(index, Qt::EditRole).toBool());
                  } else {
-                     QCheckBox *check = qobject_cast<QCheckBox *>(editor);
-                     if (check) {
-                         check->setChecked(index.model()->data(index, Qt::EditRole).toBool());
+                     QLineEdit *edit = qobject_cast<QLineEdit*>(editor);
+                     if (edit) {
+                         edit->setText(index.model()->data(index, Qt::EditRole).toString());
                      }
                  }
-
              }
 
          }
-    }
+     }
 }
 
 void QFRDRTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
@@ -161,26 +161,24 @@ void QFRDRTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
         //qDebug()<<v;
         model->setData(index, v);
     } else {
-        QLineEdit *edit = qobject_cast<QLineEdit*>(editor);
-        if (edit) {
-            model->setData(index, edit->text());
-        } else {
-             QDateTimeEdit *dateEditor = qobject_cast<QDateTimeEdit *>(editor);
-             if (dateEditor) {
-                 model->setData(index, dateEditor->dateTime());
+         QDateTimeEdit *dateEditor = qobject_cast<QDateTimeEdit *>(editor);
+         if (dateEditor) {
+             model->setData(index, dateEditor->dateTime());
+         } else {
+            QSpinBox *sEditor = qobject_cast<QSpinBox *>(editor);
+             if (sEditor) {
+                 model->setData(index, sEditor->value());
              } else {
-                QSpinBox *sEditor = qobject_cast<QSpinBox *>(editor);
-                 if (sEditor) {
-                     model->setData(index, sEditor->value());
+                 QCheckBox *check = qobject_cast<QCheckBox *>(editor);
+                 if (check) {
+                      model->setData(index, check->isChecked());
                  } else {
-                     QCheckBox *check = qobject_cast<QCheckBox *>(editor);
-                     if (check) {
-                          model->setData(index, check->isChecked());
-                     }
+                     QLineEdit *edit = qobject_cast<QLineEdit*>(editor);
+                     if (edit) {
+                         model->setData(index, edit->text());
+                    }
                  }
-
              }
-
          }
     }
 }
