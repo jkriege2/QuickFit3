@@ -40,6 +40,8 @@ void QFRDRTableColumnsBoxplotDialog::setTable(QFRDRTable *plugin)
     for (int i=0; i<plugin->colgraphGetPlotCount(); i++) {
         ui->cmbPlots->addItem(tr("add to: %1").arg(plugin->colgraphGetPlotTitle(i)), i);
     }
+    ui->cmbPlots->setCurrentIndex(1);
+
 
 }
 
