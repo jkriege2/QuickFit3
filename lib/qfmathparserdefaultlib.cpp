@@ -897,7 +897,7 @@ namespace QFMathParser_DefaultLib {
           if (n==1) {
               for (int i=0; i<items; i++)
                 r.numVec[i]=p->get_rng()->rand();
-          } else if (n==2) {
+          } else if (n==3) {
               for (int i=0; i<items; i++)
                 r.numVec[i]=p->get_rng()->rand()*(params[2].num-params[1].num)+params[1].num;
           } else {
@@ -926,7 +926,7 @@ namespace QFMathParser_DefaultLib {
           if (n==1) {
               for (int i=0; i<items; i++)
                 r.numVec[i]=p->get_rng()->randInt();
-          } else if (n==2) {
+          } else if (n==3) {
               for (int i=0; i<items; i++)
                 r.numVec[i]=p->get_rng()->randInt()*((uint32_t)params[2].num-(uint32_t)params[1].num)+(uint32_t)params[1].num;
           } else {

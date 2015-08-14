@@ -416,19 +416,20 @@ QFMathParser::qfmpTokenType QFMathParser::getToken(){
 
             return CurrentToken=MUL;
             break;
-		case '/':
-            QChar ch1=0;
-            if (program) getFromStream(program, ch1);
-            if (ch1=='/') {
-                eatSinglelineComment();
-                return getToken();
+        case '/':{
+                QChar ch1=0;
+                if (program) getFromStream(program, ch1);
+                if (ch1=='/') {
+                    eatSinglelineComment();
+                    return getToken();
+                }
+                if (ch1=='*') {
+                    eatMultilineComment();
+                    return getToken();
+                }
+                putbackStream(program, ch1);
+                return CurrentToken=DIV;
             }
-            if (ch1=='*') {
-                eatMultilineComment();
-                return getToken();
-            }
-            putbackStream(program, ch1);
-			return CurrentToken=DIV;
             break;
 		case '%':
 			return CurrentToken=MODULO;
