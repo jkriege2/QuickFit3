@@ -873,7 +873,7 @@ namespace QFMathParser_DefaultLib {
       if (n>2) p->qfmpError(QObject::tr("randint accepts 0, 1 or 2 argument"));
       r.type=qfmpDouble;
       if (n==0) r.num=p->get_rng()->randInt();
-      else if (n==2) r.num=p->get_rng()->randInt()*((uint32_t)params[1].num-(uint32_t)params[0].num)+(uint32_t)params[0].num;
+      else if (n==2) r.num=p->get_rng()->randInt((uint32_t)params[1].num-(uint32_t)params[0].num)+(uint32_t)params[0].num;
       else r.num=p->get_rng()->randInt((uint32_t)params[0].num);
       return r;
     }
@@ -928,7 +928,7 @@ namespace QFMathParser_DefaultLib {
                 r.numVec[i]=p->get_rng()->randInt();
           } else if (n==3) {
               for (int i=0; i<items; i++)
-                r.numVec[i]=p->get_rng()->randInt()*((uint32_t)params[2].num-(uint32_t)params[1].num)+(uint32_t)params[1].num;
+                r.numVec[i]=p->get_rng()->randInt((uint32_t)params[2].num-(uint32_t)params[1].num)+(uint32_t)params[1].num;
           } else {
               for (int i=0; i<items; i++)
                 r.numVec[i]=p->get_rng()->randInt((uint32_t)params[1].num);
@@ -1056,7 +1056,7 @@ namespace QFMathParser_DefaultLib {
                 MTRand rng;
                 rng.seed(params[3].num);
                 for (int i=0; i<items; i++)
-                  r.numVec[i]=rng.randInt()*((uint32_t)params[2].num-(uint32_t)params[1].num)+(uint32_t)params[1].num;
+                  r.numVec[i]=rng.randInt((uint32_t)params[2].num-(uint32_t)params[1].num)+(uint32_t)params[1].num;
             } else if (n==3){
                 MTRand rng;
                 rng.seed(params[2].num);

@@ -399,7 +399,7 @@ void QFRDRTableEditor::createWidgets() {
     actAutosetColumnWidth=new QAction(tr("Autoset column &width"), this);
     connect(actAutosetColumnWidth, SIGNAL(triggered()), this, SLOT(slAutoSetColumnWidth()));
 
-    actIndexedStat=new QAction(tr("insert indexed statistics columns"), this);
+    actIndexedStat=new QAction(tr("insert indexed statistics for columns"), this);
     connect(actIndexedStat, SIGNAL(triggered()), this, SLOT(slInsertIndexedStat()));
     connect(this, SIGNAL(enableActions(bool)), actIndexedStat, SLOT(setEnabled(bool)));
 
@@ -474,10 +474,11 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(actClearExpression);
     tvMain->addAction(actRecalcAll);
     tvMain->addAction(actExpressionSeedBeforeTableEval);
-    tvMain->addAction(getSeparatorAction(this));
-    tvMain->addAction(actHistogram);
-    tvMain->addAction(actHistogram2D);
-    tvMain->addAction(actColumnsBoxplots);
+//    tvMain->addAction(getSeparatorAction(this));
+//    tvMain->addAction(actHistogram);
+//    tvMain->addAction(actHistogram2D);
+//    tvMain->addAction(actColumnsBoxplots);
+//    tvMain->addAction(actIndexedStat);
     tvMain->addAction(actSort);
 
     propertyEditor->setMenuBarVisible(true);
@@ -529,6 +530,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actHistogram);
     menuTab->addAction(actHistogram2D);
     menuTab->addAction(actColumnsBoxplots);
+    menuTab->addAction(actIndexedStat);
     menuTab->addSeparator();
     menuTab->addAction(actClear);
     menuTab->addAction(actResize);
@@ -537,6 +539,12 @@ void QFRDRTableEditor::createWidgets() {
     menuColumns->addAction(actSetColumnTitle);
     menuColumns->addAction(actSHowMultiColEditor);
     menuColumns->addAction(actSetColumnValues);
+    menuColumns->addSeparator();
+    menuColumns->addAction(actSort);
+    menuColumns->addAction(actHistogram);
+    menuColumns->addAction(actHistogram2D);
+    menuColumns->addAction(actColumnsBoxplots);
+    menuColumns->addAction(actIndexedStat);
 
     QMenu* menuCells=propertyEditor->addMenu("&Cells", 0);
     menuCells->addAction(actSetDatatype);
@@ -563,6 +571,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTools->addAction(actHistogram);
     menuTools->addAction(actHistogram2D);
     menuTools->addAction(actColumnsBoxplots);
+    menuTools->addAction(actIndexedStat);
 
 
     QMenu*menuView =propertyEditor->addMenu("&View", 0);
@@ -1014,7 +1023,82 @@ void QFRDRTableEditor::slInsertColumn() {
 
 void QFRDRTableEditor::slInsertIndexedStat()
 {
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m && m->model()) {
+        QItemSelectionModel* smod=tvMain->selectionModel();
+        QList<int> sel;
+        if (smod->hasSelection()) {
+            QModelIndexList idxs=smod->selectedIndexes();
+            for (int i=0; i<idxs.size(); i++) {
+                if (!sel.contains(idxs[i].column())) {
+                    sel.append(idxs[i].column());
+                }
+            }
+            qSort(sel);
+        } else {
+            sel<<tvMain->currentIndex().column();
+        }
+        QFRDRTableIndexedStatDialog* dlg=new QFRDRTableIndexedStatDialog(this);
+        dlg->setTable(m);
+        dlg->setSelectedColumns(sel);
+        if (dlg->exec()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            m->model()->disableSignals();
+            QStringList names;
+            QString addToPre;
+            QList<QFRDRTableIndexedStatDialog::DataProps> dp;
+            QStringList ex=dlg->getExpressions(names, addToPre, dp);
+            m->setParserPreScript(m->getParserPreScript()+"\n"+addToPre);
+            int startCol=dlg->getResultStartColumn();
+            if (startCol<0) startCol=m->model()->columnCount();
+            for (int i=0; i<ex.size(); i++) {
+                m->model()->setColumnTitleCreate(startCol+i, names.value(i, ""));
+                m->model()->setColumnHeaderData(startCol+i, QFRDRTable::ColumnExpressionRole , ex.value(i, ""));
+            }
 
+            qDebug()<<dlg->createGraphs()<<dlg->addToExistingGraph()<<dlg->addNewGraphs()<<dp.size();
+
+            if (dlg->createGraphs()) {
+                m->colgraphSetDoEmitSignals(false);
+                int g=-1;
+                if (dlg->addToExistingGraph()) {
+                    g=dlg->addToGraph();
+                }
+                for (int i=0; i<dp.size(); i++) {
+                    if (dlg->addNewGraphs()) {
+                        g=m->colgraphAddPlot(tr("Indexed Statistics For '%1'").arg(dp[i].dataname));
+                    }
+                    qDebug()<<i<<":  adding to graph g="<<g;
+                    if (g>=0) {
+                        if (dp[i].dataForBoxplotAvailable() || (!dp[i].dataForMeanStdAvailable() && !dp[i].dataForMedianNMADAvailable())) {
+                            qDebug()<<"       boxplot";
+                            m->colgraphAddBoxPlot(g, QFRDRColumnGraphsInterface::cgoVertical, startCol+dp[i].cid, startCol+dp[i].cmin, startCol+dp[i].cq25, startCol+dp[i].cmedian, startCol+dp[i].cmean, startCol+dp[i].cq75, startCol+dp[i].cmax, tr("Boxplot for %1").arg(dp[i].dataname));
+                        } else if (dp[i].dataForMeanStdAvailable() && !dp[i].dataForMedianNMADAvailable()) {
+                            m->colgraphAddErrorGraph(g, startCol+dp[i].cid, -1, startCol+dp[i].cmean, startCol+dp[i].cstd, QFRDRColumnGraphsInterface::cgtBars, tr("Mean \\pm Std.Dev. of %1").arg(dp[i].dataname));
+                            qDebug()<<"       mean, nomedian";
+                        } else if (!dp[i].dataForMeanStdAvailable() && dp[i].dataForMedianNMADAvailable()) {
+                            qDebug()<<"       nomean, median";
+                            m->colgraphAddErrorGraph(g, startCol+dp[i].cid, -1, startCol+dp[i].cmedian, startCol+dp[i].cnmad, QFRDRColumnGraphsInterface::cgtBars, tr("Median \\pm NMAD of %1").arg(dp[i].dataname));
+                        } else if (dp[i].dataForMeanStdAvailable() && dp[i].dataForMedianNMADAvailable()) {
+                            qDebug()<<"       mean, median";
+                            m->colgraphAddErrorGraph(g, startCol+dp[i].cid, -1, startCol+dp[i].cmean, startCol+dp[i].cstd, QFRDRColumnGraphsInterface::cgtBars, tr("Median \\pm NMAD of %1").arg(dp[i].dataname));
+                            m->colgraphAddErrorGraph(g, startCol+dp[i].cid, -1, startCol+dp[i].cmedian, startCol+dp[i].cnmad, QFRDRColumnGraphsInterface::cgtPoints, tr("Median \\pm NMAD of %1").arg(dp[i].dataname));
+                        }
+
+                    }
+                }
+                m->colgraphSetDoEmitSignals(true);
+            }
+
+            m->model()->enableSignals();
+
+            slRecalcAll();
+            updateScripts();
+            QApplication::restoreOverrideCursor();
+
+        }
+        delete dlg;
+    }
 }
 
 void QFRDRTableEditor::slDeleteRow() {
@@ -2116,7 +2200,6 @@ void QFRDRTableEditor::slColumnsBoxplots()
                 m->model()->setColumnTitleCreate(startCol+i, names.value(i, ""));
                 m->model()->setColumnHeaderData(startCol+i, QFRDRTable::ColumnExpressionRole , ex.value(i, ""));
             }
-            m->model()->enableSignals();
 
             m->colgraphSetDoEmitSignals(false);
             int g=dlg->addToGraph();
@@ -2138,6 +2221,7 @@ void QFRDRTableEditor::slColumnsBoxplots()
             }
 
             m->colgraphSetDoEmitSignals(true);
+            m->model()->enableSignals();
             slRecalcAll();
             updateScripts();
             QApplication::restoreOverrideCursor();

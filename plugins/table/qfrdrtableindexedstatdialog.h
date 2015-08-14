@@ -25,6 +25,14 @@
 #define QFRDRTABLEINDEXEDSTATDIALOG_H
 
 #include <QDialog>
+#include "qfproperties.h"
+#include <QMap>
+#include <QList>
+#include <QStringList>
+#include "qftablepluginmodel.h"
+#include "qcheckablestringlistmodel.h"
+#include "qfrdrtable.h"
+#include "programoptions.h"
 
 namespace Ui {
     class QFRDRTableIndexedStatDialog;
@@ -35,12 +43,47 @@ class QFRDRTableIndexedStatDialog : public QDialog
         Q_OBJECT
 
     public:
+        struct DataProps {
+            inline explicit DataProps() {
+                cmean=-1;
+                cstd=-1;
+                cmin=-1;
+                cq25=-1;
+                cmedian=-1;
+                cq75=-1;
+                cmax=-1;
+                cnmad=-1;
+                cid=-1;
+            }
+
+            inline bool dataForBoxplotAvailable() const {
+                return ((cmean>=0)||(cmedian>=0))&&(cq25>=0)&&(cq75>=0);
+            }
+            inline bool dataForMeanStdAvailable() const {
+                return (cmean>=0)&&(cstd>=0);
+            }
+            inline bool dataForMedianNMADAvailable() const {
+                return (cmedian>=0)&&(cnmad>=0);
+            }
+
+            int cmean;
+            int cstd;
+            int cmin;
+            int cq25;
+            int cmedian;
+            int cq75;
+            int cmax;
+            int cnmad;
+            int cid;
+            QString dataname;
+        };
+
         explicit QFRDRTableIndexedStatDialog(QWidget *parent = 0);
         ~QFRDRTableIndexedStatDialog();
+        void setTable(QFRDRTable *table);
+        void setSelectedColumns(const QList<int>& cols);
 
-        void setColumns(QList<QPair<int, QString> > cols);
         int indexColumn() const;
-        int dataColumn() const;
         bool avg() const;
         bool std() const;
         bool median() const;
@@ -48,9 +91,23 @@ class QFRDRTableIndexedStatDialog : public QDialog
         bool q75() const;
         bool min() const;
         bool max() const;
+        bool nmad() const;
+
+        int getResultStartColumn() const;
+        int addToGraph() const;
+        bool addToExistingGraph() const;
+        bool addNewGraphs() const;
+        bool createGraphs() const;
+        QList<int> getDataColumns() const;
+
+        QString getDataColumnsExpression() const;
+        QStringList getExpressions(QStringList &names, QString &addToPre, QList<DataProps>& props) const;
 
     private:
         Ui::QFRDRTableIndexedStatDialog *ui;
+        QFTablePluginModel* table;
+        QFRDRTable *plugin;
+        QCheckableStringListModel cols;
 };
 
 #endif // QFRDRTABLEINDEXEDSTATDIALOG_H

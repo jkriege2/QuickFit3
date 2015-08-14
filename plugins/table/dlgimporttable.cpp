@@ -32,6 +32,7 @@ DlgIMportTable::DlgIMportTable(QWidget *parent) :
     ui(new Ui::DlgIMportTable)
 {
     ui->setupUi(this);
+    this->model=NULL;
     ui->btnPasteAgain->setVisible(false);
     ui->tableView->setItemDelegate(new QFRDRTableDelegate(ui->tableView));
     ui->tableView->selectAll();
@@ -44,6 +45,7 @@ DlgIMportTable::DlgIMportTable(bool pastAgainEnabled, QWidget *parent) :
     ui(new Ui::DlgIMportTable)
 {
     ui->setupUi(this);
+    this->model=NULL;
     ui->btnPasteAgain->setVisible(pastAgainEnabled);
     ui->tableView->setItemDelegate(new QFRDRTableDelegate(ui->tableView));
     ui->tableView->selectAll();
@@ -69,8 +71,9 @@ bool DlgIMportTable::importExpressions() const
     return ui->chkImportExressions->isChecked();
 }
 
-void DlgIMportTable::setModel(QAbstractItemModel *model)
+void DlgIMportTable::setModel(QFTablePluginModel *model)
 {
+    this->model=model;
     disconnect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionCHanged()));
     ui->tableView->setModel(model);
     ui->tableView->selectAll();
@@ -193,5 +196,12 @@ void DlgIMportTable::on_btnPasteAgain_clicked()
         tab->clear();
         tab->paste();
         tab->setReadonly(ro);
+    }
+}
+
+void DlgIMportTable::on_btnPivot_clicked()
+{
+    if (model) {
+        model->transposeTable();
     }
 }

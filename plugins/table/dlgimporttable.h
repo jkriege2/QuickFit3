@@ -43,7 +43,7 @@ class DlgIMportTable : public QDialog
 
         bool importAll() const;
         bool importExpressions() const;
-        void setModel(QAbstractItemModel* model);
+        void setModel(QFTablePluginModel* model);
         QItemSelectionModel* getSelection() const;
         int importMode() const;
 
@@ -53,9 +53,11 @@ class DlgIMportTable : public QDialog
         void on_radImportAll_toggled(bool checked);
         void selectionCHanged();
         void on_btnPasteAgain_clicked();
+        void on_btnPivot_clicked();
 
     private:
         Ui::DlgIMportTable *ui;
+        QFTablePluginModel* model;
 };
 
 #endif // DLGIMPORTTABLE_H

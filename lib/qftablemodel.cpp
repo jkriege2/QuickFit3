@@ -1790,6 +1790,81 @@ void QFTableModel::pasteHeaderTemplate(int row_start, int column_start)
     endMultiUndo();
 }
 
+void QFTableModel::transposeTable()
+{
+    startMultiUndo();
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
+
+
+    qSwap(state.rowNames, state.columnNames);
+    qSwap(state.rows, state.columns);
+    state.headerDataMap.clear();
+
+    QHash<quint64, QVariant> tmp;
+    {
+        tmp=state.dataMap;
+        state.dataMap.clear();
+        QHashIterator<quint64, QVariant> it(tmp);
+        while (it.hasNext()) {
+            it.next();
+            const int r=UInt64ToRow(it.key());
+            const int c=UInt64ToColumn(it.key());
+            state.dataMap[xyAdressToUInt64(c,r)]=it.value();
+        }
+    }
+    {
+        tmp=state.dataEditMap;
+        state.dataEditMap.clear();
+        QHashIterator<quint64, QVariant> it(tmp);
+        while (it.hasNext()) {
+            it.next();
+            const int r=UInt64ToRow(it.key());
+            const int c=UInt64ToColumn(it.key());
+            state.dataEditMap[xyAdressToUInt64(c,r)]=it.value();
+        }
+    }
+    {
+        tmp=state.dataBackgroundMap;
+        state.dataBackgroundMap.clear();
+        QHashIterator<quint64, QVariant> it(tmp);
+        while (it.hasNext()) {
+            it.next();
+            const int r=UInt64ToRow(it.key());
+            const int c=UInt64ToColumn(it.key());
+            state.dataBackgroundMap[xyAdressToUInt64(c,r)]=it.value();
+        }
+    }
+    {
+        tmp=state.dataCheckedMap;
+        state.dataCheckedMap.clear();
+        QHashIterator<quint64, QVariant> it(tmp);
+        while (it.hasNext()) {
+            it.next();
+            const int r=UInt64ToRow(it.key());
+            const int c=UInt64ToColumn(it.key());
+            state.dataCheckedMap[xyAdressToUInt64(c,r)]=it.value();
+        }
+    }
+    QHash<quint64, QHash<int, QVariant> > tmp2;
+    {
+        tmp2=state.moreDataMap;
+        state.moreDataMap.clear();
+        QHashIterator<quint64, QHash<int, QVariant> > it(tmp2);
+        while (it.hasNext()) {
+            it.next();
+            const int r=UInt64ToRow(it.key());
+            const int c=UInt64ToColumn(it.key());
+            state.moreDataMap[xyAdressToUInt64(c,r)]=it.value();
+        }
+    }
+
+
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) {beginResetModel(); endResetModel();}
+    endMultiUndo();
+}
+
 bool QFTableModel::getDoEmitSignals() const
 {
     return doEmitSignals;

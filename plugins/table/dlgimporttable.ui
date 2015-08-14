@@ -37,6 +37,16 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="btnPivot">
+       <property name="text">
+        <string>Pivot/Rotate Table</string>
+       </property>
+       <property name="shortcut">
+        <string>Ctrl+V</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btnPasteAgain">
        <property name="text">
         <string>&amp;Paste Again</string>
@@ -86,6 +96,13 @@
        </item>
       </widget>
      </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>import what:</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="1">
       <widget class="QRadioButton" name="radImportAll">
        <property name="text">
@@ -97,13 +114,6 @@
       <widget class="QRadioButton" name="radImportSelected">
        <property name="text">
         <string>import selected cells only</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>import what:</string>
        </property>
       </widget>
      </item>

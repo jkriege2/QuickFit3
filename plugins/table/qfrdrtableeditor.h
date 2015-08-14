@@ -47,7 +47,7 @@
 #include "qfenhancedtabwidget.h"
 #include "qfhistogramview.h"
 #include "qfenhancedplaintextedit.h"
-
+#include "qfrdrtableindexedstatdialog.h"
 class QFRDRTableMultiColumnEditor;
 
 /*! \brief editor class for tables

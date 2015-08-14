@@ -452,6 +452,13 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         /*! \brief pastes data from the cklipboard into the table, starting from the given position ... the table is resized if needed */
         void pasteHeaderTemplate(int row_start=0, int column_start=0);
 
+        /*! \brief  rotate/pivot/transpose the table, i.e. make all rows to columns and vice-versa
+
+
+            \warning This function will lead to a loss of all header data (except header names!!!).
+         */
+        void transposeTable();
+
         bool getDoEmitSignals() const;
         void enableSignals(bool emitReset=true);
         void disableSignals();
