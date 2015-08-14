@@ -413,9 +413,23 @@ QFMathParser::qfmpTokenType QFMathParser::getToken(){
         case ':':
             return CurrentToken=COLON;
         case '*':
-			return CurrentToken=MUL;
+
+            return CurrentToken=MUL;
+            break;
 		case '/':
+            QChar ch1=0;
+            if (program) getFromStream(program, ch1);
+            if (ch1=='/') {
+                eatSinglelineComment();
+                return getToken();
+            }
+            if (ch1=='*') {
+                eatMultilineComment();
+                return getToken();
+            }
+            putbackStream(program, ch1);
 			return CurrentToken=DIV;
+            break;
 		case '%':
 			return CurrentToken=MODULO;
 		case '+':
@@ -544,6 +558,28 @@ QFMathParser::qfmpTokenType QFMathParser::getToken(){
             break;
 	}
     return END;
+}
+
+void QFMathParser::eatMultilineComment()
+{
+    QChar ch1=0;
+    QChar ch2=0;
+    QChar ch=0;
+    while(getFromStream(program, ch)) {
+        ch1=ch2;
+        ch2=ch;
+        if (ch1=='*' && ch2=='/') {
+            break;
+        }
+    }
+}
+
+void QFMathParser::eatSinglelineComment()
+{
+    QChar ch=0;
+    while(getFromStream(program, ch) && ch!='\n') {
+        ;
+    }
 }
 
 

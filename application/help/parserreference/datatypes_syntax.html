@@ -8,11 +8,24 @@
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 	<a name="syntax"><a name="syntax"><h2>Syntax</h2>
 	<h3>Introduction</h3>
+	<p>
 	The Syntax used by this expression parser is a simple subset of what is allowed in many programming languages (like C or Pascal). It can handle several operators (e.g. <code>+, *, /, -, ^, ...</code>), named constants (e.g. <code>pi, kB, ...</code>), function calls (e.g. <code>sin(x), ...</code>) and uses parentheses <code>(...)</code> to group sub-expressions. Here is a more advanced example:
 	<blockquote>the expression <code> (a * 3 + 2.34^2) * sin(pi * sqrt(x))</code><br>will evaluate $$math:(a\cdot 3+2.34^2)\cdot\sin(\pi\cdot\sqrt{x])$$</blockquote>
+	Additional features are introduced and exlained in the following sections.
+	</p>
+	
+	<a name="comment"><a name="datatypes"><h3>Comments</h3>
+	<p>The parser understands two types of comments:
+	<ul>
+	  <li>single-line coments that start with <tt>//</tt> and end with the end of the line <tt>\n</tt></li>
+	  <li>multi-line coments that start with <tt>/*</tt> and end with the end with <tt>*/</tt></li>
+	</ul>
+	IN addition, you can use the method <tt>comment()</tt> which takes any number of arguments (also strings) and ignores them. THis way cou can write a comment as <tt>comment("my comment")</tt>
+	</p>
 	
 
 	<a name="datatypes"><a name="datatypes"><h3>Datatypes</h3>
+	<p>
 	The parser supports these datatypes:
 	<ul>
 	  <li><i>numbers</i>: all numbers are treated as floating point numbers (double precision). </li>
@@ -23,9 +36,11 @@
 	  <li><i>string vectors</i></li>
 	</ul>
 	<b>Note for vectors:</b> by default most of the predefined <a href="#functions">functions</a> and <a href="#operators">operators</a> also work element-wise on vectors! See the chapter on <a href="#vectors">vectors</a> for details.
-	
+		</p>
+
 	
 	<a name="constexpressions"><h3>Constant Expressions</h3>
+	<p>
 	Different types of constant values are possible:
 	<ul>
 	  <li><i>numbers</i>: e.g. <code>3.5, 4.34, 3.1415e-5, ...</code>, so the dot '.' is used as decimal separator and exponents may be added using the letter 'e' (<code>3.1415e-5, ...</code> = $$math:3.1415\cdot 10^{-5}$$).
@@ -39,11 +54,15 @@
 	  <li><i>boolean</i>: <code>true, false</code></li>
 	  <li><i>string</i>: <code>'text'</code> or <code>"text"</code>. You can use C-style escapes (<tt>\" \' \n \r \t \\ \/</tt>) to add the delimiting characters to the string</li>
 	</ul>
-	
+		</p>
+
 	<a name="constvar"><h3>Named Constants/Variables</h3>
+	<p>
 	Instead of literally writing a constant into the expression, it is also possible to use a name (variable) instead, like e.g. <code>pi</code> instead of <code>3.1415</code>. The parser already defines a large set of commonly used constants, see <a href="./parserreference/constants.html">common math/physics constants</a>.
-	
+		</p>
+
 	<a name="operators"><h3>Operators</h3>
+	<p>
 	This parser defines several operators that are applicable to different datatypes. Using them with the wrong datatype will lead to a runtime error. You may use parantheses <code>(...)</code> to overcome operator precedence and group parts of an expression. The operators are listed in order of increasing precedence (this implements e.g. that multiplications are performed before summing and <code>and</code> is performed before <code>or</code>, so <code>1+5*3 = 1+(5*3)</code>):
 	<blockquote><table border="1">
 	  <tr><th>Level</th><th>Operator</th><th>operation</th><th>arguments</th><th>applicable to ...</th></tr>
@@ -73,8 +92,10 @@
 	  <tr><td></td><td><code>^</code></td><td>power</td><td>2</td><td>two numbers</td></tr>
 	  <!--<tr><td></td><td><code></code></td><td></td><td></td></tr>-->
 	</table></blockquote>
-	
+		</p>
+
 	<a name="vectors"><h3>Vectors</h3>
+	<p>
 	As already described, you may also work with vectors of numbers. Most of the operators and functions can be applied element-by-element. In addition there is a special <tt>[...]</tt> operator  that allows to access elements out of a vector. The argument between brackets may either be a number of a vector. Here are some examples:
 	<ul>
 	  <li><tt>x[2]=5*5</tt>: assigns 25 (=5*5) to the 2nd element of the vector x</li>
@@ -85,7 +106,8 @@
 	  <li><tt>x[[2,5,8]]=0</tt>: assigns 0 to elements 2, 5 and 8 of vector x </li>
 	</ul>
 	$$note:All vector indices are 0-based, so the 5 elements of a 5-element vector are accessed with indizes 0,1,2,3,4. It is also possible to give floating-point numbers as vector indices. In that case the index is <u>truncated</u> to an integer! $$
-	
+		</p>
+
 	<a name="structs"><h3>Structures/structs</h3>
 	<p>You can also create structs, which are a composite of several (named) items of possibly different type. Structs can be created using the function <tt>struct(nam1, value1, name2, value2, ...)</tt> and you can access a single entry using the dot '.' operator, e.g. <tt>st=struct("a", 1, "b", true)</tt> for the creation and <tt>st.a</tt> for the access to element 'a'.</p>
 	<p>In order to set an element in a struct, use <tt>struct(st, 'a', 'newvalue')</tt>.

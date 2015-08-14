@@ -321,7 +321,7 @@ class QFLIB_EXPORT QFMathParser
             COMP_GREATER,       /*!< \brief greater than operation '>' */
             COMP_SMALLER,       /*!< \brief smaller than operation '<' */
             COMP_GEQUAL,        /*!< \brief greater than or equal operation '>=' */
-            COMP_SEQUAL        /*!< \brief smaller than or equal operation '<=' */
+            COMP_SEQUAL,        /*!< \brief smaller than or equal operation '<=' */
         };
 
 
@@ -1556,6 +1556,11 @@ class QFLIB_EXPORT QFMathParser
 
 		/** \brief Tokenizer: extract the next token from the input */
         qfmpTokenType getToken();
+
+        /** \brief eat multi-line comment from input */
+        void eatMultilineComment();
+        /** \brief eat single-line comment from input */
+        void eatSinglelineComment();
 
 		/** \brief return a delimited text, i.e. extract the texte between the delimiters <code>"</code> in: of <code>"Hallo!"</code>, i.e. returns <code> Hallo!</code>
          *         This is used to parse string constants.
