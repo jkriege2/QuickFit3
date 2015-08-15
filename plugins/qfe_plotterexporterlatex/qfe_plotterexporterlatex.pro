@@ -69,11 +69,11 @@ include(../../quickfit3_configqtwidgets.pri)
 
 
 
-SRC_DISTRIBUTED.files = $$HEADERS \
-                        $$SOURCES \
-                        $$FORMS \
-                        $$RESOURCES \
-                        $$TRANSLATIONS \
-                        $$GPL3LICENSE \
-                        QTeXEngine-0.3-opensource.zip \
-                        EmfEngine-opensource-0.8.zip
+#SRC_DISTRIBUTED.files = $$HEADERS \
+#                        $$SOURCES \
+#                        $$FORMS \
+#                        $$RESOURCES \
+#                        $$TRANSLATIONS \
+#                        $$GPL3LICENSE \
+#                        QTeXEngine-0.3-opensource.zip \
+#                        EmfEngine-opensource-0.8.zip

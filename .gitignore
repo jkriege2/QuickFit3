@@ -159,7 +159,6 @@ Thumbs.db
 /output/plugins
 /output/qtplugins
 /output/sdk
-/output/source
 /output/assets
 /output/examples
 /output/globalconfig_templates
@@ -190,3 +189,7 @@ release
 /output/*.zip
 /output/*.nsi
 /output/*.exe
+tinytiff
+cairo4qtv2
+extlibs
+plugins

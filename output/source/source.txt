@@ -1,0 +1,2 @@
+The source code of QuickFit 3.0 and all its standard plugins is available from:
+    https://github.com/jkriege2/QuickFit3

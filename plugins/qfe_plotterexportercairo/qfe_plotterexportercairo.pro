@@ -29,19 +29,15 @@ DEPENDPATH += ./
 
 include(../plugins.pri)
 include(../../libquickfitwidgets.pri)
-include(../../extlibs/cairo.pri)
+include(../../extlibsb040/cairoqpaintdevice.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
 
 # Input
 HEADERS += qfe_plotterexportercairo.h \
-    jkqtcairoengineadapter.h \
-    qcairopaintdevice.h \
-    qcairopaintengine.h
+    jkqtcairoengineadapter.h
 SOURCES += qfe_plotterexportercairo.cpp \
-    jkqtcairoengineadapter.cpp \
-    qcairopaintdevice.cpp \
-    qcairopaintengine.cpp
+    jkqtcairoengineadapter.cpp
 
 
 
@@ -57,21 +53,10 @@ INCLUDEPATH += ../../lib/ \
 include(../../quickfit3_configqtwidgets.pri)
 
 
-CAIRO4QTv2_FILES.files = qcairopaintdevice.cpp \
-                         qcairopaintengine.cpp \
-                         qcairopaintdevice.h \
-                         qcairopaintengine.h \
-                         cairoQPaintDevice_test.cpp \
-                         cairoQPaintDevice_test.pro \
-                         $$LGPL2LICENSE
-CAIRO4QTv2_FILES.path = $${QFOUTPUT}/source/cairo4qtv2/
 
-INSTALLS += CAIRO4QTv2_FILES
-
-
-SRC_DISTRIBUTED.files = $$HEADERS \
-                        $$SOURCES \
-                        $$FORMS \
-                        $$RESOURCES \
-                        $$TRANSLATIONS \
-                        $$GPL3LICENSE
+#SRC_DISTRIBUTED.files = $$HEADERS \
+#                        $$SOURCES \
+#                        $$FORMS \
+#                        $$RESOURCES \
+#                        $$TRANSLATIONS \
+#                        $$GPL3LICENSE

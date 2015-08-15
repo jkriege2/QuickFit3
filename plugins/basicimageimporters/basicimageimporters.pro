@@ -63,19 +63,3 @@ INCLUDEPATH += ../../lib/ \
                ../../extlibsb040/TinyTIFF/
 
 
-TINYTIFF_FILES.files = ../../extlibsb040/TinyTIFF/tinytiffwriter.cpp \
-                       ../../extlibsb040/TinyTIFF/tinytiffreader.cpp  \
-                       ../../extlibsb040/TinyTIFF/tinytiffwriter.h \
-                       ../../extlibsb040/TinyTIFF/tinytiffreader.h \
-                       $$GPL3LICENSE
-TINYTIFF_FILES.path = $${QFOUTPUT}/source/tinytiff/
-tinytiff_reader_test_FILES.files = ../../extlibsb040/TinyTIFF/test/tinytiff_reader_test/*.*
-tinytiff_reader_test_FILES.path = $${QFOUTPUT}/source/tinytiff/test/tinytiff_reader_test
-tinytiffwriter_test_FILES.files = ../../extlibsb040/TinyTIFF/test/tinytiffwriter_test/*.*
-tinytiffwriter_test_FILES.path = $${QFOUTPUT}/source/tinytiff/test/tinytiffwriter_test
-
-INSTALLS += TINYTIFF_FILES \
-            tinytiff_reader_test_FILES \
-            tinytiffwriter_test_FILES
-
-

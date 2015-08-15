@@ -98,11 +98,11 @@ TRANSLATIONS= ./translations/de.qfevalimfcsfit.ts
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/
 
-SRC_DISTRIBUTED.files = $$HEADERS \
-                        $$SOURCES \
-                        $$FORMS \
-                        $$RESOURCES \
-                        $$TRANSLATIONS \
-                        $$GPL3LICENSE
+#SRC_DISTRIBUTED.files = $$HEADERS \
+#                        $$SOURCES \
+#                        $$FORMS \
+#                        $$RESOURCES \
+#                        $$TRANSLATIONS \
+#                        $$GPL3LICENSE
 
 include(../../quickfit3_configqtwidgets.pri)

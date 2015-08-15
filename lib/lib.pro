@@ -341,7 +341,7 @@ FITFUNCTIONSSDK.path = $${QFOUTPUT}/sdk/sdk_fitfunctions/
 INSTALLS += FITFUNCTIONSSDK
 
 
-SRC_DISTRIBUTED.files = ../extlibs/MersenneTwister.h
+#SRC_DISTRIBUTED.files = ../extlibs/MersenneTwister.h
 
 OTHER_FILES += \
     sdk_fitfunctions/readme.txt \

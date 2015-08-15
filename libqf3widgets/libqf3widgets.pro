@@ -276,10 +276,10 @@ INSTALLS += ASSETSScript_FILES ASSETSSHTML_FILES ASSETSShigh_FILES
 
 
 
-XITS_SRC_DISTRIBUTED.files = ../extlibs/xits/*.zip
-XITS_SRC_DISTRIBUTED.path = $${QFOUTPUT}/source/extlibs/xits/
-XITS_SRC_DISTRIBUTED1.files = ../extlibs/xits/*.txt
-XITS_SRC_DISTRIBUTED1.path = $${QFOUTPUT}/source/extlibs/xits/
+#XITS_SRC_DISTRIBUTED.files = ../extlibs/xits/*.zip
+#XITS_SRC_DISTRIBUTED.path = $${QFOUTPUT}/source/extlibs/xits/
+#XITS_SRC_DISTRIBUTED1.files = ../extlibs/xits/*.txt
+#XITS_SRC_DISTRIBUTED1.path = $${QFOUTPUT}/source/extlibs/xits/
 
 
-INSTALLS += XITS_SRC_DISTRIBUTED XITS_SRC_DISTRIBUTED1
+#INSTALLS += XITS_SRC_DISTRIBUTED XITS_SRC_DISTRIBUTED1

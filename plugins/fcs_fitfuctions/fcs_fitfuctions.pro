@@ -96,12 +96,12 @@ INCLUDEPATH += ../../lib/
 include(../../quickfit3_configqt.pri)
 
 
-SRC_DISTRIBUTED.files = $$HEADERS \
-                        $$SOURCES \
-                        $$FORMS \
-                        $$RESOURCES \
-                        $$TRANSLATIONS \
-                        $$GPL3LICENSE
+#SRC_DISTRIBUTED.files = $$HEADERS \
+#                        $$SOURCES \
+#                        $$FORMS \
+#                        $$RESOURCES \
+#                        $$TRANSLATIONS \
+#                        $$GPL3LICENSE
 
 
 

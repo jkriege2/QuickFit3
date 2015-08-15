@@ -55,13 +55,13 @@ include(../../quickfit3_configqtwidgets.pri)
 
 
 
-SRC_DISTRIBUTED.files = $$HEADERS \
-                        $$SOURCES \
-                        $$FORMS \
-                        $$RESOURCES \
-                        $$TRANSLATIONS \
-                        $$GPL3LICENSE \
-                        xlslib-package-2.4.0.zip
+#SRC_DISTRIBUTED.files = $$HEADERS \
+#                        $$SOURCES \
+#                        $$FORMS \
+#                        $$RESOURCES \
+#                        $$TRANSLATIONS \
+#                        $$GPL3LICENSE \
+#                        xlslib-package-2.4.0.zip
 
 OTHER_FILES += \
     xlslib.pri

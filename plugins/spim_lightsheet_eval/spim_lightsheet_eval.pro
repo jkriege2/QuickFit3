@@ -62,11 +62,11 @@ ASSETS_TESTDATA.path = $${QFOUTPUT}/examples/$${TARGET}/test_data/
 INSTALLS += ASSETS_TESTDATA
 
 
-SRC_DISTRIBUTED.files = $$HEADERS \
-                        $$SOURCES \
-                        $$FORMS \
-                        $$RESOURCES \
-                        $$TRANSLATIONS \
-                        $$GPL3LICENSE
+#SRC_DISTRIBUTED.files = $$HEADERS \
+#                        $$SOURCES \
+#                        $$FORMS \
+#                        $$RESOURCES \
+#                        $$TRANSLATIONS \
+#                        $$GPL3LICENSE
 
 

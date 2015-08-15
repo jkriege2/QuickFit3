@@ -66,10 +66,10 @@ TRANSLATIONS= ../../output/assets/translations/de.fit_gsl.ts
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/
 
-SRC_DISTRIBUTED.files = $$HEADERS \
-                        $$SOURCES \
-                        $$FORMS \
-                        $$RESOURCES \
-                        $$TRANSLATIONS \
-                        $$GPL3LICENSE
+#SRC_DISTRIBUTED.files = $$HEADERS \
+#                        $$SOURCES \
+#                        $$FORMS \
+#                        $$RESOURCES \
+#                        $$TRANSLATIONS \
+#                        $$GPL3LICENSE
 include(../../quickfit3_configqtwidgets.pri)
