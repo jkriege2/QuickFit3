@@ -109,26 +109,41 @@ $$note:If you cange a single dtaa value, or a single cell or column expression, 
     
     
     <h2>Advanced Functions</h2>
-    <p>Several advanced functions exist in the menus of the table editor:
-    <ul>
-        <li><b>Table | set column values</b> opens a dialog, which allows you to generate a column of linearly or logaritmically spaced values.</li>
-        <li><b>Table | calculate histogram</b> opens a dilaog, which allows to calculate a histogram of the values in the curently selected column. 
+    <p>Several advanced functions exist in the menus of the table editor:</p>
+
+
+<h3>Set Column Values ...</h3>
+<p><b>Table | set column values</b> opens a dialog, which allows you to generate a column of linearly or logaritmically spaced values.</p>
+
+
+<h3>Calculate Histogram</h3>
+<p><b>Table | calculate histogram</b> opens a dilaog, which allows to calculate a histogram of the values in the curently selected column. 
 <center><a name="tableeditor_pic004"><img src="./pic/tableeditor_pic004.png" border="1">
 </center>You have to the possibility to choose different methods for the histogram:
 <ul>
     <li><b>histograms</b></li>
     <li>several different <b>kernel density estimates (KDE)</b> with different basis functions. A KDE is basically a smoothed histogram, where a narrow function is positioned at the value of each datapoint and then the functions are summed up.</li>
 </ul>
-For the histograms you can specify ranges and the number of bins, or the bin width. It is also possible to calculate cumulative histograms and to normalize the histogram (with the number of used datapoints).<br>The resulting histogram is stored in two columne (with the range centers and the histogram values) in the table
-</li>
-<li><b>Table | calculate 2D histogram</b> This function requires two columns (euither selected or choosen at the top of the window) and calculates a 2-dimensional histogram or kernel density estimate. Also here the result is stored as a column in the table. 
-<center><a name="tableeditor_pic005"><img src="./pic/tableeditor_pic005.png" border="1">
-</center>
-</li>
-<li><b>sort selected cells</b> sorts the currently selected cells, according to a user-selectable column.</li>
-        <li><b>Table | calculate boxplots from columns</b> opens a dialog, which allows to calculate all values for a boxplot (minimum, 25% quantile, mean, median, 75% quantile, maximum) of the selected columns. The data is not directly calculated, but inserted as column expressions. The dialog also allows to directly add a plot of the boxplot statistics.</li>
+For the histograms you can specify ranges and the number of bins, or the bin width. It is also possible to calculate cumulative histograms and to normalize the histogram (with the number of used datapoints).<br>The resulting histogram is stored in two columne (with the range centers and the histogram values) in the table.</p>
 
-		</ul></p>
+
+<h3>Calculate 2D Histogram</h3>
+<p><b>Table | calculate 2D histogram</b> This function requires two columns (euither selected or choosen at the top of the window) and calculates a 2-dimensional histogram or kernel density estimate. Also here the result is stored as a column in the table. 
+<center><a name="tableeditor_pic005"><img src="./pic/tableeditor_pic005.png" border="1">
+</center></p>
+
+
+
+
+<h3>Sort Data</h3>
+<p><b>sort selected cells</b> sorts the currently selected cells, according to a user-selectable column.</p>
+
+
+
+<h3>Boxplots</h3>
+<p><b>Table | calculate boxplots from columns</b> opens a dialog, which allows to calculate all values for a boxplot (minimum, 25% quantile, mean, median, 75% quantile, maximum) of the selected columns. The data is not directly calculated, but inserted as column expressions. The dialog also allows to directly add a plot of the boxplot statistics.</p>
+
+
     
     </body>
 </html>
