@@ -189,7 +189,8 @@ release
 /output/*.zip
 /output/*.nsi
 /output/*.exe
-tinytiff
-cairo4qtv2
-extlibs
-plugins
+
+/output/source/tinytiff
+/output/source/cairo4qtv2
+/output/source/extlibs
+/output/source/plugins

@@ -136,12 +136,66 @@ For the histograms you can specify ranges and the number of bins, or the bin wid
 
 
 <h3>Sort Data</h3>
-<p><b>sort selected cells</b> sorts the currently selected cells, according to a user-selectable column.</p>
+<p><b><img src=":table/sort_inc.png"> Table | sort selected cells</b> sorts the currently selected cells, according to a user-selectable column. An example: If this dataset
+<center><a name="tableeditor_pic011"><img src="./pic/tableeditor_pic011.png" border="1">
+</center>
+is sorted with these options (ascendingly sorted by first column):
+<center><a name="tableeditor_pic012"><img src="./pic/tableeditor_pic012.png" border="1">
+</center>
+the result will look as follows:
+<center><a name="tableeditor_pic013"><img src="./pic/tableeditor_pic013.png" border="1">
+</center>
+
+</p>
 
 
 
 <h3>Boxplots</h3>
-<p><b>Table | calculate boxplots from columns</b> opens a dialog, which allows to calculate all values for a boxplot (minimum, 25% quantile, mean, median, 75% quantile, maximum) of the selected columns. The data is not directly calculated, but inserted as column expressions. The dialog also allows to directly add a plot of the boxplot statistics.</p>
+<p><b>Tools | calculate boxplots from columns</b> opens a dialog, which allows to calculate all values for a boxplot (minimum, 25% quantile, mean, median, 75% quantile, maximum) of the selected columns. The data is not directly calculated, but inserted as column expressions. The dialog also allows to directly add a plot of the boxplot statistics.</p>
+<p>Here is an example: First the dataset, which contains four columns of normally distributed data with different means and averages:
+<center><a name="tableeditor_pic014"><img src="./pic/tableeditor_pic014.png" border="1">
+</center>
+Now select all these column and start the tool:
+<center><a name="tableeditor_pic015"><img src="./pic/tableeditor_pic015.png" border="1">
+</center>
+At the top of the dialog, you can select the columns for which to calculate the statistics, then the calculation mode (full boxplot, mean+/- standard deviation, ...) and finally where to store the results and whether to immediately add a plot. For the given example, the result will look as follows:
+<center><a name="tableeditor_pic016"><img src="./pic/tableeditor_pic016.png" border="1">
+</center>
+The results are calculate using column statistics, so you can later change the data columns and recalculate the boxplot data and plots by clicking on the button <img src=":table/formularecalc.png">. the created plot will look like this:
+<center><a name="tableeditor_pic017"><img src="./pic/tableeditor_pic017.png" border="1">
+</center>
+
+</p>
+
+
+
+<h3>Indexed Statistics</h3>
+<p><b>Tools | insert indexed statistics for solumns</b> opens a dialog, which allows to calculate indexed/categorized statistics for several columns in the table: One column serves as index/category and the other contain different variables for each dataset. The following table shows an example, where measurements of three types (1,2,3) were done and in each measurement 2 variables were measured (data1 and data2):
+<center><a name="tableeditor_pic006"><img src="./pic/tableeditor_pic006.png" border="1">
+</center>
+Now this tool allows you to calculate statistics (average, standard deviation, median, ...) for each of the three groups/categories/indexes deparately.
+If the three columns are selected, before opening the indexed statistics dialog, it will, look as follows:
+<center><a name="tableeditor_pic007"><img src="./pic/tableeditor_pic007.png" border="1">
+</center>
+At the top, you can choose the index/category column (here "data_ID"). Then you check all columns for which the statistics should be created and finally choose the statistics to be calculated. At the bottom, you can tell the plugin, where to write the results (here: append additional columns to the table) and whether to create raphs from the categorized statistics.</p>
+<p>The result will be created as column-expressions, so you can insert or remove data in your columns and update the statistics (and plots) by simply recalculating all results with the button <img src=":table/formularecalc.png">. Here is an example of how the result may look:
+<center><a name="tableeditor_pic010"><img src="./pic/tableeditor_pic010.png" border="1">
+</center>
+
+</p>
+<p>The graphing option will generate different types of graphs, depending on the choosen statsitics:
+<ul>
+    <li>one separate plot for each variable (here the two: "data1" and "data2"), each containing either boxplots, barcharts or point+errorbar plots over a category x-axis, e.g.:
+<center><a name="tableeditor_pic008"><img src="./pic/tableeditor_pic008.png" border="1">
+  <a name="tableeditor_pic009"><img src="./pic/tableeditor_pic009.png" border="1">
+</center>
+
+</li>
+    <ul>
+    <li>all graphs, as above, inserted into one existing plot (this is only seldomly usefull ;-)</li>
+</ul>
+</ul>
+</p>
 
 
     
