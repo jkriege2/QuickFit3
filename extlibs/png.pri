@@ -18,7 +18,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-include(zlib.pri)
 INCLUDEPATH += $$PWD/libpng/include/
 LIBS += -L$$PWD/libpng/lib/ -lpng
 DEFINES += QF_HAS_PNG cimg_use_png

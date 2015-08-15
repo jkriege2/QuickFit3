@@ -19,9 +19,16 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/cairo/include/cairo/ $$PWD/cairo/include/ cairo
-LIBS += -L$$PWD/cairo/lib/ -lcairo
-DEFINES += QF_HAS_LIBCAIRO
-include(pixman.pri)
-include(png.pri)
-win32:LIBS += -lgdi32
+DEFINES += QF_HAS_CAIROQPAINTDEVICE
+
+HEADERS += \
+    $$PWD/cairoQPaintDevice/qcairopaintdevice.h \
+    $$PWD/cairoQPaintDevice/qcairopaintengine.h 
+
+SOURCES += \
+    $$PWD/cairoQPaintDevice/qcairopaintdevice.cpp \
+    $$PWD/cairoQPaintDevice/qcairopaintengine.cpp 
+
+INCLUDEPATH += $$PWD/cairoQPaintDevice/ 
+
+include($$PWD/../extlibs/cairo.pri)
