@@ -326,6 +326,7 @@ void QFETCSPCImporterDialog::writeSettings() {
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/add_to_project", ui->chkAddToProject->isChecked());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/segments", ui->spinSegments->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/cr_binning", ui->spinCountrateBinning->value());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/fcs_cr_binning", ui->spinFCSCRBinning->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/fcs_taumin", ui->spinFCSTauMin->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/range_start", ui->spinRangeStart->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/range_end", ui->spinRangeEnd->value());
@@ -354,6 +355,7 @@ void QFETCSPCImporterDialog::readSettings() {
     ui->edtPostfix->setText(options->getQSettings()->value("tcspcimporter/dlg_correlate/postfix", ui->edtPostfix->text()).toString());
     ui->spinSegments->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/segments", ui->spinSegments->value()).toInt());
     ui->spinCountrateBinning->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/cr_binning", ui->spinCountrateBinning->value()).toDouble());
+    ui->spinFCSCRBinning->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/fcs_cr_binning", ui->spinFCSCRBinning->value()).toDouble());
     ui->spinFCSTauMin->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/fcs_taumin", ui->spinFCSTauMin->value()).toDouble());
     ui->spinRangeEnd->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_end", ui->spinRangeEnd->value()).toDouble());
     ui->spinRangeStart->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_start", ui->spinRangeStart->value()).toDouble());
@@ -693,7 +695,7 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
             }
             tmFCS->setReadonly(true);
             ui->tvFCS->setModel(tmFCS);
-            ui->spinFCSCRBinning->setValue((duration/double(ui->spinSegments->value())/1000.0)*1.0e3);
+            //ui->spinFCSCRBinning->setValue((duration/double(ui->spinSegments->value())/1000.0)*1.0e3);
 
             countRateString="";
             for (int i=0; i<channels; i++) {

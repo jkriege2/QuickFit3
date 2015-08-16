@@ -126,9 +126,9 @@ p, li { white-space: pre-wrap; }
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-46</y>
-              <width>754</width>
-              <height>484</height>
+              <y>0</y>
+              <width>761</width>
+              <height>478</height>
              </rect>
             </property>
             <layout class="QFormLayout" name="formLayout_2">
@@ -862,7 +862,7 @@ p, li { white-space: pre-wrap; }
                      <double>1000000.000000000000000</double>
                     </property>
                     <property name="value">
-                     <double>20.000000000000000</double>
+                     <double>250.000000000000000</double>
                     </property>
                    </widget>
                   </item>
@@ -1303,8 +1303,8 @@ p, li { white-space: pre-wrap; }
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="qfetcspcimporter.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="qfetcspcimporter.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>

@@ -572,6 +572,26 @@ void QFETCSPCImporterJobThread::run() {
                                 tool.properties["FCS_LIFETIMEFILTER_MODE"]=QString("NONE");
                             }
 
+                            tool.properties["SEGMENTS"]=job.fcs_segments;
+                            tool.properties["SEGMENT_DURATION"]=range_duration/double(job.fcs_segments);
+                            tool.properties["DURATION"]=range_duration;
+                            tool.properties["RANGE_START"]=starttime;
+                            tool.properties["RANGE_END"]=starttime+range_duration;
+                            tool.properties["CR_BIN_LENGTH"]=job.fcs_crbinning;
+                            tool.properties["CORRELATOR_S"]=job.fcs_S;
+                            tool.properties["CORRELATOR_P"]=job.fcs_P;
+                            tool.properties["CORRELATOR_M"]=job.fcs_m;
+                            tool.properties["CORRELATOR_TAUMIN"]=job.fcs_taumin;
+
+
+                            switch(job.fcs_correlator) {
+                                case CORRELATOR_MTAUALLMON:  tool.properties["CORRELATOR"]="CORRELATOR_MTAUALLMON"; tool.properties["CORRELATOR_NAME"]="multi-tau with monitors for all channels"; break;
+                                case CORRELATOR_MTAUONEMON:  tool.properties["CORRELATOR"]="CORRELATOR_MTAUONEMON"; tool.properties["CORRELATOR_NAME"]="multi-tau with a single monitor"; break;
+                                case CORRELATOR_TTTR:        tool.properties["CORRELATOR"]="CORRELATOR_TTTR"; tool.properties["CORRELATOR_NAME"]="TTTR"; break;
+
+                                default: tool.properties["CORRELATOR"]=job.fcs_correlator; tool.properties["CORRELATOR_NAME"]="unknown"; break;
+                            }
+
                             QString localFilename=outputFilenameBase+QString("_fcsdata%1.qf3acorr").arg(fid);
                             tool.saveFile(localFilename);
                             QFETCSPCImporterJobThreadAddFileProps fp(QStringList(localFilename), "QF3ASCIICORR", job.props);

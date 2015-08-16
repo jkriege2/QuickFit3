@@ -175,6 +175,8 @@
         <li>added an option for time-gate/lifetime-filtered FCS/FCCS to the correlator [thanks to Martin Seefeld, Uni Heidelberg for providing test-datasets]</li>
         <li>bugfix: countrate is now saved in the correct units (kHz instead of Hz) in the correlator output file (before it was a factor 1000 too high!)</li>
         <li>bugfix: fixed a small bug in the normalization of the TTTR correlator that could have an influence at low count rates</li>
+        <li>FCS countrate binning is no longer set automatically from measurement length in file</li>
+        <li>more metadata on the processing is written to the results files (and subsequently loaded into the FCS RDR)</li>
     </ul></li>
     <li><b>Table</b><ul>
         <li>added Tools menu entry to quickly calculate and plot boxplots from columned data</li>
