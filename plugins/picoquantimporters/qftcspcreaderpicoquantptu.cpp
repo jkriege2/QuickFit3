@@ -88,6 +88,7 @@ bool QFTCSPCReaderPicoquantPTU::open(const QString &filename, const QString &par
             return false;
         }
 
+
         fgetpos(tttrfile, &fileResetPos);
         currentTTTRRecordNum=0;
         current.microtime_offset=0;

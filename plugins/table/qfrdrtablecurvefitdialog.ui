@@ -524,6 +524,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QFFitFunctionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qffitfunctioncombobox.h</header>
+  </customwidget>
+  <customwidget>
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
@@ -534,11 +539,6 @@
    <extends>QSplitter</extends>
    <header>qvisiblehandlesplitter.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QFFitFunctionComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qffitfunctioncombobox.h</header>
   </customwidget>
   <customwidget>
    <class>DoubleDataCutSliders</class>
@@ -552,16 +552,44 @@
    <header>qffitalgorithmcombobox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cmbFitAlgorithm</tabstop>
+  <tabstop>btnConfigAlgorithm</tabstop>
+  <tabstop>btnHelpAlgorithm</tabstop>
+  <tabstop>cmbFitFunction</tabstop>
+  <tabstop>btnModelSelect</tabstop>
+  <tabstop>btnHelpModel</tabstop>
+  <tabstop>btnFit</tabstop>
+  <tabstop>chkFitLogY</tabstop>
+  <tabstop>btnGuess</tabstop>
+  <tabstop>chkWeighted</tabstop>
+  <tabstop>cmbWeightOptions</tabstop>
+  <tabstop>chkBootstrap</tabstop>
+  <tabstop>spinBSRepeats</tabstop>
+  <tabstop>spinBSFraction</tabstop>
+  <tabstop>spinBSDistortion</tabstop>
+  <tabstop>tabParams</tabstop>
+  <tabstop>labFitResult</tabstop>
+  <tabstop>cmbAddGraph</tabstop>
+  <tabstop>cmbSaveColumn</tabstop>
+  <tabstop>chkLogX</tabstop>
+  <tabstop>chkLogY</tabstop>
+  <tabstop>chkPlotErrors</tabstop>
+  <tabstop>chkWeightedResiduals</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton_3</tabstop>
+ </tabstops>
  <resources>
   <include location="../../application/quickfit3.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../fcsmsdevaluation/fcsmsdevaluation.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

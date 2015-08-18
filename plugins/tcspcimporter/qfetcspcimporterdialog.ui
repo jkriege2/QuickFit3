@@ -738,7 +738,7 @@ p, li { white-space: pre-wrap; }
                      <number>1</number>
                     </property>
                     <property name="maximum">
-                     <number>100</number>
+                     <number>10000</number>
                     </property>
                     <property name="value">
                      <number>5</number>
@@ -1276,26 +1276,34 @@ p, li { white-space: pre-wrap; }
   <tabstop>edtTCSPCFile</tabstop>
   <tabstop>btnSelectFile</tabstop>
   <tabstop>btnLoad</tabstop>
+  <tabstop>scrollArea_2</tabstop>
   <tabstop>cmbFileformat</tabstop>
+  <tabstop>edtTCSPCFileParameter</tabstop>
+  <tabstop>btnPeekLifetime</tabstop>
   <tabstop>edtPrefix</tabstop>
   <tabstop>edtPostfix</tabstop>
   <tabstop>chkFirstFrame</tabstop>
   <tabstop>spinRangeStart</tabstop>
   <tabstop>chkLastFrame</tabstop>
   <tabstop>spinRangeEnd</tabstop>
-  <tabstop>spinSegments</tabstop>
-  <tabstop>tvFCS</tabstop>
-  <tabstop>cmbCorrelator</tabstop>
+  <tabstop>chkFCS</tabstop>
   <tabstop>spinS</tabstop>
   <tabstop>spinP</tabstop>
   <tabstop>spinM</tabstop>
   <tabstop>spinFCSTauMin</tabstop>
+  <tabstop>cmbCorrelator</tabstop>
+  <tabstop>tvFCS</tabstop>
+  <tabstop>spinSegments</tabstop>
+  <tabstop>chkFCSLifetimeFilter</tabstop>
+  <tabstop>tvFCSLifetimeFilter</tabstop>
   <tabstop>spinFCSCRBinning</tabstop>
-  <tabstop>spinCountrateBinning</tabstop>
   <tabstop>chkAddToProject</tabstop>
+  <tabstop>chkCountrate</tabstop>
+  <tabstop>tabCR</tabstop>
   <tabstop>btnAddJob</tabstop>
-  <tabstop>scrollArea</tabstop>
+  <tabstop>spinCountrateBinning</tabstop>
   <tabstop>spinProcesses</tabstop>
+  <tabstop>scrollArea</tabstop>
   <tabstop>btnHelp</tabstop>
   <tabstop>pushButton</tabstop>
  </tabstops>

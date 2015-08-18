@@ -39,7 +39,7 @@ class QFFitFunctionFCSDistributionGaussian: public QFFitFunction {
         /*! \copydoc QFFitFunction::name()   */
         virtual QString name() const { return QString("FCS SD: Normal Diffuion 3D with gaussian diffusion time distribution"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("FCS SD: gaussian"); }
+        virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_dist_norm"); }
         /*! \copydoc QFFitFunction::category()   */

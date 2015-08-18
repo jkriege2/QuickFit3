@@ -19,8 +19,8 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef QFFitFunctionFCSDistributionIntGaussian_H
-#define QFFitFunctionFCSDistributionIntGaussian_H
+#ifndef QFFitFunctionFCSDistributionDIntGaussian_H
+#define QFFitFunctionFCSDistributionDIntGaussian_H
 #include "qfpluginfitfunction.h"
 #include <QVector>
 #include <QPair>
@@ -33,16 +33,16 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3fitfunp_fitfunctions_fcsdistribution
 
 */
-class QFFitFunctionFCSDistributionIntGaussian: public QFFitFunction {
+class QFFitFunctionFCSDistributionDIntGaussian: public QFFitFunction {
     public:
-        QFFitFunctionFCSDistributionIntGaussian();
-        virtual ~QFFitFunctionFCSDistributionIntGaussian();
+        QFFitFunctionFCSDistributionDIntGaussian();
+        virtual ~QFFitFunctionFCSDistributionDIntGaussian();
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS Dist: Normal Diffuion 3D with gaussian diffusion time distribution [num_int]"); }
+        virtual QString name() const { return QString("FCS Dist: Normal Diffuion 3D with gaussian diffusion coefficient distribution [num_int]"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("fcs_dist_int_norm"); }
+        virtual QString id() const { return QString("fcs_dist_int_norm_d"); }
         /*! \copydoc QFFitFunction::category()   */
         virtual QString category() const { return QObject::tr("Confocal FCS"); }
 
@@ -70,4 +70,4 @@ class QFFitFunctionFCSDistributionIntGaussian: public QFFitFunction {
         size_t wN;
 };
 
-#endif // QFFitFunctionFCSDistributionIntGaussian_H
+#endif // QFFitFunctionFCSDistributionDIntGaussian_H

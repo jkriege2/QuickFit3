@@ -27,7 +27,8 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "jkqtpimagetools.h"
 
 #include <QtGlobal>
-#include<QtGlobal>
+
+#include<QWindowList>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets>
 #else
@@ -69,7 +70,9 @@ int main(int argc, char * argv[])
         }
     }
 
+
 #ifdef __WINDOWS__
+    qDebug()<<"setting Qt lib paths: "<<"./qtplugins"<<(QFileInfo(argv[0]).absolutePath()+"/qtplugins");
     QCoreApplication::addLibraryPath("./qtplugins");
     QCoreApplication::addLibraryPath(QFileInfo(argv[0]).absolutePath()+"/qtplugins");
 #endif
@@ -86,6 +89,7 @@ int main(int argc, char * argv[])
     qDebug()<<"lib paths:"<<QCoreApplication::libraryPaths();
 #endif
 
+    qDebug()<<"Q_INIT_RESOURCE(quickfit3)";
     Q_INIT_RESOURCE(quickfit3);
     int res=0;
     {
@@ -163,6 +167,13 @@ int main(int argc, char * argv[])
             res=app.exec();
 
             //QFontDatabase::removeAllApplicationFonts();
+        }
+
+        QWidgetList tlw=app.topLevelWidgets();
+        foreach(QWidget *widget, tlw) {
+            qDebug()<<"deleting widget after application shutdown: "<<widget;
+            widget->close();
+            delete widget;
         }
 
         /*for (int i=0; i<appFonts.size(); i++) {

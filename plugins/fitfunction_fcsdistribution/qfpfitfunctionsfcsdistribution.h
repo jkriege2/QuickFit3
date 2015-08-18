@@ -61,12 +61,12 @@ class QFPFitFunctionsFCSDistribution : public QObject, public QFPluginFitFunctio
 
         /** \brief author the plugin */
         virtual QString getAuthor() const {
-            return QString("Jan Krieger");
+            return QString("Jan W. Krieger");
         };
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2011-2014 by Jan Krieger");
+            return tr("(c) 2011-2015 by Jan W. Krieger");
         };
 
         /** \brief weblink for the plugin */
@@ -88,7 +88,7 @@ class QFPFitFunctionsFCSDistribution : public QObject, public QFPluginFitFunctio
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=3;
+            minor=4;
         };
 
         /** \brief return list of plugin IDs */

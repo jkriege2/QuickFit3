@@ -170,6 +170,9 @@
     <li><b>2-focus Confocal FCCS fit models</b><ul>
         <li>added 2-focus FCCS 3D anomalous diffusion models</li>
     </ul></li>
+    <li><b>confocal FCS fit models with parameter distributions</b><ul>
+        <li>added model with normal distribution of D and numerical integration</li>
+    </ul></li>
     <li><b>TCSPC importer</b><ul>
         <li>added fluorescence liftetime (TCSPC microtime) histogram preview</li>
         <li>added an option for time-gate/lifetime-filtered FCS/FCCS to the correlator [thanks to Martin Seefeld, Uni Heidelberg for providing test-datasets]</li>
@@ -177,11 +180,14 @@
         <li>bugfix: fixed a small bug in the normalization of the TTTR correlator that could have an influence at low count rates</li>
         <li>FCS countrate binning is no longer set automatically from measurement length in file</li>
         <li>more metadata on the processing is written to the results files (and subsequently loaded into the FCS RDR)</li>
+        <li>bugfix: it is now possible to set the number of segments to &gt;100</li>
+        <li>bugfix: there were some counter overflows when calculating the binned countrate for FCS files.</li>
     </ul></li>
     <li><b>Table</b><ul>
         <li>added Tools menu entry to quickly calculate and plot boxplots from columned data</li>
         <li>added Tools menu entry to quickly calculate and plot indexed statistics from columned data</li>
         <li>improved import from clipboard/file: data may be pivoted/rotated now in the import dialog (by a button above the table)</li>
+        <li>fixed tab-order of plot/graph-settings widgets</li>
     </ul></li>
 
     <li><b>cairo graph exporter plugin</b><ul>
@@ -207,7 +213,9 @@
     <li><b>basicimageexporter</b><ul>
       <li>added exporter for Matlab MAT-files (using TinyMAT)</li>
     </ul></li>
-
+    <li><b>picoquantimporters</b><ul>
+      <li>importers read more metadata from TCSPC files now.</li>
+    </ul></li>
     <li><b>qfe_dataexportbasics</b><ul>
       <li>license is now LGPL 2.1</li>
     </ul></li>

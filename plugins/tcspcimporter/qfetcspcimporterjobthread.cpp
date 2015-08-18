@@ -30,6 +30,7 @@
 #include "qftools.h"
 #include "qf3correlationdataformattool.h"
 #include "tttrtools.h"
+#include <QElapsedTimer>
 
 QMutex* QFETCSPCImporterJobThread::mutexFilename=NULL;
 
@@ -539,7 +540,7 @@ void QFETCSPCImporterJobThread::run() {
                                     int c=store.store[acf].first;
                                     for (int r=0; r<job.fcs_segments; r++) {
                                         uint32_t id=xyAdressToUInt32(r, c);
-                                        tool.addCountrateEntry(fcs_crs[id].value(i, 0)*1e-3, r, acf);
+                                        tool.addCountrateEntry(fcs_crs[id].value(i, 0), r, acf);
                                     }
                                 }
                             }
@@ -712,12 +713,12 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
     double nextcrInterval=job.countrate_binning;
     uint16_t* countrate=(uint16_t*)qfCalloc(channels, sizeof(uint16_t));
     uint16_t* fcs_countrate=NULL;
-    uint16_t* fcs_storecountrate=NULL;
+    uint64_t* fcs_storecountrate=NULL;
     const bool bin_and_correlate=job.fcs_correlator<=CORRELATOR_MTAUONEMON;
     if (bin_and_correlate) {
         if (job.doFCS) fcs_countrate=(uint16_t*)qfCalloc(channels*FCS_CHANNELBUFFER_ITEMS, sizeof(uint16_t));
     }
-    fcs_storecountrate=(uint16_t*)qfCalloc(channels, sizeof(uint16_t));
+    if (job.doFCS) fcs_storecountrate=(uint64_t*)qfCalloc(channels, sizeof(uint64_t));
 
     QList<QVector<double> > arrivaltimes;
     arrivaltimes.clear();
@@ -727,16 +728,19 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
     }
 
     uint64_t crCounter=0;
+    uint64_t fcscrCounter=0;
     uint32_t fcs_countrate_counter=0;
-    double pos=0;
+    //double pos=0;
     double fcsNextSegmentValue=range_duration/double(job.fcs_segments);
     double fcsNextInterval=job.fcs_taumin;
-    double fcsNextStoreInterval=job.fcs_crbinning;
+    double fcsNextFCSCRStoreInterval=job.fcs_crbinning;
     double nextReporterStep=range_duration/1000.0;
     uint16_t fcs_segment=0;
     fcs_ccfs.clear();
     real_countrate_items=0;
     bool done=false;
+    QElapsedTimer timer;
+    timer.start();
     do {
         QFTCSPCRecord record=reader->getCurrentRecord();
         const  double t=record.absoluteTime()-starttime;
@@ -778,9 +782,9 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
             if (job.doFCS && fcs_lffilter) {
 
 
-                bool isNextSegment=(t>=fcsNextSegmentValue);
-                bool isBeforeNextFCSInteral=(t<fcsNextInterval);
-                bool isBeforeNextFCSCRInteral=(t<fcsNextStoreInterval);
+                const bool isNextSegment=(t>=fcsNextSegmentValue);
+                const bool isBeforeNextFCSInteral=(t<fcsNextInterval);
+                const bool isBeforeNextFCSCRInterval=(t<fcsNextFCSCRStoreInterval);
 
                 if (bin_and_correlate) {
                     // binning photons and correlating data
@@ -836,26 +840,35 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
 
 
                 // bin photons and calculate countrates, stored with ccfs
-                if (isBeforeNextFCSCRInteral) {
+                if (isBeforeNextFCSCRInterval) {
                     fcs_storecountrate[c]++;
                 } else {
-                    int64_t emptyrecords=(int64_t)floor((t-fcsNextStoreInterval)/job.fcs_crbinning)+1;
+                    int64_t emptyrecords=(int64_t)floor((t-fcsNextFCSCRStoreInterval)/job.fcs_crbinning)+1;
                     for (register int64_t i=0; i<(int64_t)channels*emptyrecords; i++) {
                         int cc=i%channels;
-                        fcs_crs[xyAdressToUInt32(fcs_segment, cc)].append(fcs_storecountrate[cc]/job.fcs_crbinning/1000.0);
+                        fcs_crs[xyAdressToUInt32(fcs_segment, cc)].append(double(fcs_storecountrate[cc])/job.fcs_crbinning/1000.0);
+                        //qDebug()<<fcs_segment<<cc<<fcs_storecountrate[cc]<<double(fcs_storecountrate[cc])/job.fcs_crbinning/1000.0;
                         fcs_storecountrate[cc]=0;
                     }
 
                     fcs_storecountrate[c]++;
-                    crCounter+=emptyrecords;
-                    fcsNextStoreInterval=fcsNextStoreInterval+emptyrecords*job.fcs_crbinning;
+                    fcscrCounter+=emptyrecords;
+                    fcsNextFCSCRStoreInterval=fcsNextFCSCRStoreInterval+double(emptyrecords)*job.fcs_crbinning;
+                    //qDebug()<<"emptyrecords="<<emptyrecords<<"  fcscrCounter="<<fcscrCounter<<"  fcsNextFCSCRStoreInterval="<<fcsNextFCSCRStoreInterval<<"  fcsNextSegmentValue="<<fcsNextSegmentValue<<"  t="<<t<<"\n\n\n";
+                    //qDebug()<<fcs_segment<<fcsNextStoreInterval;
                 }
+
                 if (isNextSegment) {
+                    //qDebug()<<fcs_segment<<": fcs_crs.size="<<fcs_crs.size();
                     for (register int cc=0; cc<channels; cc++) {
                         fcs_storecountrate[cc]=0;
+                        //qDebug()<<fcs_segment<<"/"<<cc<<": "<<fcs_crs[xyAdressToUInt32(fcs_segment, cc)].size();
                     }
+                    //qDebug()<<"\n\n";
                     fcs_segment++;
-                    fcsNextSegmentValue=fcsNextSegmentValue+range_duration/double(job.fcs_segments);
+                    fcsNextSegmentValue=double(fcs_segment+1)*range_duration/double(job.fcs_segments);
+                    fcsNextFCSCRStoreInterval=double(fcs_segment)*range_duration/double(job.fcs_segments)+job.fcs_crbinning;
+                    //qDebug()<<"-----------------------------------------------------------\nNEXT SEGMENT\n  fcs_segment="<<fcs_segment<<"  fcsNextSegmentValue="<<fcsNextSegmentValue<<"  fcsNextFCSCRStoreInterval="<<fcsNextFCSCRStoreInterval<<"\n-----------------------------------------------------------\n";
 
                 }
             }
@@ -865,7 +878,9 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
         if (t>nextReporterStep) {
             emit progressIncrement(1);
             nextReporterStep=nextReporterStep+range_duration/1000.0;
-            emit messageChanged(tr("running data processing [t=%1s, meas. duration: %2s, file completed: %3%4] ...").arg(t).arg(range_duration).arg(reader->percentCompleted()).arg("%"));
+            double elapsed=double(timer.elapsed())/1000.0;
+            double eta=elapsed/reader->percentCompleted()*(100.0-reader->percentCompleted());
+            emit messageChanged(tr("running data processing [t=%1s, meas. duration: %2s, file completed: %3%4, ETA: %5] ...").arg(t).arg(range_duration).arg(reader->percentCompleted(),0,'g',2).arg("%").arg(qfSecondsDurationToHMSString(eta)));
             //qDebug()<<t<<range_duration<<"  fcsNextSegmentValue="<<fcsNextSegmentValue<<"  segments="<<job.fcs_segments<< "  completed="<<reader->percentCompleted()<<"%";
         }
 
@@ -882,8 +897,9 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
             arrivaltimes.clear();
             fcs_segment++;
         }
-        qfFree(fcs_storecountrate);
+
     }
+    if (fcs_storecountrate) qfFree(fcs_storecountrate);
     qfFree(countrate);
     qfFree(fcs_countrate);
 }

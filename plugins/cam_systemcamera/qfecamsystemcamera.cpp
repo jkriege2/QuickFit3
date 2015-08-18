@@ -132,7 +132,7 @@ void QFECamSystemcamera::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
     VideoCapture cap;
     cameras=cap.getDeviceList();
-    QMenu* scm=new QMenu(tr("&System Camera Controls"));
+    QMenu* scm=new QMenu(tr("&System Camera Controls"), this);
     scm->setIcon(QIcon(":/cam_systemcam/qfecamsystemcamera.png"));
     for (size_t i=0; i<cameras.size(); i++) {
         vids.append(new VideoCapture());

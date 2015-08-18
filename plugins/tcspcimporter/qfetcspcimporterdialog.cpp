@@ -700,7 +700,7 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
             countRateString="";
             for (int i=0; i<channels; i++) {
                 if (countRateString.size()>0) countRateString=countRateString+"; ";
-                countRateString.append(QString::number(reader->avgCountRate(i)*1e-3));
+                countRateString.append(QString::number(reader->avgCountRate(i)));
             }
 
         }

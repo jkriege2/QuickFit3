@@ -453,12 +453,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFPlotter</class>
-   <extends>QWidget</extends>
-   <header>qfplotter.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
@@ -466,7 +460,42 @@
     <signal>valueChanged(double)</signal>
    </slots>
   </customwidget>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cmbInputX</tabstop>
+  <tabstop>cmbInputY</tabstop>
+  <tabstop>spinBins</tabstop>
+  <tabstop>btnAutoBins</tabstop>
+  <tabstop>chkAutoBinWidth</tabstop>
+  <tabstop>edtBinWidth</tabstop>
+  <tabstop>btnAutoBinwidth</tabstop>
+  <tabstop>chkRangeMin</tabstop>
+  <tabstop>edtRangeMin</tabstop>
+  <tabstop>chkRangeMax</tabstop>
+  <tabstop>edtRangeMax</tabstop>
+  <tabstop>spinBinsY</tabstop>
+  <tabstop>btnAutoBinsY</tabstop>
+  <tabstop>chkAutoBinWidthY</tabstop>
+  <tabstop>edtBinWidthY</tabstop>
+  <tabstop>btnAutoBinwidthY</tabstop>
+  <tabstop>chkRangeMinY</tabstop>
+  <tabstop>edtRangeMinY</tabstop>
+  <tabstop>chkRangeMaxY</tabstop>
+  <tabstop>edtRangeMaxY</tabstop>
+  <tabstop>cmbMethod</tabstop>
+  <tabstop>chkNormalized</tabstop>
+  <tabstop>edtBandwidth</tabstop>
+  <tabstop>btnAutoBandwidth</tabstop>
+  <tabstop>edtBandwidthY</tabstop>
+  <tabstop>btnAutoBandwidthY</tabstop>
+  <tabstop>cmbOutput</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

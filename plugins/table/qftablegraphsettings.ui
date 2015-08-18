@@ -3307,6 +3307,14 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
    <class>JKQTPerrorPlotstyleComboBox</class>
    <extends>QComboBox</extends>
    <header>jkqtptools.h</header>
@@ -3315,14 +3323,6 @@
    <class>QEnhancedTableView</class>
    <extends>QTableView</extends>
    <header>qenhancedtableview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QFDoubleEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qfdoubleedit.h</header>
-   <slots>
-    <signal>valueChanged(double)</signal>
-   </slots>
   </customwidget>
   <customwidget>
    <class>LineStyleComboBox</class>
@@ -3373,6 +3373,8 @@
   <tabstop>edtFunction</tabstop>
   <tabstop>btnFunctionHelp</tabstop>
   <tabstop>cmbQFFitFunction</tabstop>
+  <tabstop>cmbQFFitFunctionSubplot</tabstop>
+  <tabstop>chkQFFitFunctionSubplotAll</tabstop>
   <tabstop>cmbLinesXData</tabstop>
   <tabstop>btnClearLinesXData</tabstop>
   <tabstop>btnAutoX</tabstop>
@@ -3404,6 +3406,17 @@
   <tabstop>cmbSelectDataCompare</tabstop>
   <tabstop>edtSelectDataValue</tabstop>
   <tabstop>edtSelectDataValue2</tabstop>
+  <tabstop>cmbSelectDataLogic12</tabstop>
+  <tabstop>cmbSelectDataColumn_2</tabstop>
+  <tabstop>cmbSelectDataCompare_2</tabstop>
+  <tabstop>edtSelectDataValue_2</tabstop>
+  <tabstop>edtSelectDataValue2_2</tabstop>
+  <tabstop>cmbSelectDataLogic23</tabstop>
+  <tabstop>cmbSelectDataColumn_3</tabstop>
+  <tabstop>cmbSelectDataCompare_3</tabstop>
+  <tabstop>edtSelectDataValue_3</tabstop>
+  <tabstop>edtSelectDataValue2_3</tabstop>
+  <tabstop>cmbSort</tabstop>
   <tabstop>edtRangeStart</tabstop>
   <tabstop>edtRangeEnd</tabstop>
   <tabstop>edtRangeCenter</tabstop>
@@ -3420,6 +3433,7 @@
   <tabstop>cmbFillStyle</tabstop>
   <tabstop>cmbSymbol</tabstop>
   <tabstop>spinSymbolSize</tabstop>
+  <tabstop>spinSymbolLineWidth</tabstop>
   <tabstop>edtWidth</tabstop>
   <tabstop>edtShift</tabstop>
   <tabstop>btnShiftAuto</tabstop>
@@ -3480,9 +3494,9 @@
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

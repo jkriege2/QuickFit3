@@ -25,10 +25,11 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionfcsdistributiongaussian.h"
 #include "qffitfunctionfcsdistributiongaussianint.h"
 #include "qffitfunctionfcsdistributionloggaussianint.h"
+#include "qffitfunctionfcsdistributiongaussianDint.h"
 
 QStringList QFPFitFunctionsFCSDistribution::getIDs() const {
     QStringList res;
-    res<<"fcs_dist_norm"<<"fcs_dist_norm_d"<<"fcs_dist_lognorm"<<"fcs_dist_int_lognorm"<<"fcs_dist_int_norm";
+    res<<"fcs_dist_norm"<<"fcs_dist_norm_d"<<"fcs_dist_lognorm"<<"fcs_dist_int_lognorm"<<"fcs_dist_int_norm"<<"fcs_dist_int_norm_d";
     return res;
 }
 
@@ -43,6 +44,8 @@ QFFitFunction* QFPFitFunctionsFCSDistribution::get(const QString &id) const  {
             return new QFFitFunctionFCSDistributionIntLogGaussian();
     } else if (id=="fcs_dist_norm_d") {
         return new QFFitFunctionFCSDistributionGaussianD();
+    } else if (id=="fcs_dist_int_norm_d") {
+        return new QFFitFunctionFCSDistributionDIntGaussian();
     }
 
     return NULL;

@@ -410,6 +410,17 @@ p, li { white-space: pre-wrap; }
    <header>qfenhancedplaintextedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>edtTitle</tabstop>
+  <tabstop>edtComment</tabstop>
+  <tabstop>spinImageWidth</tabstop>
+  <tabstop>grpExpression</tabstop>
+  <tabstop>edtFormula</tabstop>
+  <tabstop>chkPreview</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>btnHelp</tabstop>
+  <tabstop>btnOK2</tabstop>
+ </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>

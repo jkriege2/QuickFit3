@@ -644,7 +644,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QStringList mathParserRefDirs;
 
         /** \brief help display widget */
-        QFHTMLHelpWindow* helpWindow;
+        QPointer<QFHTMLHelpWindow> helpWindow;
 
         /** \brief used to store the splash screen pixmap, as given to the constructor. This pixmap may be used for info dialogs. */
         QPixmap splashPix;

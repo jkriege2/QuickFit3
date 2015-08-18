@@ -22,6 +22,7 @@
 
 #include "qfetcspcimporterthreadprogress.h"
 #include "ui_qfetcspcimporterthreadprogress.h"
+#include "qftools.h"
 
 QFETCSPCImporterThreadProgress::QFETCSPCImporterThreadProgress(QWidget *parent) :
     QWidget(parent),
@@ -30,6 +31,7 @@ QFETCSPCImporterThreadProgress::QFETCSPCImporterThreadProgress(QWidget *parent) 
     ui->setupUi(this);
     m_wasCanceled=false;
     m_isDone=false;
+    runsElapsed=0;
     resetWidget();
     setStatus(0);
     setMessage("");
@@ -66,12 +68,14 @@ void QFETCSPCImporterThreadProgress::setStatus(int status) {
                 qint64 ms=started.elapsed();
                 runMins=ms/60000;
                 runSecs=(ms-runMins*60000)/1000;
+                runsElapsed=ms;
                 ui->labStatus->setPixmap(QPixmap(":/tcspcimporter/thread_ok.png")); break;
             }
         case -1:  {
                 qint64 ms=started.elapsed();
                 runMins=ms/60000;
                 runSecs=(ms-runMins*60000)/1000;
+                runsElapsed=ms;
                 ui->labStatus->setPixmap(QPixmap(":/tcspcimporter/thread_error.png")); break;
             }
         default: ui->labStatus->setText(""); break;
@@ -166,9 +170,11 @@ void QFETCSPCImporterThreadProgress::updateTime()
         qint64 ms=started.elapsed();
         qint64 rrunMins=ms/60000;
         qint64 rrunSecs=(ms-rrunMins*60000)/1000;
-        ui->labRunning->setText(tr("<small>runtime: %1:%2 min.</small>").arg(rrunMins,2,10,QLatin1Char('0')).arg(rrunSecs,2,10,QLatin1Char('0')));
+        //ui->labRunning->setText(tr("<small>runtime: %1:%2 min.</small>").arg(rrunMins,2,10,QLatin1Char('0')).arg(rrunSecs,2,10,QLatin1Char('0')));
+        ui->labRunning->setText(tr("<small>runtime: %1</small>").arg(qfSecondsDurationToHMSString(double(started.elapsed())/1000.0)));
     } else if (m_status==2 || m_status<0) {
-        QString txt=tr("<small>runtime: %1:%2 min.</small>").arg(runMins,2,10,QLatin1Char('0')).arg(runSecs,2,10,QLatin1Char('0'));
+        //QString txt=tr("<small>runtime: %1:%2 min.</small>").arg(runMins,2,10,QLatin1Char('0')).arg(runSecs,2,10,QLatin1Char('0'));
+        QString txt=tr("<small>runtime: %1</small>").arg(qfSecondsDurationToHMSString(double(runsElapsed)/1000.0));
         if (ui->labRunning->text()!=txt) ui->labRunning->setText(txt);
     } else {
         if (!ui->labRunning->text().isEmpty()) {

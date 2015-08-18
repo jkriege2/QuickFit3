@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>$$local_plugin_subname$$</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+
+<h2>Model definition</h2>
+<p>This model function implements a 3D normal diffusion FCS model, where the diffusion coefficient (and therefore also the hydrodynamic radii) are distributed according to a gaussian distribution. It also supports up to two non-fluorescent species.: </p>
+$$bmath:g(\tau)=\frac{1}{N}\cdot X_{back}\cdot X_{nf}(\tau)\cdot\frac{\int_{\tau_{min}}^{\tau_{max}}p(D)\cdot\left(1+\frac{4D\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D\tau}{\gamma^2w_{xy}^2}\right)^{-1/2}\;\mathrm{d}D}{\int_{D_{min}}^{D_{max}}p(D_D)\;\mathrm{d}D_D}.$$
+ with a Gaussian distribution
+$$bmath:p(D)=\frac{1}{\sqrt{2\pi\sigma^2(D)}}\cdot\exp\left[-\frac{1}{2}\cdot\frac{(D-D_{c})^2}{\sigma^2(D)}\right].$$
+and a photophysics (non-fluorescenct) factor
+$$bmath:X_{nf}(\tau)= \frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}.$$
+The background correction is performed by factor
+$$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
+The parameters are:</p>
+<ul>
+<li>$$math:G_\infty$$: offset of the correlation function</li>
+<li>$$math:N$$: overall particle number (including currently dark particles, e.g. in triplet state)</li>
+<li>$$math:\Theta_{trip}, \Theta_{non}$$: fraction of the particles in one of the first two non-fluorescent states (priplet, ...)</li>
+<li>$$math:\tau_{trip}, \tau_{non}$$: decay time of the first two non-fluorescent states (triplet, ...)</li>
+<li>$$math:D_{c}$$: center diffusion coefficient</li>
+<li>$$math:\sigma(D)$$: width of the diffusion time distribution</li>
+<li>$$math:\gamma=\frac{z_0}{w_{xy}}$$: aspect ratio of the gaussian used to approximate the focus</li>
+<li>$$math:w_{xy}$$: lateral half axis of the focus gaussian</li>
+<li>$$math:z_0$$: longitudinal half axis of the focus gaussian</li>
+<li>$$math:\tau_{min}$$ and $$math:\tau_{max}$$ are the integration limits</li>
+</ul>
+$$FCS_SD_INTEGRATION$$
+
+<p>This model also calculates the diffusion decay time, from the width $$math:w_{xy}$$ of the laser focus (xy plane), as: </p>
+$$bmath:\tau_D=\frac{w_{xy}^2}{4D}.$$
+<p>Also the effective focal volume $$math:V_{eff}$$ is calculated: </p>
+$$bmath:V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3$$
+<p> Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
+$$bmath:C=\frac{N}{V_{eff}}$$
+<p>The plugin also calculates some parameter errors: </p>
+$$bmath:\Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right|$$
+$$bmath:\Delta \tau_D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2D}\right)^2+\left(\Delta D\cdot\frac{w_{xy}^2}{4D^2}\right)^2}$$
+$$bmath:\Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2}$$
+$$bmath:\Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2}$$
+
+
+<p>This model is based on ideas in the paper Ref. $$REF_PAL_FCSDIST$$</p>
+
+
+    </body>
+</html>

@@ -75,6 +75,7 @@ class QFETCSPCImporterThreadProgress : public QWidget {
         QElapsedTimer started;
         qint64 runMins;
         qint64 runSecs;
+        qint64 runsElapsed;
         QTimer* timer;
 
 };

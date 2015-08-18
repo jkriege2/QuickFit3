@@ -59,6 +59,37 @@ bool QFTCSPCReaderPicoquantPT3::open(const QString &filename, const QString &par
             return false;
         }
 
+
+        fileinfo.properties["CommentField"]=txtHeader.CommentField;
+        fileinfo.properties["FileTime"]=txtHeader.FileTime;
+        fileinfo.properties["CreatorName"]=txtHeader.CreatorName;
+        fileinfo.properties["CreatorVersion"]=txtHeader.CreatorVersion;
+
+        fileinfo.properties["Tacq"]=(qlonglong)binHeader.Tacq;
+        fileinfo.properties["NumberOfBoards"]=(qlonglong)binHeader.NumberOfBoards;
+        fileinfo.properties["RoutingChannels"]=(qlonglong)binHeader.RoutingChannels;
+        fileinfo.properties["MeasMode"]=(qlonglong)binHeader.MeasMode;
+        fileinfo.properties["SubMode"]=(qlonglong)binHeader.SubMode;
+        fileinfo.properties["StopAt"]=(qlonglong)binHeader.StopAt;
+        fileinfo.properties["StopOnOvfl"]=(qlonglong)binHeader.StopOnOvfl;
+
+        fileinfo.properties["HardwareIdent"]=boardHeader.HardwareIdent;
+        fileinfo.properties["HardwareVersion"]=boardHeader.HardwareVersion;
+        fileinfo.properties["HardwareSerial"]=boardHeader.HardwareSerial;
+        fileinfo.properties["SyncDivider"]=(qlonglong)boardHeader.SyncDivider;
+        fileinfo.properties["CFDZeroCross0"]=(qlonglong)boardHeader.CFDZeroCross0;
+        fileinfo.properties["CFDLevel0"]=(qlonglong)boardHeader.CFDLevel0;
+        fileinfo.properties["CFDZeroCross1"]=(qlonglong)boardHeader.CFDZeroCross1;
+        fileinfo.properties["CFDLevel1"]=(qlonglong)boardHeader.CFDLevel1;
+        fileinfo.properties["Resolution"]=boardHeader.Resolution;
+
+
+        fileinfo.properties["CntRate0"]=(qlonglong)TTTRHeader.CntRate0;
+        fileinfo.properties["CntRate1"]=(qlonglong)TTTRHeader.CntRate1;
+        fileinfo.properties["StopAfter"]=(qlonglong)TTTRHeader.StopAfter;
+        fileinfo.properties["StopReason"]=(qlonglong)TTTRHeader.StopReason;
+        fileinfo.properties["NoOfRecords"]=(qlonglong)TTTRHeader.Records;
+
         fgetpos(tttrfile, &fileResetPos);
         currentTTTRRecordNum=0;
         current.microtime_offset=0;

@@ -840,6 +840,7 @@ void QFRDRTableCurveFitDialog::updateFitStatistics()
             }
         }
 
+
         int items=residualsY.size();
 
         // estimate goodness-of-fit

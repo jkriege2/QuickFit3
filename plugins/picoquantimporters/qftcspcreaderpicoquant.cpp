@@ -98,6 +98,33 @@ bool QFTCSPCReaderPicoquant::open(const QString &filename, const QString &parame
             return false;
         }
 
+        fileinfo.properties["CommentField"]=txtHeader.CommentField;
+        fileinfo.properties["FileTime"]=txtHeader.FileTime;
+        fileinfo.properties["HardwareVersion"]=txtHeader.HardwareVersion;
+        fileinfo.properties["SoftwareVersion"]=txtHeader.SoftwareVersion;
+
+        fileinfo.properties["NumberOfChannels"]=(qlonglong)binHeader.Channels;
+        fileinfo.properties["NumberOfBoards"]=(qlonglong)binHeader.NumberOfBoards;
+        fileinfo.properties["RoutingChannels"]=(qlonglong)binHeader.RoutingChannels;
+        fileinfo.properties["MeasMode"]=(qlonglong)binHeader.MeasMode;
+        fileinfo.properties["SubMode"]=(qlonglong)binHeader.SubMode;
+        fileinfo.properties["AcquisitionTime"]=(qlonglong)binHeader.Tacq;
+        fileinfo.properties["StopAt"]=(qlonglong)binHeader.StopAt;
+        fileinfo.properties["StopOnOvfl"]=(qlonglong)binHeader.StopOnOvfl;
+
+        fileinfo.properties["BoardSerial"]=(qlonglong)boardHeader.BoardSerial;
+        fileinfo.properties["CFDZeroCross"]=(qlonglong)boardHeader.CFDZeroCross;
+        fileinfo.properties["CFDDiscrMin"]=(qlonglong)boardHeader.CFDDiscrMin;
+        fileinfo.properties["SyncLevel"]=(qlonglong)boardHeader.SyncLevel;
+        fileinfo.properties["CFDDiscrMin"]=(qlonglong)boardHeader.CFDDiscrMin;
+
+        fileinfo.properties["Globclock"]=(qlonglong)TTTRHeader.Globclock;
+        fileinfo.properties["SyncRate"]=(qlonglong)TTTRHeader.SyncRate;
+        fileinfo.properties["TTTRCFDRate"]=(qlonglong)TTTRHeader.TTTRCFDRate;
+        fileinfo.properties["TTTRStopAfter"]=(qlonglong)TTTRHeader.TTTRStopAfter;
+        fileinfo.properties["TTTRStopReason"]=(qlonglong)TTTRHeader.TTTRStopReason;
+        fileinfo.properties["NoOfRecords"]=(qlonglong)TTTRHeader.NoOfRecords;
+
         fgetpos(tttrfile, &fileResetPos);
         currentTTTRRecordNum=0;
         current.microtime_offset=0;

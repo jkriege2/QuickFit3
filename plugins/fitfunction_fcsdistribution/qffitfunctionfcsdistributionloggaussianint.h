@@ -40,7 +40,7 @@ class QFFitFunctionFCSDistributionIntLogGaussian: public QFFitFunction {
         /*! \copydoc QFFitFunction::name()   */
         virtual QString name() const { return QString("FCS Dist: Normal Diffuion 3D with log-normal diffusion time distribution [num_int]"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("FCS Dist: log-norm [num_int]"); }
+        virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_dist_int_lognorm"); }
         /*! \copydoc QFFitFunction::category()   */

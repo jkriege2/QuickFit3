@@ -487,6 +487,11 @@ MainWindow::~MainWindow() {
         tetris->close();
         delete tetris;
     }
+
+    if (helpWindow) {
+        helpWindow->close();
+        delete helpWindow;
+    }
     //std::cout<<"deleting MainWindow\n";
     if (project) delete project;
     project=NULL;

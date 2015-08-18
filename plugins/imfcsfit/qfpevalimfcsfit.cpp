@@ -78,7 +78,7 @@ void QFPEvalIMFCSFit::registerToMenu(QMenu* menu) {
 void QFPEvalIMFCSFit::init()
 {
     if (services) {
-        QMenu* menu=new QMenu(tr("imFCS &Calibration Tool"));
+        QMenu* menu=new QMenu(tr("imFCS &Calibration Tool"), parentWidget);
         menu->setIcon(QIcon(":/imfcsfit/imfcs_fitcalib.png"));
 
         QAction* actHelp=new QAction(QIcon(":/lib/help.png"), tr("Calibration Tutorial"), this);
@@ -111,6 +111,7 @@ void QFPEvalIMFCSFit::init()
         if (extm) {
             //extm->addAction(actImFCSCalib);
             extm->addMenu(menu);
+
         }
         menuCalibration=menu;
         services->registerWizard("eval_wizards", actWizard);
