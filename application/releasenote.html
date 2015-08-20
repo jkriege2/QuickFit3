@@ -155,12 +155,13 @@
         <li>added an option for user-defined partial specific volumes for globular particles (+ presets for proteins, DNA, ...)</li>
     </ul></li>
     <li><b>SPIM-FCS fit models</b><ul>
+        <li><font color="red"><b>MAJOR BUGFIX:</b> some of the 2-pixel FCCS models has an additional factor of 1/a^2, which was wrong. Therefore the particle number estimate from these models was wrong! [Thanks to F. Taheri]</font></li>
         <li>added model for SPIM-FCS autocorrelation with diffusion and flow</li>
         <li>added 2-color FCCS model for 3D anomalous diffusion</li>
         <li>added 2-pixel FCCS 3D anomalous diffusion model</li>
     </ul></li>
     <li><b>TIR-FCS fit models</b><ul>
-    <li><font color="red"><b>MAJOR BUGFIX:</b> The TIR-FCS fit models with square-pixels had an additional factor 1/a<sup>2</sup>, which was wrong in the code (NOT IN THE DOCUMENTATION!). This is fixed now!</li>
+        <li><font color="red"><b>MAJOR BUGFIX:</b> The TIR-FCS fit models with square-pixels had an additional factor 1/a<sup>2</sup>, which was wrong in the code (NOT IN THE DOCUMENTATION!). This is fixed now!</font></li>
         <li>added model for TIR-FCS autocorrelation with diffusion and flow (pixel-detector)</li>
         <li>added 3D/2D anomalous diffusion model for confocal TIR-FCS</li>
         <li>added 3D/2D normal diffusion model for confocal TIR-FCS</li>
@@ -233,6 +234,7 @@
       <li>license is now LGPL 2.1</li>
     </ul></li>
     <li><b>qfe_calculator</b><ul>
+      <li>improved user-interface with resizable (and always visible) editor for longer scripts</li>
       <li>license is now LGPL 2.1</li>
     </ul></li>
     <li><b>qfe_helpeditor</b><ul>
