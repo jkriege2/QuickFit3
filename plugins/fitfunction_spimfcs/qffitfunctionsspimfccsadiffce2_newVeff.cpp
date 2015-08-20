@@ -126,7 +126,7 @@ double QFFitFunctionsSPIMFCCSADiffCENewVeff2::evaluate(double t, const double* d
 
 
     const double Veff=SPIMFCS_newVeff(a, wxy, wz);
-    const double pre=1.0/sqr(a);
+    const double pre=1.0;///sqr(a);
     return offset+pre/(N/Veff)*cfac*backfactor;
 }
 

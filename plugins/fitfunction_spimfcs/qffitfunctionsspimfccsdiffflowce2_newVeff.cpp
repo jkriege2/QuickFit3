@@ -125,7 +125,7 @@ double QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2::evaluate(double t, const double
     if (comp>2) cfac=cfac+r3*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx-vx*t, dy-vy*t, 0, D3, t, wxy, wxy, wz, wz);
 
     const double Veff=SPIMFCS_newVeff(a, wxy, wz);
-    const double pre=1.0/sqr(a);
+    const double pre=1.0;///sqr(a);
     return offset+pre/(N/Veff)*cfac*backfactor;
 }
 

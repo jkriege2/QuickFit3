@@ -113,7 +113,7 @@ double QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global::evaluate(double t, const 
                 r2*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, D2, t, wxy, wxy, wz, wz);
 
     const double Veff=SPIMFCS_newVeff(a, wxy, wz);
-    const double pre=1.0/sqr(a);
+    const double pre=1.0;///sqr(a);
     return offset+pre/(N/Veff)*cfac*backfactor;
 }
 
