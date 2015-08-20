@@ -64,6 +64,10 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
 
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
     //on_chkMultiline_toggled(ui->chkMultiline->isChecked());
+    ui->btnLoad->clearFocus();
+    ui->btnSave->clearFocus();
+    ui->btnEvaluate->clearFocus();
+    ui->btnEvaluateScript->clearFocus();
     ui->edtExpression->setFocus();
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
@@ -152,7 +156,7 @@ void QFECalculatorDialog::showCache()
 
 void QFECalculatorDialog::on_btnLoad_clicked()
 {
-    QString filename=qfGetOpenFileNameSet("QFECalculatorDialog/", this, tr("load script ..."), QString(), tr("expression parser script (*.esc)&&text file (*.txt)&&all files (*.*)"));
+    QString filename=qfGetOpenFileNameSet("QFECalculatorDialog/", this, tr("load script ..."), QString(), tr("expression parser script (*.esc);;text file (*.txt);;all files (*.*)"));
     if (QFile::exists(filename)) {
         QFile f(filename);
         if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
@@ -164,7 +168,7 @@ void QFECalculatorDialog::on_btnLoad_clicked()
 
 void QFECalculatorDialog::on_btnSave_clicked()
 {
-    QString filename=qfGetSaveFileNameSet("QFECalculatorDialog/", this, tr("save script ..."), QString(), tr("expression parser script (*.esc)&&text file (*.txt)&&all files (*.*)"));
+    QString filename=qfGetSaveFileNameSet("QFECalculatorDialog/", this, tr("save script ..."), QString(), tr("expression parser script (*.esc);;text file (*.txt);;all files (*.*)"));
     if (!filename.isEmpty()) {
         QFile f(filename);
         if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
@@ -223,6 +227,11 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
         parser->addVariable("ans", r);
         parser->addVariable("answer", r);
         ui->edtExpression->setText("");
+        ui->btnLoad->clearFocus();
+        ui->btnSave->clearFocus();
+        ui->btnEvaluate->clearFocus();
+        ui->btnEvaluateScript->clearFocus();
+        ui->pteExpression->clearFocus();
         ui->edtExpression->setFocus();
         history.append(expression);
     } else {
@@ -253,7 +262,11 @@ void QFECalculatorDialog::on_btnEvaluateScript_clicked()
     QString expression=ui->pteExpression->toPlainText();
     QTextCursor cur1(ui->edtHistory->document());
     cur1.movePosition(QTextCursor::End);
-    cur1.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(qfHTMLEscape(expression))));
+    QStringList ex=expression.split('\n');
+    for (int i=0; i<ex.size(); i++) {
+        if (i==0) cur1.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(qfHTMLEscape(ex[i]))));
+        else cur1.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;<i>%1</i></tt><br>").arg(qfHTMLEscape(ex[i]))));
+    }
     parser->resetErrors();
     qfmpResult r=parser->evaluate(expression);
 
@@ -288,8 +301,6 @@ void QFECalculatorDialog::on_btnEvaluateScript_clicked()
         }
         parser->addVariable("ans", r);
         parser->addVariable("answer", r);
-        ui->edtExpression->setText("");
-        ui->edtExpression->setFocus();
         history.append(expression);
     } else {
         result=tr("<font color=\"red\">invalid result</font>");
@@ -308,7 +319,7 @@ void QFECalculatorDialog::on_btnEvaluateScript_clicked()
     //on_chkMultiline_toggled(ui->chkMultiline->isChecked());
     //if (ui->chkMultiline->isChecked()) ui->pteExpression->setFocus();
     //else ui->edtExpression->setFocus();
-    ui->pteExpression->setFocus();
+
 }
 
 void QFECalculatorDialog::on_edtExpression_textChanged(QString text) {
