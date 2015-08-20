@@ -222,11 +222,11 @@ void QFDoubleEdit::updateWidget(const QString & text) {
     bool ok=true;
     double val=QLocale::system().toDouble(text, &ok);
     if (!ok) return;
-    double newVal=val;
+    //double newVal;//=val;
     //palette().setColor(QPalette::Base, m_background);
     ok=true;
-    if (m_checkMaximum && (val>m_maximum)) { ok=false; newVal=m_maximum; }
-    if (m_checkMaximum && (val<m_minimum)) { ok=false; newVal=m_minimum; }
+    if (m_checkMaximum && (val>m_maximum)) { ok=false; }//newVal=m_maximum; }
+    if (m_checkMaximum && (val<m_minimum)) { ok=false; }//newVal=m_minimum; }
     if (!ok) {
         QPalette p=palette();
         p.setColor(QPalette::Base, m_errorColor);

@@ -102,6 +102,8 @@ bool QFMathParser_DefaultLib::hasDefaultFunctions(QFMathParser* p)
 void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
 {
     p->addFunction("comment", QFMathParser_DefaultLib::fComment);
+    p->addFunction("repeatstring", QFMathParser_DefaultLib::fRepeatString);
+    p->addFunction("repeat", QFMathParser_DefaultLib::fRepeat);
     p->addFunction("struct", QFMathParser_DefaultLib::fStruct);
     p->addFunction("structkeys", QFMathParser_DefaultLib::fStructKeys);
     p->addFunction("structget", QFMathParser_DefaultLib::fStructGet);
@@ -497,6 +499,83 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
 
 
 namespace QFMathParser_DefaultLib {
+
+
+    void fComment(qfmpResult &r, const qfmpResult */*params*/, unsigned int /*n*/, QFMathParser */*p*/)
+    {
+        r.setVoid();
+    }
+
+    void fRepeat(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==2) {
+            if (params[0].isUInt()) {
+                const uint32_t N=params[0].toUInt();
+                if (params[1].type==qfmpDouble) {
+                    r.setDoubleVec(N, params[1].num);
+                } else if (params[1].type==qfmpDoubleVector) {
+                    r.setDoubleVec(N*params[1].length());
+                    for (uint32_t i=0; i<N*params[1].length(); i++) {
+                        r.numVec[i]=params[1].numVec[i%params[1].numVec.length()];
+                    }
+                } else if (params[1].type==qfmpBool) {
+                    r.setBoolVec(N, params[1].boolean);
+                } else if (params[1].type==qfmpBoolVector) {
+                    r.setBoolVec(N*params[1].length());
+                    for (uint32_t i=0; i<N*params[1].length(); i++) {
+                        r.boolVec[i]=params[1].boolVec[i%params[1].boolVec.length()];
+                    }
+                } else if (params[1].type==qfmpString) {
+                    r.setStringVec(N, params[1].str);
+                } else if (params[1].type==qfmpStringVector) {
+                    r.setStringVec(N*params[1].length());
+                    for (uint32_t i=0; i<N*params[1].length(); i++) {
+                        r.strVec[i]=params[1].strVec[i%params[1].strVec.length()];
+                    }
+                } else {
+                    p->qfmpError(QObject::tr("repeat(x,value) the argument value is of type '%1', which cannot be replicated into a vector").arg(params[1].typeName()));
+                    r.setInvalid();
+                    return;
+                }
+            } else {
+                p->qfmpError(QObject::tr("repeat(x,value) needs a positive integer as first argument"));
+                r.setInvalid();
+                return;
+            }
+        } else {
+            p->qfmpError(QObject::tr("repeat(x,value) needs at 2 arguments"));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fRepeatString(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==2) {
+            if (params[0].isUInt()) {
+                const uint32_t N=params[0].toUInt();
+                if (params[1].type==qfmpString) {
+                    r.setString("");
+                    for (uint32_t i=0; i<N; i++) {
+                        r.str.append(params[1].str);
+                    }
+                } else {
+                    p->qfmpError(QObject::tr("repeatstring(x,text) the argument text is of type '%1', but has to be a string").arg(params[1].typeName()));
+                    r.setInvalid();
+                    return;
+                }
+            } else {
+                p->qfmpError(QObject::tr("repeatstring(x,text) needs a positive integer as first argument"));
+                r.setInvalid();
+                return;
+            }
+        } else {
+            p->qfmpError(QObject::tr("repeatstring(x,text) needs at 2 arguments"));
+            r.setInvalid();
+            return;
+        }
+    }
+
 
     QString ptosystempathseparator(const QString& param) {
         QString r;
@@ -6195,11 +6274,6 @@ namespace QFMathParser_DefaultLib {
                 return;
             }
         }
-    }
-
-    void fComment(qfmpResult &r, const qfmpResult */*params*/, unsigned int /*n*/, QFMathParser */*p*/)
-    {
-        r.setVoid();
     }
 
 #endif

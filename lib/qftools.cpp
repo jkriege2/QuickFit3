@@ -287,7 +287,7 @@ void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
 }
 
 void loadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosition, QSize defaultSize, QString prefix) {
-    QSize size = settings.value(prefix+"size", defaultSize).toSize();
+    //QSize size = settings.value(prefix+"size", defaultSize).toSize();
 
     if (settings.contains(prefix+"pos")){
         QPoint pos = settings.value(prefix+"pos", defaultPosition).toPoint();
@@ -1293,12 +1293,12 @@ QString intToOctQString(int64_t value)
 
 QString doubleToLatexQStringAlwaysSign(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent, const QString& signSeparator){
     QString sign="+"+signSeparator;
-    double d=data;
+    //double d=data;
     if (data<0) {
-        d=-data;
+        //d=-data;
         sign="-"+signSeparator;
     }
-    return sign+doubleToLatexQString(data, precision, remove_trail0, belowIsZero, minNoExponent, maxNoExponent);
+    return sign+doubleToLatexQString(fabs(data), precision, remove_trail0, belowIsZero, minNoExponent, maxNoExponent);
 }
 
 QString doubleToLatexQString(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent){
@@ -1324,12 +1324,12 @@ QString doubleToLatexQString(double data, int precision, bool remove_trail0, dou
 
 QString doubleToHTMLQStringAlwaysSign(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent, const QString& signSeparator){
     QString sign="+"+signSeparator;
-    double d=data;
+    //double d=data;
     if (data<0) {
-        d=-data;
+        //d=-data;
         sign="-"+signSeparator;
     }
-    return sign+doubleToHTMLQString(data, precision, remove_trail0, belowIsZero, minNoExponent, maxNoExponent);
+    return sign+doubleToHTMLQString(fabs(data), precision, remove_trail0, belowIsZero, minNoExponent, maxNoExponent);
 
 }
 

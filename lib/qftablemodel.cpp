@@ -471,6 +471,66 @@ void QFTableModel::deleteColumn(quint32 c) {
     endMultiUndo();
 }
 
+void QFTableModel::deleteRows(const QList<quint32> &r)
+{
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
+    startMultiUndo();
+    for (int rr=0; rr<r.size(); rr++) {
+        deleteRow(r[rr]);
+    }
+    endMultiUndo();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) {
+        beginResetModel(); endResetModel();
+    }
+}
+
+void QFTableModel::deleteColumns(const QList<quint32> &c)
+{
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
+    startMultiUndo();
+    for (int rr=0; rr<c.size(); rr++) {
+        deleteColumn(c[rr]);
+    }
+    endMultiUndo();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) {
+        beginResetModel(); endResetModel();
+    }
+}
+
+void QFTableModel::deleteRows(const QVector<quint32> &r)
+{
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
+    startMultiUndo();
+    for (int rr=0; rr<r.size(); rr++) {
+        deleteRow(r[rr]);
+    }
+    endMultiUndo();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) {
+        beginResetModel(); endResetModel();
+    }
+}
+
+void QFTableModel::deleteColumns(const QVector<quint32> &c)
+{
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
+    startMultiUndo();
+    for (int rr=0; rr<c.size(); rr++) {
+        deleteColumn(c[rr]);
+    }
+    endMultiUndo();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) {
+        beginResetModel(); endResetModel();
+    }
+}
+
 void QFTableModel::emptyColumn(quint32 c)
 {
     bool oldEmit=doEmitSignals;
@@ -1338,8 +1398,8 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     if (clearTable) clear();
     //std::cout<<"      opening '"<<filename.toStdString()<<"'\n";
     QString line=in.readLine();
-    bool header_read=false;
-    quint32 row=0, rows=0, column=0, columns=0;
+    //bool header_read=false;
+    quint32 row=0, column=0;
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
     bool hasTitle=false;
@@ -1351,7 +1411,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
         //std::cout<<"read: <"<<line.toStdString()<<">\n";
         if (line.size()>0) {
             if (line.startsWith(header_start)) {
-                header_read=true;
+                //header_read=true;
                 line=line.right(line.size()-header_start.size());
                 QStringList sl=line.split(QString(column_separator));
                 state.columns=(int64_t(state.columns)>sl.size())?state.columns:sl.size();
@@ -1366,7 +1426,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                 }
                 hasTitle=true;
             } else if (line.startsWith(comment_start) && !hasTitle && !hasData) {
-                header_read=true;
+                //header_read=true;
                 line=line.right(line.size()-1);
                 QStringList sl=line.split(QString(column_separator));
                 state.columns=(int64_t(state.columns)>sl.size())?state.columns:sl.size();
@@ -1467,7 +1527,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                             bool okd=false;
                             double cd=s.toDouble(&okd);
                             bool okl=false;
-                            qlonglong cl=s.toLongLong(&okl);
+                            //qlonglong cl=s.toLongLong(&okl);
                             if (!okd && !okl) {
                                 setCellCreate(row+start_row, column+start_col, s);
                             } else {
@@ -1549,11 +1609,11 @@ QList<QList<QVariant> > QFTableModel::getDataTable(QStringList &colNames, QStrin
     int ri=0;
     for (quint32 r=0; r<state.rows; r++) {
         if (usedrows.contains(r)||saveCompleteTable) {
-            bool first=true;
+            //bool first=true;
             int ci=0;
             for (quint32 c=0; c<state.columns; c++) {
                 if (usedCols.contains(c) || saveCompleteTable) {
-                    first=false;
+                    //first=false;
                     quint64 a=xyAdressToUInt64(r, c);
                     if (state.dataMap.contains(a) && ci<data.size() && ri<data[ci].size()) {
                         data[ci].operator [](ri)=state.dataMap[a];

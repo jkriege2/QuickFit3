@@ -91,7 +91,7 @@ void dataExpand(QList<QList<QVariant> >& data, QStringList* columnsNames) {
     int colid=0;
     for (int c=0; c<data.size(); c++) {
         int cols=1;
-        bool hasErrors=false;
+        //bool hasErrors=false;
         for (int r=0; r<data[c].size(); r++) {
             const QVariant& v=data[c].at(r);
             //qDebug()<<"c="<<c<<"r="<<r<<" = "<<v;
@@ -757,7 +757,7 @@ bool mayLossLesslyDoDoubleDataToDouble(const QList<QList<QVariant> >& data) {
     for (int i=0; i<in.size(); i++) {
         for (int j=0; j<in[i].size(); j++) {
             bool ok=false;
-            double d=in[i].at(j).toDouble(&ok);
+            //double d=in[i].at(j).toDouble(&ok);
             if (in[i].at(j).canConvert(QVariant::Double) && (!ok)) {
                 return false;
             }

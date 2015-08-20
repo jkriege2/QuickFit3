@@ -494,6 +494,14 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void deleteRow(quint32 r);
         /** \brief remove the given column */
         void deleteColumn(quint32 c);
+        /** \brief remove the given rows */
+        void deleteRows(const QList<quint32>& r);
+        /** \brief remove the given columns */
+        void deleteColumns(const QList<quint32>& c);
+        /** \brief remove the given rows */
+        void deleteRows(const QVector<quint32>& r);
+        /** \brief remove the given columns */
+        void deleteColumns(const QVector<quint32>& c);
         /** \brief remove all data from given column, but do not remove the column (also does not delete it's header) */
         void emptyColumn(quint32 c);
         /** \brief delete all contents from the given cell */

@@ -87,6 +87,37 @@ int main(int argc, char *argv[])
     #define PARAMCNT2 QFPPM_INC(PARAMCNT1)
     qDebug()<<PARAMCNT2;
 
+    {
+        QList<int> l;
+        l<<1<<3<<4<<5<<6<<7<<9<<10<<11<<13<<15<<16<<17<<19;
+        qDebug()<<l<<"\n  => "<<qfConsecutiveIncIntsToRange(l,1);
+    }
+    {
+        QList<int> l;
+        l<<1;
+        qDebug()<<l<<"\n  => "<<qfConsecutiveIncIntsToRange(l,1);
+    }
+    {
+        QList<int> l;
+        l<<1<<2;
+        qDebug()<<l<<"\n  => "<<qfConsecutiveIncIntsToRange(l,1);
+    }
+    {
+        QList<int> l;
+        l<<1<<3;
+        qDebug()<<l<<"\n  => "<<qfConsecutiveIncIntsToRange(l,1);
+    }
+    {
+        QList<int> l;
+        //l;
+        qDebug()<<l<<"\n  => "<<qfConsecutiveIncIntsToRange(l,1);
+    }
+    {
+        QList<int> l;
+        l<<1<<3<<4<<5<<6<<7<<9<<10<<11<<13<<15<<16<<17;
+        qDebug()<<l<<"\n  => "<<qfConsecutiveIncIntsToRange(l,1);
+    }
+
 
     //QDir d("../../");
     //qDebug()<<qfDirListFilesRecursive(d).join("\n");

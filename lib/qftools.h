@@ -2066,6 +2066,72 @@ QFLIB_EXPORT QHBoxLayout* qfBuildQHBoxLayoutWithFinalStretch(QWidget* w1, QWidge
 QFLIB_EXPORT QVBoxLayout* qfBuildQVBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
 QFLIB_EXPORT QFormLayout* qfBuildQFormLayout(const QString& l1, QWidget* w1, const QString& l2, QWidget* w2, const QString& l3=QString(), QWidget* w3=NULL, const QString& l4=QString(), QWidget* w4=NULL, const QString& l5=QString(), QWidget* w5=NULL, const QString& l6=QString(), QWidget* w6=NULL, const QString& l7=QString(), QWidget* w7=NULL, const QString& l8=QString(), QWidget* w8=NULL, const QString& l9=QString(), QWidget* w9=NULL);
 
+
+/** \brief return a list of ranges, which compress consecutive, increasing integers */
+template<class T>
+QList<QPair<T,T> > qfConsecutiveIncIntsToRange(const QList<T>& data, T increment=T(1)) {
+    QList<QPair<T,T> > res;
+    if (data.size()<=0) return res;
+    if (data.size()==1) {
+        res.append(qMakePair(data[0],data[0]));
+        return res;
+    }
+    T rangestart=data[0];
+    //int rangestart_idx=0;
+    for (int i=1; i<data.size(); i++) {
+        if (data[i]!=data[i-1]+increment) {
+            res.append(qMakePair(rangestart,data[i-1]));
+            if (i!=data.size()-1) {
+                rangestart=data[i];
+                //rangestart_idx=i;
+            } else {
+                res.append(qMakePair(data[i],data[i]));
+                //rangestart_idx=-1;
+            }
+        } else {
+            if (i==data.size()-1) {
+                res.append(qMakePair(rangestart,data[i]));
+                //rangestart_idx=-1;
+            }
+        }
+    }
+    return res;
+}
+
+
+
+/** \brief return a list of ranges, which compress consecutive, increasing integers */
+template<class T>
+QVector<QPair<T,T> > qfConsecutiveIncIntsToRange(const QVector<T>& data, T increment=T(1)) {
+    QVector<QPair<T,T> > res;
+    if (data.size()<=0) return res;
+    if (data.size()==1) {
+        res.append(qMakePair(data[0],data[0]));
+        return res;
+    }
+    T rangestart=data[0];
+    //int rangestart_idx=0;
+    for (int i=1; i<data.size(); i++) {
+        if (data[i]!=data[i-1]+increment) {
+            res.append(qMakePair(rangestart,data[i-1]));
+            if (i!=data.size()-1) {
+                rangestart=data[i];
+                //rangestart_idx=i;
+            } else {
+                res.append(qMakePair(data[i],data[i]));
+                //rangestart_idx=-1;
+            }
+        } else {
+            if (i==data.size()-1) {
+                res.append(qMakePair(rangestart,data[i-1]));
+                //rangestart_idx=-1;
+            }
+        }
+    }
+    return res;
+}
+
+
 #endif // QFTOOLS_H
 
 

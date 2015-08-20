@@ -129,7 +129,7 @@ $$funcref_end$$
   $$funcref_start$$<a name="reverse"/><!-- func:reverse -->
   <b><tt><!-- template -->reverse(x)<!-- /template --></tt> - <i>reverse the vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  example: <tt>[1,2,3] -> [3,2,1]</tt>
+  $$example:<tt>[1,2,3] -> [3,2,1]</tt>$$
   <!-- /func:reverse -->  
 $$funcref_end$$
 
@@ -144,10 +144,20 @@ $$funcref_end$$
   $$funcref_start$$<a name="concat"/><!-- func:concat -->
   <b><tt><!-- template -->concat(x1, x2, ...)<!-- /template --></tt> - <i>concatenate the parameter vectors <tt>x1, x2, ...</tt> </i>:</b>
 $$funcref_description$$
-  example: <tt>concat([1,2,3], [4,5,6]) -> [1,2,3,4,5,6]</tt>
+  $$example: <tt>concat([1,2,3], [4,5,6]) -> [1,2,3,4,5,6]</tt>$$
   <!-- /func:concat -->  
 $$funcref_end$$
   
+  $$funcref_start$$<a name="repeat"/><!-- func:repeat -->
+  <b><tt><!-- template -->repeat(N, value)<!-- /template --></tt> - <i>returns a vector with <tt>N</tt> consecutive copies of <tt>value</tt> </i>:</b>
+$$funcref_description$$
+  If <tt>value</tt> is a vector of length <i>M</i>, <tt>repeat</tt> will return a vector of length <tt>N</tt>*<i>M</i>, as shwon in theexamples below:<br>
+  $$example: <tt>repeat(2, 3.14) -> [3.14,3.14,3.14]</tt><br><tt>repeat(5, true) -> [true,true,true,true,true]</tt><br><tt>repeat(3, [4,5,6]) -> [4,5,6,4,5,6,4,5,6]</tt>$$
+  $$startbox_note$$
+  If <tt>value</tt> is a string or string vector, the function will always return a vector of strings. If you want to concatenate several copies of the same string, use <a href="string.html#repeatstring">repeatstring(N, text)<tt></tt></a> instead.
+  $$endbox$$
+  <!-- /func:repeat -->  
+$$funcref_end$$
   
   
   
@@ -184,10 +194,10 @@ $$funcref_end$$
   $$funcref_start$$<a name="unique"/><!-- func:unique -->
   <b><tt><!-- template -->unique(x)<!-- /template --></tt> - <i>returns a list containing all elements in <tt>x</tt>, if any value appears more than once in <tt>x</tt> it is returned only once. The order is the order in the initial data vector <tt>x</tt>.</b>
 $$funcref_description$$
-  Example:<br><blockquote><tt>
+  $$example:<br><blockquote><tt>
   x=[1,3,2,1,2,3,3,2,1];
   unique[x] -> [1,3,2]
-  </tt></blockquote>
+  </tt></blockquote>$$
   <!-- /func:unique-->  
 $$funcref_end$$
 

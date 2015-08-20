@@ -173,6 +173,8 @@ namespace QFMathParser_DefaultLib {
     void fSplit(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fJoin(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fRemoveEmpty(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRepeat(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRepeatString(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fMean, mean, qfstatisticsAverage)
 

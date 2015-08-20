@@ -1113,16 +1113,17 @@ void QFRDRTableEditor::slDeleteRow() {
                 answer = QMessageBox::question(this, tr("Delete row(s) ..."), tr("Are you sure that you want to delete the selected rows?"), QMessageBox::Yes | QMessageBox::No);
                 if (answer == QMessageBox::Yes) {
                     QModelIndexList l=sm->selectedIndexes();
-                    QList<int> rl;
+                    QList<quint32> rl;
                     for (int i=0; i<l.size(); i++) {
                         if (!rl.contains(l[i].row())) rl.append(l[i].row());
                     }
                     qSort(rl);
                     m->model()->disableSignals();
-                    for (int i=rl.size()-1; i>=0; i--) {
-                        //std::cout<<"deleting row "<<rl[i]<<std::endl;
-                        m->model()->deleteRow(rl[i]);
-                    }
+                    m->model()->deleteRows(rl);
+//                    for (int i=rl.size()-1; i>=0; i--) {
+//                        //std::cout<<"deleting row "<<rl[i]<<std::endl;
+//                        m->model()->deleteRow(rl[i]);
+//                    }
                     m->model()->enableSignals(true);
                 }
             }
