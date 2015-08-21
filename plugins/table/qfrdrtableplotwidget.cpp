@@ -31,6 +31,8 @@
 #include "qffitfunction.h"
 #include "dlgcolorbarcoloring.h"
 
+#define DELAYEDUPDATEGRAPH_DELAY 200
+
 
 QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     QWidget(parent),
@@ -65,8 +67,8 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     connect(ui->widGraphSettings, SIGNAL(performRefit(int)), this, SLOT(doRefit(int)));
     connect(ui->widGraphSettings, SIGNAL(performFit(int,int,int,int,QString,QFRDRTable::GraphDataSelection)), this, SLOT(doFit(int,int,int,int,QString,QFRDRTable::GraphDataSelection)));
     connect(ui->widGraphSettings, SIGNAL(performRegression(int,int,int,int, QFRDRTable::GraphDataSelection)), this, SLOT(doRegression(int,int,int,int,QFRDRTable::GraphDataSelection)));
-    connect(ui->widSystemSettings, SIGNAL(plotSettingsChanged()), this, SLOT(updateGraph()));
-    connect(ui->widGraphSettings, SIGNAL(reloadGraph()), this, SLOT(reloadGraphData()));
+    connect(ui->widSystemSettings, SIGNAL(plotSettingsChanged()), this, SLOT(delayedUpdateGraph()));
+    connect(ui->widGraphSettings, SIGNAL(reloadGraph()), this, SLOT(delayedReloadGraphData()));
 
     //ui->formLayout_3->removeWidget(ui->widSaveCoordSettings);
     //ui->tabWidget->setCornerWidget(ui->widSaveCoordSettings);
@@ -118,6 +120,21 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     updating=false;
 
     ui->tabWidget->setCurrentIndex(0);
+    timUpdateGraph.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timUpdateGraph.setSingleShot(true);
+    timUpdateData.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timUpdateData.setSingleShot(true);
+    timReloadGraphData.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timReloadGraphData.setSingleShot(true);
+    timPlotDataChanged.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timPlotDataChanged.setSingleShot(true);
+    timGraphDataChanged.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timGraphDataChanged.setSingleShot(true);
+    connect(&timUpdateGraph, SIGNAL(timeout()), this, SLOT(updateGraph()));
+    connect(&timUpdateData, SIGNAL(timeout()), this, SLOT(updateData()));
+    connect(&timReloadGraphData, SIGNAL(timeout()), this, SLOT(reloadGraphData()));
+    connect(&timPlotDataChanged, SIGNAL(timeout()), this, SLOT(plotDataChanged()));
+    connect(&timGraphDataChanged, SIGNAL(timeout()), this, SLOT(graphDataChanged()));
 
     connect(ui->widSystemSettings, SIGNAL(autoscaleX()), this, SLOT(doAutoscaleX()));
     connect(ui->widSystemSettings, SIGNAL(autoscaleY()), this, SLOT(doAutoscaleY()));
@@ -351,6 +368,14 @@ void QFRDRTablePlotWidget::graphDataChanged() {
     updateGraph();
 }
 
+void QFRDRTablePlotWidget::delayedGraphDataChanged()
+{
+    timGraphDataChanged.stop();
+    timGraphDataChanged.setSingleShot(true);
+    timGraphDataChanged.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timGraphDataChanged.start();
+}
+
 void QFRDRTablePlotWidget::plotDataChanged() {
     //qDebug()<<"plotDataChanged   updating="<<updating;
     if (updating) return;
@@ -361,6 +386,14 @@ void QFRDRTablePlotWidget::plotDataChanged() {
         //QFRDRTable::GraphInfo graph=current->getPlot(this->plot).graphs.value(currentRow, QFRDRTable::GraphInfo());
     }
     updateGraph();
+}
+
+void QFRDRTablePlotWidget::delayedPlotDataChanged()
+{
+    timPlotDataChanged.stop();
+    timPlotDataChanged.setSingleShot(true);
+    timPlotDataChanged.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timPlotDataChanged.start();
 }
 
 
@@ -1455,6 +1488,14 @@ void QFRDRTablePlotWidget::updateGraph() {
     QApplication::restoreOverrideCursor();
 }
 
+void QFRDRTablePlotWidget::delayedUpdateGraph()
+{
+    timUpdateGraph.stop();
+    timUpdateGraph.setSingleShot(true);
+    timUpdateGraph.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timUpdateGraph.start();
+}
+
 void QFRDRTablePlotWidget::updateData() {
     bool update=ui->plotter->get_doDrawing();
     ui->plotter->set_doDrawing(false);
@@ -1498,6 +1539,14 @@ void QFRDRTablePlotWidget::updateData() {
     }
 }
 
+void QFRDRTablePlotWidget::delayedUpdateData()
+{
+    timUpdateData.stop();
+    timUpdateData.setSingleShot(true);
+    timUpdateData.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timUpdateData.start();
+}
+
 void QFRDRTablePlotWidget::updatePlotWidgetVisibility() {
     if (current) {
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
@@ -1522,7 +1571,7 @@ void QFRDRTablePlotWidget::connectWidgets()
 {
     //qDebug()<<"connectWidgets";
     connect(ui->listGraphs, SIGNAL(currentRowChanged(int)), this, SLOT(listGraphs_currentRowChanged(int)));
-    connect(ui->widGraphSettings, SIGNAL(graphDataChanged()), this, SLOT(graphDataChanged()));
+    connect(ui->widGraphSettings, SIGNAL(graphDataChanged()), this, SLOT(delayedGraphDataChanged()));
     ui->widSystemSettings->connectWidgets();
 }
 
@@ -1530,7 +1579,7 @@ void QFRDRTablePlotWidget::disconnectWidgets()
 {
     //qDebug()<<"disconnectWidgets";
     disconnect(ui->listGraphs, SIGNAL(currentRowChanged(int)), this, SLOT(listGraphs_currentRowChanged(int)));
-    disconnect(ui->widGraphSettings, SIGNAL(graphDataChanged()), this, SLOT(graphDataChanged()));
+    disconnect(ui->widGraphSettings, SIGNAL(graphDataChanged()), this, SLOT(delayedGraphDataChanged()));
     ui->widSystemSettings->disconnectWidgets();
 }
 
@@ -1827,7 +1876,17 @@ void QFRDRTablePlotWidget::on_btnColorByPalette_clicked()
 
 void QFRDRTablePlotWidget::reloadGraphData()
 {
+    QWidget* w=QApplication::focusWidget();
     listGraphs_currentRowChanged(ui->listGraphs->currentRow());
+    if (w) w->setFocus(Qt::MouseFocusReason);
+}
+
+void QFRDRTablePlotWidget::delayedReloadGraphData()
+{
+    timReloadGraphData.stop();
+    timReloadGraphData.setSingleShot(true);
+    timReloadGraphData.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timReloadGraphData.start();
 }
 
 

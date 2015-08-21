@@ -30,9 +30,10 @@
 #include <cmath>
 #include "cpptools.h"
 #include "qfrdrtable.h"
-#include "QToolTip"
+#include <QToolTip>
 #include "qfmathparser.h"
 #include "qffunctionreferencetool.h"
+#include <QTimer>
 
 namespace Ui {
     class QFRDRTablePlotWidget;
@@ -78,11 +79,18 @@ class QFRDRTablePlotWidget : public QWidget
         void on_btnResetColoring_clicked();
         void on_btnColorByPalette_clicked();
         void reloadGraphData();
+        void delayedReloadGraphData();
 
         void graphDataChanged();
+        void delayedGraphDataChanged();
         void plotDataChanged();
+        void delayedPlotDataChanged();
+
+
         void updateGraph();
+        void delayedUpdateGraph();
         void updateData();
+        void delayedUpdateData();
         void updatePlotWidgetVisibility();
 
         void connectWidgets();
@@ -96,6 +104,11 @@ class QFRDRTablePlotWidget : public QWidget
 
         void setAxisProps(JKQTPcoordinateAxis *axis, const QFRDRTable::AxisInfo &axisData, const QFRDRTable::PlotInfo &p, bool minorGrid=true, bool majorGrid=true);
     private:
+        QTimer timUpdateGraph;
+        QTimer timUpdateData;
+        QTimer timReloadGraphData;
+        QTimer timGraphDataChanged;
+        QTimer timPlotDataChanged;
         Ui::QFRDRTablePlotWidget *ui;
         QToolBar* toolbarPlot;
         QLabel* labPlotPosition;

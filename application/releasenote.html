@@ -41,6 +41,7 @@
         <li>improved autoscaling/zoom behaviour if data contains NANs</li>
         <li>bugfix: copy images didn't work in some cases</li>
         <li>you can now also copy the color palettes of an image plot to the clipboard</li>
+        <li>bugfix: barcharts (bar widths) now also work for unsorted category data</li>
       </ul></li>
       <li>expression parser:<ul>
         <li>added vector creation functions ones(), zeros(), linspace(), logspace(), vector() meshgrid2d_x(), meshgrid2d_y()</li>
@@ -49,6 +50,7 @@
         <li>added functions repeat() and repeatstring()</li>
         <li>added comments (single line with <tt>//</tt>, or multi-line <tt>/* ... */</tt>.</li>
         <li>bugfix: functions randvec(N,v1,v2) and randintvec(N,v1,v2) now work properly if more than 1 parameters are given</li>
+        <li>bugfix: savefor() didn't work correctly for <tt>savefor(i,0:3,if(i%2==0,i,"bla"))</tt></li>
       </ul></li>
       <li>online-help:<ul>
           <li>bugfix: the DOI's in the help texts should be linked now again!</li>
@@ -68,6 +70,8 @@
       <li>improved error reporting for the save-project and zip-project functions</li>
       <li>zipped-projects now also contain a <tt>.readme.txt</tt>-file, which explains the contents of the ZIP-archive</li>
       <li>added link to GitHub repository to several places in QuickFit</li>
+      <li>improved function "Copy selected cells as table RDR with result access parser functions" in evaluation editor results table context-menu</li>
+
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>
@@ -190,6 +194,8 @@
         <li>added Tools menu entry to quickly calculate and plot indexed statistics from columned data</li>
         <li>improved import from clipboard/file: data may be pivoted/rotated now in the import dialog (by a button above the table)</li>
         <li>fixed tab-order of plot/graph-settings widgets</li>
+        <li>bugfix: sometimes, old column properties were strangely reappearing when removing columns</li>
+        <li>bugfix: barcharts (bar widths) now also work for unsorted category data</li>
     </ul></li>
 
     <li><b>cairo graph exporter plugin</b><ul>

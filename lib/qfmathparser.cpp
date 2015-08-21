@@ -3701,7 +3701,7 @@ void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
                          }
                      }
                  } else {
-                     if (operationName!="savefilterfor") {
+                     if (operationName!="savefilterfor" && operationName!="savefor") {
                          if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to a boolean, but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(thisr.type)).arg(i+1));
                          r.setInvalid();
                      }
@@ -3740,7 +3740,7 @@ void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
                          defr.setInvalid();
                          if (defaultValue) defaultValue->evaluate(defr);
                          if (!defr.isValid) {
-                             if (getParser()) getParser()->qfmpError(QObject::tr("DEFAULT in %1(NAME, ..., EXPRESSION, DEFAULT)evaluated to invalid!").arg(operationName));
+                             if (getParser()) getParser()->qfmpError(QObject::tr("DEFAULT in %1(NAME, ..., EXPRESSION, DEFAULT) evaluated to invalid!").arg(operationName));
                              r.setInvalid();
                              return;
                          }
@@ -3754,9 +3754,11 @@ void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
                              return;
                          }
                      } else {
-                         if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to a compatible type in every iteration: expected compaitble with %3 (single/vector), but found %2 in iteration %4").arg(operationName).arg(defr.toTypeString()).arg(resultTypeToString(resType)).arg(i+1));
-                         r.setInvalid();
-                         return;
+                         if (operationName!="savefor") {
+                             if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to a compatible type in every iteration: expected compaitble with %3 (single/vector), but found %2 in iteration %4").arg(operationName).arg(defr.toTypeString()).arg(resultTypeToString(resType)).arg(i+1));
+                             r.setInvalid();
+                             return;
+                         }
                      }
                  }
                  switch(resType) {

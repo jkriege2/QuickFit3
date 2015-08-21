@@ -243,9 +243,11 @@ void QFDoubleEdit::updateWidget(const QString & text) {
 
 void QFDoubleEdit::focusOutEvent ( QFocusEvent * event ) {
     // on focus out, we always correct the input to a meaningful value and emit a signal
-    setValue(value());
-    emit valueChanged(value());
-    emit focusOut(value());
+    if (event->lostFocus()) {
+        setValue(value());
+        emit valueChanged(value());
+        emit focusOut(value());
+    }
     QLineEdit::focusOutEvent(event);
 }
 

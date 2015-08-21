@@ -458,7 +458,13 @@ void QFTableModel::deleteColumn(quint32 c) {
             copyCell(r, i, r, i+1);
         }
         if (i+1<state.columnNames.size()) state.columnNames[i]=state.columnNames[i+1];
+        else state.columnNames[i].clear();
         if (state.headerDataMap.contains(i+1)) state.headerDataMap[i]=state.headerDataMap[i+1];
+        else state.headerDataMap[i].clear();
+        if (i==int64_t(state.columns)-2) {
+            if (i+1<state.columnNames.size()) state.columnNames.removeAt(i+1);
+            if (state.headerDataMap.contains(i+1)) state.headerDataMap.remove(i+1);
+        }
     }
     resize(state.rows, state.columns-1);
     doEmitSignals=oldEmit;

@@ -68,8 +68,8 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
     ui->btnSave->clearFocus();
     ui->btnEvaluate->clearFocus();
     ui->btnEvaluateScript->clearFocus();
-    ui->edtExpression->setFocus();
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
+    ui->edtExpression->setFocus(Qt::MouseFocusReason);
 }
 
 void QFECalculatorDialog::setupParser(QFMathParser *parser) const
