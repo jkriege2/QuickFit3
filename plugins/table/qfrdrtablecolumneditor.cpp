@@ -156,9 +156,9 @@ QString QFRDRTableColumnEditor::getColumnTitle() const
     return ui->edtTitle->text();
 }
 
-void QFRDRTableColumnEditor::on_edtFormula_textChanged(QString /*text*/) {
-    on_edtFormula_textChanged();
-}
+//void QFRDRTableColumnEditor::on_edtFormula_textChanged(QString /*text*/) {
+//    on_edtFormula_textChanged();
+//}
 
 void QFRDRTableColumnEditor::on_edtFormula_textChanged() {
 

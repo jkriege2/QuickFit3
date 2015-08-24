@@ -897,6 +897,53 @@ QList<quint64> QFTableModel::getColumnHeaderDataRoles() const
     return state.headerDataMap.keys();
 }
 
+void QFTableModel::reorderRows(const QMap<int, int> &row_permutation, const QList<int> &cols)
+{
+    if (row_permutation.size()<=0) return;
+    QList<int> c=cols;
+    if (c.size()<=0) {
+        for (int i=0; i<columnCount(); i++) {
+            c<<i;
+        }
+    }
+    TableState tmpState=state;
+    bool oldemit=doEmitSignals;
+    doEmitSignals=false;
+    startMultiUndo();
+
+    QMapIterator<int, int> it(row_permutation);
+    while (it.hasNext()) {
+        it.next();
+        if (it.key()!=it.value()) {
+            for (int i=0; i<c.size(); i++) {
+                const quint64 idxo=xyAdressToUInt64(it.key(), c[i]);
+                const quint64 idxn=xyAdressToUInt64(it.value(), c[i]);
+                if (tmpState.dataMap.contains(idxo)) state.dataMap[idxn]=tmpState.dataMap[idxo];
+                else state.dataMap.remove(idxn);
+
+                if (tmpState.dataEditMap.contains(idxo)) state.dataEditMap[idxn]=tmpState.dataEditMap[idxo];
+                else state.dataEditMap.remove(idxn);
+
+                if (tmpState.dataBackgroundMap.contains(idxo)) state.dataBackgroundMap[idxn]=tmpState.dataBackgroundMap[idxo];
+                else state.dataBackgroundMap.remove(idxn);
+
+                if (tmpState.dataCheckedMap.contains(idxo)) state.dataCheckedMap[idxn]=tmpState.dataCheckedMap[idxo];
+                else state.dataCheckedMap.remove(idxn);
+
+                if (tmpState.moreDataMap.contains(idxo)) state.moreDataMap[idxn]=tmpState.moreDataMap[idxo];
+                else state.moreDataMap.remove(idxn);
+            }
+        }
+    }
+
+    endMultiUndo();
+    doEmitSignals=oldemit;
+    if (doEmitSignals) {
+        beginResetModel();
+        endResetModel();
+    }
+}
+
 void QFTableModel::copyColumnFromModel(QAbstractTableModel *model, int column, int column_here, int row_here, int row_model_start, int row_model_end, QFTableModel::copyColumnHeaderMode *copyHeader, QSet<int> excludedRoles, QSet<int> excludedHeaderRoles)
 {
     if (readonly) return;

@@ -266,6 +266,7 @@ void QFETCSPCImporter::correlationDialogClosed() {
         }
         if (rdr) {
             rdr->setDescription(rdr->getDescription()+QString("\n\n")+it->comment);
+            rdr->setGroup(rdr->getProject()->addOrFindRDRGroup(it->group));
         }
         for (int ii=0; ii<rdrs.size(); ii++) {
             if (rdrs[ii]) {

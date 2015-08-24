@@ -187,7 +187,7 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
                 QHash<quint64, QVariant> dataCheckedMap;
                 /** \brief this map is used to store additional data for roles >=Qt::UserRole */
                 QHash<quint64, QHash<int, QVariant> > moreDataMap;
-
+                /** \brief this map is used to store additional data for roles >=Qt::UserRole for the horizontal header (columns-header) */
                 QHash<quint64, QHash<int, QVariant> > headerDataMap;
 
                 /** \brief string list that contains the column names */
@@ -335,6 +335,12 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         QVariant getColumnHeaderData(quint32 column, int role) const;
         bool hasColumnHeaderData(quint32 column, int role) const;
         QList<quint64> getColumnHeaderDataRoles() const;
+
+        /** \brief reorder/permute the rows in the given map and in these rows, either all columns or the columns specified by the second list
+         *
+         *  \note \a  row_permutation maps from old_idx[key] -> new_idx[value]
+         */
+        void reorderRows(const QMap<int, int>& row_permutation, const QList<int>& cols=QList<int>());
 
 
         enum copyColumnHeaderMode {

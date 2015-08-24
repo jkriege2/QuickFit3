@@ -1109,15 +1109,18 @@ void QFRDRTableEditor::slDeleteRow() {
             QItemSelectionModel* sm=tvMain->selectionModel();
             if (!sm->hasSelection()) {
             } else {
-                QMessageBox::StandardButton answer;
-                answer = QMessageBox::question(this, tr("Delete row(s) ..."), tr("Are you sure that you want to delete the selected rows?"), QMessageBox::Yes | QMessageBox::No);
-                if (answer == QMessageBox::Yes) {
-                    QModelIndexList l=sm->selectedIndexes();
-                    QList<quint32> rl;
-                    for (int i=0; i<l.size(); i++) {
-                        if (!rl.contains(l[i].row())) rl.append(l[i].row());
+                QModelIndexList l=sm->selectedIndexes();
+                QList<quint32> rl;
+                for (int i=0; i<l.size(); i++) {
+                    if (!rl.contains(l[i].row())) {
+                        rl.append(l[i].row());
+                        qDebug()<<"deleting row"<<l[i].row();
                     }
-                    qSort(rl);
+                }
+                qSort(rl);
+                QMessageBox::StandardButton answer;
+                answer = QMessageBox::question(this, tr("Delete row(s) ..."), tr("Are you sure that you want to delete the selected %1 rows?").arg(rl.size()), QMessageBox::Yes | QMessageBox::No);
+                if (answer == QMessageBox::Yes) {
                     m->model()->disableSignals();
                     m->model()->deleteRows(rl);
 //                    for (int i=rl.size()-1; i>=0; i--) {
@@ -2096,6 +2099,7 @@ void QFRDRTableEditor::slSort() {
     if (m) {
         if (m->model()) {
             QList<QPair<int, QString> > cols;
+            QList<int> colidxs;
             QModelIndex ci=tvMain->currentIndex();
             if (ci.isValid()) {
                 QFRDRTableSortDialog* dlg=new QFRDRTableSortDialog(this);
@@ -2105,7 +2109,7 @@ void QFRDRTableEditor::slSort() {
                     QList<QPair<int, QVariant> > rows;
                     int firstcol=0;
                     bool first=true;
-                    QList<QVariant> idxData;
+                    //QList<QVariant> idxData;
                     for (int i=0; i<idxs.size(); i++) {
                         if (first) {
                             firstcol=idxs[i].column();
@@ -2115,8 +2119,10 @@ void QFRDRTableEditor::slSort() {
                         }
                         if (!rows.contains(qMakePair(idxs[i].row(), QVariant()))) rows.append(qMakePair(idxs[i].row(), QVariant()));
                         if (!cols.contains(qMakePair(idxs[i].column(), m->model()->headerData(idxs[i].column(), Qt::Horizontal).toString()))) cols.append(qMakePair(idxs[i].column(), m->model()->headerData(idxs[i].column(), Qt::Horizontal).toString()));
-                        idxData.append(idxs[i].data());
+                        //idxData.append(idxs[i].data());
+                        if (!colidxs.contains(idxs[i].column())) colidxs.append(idxs[i].column());
                     }
+                    qSort(colidxs);
                     dlg->setColumns(cols);
                     dlg->setCurrentColumn(firstcol);
 
@@ -2127,8 +2133,10 @@ void QFRDRTableEditor::slSort() {
                             bool ascending=dlg->sortAscending();
                             //qDebug()<<"col: "<<sortcol<<"   ascending: "<<ascending;
 
+                            QList<int> oldrows;
                             for (int i=0; i<rows.size(); i++) {
                                 rows[i].second=m->model()->cell(rows[i].first, sortcol);
+                                oldrows<<rows[i].first;
                             }
 
                             QMap<int, int> rowmap;
@@ -2138,20 +2146,14 @@ void QFRDRTableEditor::slSort() {
                                 qStableSort(rows.begin(), rows.end(), QFRDRTableEditorGreaterThan);
                             }
                             for (int r=0; r<rows.size(); r++) {
-                                rowmap[rows[r].first]=r;
+                                rowmap[rows[r].first]=oldrows[r];
                             }
 
                             QItemSelection sel=tvMain->selectionModel()->selection();
                             QModelIndex cur=tvMain->selectionModel()->currentIndex();
                             m->model()->disableSignals();
 
-                            for (int i=0; i<idxs.size(); i++) {
-                                m->model()->deleteCell(idxs[i].row(), idxs[i].column());
-                            }
-
-                            for (int i=0; i<idxs.size(); i++) {
-                                m->model()->setCell(rowmap[idxs[i].row()], idxs[i].column(), idxData[i]);
-                            }
+                            m->model()->reorderRows(rowmap, colidxs);
 
 
                             m->model()->enableSignals(true);
