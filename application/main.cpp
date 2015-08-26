@@ -167,6 +167,7 @@ int main(int argc, char * argv[])
             res=app.exec();
 
             //QFontDatabase::removeAllApplicationFonts();
+            if(settings) delete settings;
         }
 
         QWidgetList tlw=app.topLevelWidgets();
