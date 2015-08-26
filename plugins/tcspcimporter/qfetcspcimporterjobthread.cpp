@@ -145,7 +145,8 @@ QString QFETCSPCImporterJobThread::replacePostfixSpecials(const QString& input, 
     result=result.replace("%m%", QString::number(job.fcs_m), Qt::CaseInsensitive);
     result=result.replace("%start%", QString::number(job.range_min), Qt::CaseInsensitive);
     result=result.replace("%end%", QString::number(job.range_max), Qt::CaseInsensitive);
-    result=result.replace("%fcs_segments%", QString::number(job.fcs_segments), Qt::CaseInsensitive);
+    result=result.replace("%fcs_segments%", QString::number(fcs_segments), Qt::CaseInsensitive);
+    result=result.replace("%fcs_segment_duration%", QString::number(job.fcs_segment_duration), Qt::CaseInsensitive);
     result=result.replace("%fcs_taumin%", QString::number(job.fcs_taumin), Qt::CaseInsensitive);
     result=result.replace("%cr_binning%", QString::number(job.countrate_binning), Qt::CaseInsensitive);
 
@@ -231,6 +232,8 @@ void QFETCSPCImporterJobThread::run() {
             } else {
                 job.props=reader->getFileInfo().properties;
                 job.comment=reader->getFileInfo().comment;
+                lt_microtimechannels=reader->microtimeChannels();
+                lt_microtimeResolutionPS=reader->microtimeChannelsResolutionPicoSeconds();
                 emit progressIncrement(10);
                 ////////////////////////////////////////////////////////////////////////////////////////////
                 // CREATE FILENAMES FOR RESULTS AND MAKE SURE THE DIRECTORY FOR THE FILES EXISTS (mkpath() )
@@ -246,6 +249,8 @@ void QFETCSPCImporterJobThread::run() {
                 //qDebug()<<outputFilenameBase;
                 QString configFilename=outputFilenameBase+".evalsettings.txt";
                 QString crFilenameBin=outputFilenameBase+".photoncounts.dat";
+                QString ltFilenameCSV=outputFilenameBase+".lifetime.dat";
+                //QString ltFilenameTABLEXML=outputFilenameBase+".lifetime.qftxml";
                 QList<QFETCSPCImporterJobThread::ccfFileConfig> ccfFilenames;
 
                 QString localFileDirectory=QFileInfo(d.absoluteFilePath(configFilename)).dir().absolutePath();
@@ -273,6 +278,29 @@ void QFETCSPCImporterJobThread::run() {
                     if (job.range_max>0) range_duration=qMin(job.range_max, file_duration)-starttime;
                     if (range_duration<0) range_duration=0;
                     countrate_items=0;
+
+                    if (job.fcs_segments_by_duration) {
+                        fcs_segment_duration=job.fcs_segment_duration;
+                        fcs_segments=ceil(range_duration/fcs_segment_duration);
+                    } else {
+                        fcs_segments=job.fcs_segments;
+                        fcs_segment_duration=range_duration/double(fcs_segments);
+                    }
+
+                    if (job.lt_segments_by_duration) {
+                        lt_segment_duration=job.lt_segment_duration;
+                        lt_segments=ceil(range_duration/lt_segment_duration);
+                    } else {
+                        lt_segments=job.lt_segments;
+                        lt_segment_duration=range_duration/double(lt_segments);
+                    }
+
+                    qDebug()<<"running eval: ";
+                    qDebug()<<"   channels="<<channels;
+                    qDebug()<<"   fcs_segment_duration="<<fcs_segment_duration;
+                    qDebug()<<"   fcs_segments="<<fcs_segments;
+                    qDebug()<<"   lt_segment_duration="<<lt_segment_duration;
+                    qDebug()<<"   lt_segments="<<lt_segments;
 
                     ////////////////////////////////////////////////////////////////////////////////////////////
                     // OPEN COUNTRATE FILE
@@ -306,6 +334,13 @@ void QFETCSPCImporterJobThread::run() {
                     ////////////////////////////////////////////////////////////////////////////////////////////
                     if (job.doFCS) {
                         createCorrelators();
+                    }
+
+                    ////////////////////////////////////////////////////////////////////////////////////////////
+                    // CONFIGURE LIFETIME HISTOGRAMS
+                    ////////////////////////////////////////////////////////////////////////////////////////////
+                    if (job.doLifetimeHistogram) {
+                        createLifetimeHists(lt_microtimechannels);
                     }
 
 
@@ -355,8 +390,8 @@ void QFETCSPCImporterJobThread::run() {
                                  text.setLocale(outLocale);
                                  for (int i=0; i<fcs_tau.size(); i++) {
                                      text<<doubleToQString(fcs_tau[i]);
-                                     for (int r=0; r<job.fcs_segments; r++) {
-                                         uint64_t id=xyzAdressToUInt64(ccf.first, ccf.second, r);
+                                     for (uint32_t r=0; r<fcs_segments; r++) {
+                                         const uint64_t id=xyzAdressToUInt64(ccf.first, ccf.second, r);
                                          text<<", "<<doubleToQString(fcs_ccfs[id].value(i, 0));
                                      }
                                      text<<"\n";
@@ -370,14 +405,14 @@ void QFETCSPCImporterJobThread::run() {
                                      QTextStream text(&f);
                                      text.setLocale(outLocale);
                                      int items=0;
-                                     for (int r=0; r<job.fcs_segments; r++) {
+                                     for (uint32_t r=0; r<fcs_segments; r++) {
                                          uint32_t id=xyAdressToUInt32(r, ccf.first);
                                          if (r==0) items=fcs_crs[id].size();
                                          else items=qMax(items, fcs_crs[id].size());
                                      }
                                      for (int i=0; i<items; i++) {
                                          text<<doubleToQString(double(i)*job.fcs_crbinning);
-                                         for (int r=0; r<job.fcs_segments; r++) {
+                                         for (uint32_t r=0; r<fcs_segments; r++) {
                                              uint32_t id=xyAdressToUInt32(r, ccf.first);
                                              text<<", "<<doubleToQString(fcs_crs[id].value(i, 0));
                                          }
@@ -395,14 +430,14 @@ void QFETCSPCImporterJobThread::run() {
                                          QTextStream text(&f);
                                          text.setLocale(outLocale);
                                          int items=0;
-                                         for (int r=0; r<job.fcs_segments; r++) {
+                                         for (uint32_t r=0; r<fcs_segments; r++) {
                                              uint32_t id=xyAdressToUInt32(r, ccf.first);
                                              if (r==0) items=fcs_crs[id].size();
                                              else items=qMax(items, fcs_crs[id].size());
                                          }
                                          for (int i=0; i<items; i++) {
                                              text<<doubleToQString(double(i)*job.fcs_crbinning);
-                                             for (int r=0; r<job.fcs_segments; r++) {
+                                             for (uint32_t r=0; r<fcs_segments; r++) {
                                                  uint32_t id=xyAdressToUInt32(r, ccf.first);
                                                  text<<", "<<doubleToQString(fcs_crs[id].value(i, 0));
                                              }
@@ -418,14 +453,14 @@ void QFETCSPCImporterJobThread::run() {
                                          QTextStream text(&f);
                                          text.setLocale(outLocale);
                                          int items=0;
-                                         for (int r=0; r<job.fcs_segments; r++) {
+                                         for (uint32_t r=0; r<fcs_segments; r++) {
                                              uint32_t id=xyAdressToUInt32(r, ccf.second);
                                              if (r==0) items=fcs_crs[id].size();
                                              else items=qMax(items, fcs_crs[id].size());
                                          }
                                          for (int i=0; i<items; i++) {
                                              text<<doubleToQString(double(i)*job.fcs_crbinning);
-                                             for (int r=0; r<job.fcs_segments; r++) {
+                                             for (uint32_t r=0; r<fcs_segments; r++) {
                                                  uint32_t id=xyAdressToUInt32(r, ccf.second);
                                                  text<<", "<<doubleToQString(fcs_crs[id].value(i, 0));
                                              }
@@ -506,8 +541,8 @@ void QFETCSPCImporterJobThread::run() {
                             QF3CorrelationDataFormatTool tool;
                             tool.channels=store.ACFs;
                             tool.correlationTypes=store.ACFs+store.CCFs;
-                            tool.runs=job.fcs_segments;
-                            tool.rateRuns=job.fcs_segments;
+                            tool.runs=fcs_segments;
+                            tool.rateRuns=fcs_segments;
                             tool.input_file=job.filename;
                             tool.reserveCorrelations();
                             tool.reserveRate();
@@ -515,45 +550,61 @@ void QFETCSPCImporterJobThread::run() {
                             int critems=0;
 
                             for (int acf=0; acf<store.ACFs; acf++) {
-                                int c=store.store[acf].first;
-                                tool.channel_names[acf]=QString("channel %1").arg(c);
-                                tool.preferred_channels[acf]=acf;
-                                tool.roles[acf]=QString("ACF%1").arg(c);
-                                for (int r=0; r<job.fcs_segments; r++) {
-                                    uint32_t id=xyAdressToUInt32(r, c);
-                                    if (r==0) critems=fcs_crs[id].size();
-                                    else critems=qMax(critems, fcs_crs[id].size());
+                                if (acf>=0 && acf<store.store.size()) {
+                                    int c=store.store[acf].first;
+                                    tool.channel_names[acf]=QString("channel %1").arg(c);
+                                    tool.preferred_channels[acf]=acf;
+                                    tool.roles[acf]=QString("ACF%1").arg(c);
+                                    for (uint32_t r=0; r<fcs_segments; r++) {
+                                        uint32_t id=xyAdressToUInt32(r, c);
+                                        if (r==0) critems=fcs_crs[id].size();
+                                        else critems=qMax(critems, fcs_crs[id].size());
+                                    }
+                                } else {
+                                    qDebug()<<"error accessing store.store with size "<<store.store.size()<<" at acf index "<<acf;
                                 }
                             }
                             for (int ccf=store.ACFs; ccf<store.ACFs+store.CCFs; ccf++) {
-                                int c1=store.store[ccf].first;
-                                int c2=store.store[ccf].second;
-                                tool.preferred_channels[ccf]=0;
-                                if (c2<c1) tool.preferred_channels[ccf]=1;
-                                tool.roles[ccf]=QString("FCCS(%1,%2)").arg(c1).arg(c2);
+                                if (ccf>=0 && ccf<store.store.size()) {
+                                    int c1=store.store[ccf].first;
+                                    int c2=store.store[ccf].second;
+                                    tool.preferred_channels[ccf]=0;
+                                    if (c2<c1) tool.preferred_channels[ccf]=1;
+                                    tool.roles[ccf]=QString("FCCS(%1,%2)").arg(c1).arg(c2);
+                                } else {
+                                    qDebug()<<"error accessing store.store with size "<<store.store.size()<<" at ccf index "<<ccf;
+                                }
                             }
 
 
                             for (int i=0; i<critems; i++) {
                                 tool.times.append(double(i)*job.fcs_crbinning);
                                 for (int acf=0; acf<store.ACFs; acf++) {
-                                    int c=store.store[acf].first;
-                                    for (int r=0; r<job.fcs_segments; r++) {
-                                        uint32_t id=xyAdressToUInt32(r, c);
-                                        tool.addCountrateEntry(fcs_crs[id].value(i, 0), r, acf);
+                                    if (acf>=0 && acf<store.store.size()) {
+                                        int c=store.store[acf].first;
+                                        for (uint32_t r=0; r<fcs_segments; r++) {
+                                            uint32_t id=xyAdressToUInt32(r, c);
+                                            tool.addCountrateEntry(fcs_crs[id].value(i, 0), r, acf);
+                                        }
+                                    } else {
+                                        qDebug()<<"error accessing store.store with size "<<store.store.size()<<" at acf index "<<acf;
                                     }
                                 }
                             }
 
                             for (int i=0; i<fcs_tau.size(); i++) {
-                                if (fcs_tau[i]<=range_duration/double(job.fcs_segments)) {
+                                if (fcs_tau[i]<=range_duration/double(fcs_segments)) {
                                     tool.taus.append(fcs_tau[i]);
                                     for (int cf=0; cf<store.ACFs+store.CCFs; cf++) {
-                                        int c1=store.store[cf].first;
-                                        int c2=store.store[cf].second;
-                                        for (int r=0; r<job.fcs_segments; r++) {
-                                            uint64_t id=xyzAdressToUInt64(c1, c2, r);
-                                            tool.addCorrelationEntry(fcs_ccfs[id].value(i, 0), r, cf);
+                                        if (cf>=0 && cf<store.store.size()) {
+                                            int c1=store.store[cf].first;
+                                            int c2=store.store[cf].second;
+                                            for (uint32_t r=0; r<fcs_segments; r++) {
+                                                uint64_t id=xyzAdressToUInt64(c1, c2, r);
+                                                tool.addCorrelationEntry(fcs_ccfs[id].value(i, 0), r, cf);
+                                            }
+                                        } else {
+                                            qDebug()<<"error accessing store.store with size "<<store.store.size()<<" at ccf index "<<cf;
                                         }
                                     }
                                 }
@@ -573,8 +624,8 @@ void QFETCSPCImporterJobThread::run() {
                                 tool.properties["FCS_LIFETIMEFILTER_MODE"]=QString("NONE");
                             }
 
-                            tool.properties["SEGMENTS"]=job.fcs_segments;
-                            tool.properties["SEGMENT_DURATION"]=range_duration/double(job.fcs_segments);
+                            tool.properties["SEGMENTS"]=fcs_segments;
+                            tool.properties["SEGMENT_DURATION"]=fcs_segment_duration;
                             tool.properties["DURATION"]=range_duration;
                             tool.properties["RANGE_START"]=starttime;
                             tool.properties["RANGE_END"]=starttime+range_duration;
@@ -594,12 +645,117 @@ void QFETCSPCImporterJobThread::run() {
                             }
 
                             QString localFilename=outputFilenameBase+QString("_fcsdata%1.qf3acorr").arg(fid);
+                            //qDebug()<<"saving with QF3CorrelationDataFormatTool to "<<localFilename;
                             tool.saveFile(localFilename);
+                            //qDebug()<<"saving done to "<<localFilename;
                             QFETCSPCImporterJobThreadAddFileProps fp(QStringList(localFilename), "QF3ASCIICORR", job.props);
                             fp.comment=job.comment;
-                            fp.group=QString("%1_fcsdata%2").arg(outputFilenameBase).arg(fid);
+                            fp.group=job.filename;
                             fp.role="";
                             addFiles.append(fp);
+                        }
+
+                    }
+                    emit progressIncrement(10);
+
+
+                    //************** SAVE LIFETIME HISTOGRAMS
+                    if ((m_status==1) && !was_canceled && job.doLifetimeHistogram) {
+                        emit messageChanged(tr("saving lifetime histograms ..."));
+                        QString& localFilename=ltFilenameCSV;
+                        int usedCH=0;
+                        uint64_t maxCnt=0;
+                        double maxLT=0;
+
+                        QFile f(localFilename);
+                        QDir d=QFileInfo(localFilename).absoluteDir();
+                        if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                            {
+                                QTextStream text(&f);
+                                text.setLocale(outLocale);
+                                QVector<bool> useChannels(channels, false);
+                                uint64_t lastValidMicrotime=0;
+
+                                for (uint16_t s=0; s<lt_segments; s++) {
+                                    for (uint16_t c=0; c<channels; c++) {
+                                        uint64_t sum=sumLifetimeHist(s, c);
+                                        useChannels[c]=useChannels[c]||(sum>0);
+                                        //col++;
+                                    }
+                                }
+
+                                for (uint32_t mt=0; mt<lt_microtimechannels; mt++) {
+                                    bool hasNonZero=false;
+                                    for (uint16_t s=0; s<lt_segments; s++) {
+                                        for (uint16_t c=0; c<channels; c++) {
+                                            if (getLifetimeHist(mt, s, c)>0) {
+                                                hasNonZero=true;
+                                            }
+                                            if (hasNonZero) break;
+                                        }
+                                        if (hasNonZero) break;
+                                    }
+                                    if (hasNonZero) lastValidMicrotime=mt;
+                                }
+
+                                QMapIterator<QString, QVariant> pi(job.props);
+                                while (pi.hasNext()) {
+                                    pi.next();
+                                    QString s=pi.value().toString();
+                                    s=s.replace('\n', ' ');
+                                    s=s.replace('\r', ' ');
+                                    text<<tr("#    ")<<pi.key()<<QString(" = ")<< s<<QString("\n");
+                                }
+
+                                uint32_t col=0;
+                                text<<tr("#\n#\n#! \"time [ns]\", ");
+                                col++;
+                                for (uint16_t s=0; s<lt_segments; s++) {
+                                    for (uint16_t c=0; c<channels; c++) {
+                                        if (useChannels[c]) {
+                                            text<<tr("\"Counts: seg %1 / ch %2\", ").arg(s).arg(c);
+                                            col++;
+                                        }
+                                    }
+                                }
+                                text<<"\n";
+
+
+
+                                for (uint32_t mt=0; mt<=lastValidMicrotime; mt++) {
+                                    double mtns=double(mt+1)*lt_microtimeResolutionPS*1e-3;
+                                    if (mtns>maxLT) maxLT=mtns;
+                                    text<<doubleToQString(mtns)<<", ";
+                                    for (uint16_t s=0; s<lt_segments; s++) {
+                                        usedCH=0;
+                                        for (uint16_t c=0; c<channels; c++) {
+                                            if (useChannels[c]) {
+                                                usedCH++;
+                                                uint64_t cnt=getLifetimeHist(mt,s,c);
+                                                if (cnt>maxCnt) maxCnt=cnt;
+                                                text<<doubleToQString(cnt)<<", ";
+                                            }
+                                        }
+                                    }
+                                    text<<"\n";
+                                }
+
+                            }
+                            QFETCSPCImporterJobThreadAddFileProps fp(QStringList(localFilename), "LIFETIME_CSV", job.props);
+                            fp.comment=job.comment;
+                            fp.group=QString("%1_fcsdata").arg(outputFilenameBase);
+                            fp.role="";
+                            fp.dataForInsert.clear();
+                            fp.dataForInsert.append(lt_segments);
+                            fp.dataForInsert.append(usedCH);
+                            fp.dataForInsert.append(maxLT);
+                            fp.dataForInsert.append(maxCnt);
+                            addFiles.append(fp);
+
+                            f.close();
+                        } else {
+                            m_status=-1; emit statusChanged(m_status);
+                            emit messageChanged(tr("could not create lifetimes file '%1': %2!").arg(localFilename).arg(f.errorString()));
                         }
 
                     }
@@ -629,7 +785,8 @@ void QFETCSPCImporterJobThread::run() {
                             text<<"range start                 : "<<doubleToQString(starttime) << "\n";
                             text<<"range duration              : "<<doubleToQString(range_duration) << "\n";
                             if (job.doFCS) {
-                                text<<"FCS: segments               : "<<doubleToQString(job.fcs_segments) << "\n";
+                                text<<"FCS: segments               : "<<doubleToQString(fcs_segments) << "\n";
+                                text<<"FCS: segment duration [s]   : "<<doubleToQString(fcs_segment_duration) << "\n";
                                 text<<"FCS: correlator S           : "<<doubleToQString(job.fcs_S) << "\n";
                                 text<<"FCS: correlator m           : "<<doubleToQString(job.fcs_m) << "\n";
                                 text<<"FCS: correlator P           : "<<doubleToQString(job.fcs_P) << "\n";
@@ -666,6 +823,12 @@ void QFETCSPCImporterJobThread::run() {
                             if (job.doCountrate) {
                                 text<<"PhotonsCounts: binning [s]       : "<<doubleToQString(job.countrate_binning) << "\n";
                             }
+                            if (job.doLifetimeHistogram) {
+                                text<<"LifetimeHistogram: microtime resolution [ps]: "<<doubleToQString(lt_microtimeResolutionPS) << "\n";
+                                text<<"LifetimeHistogram: microtime channels       : "<<doubleToQString(lt_microtimechannels) << "\n";
+                                text<<"LifetimeHistogram: segments                 : "<<lt_segments << "\n";
+                                text<<"LifetimeHistogram: segment duration [s]     : "<<doubleToQString(lt_segment_duration) << "\n";
+                            }
                             text<<"duration [s]                : "<<ptime.elapsed()/1000.0 << "\n";
 
                             f.close();
@@ -676,6 +839,7 @@ void QFETCSPCImporterJobThread::run() {
 
                     }
                     emit progressIncrement(10);
+
                 } else {
                     if (mutexFilename) mutexFilename->unlock();
                     m_status=-1; emit statusChanged(m_status);
@@ -731,7 +895,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
     uint64_t fcscrCounter=0;
     uint32_t fcs_countrate_counter=0;
     //double pos=0;
-    double fcsNextSegmentValue=range_duration/double(job.fcs_segments);
+    double fcsNextSegmentValue=fcs_segment_duration;
     double fcsNextInterval=job.fcs_taumin;
     double fcsNextFCSCRStoreInterval=job.fcs_crbinning;
     double nextReporterStep=range_duration/1000.0;
@@ -769,6 +933,12 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                     nextcrInterval=nextcrInterval+emptyrecords*job.countrate_binning;
                     if (crCounter>=countrate_items) nextcrInterval=2*range_duration;
                 }
+            }
+
+            // PROCESS LIFETIME_HISTOGRAMS
+            if (job.doLifetimeHistogram) {
+                const uint16_t lfSeg=floor(t/lt_segment_duration);
+                incLifetimeHist(record.microtime_channel, lfSeg, c);
             }
 
 
@@ -832,7 +1002,11 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                             arrivaltimes.append(dummy);
                         }
                     } else {
-                        arrivaltimes[c].append(t);
+                        if (c>=0 && c<arrivaltimes.size()) {
+                            arrivaltimes[c].append(t);
+                        } else {
+                            qDebug()<<"error storing arrivaltime "<<t<<" in channel "<<c<<"/"<<arrivaltimes.size();
+                        }
                     }
                 }
 
@@ -866,8 +1040,8 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                     }
                     //qDebug()<<"\n\n";
                     fcs_segment++;
-                    fcsNextSegmentValue=double(fcs_segment+1)*range_duration/double(job.fcs_segments);
-                    fcsNextFCSCRStoreInterval=double(fcs_segment)*range_duration/double(job.fcs_segments)+job.fcs_crbinning;
+                    fcsNextSegmentValue=double(fcs_segment+1)*fcs_segment_duration;
+                    fcsNextFCSCRStoreInterval=double(fcs_segment)*fcs_segment_duration+job.fcs_crbinning;
                     //qDebug()<<"-----------------------------------------------------------\nNEXT SEGMENT\n  fcs_segment="<<fcs_segment<<"  fcsNextSegmentValue="<<fcsNextSegmentValue<<"  fcsNextFCSCRStoreInterval="<<fcsNextFCSCRStoreInterval<<"\n-----------------------------------------------------------\n";
 
                 }
@@ -880,8 +1054,8 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
             nextReporterStep=nextReporterStep+range_duration/1000.0;
             double elapsed=double(timer.elapsed())/1000.0;
             double eta=elapsed/reader->percentCompleted()*(100.0-reader->percentCompleted());
-            emit messageChanged(tr("running data processing [t=%1s, meas. duration: %2s, file completed: %3%4, ETA: %5] ...").arg(t).arg(range_duration).arg(reader->percentCompleted(),0,'g',2).arg("%").arg(qfSecondsDurationToHMSString(eta)));
-            //qDebug()<<t<<range_duration<<"  fcsNextSegmentValue="<<fcsNextSegmentValue<<"  segments="<<job.fcs_segments<< "  completed="<<reader->percentCompleted()<<"%";
+            emit messageChanged(tr("running data processing [t=%1s, meas. duration: %2s, file completed: %3%4, ETA: %5] ...").arg(t).arg(range_duration).arg(reader->percentCompleted(),0,'f',2).arg("%").arg(qfSecondsDurationToHMSString(eta)));
+            //qDebug()<<t<<range_duration<<"  fcsNextSegmentValue="<<fcsNextSegmentValue<<"  segments="<<fcs_segments<< "  completed="<<reader->percentCompleted()<<"%";
         }
 
         done=(t>range_duration);
@@ -891,7 +1065,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
         if (job.fcs_correlator<=CORRELATOR_MTAUONEMON) {
             if (fcs_countrate_counter>0) shiftIntoCorrelators(fcs_countrate, fcs_countrate_counter);
         }
-        while (fcs_segment<job.fcs_segments) {
+        while (fcs_segment<fcs_segments) {
             //qDebug()<<"-- fcs segment "<<fcs_segment<<" -----------------------------";
             copyCorrelatorIntermediateResults(fcs_segment, arrivaltimes);
             arrivaltimes.clear();
@@ -920,6 +1094,21 @@ void QFETCSPCImporterJobThread::clearCorrelators() {
 
     corrtttr.clear();
     //qDebug()<<"clearCorrelators() ... DONE";
+}
+
+void QFETCSPCImporterJobThread::createLifetimeHists(int32_t histitems) {
+    lifetime_hists.clear();
+    QVector<uint64_t> v(histitems, uint64_t(0));
+    for (uint32_t s=0; s<lt_segments; s++) {
+        for (int c=0; c<channels; c++) {
+            lifetime_hists[xyzAdressToUInt64(s,c,0)]=v;
+        }
+    }
+}
+
+void QFETCSPCImporterJobThread::clearLifetimeHists()
+{
+    lifetime_hists.clear();
 }
 
 void QFETCSPCImporterJobThread::createCorrelators() {
@@ -1004,19 +1193,30 @@ void QFETCSPCImporterJobThread::copyCorrelatorIntermediateResults(uint16_t fcs_s
     } else if (job.fcs_correlator==CORRELATOR_TTTR) {
         for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
              QPair<int, int> ccf=*i;
-             qDebug()<<ccf.first<<ccf.second<<fcs_segment<<arrivaltimes.size()<<arrivaltimes[ccf.first].size()<<arrivaltimes[ccf.second].size();
+             //qDebug()<<"copyCorrelatorIntermediateResults: "<<ccf.first<<ccf.second<<arrivaltimes.size();
+             //if (ccf.first<arrivaltimes.size() && ccf.second<arrivaltimes.size() ) qDebug()<<"    "<<arrivaltimes[ccf.first].size()<<arrivaltimes[ccf.second].size();
              uint64_t id=xyzAdressToUInt64(ccf.first, ccf.second, fcs_segment);
              uint32_t idc=xyAdressToUInt32(ccf.first, ccf.second);
 
              if (arrivaltimes.size()>0) {
                  if (ccf.first==ccf.second) {
-                     qDebug()<<arrivaltimes[ccf.first].size()<<fcs_tau.size()<<corrtttr[idc].size();
-                     TTTRcorrelate(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), corrtttr[idc].data(), fcs_tau.data(), fcs_tau.size());
+                     if (ccf.first>=0 && ccf.first<arrivaltimes.size()) {
+                         //qDebug()<<"running TTTRcorrelate(): "<<arrivaltimes[ccf.first].size()<<fcs_tau.data()<<fcs_tau.size()<<corrtttr[idc].data()<<corrtttr[idc].size();
+                         TTTRcorrelate(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), corrtttr[idc].data(), fcs_tau.data(), fcs_tau.size());
+                         //qDebug()<<"finished TTTRcrosscorrelate()!";
+                     } else {
+                         //qDebug()<<"copyCorrelatorIntermediateResults: ERROR "<<ccf.first<<arrivaltimes.size();
+                     }
                      //TTTRcorrelateWithAvg(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), corrtttr[idc], fcs_tau, job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
                  } else {
-                     qDebug()<<arrivaltimes[ccf.first].size()<<arrivaltimes[ccf.second].size()<<fcs_tau.size()<<corrtttr[idc].size();
-                     TTTRcrosscorrelate(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), arrivaltimes[ccf.second].data() , arrivaltimes[ccf.second].size(), corrtttr[idc].data(), fcs_tau.data(), fcs_tau.size());
-                     //TTTRcrosscorrelateWithAvg(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), arrivaltimes[ccf.second].data() , arrivaltimes[ccf.second].size(), corrtttr[idc], fcs_tau, job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
+                     if (ccf.second>=0 && ccf.second<arrivaltimes.size() && ccf.first>=0 && ccf.first<arrivaltimes.size()) {
+                         //qDebug()<<"running TTTRcrosscorrelate(): "<<arrivaltimes[ccf.first].size()<<arrivaltimes[ccf.second].size()<<fcs_tau.data()<<fcs_tau.size()<<corrtttr[idc].data()<<corrtttr[idc].size();
+                         TTTRcrosscorrelate(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), arrivaltimes[ccf.second].data() , arrivaltimes[ccf.second].size(), corrtttr[idc].data(), fcs_tau.data(), fcs_tau.size());
+                         //qDebug()<<"finished TTTRcrosscorrelate()!";
+                         //TTTRcrosscorrelateWithAvg(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), arrivaltimes[ccf.second].data() , arrivaltimes[ccf.second].size(), corrtttr[idc], fcs_tau, job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
+                     } else {
+                         //qDebug()<<"copyCorrelatorIntermediateResults: ERROR "<<ccf.first<<ccf.second<<arrivaltimes.size();
+                     }
                  }
 
              }

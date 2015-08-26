@@ -607,7 +607,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphSetPlotYRange(int plotid, double xmin, double xmax);
 
         virtual void colgraphSetGraphTitle(int plotid,  int graphid,  const QString& title);
-        virtual void colgraphSetGrphType(int plotid,  int graphid,  ColumnGraphTypes type);
+        virtual void colgraphSetGraphType(int plotid,  int graphid,  ColumnGraphTypes type);
         virtual void colgraphSetGraphErrorStyle(int plotid,  int graphid,  ErrorGraphTypes errorStyle);
         virtual void colgraphSetGraphErrorColor(int plotid,  int graphid, QColor errorColor);
         virtual void colgraphSetGraphFillColor(int plotid,  int graphid, QColor fillColor);

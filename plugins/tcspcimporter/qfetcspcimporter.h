@@ -105,6 +105,7 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
         QFRawDataRecord* insertFCSCSVFile(const QString &filenameFCS, const QString& filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""), const QString& role=QString(""));
         QFRawDataRecord* insertFCCSCSVFile(const QString& filenameFCS, const QString &filenameCR1, const QString &filenameCR2, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""), const QString& role=QString(""));
         QFRawDataRecord* insertCountRate(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""), const QString& role=QString(""));
+        QFRawDataRecord* insertTable(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""), const QString& role=QString(""));
         QList<QPointer<QFRawDataRecord> > insertQF3ASCIICORRFile(const QString& filenameFCS, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""));
 
         QFETCSPCImporterDialog* dlgCorrelate;

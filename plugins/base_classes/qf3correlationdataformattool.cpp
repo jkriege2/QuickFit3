@@ -169,15 +169,7 @@ bool QF3CorrelationDataFormatTool::loadFile(const QString &filename, bool proper
                             int idx=rxPC.cap(1).toInt();
                             preferred_channels[idx]=value.toInt();
                         } else {
-                            QRegExp rxInt("[+|-]?\\d+");
-                            QRegExp rxDouble("[+|-]?\\d+[\\.]?\\d*[eE]?\\d*");
-                            if (rxInt.exactMatch(value)) {
-                                properties[name]=value.toInt();
-                            } else if (rxDouble.exactMatch(value)) {
-                                properties[name]=value.toDouble();
-                            } else {
-                                properties[name]=value;
-                            }
+                            properties[name]=qfStringToVariantAutoRecognizeType(value);
 
                         }
                     } else if (!propertiesOnly && section==1) { // correlation data section

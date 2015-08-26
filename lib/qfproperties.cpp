@@ -279,11 +279,11 @@ void QFProperties::storeProperties(QXmlStreamWriter& w) const {
     }
 }
 
-void QFProperties::readProperties(QDomElement& e) {
+void QFProperties::readProperties(QDomElement& e, bool clearProps) {
     {
         //QFPropsWriteLocker lock(this->p->propertyLocker);
         QDomElement te=e.firstChildElement("property");
-        props.clear();
+        if (clearProps) props.clear();
         while (!te.isNull()) {
             bool ok=true;
             QString n=te.attribute("name", "");

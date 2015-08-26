@@ -1284,7 +1284,7 @@ void QFRDRTable::colgraphSetGraphTitle(int plotid, int graphid, const QString &t
     }
 }
 
-void QFRDRTable::colgraphSetGrphType(int plotid, int graphid, QFRDRColumnGraphsInterface::ColumnGraphTypes type)
+void QFRDRTable::colgraphSetGraphType(int plotid, int graphid, QFRDRColumnGraphsInterface::ColumnGraphTypes type)
 {
     if (plotid>=0 && plotid<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(plotid);
@@ -2134,22 +2134,56 @@ void QFRDRTable::intReadData(QDomElement* e) {
     datamodel->clear();
     datamodel->setReadonly(false);
     if (files.size()>0 && !getQFProperty("DONT_READWRITE_FILE", false).toBool() ) {
-        //qDebug()<<"    reading CSV\n";
-        QString s=getProperty("column_separator", ",").toString();
-        char column_separator=(s.size()>0)?s[0].toLatin1():',';
-        s=getProperty("decimal_separator", ".").toString();
-        char decimal_separator=(s.size()>0)?s[0].toLatin1():'.';
-        s=getProperty("header_start", "#!").toString();
-        QString header_start=s;
-        s=getProperty("coment_start", "#").toString();
-        char comment_start=(s.size()>0)?s[0].toLatin1():'#';
+        QString format=getQFProperty("READFILE_FILEFORMAT", "CSV").toString().trimmed().toUpper();
+        if (format=="") {
+            datamodel->readXMLFile(files[0]);
+            QDomDocument docxml;
+            if (docxml.setContent(readFile(files[0]))) {
+                QDomElement er=docxml.firstChildElement("qfrdrtable");
+                if (!er.isNull()) {
+                    QDomElement e=er.firstChildElement("properties");
+                    if (!e.isNull()) {
+                        readProperties(e, false);
+                    }
+                }
+            }
+        } else {
+            //qDebug()<<"    reading CSV\n";
+            QString s=getProperty("column_separator", ",").toString();
+            char column_separator=(s.size()>0)?s[0].toLatin1():',';
+            s=getProperty("decimal_separator", ".").toString();
+            char decimal_separator=(s.size()>0)?s[0].toLatin1():'.';
+            s=getProperty("header_start", "#!").toString();
+            QString header_start=s;
+            s=getProperty("coment_start", "#").toString();
+            char comment_start=(s.size()>0)?s[0].toLatin1():'#';
 
-        //qDebug()<<"column_separator="<<column_separator<<"  decimal_separator="<<decimal_separator<<"   header_start="<<header_start.toStdString()<<"   comment_start="<<comment_start<<std::endl;
+            //qDebug()<<"column_separator="<<column_separator<<"  decimal_separator="<<decimal_separator<<"   header_start="<<header_start.toStdString()<<"   comment_start="<<comment_start<<std::endl;
 
-        datamodel->readCSV(files[0], column_separator, decimal_separator, header_start, comment_start);
+            QByteArray file=readFile(files[0]);
+            QList<QByteArray> lines=file.split('\n');
+            for (int l=0; l<lines.size(); l++) {
+                QString ll=lines[l].trimmed();
+                if (ll.startsWith(comment_start) && (header_start==QString(QChar(comment_start)) || !ll.startsWith(header_start))) {
+                    ll=ll.right(ll.size()-1).trimmed();
+                    QRegExp rxc("(.+)[\\=|\\:](.+)");
+                    if (rxc.exactMatch(ll) && rxc.cap(1).trimmed().size()>0 && rxc.cap(2).trimmed().size()>0) {
+                        QString name=rxc.cap(1).trimmed();
+                        QString value=rxc.cap(2).trimmed();
+                        setQFProperty(name, qfStringToVariantAutoRecognizeType(value), false, true);
+                    }
+                } else {
+                    if (ll.startsWith(header_start) || (!ll.simplified().trimmed().isEmpty())) {
+                        break;
+                    }
+                }
+            }
+
+            datamodel->readCSV(files[0], column_separator, decimal_separator, header_start, comment_start);
+        }
         datamodel->setReadonly(true);
         if (propertyExists("CONVERT_READWRITE") && getQFProperty("CONVERT_READWRITE", false).toBool()) {
-            datamodel->setReadonly(true);
+            datamodel->setReadonly(false);
             setQFProperty("DONT_READWRITE_FILE", true, false, false);
             deleteProperty("CONVERT_READWRITE");
         }

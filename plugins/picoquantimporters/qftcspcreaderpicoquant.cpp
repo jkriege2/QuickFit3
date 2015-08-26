@@ -234,6 +234,16 @@ uint16_t QFTCSPCReaderPicoquant::inputChannels() const {
     return binHeader.RoutingChannels;
 }
 
+uint32_t QFTCSPCReaderPicoquant::microtimeChannels() const
+{
+    return binHeader.Channels;
+}
+
+double QFTCSPCReaderPicoquant::microtimeChannelsResolutionPicoSeconds() const
+{
+    return boardHeader.Resolution*1e3;
+}
+
 double QFTCSPCReaderPicoquant::avgCountRate(uint16_t channel) const {
     return cr.value(channel, 0);
 }

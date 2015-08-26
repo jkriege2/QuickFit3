@@ -206,7 +206,7 @@ class QFRDRColumnGraphsInterface {
         /** \brief set the title of the graph */
         virtual void colgraphSetGraphTitle(int plot,  int graph,  const QString& title)=0;
         /** \brief set the type of the graph */
-        virtual void colgraphSetGrphType(int plot,  int graph,  ColumnGraphTypes type)=0;
+        virtual void colgraphSetGraphType(int plot,  int graph,  ColumnGraphTypes type)=0;
         /** \brief set the error style of the graph */
         virtual void colgraphSetGraphErrorStyle(int plot,  int graph,  ErrorGraphTypes errorType)=0;
         /** \brief set the plot symbol of the graph */

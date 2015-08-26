@@ -440,13 +440,13 @@ QFLIB_EXPORT QString CDoubleListToQString(const QList<double> values, const QStr
     \ingroup qf3lib_tools
 
 */
-QFLIB_EXPORT double CQStringToDouble(QString value);
+QFLIB_EXPORT double CQStringToDouble(const QString& value);
 
 /*! \brief convert a QString to a double and accept ',' and '.' as decimal separator
     \ingroup qf3lib_tools
 
 */
-QFLIB_EXPORT double QStringToDouble(QString value);
+QFLIB_EXPORT double QStringToDouble(const QString& value);
 
 /*! \brief convert a string \a data to a boolean
     \ingroup qf3lib_tools
@@ -479,7 +479,7 @@ QFLIB_EXPORT QString replaceFileExt(const QString& filename, const QString& exte
     \ingroup qf3lib_tools
 
 */
-QFLIB_EXPORT QString readFile(const QString& filename);
+QFLIB_EXPORT QByteArray readFile(const QString& filename);
 /*! \brief convert a QChar \a data to a human-readable string
     \ingroup qf3lib_tools
 
@@ -2054,6 +2054,7 @@ QFLIB_EXPORT QImage cropTopBottom(const QImage& pix, QRgb cropcolor);
 QFLIB_EXPORT QPixmap cropTopBottom(const QPixmap& pix);
 QFLIB_EXPORT QImage cropTopBottom(const QImage& pix);
 
+QFLIB_EXPORT QVariant qfStringToVariantAutoRecognizeType(const QString& value);
 
 
 QFLIB_EXPORT QString qfCanonicalOrAbsoluteFilePath(const QString& file);

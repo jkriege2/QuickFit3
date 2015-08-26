@@ -22,18 +22,21 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfsimpletcspcimporterplugin.h"
 #include "qfsimpletcspcimporter.h"
 #include "qfpluginservices.h"
+#include "qfpicoquanttexttcspcimporter.h"
 
 
 QStringList QFSimpleTCSPCImporterPlugin::getIDs() const {
     QStringList res;
-    res<<"tcspcimporter_simpletcspc";
+    res<<"tcspcimporter_simpletcspc"<<"tcspcimporter_picoquanttexttcspc";
     return res;
 }
 
 QFImporter* QFSimpleTCSPCImporterPlugin::createImporter(QString id) const  {
     if (id=="tcspcimporter_simpletcspc") {
         return new QFSimpleTCSPCImporter();
-    } 
+    } else if (id=="tcspcimporter_picoquanttexttcspc") {
+        return new QFPicoquantTextTCSPCImporter();
+    }
     return NULL;
 }
 

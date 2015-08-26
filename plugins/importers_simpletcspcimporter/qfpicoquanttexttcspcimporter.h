@@ -1,6 +1,5 @@
 /*
-    Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
-    German Cancer Research Center/University Heidelberg
+Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
     
 
@@ -20,28 +19,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef QFTCSPCREADERPICOQUANTPT3_H
-#define QFTCSPCREADERPICOQUANTPT3_H
+#ifndef QFPicoquantTextTCSPCImporter_H
+#define QFPicoquantTextTCSPCImporter_H
 #include "qfpluginimporters.h"
 #include "qfimporter.h"
 #include "qftcspcreader.h"
 #include <stdio.h>
 #include <QMap>
-#include "picoquant_pt3_tools.h"
+#include <QFile>
 
 
-/*! \brief QFImporter class for PicoQuant PicoHarp 300 Files (as TCSPC files)
+/*! \brief QFImporter class for simple text TCSPC as output by PicoQUant demo programs
     \ingroup qf3importerplugins_importers_picoquant
 
-
-      - <a href="http://ridl.cis.rit.edu/products/manuals/PicoQuant/PicoHarp%20300%20v2.3/filedemo/pt3/c/pt3demo.c">Demo code</a>
-      - <a href="http://wwwmc.bio.uva.nl/cam/manuals/PicoHarp%20300%20Manual%20v2.2.pdf">Documentation</a>
-    .
 */
-class QFTCSPCReaderPicoquantPT3: public QFTCSPCReader {
+class QFPicoquantTextTCSPCImporter: public QFTCSPCReader {
     public:
-        QFTCSPCReaderPicoquantPT3();
-        virtual ~QFTCSPCReaderPicoquantPT3();
+
+        QFPicoquantTextTCSPCImporter();
+        virtual ~QFPicoquantTextTCSPCImporter();
         /*! \copydoc QFFitFunction::filter()   */
         virtual QString filter() const ;
         /*! \copydoc QFFitFunction::formatName()   */
@@ -53,7 +49,7 @@ class QFTCSPCReaderPicoquantPT3: public QFTCSPCReader {
         /** \copydoc QFTCSPCReader:open:() */
         virtual bool open(const QString& filename, const QString& parameters=QString());
         /** \brief QFTCSPCReader::isOpenParametersUsed() */
-        virtual bool isOpenParametersUsed( QString* optionsDescription=NULL) const;
+        virtual bool isOpenParametersUsed(QString *optionsDescription=NULL) const;
 
         /** \copydoc QFTCSPCReader::close() */
         virtual void close();
@@ -65,6 +61,10 @@ class QFTCSPCReaderPicoquantPT3: public QFTCSPCReader {
         virtual double measurementDuration() const;
         /** \copydoc QFTCSPCReader::inputChannels() */
         virtual uint16_t inputChannels() const;
+        /** \copydoc QFTCSPCReader::microtimeChannels() */
+        virtual uint32_t microtimeChannels() const;
+        /** \copydoc QFTCSPCReader::microtimeChannelsResolutionPicoSeconds() */
+        virtual double microtimeChannelsResolutionPicoSeconds() const;
 
         /** \copydoc QFTCSPCReader::avgCountRate() */
         virtual double avgCountRate(uint16_t channel) const;
@@ -72,29 +72,26 @@ class QFTCSPCReaderPicoquantPT3: public QFTCSPCReader {
         virtual QFTCSPCRecord getCurrentRecord() const;
 
         virtual double percentCompleted()const;
-        /** \copydoc QFTCSPCReader::microtimeChannels() */
-        virtual uint32_t microtimeChannels() const;
-        /** \copydoc QFTCSPCReader::microtimeChannelsResolutionPicoSeconds() */
-        virtual double microtimeChannelsResolutionPicoSeconds() const;
 
     protected:
-        FILE* tttrfile;
-        PT3TxtHdr txtHeader;
-        PT3BinHdr binHeader;
-        PT3BoardHdr boardHeader;
-        PT3TTTRHdr TTTRHeader;
+        QFile tttrfile;
 
-        fpos_t fileResetPos;
-
+        uint64_t fileResetLine;
         uint64_t currentTTTRRecordNum;
-        uint64_t ofltime;
-        uint64_t overflows;
-        double syncperiod;
+        uint64_t recordsInTTTRFile;
+
+        double mtResolutionPS;
+        uint32_t mtChannels;
+        double duration;
+        uint16_t inChannels;
+        double timeFactorXToS;
+
+        int idxTime;
+        int idxChannel;
+        int idxRoute;
 
         QFTCSPCRecord current;
         QMap<uint16_t, double> cr;
-
-        double duration;
 };
 
-#endif // QFTCSPCREADERPICOQUANTPT3_H
+#endif // QFPicoquantTextTCSPCImporter_H

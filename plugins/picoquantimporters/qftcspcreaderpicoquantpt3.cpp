@@ -216,3 +216,13 @@ double QFTCSPCReaderPicoquantPT3::percentCompleted() const {
     return double(currentTTTRRecordNum)/double(TTTRHeader.Records)*100.0;
 }
 
+uint32_t QFTCSPCReaderPicoquantPT3::microtimeChannels() const
+{
+    return 65536;
+}
+
+double QFTCSPCReaderPicoquantPT3::microtimeChannelsResolutionPicoSeconds() const
+{
+    return boardHeader.Resolution*1e3;
+}
+

@@ -40,7 +40,8 @@
 #include "qfpluginservices.h"
 #include <QSet>
 #include <QPair>
-
+#include <QtAlgorithms>
+#include <numeric>
 // TODO: add bleach correction
 
 class QFETCSPCImporterThreadProgress; // forward
@@ -88,6 +89,10 @@ struct TCSPCImporterJob {
     double fcs_crbinning;
     /** \brief cut the input sequence in this number of segments and calculate and average + stddev for every point in the ACF/CCF */
     int32_t fcs_segments;
+    /** \brief duration of a segment */
+    double fcs_segment_duration;
+    /** \brief if \c true, segments are defined by the given duration, otherwise by measurement_duration/fcs_segments */
+    bool fcs_segments_by_duration;
     /** \brief start of range in seconds */
     double range_min;
     /** \brief end of range in seconds */
@@ -100,9 +105,19 @@ struct TCSPCImporterJob {
     QString postfix;
     /** \brief binning for count rates in seconds */
     double countrate_binning;
-
+    /** \brief \c true, if lifetime-histogram should be created */
+    bool doLifetimeHistogram;
+    /** \brief \c true, if FCS-analysis should be done */
     bool doFCS;
+    /** \brief \c true, if countrate-traces should be calculated/generated */
     bool doCountrate;
+
+    /** \brief cut the input sequence in this number of segments and calculate a lifetime histogram for each */
+    int32_t lt_segments;
+    /** \brief duration of a segment */
+    double lt_segment_duration;
+    /** \brief if \c true, segments are defined by the given duration, otherwise by measurement_duration/fcs_segments */
+    bool lt_segments_by_duration;
 
     QSet<QPair<int, int> > fcs_correlate;
     QSet<int> countrate_channels;
@@ -132,6 +147,7 @@ struct QFETCSPCImporterJobThreadAddFileProps {
     QString comment;
     QString group;
     QString role;
+    QVariantList dataForInsert;
     QFETCSPCImporterJobThreadAddFileProps(const QStringList& files, const QString& type, const QMap<QString, QVariant>& props) {
         this->files=files;
         this->type=type;
@@ -292,6 +308,8 @@ protected:
     typedef correlatorjb<double, double> corrjb_type;
     typedef MultiTauCorrelator<double, double> corrjk_type;
 
+    QMap<uint64_t, QVector<uint64_t> > lifetime_hists;
+    double lifetime_hists_deltaT_ns;
     QMap<uint32_t, corrjb_type*> corrjb;
     QMap<uint32_t, corrjk_type*> corrjk;
     QMap<uint32_t, QVector<double> > corrtttr;
@@ -301,6 +319,18 @@ protected:
 
     void clearCorrelators();
     void createCorrelators();
+    void createLifetimeHists(int32_t histitems);
+    void clearLifetimeHists();
+    inline void incLifetimeHist(int32_t lifetime, uint16_t segment, uint16_t channel) {
+        if (lifetime>=0 && lifetime<lifetime_hists[xyzAdressToUInt64(segment,channel,0)].size()) lifetime_hists[xyzAdressToUInt64(segment,channel,0)].operator [](lifetime)++;
+    }
+    inline uint64_t getLifetimeHist(int32_t lifetime, uint16_t segment, uint16_t channel) {
+        return lifetime_hists[xyzAdressToUInt64(segment,channel,0)].value(lifetime, 0);
+    }
+    inline uint64_t sumLifetimeHist(uint16_t segment, uint16_t channel) {
+        return std::accumulate(lifetime_hists[xyzAdressToUInt64(segment,channel,0)].begin(), lifetime_hists[xyzAdressToUInt64(segment,channel,0)].end(), 0);
+    }
+
     void copyCorrelatorIntermediateResults(uint16_t fcs_segment, const QList<QVector<double> > &arrivaltimes=QList<QVector<double> >());
     void shiftIntoCorrelators(uint16_t *fcs_countrate, uint32_t count);
 
@@ -311,6 +341,13 @@ protected:
     uint16_t channels;
     uint64_t countrate_items;
     uint64_t real_countrate_items;
+
+    uint32_t fcs_segments;
+    uint32_t lt_segments;
+    double fcs_segment_duration;
+    double lt_segment_duration;
+    uint32_t lt_microtimechannels;
+    double lt_microtimeResolutionPS;
 
     struct ccfFileConfig {
         QString filename;

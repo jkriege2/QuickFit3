@@ -1365,7 +1365,7 @@ bool QFTableModel::saveCSV(QTextStream &out, QString column_separator, char deci
     for (quint32 c=0; c<state.columns; c++) {
         if (usedCols.contains(c) || saveCompleteTable) {
             if (cc>0) out<<column_separator;
-            if (int64_t(c)<state.columnNames.size()) out<<QString("\"%1\"").arg(state.columnNames[c]).arg(c+1);
+            if (int64_t(c)<state.columnNames.size()) out<<QString("\"%1\"").arg(state.columnNames[c]);
             cc++;
         }
     }

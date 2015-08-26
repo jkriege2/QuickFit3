@@ -59,6 +59,10 @@ class QFSimpleTCSPCImporter: public QFTCSPCReader {
         virtual double measurementDuration() const;
         /** \copydoc QFTCSPCReader::inputChannels() */
         virtual uint16_t inputChannels() const;
+        /** \copydoc QFTCSPCReader::microtimeChannels() */
+        virtual uint32_t microtimeChannels() const;
+        /** \copydoc QFTCSPCReader::microtimeChannelsResolutionPicoSeconds() */
+        virtual double microtimeChannelsResolutionPicoSeconds() const;
 
         /** \copydoc QFTCSPCReader::avgCountRate() */
         virtual double avgCountRate(uint16_t channel) const;

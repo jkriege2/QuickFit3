@@ -588,16 +588,17 @@ QString CDoubleListToQString(const QList<double> values, const QString& separato
 }
 
 
-double CQStringToDouble(QString value) {
+double CQStringToDouble(const QString& value) {
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
     return loc.toDouble(value) ;
 }
 
-double QStringToDouble(QString value) {
+double QStringToDouble(const QString& value) {
     QString v=value;
     if (value.contains(',')) {
-        v=value.replace(',', '.');
+        v=value;
+        v=v.replace(',', '.');
     }
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
@@ -648,14 +649,14 @@ QString replaceFileExt(const QString& filename, const QString& extension) {
     return f;
 }
 
-QString readFile(const QString& filename) {
-    if (!QFile::exists(filename)) return QString();
+QByteArray readFile(const QString& filename) {
+    if (!QFile::exists(filename)) return QByteArray();
     QFile f(filename);
     if (f.open(QIODevice::ReadOnly)) {
         return f.readAll();
         f.close();
     }
-    return QString();
+    return QByteArray();
 }
 
 
@@ -1935,4 +1936,16 @@ QByteArray qfGetCrytographicHashForFile(const QString& file, QCryptographicHash:
         return QCryptographicHash::hash(f.readAll(), method);
     }
     return QByteArray();
+}
+
+QVariant qfStringToVariantAutoRecognizeType(const QString& value) {
+    QRegExp rxInt("[+|-]?\\d+");
+    QRegExp rxDouble("[+|-]?\\d+[\\.]?\\d*[eE]?\\d*");
+    if (rxInt.exactMatch(value)) {
+        return value.toInt();
+    } else if (rxDouble.exactMatch(value)) {
+        return QStringToDouble(value);
+    } else {
+        return value;
+    }
 }
