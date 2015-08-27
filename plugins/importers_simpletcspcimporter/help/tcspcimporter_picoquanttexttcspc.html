@@ -21,7 +21,9 @@
 		  <li><b>Data Header:</b> Is a line directly before the data segment, which specifies the order of data. The importer will try to parse this From this header, also the time-unit of the column time or truetime is determined (given e.g. as <tt>truetime/ns</tt>)</li>
 		  <li><b>Data:</b> data as numbers, separated by whitespace and in the order specified in 2. This part of the reader ignores the appearance of <tt>CHN</tt> in a line and removes lines with indicators <tt>MAR</tt> and <tt>OFL</tt>. $$note:Therefore urrently markers are not supported!!!$$</li>
 		</ol>
+		$$note:The plugin wil output some debug-information when parsing a file to QuickFit's main log.$$
 		</p>
+		
 		
 		<h2>Example Data</h2>
 		<h3>From PTU-file</h3>
