@@ -7,6 +7,7 @@
 #include "qfimportermanager.h"
 #include "qfimporter.h"
 #include "image_tools.h"
+#include <QtConcurrent/QtConcurrent>
 
 QFImagePlot::QFImagePlot(QWidget *parent, const QString &prefix):
     QWidget(parent),
@@ -354,14 +355,55 @@ void QFImagePlotWizardPage::setImage(double *image, int32_t width, int32_t heigh
     }
 }
 
+
+class QFImporterImageSeriesOpener {
+    public:
+        QFImporterImageSeriesOpener(QFImporterImageSeries* reader) {
+            this->reader=reader;
+        }
+
+        bool operator()(const QString &filename) {
+            return reader->open(filename);
+        }
+        typedef bool result_type;
+
+        protected:
+            QFImporterImageSeries* reader;
+};
+
+class QFImporterImageSeriesFrameCounter {
+    public:
+        QFImporterImageSeriesFrameCounter(QFImporterImageSeries* reader) {
+            this->reader=reader;
+        }
+
+        uint32_t operator()() {
+            return reader->countFrames();
+        }
+        typedef uint32_t result_type;
+
+        protected:
+            QFImporterImageSeries* reader;
+};
+
 void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, int frameNum, QFImporter::FileInfo* fileinfo)
 {
     QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
     QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
     if (r) {
-        if (r->open(filename)) {
+        QFImporterImageSeriesOpener opener(r);
+        QFuture<bool> opened=QtConcurrent::run(opener, filename);
+        while (!opened.isFinished()) {
+            QApplication::processEvents();
+        }
+        if (opened.result()) {
             if (frameNum<0) {
-                frameNum=r->countFrames()/2;
+                QFImporterImageSeriesFrameCounter counter(r);
+                QFuture<uint32_t> cnt=QtConcurrent::run(counter);
+                while (!cnt.isFinished()) {
+                    QApplication::processEvents();
+                }
+                frameNum=cnt.result()/2;
             }
             if (frameNum>0) {
                 for (int i=0; i<frameNum; i++) {
@@ -388,13 +430,23 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
     QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
     QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
     if (r) {
-        if (r->open(filename)) {
+        QFImporterImageSeriesOpener opener(r);
+        QFuture<bool> opened=QtConcurrent::run(opener, filename);
+        while (!opened.isFinished()) {
+            QApplication::processEvents();
+        }
+        if (opened.result()) {
             int fs=0;
+            QFImporterImageSeriesFrameCounter counter(r);
+            QFuture<uint32_t> cnt=QtConcurrent::run(counter);
+            while (!cnt.isFinished()) {
+                QApplication::processEvents();
+            }
             if (frameNum<0) {
-                fs=r->countFrames();
-                frameNum=r->countFrames()/2;
+                fs=cnt.result();
+                frameNum=cnt.result()/2;
             } else {
-                if (frames) fs=r->countFrames();
+                if (frames) fs=cnt.result();
             }
             if (frames) *frames=fs;
             if (frameNum>0) {
@@ -427,15 +479,25 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
     QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
     //qDebug()<<imp<<r;
     if (r) {
-        if (r->open(filename)) {
+        QFImporterImageSeriesOpener opener(r);
+        QFuture<bool> opened=QtConcurrent::run(opener, filename);
+        while (!opened.isFinished()) {
+            QApplication::processEvents();
+        }
+        if (opened.result()) {
             //qDebug()<<"opened "<<filename;
             int fs=0;
             frameCount=qMax(frameCount, 1);
+            QFImporterImageSeriesFrameCounter counter(r);
+            QFuture<uint32_t> cnt=QtConcurrent::run(counter);
+            while (!cnt.isFinished()) {
+                QApplication::processEvents();
+            }
             if (frameStart<0) {
-                fs=r->countFrames();
-                frameStart=qMax((uint32_t)0,(r->countFrames()-frameCount)/2);
+                fs=cnt.result();
+                frameStart=qMax((uint32_t)0,(cnt.result()-frameCount)/2);
             } else {
-                if (frames) fs=r->countFrames();
+                if (frames) fs=cnt.result();
             }
             if (frames) *frames=fs;
             if (frameStart>0) {
@@ -465,6 +527,9 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
                     }
                 } else {
                     break;
+                }
+                if (i%5==0) {
+                    QApplication::processEvents();
                 }
             }
             //qDebug()<<"normalize "<<fcnt;

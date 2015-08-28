@@ -636,6 +636,11 @@ void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumn
         case QFRDRColumnGraphsInterface::cgtBoxPlot:
             g.type=gtBoxplotY;
             break;
+        case QFRDRColumnGraphsInterface::cgtParametrizedScatter:
+            g.type=gtParametrizedScatter;
+            g.drawLine=true;
+            g.symbol=JKQTPnoSymbol;
+            break;
     }
 }
 
@@ -651,6 +656,47 @@ int QFRDRTable::colgraphAddGraph(int plotid, int columnX, int columnY, QFRDRColu
         g.fillColor=g.color.lighter();
         colgraphToolsSetGraphtype(g, type);
         g.title=title;
+        plt.graphs.append(g);
+
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+        return plt.graphs.size()-1;
+    }
+    return -1;
+}
+
+
+int QFRDRTable::colgraphAddParametrizedScatterGraph(int plotid, int columnX, int columnY, int columnP, const QString &title, QFRDRColumnGraphsInterface::ParametrizationType type, bool colorbarVisible, const QString& colorbarLabel)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        QFRDRTable::GraphInfo g;
+        g.xcolumn=columnX;
+        g.ycolumn=columnY;
+
+        colgraphToolsSetGraphtype(g, QFRDRColumnGraphsInterface::cgtParametrizedScatter);
+        g.meancolumn=columnP;
+        if (type==QFRDRColumnGraphsInterface::cgptColorLines) {
+            g.meancolumn=columnP;
+            g.drawLine=true;
+            g.symbol=JKQTPnoSymbol;
+        } else if (type==QFRDRColumnGraphsInterface::cgptColorSymbols) {
+            g.meancolumn=columnP;
+            g.drawLine=false;
+            g.symbol=JKQTPfilledCircle;
+        } else if (type==QFRDRColumnGraphsInterface::cgptSize) {
+            g.q75column=columnP;
+            g.drawLine=false;
+            g.symbol=JKQTPfilledCircle;
+        }
+
+        g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
+        g.errorColor=g.color.darker();
+        g.fillColor=g.color.lighter();
+        g.title=title;
+        g.imageColorbarRight=colorbarVisible;
+        g.imageColorbarTop=false;
+        g.imageLegend=colorbarLabel;
         plt.graphs.append(g);
 
         setPlot(plotid, plt);
@@ -1055,6 +1101,7 @@ int QFRDRTable::colgraphAddPlot(const QString &title, const QString &xLabel, con
     return plots.size()-1;
 }
 
+
 int QFRDRTable::colgraphGetGraphCount(int plotid) const
 {
     if (plotid>=0 && plotid<plots.size()) {
@@ -1372,6 +1419,18 @@ void QFRDRTable::colgraphSetGraphTransparency(int plotid, int graphid, double tr
     }
 }
 
+void QFRDRTable::colgraphSetColorPalette(int plotid, int graphid, QFRDRColumnGraphsInterface::ImageColorPalette palette)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].imagePalette=JKQTPMathImageColorPalette((int)palette);
+        }
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
 void QFRDRTable::colgraphSetGraphSymbol(int plotid, int graphid, QFRDRColumnGraphsInterface::ColumnGraphSymbols symbol, double symbolSize)
 {
     if (plotid>=0 && plotid<plots.size()) {
@@ -1384,6 +1443,40 @@ void QFRDRTable::colgraphSetGraphSymbol(int plotid, int graphid, QFRDRColumnGrap
         emitRebuildPlotWidgets();
     }
 }
+
+
+QString QFRDRTable::colgraphGetPlotXAxisLabel(int plotid)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        return getPlot(plotid).xAxis.label;
+    }
+    return QString();
+}
+
+QString QFRDRTable::colgraphGetPlotYAxisLabel(int plotid)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        return getPlot(plotid).xAxis.label;
+    }
+    return QString();
+}
+
+bool QFRDRTable::colgraphGetPlotXAxisLog(int plotid)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        return getPlot(plotid).yAxis.log;
+    }
+    return false;
+}
+
+bool QFRDRTable::colgraphGetPlotYAxisLog(int plotid)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        return getPlot(plotid).xAxis.log;
+    }
+    return false;
+}
+
 
 
 int QFRDRTable::getPlotCount() const

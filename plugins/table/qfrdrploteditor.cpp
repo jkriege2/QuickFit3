@@ -110,6 +110,26 @@ void QFRDRPlotEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* 
     rebuildPlotWidgets();
     //std::cout<<m<<" done\n";
     updating=false;
+
+    bool newrec=(current!=old);
+    if (newrec && current && current->propertyExists("AUTOSCALEXY_PLOTS_ON_SHOWUP")) {
+        for (int i=0; i<plotWidgets.size(); i++) {
+            plotWidgets[i]->doAutoscaleXY();
+        }
+        current->deleteProperty("AUTOSCALEXY_PLOTS_ON_SHOWUP");
+    }
+    if (newrec && current && current->propertyExists("AUTOSCALEX_PLOTS_ON_SHOWUP")) {
+        for (int i=0; i<plotWidgets.size(); i++) {
+            plotWidgets[i]->doAutoscaleX();
+        }
+        current->deleteProperty("AUTOSCALEX_PLOTS_ON_SHOWUP");
+    }
+    if (newrec && current && current->propertyExists("AUTOSCALEY_PLOTS_ON_SHOWUP")) {
+        for (int i=0; i<plotWidgets.size(); i++) {
+            plotWidgets[i]->doAutoscaleY();
+        }
+        current->deleteProperty("AUTOSCALEY_PLOTS_ON_SHOWUP");
+    }
 }
 
 void QFRDRPlotEditor::rawDataChanged() {

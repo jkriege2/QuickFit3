@@ -138,6 +138,7 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
 
     connect(ui->widSystemSettings, SIGNAL(autoscaleX()), this, SLOT(doAutoscaleX()));
     connect(ui->widSystemSettings, SIGNAL(autoscaleY()), this, SLOT(doAutoscaleY()));
+    connect(ui->widSystemSettings, SIGNAL(autoscaleXY()), this, SLOT(doAutoscaleXY()));
 
 
     if (ProgramOptions::getInstance() && ProgramOptions::getInstance()->getQSettings()) readSettings(*(ProgramOptions::getInstance()->getQSettings()), "table/QFRDRTablePlotWidget/");
@@ -152,6 +153,7 @@ QFRDRTablePlotWidget::~QFRDRTablePlotWidget()
 
 void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
 {
+
     current=record;
     this->plot=graph;
     updating=true;
@@ -185,6 +187,7 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
     connectWidgets();
     listGraphs_currentRowChanged(ui->listGraphs->currentRow());
     updateGraph();
+
 }
 
 void QFRDRTablePlotWidget::rawDataChanged() {
@@ -328,6 +331,18 @@ void QFRDRTablePlotWidget::doAutoscaleY() {
     ui->widSystemSettings->setYRange(ui->plotter->getYMin(), ui->plotter->getYMax());
     updating=false;
     plotDataChanged();
+}
+
+void QFRDRTablePlotWidget::doAutoscaleXY()
+{
+    ui->plotter->zoomToFit(true, true);
+    updating=true;
+    //qDebug()<<"autoX: "<<ui->plotter->getXMin()<<ui->plotter->getXMax();
+    ui->widSystemSettings->setXRange(ui->plotter->getXMin(), ui->plotter->getXMax());
+    ui->widSystemSettings->setYRange(ui->plotter->getYMin(), ui->plotter->getYMax());
+    updating=false;
+    plotDataChanged();
+
 }
 
 void QFRDRTablePlotWidget::on_plotter_plotMouseMove(double x, double y)

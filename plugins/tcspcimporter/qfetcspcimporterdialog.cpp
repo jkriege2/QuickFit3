@@ -29,7 +29,7 @@
 #else
 #include <QtGui>
 #endif
-
+#include <QtConcurrent/QtConcurrent>
 
 #include <QDebug>
 #include "qmodernprogresswidget.h"
@@ -682,9 +682,52 @@ void QFETCSPCImporterDialog::on_btnPeekLifetime_clicked()
     }
 }
 
+class QFTCSPCReaderOpener {
+    public:
+        QFTCSPCReaderOpener(QFTCSPCReader* reader) {
+            this->reader=reader;
+        }
+
+        bool operator()(const QString &filename, const QString &parameters) {
+            return reader->open(filename, parameters);
+        }
+        typedef bool result_type;
+
+        protected:
+            QFTCSPCReader* reader;
+};
+
+/*
+ *
+        #include <QtConcurrent/QtConcurrent>
+        QModernProgressDialog progress(this);
+        progress.setHasCancel(false);
+        progress.setLabelText(tr("reading properties from TCSPC file ..."));
+        progress.setMode(true, false);
+        progress.show();
+
+
+
+        QFTCSPCReaderOpener opener(reader);
+        QFuture<bool> opened=QtConcurrent::run(opener, ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text());
+        while (!opened.isFinished()) {
+            QApplication::processEvents();
+        }
+
+
+        if (opened.result()) {
+
+ * */
+
 void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFTCSPCReader* reader=QFETCSPCImporterJobThread::getImporter(ui->cmbFileformat->currentIndex(), pluginServices);    
     if (reader) {
+        QModernProgressDialog progress(this);
+        progress.setHasCancel(false);
+        progress.setLabelText(tr("reading properties from TCSPC file ..."));
+        progress.setMode(true, false);
+        progress.show();
         QString paramName="";
         ui->edtTCSPCFileParameter->setEnabled(false);
         ui->labParameter->setEnabled(false);
@@ -698,7 +741,13 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
             }
         }
         //qDebug()<<"opening file: "<<ui->edtTCSPCFile->text();
-        if (reader->open(ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text())) {
+        QFTCSPCReaderOpener opener(reader);
+        QFuture<bool> opened=QtConcurrent::run(opener, ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text());
+        while (!opened.isFinished()) {
+            QApplication::processEvents();
+        }
+
+        if (opened.result()) {//reader->open(ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text())) {
             duration=reader->measurementDuration();
             //qDebug()<<"  duration: "<<duration;
             channels=reader->inputChannels();
@@ -799,6 +848,7 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
     }
     updateDuration();
     updateCorrelator();
+    QApplication::restoreOverrideCursor();
 }
 
 

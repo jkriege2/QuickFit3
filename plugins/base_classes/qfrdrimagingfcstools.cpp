@@ -143,6 +143,14 @@ void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& 
                 files_types<<"image_other";
                 files_descriptions<<inifiledescriptions[i];
             }
+        } else if (inifiletypes[i].toLower()=="csv_msd") {
+            files<<inifiles[i];
+            files_types<<"simulation_msds";
+            files_descriptions<<inifiledescriptions[i];
+        } else if (inifiletypes[i].toLower()=="csv_trajectories") {
+            files<<inifiles[i];
+            files_types<<"simulation_trajectories";
+            files_descriptions<<inifiledescriptions[i];
         } else if (inifiletypes[i].toLower().contains("csv")) {
             if (inifiledescriptions[i].toLower().contains("measureable") && inifiledescriptions[i].toLower().contains("properties") && inifiletypes[i].toLower()=="csv") {
                 files<<inifiles[i];
@@ -590,7 +598,7 @@ bool readEvalSettingsFile(const QString &evalFilename, bool isDCCF, QMap<QString
                         files_types<<"mask";
                         files_descriptions<<QObject::tr("mask");
                     }
-                } else if (name=="date/time") {
+                 } else if (name=="date/time") {
                     initParams["CORRELATION_DATE"]=value;
                     paramsReadonly<<"CORRELATION_DATE";
                 } else {

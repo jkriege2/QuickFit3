@@ -48,19 +48,25 @@ The simulation dialog looks like this:
 <h2>Simulation Properties</h2>
 <h3>2D Random Walk</h3>
 <ul>
-    <li>The simulation performs a 2D random walk with periodic boundary conditions for each walker. </li>
-    <li>There are up to six different sets of walkers: 2&times; green walkers (always there), 2&times; red walkers and 2&times; red+green walkers (the last two are only available in the dual view mode). 
+    <li>The simulation performs a 2D random walk with (usually) periodic boundary conditions for each walker. If "random re-introduce" boundary conditions are choose, any walker that leaves the simulational box is re-introduced randomly on the border of the box.</li>
+	<li>The simulation generates creates $(N_\text{frames})$ frames with a frametime of $(\Delta t_\text{frame})$ each. It actually progresses in simulation timesteps $(\Delta t)$ (note that $(\Delta t_\text{frame})$ has to be an integer multiple of $(\Delta t)$), which may be shorter than $(\Delta t_\text{frame})$. The intensity (see below) created in each simulation timestep is accumulated, until the next frame is ready.</li>
+    <li>There are up to seven different sets of walkers: 3&times; green walkers (always there), 2&times; red walkers and 2&times; red+green walkers (the last two are only available in the dual view mode). 
     Each set has its own diffusion coefficient  and a global flow may be added in addition. Every walker is thus displaced in every timestep $$math:\Delta t$$: 
       $$bmath:\Delta x=N(0,\sqrt{2\cdot D\cdot \Delta t})+v_x\cdot \Delta t$$ 
       $$bmath:\Delta y=N(0,\sqrt{2\cdot D\cdot \Delta t})+v_y\cdot \Delta t$$ 
-    where $$math:N(0,\sigma)$$ is a normally distributed random number with mean 0 and variance $$math:\sigma^2$$. $$note:The flow may be limited to the right image half (y>width/2).<br>Also the diffusion of each species may be limited to the bottom half (x>width/2) of the image. Then in the x-direction the boundary conditions are no longer periodic, but reflective (in y-direction they stay periodic!). Be aware, that therefore limiting the diffusion space and using flow may lead to a concentration of the particles at a border!$$</li>
+    where $$math:N(0,\sigma)$$ is a normally distributed random number with mean 0 and variance $$math:\sigma^2$$. $$note:The flow may be limited to the right image half (y>width/2).<br>Also the diffusion of each species may be limited to the bottom half (x>width/2) of the image. Then in the x-direction the boundary conditions are no longer periodic, but reflective (in y-direction they stay periodic!). Be aware, that therefore limiting the diffusion space and using flow may lead to a concentration of the particles at a border!$$ The simulation supports several possibilities for a structured environment:<ul>
+	<li><b>free diffusion:</b> The particles progress freely, as described above.</li>
+	<li><b>barrier mesh/regular barrier grid:</b> Here, a regular grid of barriers (spacing $(\Delta x_\text{grid})$ in x- and y-direction) is overlayn over the simulation space. If a particle tries to jump over any such barrier, this is only possible with a certain probability $(p_\text{barrier}/N_\text{jumps})$, where $(N_\text{jumps}\geq1)$ is the number of barriers, the particle tries to cross. </li>
+	</ul></li>
     <li>Then the intensity in each pixel is calculated as
-    $$bmath:I_g(x,y)=N(B, \sigma_B)+\sum_{i=1}^{N_g} b_g\cdot\exp\left(-2\cdot\frac{(x-x_{g,i})^2+(y-y_{g,i})^2}{w_{xy}^2}\right)+\sum_{i=1}^{N_{rg}} b_g\cdot\exp\left(-2\cdot\frac{(x-x_{rg,i})^2+(y-y_{rg,i})^2}{w_{xy}^2}\right)$$
-    $$bmath:I_r(x,y)=N(B, \sigma_B)+\sum_{i=1}^{N_r} b_r\cdot\exp\left(-2\cdot\frac{(x-x_{r,i})^2+(y-y_{r,i})^2}{w_{xy}^2}\right)+\sum_{i=1}^{N_{rg}} b_r\cdot\exp\left(-2\cdot\frac{(x-x_{rg,i})^2+(y-y_{rg,i})^2}{w_{xy}^2}\right)$$
-    Here $$math:w_{xy}$$ is the parameter <code>psf_size</code>, $$math:N_g, N_r, N_{rg}$$ are the numbers of green, red and red+green walkers and $$math:b_g, b_r$$ are the molecular brightnesses of the red and green dyes. 
-    The pairs $$math:(x_{g,i}, y_{g,i}), (x_{r,i}, y_{r,i}), (x_{rg,i}, y_{rg,i})$$ are the trajectories (time index $$math:i$$) of the green, red and red+green walkers. The background signal
+    $$bmath:I_g(x,y)=N(B, \sigma_B)+\Delta t\cdot\left[\sum_{p\in\{\text{g,g2,g3,rg,rg2}\}}\left(b_{g,p}\cdot I_{p}(x,y; w_{g}; \vec{\delta}_{gr})\right]$$
+    $$bmath:I_r(x,y)=N(B, \sigma_B)+\Delta t\cdot\left[\sum_{p\in\{\text{r,r2,r3,rg,rg2}\}}\left(b_{r,p}\cdot I_{p}(x,y; w_{r}; \vec{\delta}_{gr})+\kappa_{gr}\sum_{p\in\{\text{g,g2,g3,rg,rg2}\}}\left(b_{g,p}\cdot I_{p}(x,y; w_{g}; \vec{\delta}_{gr})\right]$$
+	$$bmath:\text{with intensity from component $p$:}\ \ \ \ \ I_{p}(x,y; w_{xy}; \vec{\delta})=\sum_{i=1}^{N_p} \cdot\exp\left(-2\cdot\frac{(x-x_{p,i}-\delta_x)^2+(y-y_{p,i}-\delta_y)^2}{w_{xy}^2}\right)
+    Here $$math:w_{g/r}$$ are the parameters <code>psf_size</code> for the green and red PSF, $$math:N_g, N_r, N_{rg}, ...$$ are the numbers of green, red and red+green walkers and $$math:b_g, b_r, ...$$ are the molecular brightnesses (per second) of the red and green dyes. The crosstalk from the green into the red channel is given by the factor $(\kappa_{gr})$.
+    The pairs $$math:(x_{g,i}, y_{g,i}), (x_{r,i}, y_{r,i}), (x_{rg,i}, y_{rg,i}), ...$$ are the trajectories (time index $$math:i$$) of the green, red and red+green walkers. The background signal
     is calculated from a normal distribution with mean $$math:B$$ and standard deviation $$math:\sigma_B$$.
     </li>
+	<li>Finally the pixel-intensity is rounded to integer values.</li>
     <li>In dual view mode, the output image has twice the given width and the right part of it represents the red detection channel. This is thus a simple
     simulation of a DualView optical system, as often used for imFCS. </li>
 </ul>  </body>

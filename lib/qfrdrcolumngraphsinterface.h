@@ -33,7 +33,7 @@
 */
 class QFRDRColumnGraphsInterface {
     public:
-        virtual ~QFRDRColumnGraphsInterface() {};
+        virtual ~QFRDRColumnGraphsInterface() {}
 
         enum ColumnGraphTypes {
             cgtLines,
@@ -52,12 +52,18 @@ class QFRDRColumnGraphsInterface {
             cgtMaskImage,
             cgtHorizontalRange,
             cgtVerticalRange,
-            cgtBoxPlot
+            cgtBoxPlot,
+            cgtParametrizedScatter
         };
 
         enum Orientation {
             cgoHorizontal,
             cgoVertical
+        };
+        enum ParametrizationType {
+            cgptColorLines,
+            cgptColorSymbols,
+            cgptSize
         };
 
 
@@ -145,6 +151,8 @@ class QFRDRColumnGraphsInterface {
 
         /** \brief add a plot of  columnX against columnY to the given plot */
         virtual int colgraphAddGraph(int plot, int columnX, int columnY, ColumnGraphTypes type, const QString&  title)=0;
+        /** \brief add a plot of  columnX against columnY to the given plot, as a parametrized scatter plot */
+        virtual int colgraphAddParametrizedScatterGraph(int plot, int columnX, int columnY, int columnP, const QString&  title, ParametrizationType type=cgptColorLines, bool colorbarVisible=false, const QString& colorbarLabel=QString())=0;
         /** \brief add a boxplot */
         virtual int colgraphAddBoxPlot(int plot, Orientation orientation, int columnX, int columnMin, int columnQ25, int columnMedian, int columnMean, int columnQ75, int columnMax, const QString&  title)=0;
         /** \brief add a plot of  columnX against columnY to the given plot */
@@ -221,6 +229,24 @@ class QFRDRColumnGraphsInterface {
         /** \brief set a plot's y-axis properties */
         virtual void colgraphSetPlotYAxisProps(int plot, const QString& yLabel=QString("y"), bool logY=false)=0;
 
+        /** \brief get a plot's x-axis label */
+        virtual QString colgraphGetPlotXAxisLabel(int plot)=0;
+        /** \brief get a plot's y-axis label */
+        virtual QString colgraphGetPlotYAxisLabel(int plot)=0;
+
+        /** \brief get a plot's x-axis Log */
+        virtual bool colgraphGetPlotXAxisLog(int plot)=0;
+        /** \brief get a plot's y-axis Log */
+        virtual bool colgraphGetPlotYAxisLog(int plot)=0;
+          /** \brief set a plot's y-axis label */
+        inline virtual void colgraphSetPlotYAxisLabel(int plot, const QString& yLabel) {
+            colgraphSetPlotYAxisProps(plot, yLabel, colgraphGetPlotYAxisLog(plot));
+        }
+        /** \brief set a plot's x-axis label */
+        inline virtual void colgraphSetPlotXAxisLabel(int plot, const QString& xLabel) {
+            colgraphSetPlotXAxisProps(plot, xLabel, colgraphGetPlotXAxisLog(plot));
+        }
+
         /** \brief set x-axis range */
         virtual void colgraphSetPlotXRange(int plot, double xmin, double xmax)=0;
         /** \brief set y-axis range */
@@ -284,6 +310,9 @@ class QFRDRColumnGraphsInterface {
         /** \brief get a named property in the given graph
          */
         virtual QVariant colgraphGetGraphProperty(int plot, int graph, const QString& name, const QVariant& defaultValue=QVariant())=0;
+        /** \brief set the color palette of a plot
+         */
+        virtual void colgraphSetColorPalette(int plot, int graph, ImageColorPalette palette)=0;
 
 
 };

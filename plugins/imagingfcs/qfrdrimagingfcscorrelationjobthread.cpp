@@ -1541,7 +1541,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
     while ((image_series==NULL) && (!was_canceled)) {
         image_series=(float*)qfCalloc((frames+2)*frame_width*frame_height,sizeof(float));
         if (!image_series) {
-            emit messageChanged(tr("waiting for available memory"));
+            emit messageChanged(tr("waiting for available memory (frames: %2, size: %3x%4, %1 MB)").arg((frames+2)*frame_width*frame_height*sizeof(float)/1024/1024).arg(frames).arg(frame_width).arg(frame_height));
         }
         msleep(50);
     }

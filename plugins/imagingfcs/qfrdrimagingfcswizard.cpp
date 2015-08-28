@@ -2,6 +2,7 @@
 #include "qfpluginservices.h"
 #include "programoptions.h"
 #include "qfrdrimagingfcs.h"
+#include "qmodernprogresswidget.h"
 
 QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     QFWizard(QSize(600, 440), parent, QString("imaging_fcs/wizard/"))
@@ -1396,6 +1397,12 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
 {
     //qDebug()<<"QFRDRImagingFCSWizard_ImagestackIsValid::isValid";
     if (wizard) {
+        QModernProgressDialog progress(wizard);
+        progress.setHasCancel(false);
+        progress.setLabelText(QObject::tr("reading image file ..."));
+        progress.setMode(true, false);
+        progress.show();
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         QString readerid=wizard->imageFormatIDs.value(wizard->cmbFileformat->currentIndex(), wizard->imageFormatIDs.value(0, ""));
 
         wizard->wizImageProps->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
@@ -1452,6 +1459,7 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
         if (wizard->cmbDualView->currentIndex()==2) {
             wizard->cmbCalibCropRegion->setCurrentIndex(3);
         }
+        QApplication::restoreOverrideCursor();
 
         if (wizard->frame_count_io<=0) {
             wizard->labFileError->setText(QObject::tr("<font color=\"red\"><b><u>ERROR:</u> Image stack file does not contain frames or could not be read!</b></font>"));

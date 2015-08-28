@@ -615,7 +615,12 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphSetGraphFillTransparency(int plotid,  int graphid, double fillT);
         virtual void colgraphSetGraphTransparency(int plotid,  int graphid, double trans);
         virtual void colgraphSetGraphSymbol(int graph,  int plot,  ColumnGraphSymbols symbol, double symbolSize=10.0);
-
+        virtual int colgraphAddParametrizedScatterGraph(int plot, int columnX, int columnY, int columnP, const QString&  title, ParametrizationType type=cgptColorLines, bool colorbarVisible=false, const QString& colorbarLabel=QString());
+        virtual QString colgraphGetPlotXAxisLabel(int plot);
+        virtual QString colgraphGetPlotYAxisLabel(int plot);
+        virtual bool colgraphGetPlotXAxisLog(int plot);
+        virtual bool colgraphGetPlotYAxisLog(int plot);
+        virtual void colgraphSetColorPalette(int plotid, int graphid, ImageColorPalette palette);
         void colgraphToolsSetGraphtype(QFRDRTable::GraphInfo& g, QFRDRColumnGraphsInterface::ColumnGraphTypes type);
 
 

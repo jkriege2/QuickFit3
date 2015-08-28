@@ -57,9 +57,13 @@ class QFRDRTablePlotWidget : public QWidget
 
 
         double getMagnification() const;
+    public slots:
+        void doAutoscaleX();
+        void doAutoscaleY();
+        void doAutoscaleXY();
+
     signals:
         void plotTitleChanged(int plot, QString title);
-    signals:
         void performFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString function, QFRDRTable::GraphDataSelection sel,bool xlog,bool ylog);
         void performRegression(int xCol, int yCol, int sigmaCol, int plot,int graph, QFRDRTable::GraphDataSelection sel,bool xlog,bool ylog);
         void performRefit(int plot, int graph);
@@ -71,8 +75,6 @@ class QFRDRTablePlotWidget : public QWidget
         void on_btnDeleteGraph_clicked();
         void on_btnCloneGraph_clicked();
         void on_btnAddGraph_clicked();
-        void doAutoscaleX();
-        void doAutoscaleY();
         void on_plotter_plotMouseMove(double x, double y);
         void on_btnMoveUp_clicked();
         void on_btnMoveDown_clicked();
