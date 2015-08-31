@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>965</width>
+    <width>1015</width>
     <height>663</height>
    </rect>
   </property>
@@ -30,8 +30,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>908</width>
-           <height>807</height>
+           <width>958</width>
+           <height>859</height>
           </rect>
          </property>
          <layout class="QFormLayout" name="formLayout">
@@ -473,6 +473,13 @@ You can use some special substrings to add information from the simulation into 
           <item row="9" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
+             <widget class="QLabel" name="label_60">
+              <property name="text">
+               <string>pixel size:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QDoubleSpinBox" name="spinPixelSize">
               <property name="suffix">
                <string> µm</string>
@@ -502,6 +509,43 @@ You can use some special substrings to add information from the simulation into 
               <property name="sizeHint" stdset="0">
                <size>
                 <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_61">
+              <property name="text">
+               <string>PSF type: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cmbPSF">
+              <item>
+               <property name="text">
+                <string>Gaussian</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Pixel-Gaussian</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_22">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>15</width>
                 <height>20</height>
                </size>
               </property>
@@ -543,7 +587,7 @@ You can use some special substrings to add information from the simulation into 
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>15</width>
                 <height>20</height>
                </size>
               </property>
@@ -1532,7 +1576,7 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="18" column="1">
            <widget class="QWidget" name="verticalWidget" native="true">
-            <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,1">
+            <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -1560,6 +1604,155 @@ p, li { white-space: pre-wrap; }
                <property name="text">
                 <string>barrier mesh:</string>
                </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QRadioButton" name="radTraps">
+               <property name="text">
+                <string>trapping regions:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="2" column="1" rowspan="2">
+              <widget class="QWidget" name="widget_2" native="true">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_7">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item row="2" column="1">
+                 <widget class="QFDoubleEdit" name="edtTrapSlowdown"/>
+                </item>
+                <item row="0" column="0" rowspan="2">
+                 <widget class="QLabel" name="label_56">
+                  <property name="text">
+                   <string>grid spacing:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1" rowspan="2">
+                 <widget class="QDoubleSpinBox" name="spinTrapGridSpacing">
+                  <property name="suffix">
+                   <string> µm</string>
+                  </property>
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="minimum">
+                   <double>1.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>5.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_59">
+                  <property name="text">
+                   <string>slow-down factor:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2" rowspan="2">
+                 <spacer name="horizontalSpacer_24">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Preferred</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="5" rowspan="2">
+                 <spacer name="horizontalSpacer_26">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Preferred</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="3" rowspan="2">
+                 <widget class="QLabel" name="label_57">
+                  <property name="text">
+                   <string>trap diameter</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="4" rowspan="2">
+                 <widget class="QDoubleSpinBox" name="spinTrapDiameter">
+                  <property name="suffix">
+                   <string> µm</string>
+                  </property>
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="minimum">
+                   <double>1.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>5.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="6" rowspan="2">
+                 <widget class="QCheckBox" name="chkTrapOnlyHalf">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="7" rowspan="2">
+                 <widget class="QLabel" name="label_58">
+                  <property name="text">
+                   <string>present only for &lt;i&gt;x&gt;&lt;tt&gt;width&lt;/tt&gt;/2&lt;/i&gt;:</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
              <item row="1" column="1">
@@ -1661,19 +1854,6 @@ p, li { white-space: pre-wrap; }
                    <string>present only for &lt;i&gt;x&gt;&lt;tt&gt;width&lt;/tt&gt;/2&lt;/i&gt;:</string>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_22">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </widget>
@@ -1940,11 +2120,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>400</x>
-     <y>59</y>
+     <x>487</x>
+     <y>7</y>
     </hint>
    </hints>
   </connection>
@@ -1956,11 +2136,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>720</x>
-     <y>87</y>
+     <x>758</x>
+     <y>35</y>
     </hint>
    </hints>
   </connection>
@@ -1972,11 +2152,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>917</x>
-     <y>87</y>
+     <x>967</x>
+     <y>35</y>
     </hint>
    </hints>
   </connection>
@@ -1988,11 +2168,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>720</x>
-     <y>106</y>
+     <x>758</x>
+     <y>54</y>
     </hint>
    </hints>
   </connection>
@@ -2004,11 +2184,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>917</x>
-     <y>106</y>
+     <x>967</x>
+     <y>54</y>
     </hint>
    </hints>
   </connection>
@@ -2020,11 +2200,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>720</x>
-     <y>132</y>
+     <x>758</x>
+     <y>80</y>
     </hint>
    </hints>
   </connection>
@@ -2036,11 +2216,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>917</x>
-     <y>132</y>
+     <x>967</x>
+     <y>80</y>
     </hint>
    </hints>
   </connection>
@@ -2052,11 +2232,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>720</x>
-     <y>158</y>
+     <x>758</x>
+     <y>106</y>
     </hint>
    </hints>
   </connection>
@@ -2068,11 +2248,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>720</x>
-     <y>185</y>
+     <x>758</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>
@@ -2084,11 +2264,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>917</x>
-     <y>185</y>
+     <x>967</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>
@@ -2100,11 +2280,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>720</x>
-     <y>207</y>
+     <x>758</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>
@@ -2116,11 +2296,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>917</x>
-     <y>207</y>
+     <x>967</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>
@@ -2132,11 +2312,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>720</x>
-     <y>226</y>
+     <x>758</x>
+     <y>174</y>
     </hint>
    </hints>
   </connection>
@@ -2148,11 +2328,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>917</x>
-     <y>226</y>
+     <x>967</x>
+     <y>174</y>
     </hint>
    </hints>
   </connection>
@@ -2164,11 +2344,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>720</x>
-     <y>252</y>
+     <x>758</x>
+     <y>200</y>
     </hint>
    </hints>
   </connection>
@@ -2180,11 +2360,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>917</x>
-     <y>252</y>
+     <x>967</x>
+     <y>200</y>
     </hint>
    </hints>
   </connection>
@@ -2196,11 +2376,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>720</x>
-     <y>278</y>
+     <x>758</x>
+     <y>226</y>
     </hint>
    </hints>
   </connection>
@@ -2211,12 +2391,12 @@ You can use some special substrings to add information from the simulation into 
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>189</x>
-     <y>60</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>720</x>
-     <y>305</y>
+     <x>758</x>
+     <y>253</y>
     </hint>
    </hints>
   </connection>
@@ -2228,11 +2408,11 @@ You can use some special substrings to add information from the simulation into 
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>60</y>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>917</x>
-     <y>305</y>
+     <x>967</x>
+     <y>253</y>
     </hint>
    </hints>
   </connection>
@@ -2243,12 +2423,12 @@ You can use some special substrings to add information from the simulation into 
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>803</x>
-     <y>-191</y>
+     <x>853</x>
+     <y>-243</y>
     </hint>
     <hint type="destinationlabel">
-     <x>917</x>
-     <y>-192</y>
+     <x>967</x>
+     <y>-244</y>
     </hint>
    </hints>
   </connection>
@@ -2259,12 +2439,12 @@ You can use some special substrings to add information from the simulation into 
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>550</x>
-     <y>-99</y>
+     <x>563</x>
+     <y>-151</y>
     </hint>
     <hint type="destinationlabel">
-     <x>465</x>
-     <y>-100</y>
+     <x>478</x>
+     <y>-152</y>
     </hint>
    </hints>
   </connection>
@@ -2275,12 +2455,12 @@ You can use some special substrings to add information from the simulation into 
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>208</x>
-     <y>504</y>
+     <x>227</x>
+     <y>452</y>
     </hint>
     <hint type="destinationlabel">
-     <x>410</x>
-     <y>503</y>
+     <x>540</x>
+     <y>451</y>
     </hint>
    </hints>
   </connection>
@@ -2291,12 +2471,12 @@ You can use some special substrings to add information from the simulation into 
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>480</x>
-     <y>-156</y>
+     <x>648</x>
+     <y>-215</y>
     </hint>
     <hint type="destinationlabel">
-     <x>675</x>
-     <y>-149</y>
+     <x>833</x>
+     <y>-216</y>
     </hint>
    </hints>
   </connection>
@@ -2307,12 +2487,12 @@ You can use some special substrings to add information from the simulation into 
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>499</x>
-     <y>-153</y>
+     <x>648</x>
+     <y>-215</y>
     </hint>
     <hint type="destinationlabel">
-     <x>802</x>
-     <y>-152</y>
+     <x>853</x>
+     <y>-216</y>
     </hint>
    </hints>
   </connection>
@@ -2323,12 +2503,28 @@ You can use some special substrings to add information from the simulation into 
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>387</x>
-     <y>-155</y>
+     <x>648</x>
+     <y>-215</y>
     </hint>
     <hint type="destinationlabel">
-     <x>880</x>
-     <y>-154</y>
+     <x>967</x>
+     <y>-216</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radTraps</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widget_2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>190</x>
+     <y>487</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>253</x>
+     <y>499</y>
     </hint>
    </hints>
   </connection>

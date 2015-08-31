@@ -20,25 +20,14 @@
 
 
 #include "qfrdrimagingfcssimulationthread.h"
-#include <QApplication>
-#include <QElapsedTimer>
-#include "MersenneTwister.h"
-#include <QFile>
-#include <QSettings>
-#include <QString>
-#include <QVector>
-#include <QFileInfo>
-#include <QDebug>
-#include "qftools.h"
-#include "statistics_tools.h"
-#include "datatools.h"
 
-inline float sqr(const float& x) { return x*x; }
+#include "statistics_tools.h"
 
 QFRDRImagingFCSSimulationThread::QFRDRImagingFCSSimulationThread(QObject *parent) :
     QThread(parent),
     rng()
 {
+    psf_type=0;
     saveTrajectores=false;
     trajectoresMaxSteps=1000;
     maxTrajectores=10;
@@ -91,6 +80,10 @@ QFRDRImagingFCSSimulationThread::QFRDRImagingFCSSimulationThread(QObject *parent
     boundaryGridJumpProbability=0.001;
     boundaryGridOnlyRight=false;
 
+    trapGridSpacing=5;
+    trapDiameter=3;
+    trapSlowdown=0.1;
+    trapOnlyRight=false;
 }
 
 int QFRDRImagingFCSSimulationThread::getCurrentFrame() const
@@ -156,6 +149,8 @@ void QFRDRImagingFCSSimulationThread::run()
     QString inifilename=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".configuration.ini";
     QString filename_msd=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".msd.dat";
     QString filename_t=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".trajectories.dat";
+    QString filename_jh=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".jumphist.dat";
+    QString filename_psf=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".psf.dat";
     QString filenameBackground=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".background.tif";
     QSettings config(inifilename, QSettings::IniFormat);
     config.setValue("acquisition/pixel_width", (double)pixel_size);
@@ -187,11 +182,17 @@ void QFRDRImagingFCSSimulationThread::run()
     config.setValue("simulation/environmentMode_id", environmentMode);
     if (environmentMode==SIMENV_NORMAL) {
         config.setValue("simulation/environmentMode", tr("free diffusion"));
-    } else {
+    } else if (environmentMode==SIMENV_GRIDBOUNDARIES) {
         config.setValue("simulation/environmentMode", tr("regular barrier grid"));
         config.setValue("simulation/boundaryGridSpacing", (double)boundaryGridSpacing);
         config.setValue("simulation/boundaryGridJumpProbability", (double)boundaryGridJumpProbability);
         config.setValue("simulation/boundaryGridOnlyRight", boundaryGridOnlyRight);
+    } else if (environmentMode==SIMENV_TRAPS) {
+        config.setValue("simulation/environmentMode", tr("regular trap grid"));
+        config.setValue("simulation/trapGridSpacing", (double)trapGridSpacing);
+        config.setValue("simulation/trapDiameter", (double)trapDiameter);
+        config.setValue("simulation/trapSlowdown", (double)trapSlowdown);
+        config.setValue("simulation/trapOnlyRight", trapOnlyRight);
     }
 
     config.setValue("simulation/saveMSD", saveMSD);
@@ -207,6 +208,9 @@ void QFRDRImagingFCSSimulationThread::run()
 
     config.setValue("simulation/warmup", (qlonglong)warmup);
     config.setValue("simulation/dualView", dualView);
+    config.setValue("simulation/psfType_id", psf_type);
+    if (psf_type==PSF_GAUSS) config.setValue("simulation/psfType", tr("Gaussian"));
+    if (psf_type==PSF_PIXELGAUSS) config.setValue("simulation/psfType", tr("Pixel-Gaussian"));
     config.setValue("simulation/pixel_size", (double)pixel_size);
     config.setValue("simulation/psf_size_green", (double)psf_size_g);
     if (dualView) config.setValue("simulation/psf_size_red", (double)psf_size_r);
@@ -288,6 +292,7 @@ void QFRDRImagingFCSSimulationThread::run()
     if (tif) {
         emit statusMessage(tr("warming up simulation ..."));
         for (uint64_t wi=0; wi<warmup; wi++) {
+            if (wi%100==0) emit statusMessage(tr("warming up simulation (step %1 / %2 )...").arg(wi+1).arg(warmup));
             propagateWalkers(wg, DG,onlyHalf_DG);
             propagateWalkers(wg2, DG2,onlyHalf_DG2);
             propagateWalkers(wg3, DG3,onlyHalf_DG3);
@@ -298,7 +303,7 @@ void QFRDRImagingFCSSimulationThread::run()
                 propagateWalkers(wrg2, DRG2,onlyHalf_DRG2);
             }
             if (timer.elapsed()>200) {
-                emit progress(currentFrame+warmup);
+                emit progress(wi);
                 timer.start();
             }
             if (canceled) break;
@@ -316,73 +321,135 @@ void QFRDRImagingFCSSimulationThread::run()
                     bool savMSD=(saveMSD&&((msdMaxSteps<=1)||(t<float(msdMaxSteps)*sim_timestep)));
                     bool savTraj=(saveTrajectores&&((trajectoresMaxSteps<=1)||(t<float(trajectoresMaxSteps)*sim_timestep)));
                     propagateWalkers(wg, DG,onlyHalf_DG, savMSD?(&wg_msd):NULL, savTraj?(&wg_t):NULL);
-                    const float psfgsig2=sqr(psf_size_g);
-                    const float psfrsig2=sqr(psf_size_r);
-                    for (register int i=0; i<wg.size(); i++) {
-                        float* f=framef;
-                        for (register int c=0; c<framesize; c++) {
-                            const float x=float(c%realwidth)*pixel_size;
-                            const float y=float(c/realwidth)*pixel_size;
-                            const float d=sqr(wg[i].x-x)+sqr(wg[i].y-y);
-                            if (d<5.0*psfgsig2) (*f)=(*f)+brightnessG*exp(-2.0*(d)/psfgsig2);
-                            f++;
-                        }
-                    }
                     propagateWalkers(wg2, DG2,onlyHalf_DG2, savMSD?(&wg2_msd):NULL, savTraj?(&wg2_t):NULL);
-                    for (register int i=0; i<wg2.size(); i++) {
-                        float* f=framef;
-                        for (register int c=0; c<framesize; c++) {
-                            const float x=float(c%realwidth)*pixel_size;
-                            const float y=float(c/realwidth)*pixel_size;
-                            const float d=sqr(wg2[i].x-x)+sqr(wg2[i].y-y);
-                            if (d<5.0*psfgsig2) (*f)=(*f)+brightnessG2*exp(-2.0*(d)/psfgsig2);
-                            f++;
-                        }
-                    }
                     propagateWalkers(wg3, DG3,onlyHalf_DG3, savMSD?(&wg3_msd):NULL, savTraj?(&wg3_t):NULL);
-                    for (register int i=0; i<wg3.size(); i++) {
-                        float* f=framef;
-                        for (register int c=0; c<framesize; c++) {
-                            const float x=float(c%realwidth)*pixel_size;
-                            const float y=float(c/realwidth)*pixel_size;
-                            const float d=sqr(wg3[i].x-x)+sqr(wg3[i].y-y);
-                            if (d<5.0*psfgsig2) (*f)=(*f)+brightnessG3*exp(-2.0*(d)/psfgsig2);
-                            f++;
+                    if (psf_type==PSF_PIXELGAUSS) {
+                        for (register int i=0; i<wg.size(); i++) {
+                            float* f=framef;
+                            for (register int c=0; c<framesize; c++) {
+                                const float x=float(c%realwidth)*pixel_size;
+                                const float y=float(c/realwidth)*pixel_size;
+                                (*f)=(*f)+brightnessG*psf_pixelgauss(wg[i].x-x, wg[i].y-y, psf_size_g);
+                                f++;
+                            }
+                        }
+                        for (register int i=0; i<wg2.size(); i++) {
+                            float* f=framef;
+                            for (register int c=0; c<framesize; c++) {
+                                const float x=float(c%realwidth)*pixel_size;
+                                const float y=float(c/realwidth)*pixel_size;
+                                (*f)=(*f)+brightnessG2*psf_pixelgauss(wg2[i].x-x, wg2[i].y-y, psf_size_g);
+                                f++;
+                            }
+                        }
+                        for (register int i=0; i<wg3.size(); i++) {
+                            float* f=framef;
+                            for (register int c=0; c<framesize; c++) {
+                                const float x=float(c%realwidth)*pixel_size;
+                                const float y=float(c/realwidth)*pixel_size;
+                                (*f)=(*f)+brightnessG3*psf_pixelgauss(wg3[i].x-x, wg3[i].y-y, psf_size_g);
+                                f++;
+                            }
+                        }
+                    } else {
+                        for (register int i=0; i<wg.size(); i++) {
+                            float* f=framef;
+                            for (register int c=0; c<framesize; c++) {
+                                const float x=float(c%realwidth)*pixel_size;
+                                const float y=float(c/realwidth)*pixel_size;
+                                (*f)=(*f)+brightnessG*psf_gauss(wg[i].x-x, wg[i].y-y, psf_size_g);
+                                f++;
+                            }
+                        }
+                        for (register int i=0; i<wg2.size(); i++) {
+                            float* f=framef;
+                            for (register int c=0; c<framesize; c++) {
+                                const float x=float(c%realwidth)*pixel_size;
+                                const float y=float(c/realwidth)*pixel_size;
+                                (*f)=(*f)+brightnessG2*psf_gauss(wg2[i].x-x, wg2[i].y-y, psf_size_g);
+                                f++;
+                            }
+                        }
+                        for (register int i=0; i<wg3.size(); i++) {
+                            float* f=framef;
+                            for (register int c=0; c<framesize; c++) {
+                                const float x=float(c%realwidth)*pixel_size;
+                                const float y=float(c/realwidth)*pixel_size;
+                                (*f)=(*f)+brightnessG3*psf_gauss(wg3[i].x-x, wg3[i].y-y, psf_size_g);
+                                f++;
+                            }
                         }
                     }
                     if (dualView) {
                         propagateWalkers(wr, DR,onlyHalf_DR, savMSD?(&wr_msd):NULL, savTraj?(&wr_t):NULL);
                         propagateWalkers(wrg, DRG,onlyHalf_DRG, savMSD?(&wrg_msd):NULL, savTraj?(&wrg_t):NULL);
-
-                        for (register int i=0; i<wr.size(); i++) {
-                            for (register int y=0; y<height; y++) {
-                                for (register int x=0; x<width; x++) {
-                                    framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wr[i].x-float(x)*pixel_size-deltax)+sqr(wr[i].y-float(y)*pixel_size-deltay))/psfrsig2);
-                                }
-                            }
-                        }
-                        for (register int i=0; i<wrg.size(); i++) {
-                            for (register int y=0; y<height; y++) {
-                                for (register int x=0; x<width; x++) {
-                                    framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wrg[i].x-float(x)*pixel_size-deltax)+sqr(wrg[i].y-float(y)*pixel_size-deltay))/psfrsig2);
-                                    framef[y*realwidth+x]=framef[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wrg[i].x-float(x)*pixel_size-deltax)+sqr(wrg[i].y-float(y)*pixel_size-deltay))/psfgsig2);
-                                }
-                            }
-                        }
                         propagateWalkers(wr2, DR2,onlyHalf_DR2, savMSD?(&wr2_msd):NULL, savTraj?(&wr2_t):NULL);
                         propagateWalkers(wrg2, DRG2,onlyHalf_DRG2, savMSD?(&wrg2_msd):NULL, savTraj?(&wrg2_t):NULL);
-                        for (register int i=0; i<wr2.size(); i++) {
-                            for (register int y=0; y<height; y++) {
-                                for (register int x=0; x<width; x++) {
-                                    framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR2*exp(-2.0*(sqr(wr2[i].x-float(x)*pixel_size-deltax)+sqr(wr2[i].y-float(y)*pixel_size-deltay))/psfrsig2);
+
+                        if (psf_type==PSF_PIXELGAUSS) {
+                            for (register int i=0; i<wr.size(); i++) {
+                                for (register int y=0; y<height; y++) {
+                                    for (register int x=0; x<width; x++) {
+                                        framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR*psf_pixelgauss(wr[i].x-float(x)*pixel_size-deltax, wr[i].y-float(y)*pixel_size-deltay, psf_size_r);
+                                    }
                                 }
                             }
-                        }
-                        for (register int i=0; i<wrg2.size(); i++) {
-                            for (register int y=0; y<height; y++) {
-                                for (register int x=0; x<width; x++) {
-                                    framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR2*exp(-2.0*(sqr(wrg2[i].x-float(x)*pixel_size-deltax)+sqr(wrg2[i].y-float(y)*pixel_size-deltay))/psfrsig2);
-                                    framef[y*realwidth+x]=framef[y*realwidth+x]+brightnessG2*exp(-2.0*(sqr(wrg2[i].x-float(x)*pixel_size-deltax)+sqr(wrg2[i].y-float(y)*pixel_size-deltay))/psfgsig2);
+                            for (register int i=0; i<wrg.size(); i++) {
+                                for (register int y=0; y<height; y++) {
+                                    for (register int x=0; x<width; x++) {
+                                        framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR*psf_pixelgauss(wrg[i].x-float(x)*pixel_size-deltax, wrg[i].y-float(y)*pixel_size-deltay, psf_size_r);
+                                        //exp(-2.0*(qfSqr(wrg[i].x-float(x)*pixel_size-deltax)+qfSqr(wrg[i].y-float(y)*pixel_size-deltay))/psfrsig2);
+                                        framef[y*realwidth+x]=framef[y*realwidth+x]+brightnessG*psf_pixelgauss(wrg[i].x-float(x)*pixel_size, wrg[i].y-float(y)*pixel_size, psf_size_g);
+                                        //exp(-2.0*(qfSqr(wrg[i].x-float(x)*pixel_size-deltax)+qfSqr(wrg[i].y-float(y)*pixel_size-deltay))/psfgsig2);
+                                    }
+                                }
+                            }
+                            for (register int i=0; i<wr2.size(); i++) {
+                                for (register int y=0; y<height; y++) {
+                                    for (register int x=0; x<width; x++) {
+                                        framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR2*psf_pixelgauss(wr2[i].x-float(x)*pixel_size-deltax, wr2[i].y-float(y)*pixel_size-deltay, psf_size_r);//*exp(-2.0*(qfSqr(wr2[i].x-float(x)*pixel_size-deltax)+qfSqr(wr2[i].y-float(y)*pixel_size-deltay))/psfrsig2);
+                                    }
+                                }
+                            }
+                            for (register int i=0; i<wrg2.size(); i++) {
+                                for (register int y=0; y<height; y++) {
+                                    for (register int x=0; x<width; x++) {
+                                        framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR2*psf_pixelgauss(wrg2[i].x-float(x)*pixel_size-deltax, wrg2[i].y-float(y)*pixel_size-deltay, psf_size_r);//exp(-2.0*(qfSqr(wrg2[i].x-float(x)*pixel_size-deltax)+qfSqr(wrg2[i].y-float(y)*pixel_size-deltay))/psfrsig2);
+                                        framef[y*realwidth+x]=framef[y*realwidth+x]+brightnessG2*psf_pixelgauss(wrg2[i].x-float(x)*pixel_size, wrg2[i].y-float(y)*pixel_size, psf_size_g); //exp(-2.0*(qfSqr(wrg2[i].x-float(x)*pixel_size-deltax)+qfSqr(wrg2[i].y-float(y)*pixel_size-deltay))/psfgsig2);
+                                    }
+                                }
+                            }
+                        } else {
+                            for (register int i=0; i<wr.size(); i++) {
+                                for (register int y=0; y<height; y++) {
+                                    for (register int x=0; x<width; x++) {
+                                        framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR*psf_gauss(wr[i].x-float(x)*pixel_size-deltax, wr[i].y-float(y)*pixel_size-deltay, psf_size_r);
+                                    }
+                                }
+                            }
+                            for (register int i=0; i<wrg.size(); i++) {
+                                for (register int y=0; y<height; y++) {
+                                    for (register int x=0; x<width; x++) {
+                                        framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR*psf_gauss(wrg[i].x-float(x)*pixel_size-deltax, wrg[i].y-float(y)*pixel_size-deltay, psf_size_r);
+                                        //exp(-2.0*(qfSqr(wrg[i].x-float(x)*pixel_size-deltax)+qfSqr(wrg[i].y-float(y)*pixel_size-deltay))/psfrsig2);
+                                        framef[y*realwidth+x]=framef[y*realwidth+x]+brightnessG*psf_gauss(wrg[i].x-float(x)*pixel_size, wrg[i].y-float(y)*pixel_size, psf_size_g);
+                                        //exp(-2.0*(qfSqr(wrg[i].x-float(x)*pixel_size-deltax)+qfSqr(wrg[i].y-float(y)*pixel_size-deltay))/psfgsig2);
+                                    }
+                                }
+                            }
+                            for (register int i=0; i<wr2.size(); i++) {
+                                for (register int y=0; y<height; y++) {
+                                    for (register int x=0; x<width; x++) {
+                                        framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR2*psf_gauss(wr2[i].x-float(x)*pixel_size-deltax, wr2[i].y-float(y)*pixel_size-deltay, psf_size_r);//*exp(-2.0*(qfSqr(wr2[i].x-float(x)*pixel_size-deltax)+qfSqr(wr2[i].y-float(y)*pixel_size-deltay))/psfrsig2);
+                                    }
+                                }
+                            }
+                            for (register int i=0; i<wrg2.size(); i++) {
+                                for (register int y=0; y<height; y++) {
+                                    for (register int x=0; x<width; x++) {
+                                        framef[y*realwidth+x+width]=framef[y*realwidth+x+width]+brightnessR2*psf_gauss(wrg2[i].x-float(x)*pixel_size-deltax, wrg2[i].y-float(y)*pixel_size-deltay, psf_size_r);//exp(-2.0*(qfSqr(wrg2[i].x-float(x)*pixel_size-deltax)+qfSqr(wrg2[i].y-float(y)*pixel_size-deltay))/psfrsig2);
+                                        framef[y*realwidth+x]=framef[y*realwidth+x]+brightnessG2*psf_gauss(wrg2[i].x-float(x)*pixel_size, wrg2[i].y-float(y)*pixel_size, psf_size_g); //exp(-2.0*(qfSqr(wrg2[i].x-float(x)*pixel_size-deltax)+qfSqr(wrg2[i].y-float(y)*pixel_size-deltay))/psfgsig2);
+                                    }
                                 }
                             }
                         }
@@ -395,6 +462,7 @@ void QFRDRImagingFCSSimulationThread::run()
                         }
                     }
                     t=t+sim_timestep;
+                    if (canceled) break;
                 }
 
 
@@ -419,151 +487,213 @@ void QFRDRImagingFCSSimulationThread::run()
                 }
                 if (canceled) break;
             }
+            if (!canceled) {
 
-            if (saveMSD) {
-                emit statusMessage(tr("calculating and saving MSDs ..."));
+                if (saveMSD) {
+                    emit statusMessage(tr("calculating and saving MSDs ..."));
 
-                QVector<uint64_t> tau;
-                int S=1, P=8;
-                while (tau.size()<=0 || tau.last()<frames/4) {
-                    tau.resize(S*P);
-                    statisticsAutocorrelateCreateMultiTau64(tau.data(), S, 2, P);
-                    S++;
-                }
-                QVector<double> tauT;
-                for (int i=0; i<tau.size(); i++) {
-                    tauT.append(float(tau[i])*sim_timestep*1e-6);
-                }
+                    QVector<uint64_t> tau;
+                    int S=1, P=8;
+                    while (tau.size()<=0 || tau.last()<frames/4) {
+                        tau.resize(S*P);
+                        statisticsAutocorrelateCreateMultiTau64(tau.data(), S, 2, P);
+                        S++;
+                    }
+                    QVector<double> tauT;
+                    for (int i=0; i<tau.size(); i++) {
+                        tauT.append(float(tau[i])*sim_timestep*1e-6);
+                    }
 
-                QList<QVector<double> > msdout;
-                QStringList columnHeaders;
-                msdout.append(tauT);
-                columnHeaders<<tr("lag time [s]");
-
-
-
-                if (wg_msd.size()>0) {
-                    msdNames<<"walker_g";
-                    columnHeaders<<tr("MSD(walker_g) [micrometer^2]");
-                    columnHeaders<<tr("MSDERROR(walker_g) [micrometer^2]");
-                    calcMSD(msdout, wg_msd, tau);
-                    wg_msd.clear();
-                }
-                if (wg2_msd.size()>0) {
-                    msdNames<<"walker_{g2}";
-                    columnHeaders<<tr("MSD(walker_{g2}) [micrometer^2]");
-                    columnHeaders<<tr("MSDERROR(walker_{g2}) [micrometer^2]");
-                    calcMSD(msdout, wg2_msd, tau);
-                    wg2_msd.clear();
-                }
-                if (wg3_msd.size()>0) {
-                    msdNames<<"walker_{g3}";
-                    columnHeaders<<tr("MSD(walker_{g3}) [micrometer^2]");
-                    columnHeaders<<tr("MSDERROR(walker_{g3}) [micrometer^2]");
-                    calcMSD(msdout, wg3_msd, tau);
-                    wg3_msd.clear();
-                }
-                if (wr_msd.size()>0) {
-                    msdNames<<"walker_r";
-                    columnHeaders<<tr("MSD(walker_r) [micrometer^2]");
-                    columnHeaders<<tr("MSDERROR(walker_r) [micrometer^2]");
-                    calcMSD(msdout, wr_msd, tau);
-                    wr_msd.clear();
-                }
-                if (wr2_msd.size()>0) {
-                    msdNames<<"walker_{r2}";
-                    columnHeaders<<tr("MSD(walker_{r2}) [micrometer^2]");
-                    columnHeaders<<tr("MSDERROR(walker_{r2}) [micrometer^2]");
-                    calcMSD(msdout, wr2_msd, tau);
-                    wr2_msd.clear();
-                }
-                if (wrg_msd.size()>0) {
-                    msdNames<<"walker_rg";
-                    columnHeaders<<tr("MSD(walker_rg) [micrometer^2]");
-                    columnHeaders<<tr("MSDERROR(walker_rg) [micrometer^2]");
-                    calcMSD(msdout, wrg_msd, tau);
-                    wrg_msd.clear();
-                }
-                if (wrg2_msd.size()>0) {
-                    msdNames<<"walker_{rg2}";
-                    columnHeaders<<tr("MSD(walker_{rg2}) [micrometer^2]");
-                    columnHeaders<<tr("MSDERROR(walker_{rg2}) [micrometer^2]");
-                    calcMSD(msdout, wrg2_msd, tau);
-                    wrg2_msd.clear();
-                }
-
-                saveStringToFile(filename_msd, toCSV(msdout, columnHeaders, QStringList(), '.', ", ", true, '\"', "#! ", 10));
-
-                fileCount++;
-                config.setValue("files/count", fileCount);
-                config.setValue(QString("files/name%1").arg(fileCount-1), QFileInfo(filename_msd).fileName());
-                config.setValue(QString("files/type%1").arg(fileCount-1), "CSV_MSD");
-                config.setValue(QString("files/description%1").arg(fileCount-1), tr("simulation MSDs: %1").arg(msdNames.join("; ")));
-
-            }
-
-
-            if (saveTrajectores) {
-                emit statusMessage(tr("saving trajectories ..."));
-
-                int tmax=0;
-                QList<QVector<double> > trajout;
-                QStringList columnHeaders;
+                    QList<QVector<double> > msdout;
+                    QStringList columnHeaders;
+                    msdout.append(tauT);
+                    columnHeaders<<tr("lag time [s]");
 
 
 
-                if (wg_t.size()>0) {
-                    trajNames<<tr("walkers G: %1").arg(wg_t.size());
-                    saveTraj(trajout, wg_t, tmax,  columnHeaders, tr("walkers G"));
-                    wg_t.clear();
-                }
-                if (wg2_t.size()>0) {
-                    trajNames<<tr("walkers G2: %1").arg(wg2_t.size());
-                    saveTraj(trajout, wg2_t, tmax,  columnHeaders, tr("walkers G2"));
-                    wg2_t.clear();
-                }
-                if (wg3_t.size()>0) {
-                    trajNames<<tr("walkers G3: %1").arg(wg3_t.size());
-                    saveTraj(trajout, wg3_t, tmax,  columnHeaders, tr("walkers G3"));
-                    wg3_t.clear();
-                }
-                if (wr_t.size()>0) {
-                    trajNames<<tr("walkers R: %1").arg(wr_t.size());
-                    saveTraj(trajout, wr_t, tmax,  columnHeaders, tr("walkers R"));
-                    wr_t.clear();
-                }
-                if (wr2_t.size()>0) {
-                    trajNames<<tr("walkers R2: %1").arg(wr2_t.size());
-                    saveTraj(trajout, wr2_t, tmax,  columnHeaders, tr("walkers R2"));
-                    wr2_t.clear();
-                }
-                if (wrg_t.size()>0) {
-                    trajNames<<tr("walkers RG: %1").arg(wrg_t.size());
-                    saveTraj(trajout, wrg_t, tmax,  columnHeaders, tr("walkers RG"));
-                    wrg_t.clear();
-                }
-                if (wrg2_t.size()>0) {
-                    trajNames<<tr("walkers RG2: %1").arg(wrg2_t.size());
-                    saveTraj(trajout, wrg2_t, tmax,  columnHeaders, tr("walkers RG2"));
-                    wrg2_t.clear();
+                    if (wg_msd.size()>0) {
+                        msdNames<<"walker_g";
+                        columnHeaders<<tr("MSD(walker_g) [micrometer^2]");
+                        columnHeaders<<tr("MSDERROR(walker_g) [micrometer^2]");
+                        calcMSD(msdout, wg_msd, tau);
+                        wg_msd.clear();
+                    }
+                    if (wg2_msd.size()>0) {
+                        msdNames<<"walker_{g2}";
+                        columnHeaders<<tr("MSD(walker_{g2}) [micrometer^2]");
+                        columnHeaders<<tr("MSDERROR(walker_{g2}) [micrometer^2]");
+                        calcMSD(msdout, wg2_msd, tau);
+                        wg2_msd.clear();
+                    }
+                    if (wg3_msd.size()>0) {
+                        msdNames<<"walker_{g3}";
+                        columnHeaders<<tr("MSD(walker_{g3}) [micrometer^2]");
+                        columnHeaders<<tr("MSDERROR(walker_{g3}) [micrometer^2]");
+                        calcMSD(msdout, wg3_msd, tau);
+                        wg3_msd.clear();
+                    }
+                    if (wr_msd.size()>0) {
+                        msdNames<<"walker_r";
+                        columnHeaders<<tr("MSD(walker_r) [micrometer^2]");
+                        columnHeaders<<tr("MSDERROR(walker_r) [micrometer^2]");
+                        calcMSD(msdout, wr_msd, tau);
+                        wr_msd.clear();
+                    }
+                    if (wr2_msd.size()>0) {
+                        msdNames<<"walker_{r2}";
+                        columnHeaders<<tr("MSD(walker_{r2}) [micrometer^2]");
+                        columnHeaders<<tr("MSDERROR(walker_{r2}) [micrometer^2]");
+                        calcMSD(msdout, wr2_msd, tau);
+                        wr2_msd.clear();
+                    }
+                    if (wrg_msd.size()>0) {
+                        msdNames<<"walker_rg";
+                        columnHeaders<<tr("MSD(walker_rg) [micrometer^2]");
+                        columnHeaders<<tr("MSDERROR(walker_rg) [micrometer^2]");
+                        calcMSD(msdout, wrg_msd, tau);
+                        wrg_msd.clear();
+                    }
+                    if (wrg2_msd.size()>0) {
+                        msdNames<<"walker_{rg2}";
+                        columnHeaders<<tr("MSD(walker_{rg2}) [micrometer^2]");
+                        columnHeaders<<tr("MSDERROR(walker_{rg2}) [micrometer^2]");
+                        calcMSD(msdout, wrg2_msd, tau);
+                        wrg2_msd.clear();
+                    }
+
+                    saveStringToFile(filename_msd, toCSV(msdout, columnHeaders, QStringList(), '.', ", ", true, '\"', "#! ", 10));
+
+                    fileCount++;
+                    config.setValue("files/count", fileCount);
+                    config.setValue(QString("files/name%1").arg(fileCount-1), QFileInfo(filename_msd).fileName());
+                    config.setValue(QString("files/type%1").arg(fileCount-1), "CSV_MSD");
+                    config.setValue(QString("files/description%1").arg(fileCount-1), tr("simulation MSDs: %1").arg(msdNames.join("; ")));
+
                 }
 
-                QVector<double> tt;
-                for (int i=0; i<tmax; i++) {
-                    tt<<float(i)*sim_timestep*1e-6;
+
+                if (saveTrajectores) {
+                    emit statusMessage(tr("saving trajectories ..."));
+
+                    int tmax=0;
+                    QList<QVector<double> > trajout, jumpOut;
+                    QStringList columnHeaders, jumpColumnHeaders;
+
+
+
+                    if (wg_t.size()>0) {
+                        QVector<double> hX,hN;
+                        trajNames<<tr("walkers G: %1").arg(wg_t.size());
+                        saveTraj(trajout, wg_t, tmax,  columnHeaders, tr("walkers G"), &hX, &hN);
+                        wg_t.clear();
+                        jumpOut<<hX<<hN;
+                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                    }
+                    if (wg2_t.size()>0) {
+                        QVector<double> hX,hN;
+                        trajNames<<tr("walkers G2: %1").arg(wg2_t.size());
+                        saveTraj(trajout, wg2_t, tmax,  columnHeaders, tr("walkers G2"), &hX, &hN);
+                        wg2_t.clear();
+                        jumpOut<<hX<<hN;
+                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                    }
+                    if (wg3_t.size()>0) {
+                        QVector<double> hX,hN;
+                        trajNames<<tr("walkers G3: %1").arg(wg3_t.size());
+                        saveTraj(trajout, wg3_t, tmax,  columnHeaders, tr("walkers G3"), &hX, &hN);
+                        wg3_t.clear();
+                        jumpOut<<hX<<hN;
+                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                    }
+                    if (wr_t.size()>0) {
+                        QVector<double> hX,hN;
+                        trajNames<<tr("walkers R: %1").arg(wr_t.size());
+                        saveTraj(trajout, wr_t, tmax,  columnHeaders, tr("walkers R"), &hX, &hN);
+                        wr_t.clear();
+                        jumpOut<<hX<<hN;
+                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                    }
+                    if (wr2_t.size()>0) {
+                        QVector<double> hX,hN;
+                        trajNames<<tr("walkers R2: %1").arg(wr2_t.size());
+                        saveTraj(trajout, wr2_t, tmax,  columnHeaders, tr("walkers R2"), &hX, &hN);
+                        wr2_t.clear();
+                        jumpOut<<hX<<hN;
+                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                    }
+                    if (wrg_t.size()>0) {
+                        QVector<double> hX,hN;
+                        trajNames<<tr("walkers RG: %1").arg(wrg_t.size());
+                        saveTraj(trajout, wrg_t, tmax,  columnHeaders, tr("walkers RG"), &hX, &hN);
+                        wrg_t.clear();
+                        jumpOut<<hX<<hN;
+                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                    }
+                    if (wrg2_t.size()>0) {
+                        QVector<double> hX,hN;
+                        trajNames<<tr("walkers RG2: %1").arg(wrg2_t.size());
+                        saveTraj(trajout, wrg2_t, tmax,  columnHeaders, tr("walkers RG2"), &hX, &hN);
+                        wrg2_t.clear();
+                        jumpOut<<hX<<hN;
+                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                    }
+
+                    QVector<double> tt;
+                    for (int i=0; i<tmax; i++) {
+                        tt<<float(i)*sim_timestep*1e-6;
+                    }
+
+                    trajout.prepend(tt);
+                    columnHeaders.prepend(tr("time [s]"));
+
+                    saveStringToFile(filename_t, toCSV(trajout, columnHeaders, QStringList(), '.', ", ", true, '\"', "#! ", 8));
+                    fileCount++;
+                    config.setValue("files/count", fileCount);
+                    config.setValue(QString("files/name%1").arg(fileCount-1), QFileInfo(filename_t).fileName());
+                    config.setValue(QString("files/type%1").arg(fileCount-1), "CSV_TRAJECTORIES");
+                    config.setValue(QString("files/description%1").arg(fileCount-1), tr("simulation trajectories - %1").arg(trajNames.join("; ")));
+
+
+
+                    saveStringToFile(filename_jh, toCSV(jumpOut, jumpColumnHeaders, QStringList(), '.', ", ", true, '\"', "#! ", 5));
+                    fileCount++;
+                    config.setValue("files/count", fileCount);
+                    config.setValue(QString("files/name%1").arg(fileCount-1), QFileInfo(filename_jh).fileName());
+                    config.setValue(QString("files/type%1").arg(fileCount-1), "CSV_JUMPHISTOGRAMS");
+                    config.setValue(QString("files/description%1").arg(fileCount-1), tr("jump histograms - %1").arg(trajNames.join("; ")));
+
                 }
 
-                trajout.prepend(tt);
-                columnHeaders.prepend(tr("time [s]"));
+                {
+                    emit statusMessage(tr("saving PSF ..."));
 
-                saveStringToFile(filename_t, toCSV(trajout, columnHeaders, QStringList(), '.', ", ", true, '\"', "#! ", 8));
+                    QList<QVector<double> > psfOut;
+                    QStringList psfColumnHeaders;
 
-                fileCount++;
-                config.setValue("files/count", fileCount);
-                config.setValue(QString("files/name%1").arg(fileCount-1), QFileInfo(filename_t).fileName());
-                config.setValue(QString("files/type%1").arg(fileCount-1), "CSV_TRAJECTORIES");
-                config.setValue(QString("files/description%1").arg(fileCount-1), tr("simulation trajectories - %1").arg(trajNames.join("; ")));
+                    float rmin=qMax(pixel_size, psf_size_g);
+                    psfOut<<QVector<double>()<<QVector<double>();
+                    psfColumnHeaders<<tr("x [micrometers]")<<tr("PSF_g(x) [AU]");
+                    for (float x=-5.0*rmin; x<=5.0*rmin; x+=2.0*qMax(pixel_size, psf_size_g)/500.0) {
+                        psfOut[0]<<x;
+                        if (psf_type==PSF_PIXELGAUSS) psfOut[1]<<psf_pixelgauss(x, 0, psf_size_g);
+                        else psfOut[1]<<psf_gauss(x, 0, psf_size_g);
+                    }
+                    if (dualView) {
+                        psfOut<<QVector<double>();
+                        psfColumnHeaders<<tr("PSF_r(x) [AU]");
+                        for (float x=-5.0*rmin; x<=5.0*rmin; x+=2.0*qMax(pixel_size, psf_size_g)/500.0) {
+                            if (psf_type==PSF_PIXELGAUSS) psfOut[2]<<psf_pixelgauss(x-deltax, 0, psf_size_r);
+                            else psfOut[2]<<psf_gauss(x-deltax, 0, psf_size_r);
+                        }
+                    }
 
+                    saveStringToFile(filename_psf, toCSV(psfOut, psfColumnHeaders, QStringList(), '.', ", ", true, '\"', "#! ", 5));
+                    fileCount++;
+                    config.setValue("files/count", fileCount);
+                    config.setValue(QString("files/name%1").arg(fileCount-1), QFileInfo(filename_psf).fileName());
+                    config.setValue(QString("files/type%1").arg(fileCount-1), "CSV_PSF");
+                    config.setValue(QString("files/description%1").arg(fileCount-1), tr("PSF"));
+                }
             }
 
         }
@@ -621,8 +751,9 @@ void QFRDRImagingFCSSimulationThread::calcMSD(QList<QVector<double> >& msdout, c
     }
 }
 
-void QFRDRImagingFCSSimulationThread::saveTraj(QList<QVector<double> > &msdout, const QList<QVector<QPair<float, float> > > &wg_msd, int &tmax, QStringList &columnNames, const QString& wname)
+void QFRDRImagingFCSSimulationThread::saveTraj(QList<QVector<double> > &msdout, const QList<QVector<QPair<float, float> > > &wg_msd, int &tmax, QStringList &columnNames, const QString& wname, QVector<double> *jumpDistX, QVector<double> *jumpDistN, int jumpDistBins, double jumpDistMin, double jumpDistMax)
 {
+    QVector<double> jumps;
     for (int i=0; i<wg_msd.size(); i++) {
         QVector<double> x,y;
         int j=0;
@@ -630,7 +761,10 @@ void QFRDRImagingFCSSimulationThread::saveTraj(QList<QVector<double> > &msdout, 
             bool isNan=!QFFloatIsOK(wg_msd[i].at(j).first);
             if (!isNan) {
                 x<<wg_msd[i].at(j).first;
-                y<<wg_msd[i].at(j).second;
+                y<<wg_msd[i].at(j).second;                
+                if (jumpDistX && jumpDistN && j>0) {
+                    jumps.append(sqrt(qfSqr(wg_msd[i].at(j).first-wg_msd[i].at(j-1).first)+qfSqr(wg_msd[i].at(j).second-wg_msd[i].at(j-1).second)));
+                }
             }
             j++;
             if (isNan) break;
@@ -640,6 +774,14 @@ void QFRDRImagingFCSSimulationThread::saveTraj(QList<QVector<double> > &msdout, 
         tmax=qMax(tmax, x.size());
         columnNames<<tr("%1 #%2 X [micrometers]").arg(wname).arg(i+1);
         columnNames<<tr("%1 #%2 Y [micrometers]").arg(wname).arg(i+1);
+        if (jumpDistX && jumpDistN) {
+            int bins=ceil(qMax(11.0,sqrt(jumps.size())));
+            if (jumpDistBins>0) bins=jumpDistBins;
+            jumpDistX->resize(bins);
+            jumpDistN->resize(bins);
+            if (jumpDistMin!=0 ||jumpDistMax!=0) statisticsHistogramRanged<double,double>(jumps.data(), jumps.size(), jumpDistMin, jumpDistMax, jumpDistX->data(), jumpDistN->data(), bins);
+            else statisticsHistogram<double,double>(jumps.data(), jumps.size(), jumpDistX->data(), jumpDistN->data(), bins);
+        }
     }
 }
 
@@ -661,12 +803,37 @@ QVector<QFRDRImagingFCSSimulationThread::WalkerData> QFRDRImagingFCSSimulationTh
 
 void QFRDRImagingFCSSimulationThread::propagateWalkers(QVector<QFRDRImagingFCSSimulationThread::WalkerData> &walkersv, float D, bool onlyHalfImage, QList<QVector<QPair<float, float> > > *msds, QList<QVector<QPair<float, float> > > *traj)
 {
-    const float vxfactor=VX*sim_timestep*1.0e-6;
-    const float vyfactor=VY*sim_timestep*1.0e-6;
-    const float Dfactor=sqrt(2.0*D*sim_timestep*1.0e-6);
+    //static int cnt=0;
     for (register int i=0; i<walkersv.size(); i++) {
         QFRDRImagingFCSSimulationThread::WalkerData& d=walkersv[i];
 
+        float sdown=1;
+
+        if (environmentMode==SIMENV_TRAPS && (!trapOnlyRight || (trapOnlyRight && d.x>float(width)/2.0*pixel_size))) {
+            const float ddx=round((d.x-width/4.0)/trapGridSpacing);
+            const float ddy=round((d.y-height/2.0)/trapGridSpacing);
+            const float gx=width/4.0+float(ddx)*trapGridSpacing;
+            const float gy=height/2.0+float(ddy)*trapGridSpacing;
+            if (  (qfSqr(gx-d.x)+qfSqr(gy-d.y)<qfSqr(trapDiameter/2.0))
+                  ||(qfSqr(gx+trapGridSpacing-d.x)+qfSqr(gy-d.y)<qfSqr(trapDiameter/2.0))
+                  ||(qfSqr(gx-trapGridSpacing-d.x)+qfSqr(gy-d.y)<qfSqr(trapDiameter/2.0))
+                  ||(qfSqr(gx-d.x)+qfSqr(gy+trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
+                  ||(qfSqr(gx-d.x)+qfSqr(gy-trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
+                  ||(qfSqr(gx+trapGridSpacing-d.x)+qfSqr(gy+trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
+                  ||(qfSqr(gx-trapGridSpacing-d.x)+qfSqr(gy+trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
+                  ||(qfSqr(gx-trapGridSpacing-d.x)+qfSqr(gy+trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
+                  ||(qfSqr(gx-trapGridSpacing-d.x)+qfSqr(gy-trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
+               ) {
+                sdown=trapSlowdown;
+            }
+            //if (i==0 && cnt==100) { cnt=0; qDebug()<<i<<":   "<<d.x<<d.y<<" => "<<ddx<<ddy<<" == "<<gx<<gy<<"   ---> "<<sdown; }
+            //if (i==0) cnt++;
+
+        }
+
+        const float vxfactor=VX*sim_timestep*1.0e-6*sdown;
+        const float vyfactor=VY*sim_timestep*1.0e-6*sdown;
+        const float Dfactor=sqrt(2.0*D*sim_timestep*1.0e-6*sdown);
         register float v=(FlowEeverywhere || (d.x>float(width)*pixel_size/2.0))?1.0:0.0;
         register float dx=d.x+rng.randNorm(0.0, 1.0)*Dfactor+v*vxfactor;
         register float dy=d.y+rng.randNorm(0.0, 1.0)*Dfactor+v*vyfactor;

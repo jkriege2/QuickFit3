@@ -151,6 +151,14 @@ void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& 
             files<<inifiles[i];
             files_types<<"simulation_trajectories";
             files_descriptions<<inifiledescriptions[i];
+        } else if (inifiletypes[i].toLower()=="csv_jumphistograms") {
+            files<<inifiles[i];
+            files_types<<"simulation_jumphistograms";
+            files_descriptions<<inifiledescriptions[i];
+        } else if (inifiletypes[i].toLower()=="csv_psf") {
+            files<<inifiles[i];
+            files_types<<"simulation_psf";
+            files_descriptions<<inifiledescriptions[i];
         } else if (inifiletypes[i].toLower().contains("csv")) {
             if (inifiledescriptions[i].toLower().contains("measureable") && inifiledescriptions[i].toLower().contains("properties") && inifiletypes[i].toLower()=="csv") {
                 files<<inifiles[i];

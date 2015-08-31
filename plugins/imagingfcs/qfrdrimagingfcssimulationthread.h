@@ -22,17 +22,32 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFRDRIMAGINGFCSSIMULATIONTHREAD_H
 #define QFRDRIMAGINGFCSSIMULATIONTHREAD_H
 
+#include <QApplication>
+#include <QElapsedTimer>
+#include <QFile>
+#include <QSettings>
+#include <QString>
+#include <QVector>
+#include <QFileInfo>
+#include <QDebug>
 #include <QThread>
 #include <QStringList>
 #include "cpptools.h"
 #include "tinytiffwriter.h"
-#include "../../extlibs/MersenneTwister.h"
+#include "MersenneTwister.h"
+#include "qftools.h"
+#include "datatools.h"
+
 
 #define SIMENV_NORMAL 0
 #define SIMENV_GRIDBOUNDARIES 1
+#define SIMENV_TRAPS 2
 
 #define BOUNDARY_PERIODIC 0
 #define BOUNDARY_REINTRODUCE 1
+
+#define PSF_GAUSS 0
+#define PSF_PIXELGAUSS 1
 
 class QFRDRImagingFCSSimulationThread : public QThread
 {
@@ -102,6 +117,13 @@ class QFRDRImagingFCSSimulationThread : public QThread
         GET_SET_MACRO(int, msdMaxSteps)
         GET_MACRO(QStringList, msdNames)
         GET_MACRO(QStringList, trajNames)
+
+        GET_SET_MACRO(float, trapGridSpacing)
+        GET_SET_MACRO(float, trapDiameter)
+        GET_SET_MACRO(float, trapSlowdown)
+        GET_SET_MACRO(bool, trapOnlyRight)
+        GET_SET_MACRO(int, psf_type)
+
     public slots:
         void cancel();
         void waitForFinish();
@@ -111,6 +133,15 @@ class QFRDRImagingFCSSimulationThread : public QThread
     protected:
         virtual void run();
 
+        inline float psf_gauss(float x, float y, float wxy) {
+            if (qfSqr(x)+qfSqr(y)>5.0*qfSqr(wxy)) return 0;
+            return exp(-2.0*(qfSqr(x)+qfSqr(y))/qfSqr(wxy));
+        }
+        inline float psf_pixelgauss(float x, float y, float wxy) {
+            if (qfSqr(x)+qfSqr(y)>5.0*qfSqr(wxy)) return 0;
+            return (erf((pixel_size-2.0*x)/wxy/M_SQRT2)+erf((pixel_size+2.0*x)/wxy/M_SQRT2))*(erf((pixel_size-2.0*y)/wxy/M_SQRT2)+erf((pixel_size+2.0*y)/wxy/M_SQRT2))/qfSqr(2.0*erf(pixel_size/wxy/M_SQRT2));
+        }
+
         struct WalkerData {
             float x;
             float y;
@@ -118,7 +149,7 @@ class QFRDRImagingFCSSimulationThread : public QThread
         QVector<WalkerData> createWalkers(int count, bool onlyHalfImage);
         void propagateWalkers(QVector<WalkerData>& walkers, float D, bool onlyHalfImage, QList<QVector<QPair<float,float> > >* msds=NULL, QList<QVector<QPair<float, float> > > *traj=NULL);
         void calcMSD(QList<QVector<double> > &msdout, const QList<QVector<QPair<float, float> > > &wg_msd, const QVector<uint64_t> &tau);
-        void saveTraj(QList<QVector<double> > &msdout, const QList<QVector<QPair<float, float> > > &wg_msd, int& tmax, QStringList& columnNames, const QString &wname);
+        void saveTraj(QList<QVector<double> > &msdout, const QList<QVector<QPair<float, float> > > &wg_msd, int& tmax, QStringList& columnNames, const QString &wname, QVector<double>* jumpDistX=NULL, QVector<double>* jumpDistN=NULL, int jumpDistBins=0, double jumpDistMin=0, double jumpDistMax=0);
 
         bool canceled;
         float DG;
@@ -186,9 +217,18 @@ class QFRDRImagingFCSSimulationThread : public QThread
         bool boundaryGridOnlyRight;
         int environmentMode;
 
+        float trapGridSpacing;
+        float trapDiameter;
+        float trapSlowdown;
+        bool trapOnlyRight;
+
+        int psf_type;
+
         QStringList msdNames;
         QStringList trajNames;
         MTRand rng;
+
+        //QVector<bool> trapGrid;
         
 };
 
