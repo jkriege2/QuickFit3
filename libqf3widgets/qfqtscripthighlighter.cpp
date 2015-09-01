@@ -132,8 +132,8 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
      format.setFontWeight((bold)?(QFont::Bold):(QFont::Normal));
      format.setFontUnderline(underlined);
      format.setFontFixedPitch(settings.value("editor/fixedpitch", true).toBool());
-     format.setFontFamily(settings.value("editor/fontname", "Courier New").toString());
-     format.setFontPointSize(settings.value("editor/fontsize", 10).toDouble());
+     format.setFontFamily(settings.value("editor/fontname", ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString()).toString());
+     format.setFontPointSize(settings.value("editor/fontsize", ProgramOptions::getConfigValue("quickfit/code_fontsize", 10).toInt()).toDouble());
 
 }
 

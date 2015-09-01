@@ -40,7 +40,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QMessageBox>
 #include <QPainter>
 #include <QToolTip>
-
+#include "programoptions.h"
 
 
 
@@ -50,8 +50,8 @@ QFCompleterTextEditNumberBar::QFCompleterTextEditNumberBar(QTextEdit* edtr, QWid
 {
     markerWidth=16;
     linenumberColor=QColor("black");
-    linenumberFont.setFamily("Courier New");
-    linenumberFont.setPointSize(10);
+    linenumberFont.setFamily(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString());
+    linenumberFont.setPointSize(ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
     linenumberFont.setFixedPitch(true);
     linenumberColumnColor=QColor("gainsboro");
     markerColumnColor=QColor("darkgray");
@@ -67,8 +67,8 @@ QFCompleterTextEditNumberBar::~QFCompleterTextEditNumberBar() {
 
 void QFCompleterTextEditNumberBar::readSettings(QSettings& settings) {
     markerWidth=settings.value("editor/marker_width", 16).toInt();
-    linenumberFont.setPointSize(settings.value("editor/linenumber_fontsize", 10).toInt());
-    linenumberFont.setFamily(settings.value("editor/linenumber_fontname", "Courier New").toString());
+    linenumberFont.setPointSize(settings.value("editor/linenumber_fontsize", ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt()).toInt());
+    linenumberFont.setFamily(settings.value("editor/linenumber_fontname", ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString()).toString());
     linenumberColor=QColor(settings.value("editor/linenumber_color", "black").toString());
     linenumberColumnColor=QColor(settings.value("editor/linenumber_column_color", "gainsboro").toString());
     markerColumnColor=QColor(settings.value("editor/marker_column_color", "gray").toString());
@@ -830,8 +830,10 @@ QFCompleterTextEdit::QFCompleterTextEdit(QWidget* parent):
 {
     editor = new QFCompleterTextEditWidget(this);
     editor->setFrameStyle(QFrame::NoFrame);
-    QFont f("Monospace");
+    QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString());
+    f.setPointSizeF(ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
     f.setStyleHint(QFont::TypeWriter);
+    f.setFamily(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString());
     editor->setFontFamily(f.family());
     editor->setTabwidth(2);
 
@@ -846,8 +848,8 @@ QFCompleterTextEdit::QFCompleterTextEdit(QWidget* parent):
 
 void QFCompleterTextEdit::readSettings(QSettings& settings) {
     numbers->readSettings(settings);
-    editor->setFontFamily(settings.value("editor/fontname", "Courier New").toString());
-    editor->setFontPointSize(settings.value("editor/fontsize", 10).toDouble());
+    editor->setFontFamily(settings.value("editor/fontname", ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString()).toString());
+    editor->setFontPointSize(settings.value("editor/fontsize", ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt()).toDouble());
     editor->setTabwidth(settings.value("editor/tabwidth", 2).toInt());
     QFont f=editor->font();
     f.setFixedPitch(true);

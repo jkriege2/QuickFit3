@@ -4682,6 +4682,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     localreplaces<<qMakePair<QString, QString>("main_fontsize", QString("%1pt").arg(settings->getConfigValue("quickfit/help_pointsize", 11).toInt()));
     localreplaces<<qMakePair<QString, QString>("math_fontsize", QString("%1pt").arg(settings->getConfigValue("quickfit/math_pointsize", 14).toInt()));
     localreplaces<<qMakePair<QString, QString>("main_font", QString("%1").arg(settings->getConfigValue("quickfit/help_font", font().family()).toString()));
+    localreplaces<<qMakePair<QString, QString>("main_fontcode", QString("%1").arg(settings->getConfigValue("quickfit/code_font", font().family()).toString()));
 
     if (QFile::exists(basedir.absoluteFilePath("localreplaces.ini"))) {
         QSettings setLocalReplace(basedir.absoluteFilePath("localreplaces.ini"), QSettings::IniFormat);

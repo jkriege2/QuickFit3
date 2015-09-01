@@ -33,6 +33,7 @@ QFRDRTableMultiColumnEditor::QFRDRTableMultiColumnEditor(QFTableModel *model, QW
     ui->tableView->setItemDelegate(del=new QFHTMLDelegate(ui->tableView));
     del->setDisplayRichTextEditor(false);
     del->addMultilineEditColumn(1);
+    del->setUseCodeEditorFontForMultilineEdits(true);
     hmodel.addProperty(QFRDRTable::ColumnExpressionRole, tr("expression"));
     hmodel.addProperty(QFRDRTable::ColumnImageWidth, tr("image width"));
     hmodel.addProperty(QFRDRTable::ColumnCommentRole, tr("comment"));

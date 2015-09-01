@@ -53,6 +53,8 @@ DlgSetRDRPropertyByRegExp::DlgSetRDRPropertyByRegExp(QWidget *parent) :
     ProgramOptions::getConfigQSplitter(ui->splitter, "DlgSetRDRPropertyByExpression/splitter");
 
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
+    QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString(), ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
+    ui->edtRegExp->setFont(f);
 }
 
 DlgSetRDRPropertyByRegExp::~DlgSetRDRPropertyByRegExp()

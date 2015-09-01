@@ -70,6 +70,10 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
     ui->btnEvaluateScript->clearFocus();
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
     ui->edtExpression->setFocus(Qt::MouseFocusReason);
+
+    QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString(), ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
+    ui->edtExpression->setFont(f)    ;
+    ui->pteExpression->setFont(f);
 }
 
 void QFECalculatorDialog::setupParser(QFMathParser *parser) const

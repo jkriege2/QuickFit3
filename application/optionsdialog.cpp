@@ -25,11 +25,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfstyledbutton.h"
 #include "qftools.h"
 
+#define TEST_MATH "g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\left(1+\\frac{\\tau}{\\tau_D}\\right)^{-1}\\cdot\\left(1+\\frac{\\tau}{\\gamma^2\\tau_D}\\right)^{-1/2}"
+
 OptionsDialog::OptionsDialog(QWidget* parent):
     QDialog(parent)
 {
     setupUi(this);
-    labMath->setText("g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\left(1+\\frac{\\tau}{\\tau_D}\\right)^{-1}\\cdot\\left(1+\\frac{\\tau}{\\gamma^2\\tau_D}\\right)^{-1/2}");
+    labMath->setMath(TEST_MATH);
+    //labMath->setText(TEST_MATH);
     QFStyledButton* btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtUserFitFunctions, edtUserFitFunctions);
     edtUserFitFunctions->addButton(btn);
     btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtUserSettings, edtUserSettings);
@@ -47,6 +50,10 @@ OptionsDialog::OptionsDialog(QWidget* parent):
     chkChildWindowsStayOnTop->setVisible(false);
     chkHelpWindowsStayOnTop->setVisible(false);
     chkProjectWindowsStayOnTop->setVisible(false);
+
+
+    updateFontExample();
+    on_spinMath_valueChanged(spinMath->value());
 
     connect(cmbStyle, SIGNAL(currentIndexChanged(QString)), this, SLOT(styleChanged(QString)));
     connect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(stylesheetChanged(QString)));
@@ -79,9 +86,16 @@ void OptionsDialog::styleChanged( const QString & text ) {
 //        QStyle* s=QStyleFactory::create(text);
 //        if (s!=NULL) this->setStyle(s);
 
-    QApplication::setStyle(QStyleFactory::create(text));
-
-    QApplication::setPalette(QApplication::style()->standardPalette());
+    QStyle* s=QStyleFactory::create(text);
+    QStyle* s2=QStyleFactory::create(text);
+    if (s) {
+        QApplication::setStyle(s);
+        QApplication::setPalette(s->standardPalette());
+    }
+    if (s2) {
+        this->setStyle(s2);
+        this->setPalette(s2->standardPalette());
+    }
 }
 
 //void OptionsDialog::on_cmbStyle_highlighted( const QString & text ) {
@@ -102,7 +116,7 @@ void OptionsDialog::on_spinMath_valueChanged(int value)
 {
     labMath->getMathText()->set_fontSize(value);
     labMath->getMathText()->useSTIX();
-    labMath->setMath("g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\frac{1}{\\sqrt{1+\\frac{\\tau}{\\tau_D}}}");
+    labMath->setMath(TEST_MATH, true);
 
 }
 
@@ -110,6 +124,8 @@ void OptionsDialog::updateFontExample()
 {
     labFontExample->setText("Test Example");
     labFontExample->setFont(QFont(cmbHelpFont->currentFont().family(), spinHelpFontsize->value()));
+    labCodeFontExample->setText("Test Example 0123 l10 G5");
+    labCodeFontExample->setFont(QFont(cmbCodeFont->currentFont().family(), spinCodeFontsize->value()));
 }
 
 
@@ -139,8 +155,10 @@ void OptionsDialog::open(ProgramOptions* options) {
     }
     cmbLanguage->setCurrentIndex( cmbLanguage->findText(options->getLanguageID()));
 
+    cmbStyle->clear();
     cmbStyle->addItems(QStyleFactory::keys());
     cmbStyle->setCurrentIndex(cmbStyle->findText(options->getStyle(), Qt::MatchContains));
+    //styleChanged(cmbStyle->currentText());
     spinAutosave->setValue(options->getAutosave());
     //chkAskSaveNewProject->setChecked(options->getUserSaveAfterFirstEdit());
     chkChildWindowsStayOnTop->setChecked(options->getChildWindowsStayOnTop());
@@ -161,9 +179,11 @@ void OptionsDialog::open(ProgramOptions* options) {
     edtGlobalSettings->setText(options->getGlobalConfigFileDirectory());
     edtTempFolder->setText(options->getConfigValue("quickfit/temp_folder", QDir::tempPath()).toString());
     chkDefaultTempFolder->setChecked(options->getConfigValue("quickfit/temp_folder_default", true).toBool());
-    spinHelpFontsize->setValue(options->getConfigValue("quickfit/help_pointsize", 11).toInt());
     spinMath->setValue(options->getConfigValue("quickfit/math_pointsize", 14).toInt());
+    spinHelpFontsize->setValue(options->getConfigValue("quickfit/help_pointsize", 11).toInt());
     cmbHelpFont->setCurrentFont(QFont(options->getConfigValue("quickfit/help_font", font().family()).toString()));
+    spinCodeFontsize->setValue(options->getConfigValue("quickfit/code_pointsize", 10).toInt());
+    cmbCodeFont->setCurrentFont(QFont(options->getConfigValue("quickfit/code_font", "Hack").toString()));
 
     cmbFileDialog->setCurrentIndex(0);
     if (!ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
@@ -188,14 +208,15 @@ void OptionsDialog::open(ProgramOptions* options) {
     connect(cmbStyle, SIGNAL(currentIndexChanged(QString)), this, SLOT(styleChanged(QString)));
     connect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(stylesheetChanged(QString)));
 
-    stylesheetChanged( cmbStylesheet->currentText() );
     styleChanged(cmbStyle->currentText());
+    stylesheetChanged(cmbStylesheet->currentText() );
 
     for (int i=0; i<m_plugins.size(); i++) {
         m_plugins[i]->readSettings(options);
     }
 
     if (exec() == QDialog::Accepted ){
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         options->setMaxThreads(spnMaxThreads->value());
         options->setLanguageID(cmbLanguage->currentText());
         options->setStylesheet(cmbStylesheet->currentText());
@@ -217,6 +238,9 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setConfigValue("quickfit/math_pointsize", spinMath->value());
         options->setConfigValue("quickfit/help_pointsize", spinHelpFontsize->value());
         options->setConfigValue("quickfit/help_font", cmbHelpFont->currentFont().family());
+        options->setConfigValue("quickfit/code_pointsize", spinCodeFontsize->value());
+        options->setConfigValue("quickfit/code_fontsize", spinCodeFontsize->value());
+        options->setConfigValue("quickfit/code_font", cmbCodeFont->currentFont().family());
         options->setConfigValue("quickfit/windowheadermode", cmbWindowHeader->currentIndex());
 
         options->setConfigValue("quickfit/temp_folder", edtTempFolder->text());
@@ -242,6 +266,7 @@ void OptionsDialog::open(ProgramOptions* options) {
             m_plugins[i]->writeSettings(options);
         }
         options->writeSettings();
+        QApplication::restoreOverrideCursor();
     }
 }
 

@@ -178,7 +178,14 @@
      <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
        <item>
-        <widget class="QFCompleterTextEdit" name="edtScript" native="true"/>
+        <widget class="QFCompleterTextEdit" name="edtScript" native="true">
+         <property name="font">
+          <font>
+           <family>Hack</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="labCursorPos">
@@ -408,21 +415,26 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QModernProgressWidget</class>
-   <extends>QWidget</extends>
-   <header>qmodernprogresswidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFCompleterTextEdit</class>
    <extends>QWidget</extends>
    <header>qfcompletertextedit.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QModernProgressWidget</class>
+   <extends>QWidget</extends>
+   <header>qmodernprogresswidget.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="spimb040.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections/>

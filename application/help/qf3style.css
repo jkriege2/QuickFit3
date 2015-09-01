@@ -1,31 +1,34 @@
 body,p {
   font-size: $$main_fontsize$$;
-  font-family: $$main_font$$;  
+  font-family: "$$main_font$";  
 }
 h1 {
   font-size: $$main_fontsize:+10$$;
-  font-family: $$main_font$$;
+  font-family: "$$main_font$";
   background-color: SkyBlue ;
 }
 h2 {
   font-size: $$main_fontsize:+8$$;
-  font-family: $$main_font$$;
+  font-family: "$$main_font$";
   background-color: SkyBlue ;
 }
 h3 {
   font-size: $$main_fontsize:+6$$;
-  font-family: $$main_font$$;
+  font-family: "$$main_font$";
   background-color: SkyBlue ;
 }
 h4 {
   font-size: $$main_fontsize:+4$$;
-  font-family: $$main_font$$;
+  font-family: "$$main_font$";
   background-color: SkyBlue ;
 }
 h5 {
   font-size: $$main_fontsize:+2$$;
-  font-family: $$main_font$$;
+  font-family: "$$main_font$"$;
   background-color: SkyBlue ;
 }
-
+tt,pre,code {
+  font-family: "$$main_fontcode$$",courier,monospace;
+  font-size: $$main_fontsize:+1$$;
+}
 

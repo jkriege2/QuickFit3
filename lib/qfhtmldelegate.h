@@ -54,11 +54,13 @@ class QFLIB_EXPORT QFHTMLDelegate : public QStyledItemDelegate {
         void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
         void clearMultilineEditColumns();
         void addMultilineEditColumn(int col);
+        void setUseCodeEditorFontForMultilineEdits(bool v);
     private:
         bool m_displayRichTextEditor;
         QRegExp rxHTML;
         bool m_printMode;
         QSet<int> multiline_edits;
+        bool m_codeEditorFont;
     protected:
         void drawCheck(QPainter *painter,
                        const QStyleOptionViewItem &option,

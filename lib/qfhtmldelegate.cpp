@@ -33,6 +33,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QDate>
 #include <QDateTime>
 #include <QPlainTextEdit>
+#include "programoptions.h"
 QFHTMLDelegate::QFHTMLDelegate(QObject* parent):
     QStyledItemDelegate(parent)
 {
@@ -40,6 +41,7 @@ QFHTMLDelegate::QFHTMLDelegate(QObject* parent):
     rxHTML=QRegExp("(<\\s*\\w+.*>)|(<\\s*/\\s*\\w+\\s*>)|(\\&\\w+\\;)");
     rxHTML.setMinimal(true);
     m_printMode=false;
+    m_codeEditorFont=false;
 }
 
 QFHTMLDelegate::~QFHTMLDelegate()
@@ -326,7 +328,12 @@ QWidget *QFHTMLDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
     if (m_displayRichTextEditor&&(data.type()==QVariant::String)) {
         return new QTextEdit(parent);
     } else if (multiline_edits.contains(index.column()) && (data.type()==QVariant::String)) {
-        return new QPlainTextEdit(parent);
+        QPlainTextEdit* edt= new QPlainTextEdit(parent);
+        if (m_codeEditorFont) {
+            QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString(), ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
+            edt->setFont(f);
+        }
+        return edt;
     }
     return QStyledItemDelegate::createEditor(parent, option, index);
 }
@@ -336,10 +343,20 @@ void QFHTMLDelegate::setEditorData(QWidget *editor, const QModelIndex &index) co
     if (m_displayRichTextEditor&&(data.type()==QVariant::String)) {
         QTextEdit *te=static_cast<QTextEdit*>(editor);
         te->setHtml(data.toString());
+        QTextCursor cur=te->textCursor();
+        cur.movePosition(QTextCursor::Start);
+        te->setTextCursor(cur);
         return;
     } else if (multiline_edits.contains(index.column()) && (data.type()==QVariant::String)) {
         QPlainTextEdit *tp=static_cast<QPlainTextEdit*>(editor);
         tp->setPlainText(data.toString());
+        if (m_codeEditorFont) {
+            QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString(), ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
+            tp->setFont(f);
+        }
+        QTextCursor cur=tp->textCursor();
+        cur.movePosition(QTextCursor::Start);
+        tp->setTextCursor(cur);
         return;
     }
     QStyledItemDelegate::setEditorData(editor, index);
@@ -384,4 +401,10 @@ void QFHTMLDelegate::clearMultilineEditColumns()
 void QFHTMLDelegate::addMultilineEditColumn(int col)
 {
     multiline_edits.insert(col);
+}
+
+void QFHTMLDelegate::setUseCodeEditorFontForMultilineEdits(bool v)
+{
+    m_codeEditorFont=v;
+
 }

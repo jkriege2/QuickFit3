@@ -145,13 +145,23 @@ int main(int argc, char * argv[])
             app.processEvents();
             //if (!fdb.families().contains("XITS")) {
             QList<int> appFonts;
-            if (QFile::exists(":/JKQTmathText/fonts/xits-bold.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-bold.otf")); }
-            if (QFile::exists(":/JKQTmathText/fonts/xits-bolditalic.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-bolditalic.otf")); }
+            if (QFile::exists(":/JKQTmathText/fonts/Hack-Bold.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/Hack-Bold.otf")); }
+            if (QFile::exists(":/JKQTmathText/fonts/Hack-Bolditalic.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/Hack-Bolditalic.otf")); }
             if (QFile::exists(":/JKQTmathText/fonts/xits-italic.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-italic.otf")); }
             if (QFile::exists(":/JKQTmathText/fonts/xits-math.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-math.otf")); }
             if (QFile::exists(":/JKQTmathText/fonts/xits-mathbold.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-mathbold.otf")); }
             if (QFile::exists(":/JKQTmathText/fonts/xits-regular.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-regular.otf")); }
             //}
+
+            splash->showMessage("loading HACK fonts ...");
+            app.processEvents();
+            app.processEvents();
+            app.processEvents();
+            //QList<int> appFonts;
+            if (QFile::exists(":/fonts/hack/Hack-Bold.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/fonts/hack/Hack-Bold.otf")); }
+            if (QFile::exists(":/fonts/hack/Hack-BoldOblique.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/fonts/hack/Hack-BoldOblique.otf")); }
+            if (QFile::exists(":/fonts/hack/Hack-Regular.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/fonts/hack/Hack-Regular.otf")); }
+            if (QFile::exists(":/fonts/hack/Hack-RegularOblique.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/fonts/hackHack-RegularOblique.otf")); }
             splash->showMessage("initializing ...");
             app.processEvents();
             app.processEvents();
