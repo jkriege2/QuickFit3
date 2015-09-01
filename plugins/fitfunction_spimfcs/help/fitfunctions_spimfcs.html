@@ -9,8 +9,8 @@
         <h2>Fit Functions for SPIM-FCS</h2>
         <ul>
           <li><b>FCS, i.e. single-pixel autocorrelation</b>:<ul>
-            <li><a href="fcs_spim_adiffe2.html">anomalous diffusion ($$math:1/e^2$$ width, new V<sub>eff</sub>)</a></li>
-            <li><a href="fcs_spim_adiffce2.html">anomalous diffusion, c as fit parameter ($$math:1/e^2$$ width, new V<sub>eff</sub>)</a></li>
+            <li><a href="fcs_spim_adiffe2.html">anomalous diffusion ($$math:1/e<sup>2</sup>$$ width, new V<sub>eff</sub>)</a></li>
+            <li><a href="fcs_spim_adiffce2.html">anomalous diffusion, c as fit parameter ($$math:1/e<sup>2</sup>$$ width, new V<sub>eff</sub>)</a></li>
             <li><a href="fcs_spim_diffe2.html">normal diffusion (1/e<sup>2</sup> width)</a></li>
             <li><a href="fcs_spim_diffe2_newveff.html">normal diffusion (1/e<sup>2</sup> width, new V<sub>eff</sub>)</a></li>
             <li><a href="fcs_spim_diffe2_newveff_diffbright.html">normal diffusion, different molecular brightnesses per species (1/e<sup>2</sup> width, new V<sub>eff</sub>)</a></li>
@@ -21,34 +21,59 @@
             <li><font color="grey">Deprecated: <a href="fcs_spim_adiff.html">anomalous diffusion ($$math:1/\sqrt{e}$$ width)</a></font></li>
           </ul></li>
           <li><b>two-pixel cross-correlation</b>:<ul>
-            <li><a href="fccs_spim_diffflowce2.html">normal diffusion+flow ($$math:1/e^2$$ width)</a></li>
-            <li><a href="fccs_spim_diffce2.html">normal diffusion ($$math:1/e^2$$ width)</a></li>
-            <li><a href="fccs_spim_adiffce2.html">anomalous diffusion ($$math:1/e^2$$ width)</a></li>
-            <li><a href="fccs_spim_global_diffflowce2.html">diffusion+flow+global decay ($$math:1/e^2$$ width)</a></li>
+            <li><a href="fccs_spim_diffflowce2.html">normal diffusion+flow ($$math:1/e<sup>2</sup>$$ width)</a></li>
+            <li><a href="fccs_spim_diffce2.html">normal diffusion ($$math:1/e<sup>2</sup>$$ width)</a></li>
+            <li><a href="fccs_spim_adiffce2.html">anomalous diffusion ($$math:1/e<sup>2</sup>$$ width)</a></li>
+            <li><a href="fccs_spim_global_diffflowce2.html">diffusion+flow+global decay ($$math:1/e<sup>2</sup>$$ width)</a></li>
             <li><font color="grey">Deprecated: <a href="fccs_spim_diff.html">normal diffusion ($$math:1/\sqrt{e}$$ width)</a></font></li>
             <li><font color="grey">Deprecated: <a href="fccs_spim_diffflow.html">normal diffusion+flow ($$math:1/\sqrt{e}$$ width)</a></font></li>
             <li><font color="grey">Deprecated: <a href="fccs_spim_diff2color.html">2-color crosscorrelation normal diffusion ($$math:1/\sqrt{e}$$ width)</a></font></li>
           </ul></li>
           <li><b>2-color cross-correlation</b>:<ul>
-            <li><a href="fccs_spim_diff2color.html">2-color crosscorrelation framework, normal diffusion (1/e<sup>2</sup> radii):</a> <ul>
+            <li>2-comp. 2D Normal Diffusion (xy), species A+B+AB, c per species, D1/D2 per channel (rect. pixel, 1/e<sup>2</sup> radii): <ul>
+                                  <li><a href="fccs_spim_fw_2csep2ddiffxy2coloracfg.html">ACF, green</a></li>
+                                  <li><a href="fccs_spim_fw_2csep2ddiffxy2coloracfr.html">ACF, red</a></li>
+                                  <li><a href="fccs_spim_fw_2csep2ddiffxy2colorccf.html">CCF</a></li>
+                              </ul></li>
+            <li>2-comp. 2D Normal Diffusion (xz), species A+B+AB, c per species, D1/D2 per channel (rect. pixel, 1/e<sup>2</sup> radii): <ul>
+                                  <li><a href="fccs_spim_fw_2csep2ddiffxz2coloracfg.html">ACF, green</a></li>
+                                  <li><a href="fccs_spim_fw_2csep2ddiffxz2coloracfr.html">ACF, red</a></li>
+                                  <li><a href="fccs_spim_fw_2csep2ddiffxz2colorccf.html">CCF</a></li>
+                              </ul></li>
+            <li>1-comp. 3D normal diffusion, species A+B+AB, c/D per species (rect. pixel, 1/e<sup>2</sup> radii): <ul>
                                   <li><a href="fccs_spim_fw_diff2coloracfg.html">ACF, green</a></li>
                                   <li><a href="fccs_spim_fw_diff2coloracfr.html">ACF, red</a></li>
                                   <li><a href="fccs_spim_fw_diff2colorccf.html">CCF</a></li>
                               </ul></li>
-            <li><a href="fccs_spim_diff2color.html">2-color crosscorrelation framework, normal diffusion, factor D (1/e<sup>2</sup> radii):</a> <small>In this model $$math:D_{b}=F_b\cdot D_a$$ and $$math:D_{ab}=F_{ab}\cdot D_a$$</small><ul>
+            <li>2-comp. 3D normal diffusion, species A+B+AB, c/Dab=Fab*Da/Db=Fb*Da per species (rect. pixel, 1/e<sup>2</sup> radii)</small><ul>
                                   <li><a href="fccs_spim_fw_factordiff2coloracfg.html">ACF, green</a></li>
                                   <li><a href="fccs_spim_fw_factordiff2coloracfr.html">ACF, red</a></li>
                                   <li><a href="fccs_spim_fw_factordiff2colorccf.html">CCF</a></li>
                               </ul></li>
-            <li><a href="fccs_spim_2cdiff2color.html">2-color crosscorrelation framework, 2-component normal diffusion (1/e<sup>2</sup> radii):</a> <ul>
+           <li>2-comp. 3D normal diffusion, species A+B+AB, c/D1/D2 per species (rect. pixel, 1/e<sup>2</sup> radii): <ul>
                                   <li><a href="fccs_spim_fw_2cdiff2coloracfg.html">ACF, green</a></li>
                                   <li><a href="fccs_spim_fw_2cdiff2coloracfr.html">ACF, red</a></li>
                                   <li><a href="fccs_spim_fw_2cdiff2colorccf.html">CCF</a></li>
                               </ul></li>
-            <li><a href="fccs_spim_diff2color.html">2-color crosscorrelation framework, anomalous diffusion (1/e<sup>2</sup> radii):</a> <ul>
+            <li>2-comp. 3D normal diffusion, species A+B+AB, c per species, D1/D2 per channel (rect. pixel, 1/e<sup>2</sup> radii): <ul>
+                                  <li><a href="fccs_spim_fw_2csepdiff2coloracfg.html">ACF, green</a></li>
+                                  <li><a href="fccs_spim_fw_2csepdiff2coloracfr.html">ACF, red</a></li>
+                                  <li><a href="fccs_spim_fw_2csepdiff2colorccf.html">CCF</a></li>
+                              </ul></li>
+            <li>1-comp. 3D normal diffusion, species A+B+AB, c per species, D per channel (rect. pixel, 1/e<sup>2</sup> radii): <ul>
+                                  <li><a href="fccs_spim_fw_sepdiff2coloracfg.html">ACF, green</a></li>
+                                  <li><a href="fccs_spim_fw_sepdiff2coloracfr.html">ACF, red</a></li>
+                                  <li><a href="fccs_spim_fw_sepdiff2colorccf.html">CCF</a></li>
+                              </ul></li>
+            <li>1-comp. 3D anomalous diffusion, species A+B+AB, c/Gamma/alpha per species (rect. pixel, 1/e<sup>2</sup> radii): <ul>
                                   <li><a href="fccs_spim_fw_adiff2coloracfg.html">ACF, green</a></li>
                                   <li><a href="fccs_spim_fw_adiff2coloracfr.html">ACF, red</a></li>
                                   <li><a href="fccs_spim_fw_adiff2colorccf.html">CCF</a></li>
+                              </ul></li>
+             <li>1-comp. anomalous diffusion, species A+B+AB, c per species, D/alpha per channel (rect. pixel, 1/e<sup>2</sup> radii): <ul>
+                                  <li><a href="fccs_spim_fw_2csepadiff2coloracfg.html">ACF, green</a></li>
+                                  <li><a href="fccs_spim_fw_2csepadiff2coloracfr.html">ACF, red</a></li>
+                                  <li><a href="fccs_spim_fw_2csepadiff2colorccf.html">CCF</a></li>
                               </ul></li>
         </ul></li>
         </ul>
