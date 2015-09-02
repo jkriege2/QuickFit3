@@ -50,6 +50,7 @@ class QFETCSPCImporterJobThread; // forward
 #define CORRELATOR_MTAUALLMON 0
 #define CORRELATOR_MTAUONEMON 1
 #define CORRELATOR_TTTR 2
+#define CORRELATOR_TTTRAVG 3
 
 
 /*! \brief job description for tcspc evaluation
@@ -121,6 +122,8 @@ struct TCSPCImporterJob {
 
     QSet<QPair<int, int> > fcs_correlate;
     QSet<int> countrate_channels;
+    //QSet<int> lt_channels;
+
 
     struct FCSLifetimeFilter {
         FCSLifetimeFilter() {

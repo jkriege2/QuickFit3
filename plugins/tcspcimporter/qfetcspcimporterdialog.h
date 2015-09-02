@@ -113,6 +113,7 @@ private:
     QStringList tcspcFormatNames;
     QList<TCSPCImporterJob> jobs;
     QFTableModel* tmCR;
+    //QFTableModel* tmCRLifetime;
     QFTableModel* tmFCS;
     QFTableModel* tmFCSLifetimeFilter;
     //QList<Job> jobsToAdd;

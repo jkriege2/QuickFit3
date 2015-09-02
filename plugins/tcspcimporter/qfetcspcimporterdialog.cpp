@@ -67,6 +67,14 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     tmCR->setReadonly(true);
     ui->tabCR->setModel(tmCR);
 
+//    tmCRLifetime=new QFTableModel(ui->tabCRLifetime);
+//    tmCRLifetime->setReadonly(true);
+//    tmCRLifetime->setReadonlyButStillCheckable(true);
+//    tmCRLifetime->setReadonly(false);
+//    tmCRLifetime->clear();
+//    tmCRLifetime->setReadonly(true);
+//    ui->tabCRLifetime->setModel(tmCR);
+
 
     tmFCS=new QFTableModel(ui->tvFCS);
     tmFCS->setReadonlyButStillCheckable(true);
@@ -80,6 +88,11 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     tmFCSLifetimeFilter->clear();
     ui->tvFCSLifetimeFilter->setModel(tmFCSLifetimeFilter);
     ui->tvFCSLifetimeFilter->setItemDelegate(new QFTableDelegate(ui->tvFCSLifetimeFilter));
+    ui->cmbCorrelator->clear();
+    ui->cmbCorrelator->addItem(tr("bin and correlate: Multi-Tau 1 (one monitor per lag)"), CORRELATOR_MTAUALLMON);
+    ui->cmbCorrelator->addItem(tr("photon arrival times correlator (Multi-Tau)"), CORRELATOR_TTTR);
+    ui->cmbCorrelator->addItem(tr("photon arrival times correlator with averaging (Multi-Tau)"), CORRELATOR_TTTRAVG);
+    ui->cmbCorrelator->setCurrentIndex(0);
 /*
 %counter% by the value of \a counter, if this value is >0, or by an empty string
           - \c %S% S parameter of the correlator
@@ -358,7 +371,7 @@ void QFETCSPCImporterDialog::writeSettings() {
     if (!options) return;
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/last_imagefile_dir", lastTCSPCFileDir);
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/last_imagefile_filter", lastTCSPCFileFilter);
-    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/correlator", ui->cmbCorrelator->currentIndex());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/correlator", ui->cmbCorrelator->currentData().toInt());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/prefix", ui->edtPrefix->text());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/postfix", ui->edtPostfix->text());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/S", ui->spinS->value());
@@ -397,7 +410,7 @@ void QFETCSPCImporterDialog::readSettings() {
     lastTCSPCFileDir=options->getQSettings()->value("tcspcimporter/dlg_correlate/last_imagefile_dir", lastTCSPCFileDir).toString();
     lastTCSPCFileFilter=options->getQSettings()->value("tcspcimporter/dlg_correlate/last_imagefile_filter", lastTCSPCFileFilter).toString();
 
-    ui->cmbCorrelator->setCurrentIndex(options->getQSettings()->value("tcspcimporter/dlg_correlate/correlator", ui->cmbCorrelator->currentIndex()).toInt());
+    ui->cmbCorrelator->setCurrentData(options->getQSettings()->value("tcspcimporter/dlg_correlate/correlator", ui->cmbCorrelator->currentData().toInt()).toInt());
     ui->spinS->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/S", ui->spinS->value()).toInt());
     ui->spinP->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/P", ui->spinP->value()).toInt());
     ui->spinM->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/m", ui->spinM->value()).toInt());
@@ -496,7 +509,7 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
     connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
     job.filename=ui->edtTCSPCFile->text();
     job.importerParameter=ui->edtTCSPCFileParameter->text();
-    job.fcs_correlator=ui->cmbCorrelator->currentIndex();
+    job.fcs_correlator=ui->cmbCorrelator->currentData().toInt();
     job.fileFormat=ui->cmbFileformat->currentIndex();
     //qDebug()<<"job.fileFormat="<<job.fileFormat<<"  "<<ui->cmbFileformat->count();
     job.fcs_S=ui->spinS->value();
@@ -533,6 +546,9 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
         if (tmCR->data(tmCR->index(0, i),Qt::CheckStateRole).toInt()!=Qt::Unchecked) {
             job.countrate_channels.insert(i);
         }
+//        if (tmCRLifetime->data(tmCRLifetime->index(0, i),Qt::CheckStateRole).toInt()!=Qt::Unchecked) {
+//            job.lt_channels.insert(i);
+//        }
     }
 
     job.fcs_uselifetimefilter=ui->chkFCSLifetimeFilter->isChecked();
@@ -573,7 +589,7 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
 
 
 void QFETCSPCImporterDialog::updateCorrelator() {
-    int corrType=ui->cmbCorrelator->currentIndex();
+    int corrType=ui->cmbCorrelator->currentData().toInt();
     if (corrType==1) {
         ui->spinM->setEnabled(false);
         ui->labM->setEnabled(false);
@@ -786,6 +802,29 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
             tmCR->setReadonly(true);
             ui->tabCR->setModel(tmCR);
 
+            //ui->tabCRLifetime->setModel(NULL);
+
+//            tmCRLifetime->setReadonly(false);
+//            if (tmCRLifetime->rowCount()<=0) tmCRLifetime->appendRow();
+//            if (channels>tmCRLifetime->columnCount()) {
+//                int cols=tmCRLifetime->columnCount();
+//                for (int i=cols; i<channels; i++) {
+//                    tmCRLifetime->appendColumn();
+//                    tmCRLifetime->setCell(0,i, tr("CH %1").arg(i+1));
+//                    if (reader->avgCountRate(i)>0) tmCRLifetime->setCellCheckedRole(0,i, Qt::Checked);
+//                    else tmCRLifetime->setCellCheckedRole(0,i, Qt::Unchecked);
+//                }
+//            } else if (channels<tmCRLifetime->columnCount()) {
+//                while (tmCRLifetime->columnCount()>channels) {
+//                    tmCRLifetime->deleteColumn(tmCRLifetime->columnCount()-1);
+//                }
+//            }
+//            while (tmCRLifetime->rowCount()>1) {
+//                tmCRLifetime->deleteRow(tmCRLifetime->rowCount()-1);
+//            }
+//            tmCRLifetime->setReadonly(true);
+//            ui->tabCRLifetime->setModel(tmCRLifetime);
+
             ui->tvFCSLifetimeFilter->setModel(NULL);
             tmFCSLifetimeFilter->setReadonly(false);
             tmFCSLifetimeFilter->setColumnTitleCreate(0, tr("min. lifetime [ns]"));
@@ -806,8 +845,8 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
 
             ui->tvFCS->setModel(NULL);
             tmFCS->setReadonly(false);
-            if (tmFCS->rowCount()<=0) tmCR->appendRow();
-            if (tmFCS->columnCount()<=0) tmCR->appendColumn();
+            if (tmFCS->rowCount()<=0) { tmCR->appendRow(); }//tmCRLifetime->appendRow(); }
+            if (tmFCS->columnCount()<=0) { tmCR->appendColumn(); }//tmCRLifetime->appendColumn(); }
             //qDebug()<<channels<<tmFCS->columnCount();
             if (channels>tmFCS->columnCount()) {
                 int cols=tmFCS->columnCount();

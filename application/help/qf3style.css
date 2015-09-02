@@ -1,6 +1,7 @@
 body,p {
   font-size: $$main_fontsize$$;
   font-family: "$$main_font$";  
+  background-color: White ;
 }
 h1 {
   font-size: $$main_fontsize:+10$$;

@@ -156,6 +156,7 @@ QString QFETCSPCImporterJobThread::replacePostfixSpecials(const QString& input, 
     if (job.fcs_correlator==CORRELATOR_MTAUALLMON) corr="mtauallmon";
     if (job.fcs_correlator==CORRELATOR_MTAUONEMON) corr="mtauonemon";
     if (job.fcs_correlator==CORRELATOR_TTTR) corr="tttr";
+    if (job.fcs_correlator==CORRELATOR_TTTRAVG) corr="tttravg";
 
     result=result.replace("%correlator%", corr, Qt::CaseInsensitive);
     result=result.replace("%correlatorid%", QString::number(job.fcs_correlator), Qt::CaseInsensitive);
@@ -640,6 +641,7 @@ void QFETCSPCImporterJobThread::run() {
                                 case CORRELATOR_MTAUALLMON:  tool.properties["CORRELATOR"]="CORRELATOR_MTAUALLMON"; tool.properties["CORRELATOR_NAME"]="multi-tau with monitors for all channels"; break;
                                 case CORRELATOR_MTAUONEMON:  tool.properties["CORRELATOR"]="CORRELATOR_MTAUONEMON"; tool.properties["CORRELATOR_NAME"]="multi-tau with a single monitor"; break;
                                 case CORRELATOR_TTTR:        tool.properties["CORRELATOR"]="CORRELATOR_TTTR"; tool.properties["CORRELATOR_NAME"]="TTTR"; break;
+                                case CORRELATOR_TTTRAVG:        tool.properties["CORRELATOR"]="CORRELATOR_TTTRAVG"; tool.properties["CORRELATOR_NAME"]="TTTR with averaging"; break;
 
                                 default: tool.properties["CORRELATOR"]=job.fcs_correlator; tool.properties["CORRELATOR_NAME"]="unknown"; break;
                             }
@@ -796,6 +798,7 @@ void QFETCSPCImporterJobThread::run() {
                                     case CORRELATOR_MTAUALLMON:  text<<"multi-tau with monitors for all channels\n"; break;
                                     case CORRELATOR_MTAUONEMON:  text<<"multi-tau with a single monitor\n"; break;
                                     case CORRELATOR_TTTR:  text<<"TTTR\n"; break;
+                                    case CORRELATOR_TTTRAVG:  text<<"TTTR with averaging\n"; break;
 
                                     default: text<<"FCS: correlator type name        : unknown\n"; break;
                                 }
@@ -1147,6 +1150,12 @@ void QFETCSPCImporterJobThread::createCorrelators() {
 
              fcs_tau.resize(job.fcs_S*job.fcs_P);
              statisticsAutocorrelateCreateMultiTau(fcs_tau.data(), job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
+         } else if (job.fcs_correlator==CORRELATOR_TTTRAVG) {
+             QVector<double> ctemp(job.fcs_S*job.fcs_P, 0.0);
+             corrtttr[id]=ctemp;
+
+             fcs_tau.resize(job.fcs_S*job.fcs_P);
+             statisticsAutocorrelateCreateMultiTau(fcs_tau.data(), job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
          }
 
     }
@@ -1227,7 +1236,40 @@ void QFETCSPCImporterJobThread::copyCorrelatorIntermediateResults(uint16_t fcs_s
                  fcs_ccfs[id].append(corrtttr[idc].value(tau)-1.0);
              }
         }
+    } else if (job.fcs_correlator==CORRELATOR_TTTRAVG) {
+        for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
+             QPair<int, int> ccf=*i;
+             //qDebug()<<"copyCorrelatorIntermediateResults: "<<ccf.first<<ccf.second<<arrivaltimes.size();
+             //if (ccf.first<arrivaltimes.size() && ccf.second<arrivaltimes.size() ) qDebug()<<"    "<<arrivaltimes[ccf.first].size()<<arrivaltimes[ccf.second].size();
+             uint64_t id=xyzAdressToUInt64(ccf.first, ccf.second, fcs_segment);
+             uint32_t idc=xyAdressToUInt32(ccf.first, ccf.second);
 
+             if (arrivaltimes.size()>0) {
+                 if (ccf.first==ccf.second) {
+                     if (ccf.first>=0 && ccf.first<arrivaltimes.size()) {
+                         //qDebug()<<"running TTTRcorrelate(): "<<arrivaltimes[ccf.first].size()<<fcs_tau.data()<<fcs_tau.size()<<corrtttr[idc].data()<<corrtttr[idc].size();
+                         TTTRcorrelateWithAvg(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), corrtttr[idc], fcs_tau, job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
+                         //qDebug()<<"finished TTTRcrosscorrelate()!";
+                     } else {
+                         //qDebug()<<"copyCorrelatorIntermediateResults: ERROR "<<ccf.first<<arrivaltimes.size();
+                     }
+                     //TTTRcorrelateWithAvg(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), corrtttr[idc], fcs_tau, job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
+                 } else {
+                     if (ccf.second>=0 && ccf.second<arrivaltimes.size() && ccf.first>=0 && ccf.first<arrivaltimes.size()) {
+                         TTTRcrosscorrelateWithAvg(arrivaltimes[ccf.first].data(), arrivaltimes[ccf.first].size(), arrivaltimes[ccf.second].data() , arrivaltimes[ccf.second].size(), corrtttr[idc], fcs_tau, job.fcs_S, job.fcs_m, job.fcs_P, job.fcs_taumin);
+                     } else {
+                         //qDebug()<<"copyCorrelatorIntermediateResults: ERROR "<<ccf.first<<ccf.second<<arrivaltimes.size();
+                     }
+                 }
+
+             }
+
+             fcs_ccfs[id]=QVector<double>();
+             //qDebug()<<"added empty vector";
+             for (int tau=0; tau<qMin(corrtttr[idc].size(), fcs_tau.size()); tau++) {
+                 fcs_ccfs[id].append(corrtttr[idc].value(tau)-1.0);
+             }
+        }
     }
     //qDebug()<<"copyCorrelatorIntermediateResults("<<fcs_segment<<") ... DONE";
 

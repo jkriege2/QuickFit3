@@ -126,9 +126,9 @@ p, li { white-space: pre-wrap; }
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>0</y>
-              <width>813</width>
-              <height>539</height>
+              <y>-202</y>
+              <width>842</width>
+              <height>558</height>
              </rect>
             </property>
             <layout class="QFormLayout" name="formLayout_2">
@@ -647,7 +647,7 @@ p, li { white-space: pre-wrap; }
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="cmbCorrelator">
+                   <widget class="QFEnhancedComboBox" name="cmbCorrelator">
                     <property name="minimumSize">
                      <size>
                       <width>150</width>
@@ -959,7 +959,7 @@ p, li { white-space: pre-wrap; }
                 </font>
                </property>
                <property name="text">
-                <string>&amp;counrate:</string>
+                <string>&amp;Counrate:</string>
                </property>
                <property name="checked">
                 <bool>false</bool>
@@ -1058,7 +1058,7 @@ p, li { white-space: pre-wrap; }
                 </font>
                </property>
                <property name="text">
-                <string>&amp;lifetime-histogram</string>
+                <string>&amp;Arrivaltime Histograms:</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -1072,6 +1072,13 @@ p, li { white-space: pre-wrap; }
                  <widget class="QLabel" name="labLifetimeInfo">
                   <property name="text">
                    <string>TextLabel</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_13">
+                  <property name="text">
+                   <string>A histogram is created for every channel in which at least a few photons were detected!</string>
                   </property>
                  </widget>
                 </item>
@@ -1489,6 +1496,11 @@ p, li { white-space: pre-wrap; }
    <extends>QLineEdit</extends>
    <header>qfenhancedlineedit.h</header>
   </customwidget>
+  <customwidget>
+   <class>QFEnhancedComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfenhancedcombobox.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>edtTCSPCFile</tabstop>
@@ -1530,8 +1542,8 @@ p, li { white-space: pre-wrap; }
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="qfetcspcimporter.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="qfetcspcimporter.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

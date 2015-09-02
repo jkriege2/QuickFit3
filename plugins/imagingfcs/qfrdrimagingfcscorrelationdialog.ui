@@ -1620,7 +1620,7 @@ p, li { white-space: pre-wrap; }
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <item>
-                  <widget class="QComboBox" name="cmbCorrelator">
+                  <widget class="QFEnhancedComboBox" name="cmbCorrelator">
                    <property name="minimumSize">
                     <size>
                      <width>150</width>
@@ -1653,16 +1653,6 @@ p, li { white-space: pre-wrap; }
                    <item>
                     <property name="text">
                      <string>Multi-Tau 1 (one monitor per lag)</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Multi-Tau 2 (one monitor for all lags)</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>!!! Experimental Corelator from Shared Library [don't use]</string>
                     </property>
                    </item>
                   </widget>
@@ -2441,11 +2431,6 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFEnhancedLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qfenhancedlineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
@@ -2453,6 +2438,16 @@ p, li { white-space: pre-wrap; }
     <signal>valueChanged(double)</signal>
     <slot>setValue(double)</slot>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>QFEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfenhancedlineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QFEnhancedComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfenhancedcombobox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

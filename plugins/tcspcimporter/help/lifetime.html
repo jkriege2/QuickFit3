@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>$$local_plugin_name$$: Arrivaltime Histograms</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+<p>This tool will calculate histograms of the microtime (i.e. the picosecond-resolution time-tag part) in the TCSPC records.  The results will be imported into the QuickFit project as <a href="$$plugin_info:help:table$$">table RDRs</a>, which contain the histogram data and plots for each channel. YYou can choose to cut the input file into several segments. Then a histogram for each channel in each segment is calculated ans displayed.
+</p>
+<p>When the evaluation has finished, the project contains an RDR, like the following for the histograms:
+<center><a name="lifetime_pic000"><img src="./pic/lifetime_pic000.png" border="1">
+</center>
+This RDR contains a table with the histograms:
+<center><a name="lifetime_pic001"><img src="./pic/lifetime_pic001.png" border="1">
+</center>
+and plots of the histograms:
+<center><a name="lifetime_pic002"><img src="./pic/lifetime_pic002.png" border="1">
+</center>
+You can use the fitting facilities of the <a href="$$plugin_info:help:table$$">table plugin</a> to perform simple lifetime fitting (i.e. click on the "least squares fit" button at the lower-right of the window for any graph in the plot).
+</p>
+    </body>
+</html>
