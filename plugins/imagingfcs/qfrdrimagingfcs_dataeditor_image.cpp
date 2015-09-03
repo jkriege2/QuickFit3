@@ -6551,10 +6551,10 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                                 for (int i=0; i<mprob.size(); i++) {
                                     sum += mprob[i].at(j);
                                 }
-                                qDebug()<<j<<sum<<":";
+                                //qDebug()<<j<<sum<<":";
                                 for (int i=0; i<mprob.size(); i++) {
                                      mprob[i].operator[](j)= mprob[i].at(j)/sum;
-                                     qDebug()<<j<<":   "<<i<<mprob[i].at(j);
+                                     //qDebug()<<j<<":   "<<i<<mprob[i].at(j);
                                 }
                             }
 
