@@ -9,6 +9,7 @@ Project Homepage: http://www.dkfz.de/Macromol/quickfit/
 Currently QuickFit can be found here (will be moved to GitHub soon):
 - Windows Binaries: http://www.dkfz.de/Macromol/quickfit/#download
 - Source Code: https://github.com/jkriege2/QuickFit3
+- Several smaller source code components (also included as subprojects in the main repository) are summarized here: https://github.com/jkriege2/
 
 ##Description
 ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/images/splash.png)
