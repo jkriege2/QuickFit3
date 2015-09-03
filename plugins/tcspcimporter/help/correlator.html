@@ -102,16 +102,9 @@ Wahl M, Gregor I, Patting M, Enderlein J  (2003) Fast calculation of fluorescenc
 
 <h3>Comparison of the correlators</h3>
 <p>
-  In general the results of all correlation scheme are the same. Those with intrinsic averaging will decrease the noise on the correlation curve at larger lag times, where the statistics tends to get worse due to the fewer summands in the average. This is beneficial, when the correlation curves decay to zero/one in this regime, as then the estimation error is decreased. If the correlation curves do not decay, using a correlator with averaging will introduce an additional systematic error. This can be illustrated in these examples:
-     <blockquote>
-       <b>autocorrelation of a sine signal:</b><br>
-       <img src="./pic/corr_examples_sine.png">
-     </blockquote>        
-     <blockquote>
-       <b>autocorrelation which decays to one for different decay times:</b><br>
-       <img src="./pic/corr_examples.png">
-     </blockquote>    
-    In addition to these discussed errors there are other differences in the implementations: The <i>direct correlators</i> need the whole image series to reside in memory, so if your image series is very long (longer than ~1,000,000 frames and with many pixels) it is usually better to use the multi-&tau; correlators, as these are fed frame by frame, so only few frames reside in memory at every time. 
+  <center><a name="correlator_pic000"><img src="./pic/correlator_pic000.png" border="1">
+</center>
+
   </p>
 
 

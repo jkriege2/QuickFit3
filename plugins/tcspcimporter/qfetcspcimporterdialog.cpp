@@ -91,7 +91,7 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     ui->cmbCorrelator->clear();
     ui->cmbCorrelator->addItem(tr("bin and correlate: Multi-Tau 1 (one monitor per lag)"), CORRELATOR_MTAUALLMON);
     ui->cmbCorrelator->addItem(tr("photon arrival times correlator (Multi-Tau)"), CORRELATOR_TTTR);
-    ui->cmbCorrelator->addItem(tr("photon arrival times correlator with averaging (Multi-Tau)"), CORRELATOR_TTTRAVG);
+    //ui->cmbCorrelator->addItem(tr("photon arrival times correlator with averaging (Multi-Tau)"), CORRELATOR_TTTRAVG);
     ui->cmbCorrelator->setCurrentIndex(0);
 /*
 %counter% by the value of \a counter, if this value is >0, or by an empty string

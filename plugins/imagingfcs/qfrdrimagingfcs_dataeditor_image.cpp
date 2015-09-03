@@ -6388,8 +6388,13 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
             settings->setValue(prefix+"chkAnnotateMoreRDRs", chkAnnotateMoreRDRs->isChecked());
 
 
-            bool doBayesNormProb=(cmbAnnotateDlgParameter->currentData().toString().toLower().endsWith("bayes_model_probability") && chkAnnotateDlgCalcModelProb->isChecked());
-            qDebug()<<cmbAnnotateDlgParameter->currentData().toString()<<chkAnnotateDlgCalcModelProb->isChecked()<<doBayesNormProb;
+            bool doBayesNormProb=((cmbAnnotateDlgParameter->currentData().toString().toLower().endsWith("bayes_model_probability")
+                                   ||cmbAnnotateDlgParameter->currentData().toString().toLower().endsWith("bayes model probability")
+                                   ||cmbAnnotateDlgParameter->currentData().toString().toLower().endsWith("bayes probability")
+                                   ||cmbAnnotateDlgParameter->currentData().toString().toLower().endsWith("bayes_model_propability")
+                                   ||cmbAnnotateDlgParameter->currentData().toString().toLower().endsWith("bayes model propability")
+                                   ||cmbAnnotateDlgParameter->currentData().toString().toLower().endsWith("bayes propability")) && chkAnnotateDlgCalcModelProb->isChecked());
+            //qDebug()<<cmbAnnotateDlgParameter->currentData().toString()<<chkAnnotateDlgCalcModelProb->isChecked()<<doBayesNormProb<;
             QList<QPointer<QFRawDataRecord> > recs;
 
 
@@ -6546,8 +6551,10 @@ void QFRDRImagingFCSImageEditor::annotateModelComparison()
                                 for (int i=0; i<mprob.size(); i++) {
                                     sum += mprob[i].at(j);
                                 }
+                                qDebug()<<j<<sum<<":";
                                 for (int i=0; i<mprob.size(); i++) {
                                      mprob[i].operator[](j)= mprob[i].at(j)/sum;
+                                     qDebug()<<j<<":   "<<i<<mprob[i].at(j);
                                 }
                             }
 

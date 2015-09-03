@@ -33,12 +33,6 @@ QFRDRImagingFCSSimulator::QFRDRImagingFCSSimulator(QWidget *parent) :
     dstate=dsParameterInput;
     lastSimFile="";
     ui->setupUi(this);
-    readSettings();
-    ui->groupBox->setVisible(false);
-    sim=new QFRDRImagingFCSSimulationThread(this);
-    connect(sim, SIGNAL(progress(int)), this, SLOT(updateSimStatus(int)));
-    connect(sim, SIGNAL(statusMessage(QString)), ui->labProgress, SLOT(setText(QString)));
-    connect(sim, SIGNAL(finished()), this, SLOT(threadFinished()));
     ui->edtFilename->addInsertContextMenuEntry(tr("insert %counter%"), QString("%counter%"));
     ui->edtFilename->addButton(new QFStyledButton(QFStyledButton::SelectNewFile, ui->edtFilename, ui->edtFilename));
 
@@ -53,6 +47,27 @@ QFRDRImagingFCSSimulator::QFRDRImagingFCSSimulator(QWidget *parent) :
     ui->edtTrapSlowdown->setDecimals(3);
     ui->edtTrapSlowdown->setCheckBounds(true, true);
     ui->edtTrapSlowdown->setLogScale(true);
+
+
+    ui->edtTrapJumpOut->setRange(0,1);
+    ui->edtTrapJumpOut->setValue(1e-1);
+    ui->edtTrapJumpOut->setDecimals(4);
+    ui->edtTrapJumpOut->setCheckBounds(true, true);
+    ui->edtTrapJumpOut->setLogScale(true);
+
+    ui->edtTrapJumpIn->setRange(0,1);
+    ui->edtTrapJumpIn->setValue(1e-1);
+    ui->edtTrapJumpIn->setDecimals(4);
+    ui->edtTrapJumpIn->setCheckBounds(true, true);
+    ui->edtTrapJumpIn->setLogScale(true);
+
+    readSettings();
+    ui->groupBox->setVisible(false);
+    sim=new QFRDRImagingFCSSimulationThread(this);
+    connect(sim, SIGNAL(progress(int)), this, SLOT(updateSimStatus(int)));
+    connect(sim, SIGNAL(statusMessage(QString)), ui->labProgress, SLOT(setText(QString)));
+    connect(sim, SIGNAL(finished()), this, SLOT(threadFinished()));
+
 }
 
 QFRDRImagingFCSSimulator::~QFRDRImagingFCSSimulator()
@@ -97,6 +112,7 @@ void QFRDRImagingFCSSimulator::writeSettings() const {
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/onlyhalf_DRG", ui->chkBottomRG->isChecked());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/boundary", ui->cmbBoundary->currentIndex());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/psf", ui->cmbPSF->currentIndex());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/psf_cutoff", ui->spinPSFCutoff->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/save_msd", ui->chkSaveMSD->isChecked());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/msd_max_steps", ui->spinMsdMaxSteps->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/save_traj", ui->chkSaveTrajectories->isChecked());
@@ -153,6 +169,8 @@ void QFRDRImagingFCSSimulator::writeSettings() const {
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/trap_diameter", ui->spinTrapDiameter->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/trap_onlyhalf", ui->chkTrapOnlyHalf->isChecked());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/traps", ui->radTraps->isChecked());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/trap_jump_out", ui->edtTrapJumpOut->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/trap_jump_in", ui->edtTrapJumpIn->value());
 }
 
 void QFRDRImagingFCSSimulator::readSettings()
@@ -175,6 +193,7 @@ void QFRDRImagingFCSSimulator::readSettings()
     ui->spinWarmup->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/warmup", 10000).toDouble());
     ui->spinPSFSizeGreen->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/psfSizeGreen", 0.6).toDouble());
     ui->spinPSFSizeRed->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/psfSizeRed", 0.7).toDouble());
+    ui->spinPSFCutoff->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/psf_cutoff", 1.0).toDouble());
     ui->spinCrosstalk->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/crosstalk", 5).toDouble());
     ui->spinVX->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/VX", 0).toDouble());
     ui->spinVY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/VY", 0).toDouble());
@@ -225,8 +244,10 @@ void QFRDRImagingFCSSimulator::readSettings()
     ui->radUnhinderedDiff->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/free_diffusion", true).toBool());
 
     ui->spinTrapGridSpacing->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/trap_spacing", 5).toDouble());
-    ui->edtTrapSlowdown->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/trap_slowdown", 0.1).toDouble());
+    ui->edtTrapSlowdown->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/trap_slowdown", 0.05).toDouble());
     ui->spinTrapDiameter->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/trap_diameter", 3).toDouble());
+    ui->edtTrapJumpOut->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/trap_jump_out", 1).toDouble());
+    ui->edtTrapJumpIn->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/trap_jump_in", 1).toDouble());
     ui->chkTrapOnlyHalf->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/trap_onlyhalf", false).toBool());
     ui->radTraps->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/traps", false).toBool());
 
@@ -303,10 +324,14 @@ void QFRDRImagingFCSSimulator::on_btnRun_clicked()
         sim->set_boundaryGridOnlyRight(ui->chkBarrierOnlyHalf->isChecked());
         sim->set_boundaryGridSpacing(ui->spinBarrierGridSpacing->value()/1000.0);
 
+        sim->set_psf_cutoff_factor(ui->spinPSFCutoff->value());
+
 
         sim->set_trapDiameter(ui->spinTrapDiameter->value());
         sim->set_trapOnlyRight(ui->chkTrapOnlyHalf->isChecked());
         sim->set_trapGridSpacing(ui->spinTrapGridSpacing->value());
+        sim->set_trapJumpOut(ui->edtTrapJumpOut->value());
+        sim->set_trapJumpIn(ui->edtTrapJumpIn->value());
         sim->set_trapSlowdown(ui->edtTrapSlowdown->value());
         if (ui->radBarriers->isChecked()) {
             sim->set_environmentMode(SIMENV_GRIDBOUNDARIES);

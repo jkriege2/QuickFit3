@@ -105,7 +105,7 @@ inline void TTTRcrosscorrelate(const TDATA *t, uint64_t Nt, const TDATA *u, uint
         for(register uint k=0;k<ntau;++k) { // loop over bins
             //const TCORR tauk=tau[k];
             //const TCORR taukp1=tau[k+1];
-            const TCORR tauk=(k>0)?tau[k-1]:0;
+            const TCORR tauk=(k>0)?tau[k-1]:(tau[k]/TCORR(2));
             const TCORR taukp1=tau[k];
 
             const TCORR tauStart = ti + tauk;
@@ -114,7 +114,7 @@ inline void TTTRcrosscorrelate(const TDATA *t, uint64_t Nt, const TDATA *u, uint
 
             //txt<<i<<k<<": ti="<<ti<<"\n";
             //txt<<"    l="<<l<<" tauStart="<<tauStart<<" u[l-1]="<<u[l-1]<<")    u[l]="<<u[l]<<"\n";
-            while( (l>=0)&&(l<Nu-1) && u[l]<=tauStart /*!(u[l-1]<tauStart && tauStart<=u[l])*/) { // start photon in bin k
+            while( (l>=0)&&(l<Nu-1) && u[l]<tauStart /*!(u[l-1]<tauStart && tauStart<=u[l])*/) { // start photon in bin k
                 l++;
             }
 
@@ -128,7 +128,7 @@ inline void TTTRcrosscorrelate(const TDATA *t, uint64_t Nt, const TDATA *u, uint
             //if (l<Nu-1 && m<Nu-1) {
                 lk[k] = l;
                 mk[k] = m;
-                if (m-l>0 && l<Nu-1 && m<Nu-1) gg[k] = gg[k] + TCORR(m-l);  // update correlogram
+                if (m-l>0 && l<Nu-1 && m<Nu-1) gg[k] = gg[k] + (m-l);  // update correlogram
             //}
         }
     }
@@ -154,7 +154,7 @@ inline void TTTRcrosscorrelate(const TDATA *t, uint64_t Nt, const TDATA *u, uint
         // normalize by the number of photons for the lag times (symmetrically for u and t)
         // and the binwidth tau_{k+1} - tau_k (rectangular averaging).
         TCORR o=gg[k];
-        const TCORR taukm1=(k>0)?tau[k-1]:0;
+        const TCORR taukm1=(k>0)?tau[k-1]:(tau[k]/TCORR(2));
         const TCORR tauk=tau[k];
         g[k]=o*(T-tau[k])/(tauk-taukm1)/(TCORR)nt[k]/(TCORR)nu[k];
         //qDebug()<<k<<":"<<tau[k]<<T<<(tauk-taukm1)<<(TCORR)nt[k]<<(TCORR)nu[k]<<o<<"  => "<<g[k];

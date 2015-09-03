@@ -23,11 +23,15 @@
 
 #include "statistics_tools.h"
 
+QMutex* QFRDRImagingFCSSimulationThread::mutexFilename=NULL;
+
 QFRDRImagingFCSSimulationThread::QFRDRImagingFCSSimulationThread(QObject *parent) :
     QThread(parent),
     rng()
 {
+    if (!mutexFilename) mutexFilename=new QMutex(QMutex::Recursive);
     psf_type=0;
+    psf_cutoff_factor=3;
     saveTrajectores=false;
     trajectoresMaxSteps=1000;
     maxTrajectores=10;
@@ -84,6 +88,8 @@ QFRDRImagingFCSSimulationThread::QFRDRImagingFCSSimulationThread(QObject *parent
     trapDiameter=3;
     trapSlowdown=0.1;
     trapOnlyRight=false;
+    trapJumpIn=1;
+    trapJumpOut=1;
 }
 
 int QFRDRImagingFCSSimulationThread::getCurrentFrame() const
@@ -108,7 +114,7 @@ void QFRDRImagingFCSSimulationThread::run()
     QElapsedTimer timer;
     timer.start();
     emit statusMessage(tr("initialising simulation ..."));
-
+    if (mutexFilename) mutexFilename->lock();
     msdNames.clear();
 
     filename=filename.replace("%timestep%", tr("%1uS").arg(frametime));
@@ -137,15 +143,18 @@ void QFRDRImagingFCSSimulationThread::run()
         int cnt=0;
         QString fn=filename;
         fn=fn.replace("%counter%", QString::number(cnt));
-        while (QFile::exists(fn)) {
+        QString tiffilename=QFileInfo(fn).path()+"/"+QFileInfo(fn).completeBaseName()+".tif";
+        while (QFile::exists(tiffilename)) {
             cnt++;
             fn=filename;
             fn=fn.replace("%counter%", QString::number(cnt));
+            tiffilename=QFileInfo(fn).path()+"/"+QFileInfo(fn).completeBaseName()+".tif";
         }
         filename=fn;
     }
-
     QString tiffilename=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".tif";
+    touchFile(tiffilename);
+    if (mutexFilename) mutexFilename->unlock();
     QString inifilename=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".configuration.ini";
     QString filename_msd=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".msd.dat";
     QString filename_t=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".trajectories.dat";
@@ -192,6 +201,8 @@ void QFRDRImagingFCSSimulationThread::run()
         config.setValue("simulation/trapGridSpacing", (double)trapGridSpacing);
         config.setValue("simulation/trapDiameter", (double)trapDiameter);
         config.setValue("simulation/trapSlowdown", (double)trapSlowdown);
+        config.setValue("simulation/trapJumpIn", (double)trapJumpIn);
+        config.setValue("simulation/trapJumpOut", (double)trapJumpOut);
         config.setValue("simulation/trapOnlyRight", trapOnlyRight);
     }
 
@@ -217,6 +228,7 @@ void QFRDRImagingFCSSimulationThread::run()
     if (dualView) config.setValue("simulation/crosstalk", (double)crosstalk);
     config.setValue("simulation/background", (double)background);
     config.setValue("simulation/backgroundNoise", (double)backgroundNoise);
+    config.setValue("simulation/psf_cutoff_factor", (double)psf_cutoff_factor);
 
     if (walkersG>0) config.setValue("simulation/DG", (double)DG);
     if (dualView && walkersR>0) config.setValue("simulation/DR", (double)DR);
@@ -582,60 +594,60 @@ void QFRDRImagingFCSSimulationThread::run()
 
 
                     if (wg_t.size()>0) {
-                        QVector<double> hX,hN;
+                        QVector<double> hX,hN, hXX, hXN, hYX, hYN;
                         trajNames<<tr("walkers G: %1").arg(wg_t.size());
-                        saveTraj(trajout, wg_t, tmax,  columnHeaders, tr("walkers G"), &hX, &hN);
+                        saveTraj(trajout, wg_t, tmax,  columnHeaders, tr("walkers G"), &hX, &hN, &hXX, &hXN, &hYX, &hYN);
                         wg_t.clear();
-                        jumpOut<<hX<<hN;
-                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                        jumpOut<<hX<<hN<< hXX<< hXN<< hYX<< hYN;
+                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})")<<tr("walkers G: D_{Jump,X}")<<tr("walkers G: N(D_{Jump,X})")<<tr("walkers G: D_{Jump,Y}")<<tr("walkers G: N(D_{Jump,Y})");
                     }
                     if (wg2_t.size()>0) {
-                        QVector<double> hX,hN;
+                        QVector<double> hX,hN, hXX, hXN, hYX, hYN;
                         trajNames<<tr("walkers G2: %1").arg(wg2_t.size());
-                        saveTraj(trajout, wg2_t, tmax,  columnHeaders, tr("walkers G2"), &hX, &hN);
+                        saveTraj(trajout, wg2_t, tmax,  columnHeaders, tr("walkers G2"), &hX, &hN, &hXX, &hXN, &hYX, &hYN);
                         wg2_t.clear();
-                        jumpOut<<hX<<hN;
-                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                        jumpOut<<hX<<hN<< hXX<< hXN<< hYX<< hYN;
+                        jumpColumnHeaders<<tr("walkers G2: D_{Jump}")<<tr("walkers G2: N(D_{Jump})")<<tr("walkers G2: D_{Jump,X}")<<tr("walkers G2: N(D_{Jump,X})")<<tr("walkers G2: D_{Jump,Y}")<<tr("walkers G2: N(D_{Jump,Y})");
                     }
                     if (wg3_t.size()>0) {
-                        QVector<double> hX,hN;
+                        QVector<double> hX,hN, hXX, hXN, hYX, hYN;
                         trajNames<<tr("walkers G3: %1").arg(wg3_t.size());
-                        saveTraj(trajout, wg3_t, tmax,  columnHeaders, tr("walkers G3"), &hX, &hN);
+                        saveTraj(trajout, wg3_t, tmax,  columnHeaders, tr("walkers G3"), &hX, &hN, &hXX, &hXN, &hYX, &hYN);
                         wg3_t.clear();
-                        jumpOut<<hX<<hN;
-                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                        jumpOut<<hX<<hN<< hXX<< hXN<< hYX<< hYN;
+                        jumpColumnHeaders<<tr("walkers G3: D_{Jump}")<<tr("walkers G3: N(D_{Jump})")<<tr("walkers G3: D_{Jump,X}")<<tr("walkers G3: N(D_{Jump,X})")<<tr("walkers G3: D_{Jump,Y}")<<tr("walkers G3: N(D_{Jump,Y})");
                     }
                     if (wr_t.size()>0) {
-                        QVector<double> hX,hN;
+                        QVector<double> hX,hN, hXX, hXN, hYX, hYN;
                         trajNames<<tr("walkers R: %1").arg(wr_t.size());
-                        saveTraj(trajout, wr_t, tmax,  columnHeaders, tr("walkers R"), &hX, &hN);
+                        saveTraj(trajout, wr_t, tmax,  columnHeaders, tr("walkers R"), &hX, &hN, &hXX, &hXN, &hYX, &hYN);
                         wr_t.clear();
-                        jumpOut<<hX<<hN;
-                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                        jumpOut<<hX<<hN<< hXX<< hXN<< hYX<< hYN;
+                        jumpColumnHeaders<<tr("walkers R: D_{Jump}")<<tr("walkers R: N(D_{Jump})")<<tr("walkers R: D_{Jump,X}")<<tr("walkers R: N(D_{Jump,X})")<<tr("walkers R: D_{Jump,Y}")<<tr("walkers R: N(D_{Jump,Y})");
                     }
                     if (wr2_t.size()>0) {
-                        QVector<double> hX,hN;
+                        QVector<double> hX,hN, hXX, hXN, hYX, hYN;
                         trajNames<<tr("walkers R2: %1").arg(wr2_t.size());
-                        saveTraj(trajout, wr2_t, tmax,  columnHeaders, tr("walkers R2"), &hX, &hN);
+                        saveTraj(trajout, wr2_t, tmax,  columnHeaders, tr("walkers R2"), &hX, &hN, &hXX, &hXN, &hYX, &hYN);
                         wr2_t.clear();
-                        jumpOut<<hX<<hN;
-                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                        jumpOut<<hX<<hN<< hXX<< hXN<< hYX<< hYN;
+                        jumpColumnHeaders<<tr("walkers R2: D_{Jump}")<<tr("walkers R2: N(D_{Jump})")<<tr("walkers R2: D_{Jump,X}")<<tr("walkers R2: N(D_{Jump,X})")<<tr("walkers R2: D_{Jump,Y}")<<tr("walkers R2: N(D_{Jump,Y})");
                     }
                     if (wrg_t.size()>0) {
-                        QVector<double> hX,hN;
+                        QVector<double> hX,hN, hXX, hXN, hYX, hYN;
                         trajNames<<tr("walkers RG: %1").arg(wrg_t.size());
-                        saveTraj(trajout, wrg_t, tmax,  columnHeaders, tr("walkers RG"), &hX, &hN);
+                        saveTraj(trajout, wrg_t, tmax,  columnHeaders, tr("walkers RG"), &hX, &hN, &hXX, &hXN, &hYX, &hYN);
                         wrg_t.clear();
-                        jumpOut<<hX<<hN;
-                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                        jumpOut<<hX<<hN<< hXX<< hXN<< hYX<< hYN;
+                        jumpColumnHeaders<<tr("walkers RG: D_{Jump}")<<tr("walkers RG: N(D_{Jump})")<<tr("walkers RG: D_{Jump,X}")<<tr("walkers RG: N(D_{Jump,X})")<<tr("walkers RG: D_{Jump,Y}")<<tr("walkers RG: N(D_{Jump,Y})");
                     }
                     if (wrg2_t.size()>0) {
-                        QVector<double> hX,hN;
+                        QVector<double> hX,hN, hXX, hXN, hYX, hYN;
                         trajNames<<tr("walkers RG2: %1").arg(wrg2_t.size());
                         saveTraj(trajout, wrg2_t, tmax,  columnHeaders, tr("walkers RG2"), &hX, &hN);
                         wrg2_t.clear();
-                        jumpOut<<hX<<hN;
-                        jumpColumnHeaders<<tr("walkers G: D_{Jump}")<<tr("walkers G: N(D_{Jump})");
+                        jumpOut<<hX<<hN<< hXX<< hXN<< hYX<< hYN;
+                        jumpColumnHeaders<<tr("walkers RG2: D_{Jump}")<<tr("walkers RG2: N(D_{Jump})")<<tr("walkers RG2: D_{Jump,X}")<<tr("walkers RG2: N(D_{Jump,X})")<<tr("walkers RG2: D_{Jump,Y}")<<tr("walkers RG2: N(D_{Jump,Y})");
                     }
 
                     QVector<double> tt;
@@ -671,20 +683,54 @@ void QFRDRImagingFCSSimulationThread::run()
                     QStringList psfColumnHeaders;
 
                     float rmin=qMax(pixel_size, psf_size_g);
+                    QStringList psfs;
                     psfOut<<QVector<double>()<<QVector<double>();
-                    psfColumnHeaders<<tr("x [micrometers]")<<tr("PSF_g(x) [AU]");
+                    psfColumnHeaders<<tr("x [micrometers]");
+                    int psfcnt=1;
+                    if (psf_type==PSF_PIXELGAUSS) {
+                        psfs<<tr("PSF green: pixel-gauss");
+                        psfs<<tr("PSF green: gauss");
+                        psfColumnHeaders<<tr("PSF_{g,pixel-gauss}(x) [AU]");
+                        psfColumnHeaders<<tr("PSF_{g,gauss}(x) [AU]");
+                        psfcnt++;
+                        psfOut<<QVector<double>();
+                    } else {
+                        psfs<<tr("PSF green: gauss");
+                        psfColumnHeaders<<tr("PSF_{g,gauss}(x) [AU]");
+                    }
                     for (float x=-5.0*rmin; x<=5.0*rmin; x+=2.0*qMax(pixel_size, psf_size_g)/500.0) {
                         psfOut[0]<<x;
-                        if (psf_type==PSF_PIXELGAUSS) psfOut[1]<<psf_pixelgauss(x, 0, psf_size_g);
-                        else psfOut[1]<<psf_gauss(x, 0, psf_size_g);
+                        if (psf_type==PSF_PIXELGAUSS) {
+                            psfOut[1]<<psf_pixelgauss(x, 0, psf_size_g);
+                            psfOut[2]<<psf_gauss(x, 0, psf_size_g);
+                        } else {
+                            psfOut[1]<<psf_gauss(x, 0, psf_size_g);
+                        }
                     }
+
                     if (dualView) {
                         psfOut<<QVector<double>();
-                        psfColumnHeaders<<tr("PSF_r(x) [AU]");
-                        for (float x=-5.0*rmin; x<=5.0*rmin; x+=2.0*qMax(pixel_size, psf_size_g)/500.0) {
-                            if (psf_type==PSF_PIXELGAUSS) psfOut[2]<<psf_pixelgauss(x-deltax, 0, psf_size_r);
-                            else psfOut[2]<<psf_gauss(x-deltax, 0, psf_size_r);
+                        if (psf_type==PSF_PIXELGAUSS) {
+                            psfs<<tr("PSF red: pixel-gauss");
+                            psfs<<tr("PSF red: gauss");
+                            psfColumnHeaders<<tr("PSF_{r,pixel-gauss}(x) [AU]");
+                            psfColumnHeaders<<tr("PSF_{r,gauss}(x) [AU]");
+                            psfcnt++;
+                            psfOut<<QVector<double>();
+                        } else {
+                            psfs<<tr("PSF red: gauss");
+                            psfColumnHeaders<<tr("PSF_{r,gauss}(x) [AU]");
                         }
+                        psfcnt++;
+                        for (float x=-5.0*rmin; x<=5.0*rmin; x+=2.0*qMax(pixel_size, psf_size_g)/500.0) {
+                            if (psf_type==PSF_PIXELGAUSS) {
+                                psfOut[psfcnt-1]<<psf_pixelgauss(x-deltax, 0, psf_size_r);
+                                psfOut[psfcnt]<<psf_gauss(x-deltax, 0, psf_size_r);
+                            } else {
+                                psfOut[psfcnt]<<psf_gauss(x-deltax, 0, psf_size_r);
+                            }
+                        }
+                        psfcnt++;
                     }
 
                     saveStringToFile(filename_psf, toCSV(psfOut, psfColumnHeaders, QStringList(), '.', ", ", true, '\"', "#! ", 5));
@@ -692,7 +738,7 @@ void QFRDRImagingFCSSimulationThread::run()
                     config.setValue("files/count", fileCount);
                     config.setValue(QString("files/name%1").arg(fileCount-1), QFileInfo(filename_psf).fileName());
                     config.setValue(QString("files/type%1").arg(fileCount-1), "CSV_PSF");
-                    config.setValue(QString("files/description%1").arg(fileCount-1), tr("PSF"));
+                    config.setValue(QString("files/description%1").arg(fileCount-1), tr("PSFs - %1").arg(psfs.join(";")));
                 }
             }
 
@@ -751,9 +797,9 @@ void QFRDRImagingFCSSimulationThread::calcMSD(QList<QVector<double> >& msdout, c
     }
 }
 
-void QFRDRImagingFCSSimulationThread::saveTraj(QList<QVector<double> > &msdout, const QList<QVector<QPair<float, float> > > &wg_msd, int &tmax, QStringList &columnNames, const QString& wname, QVector<double> *jumpDistX, QVector<double> *jumpDistN, int jumpDistBins, double jumpDistMin, double jumpDistMax)
+void QFRDRImagingFCSSimulationThread::saveTraj(QList<QVector<double> > &msdout, const QList<QVector<QPair<float, float> > > &wg_msd, int &tmax, QStringList &columnNames, const QString& wname, QVector<double> *jumpDistX, QVector<double> *jumpDistN, QVector<double> *jumpXDistX, QVector<double> *jumpXDistN, QVector<double> *jumpYDistX, QVector<double> *jumpYDistN, int jumpDistBins, double jumpDistMin, double jumpDistMax)
 {
-    QVector<double> jumps;
+    QVector<double> jumps, jumpX, jumpY;
     for (int i=0; i<wg_msd.size(); i++) {
         QVector<double> x,y;
         int j=0;
@@ -764,6 +810,8 @@ void QFRDRImagingFCSSimulationThread::saveTraj(QList<QVector<double> > &msdout, 
                 y<<wg_msd[i].at(j).second;                
                 if (jumpDistX && jumpDistN && j>0) {
                     jumps.append(sqrt(qfSqr(wg_msd[i].at(j).first-wg_msd[i].at(j-1).first)+qfSqr(wg_msd[i].at(j).second-wg_msd[i].at(j-1).second)));
+                    jumpX.append(wg_msd[i].at(j).first-wg_msd[i].at(j-1).first);
+                    jumpY.append(wg_msd[i].at(j).second-wg_msd[i].at(j-1).second);
                 }
             }
             j++;
@@ -775,12 +823,28 @@ void QFRDRImagingFCSSimulationThread::saveTraj(QList<QVector<double> > &msdout, 
         columnNames<<tr("%1 #%2 X [micrometers]").arg(wname).arg(i+1);
         columnNames<<tr("%1 #%2 Y [micrometers]").arg(wname).arg(i+1);
         if (jumpDistX && jumpDistN) {
-            int bins=ceil(qMax(11.0,sqrt(jumps.size())));
+            int bins=ceil(qMax(20.0,5.0*log(jumps.size())/log(2.0)+1.0));
             if (jumpDistBins>0) bins=jumpDistBins;
+            jumpDistX->clear();
+            jumpDistN->clear();
             jumpDistX->resize(bins);
             jumpDistN->resize(bins);
             if (jumpDistMin!=0 ||jumpDistMax!=0) statisticsHistogramRanged<double,double>(jumps.data(), jumps.size(), jumpDistMin, jumpDistMax, jumpDistX->data(), jumpDistN->data(), bins);
             else statisticsHistogram<double,double>(jumps.data(), jumps.size(), jumpDistX->data(), jumpDistN->data(), bins);
+
+            jumpXDistX->clear();
+            jumpXDistN->clear();
+            jumpXDistX->resize(bins);
+            jumpXDistN->resize(bins);
+            if (jumpDistMax!=0) statisticsHistogramRanged<double,double>(jumpX.data(), jumpX.size(), -jumpDistMax, jumpDistMax, jumpXDistX->data(), jumpXDistN->data(), bins);
+            else statisticsHistogram<double,double>(jumpX.data(), jumpX.size(), jumpXDistX->data(), jumpXDistN->data(), bins);
+
+            jumpYDistX->clear();
+            jumpYDistN->clear();
+            jumpYDistX->resize(bins);
+            jumpYDistN->resize(bins);
+            if (jumpDistMax!=0) statisticsHistogramRanged<double,double>(jumpY.data(), jumpY.size(), -jumpDistMax, jumpDistMax, jumpYDistX->data(), jumpYDistN->data(), bins);
+            else statisticsHistogram<double,double>(jumpY.data(), jumpY.size(), jumpYDistX->data(), jumpYDistN->data(), bins);
         }
     }
 }
@@ -808,22 +872,15 @@ void QFRDRImagingFCSSimulationThread::propagateWalkers(QVector<QFRDRImagingFCSSi
         QFRDRImagingFCSSimulationThread::WalkerData& d=walkersv[i];
 
         float sdown=1;
+        bool oldIsInTrap=false;
+        const float trap_ddx=round((d.x-width/4.0)/trapGridSpacing);
+        const float trap_ddy=round((d.y-height/2.0)/trapGridSpacing);
+        const float trap_gx=width/4.0+float(trap_ddx)*trapGridSpacing;
+        const float trap_gy=height/2.0+float(trap_ddy)*trapGridSpacing;
 
         if (environmentMode==SIMENV_TRAPS && (!trapOnlyRight || (trapOnlyRight && d.x>float(width)/2.0*pixel_size))) {
-            const float ddx=round((d.x-width/4.0)/trapGridSpacing);
-            const float ddy=round((d.y-height/2.0)/trapGridSpacing);
-            const float gx=width/4.0+float(ddx)*trapGridSpacing;
-            const float gy=height/2.0+float(ddy)*trapGridSpacing;
-            if (  (qfSqr(gx-d.x)+qfSqr(gy-d.y)<qfSqr(trapDiameter/2.0))
-                  ||(qfSqr(gx+trapGridSpacing-d.x)+qfSqr(gy-d.y)<qfSqr(trapDiameter/2.0))
-                  ||(qfSqr(gx-trapGridSpacing-d.x)+qfSqr(gy-d.y)<qfSqr(trapDiameter/2.0))
-                  ||(qfSqr(gx-d.x)+qfSqr(gy+trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
-                  ||(qfSqr(gx-d.x)+qfSqr(gy-trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
-                  ||(qfSqr(gx+trapGridSpacing-d.x)+qfSqr(gy+trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
-                  ||(qfSqr(gx-trapGridSpacing-d.x)+qfSqr(gy+trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
-                  ||(qfSqr(gx-trapGridSpacing-d.x)+qfSqr(gy+trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
-                  ||(qfSqr(gx-trapGridSpacing-d.x)+qfSqr(gy-trapGridSpacing-d.y)<qfSqr(trapDiameter/2.0))
-               ) {
+            oldIsInTrap=isInTrap(trap_gx, trap_gy, d.x, d.y);
+            if ( oldIsInTrap ) {
                 sdown=trapSlowdown;
             }
             //if (i==0 && cnt==100) { cnt=0; qDebug()<<i<<":   "<<d.x<<d.y<<" => "<<ddx<<ddy<<" == "<<gx<<gy<<"   ---> "<<sdown; }
@@ -839,15 +896,31 @@ void QFRDRImagingFCSSimulationThread::propagateWalkers(QVector<QFRDRImagingFCSSi
         register float dy=d.y+rng.randNorm(0.0, 1.0)*Dfactor+v*vyfactor;
 
 
-        if (environmentMode==SIMENV_GRIDBOUNDARIES && (!boundaryGridOnlyRight || (boundaryGridOnlyRight && d.x>float(width)/2.0*pixel_size))) {
+        if (environmentMode==SIMENV_GRIDBOUNDARIES && (!boundaryGridOnlyRight || (boundaryGridOnlyRight && d.x>float(width)/2.0*pixel_size))) { // check for jump over boundaries
             const int ddx=abs(floor((2.0*simspace_sizeinc+dx)/boundaryGridSpacing)-floor((2.0*simspace_sizeinc+d.x)/boundaryGridSpacing));
             const int ddy=abs(floor((2.0*simspace_sizeinc+dy)/boundaryGridSpacing)-floor((2.0*simspace_sizeinc+d.y)/boundaryGridSpacing));
             if (ddx!=0 || ddy!=0) {
-                if (rng.rand()>boundaryGridJumpProbability/float(qMax(1,qMax(ddx,ddy)))) {
+                if (rng.rand()>boundaryGridJumpProbability) {
                     dx=d.x;
                     dy=d.y;
-                } else {
+                //} else {
                     //qDebug()<<"jump accepted for walker "<<i<<"  delta:"<<ddx<<ddy;
+                }
+            }
+        }
+
+
+        if (environmentMode==SIMENV_TRAPS && (!trapOnlyRight || (trapOnlyRight && d.x>float(width)/2.0*pixel_size))) { // check for jumps into/out of traps
+            const bool newIsInTrap=isInTrap(trap_gx, trap_gy, dx, dy);
+            if (trapJumpIn<1 && newIsInTrap && !oldIsInTrap) {
+                if (rng.rand()>trapJumpIn) {
+                    dx=d.x;
+                    dy=d.y;
+                }
+            } else if (trapJumpOut<1 && !newIsInTrap && oldIsInTrap) {
+                if (rng.rand()>trapJumpOut) {
+                    dx=d.x;
+                    dy=d.y;
                 }
             }
         }

@@ -4919,7 +4919,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 result=result.replace(bidx, rxBody.matchedLength(), QString("$$qf_css_mainfile_block$$\n%1\n$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$").arg(rxBody.cap(0)));
                 //result=result.replace(QString("<body>"), QString("<body>$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$"));
             } else {
-                result=result.replace(bidx, rxBody.matchedLength(), QString("$$qf_css_mainfile_block$$\n%1").arg(rxBody.cap(0)));
+                result=result.replace(bidx, rxBody.matchedLength(), QString("$$qf_css_mainfile_block$$\n<body bgcolor=\"white\" %1>").arg(rxBody.cap(1)));
             }
         }
 
@@ -6029,6 +6029,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
     }
 
+    //saveStringToFile("c:/temp/test.html", result);
     return result;
 
 

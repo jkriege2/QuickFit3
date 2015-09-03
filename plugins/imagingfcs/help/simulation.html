@@ -56,9 +56,11 @@ The simulation dialog looks like this:
       $$bmath:\Delta y=N(0,\sqrt{2\cdot D\cdot \Delta t})+v_y\cdot \Delta t$$ 
     where $$math:N(0,\sigma)$$ is a normally distributed random number with mean 0 and variance $$math:\sigma^2$$. $$note:The flow may be limited to the right image half (y>width/2).<br>Also the diffusion of each species may be limited to the bottom half (x>width/2) of the image. Then in the x-direction the boundary conditions are no longer periodic, but reflective (in y-direction they stay periodic!). Be aware, that therefore limiting the diffusion space and using flow may lead to a concentration of the particles at a border!$$ The simulation supports several possibilities for a structured environment:<ul>
     <li><b>free diffusion:</b> The particles progress freely, as described above.</li>
-    <li><b>barrier mesh/regular barrier grid:</b> Here, a regular grid of barriers (spacing $(\Delta x_\text{grid})$ in x- and y-direction) is overlayn over the simulation space. If a particle tries to jump over any such barrier, this is only possible with a certain probability $(p_\text{barrier}/N_\text{jumps})$, where $(N_\text{jumps}\geq1)$ is the number of barriers, the particle tries to cross. </li>
-    <li><b>grid of traps:</b> Here, a regular grid of round traps (spacing $(\Delta x_\text{grid})$ in x- and y-direction, diameter $(d_\text{Trap})$) is overlayn over the simulation space. If a particle moves inside such a trap, ist diffusion coefficient $(D)$ (and flow velocity) is reduced by a factor $(f_\text{Trap})$, i.e. $(D\rightarrow D\cdot f_\text{Trap})$. This is a simple model for e.g. lipid rafts in a membrane. For each walker and each step, this environment finds the nearest trap position and checks for the distance of the particle to this nearest trap and its surrounding 8 traps. If it is closer than $(d_\text{Trap})$ to any of them, the slow-down takes effect.</li>
-    </ul></li>
+    <li><b>barrier mesh/regular barrier grid $$ref:WAW2005:Wawrezinieck L, Rigneault H, Marguet D, Lenne P  (2005) Fluorescence Correlation Spectroscopy Diffusion Laws to Probe the Submicron Cell Membrane Organization. <i>Biophysical Journal</i> <b>89</b><b>:</b> 4029-4042$$</ul>:</b> Here, a regular grid of barriers (spacing $(\Delta x_\text{grid})$ in x- and y-direction) is overlayn over the simulation space. If a particle tries to jump over any such barrier, this is only possible with a certain probability $(p_\text{barrier}/N_\text{jumps})$, where $(N_\text{jumps}\geq1)$ is the number of barriers, the particle tries to cross. 
+<center><img src="pic/barriers.png"></center></li>
+    <li><b>grid of traps $$ref:WAW2005:$$:</b> Here, a regular grid of round traps (spacing $(\Delta x_\text{grid})$ in x- and y-direction, diameter $(d_\text{Trap})$) is overlayn over the simulation space. If a particle moves inside such a trap, ist diffusion coefficient $(D)$ (and flow velocity) is reduced by a factor $(f_\text{Trap})$, i.e. $(D\rightarrow D\cdot f_\text{Trap})$. This is a simple model for e.g. lipid rafts in a membrane. For each walker and each step, this environment finds the nearest trap position and checks for the distance of the particle to this nearest trap and its surrounding 8 traps. If it is closer than $(d_\text{Trap})$ to any of them, the slow-down takes effect. In addition, it is possible to define probabilities for jumping into and out of traps. <center><img src="pic/traps.png"></center></li>
+    </ul>
+    </li>
     <li>Then the intensity in each pixel is calculated as
     $$bmath:I_g(x,y)=N(B, \sigma_B)+\Delta t\cdot\left[\sum_{p\in\{\text{g,g2,g3,rg,rg2}\}}b_{g,p}\cdot I_{p}(x,y; w_{g}; \vec{\delta}_{gr})\right]$$
     $$bmath:I_r(x,y)=N(B, \sigma_B)+\Delta t\cdot\left[\sum_{p\in\{\text{r,r2,r3,rg,rg2}\}}b_{r,p}\cdot I_{p}(x,y; w_{r}; \vec{\delta}_{gr})+\kappa_{gr}\sum_{p\in\{\text{g,g2,g3,rg,rg2}\}}\left(b_{g,p}\cdot I_{p}(x,y; w_{g}; \vec{\delta}_{gr})\right]$$
@@ -78,5 +80,9 @@ The intensity contribution of component $(p)$ is defined as:
     <li>Finally the pixel-intensity is rounded to integer values.</li>
     <li>In dual view mode, the output image has twice the given width and the right part of it represents the red detection channel. This is thus a simple
     simulation of a DualView optical system, as often used for imFCS. </li>
-</ul>  </body>
+</ul>  
+
+<h2>References</h2>
+$$references$$
+</body>
 </html>
