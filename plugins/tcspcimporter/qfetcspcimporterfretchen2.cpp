@@ -262,7 +262,7 @@ void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
                     double emin=outData.properties.value("burstfiltered_histogram_E_min", 0).toDouble();
                     double emax=outData.properties.value("burstfiltered_histogram_E_max", 1).toDouble();
                     int ebins=outData.properties.value("burstfiltered_histogram_E_bins", 31).toInt();
-                    QString pre=QString("// burst duration histogram:\nbdur_bins=21;\n// burst size histogram:\nbsize_bins=21;\n// burst countrate histogram:\nbrate_bins=21;\n// P-histogram bins:\npmin = %1;\npmax = %2;\npbins = %3;\n// E-histogram bins:\nemin = %4;\nemax = %5;\nebins = %6;\n")
+                    QString pre=QString("// burst duration histogram:\nbdur_bins=21;\n\n// burst size histogram:\nbsize_bins=21;\n\n// burst countrate histogram:\nbrate_bins=21;\n\n// P-histogram bins:\npmin = %1;\npmax = %2;\npbins = %3;\n\n// E-histogram bins:\nemin = %4;\nemax = %5;\nebins = %6;\n")
                                 .arg(CDoubleToQString(pmin)).arg(CDoubleToQString(pmax)).arg(pbins)
                                 .arg(CDoubleToQString(emin)).arg(CDoubleToQString(emax)).arg(ebins);
 
@@ -302,6 +302,7 @@ void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
 
 
 
+                    rdrAT->tableReevaluateExpressions();
                     rdrAT->tableReevaluateExpressions();
 
                 }
@@ -352,6 +353,7 @@ void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
                     rdrFT->tableSetColumnExpression(histStart+9, QString("histogram(column(6)*1e-3, brate_bins)"));
 
 
+                    rdrFT->tableReevaluateExpressions();
                     rdrFT->tableReevaluateExpressions();
 
                 }
@@ -490,7 +492,7 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
     QVector<double> x, y;
     x.reserve(photons.photondata.size()/1000+10);
     y.reserve(photons.photondata.size()/1000+10);
-    qDebug()<<s<<l<<photons.firstPhoton<<photons.duration<<photons.photondata.size()<<(ui->chkSHowFilteredIPT->isChecked() && photons.lastLEEWindowSize>0);
+    //qDebug()<<s<<l<<photons.firstPhoton<<photons.duration<<photons.photondata.size()<<(ui->chkSHowFilteredIPT->isChecked() && photons.lastLEEWindowSize>0);
     if (ui->chkSHowFilteredIPT->isChecked() && photons.lastLEEWindowSize>0) {
         for (int i=0; i<photons.photondata.size(); i++) {
             const double at=photons.photondata.at(i).arrivaltime;
@@ -520,7 +522,7 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
         plteInterphotonTimes->set_drawLine(false);
         plteInterphotonTimes->set_title(tr("all photons"));
     }
-    qDebug()<<x.size()<<y.size();
+    //qDebug()<<x.size()<<y.size();
     plteInterphotonTimes->set_xColumn(ds->addCopiedColumn(x, tr("Arrivaltime [s]")));
     plteInterphotonTimes->set_yColumn(ds->addCopiedColumn(y, tr("Inter-Photon Time IPT [microseconds]")));
 
@@ -589,7 +591,7 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     dsB->clear();
     dsP->clear();
 
-    QVector<double> PVec, EVec, DVec, RVec, SAllVec, DAllVec;
+    QVector<double> PVec, EVec, PVecAll, EVecAll, DVec, RVec, SAllVec, DAllVec;
     const double mir=ui->spinMinRate->value()*1e3;
     const double mar=ui->spinMaxRate->value()*1e3;
 
@@ -606,6 +608,8 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
         const double r=bursts.burstdata[i].getRate();
         SAllVec<<(bursts.burstdata[i].photonG+bursts.burstdata[i].photonR);
         DAllVec<<(bursts.burstdata[i].duration*1e3);
+        PVecAll<<bursts.burstdata[i].P;
+        EVecAll<<bursts.burstdata[i].E;
         if (r>=mir && r<=mar) {
             RVec<<r;
             DVec<<(bursts.burstdata[i].duration);
@@ -631,6 +635,26 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     int nbins=1;
     double binw=ui->spinHBinWidth->value();
     double dmin=0, dmax=0;
+
+    {
+        nbins=1;
+        dmin=dmax=0;
+        calcHistParams(PVecAll, dmin,dmax,nbins,binw);
+        outData.properties["burstfiltered_histogram_P_min"]=dmin;
+        outData.properties["burstfiltered_histogram_P_max"]=dmax;
+        outData.properties["burstfiltered_histogram_P_bins"]=nbins;
+        outData.properties["burstfiltered_histogram_P_binwidth"]=binw;
+    }
+    {
+        nbins=1;
+        dmin=dmax=0;
+        calcHistParams(EVecAll, dmin,dmax,nbins,binw);
+        outData.properties["burstfiltered_histogram_E_min"]=dmin;
+        outData.properties["burstfiltered_histogram_E_max"]=dmax;
+        outData.properties["burstfiltered_histogram_E_bins"]=nbins;
+        outData.properties["burstfiltered_histogram_E_binwidth"]=binw;
+    }
+
 
     {
         nbins=1;
