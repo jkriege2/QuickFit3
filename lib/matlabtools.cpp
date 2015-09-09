@@ -233,7 +233,7 @@ void matlabCopyScript(const QList<QVector<QVariant> >& data) {
     matlabCopyScript(d);
 }
 
-void saveToMatlabMATfile(const QString&filename, const QList<QList<QVariant> >& data, const QString& varname,  QStringList columnsNames,  QStringList rowNames, bool convertToNumberMatrix) {
+void saveToMatlabMATfile(const QString&filename, const QList<QList<QVariant> >& data, const QString& varname,  QStringList columnsNames,  QStringList rowNames, bool convertToNumberMatrix, const QString& comment, const QMap<QString, QVariant> properties) {
     TinyMATWriterFile* mat=TinyMATWriter_open(filename.toLocal8Bit().data());
     if (mat) {
         if (convertToNumberMatrix) {
@@ -253,12 +253,14 @@ void saveToMatlabMATfile(const QString&filename, const QList<QList<QVariant> >& 
         }
         TinyMATWriter_writeQStringList(mat, "columnNames", columnsNames);
         TinyMATWriter_writeQStringList(mat, "rowNames", rowNames);
+        if (comment.size()>0) TinyMATWriter_writeString(mat, "Comment", comment.toStdString());
+        if (properties.size()>0) TinyMATWriter_writeQVariantMap(mat, "Properties", properties);
         TinyMATWriter_close(mat);
     }
 }
 
 
-void saveToMatlabMATfile(const QString&filename, const QList<QVector<double> >& datad, const QString& varname,  QStringList columnsNames,  QStringList rowNames) {
+void saveToMatlabMATfile(const QString&filename, const QList<QVector<double> >& datad, const QString& varname,  QStringList columnsNames,  QStringList rowNames, const QString& comment, const QMap<QString, QVariant> properties) {
     TinyMATWriterFile* mat=TinyMATWriter_open(filename.toLocal8Bit().data());
     if (mat) {
         double* d=doubleDataToDoubleMatrix(datad);
@@ -266,6 +268,8 @@ void saveToMatlabMATfile(const QString&filename, const QList<QVector<double> >& 
         if (d) qfFree(d);
         TinyMATWriter_writeQStringList(mat, "columnNames", columnsNames);
         TinyMATWriter_writeQStringList(mat, "rowNames", rowNames);
+        if (comment.size()>0) TinyMATWriter_writeString(mat, "Comment", comment.toStdString());
+        if (properties.size()>0) TinyMATWriter_writeQVariantMap(mat, "Properties", properties);
         TinyMATWriter_close(mat);
     }
 }

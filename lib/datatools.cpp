@@ -625,6 +625,65 @@ void QFDataExportHandler::save(const QList<QList<QVariant> >& data, int format, 
     }
 }
 
+void QFDataExportHandler::save(const QList<QList<QVariant> > &data, int format, const QString &filename, const QStringList &columnHeaders, const QStringList &rowHeaders, const QString &comment, const QMap<QString, QVariant> properties)
+{
+    QString c;
+    QStringList cl=comment.split('\n');
+    for (int i=0; i<cl.size(); i++) {
+        cl[i]="# "+cl[i];
+    }
+    cl.append("# ");
+    c=cl.join("\n");
+    QString p;
+    QMapIterator<QString, QVariant> it(properties);
+    while (it.hasNext()) {
+        it.next();
+        p+=QString("# %1 = %2\n").arg(it.key()).arg(getQVariantData(it.value()));
+    }
+    p+="# \n";
+
+    int f=0;
+    if (format==f++) { // CSV
+        saveStringToFile(filename, c+p+toCSV(data, columnHeaders, rowHeaders, '.', ", ", true, '\"', "#! ", 15));
+    } else  if (format==f++) { // CSV
+        saveStringToFile(filename, c+p+toCSV(dataRotate(data), rowHeaders, columnHeaders, '.', ", ", true, '\"', "#! ", 15));
+    } else if (format==f++) { // SSV
+        saveStringToFile(filename, c+p+toCSV(data, columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
+    } else if (format==f++) { // SSV
+        saveStringToFile(filename, c+p+toCSV(dataRotate(data), rowHeaders, columnHeaders, '.', "; ", true, '\"', "#! ", 15));
+    } else if (format==f++) { // SSV,
+        saveStringToFile(filename, c+p+toCSV(data, columnHeaders, rowHeaders, ',', "; ", true, '\"', "#! ", 15));
+    } else if (format==f++) { // SSV,
+        saveStringToFile(filename, toCSV(dataRotate(data), rowHeaders, columnHeaders, ',', "; ", true, '\"', "#! ", 15));
+    } else if (format==f++) { // TSV
+        saveStringToFile(filename, c+p+toCSV(data, columnHeaders, rowHeaders, '.', "\t", true, '\"', "#! ", 15));
+    } else if (format==f++) { // TSV
+        saveStringToFile(filename, c+p+toCSV(dataRotate(data), rowHeaders, columnHeaders, '.', "\t", true, '\"', "#! ", 15));
+    } else if (format==f++) { // SYLK
+        saveStringToFile(filename, toSYLK(data, columnHeaders, rowHeaders));
+    } else if (format==f++) { // SYLK flipped
+        saveStringToFile(filename, toSYLK(dataRotate(data), rowHeaders, columnHeaders));
+    } else if (format==f++) { // Matlab MAT as cel/matrix
+        saveToMatlabMATfile(filename, data, "M", columnHeaders, rowHeaders, false, comment, properties);
+    } else if (format==f++) { // Matlab MAT as cel/matrix, flipped
+        saveToMatlabMATfile(filename, dataRotate(data), "M", columnHeaders, rowHeaders, false, comment, properties);
+    } else if (format==f++) { // Matlab MAT as matrix
+        saveToMatlabMATfile(filename, data, "M", columnHeaders, rowHeaders, true, comment, properties);
+    } else if (format==f++) { // Matlab MAT as matrix, flipped
+        saveToMatlabMATfile(filename, dataRotate(data), "M", columnHeaders, rowHeaders, true, comment, properties);
+    } else if (format==f++) { // Matlab
+        saveStringToFile(filename, c+p+toMatlabScript(data, false));
+    } else if (format==f++) { // Matlab
+        saveStringToFile(filename, c+p+toMatlabScript(dataRotate(data), false));
+    } else if (format==f++) { // QFTable XML
+        saveStringToFile(filename, toQFTableModelXML(data, columnHeaders, rowHeaders), QString("UTF-8"));
+    } else if (format==f++) { // QFTable XML, flipped
+        saveStringToFile(filename, toQFTableModelXML(dataRotate(data), rowHeaders, columnHeaders), QString("UTF-8"));
+    } else if (format-f>=0 && format-f<writers.size()) {
+        writers[format-f]->save(data, filename, columnHeaders, rowHeaders);
+    }
+}
+
 void QFDataExportHandler::save(const QList<QList<QVariant> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
 {
     QString lastDir=ProgramOptions::getConfigValue("QFDataExportHandler/saveLastDir", "").toString();
@@ -806,12 +865,14 @@ int dataGetRows(const QList<QList<QVariant> >& data) {
 
 void QFDataExportTool::save(const QString &filename, int format) const
 {
-    QFDataExportHandler::save(data, format, filename, colHeaders, rowHeaders);
+    QFDataExportHandler::save(data, format, filename, colHeaders, rowHeaders, comment, properties);
 }
 
 void QFDataExportTool::clear()
 {
     data.clear();
+    comment.clear();
+    properties.clear();
     colHeaders.clear();
     rowHeaders.clear();
 }

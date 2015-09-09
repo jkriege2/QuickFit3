@@ -186,6 +186,7 @@ void TTTRFindBursts(TCSPCBurstsData *output, const TCSPCPhotonsData &photons, TT
                 b.photonR=0;
                 b.size=1;
                 b.P=0;
+                b.E=0;
                 if (photons.photondata[i].channel==props.chG) b.photonG++;
                 if (photons.photondata[i].channel==props.chR) b.photonR++;
                 isBurst=true;
@@ -202,5 +203,6 @@ void TTTRCalcBurstProperties(TCSPCBurstsData *output, TTTRCalcBurstPropertiesPro
         double ND=double(output->burstdata[i].photonG)-output->burstdata[i].duration*props.backG;
         double NA=double(output->burstdata[i].photonR)-output->burstdata[i].duration*(props.backR+props.fdirect)-props.crosstalk*ND;
         output->burstdata[i].P=NA/(NA+ND);
+        output->burstdata[i].E=NA/(NA+props.gamma*ND);
     }
 }

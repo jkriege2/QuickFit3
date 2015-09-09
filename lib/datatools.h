@@ -167,6 +167,8 @@ class QFLIB_EXPORT QFDataExportTool {
         QList<QList<QVariant> > data;
         QStringList colHeaders;
         QStringList rowHeaders;
+        QString comment;
+        QMap<QString, QVariant> properties;
 
         void save(const QString& filename, int format) const;
 
@@ -234,6 +236,9 @@ class QFLIB_EXPORT QFDataExportHandler {
         /*! \brief save the given \a data in the given \A format (index into the list, as returned by dataGetFormats() )
          */
         static void save(const QList<QList<QVariant> > &data, int format, const QString& filename, const QStringList& columnHeaders=QStringList(), const QStringList& rowHeaders=QStringList());
+        /*! \brief save the given \a data in the given \A format (index into the list, as returned by dataGetFormats() )
+         */
+        static void save(const QList<QList<QVariant> > &data, int format, const QString& filename, const QStringList& columnHeaders, const QStringList& rowHeaders, const QString& comment, const QMap<QString, QVariant> properties);
         /*! \brief save the given \a data in the given \A format (index into the list, as returned by dataGetFormats() )
          */
         static void save(const QList<QList<QVariant> > &data, const QStringList& columnHeaders=QStringList(), const QStringList& rowHeaders=QStringList());
