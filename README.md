@@ -9,6 +9,7 @@ Project Homepage: http://www.dkfz.de/Macromol/quickfit/
 Currently QuickFit can be found here (will be moved to GitHub soon):
 - Windows Binaries: http://www.dkfz.de/Macromol/quickfit/#download
 - Source Code: https://github.com/jkriege2/QuickFit3
+- Several smaller source code components (also included as subprojects in the main repository) are summarized here: https://github.com/jkriege2/
 
 ##Description
 ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/images/splash.png)
@@ -136,7 +137,15 @@ This software is provided as is without any warranties. Use it at your own risk.
 ### 3D Image Stack Viewer
  ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/screen_3dviewer.png)
 
- 
+### Linux: Using QF3 to control a lightsheet microscope
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/linux_screen_spimcontrol.png)
+
+### Linux: The image stack plugin on Linux
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/linux_screen_imagestack.png)
+
+### Linux: The FCS Fit plugin on Linux
+ ![SplashScreen](https://raw.githubusercontent.com/jkriege2/QuickFit3/master/screenshots/linux_screen_fcsfit.png)
+
 ##How to compile
  1. Check out the source code from this GitHub repository (https://github.com/jkriege2/QuickFit3.git)
  2. Set up the build environment. You will need (This is also detailed in https://github.com/jkriege2/QuickFit3/blob/master/basic_documentation/compile_quickfit3.txt ):
