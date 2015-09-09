@@ -108,6 +108,12 @@ class QFLIB_EXPORT QFTCSPCReader: public QFImporter {
 
         /** \brief returns the position inside the input file in % */
         virtual double percentCompleted()const =0;
+
+        static QStringList getImporterFilterList();
+        static QStringList getImporterFormatNameList();
+        static QFTCSPCReader* getImporter(int idx);
+        static int getImporterCount();
+
     protected:
 
 };

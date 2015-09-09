@@ -20,7 +20,8 @@
 */
 
 #include "qftcspcreader.h"
-
+#include "qfpluginservices.h"
+#include "qfimportermanager.h"
 
 QFTCSPCRecord::QFTCSPCRecord(uint16_t input_channel, double macrotime, int16_t microtime_channel, double microtime_offset, double microtime_deltaT, bool isPhoton, uint8_t marker_type) {
     this->input_channel=input_channel;
@@ -38,4 +39,49 @@ QFTCSPCReader::QFTCSPCReader() {
 
 QFTCSPCReader::~QFTCSPCReader() {
 
+}
+
+QStringList QFTCSPCReader::getImporterFilterList()
+{
+    QStringList l;
+    int i=0;
+    QFTCSPCReader* r=NULL;
+    while ((r=getImporter(i))!=NULL) {
+        l.append(r->filter());
+        delete r;
+        i++;
+    }
+    return l;
+}
+
+QStringList QFTCSPCReader::getImporterFormatNameList()
+{
+    QStringList l;
+    int i=0;
+    QFTCSPCReader* r=NULL;
+    while ((r=getImporter(i))!=NULL) {
+        l.append(r->formatName());
+        delete r;
+        i++;
+    }
+    return l;
+}
+
+QFTCSPCReader *QFTCSPCReader::getImporter(int idx)
+{
+    QFTCSPCReader* r=NULL;
+
+    QStringList imp=QFPluginServices::getInstance()->getImporterManager()->getImporters<QFTCSPCReader*>();
+
+    if (idx>=0 && idx<imp.size()) {
+        r=dynamic_cast<QFTCSPCReader*>(QFPluginServices::getInstance()->getImporterManager()->createImporter(imp[idx]));
+    }
+
+    return r;
+}
+
+int QFTCSPCReader::getImporterCount()
+{
+    QStringList imp=QFPluginServices::getInstance()->getImporterManager()->getImporters<QFTCSPCReader*>();
+    return imp.size();
 }

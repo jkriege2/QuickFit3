@@ -29,6 +29,8 @@
 #include "statistics_tools.h"
 #include <QVector>
 #include <stdint.h>
+#include "qftcspcreader.h"
+
 
 /** \group qf3_tttr_tools TTTR Tools
  *  \ingroup qf3tools
@@ -442,5 +444,91 @@ template<typename TDATA, typename TCORR>
 inline void TTTRcorrelateWithAvg(const TDATA *t_in, int64_t Nt,QVector<TCORR>&g, QVector<TCORR>&tau, int S, int m, int P, double tauMin) {
     TTTRcrosscorrelateWithAvg(t_in, Nt, t_in, Nt, g, tau, S, m, P, tauMin);
 }
+
+
+struct TCSPCPhotonData {
+    uint8_t channel;
+    double arrivaltime;
+    double IPT; // interphotontime
+    double IPT_filtered; // interphotontime
+    uint16_t microtime;
+};
+
+struct TCSPCPhotonsData {
+    QVector<TCSPCPhotonData> photondata;
+    QVector<double> backgroundrate;
+    QVector<double> avgrate;
+    double backgroundDuration;
+    double duration;
+    double micrrotime_dt;
+    double firstPhoton;
+    double avg_IPT;
+    uint64_t photonsG;
+    uint64_t photonsR;
+
+    double lastLEESigma0;
+    int lastLEEWindowSize;
+
+    void applyLEEFilter(int win, double sigma0);
+};
+
+struct TCSPCBurstData {
+    TCSPCBurstData() {
+        start=0;
+        duration=0;
+        photonG=0;
+        photonR=0;
+        P=0;
+        size=0;
+    }
+
+    double start;
+    double duration;
+    int photonG;
+    int photonR;
+    double P;
+    int size;
+
+    inline double getRate() const {
+        return double(photonG+photonR)/duration;
+    }
+
+
+};
+
+struct TCSPCBurstsData {
+    QVector<TCSPCBurstData> burstdata;
+    double avgDuration;
+};
+
+struct TTTRReadPhotonsDataEvalProps {
+    double start;
+    double end;
+    int chG;
+    int chR;
+};
+
+bool TTTRReadPhotonsData(TCSPCPhotonsData* output, QFTCSPCReader* readerData, QFTCSPCReader* readerBackground, TTTRReadPhotonsDataEvalProps props);
+
+struct TTTRFindBurstsEvalProps {
+    double maxBurstDuration;
+    double maxIPT;
+    int minBurstSize;
+    int chG;
+    int chR;
+    bool filtered;
+};
+
+void TTTRFindBursts(TCSPCBurstsData* output, const TCSPCPhotonsData& photons, TTTRFindBurstsEvalProps props);
+
+
+struct TTTRCalcBurstPropertiesProps {
+    double backG;
+    double backR;
+    double crosstalk;
+    double fdirect;
+};
+
+void TTTRCalcBurstProperties(TCSPCBurstsData* output, TTTRCalcBurstPropertiesProps props);
 
 #endif // TTTRTOOLS_H

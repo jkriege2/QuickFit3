@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="qfetcspcimporter.qrc">
-    <normaloff>:/tcspcimporter/tcspcimporter.png</normaloff>:/tcspcimporter/tcspcimporter.png</iconset>
+    <normaloff>:/tcspcimporter/correlator.png</normaloff>:/tcspcimporter/correlator.png</iconset>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -126,7 +126,7 @@ p, li { white-space: pre-wrap; }
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-202</y>
+              <y>-221</y>
               <width>842</width>
               <height>558</height>
              </rect>
@@ -1543,9 +1543,9 @@ p, li { white-space: pre-wrap; }
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfetcspcimporter.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>

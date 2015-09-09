@@ -28,6 +28,7 @@
 #include "qfextension.h"
 
 class QFETCSPCImporterDialog; // forward
+class QFETCSPCImporterFretchen2;
 
 /*!
     \defgroup qf3ext_tcspcimporter QFExtension implementation
@@ -77,6 +78,7 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
         virtual void deinit();
     protected slots:
         void startPlugin();
+        void startBurstAnalyzer();
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);
@@ -107,6 +109,8 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
         QFRawDataRecord* insertCountRate(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""), const QString& role=QString(""));
         QFRawDataRecord* insertTable(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""), const QString& role=QString(""));
         QList<QPointer<QFRawDataRecord> > insertQF3ASCIICORRFile(const QString& filenameFCS, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""));
+
+        QList<QPointer<QFETCSPCImporterFretchen2> > FRETDialogs;
 
         QFETCSPCImporterDialog* dlgCorrelate;
 	protected:

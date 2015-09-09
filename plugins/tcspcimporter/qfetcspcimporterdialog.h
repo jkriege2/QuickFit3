@@ -103,8 +103,9 @@ protected:
     int runningThreads() const;
     int waitingThreads() const;
 private:
-    QFPluginServices* pluginServices;
     Ui::QFETCSPCImporterDialog *ui;
+protected:
+    QFPluginServices* pluginServices;
     QPointer<QFProject> project;
     ProgramOptions* options;
     QString lastTCSPCFileDir;

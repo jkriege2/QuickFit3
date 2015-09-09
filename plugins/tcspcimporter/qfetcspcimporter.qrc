@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/tcspcimporter">
         <file alias="tcspcimporter.png">images/tcspcimporter.png</file>
+        <file alias="burstanalyzer.png">images/burstanalyzer.png</file>
+        <file alias="correlator.png">images/correlator.png</file>
         <file alias="fileopen.png">images/fileopen.png</file>
         <file alias="thread_error.png">images/thread_error.png</file>
         <file alias="thread_ok.png">images/thread_ok.png</file>

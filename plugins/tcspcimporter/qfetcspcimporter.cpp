@@ -20,6 +20,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "statistics_tools.h"
 #include "qfetcspcimporter.h"
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtGlobal>
@@ -38,6 +39,7 @@
 #include"qfetcspcimporterjobthread.h"
 #include "qf3correlationdataformattool.h"
 #include "qfrdrcolumngraphsinterface.h"
+#include "qfetcspcimporterfretchen2.h"
 
 #define LOG_PREFIX QString("tcspcimporter >>> ").toUpper()
 
@@ -55,6 +57,11 @@ QFETCSPCImporter::~QFETCSPCImporter() {
 
 void QFETCSPCImporter::deinit() {
 	/* add code for cleanup here */
+    for (int i=0; i<FRETDialogs.size(); i++) {
+        if (FRETDialogs[i]) {
+            FRETDialogs[i]->close();
+        }
+    }
 }
 
 void QFETCSPCImporter::projectChanged(QFProject* oldProject, QFProject* project) {
@@ -74,12 +81,16 @@ void QFETCSPCImporter::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
 
 
-    QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("import/process TCSPC ..."), this);
+    QAction* actStartPlugin=new QAction(QIcon(":/tcspcimporter/correlator.png"), tr("import/process TCSPC ..."), this);
     actStartPlugin->setToolTip(tr("Import TCSPC Files as FCS, CountRates, ..."));
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
+    QAction* actStartBurstAnalyzer=new QAction(QIcon(":/tcspcimporter/burstanalyzer.png"), tr("TCSPC Burst Analyzer..."), this);
+    actStartBurstAnalyzer->setToolTip(tr("Import TCSPC Files for Burst Analysis ..."));
+    connect(actStartBurstAnalyzer, SIGNAL(triggered()), this, SLOT(startBurstAnalyzer()));
     QMenu* extm=services->getMenu("data/rdr");
     if (extm) {
         extm->addAction(actStartPlugin);
+        extm->addAction(actStartBurstAnalyzer);
     }
 
 }
@@ -95,6 +106,13 @@ void QFETCSPCImporter::startPlugin() {
         dlgCorrelate->show();
         connect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(correlationDialogClosed()));
     }
+}
+
+void QFETCSPCImporter::startBurstAnalyzer()
+{
+    QFETCSPCImporterFretchen2* dlg=new QFETCSPCImporterFretchen2(parentWidget);
+    dlg->show();
+    FRETDialogs.append(dlg);
 }
 
 QFRawDataRecord *QFETCSPCImporter::insertFCSCSVFile(const QString& filenameFCS, const QString &filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group, const QString& role) {
