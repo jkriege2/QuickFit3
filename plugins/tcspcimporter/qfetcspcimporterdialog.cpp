@@ -883,6 +883,10 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
                 countRateString.append(QString::number(reader->avgCountRate(i)));
             }
 
+        } else {
+            QApplication::restoreOverrideCursor();
+            QMessageBox::critical(this, tr("TCSPC Importer"), tr("Could not read file '%1'.\n   ERROR: %2").arg(ui->edtTCSPCFile->text()).arg(reader->lastError()));
+            return;
         }
     }
     updateDuration();

@@ -80,6 +80,13 @@ class QFTCSPCReaderPicoquant: public QFTCSPCReader {
         TTTRBoardHdr boardHeader;
         TTTRHdr TTTRHeader;
 
+        TTTRTxtHdr6 txtHeader6;
+        TTTRBinHdr6 binHeader6;
+        TTTRBoardHdr6 boardHeader6;
+        TTTRHdr6 TTTRHeader6;
+        bool isV6;
+
+
         fpos_t fileResetPos;
 
         uint64_t currentTTTRRecordNum;

@@ -5960,7 +5960,7 @@ namespace QFMathParser_DefaultLib {
                             }
                             if (!found) {
                                 delete ff;
-                                parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) parameter-name '%1' not found for specified fit function").arg(pname);
+                                parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) parameter-name '%1' not found for specified fit function").arg(pname));
                                 res.setInvalid();
                                 return;
                             }
