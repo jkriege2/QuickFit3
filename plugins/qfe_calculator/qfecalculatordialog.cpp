@@ -312,7 +312,7 @@ void QFECalculatorDialog::on_btnEvaluateScript_clicked()
 
     QTextCursor cur(ui->edtHistory->document());
     cur.movePosition(QTextCursor::End);
-    cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; = %1</tt><br>").arg(result)));
+    cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; = <tt>%1</tt></tt><br>").arg(result)));
     if (parser->hasErrorOccured()) {
         cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; <font color=\"red\">ERROR: %1</font></tt><br>").arg(parser->getLastErrors().join("<br>ERROR: "))));
     }

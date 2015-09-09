@@ -125,6 +125,7 @@ QFFunctionReferenceTool::QFFunctionReferenceTool(QObject *parent) :
     connect(actDefaultHelp, SIGNAL(triggered()), SLOT(showDefaultHelp()));
     connect(actCurrentFunctionHelp, SIGNAL(triggered()), SLOT(showCurrentFunctionHelp()));
     connect(&timDelayedAddNamesAndTemplates, SIGNAL(timeout()), this, SLOT(delayedAddNamesAndTemplates()));
+    connect(&timDelayedCursorChange, SIGNAL(timeout()), this, SLOT(onCursorPositionChanged()));
 }
 
 void QFFunctionReferenceTool::setRxDefinition(const QRegExp &rxDefinition)
@@ -201,6 +202,7 @@ void QFFunctionReferenceTool::addFunction(QString name, QString templ, QString h
     timDelayedAddNamesAndTemplates.setSingleShot(true);
     timDelayedAddNamesAndTemplates.setInterval(150);
     timDelayedAddNamesAndTemplates.start();
+
 }
 
 void QFFunctionReferenceTool::addFunction(QString name, QStringList templ, QString help, QString helplink)
@@ -411,7 +413,7 @@ void QFFunctionReferenceTool::setLabTemplate(QLabel *labTemplate)
 
 void QFFunctionReferenceTool::registerEditor(QLineEdit *edtFormula)
 {
-    connect(edtFormula, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(onCursorPositionChanged(int,int)));
+    connect(edtFormula, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(onCursorPositionChangedDelayed(int,int)));
     edtFormula->setCompleter(compExpression);
     QFEnhancedLineEdit* ed=qobject_cast<QFEnhancedLineEdit*>(edtFormula);
     if (ed) {
@@ -424,7 +426,7 @@ void QFFunctionReferenceTool::registerEditor(QLineEdit *edtFormula)
 
 void QFFunctionReferenceTool::registerEditor(QPlainTextEdit *edtFormula)
 {
-    connect(edtFormula, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
+    connect(edtFormula, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChangedDelayed()));
 
     QFEnhancedPlainTextEdit* ed=qobject_cast<QFEnhancedPlainTextEdit*>(edtFormula);
     if (ed) {
@@ -564,17 +566,20 @@ void QFFunctionReferenceTool::showDefaultHelp()
 }
 
 
-void QFFunctionReferenceTool::onCursorPositionChanged(int /*old*/, int newPosIn)
+void QFFunctionReferenceTool::onCursorPositionChanged()
 {
+    int old=last_old;
+    int newPosIn=last_newPos;
+
     QString text="";
     int newPos=-1;
 
-    QLineEdit* edit=qobject_cast<QLineEdit*>(sender());
+    QLineEdit* edit=qobject_cast<QLineEdit*>(last_sender);
     if (edit) {
         text=edit->text();
         newPos=newPosIn;
     }
-    QPlainTextEdit* pte=qobject_cast<QPlainTextEdit*>(sender());
+    QPlainTextEdit* pte=qobject_cast<QPlainTextEdit*>(last_sender);
     if (pte) {
         //qDebug()<<pte->textCursor().blockNumber()<<pte->textCursor().positionInBlock();
         text=pte->toPlainText();
@@ -627,5 +632,16 @@ void QFFunctionReferenceTool::onCursorPositionChanged(int /*old*/, int newPosIn)
         }
 
     }
+}
+
+void QFFunctionReferenceTool::onCursorPositionChangedDelayed(int old, int newPos)
+{
+    last_sender=sender();
+    last_old=old;
+    last_newPos=newPos;
+
+    timDelayedCursorChange.setSingleShot(true);
+    timDelayedCursorChange.setInterval(150);
+    timDelayedCursorChange.start();
 }
 
