@@ -571,6 +571,8 @@ void QFFunctionReferenceTool::onCursorPositionChanged()
     int old=last_old;
     int newPosIn=last_newPos;
 
+    //qDebug()<<"onCursorPositionChanged("<<last_old<<last_newPos<<") from "<<last_sender;
+
     QString text="";
     int newPos=-1;
 
@@ -640,8 +642,9 @@ void QFFunctionReferenceTool::onCursorPositionChangedDelayed(int old, int newPos
     last_old=old;
     last_newPos=newPos;
 
+    //qDebug()<<"onCursorPositionChangedDelayed("<<old<<newPos<<") from "<<sender();
     timDelayedCursorChange.setSingleShot(true);
-    timDelayedCursorChange.setInterval(150);
+    timDelayedCursorChange.setInterval(50);
     timDelayedCursorChange.start();
 }
 

@@ -570,6 +570,9 @@ qfmpResult fDisp(const qfmpResult* params, unsigned int  n, QFMathParser* p){
 
       QTextCursor cur1(h->document());
       cur1.movePosition(QTextCursor::End);
+      QTextCharFormat f=cur1.blockCharFormat();
+      f.setFontFamily("Courier");
+      cur1.setCharFormat(f);
       cur1.insertFragment(QTextDocumentFragment::fromPlainText(t+"\n"));
 
   }
@@ -588,6 +591,9 @@ qfmpResult fDispNLB(const qfmpResult* params, unsigned int  n, QFMathParser* p){
 
       QTextCursor cur1(h->document());
       cur1.movePosition(QTextCursor::End);
+      QTextCharFormat f=cur1.blockCharFormat();
+      f.setFontFamily("Courier");
+      cur1.setCharFormat(f);
       cur1.insertFragment(QTextDocumentFragment::fromPlainText(t));
 
   }
@@ -606,6 +612,9 @@ qfmpResult fDispType(const qfmpResult* params, unsigned int  n, QFMathParser* p)
 
       QTextCursor cur1(h->document());
       cur1.movePosition(QTextCursor::End);
+      QTextCharFormat f=cur1.blockCharFormat();
+      f.setFontFamily("Courier");
+      cur1.setCharFormat(f);
       cur1.insertFragment(QTextDocumentFragment::fromPlainText(t+"\n"));
 
   }

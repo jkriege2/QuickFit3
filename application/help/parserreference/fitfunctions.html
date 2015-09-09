@@ -25,6 +25,9 @@
  $$funcref_end$$
 
 
+ 
+ 
+ 
 $$funcref_start$$<a name="fitfunction_calcparameters"/><!-- func:fitfunction_calcparameters -->
   <b><tt><!-- template -->fitfunction_calcparameters(ffid, params)<!-- /template --></tt> - <i> calculates missing fit parameters for the fit function <tt>ffid</tt> </i>:</b>
 $$funcref_description$$
@@ -43,9 +46,13 @@ $$see:<a href="#fitfunction_ids"><tt>fitfunction_ids()</tt></a> for a function, 
      <!-- /func:fitfunction_calcparameters -->
 $$funcref_end$$
 
-<h2>Obtain Metadata about fit functions</h2>
 
-  
+
+
+
+
+<h2>Obtain Metadata about fit functions</h2>
+ 
   
   $$funcref_start$$<a name="fitfunction_ids"/><!-- func:fitfunction_ids -->
     <b><tt><!-- template -->fitfunction_ids()<!-- /template --></tt> - <i> returns a list of all available fit function IDs </i>:</b>
@@ -56,6 +63,9 @@ $$funcref_end$$
      $$endbox$$
      <!-- /func:fitfunction_ids -->
   $$funcref_end$$
+  
+  
+  
   
   
   $$funcref_start$$<a name="fitfunction_parameternames"/><!-- func:fitfunction_parameternames -->
@@ -69,6 +79,9 @@ $$funcref_end$$
      <!-- /func:fitfunction_parameternames -->
   $$funcref_end$$
   
+  
+  
+  
   $$funcref_start$$<a name="fitfunction_isfitparameters"/><!-- func:fitfunction_isfitparameters -->
     <b><tt><!-- template -->fitfunction_isfitparameters(ffid)<!-- /template --></tt> - <i> returns a boolean vector, which specified for each parameter of the fit function <tt>ffid</tt>, whether it is a fit parameter or not  </i>:</b>
   $$funcref_description$$
@@ -80,36 +93,175 @@ $$funcref_end$$
      <!-- /func:fitfunction_isfitparameters -->
   $$funcref_end$$
   
+  
+  
+  
   $$funcref_start$$<a name="fitfunction_init"/><!-- func:fitfunction_init -->
-    <b><tt><!-- template -->fitfunction_init(ffid)<!-- /template --></tt> - <i> returns a number vector, which specified the default initial value for each parameter of the fit function <tt>ffid</tt> </i>:</b>
+    <b><tt><!-- template -->fitfunction_init(ffid[,paream_id, value, ...])<!-- /template --></tt> - <i> returns a number vector, which specified the default initial value for each parameter of the fit function <tt>ffid</tt> </i>:</b>
   $$funcref_description$$
+      If name-value pairs <tt>paream_id, value</tt>, the function searches for a parameter <tt>paream_id</tt> and uses the respective <tt>value</tt> instead of the initial value.
+	  $$startbox_example$$
+<blockquote><pre>p=fitfunction_init("gen_gaussian_sqrte"); // get initial parameter IDs
+disp("names:                             ", fitfunction_parameternames("gen_gaussian_sqrte"));
+disp("unaltered initial values:          ", p);
+disp("altered by fitfunction_init():     ", fitfunction_init("gen_gaussian_sqrte", "offset", 3, "amplitude",5));
+<!--pa=fitfunction_setparam("gen_gaussian_sqrte", p, "offset", 3, "amplitude",5);
+disp("altered by fitfunction_setparam(): ", pa);-->
+</pre></blockquote>
+will output the parameter names, the default initial parameter vector and an altered initial parameter vector for the fit function "gen_gaussian_sqrte":
+<blockquote><pre>names:                             [ offset, amplitude, position, width ]
+unaltered initial values:          [ 0, 1, 0, 1 ]
+altered by fitfunction_init():     [ 3, 5, 0, 1 ]
+</pre></blockquote>
+	  $$endbox$$
       $$see:<a href="#fitfunction_ids"><tt>fitfunction_ids()</tt></a> for a function, which returns all available fit function IDs and <a href="#fitfunction_parameternames"><tt>fitfunction_parameternames()</tt></a> for a function, that returns the names of the fit parameters$$  
      $$startbox_info$$
      <b>fit function:</b> $$tooltip:FITFUNCTION$$
      $$endbox$$
      <!-- /func:fitfunction_init -->
   $$funcref_end$$
+   
   
-  $$funcref_start$$<a name="fitfunction_estimateparameters"/><!-- func:fitfunction_estimateparameters -->
-    <b><tt><!-- template -->fitfunction_estimateparameters(ffid, dataX, dataY)<!-- /template --></tt> - <i> returns a number vector, which is a guess for the ideal parameters, if the fit function <tt>ffid</tt> should represet the dataset in dataX and dataY </i>:</b>
+  
+  
+  $$funcref_start$$<a name="fitfunction_setparam"/><!-- func:fitfunction_setparam -->
+    <b><tt><!-- template -->fitfunction_setparam(ffid, old_params, paream_id, value, ...)<!-- /template --></tt> - <i> returns the parameter vector <tt>old_params</tt> (number vector) of the fit function <tt>ffid</tt>, with the parameter <tt>param_id</tt> set to a new value <tt>value</tt> </i>:</b>
   $$funcref_description$$
-  If this feature is not implemented for the specified fit function, the function returns the vector of intial values.
+      $$startbox_example$$
+<blockquote><pre>p=fitfunction_init("gen_gaussian_sqrte"); // get initial parameter IDs
+disp("names:                             ", fitfunction_parameternames("gen_gaussian_sqrte"));
+disp("unaltered initial values:          ", p);
+p=fitfunction_setparam("gen_gaussian_sqrte", p, "offset", 3, "amplitude",5); // alter some parameters
+p=fitfunction_setparam("gen_gaussian_sqrte", p, "width", 2*pi); // alter some parameters
+disp("altered by fitfunction_setparam(): ", p);
+</pre></blockquote>
+will output the parameter names, the default initial parameter vector and an altered initial parameter vector for the fit function "gen_gaussian_sqrte":
+<blockquote><pre>names:                             [ offset, amplitude, position, width ]
+unaltered initial values:          [ 0, 1, 0, 1 ]
+altered by fitfunction_setparam(): [ 3, 5, 0, 6.283185307 ]
+</pre></blockquote>
+	  $$endbox$$
       $$see:<a href="#fitfunction_ids"><tt>fitfunction_ids()</tt></a> for a function, which returns all available fit function IDs and <a href="#fitfunction_parameternames"><tt>fitfunction_parameternames()</tt></a> for a function, that returns the names of the fit parameters$$  
      $$startbox_info$$
      <b>fit function:</b> $$tooltip:FITFUNCTION$$
      $$endbox$$
-     <!-- /func:fitfunction_estimateparameters -->
+     <!-- /func:fitfunction_setparam -->
   $$funcref_end$$
   
+  
+  
+  
+  
+  
   $$funcref_start$$<a name="fitfunction_initfix"/><!-- func:fitfunction_initfix -->
-    <b><tt><!-- template -->fitfunction_initfix(ffid)<!-- /template --></tt> - <i> returns a boolean vector, which specified the default initial fix state for each parameter of the fit function <tt>ffid</tt> </i>:</b>
+    <b><tt><!-- template -->fitfunction_initfix(ffid[,paream_id, fixed, ...])<!-- /template --></tt> - <i> returns a boolean vector, which specified the default initial fix state for each parameter of the fit function <tt>ffid</tt> </i>:</b>
   $$funcref_description$$
+      If name-value pairs <tt>paream_id, fixed</tt>, the function searches for a parameter <tt>paream_id</tt> and uses the respective <tt>fixed</tt> instead of the initial fix state.
+	  
+	  $$startbox_example$$
+<blockquote><pre>p=fitfunction_initfix("gen_gaussian_sqrte"); // get initial parameter IDs
+disp("names:                             ", fitfunction_parameternames("gen_gaussian_sqrte"));
+disp("unaltered initial values:          ", p);
+disp("altered by fitfunction_initfix():  ", fitfunction_initfix("gen_gaussian_sqrte", "offset", true, "amplitude",true));
+<!--pa=fitfunction_setparam("gen_gaussian_sqrte", p, "offset", 3, "amplitude",5);
+disp("altered by fitfunction_setparam(): ", pa);-->
+</pre></blockquote>
+will output the parameter names, the default initial fix state vector and an altered initial fix state vector for the fit function "gen_gaussian_sqrte":
+<blockquote><pre>names:                             [ offset, amplitude, position, width ]
+unaltered initial values:          [ false, false, false, false ]
+altered by fitfunction_initfix():  [ true, true, false, false ]
+</pre></blockquote>
+	  $$endbox$$
+	  
       $$see:<a href="#fitfunction_ids"><tt>fitfunction_ids()</tt></a> for a function, which returns all available fit function IDs and <a href="#fitfunction_parameternames"><tt>fitfunction_parameternames()</tt></a> for a function, that returns the names of the fit parameters$$  
      $$startbox_info$$
      <b>fit function:</b> $$tooltip:FITFUNCTION$$
      $$endbox$$
      <!-- /func:fitfunction_initfix -->
   $$funcref_end$$
+  
+  
+  
+  
+  
+  $$funcref_start$$<a name="fitfunction_setfix"/><!-- func:fitfunction_setfix -->
+    <b><tt><!-- template -->fitfunction_setfix(ffid, old_fixstate, paream_id, fixed, ...)<!-- /template --></tt> - <i> returns the parameter vector <tt>old_fixstate</tt> (boolean vector) of the fit function <tt>ffid</tt>, with the parameter <tt>param_id</tt>' fixed state set to a new value <tt>fixed</tt> </i>:</b>
+  $$funcref_description$$
+      $$startbox_example$$
+<blockquote><pre>p=fitfunction_initfix("gen_gaussian_sqrte"); // get initial parameter IDs
+disp("names:                             ", fitfunction_parameternames("gen_gaussian_sqrte"));
+disp("unaltered initial values:          ", p);
+p=fitfunction_setfix("gen_gaussian_sqrte", p, "offset", true, "amplitude",true); // alter some parameters
+disp("altered by fitfunction_setfix():   ", p);
+</pre></blockquote>
+will output the parameter names, the default initial parameter vector and an altered initial parameter vector for the fit function "gen_gaussian_sqrte":
+<blockquote><pre>names:                             [ offset, amplitude, position, width ]
+unaltered initial values:          [ false, false, false, false ]
+altered by fitfunction_setfix():   [ true, true, false, false ]
+</pre></blockquote>
+	  $$endbox$$
+      $$see:<a href="#fitfunction_ids"><tt>fitfunction_ids()</tt></a> for a function, which returns all available fit function IDs and <a href="#fitfunction_parameternames"><tt>fitfunction_parameternames()</tt></a> for a function, that returns the names of the fit parameters$$  
+     $$startbox_info$$
+     <b>fit function:</b> $$tooltip:FITFUNCTION$$
+     $$endbox$$
+     <!-- /func:fitfunction_setfix -->
+  $$funcref_end$$
+  
+  
+  
+  
+  $$funcref_start$$<a name="fitfunction_parammins"/><!-- func:fitfunction_parammins -->
+    <b><tt><!-- template -->fitfunction_parammins(ffid[,paream_id, value, ...])<!-- /template --></tt> - <i> returns the default fit parameter lower bounds the fit function <tt>ffid</tt> </i>:</b>
+  $$funcref_description$$
+      
+      $$see:This function works like <a href="#fitfunction_init"><tt>fitfunction_init()</tt></a>, but returns the parameter bounds instead$$  
+     $$startbox_info$$
+     <b>fit function:</b> $$tooltip:FITFUNCTION$$
+     $$endbox$$
+     <!-- /func:fitfunction_parammins -->
+  $$funcref_end$$
+   
+  $$funcref_start$$<a name="fitfunction_parammaxs"/><!-- func:fitfunction_parammaxs -->
+    <b><tt><!-- template -->fitfunction_parammaxs(ffid[,paream_id, value, ...])<!-- /template --></tt> - <i> returns the default fit parameter upper bounds the fit function <tt>ffid</tt> </i>:</b>
+  $$funcref_description$$
+      
+      $$see:This function works like <a href="#fitfunction_init"><tt>fitfunction_init()</tt></a>, but returns the parameter bounds instead$$  
+     $$startbox_info$$
+     <b>fit function:</b> $$tooltip:FITFUNCTION$$
+     $$endbox$$
+     <!-- /func:fitfunction_parammaxs -->
+  $$funcref_end$$
+   
+  
+  
+  
+  $$funcref_start$$<a name="fitfunction_paramabsmins"/><!-- func:fitfunction_paramabsmins -->
+    <b><tt><!-- template -->fitfunction_paramabsmins(ffid[,paream_id, value, ...])<!-- /template --></tt> - <i> returns the absolute fit parameter lower bounds the fit function <tt>ffid</tt> </i>:</b>
+  $$funcref_description$$
+      
+      $$see:This function works like <a href="#fitfunction_init"><tt>fitfunction_init()</tt></a>, but returns the parameter bounds instead$$  
+     $$startbox_info$$
+     <b>fit function:</b> $$tooltip:FITFUNCTION$$
+     $$endbox$$
+     <!-- /func:fitfunction_paramabsmins -->
+  $$funcref_end$$
+   
+  $$funcref_start$$<a name="fitfunction_paramabsmaxs"/><!-- func:fitfunction_paramabsmaxs -->
+    <b><tt><!-- template -->fitfunction_paramabsmaxs(ffid[,paream_id, value, ...])<!-- /template --></tt> - <i> returns the absolute fit parameter upper bounds the fit function <tt>ffid</tt> </i>:</b>
+  $$funcref_description$$
+      
+      $$see:This function works like <a href="#fitfunction_init"><tt>fitfunction_init()</tt></a>, but returns the parameter bounds instead$$  
+     $$startbox_info$$
+     <b>fit function:</b> $$tooltip:FITFUNCTION$$
+     $$endbox$$
+     <!-- /func:fitfunction_paramabsmaxs -->
+  $$funcref_end$$
+   
+  
+  
+  
+  
+  
   
   $$funcref_start$$<a name="fitfunction_paramcount"/><!-- func:fitfunction_paramcount -->
     <b><tt><!-- template -->fitfunction_paramcount(ffid)<!-- /template --></tt> - <i> returns the number of parameters of the fit function <tt>ffid</tt> </i>:</b>
@@ -122,6 +274,21 @@ $$funcref_end$$
   $$funcref_end$$
   
   
+  
+  
+  
+  
+  <h2>Guess fit function  parameters</h2>
+  $$funcref_start$$<a name="fitfunction_estimateparameters"/><!-- func:fitfunction_estimateparameters -->
+    <b><tt><!-- template -->fitfunction_estimateparameters(ffid, dataX, dataY)<!-- /template --></tt> - <i> returns a number vector, which is a guess for the ideal parameters, if the fit function <tt>ffid</tt> should represet the dataset in dataX and dataY </i>:</b>
+  $$funcref_description$$
+  If this feature is not implemented for the specified fit function, the function returns the vector of intial values.
+      $$see:<a href="#fitfunction_ids"><tt>fitfunction_ids()</tt></a> for a function, which returns all available fit function IDs and <a href="#fitfunction_parameternames"><tt>fitfunction_parameternames()</tt></a> for a function, that returns the names of the fit parameters$$  
+     $$startbox_info$$
+     <b>fit function:</b> $$tooltip:FITFUNCTION$$
+     $$endbox$$
+     <!-- /func:fitfunction_estimateparameters -->
+  $$funcref_end$$
   </body>
 </html>
   

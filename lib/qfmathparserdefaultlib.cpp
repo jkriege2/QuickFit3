@@ -454,10 +454,22 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("fitfunction_calcparameters", fFitFunctionCalc);
     p->addFunction("fitfunction_estimateparameters", fFitFunctionEstimate);
     p->addFunction("fitfunction_fit", fFitFunctionFit);
+    p->addFunction("fitfunction_fitranged", fFitFunctionFitRanged);
+
+    p->addFunction("fitfunction_setparam", fFitFunctionSetParam);
+    p->addFunction("fitfunction_setfix", fFitFunctionSetFix);
+    p->addFunction("fitfunction_setparammin", fFitFunctionSetParamMin);
+    p->addFunction("fitfunction_setparammax", fFitFunctionSetParamMax);
+    p->addFunction("fitfunction_parammins", fFitFunctionParamMins);
+    p->addFunction("fitfunction_parammaxs", fFitFunctionParamMaxs);
+    p->addFunction("fitfunction_paramabsmins", fFitFunctionParamAbsMins);
+    p->addFunction("fitfunction_paramabsmaxs", fFitFunctionParamAbsMaxs);
+
 
     p->addFunction("fitalgorithm_ids", fFitAlgorithmsIDs);
 
     p->addFunction("fit", fFit);
+    p->addFunction("fitranged", fFitRanged);
 #endif
 
 
@@ -5905,107 +5917,377 @@ namespace QFMathParser_DefaultLib {
 
     }
 
+    #define internal_fFitFunctionInit(res, params, n, parser, fname, descparamname) \
+        res.setInvalid(); \
+        if (n>=1 && params[0].type==qfmpString ) { \
+            QString ffid=params[0].str; \
+            QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid); \
+            if (ff) { \
+                res.setDoubleVec(); \
+                for (int i=0; i<ff->paramCount(); i++) { \
+                    res.numVec<<ff->getDescription(i).descparamname; \
+                } \
+                if (n>1) { \
+                    if ((n-1)/2<=0) { \
+                        delete ff; \
+                        parser->qfmpError(QObject::tr("%1(ffid, \"param\", value, ...) no complete \"param\",value pairs given").arg(fname)); \
+                        res.setInvalid(); \
+                        return; \
+                    } \
+                    if ((n-1)%2==1) { \
+                        delete ff; \
+                        parser->qfmpError(QObject::tr("%1(ffid, \"param\", value, ...) incomplete \"param\",value pair given").arg(fname)); \
+                        res.setInvalid(); \
+                        return; \
+                    } \
+                    for (unsigned int i=1; i<n; i+=2) { \
+                        QString pname=""; \
+                        double pvalue=NAN; \
+                        if (params[i].type!=qfmpString) { \
+                            delete ff; \
+                            parser->qfmpError(QObject::tr("%2(ffid, \"param\", value, ...) parameter-name %1 is no string").arg((i-1)/2+1).arg(fname)); \
+                            res.setInvalid(); \
+                            return; \
+                        } else { \
+                            pname=params[i].str; \
+                        } \
+                        if (params[i+1].type!=qfmpDouble) { \
+                            delete ff; \
+                            parser->qfmpError(QObject::tr("%2(ffid, \"param\", value, ...) parameter-value %1 is no number").arg((i-1)/2+1).arg(fname)); \
+                            res.setInvalid(); \
+                            return; \
+                        } else { \
+                            pvalue=params[i+1].num; \
+                        } \
+                        bool found=false; \
+                        for (int i=0; i<ff->paramCount(); i++) { \
+                            if (ff->getDescription(i).id==pname) { \
+                                res.numVec[i]=pvalue; \
+                                found=true; \
+                                break; \
+                            } \
+                        } \
+                        if (!found) { \
+                            delete ff; \
+                            parser->qfmpError(QObject::tr("%2(ffid, \"param\", value, ...) parameter-name '%1' not found for specified fit function").arg(pname).arg(fname)); \
+                            res.setInvalid(); \
+                            return; \
+                        } \
+                    } \
+                } \
+                delete ff; \
+            } else { \
+                parser->qfmpError(QObject::tr("%2(ffid, \"param\", value, ...) specified fit function '%1' not available").arg(ffid).arg(fname)); \
+                res.setInvalid(); \
+                return; \
+            } \
+        } else { \
+            parser->qfmpError(QObject::tr("%1(ffid, \"param\", value, ...) needs at least one string argument").arg(fname)); \
+            res.setInvalid(); \
+            return; \
+        }
+
+
     void fFitFunctionInit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        internal_fFitFunctionInit(res, params, n, parser, "fitfunction_init", initialValue)
+    }
+
+    void fFitFunctionParamMins(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        internal_fFitFunctionInit(res, params, n, parser, "fitfunction_parammins", minValue)
+    }
+
+    void fFitFunctionParamMaxs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        internal_fFitFunctionInit(res, params, n, parser, "fitfunction_parammaxs", maxValue)
+    }
+
+    void fFitFunctionParamAbsMins(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        internal_fFitFunctionInit(res, params, n, parser, "fitfunction_paramabsmins", absMinValue)
+    }
+
+    void fFitFunctionParamAbsMaxs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        internal_fFitFunctionInit(res, params, n, parser, "fitfunction_paramabsmaxs", absMaxValue)
+    }
+
+
+
+
+
+
+    void internal_fFitFunctionSetParam(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser, const QString& fname)
     {
         res.setInvalid();
 
-            if (n>=1 && params[0].type==qfmpString ) {
-                QString ffid=params[0].str;
-                QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
-                res.setBoolVec();
-                if (ff) {
-                    res.setDoubleVec();
-                    for (int i=0; i<ff->paramCount(); i++) {
-                        res.numVec<<ff->getDescription(i).initialValue;
+        if (n>=2 && params[0].type==qfmpString && params[1].type==qfmpDoubleVector ) {
+            QString ffid=params[0].str;
+            QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
+            if (ff) {
+                res=params[1];
+                if (n>2) {
+                    if ((n-2)/2<=0) {
+                        delete ff;
+                        parser->qfmpError(QObject::tr("%1(ffid, params, \"param\", value, ...) no complete \"param\",value pairs given").arg(fname));
+                        res.setInvalid();
+                        return;
                     }
-                    if (n>1) {
-                        if ((n-1)/2<=0) {
+                    if ((n-2)%2==1) {
+                        delete ff;
+                        parser->qfmpError(QObject::tr("%1(ffid, params, \"param\", value, ...) incomplete \"param\",value pair given").arg(fname));
+                        res.setInvalid();
+                        return;
+                    }
+                    for (unsigned int i=2; i<n; i+=2) {
+                        QString pname="";
+                        double pvalue=NAN;
+                        if (params[i].type!=qfmpString) {
                             delete ff;
-                            parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) no complete \"param\",value pairs given").arg(ffid));
+                            parser->qfmpError(QObject::tr("%1(ffid, params, \"param\", value, ...) parameter-name %1 is no string").arg((i-1)/2+1).arg(fname));
+                            res.setInvalid();
+                            return;
+                        } else {
+                            pname=params[i].str;
+                        }
+                        if (params[i+1].type!=qfmpDouble) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("%1(ffid, params, \"param\", value, ...) parameter-value %1 is no number").arg((i-1)/2+1).arg(fname));
+                            res.setInvalid();
+                            return;
+                        } else {
+                            pvalue=params[i+1].num;
+                        }
+                        bool found=false;
+                        if (res.numVec.size()<ff->paramCount()) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("%3(ffid, params, \"param\", value, ...) the vector params is too short, it has to have at least %1 parameters, but has only %2").arg(ff->paramCount()).arg(res.numVec.size()).arg(fname));
                             res.setInvalid();
                             return;
                         }
-                        if ((n-1)%2==1) {
-                            delete ff;
-                            parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) incomplete \"param\",value pair given").arg(ffid));
-                            res.setInvalid();
-                            return;
-                        }
-                        for (int i=1; i<n; i+=2) {
-                            QString pname="";
-                            double pvalue=NAN;
-                            if (params[i].type!=qfmpString) {
-                                delete ff;
-                                parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) parameter-name %1 is no string").arg((i-1)/2+1));
-                                res.setInvalid();
-                                return;
-                            } else {
-                                pname=params[i].str;
-                            }
-                            if (params[i+1].type!=qfmpString) {
-                                delete ff;
-                                parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) parameter-value %1 is no number").arg((i-1)/2+1));
-                                res.setInvalid();
-                                return;
-                            } else {
-                                pvalue=params[i].num;
-                            }
-                            bool found=false;
-                            for (int i=0; i<ff->paramCount(); i++) {
-                                if (ff->getDescription(i).id==pname) {
-                                    res.numVec[i]=pvalue;
-                                    found=true;
-                                    break;
-                                }
-                            }
-                            if (!found) {
-                                delete ff;
-                                parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) parameter-name '%1' not found for specified fit function").arg(pname);
-                                res.setInvalid();
-                                return;
-                            }
 
+                        for (int i=0; i<ff->paramCount(); i++) {
+                            if (ff->getDescription(i).id==pname) {
+                                res.numVec[i]=pvalue;
+                                found=true;
+                                break;
+                            }
                         }
+                        if (!found) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("%2(ffid, params, \"param\", value, ...) parameter-name '%1' not found for specified fit function").arg(pname).arg(fname));
+                            res.setInvalid();
+                            return;
+                        }
+
                     }
-                    delete ff;
-                } else {
-                    parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) specified fit function '%1' not available").arg(ffid));
-                    res.setInvalid();
-                    return;
                 }
+                delete ff;
             } else {
-                parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) needs at least one string argument"));
+                parser->qfmpError(QObject::tr("%2(ffid, params, \"param\", value, ...) specified fit function '%1' not available").arg(ffid).arg(fname));
                 res.setInvalid();
                 return;
             }
+        } else {
+            parser->qfmpError(QObject::tr("%1(ffid, params, \"param\", value, ...) needs at least one string and one number-vector argument").arg(fname));
+            res.setInvalid();
+            return;
+        }
 
     }
 
+
+    void fFitFunctionSetParam(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        internal_fFitFunctionSetParam(res, params, n, parser, "fitfunction_setparam");
+    }
+
+
+    void fFitFunctionSetParamMin(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        internal_fFitFunctionSetParam(res, params, n, parser, "fitfunction_setparammin");
+    }
+
+    void fFitFunctionSetParamMax(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        internal_fFitFunctionSetParam(res, params, n, parser, "fitfunction_setparammax");
+    }
+
+    void fFitFunctionSetFix(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+
+        if (n>=2 && params[0].type==qfmpString && params[1].type==qfmpBoolVector ) {
+            QString ffid=params[0].str;
+            QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
+            if (ff) {
+                res=params[1];
+                if (n>2) {
+                    if ((n-2)/2<=0) {
+                        delete ff;
+                        parser->qfmpError(QObject::tr("fitfunction_setfix(ffid, old_fixeds, \"param\", fixed, ...) no complete \"param\",value pairs given").arg(ffid));
+                        res.setInvalid();
+                        return;
+                    }
+                    if ((n-2)%2==1) {
+                        delete ff;
+                        parser->qfmpError(QObject::tr("fitfunction_setfix(ffid, old_fixeds, \"param\", fixed, ...) incomplete \"param\",value pair given").arg(ffid));
+                        res.setInvalid();
+                        return;
+                    }
+                    for (unsigned int i=2; i<n; i+=2) {
+                        QString pname="";
+                        bool pvalue=false;
+                        if (params[i].type!=qfmpString) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("fitfunction_setfix(ffid, old_fixeds, \"param\", fixed, ...) parameter-name %1 is no string").arg((i-1)/2+1));
+                            res.setInvalid();
+                            return;
+                        } else {
+                            pname=params[i].str;
+                        }
+                        if (params[i+1].type!=qfmpBool) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("fitfunction_setfix(ffid, old_fixeds, \"param\", fixed, ...) parameter-value %1 is no boolean").arg((i-1)/2+1));
+                            res.setInvalid();
+                            return;
+                        } else {
+                            pvalue=params[i+1].boolean;
+                        }
+                        bool found=false;
+                        if (res.boolVec.size()<ff->paramCount()) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("fitfunction_setfix(ffid, old_fixeds, \"param\", fixed, ...) the vector old_fixeds is too short, it has to have at least %1 parameters, but has only %2").arg(ff->paramCount()).arg(res.boolVec.size()));
+                            res.setInvalid();
+                            return;
+                        }
+                        for (int i=0; i<ff->paramCount(); i++) {
+                            if (ff->getDescription(i).id==pname) {
+                                res.boolVec[i]=pvalue;
+                                found=true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("fitfunction_setfix(ffid, old_fixeds, \"param\", fixed, ...) parameter-name '%1' not found for specified fit function").arg(pname));
+                            res.setInvalid();
+                            return;
+                        }
+
+                    }
+                }
+                delete ff;
+            } else {
+                parser->qfmpError(QObject::tr("fitfunction_setfix(ffid, old_fixeds, \"param\", fixed, ...) specified fit function '%1' not available").arg(ffid));
+                res.setInvalid();
+                return;
+            }
+        } else {
+            parser->qfmpError(QObject::tr("fitfunction_setfix(ffid, old_fixeds, \"param\", fixed, ...) needs at least one string and one number-vector argument"));
+            res.setInvalid();
+            return;
+        }
+
+    }
 
     void fFitFunctionInitFix(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
 
-            if (n==1 && params[0].type==qfmpString ) {
-                QString ffid=params[0].str;
-                QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
+        if (n>=1 && params[0].type==qfmpString ) {
+            QString ffid=params[0].str;
+            QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
+            if (ff) {
                 res.setBoolVec();
-                if (ff) {
-                    res.setBoolVec();
-                    for (int i=0; i<ff->paramCount(); i++) {
-                        res.boolVec<<ff->getDescription(i).initialFix;
-                    }
-                    delete ff;
-                } else {
-                    parser->qfmpError(QObject::tr("fitfunction_initfix(ffid) specified fit function not available"));
-                    res.setInvalid();
-                    return;
+                for (int i=0; i<ff->paramCount(); i++) {
+                    res.boolVec<<ff->getDescription(i).initialFix;
                 }
+                if (n>1) {
+                    if ((n-1)/2<=0) {
+                        delete ff;
+                        parser->qfmpError(QObject::tr("fitfunction_initfix(ffid, \"param\", fixed, ...) no complete \"param\",value pairs given").arg(ffid));
+                        res.setInvalid();
+                        return;
+                    }
+                    if ((n-1)%2==1) {
+                        delete ff;
+                        parser->qfmpError(QObject::tr("fitfunction_initfix(ffid, \"param\", fixed, ...) incomplete \"param\",value pair given").arg(ffid));
+                        res.setInvalid();
+                        return;
+                    }
+                    for (unsigned int i=1; i<n; i+=2) {
+                        QString pname="";
+                        bool pvalue=false;
+                        if (params[i].type!=qfmpString) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("fitfunction_initfix(ffid, \"param\", fixed, ...) parameter-name %1 is no string").arg((i-1)/2+1));
+                            res.setInvalid();
+                            return;
+                        } else {
+                            pname=params[i].str;
+                        }
+                        if (params[i+1].type!=qfmpBool) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("fitfunction_initfix(ffid, \"param\", fixed, ...) parameter-value %1 is no boolean").arg((i-1)/2+1));
+                            res.setInvalid();
+                            return;
+                        } else {
+                            pvalue=params[i+1].boolean;
+                        }
+                        bool found=false;
+                        for (int i=0; i<ff->paramCount(); i++) {
+                            if (ff->getDescription(i).id==pname) {
+                                res.boolVec[i]=pvalue;
+                                found=true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("fitfunction_initfix(ffid, \"param\", fixed, ...) parameter-name '%1' not found for specified fit function").arg(pname));
+                            res.setInvalid();
+                            return;
+                        }
+
+                    }
+                }
+                delete ff;
             } else {
-                parser->qfmpError(QObject::tr("fitfunction_initfix(ffid) needs one string argument"));
+                parser->qfmpError(QObject::tr("fitfunction_initfix(ffid, \"param\", fixed, ...) specified fit function '%1' not available").arg(ffid));
                 res.setInvalid();
                 return;
             }
+        } else {
+            parser->qfmpError(QObject::tr("fitfunction_initfix(ffid, \"param\", fixed, ...) needs at least one string argument"));
+            res.setInvalid();
+            return;
+        }
+
+
+//        res.setInvalid();
+
+//            if (n==1 && params[0].type==qfmpString ) {
+//                QString ffid=params[0].str;
+//                QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
+//                res.setBoolVec();
+//                if (ff) {
+//                    res.setBoolVec();
+//                    for (int i=0; i<ff->paramCount(); i++) {
+//                        res.boolVec<<ff->getDescription(i).initialFix;
+//                    }
+//                    delete ff;
+//                } else {
+//                    parser->qfmpError(QObject::tr("fitfunction_initfix(ffid) specified fit function not available"));
+//                    res.setInvalid();
+//                    return;
+//                }
+//            } else {
+//                parser->qfmpError(QObject::tr("fitfunction_initfix(ffid) needs one string argument"));
+//                res.setInvalid();
+//                return;
+//            }
 
     }
 
@@ -6166,8 +6448,8 @@ namespace QFMathParser_DefaultLib {
                     QVector<double> dx, dy, w, pmin, pmax;
                     for (int i=0; i<ff->paramCount(); i++) {
                         fix<<ff->getDescription(i).initialFix;
-                        pmin<<ff->getDescription(i).minValue;
-                        pmax<<ff->getDescription(i).maxValue;
+                        pmin<<ff->getDescription(i).absMinValue;
+                        pmax<<ff->getDescription(i).absMaxValue;
                     }
                     bool hasMin=false;
                     bool hasMax=false;
@@ -6239,12 +6521,12 @@ namespace QFMathParser_DefaultLib {
                     res.setDoubleVec(pout);
                 } else {
                     if (!fa) {
-                        parser->qfmpError(QObject::tr("fit(fitalg, fitfunction, parameters, initparams, dataX, dataY[, weight]) specified fit algorithm not available"));
+                        parser->qfmpError(QObject::tr("fitfunction_fit(fitalg, ffid, initparams, fix, dataX, dataY[, weight]) specified fit algorithm not available"));
                         res.setInvalid();
                         return;
                     }
                     if (!ff) {
-                        parser->qfmpError(QObject::tr("fit(fitalg, fitfunction, parameters, initparams, dataX, dataY[, weight]) specified fit function not available"));
+                        parser->qfmpError(QObject::tr("fitfunction_fit(fitalg, ffid, initparams, fix, dataX, dataY[, weight]) specified fit function not available"));
                         res.setInvalid();
                         return;
                     }
@@ -6257,6 +6539,128 @@ namespace QFMathParser_DefaultLib {
 
     }
 
+
+    void fFitFunctionFitRanged(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+            if (n>=6 && params[0].type==qfmpString && params[1].type==qfmpString &&  params[2].type==qfmpDoubleVector ) {
+                QString ffid=params[1].str;
+                QString faid=params[0].str;
+                QScopedPointer<QFFitFunction> ff(QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid));
+                QScopedPointer<QFFitAlgorithm> fa(QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(faid));
+                if (ff && fa) {
+                    QVector<bool> fix;
+                    QVector<double> dx, dy, w, pmin, pmax;
+                    int pcnt=ff->paramCount();
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        fix<<ff->getDescription(i).initialFix;
+                        pmin<<ff->getDescription(i).absMinValue;
+                        pmax<<ff->getDescription(i).absMaxValue;
+                    }
+                    unsigned int minID=3;
+                    unsigned int maxID=4;
+                    unsigned int xID=5;
+                    unsigned int yID=6;
+                    if (n>=8 && params[3].type==qfmpBoolVector) {
+                        fix=params[3].boolVec;
+                        minID=4;
+                        maxID=5;
+                        xID=6;
+                        yID=7;
+                        if (fix.size()<ff->paramCount()) {
+                            parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams, fix, params_min, params_max, dataX, dataY[, weight]) parameter 'fix' has too few entries (available: %1, required: %2)").arg(fix.size()).arg(ff->paramCount()));
+                            res.setInvalid();
+                            return;
+                        }
+                    } else if (n>=7 && params[3].type==qfmpDoubleVector ) {
+                        minID=3;
+                        maxID=4;
+                        xID=5;
+                        yID=6;
+                    } else {
+                        parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams, fix, params_min, params_max, dataX, dataY[, weight]) parameters 'dataX'/'dataY' have to be number vectors"));
+                        res.setInvalid();
+                        return;
+                    }
+
+                    if (yID<n && params[xID].type==qfmpDoubleVector && params[yID].type==qfmpDoubleVector) {
+                        dx=params[xID].numVec;
+                        dy=params[yID].numVec;
+                        if (yID+1<n && params[yID+1].type==qfmpDoubleVector) {
+                            w=params[yID+1].numVec;
+                        } else if (yID+1<n && params[yID+1].type!=qfmpDoubleVector) {
+                            parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams[, fix], params_min, params_max, dataX, dataY, weight) parameter 'weight' has to be number vectors"));
+                            res.setInvalid();
+                            return;
+                        }
+                    } else {
+                        parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams[, fix], params_min, params_max, dataX, dataY[, weight]) parameters 'dataX'/'dataY' have to be number vectors"));
+                        res.setInvalid();
+                        return;
+                    }
+
+                    if (maxID<n && params[minID].type==qfmpDoubleVector && params[maxID].type==qfmpDoubleVector) {
+                        pmin=params[minID].numVec;
+                        pmax=params[maxID].numVec;
+                        if ((pmin.size()!=pcnt) || (pmax.size()!=pcnt)) {
+                            parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams[, fix], params_min, params_max, dataX, dataY[, weight]) parameters 'params_min'/'params_max' have to have %1 entries, but %2/%3 entries were given").arg(pcnt).arg(pmin.size()).arg(pmax.size()));
+                            res.setInvalid();
+                            return;
+                        }
+                    } else {
+                        parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams[, fix], params_min, params_max, dataX, dataY[, weight]) parameters 'params_min'/'params_max' have to be number vectors"));
+                        res.setInvalid();
+                        return;
+                    }
+
+                    QVector<double> pout=params[2].numVec;
+                    QVector<double> eout(pout.size());
+                    int Ndata=qMin(dx.size(), dy.size());
+                    if (w.size()<=0) {
+                        for (int i=0; i<Ndata; i++) w<<1;
+                    }
+                    if (Ndata<=1) {
+                        parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams[, fix], params_min, params_max, dataX, dataY[, weight]) needs at least one entry in dataX/dataY"));
+                        res.setInvalid();
+                        return;
+                    }
+                    if (w.size()<Ndata) {
+                        parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams[, fix], params_min, params_max, dataX, dataY[, weight]) needs the same number of entries in dataX/dataY and weight"));
+                        res.setInvalid();
+                        return;
+                    }
+                    if (fix.size()<ff->paramCount()) {
+                        parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams, fix, params_min, params_max, dataX, dataY[, weight]) parameter 'fix' has too few entries (available: %1, required: %2)").arg(fix.size()).arg(ff->paramCount()));
+                        res.setInvalid();
+                        return;
+                    }
+                    if (params[2].numVec.size()<ff->paramCount()) {
+                        parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams, fix, params_min, params_max, dataX, dataY[, weight]) parameter 'initparams' has too few entries (available: %1, required: %2)").arg(params[2].numVec.size()).arg(ff->paramCount()));
+                        res.setInvalid();
+                        return;
+                    }
+
+                    fa->fit(pout.data(), eout.data(), dx.data(), dy.data(), w.data(), Ndata, ff.data(), params[2].numVec.data(), fix.data(), pmin.data(), pmax.data());
+                    res.setDoubleVec(pout);
+                } else {
+                    if (!fa) {
+                        parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams, fix, params_min, params_max, dataX, dataY[, weight]) specified fit algorithm not available"));
+                        res.setInvalid();
+                        return;
+                    }
+                    if (!ff) {
+                        parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams, params_min, params_max, fix, dataX, dataY[, weight]) specified fit function not available"));
+                        res.setInvalid();
+                        return;
+                    }
+                }
+            } else {
+                parser->qfmpError(QObject::tr("fitfunction_fitranged(fitalg, ffid, initparams[, fix], params_min, params_max, dataX, dataY[, weight]) needs at least six arguments [string, string, number_vector, [boolean_vector], number_vector, number_vector, number_vector, number_vector, [number_vector]]"));
+                res.setInvalid();
+                return;
+            }
+
+    }
     void fFit(qfmpResult &res, QFMathParser::qfmpNode **nodes, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
@@ -6329,6 +6733,83 @@ namespace QFMathParser_DefaultLib {
             }
         }
     }
+
+
+
+    void fFitRanged(qfmpResult &res, QFMathParser::qfmpNode **nodes, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        if (n>=8) {
+            qfmpResult paramsFitAlg, paramsParams, paramsInitParams, paramsDataX, paramsDataY, paramsWeights, paramsMin, paramsMax;
+            nodes[0]->evaluate(paramsFitAlg);
+            nodes[2]->evaluate(paramsParams);
+            nodes[3]->evaluate(paramsInitParams);
+            nodes[4]->evaluate(paramsMin);
+            nodes[5]->evaluate(paramsMax);
+            nodes[6]->evaluate(paramsDataX);
+            nodes[7]->evaluate(paramsDataY);
+            if (n>=9) nodes[8]->evaluate(paramsWeights);
+            if (paramsFitAlg.type==qfmpString && paramsParams.type==qfmpStringVector && paramsInitParams.type==qfmpDoubleVector && paramsDataX.type==qfmpDoubleVector && paramsDataY.type==qfmpDoubleVector && paramsMin.type==qfmpDoubleVector && paramsMax.type==qfmpDoubleVector ) {
+                QScopedPointer<QFFitAlgorithm> fa(QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(paramsFitAlg.str));
+                QStringList paramnames=paramsParams.strVec;
+                QVector<double> initP=paramsInitParams.numVec;
+                if (paramnames.size()!=initP.size() || paramsMin.numVec.size()!=initP.size() || paramsMax.numVec.size()!=initP.size()) {
+                    parser->qfmpError(QObject::tr("fitranged(fitalg, fitfunction, parameters, initparams, paramsmin, paramsmax, dataX, dataY[, weight]) parameters 'parameters', 'initparams', 'paramsMin' and 'paramsMax' don't have the name number of entries"));
+                    res.setInvalid();
+                    return;
+                }
+                if (paramsDataX.numVec.size()!=paramsDataY.numVec.size() || paramsDataX.numVec.size()<1 || paramsDataY.numVec.size()<1) {
+                    parser->qfmpError(QObject::tr("fitranged(fitalg, fitfunction, parameters, initparams, paramsmin, paramsmax, dataX, dataY[, weight]) parameters 'dataX' and 'dataY' don't have the name number of entries, and/or have less than 1 entry"));
+                    res.setInvalid();
+                    return;
+                }
+                if (n>=9 && paramsWeights.isValid && paramsWeights.numVec.size()!=paramsDataY.numVec.size()) {
+                    parser->qfmpError(QObject::tr("fitranged(fitalg, fitfunction, parameters, initparams, paramsmin, paramsmax, dataX, dataY, weight) parameters 'dataX', 'dataY' and 'weights' don't have the name number of entries, and/or have less than 1 entry"));
+                    res.setInvalid();
+                    return;
+                }
+                QScopedPointer<QFFitFunctionQFMathparserNode> ff(new QFFitFunctionQFMathparserNode(parser, nodes[1], paramnames, initP));
+                if (fa && ff) {
+                    QVector<bool> fix;
+                    QVector<double> pmin=paramsMin.numVec;
+                    QVector<double> pmax=paramsMax.numVec;
+                    for (int i=0; i<initP.size(); i++) {
+                        fix<<false;
+                    }
+
+
+                    QVector<double> pout=initP;
+                    QVector<double> eout(pout.size());
+                    QVector<double> w;
+
+
+
+
+                    if (n>=9 && paramsWeights.isValid) {
+                        w=paramsWeights.numVec;
+                    } else {
+                        w.fill(1, paramsDataX.numVec.size());
+                    }
+
+                    fa->fit(pout.data(), eout.data(), paramsDataX.numVec.data(), paramsDataY.numVec.data(), w.data(), paramsDataX.numVec.size(), ff.data(), initP.data(), fix.data(), pmin.data(), pmax.data());
+                    res.setDoubleVec(pout);
+                } else {
+                    if (!fa) {
+                        parser->qfmpError(QObject::tr("fitranged(fitalg, fitfunction, parameters, initparams, paramsmin, paramsmax, dataX, dataY[, weight]) specified fit algorithm not available"));
+                    } else {
+                        parser->qfmpError(QObject::tr("fitranged(fitalg, fitfunction, parameters, initparams, paramsmin, paramsmax, dataX, dataY[, weight]) could not construct fit function"));
+                    }
+                    res.setInvalid();
+                    return;
+                }
+            } else {
+                parser->qfmpError(QObject::tr("fitranged(fitalg, fitfunction, parameters, initparams, paramsmin, paramsmax, dataX, dataY[, weight]) needs at least seven arguments [string, expression, string_vector, number_vector, number_vector, number_vector, [number_vector]]"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
 
 #endif
 }

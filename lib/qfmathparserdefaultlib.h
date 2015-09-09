@@ -572,6 +572,14 @@ namespace QFMathParser_DefaultLib {
     void fFitFunctionParameters(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionIsFit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionInit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionParamMins(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionParamMaxs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionParamAbsMins(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionParamAbsMaxs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionSetParam(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionSetParamMin(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionSetParamMax(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionSetFix(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionInitFix(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionEval(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
@@ -580,7 +588,9 @@ namespace QFMathParser_DefaultLib {
     void fFitFunctionParamCount(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 
     void fFitFunctionFit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionFitRanged(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFit(qfmpResult& res, QFMathParser::qfmpNode **nodes, unsigned int n, QFMathParser* p);
+    void fFitRanged(qfmpResult& res, QFMathParser::qfmpNode **nodes, unsigned int n, QFMathParser* p);
 
 
     void fFitAlgorithmsIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
