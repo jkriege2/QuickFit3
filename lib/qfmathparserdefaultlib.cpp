@@ -5909,7 +5909,7 @@ namespace QFMathParser_DefaultLib {
     {
         res.setInvalid();
 
-            if (n==1 && params[0].type==qfmpString ) {
+            if (n>=1 && params[0].type==qfmpString ) {
                 QString ffid=params[0].str;
                 QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
                 res.setBoolVec();
@@ -5918,14 +5918,63 @@ namespace QFMathParser_DefaultLib {
                     for (int i=0; i<ff->paramCount(); i++) {
                         res.numVec<<ff->getDescription(i).initialValue;
                     }
+                    if (n>1) {
+                        if ((n-1)/2<=0) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) no complete \"param\",value pairs given").arg(ffid));
+                            res.setInvalid();
+                            return;
+                        }
+                        if ((n-1)%2==1) {
+                            delete ff;
+                            parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) incomplete \"param\",value pair given").arg(ffid));
+                            res.setInvalid();
+                            return;
+                        }
+                        for (int i=1; i<n; i+=2) {
+                            QString pname="";
+                            double pvalue=NAN;
+                            if (params[i].type!=qfmpString) {
+                                delete ff;
+                                parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) parameter-name %1 is no string").arg((i-1)/2+1));
+                                res.setInvalid();
+                                return;
+                            } else {
+                                pname=params[i].str;
+                            }
+                            if (params[i+1].type!=qfmpString) {
+                                delete ff;
+                                parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) parameter-value %1 is no number").arg((i-1)/2+1));
+                                res.setInvalid();
+                                return;
+                            } else {
+                                pvalue=params[i].num;
+                            }
+                            bool found=false;
+                            for (int i=0; i<ff->paramCount(); i++) {
+                                if (ff->getDescription(i).id==pname) {
+                                    res.numVec[i]=pvalue;
+                                    found=true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                delete ff;
+                                parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) parameter-name '%1' not found for specified fit function").arg(pname);
+                                res.setInvalid();
+                                return;
+                            }
+
+                        }
+                    }
                     delete ff;
                 } else {
-                    parser->qfmpError(QObject::tr("fitfunction_init(ffid) specified fit function not available"));
+                    parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) specified fit function '%1' not available").arg(ffid));
                     res.setInvalid();
                     return;
                 }
             } else {
-                parser->qfmpError(QObject::tr("fitfunction_init(ffid) needs one string argument"));
+                parser->qfmpError(QObject::tr("fitfunction_init(ffid, \"param\", value, ...) needs at least one string argument"));
                 res.setInvalid();
                 return;
             }
