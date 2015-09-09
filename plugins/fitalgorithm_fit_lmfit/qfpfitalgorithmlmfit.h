@@ -61,12 +61,12 @@ class QFPFitAlgorithmLMFitPlugin : public QObject, public QFPluginFitAlgorithm {
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr("lmfit: Levenberg-Marquard fit (without box constraints)");
+            return tr("lmfit: Levenberg-Marquard fit");
         };
 
         /** \brief short description for the plugin */
         virtual QString getDescription() const {
-            return tr("Levenberg-Marquard fit (without box constraints) using the lmfit library");
+            return tr("Levenberg-Marquard fit using the lmfit library");
         };
 
         /** \brief author the plugin */
