@@ -31,6 +31,7 @@
 #include <QTextStream>
 #include <QStringList>
 #include "lib_imexport.h"
+#include "qfrdrtableinterface.h"
 
 /*! \brief exchange rows and columns
     \ingroup qf3lib_tools
@@ -171,6 +172,7 @@ class QFLIB_EXPORT QFDataExportTool {
         QMap<QString, QVariant> properties;
 
         void save(const QString& filename, int format) const;
+        void saveToTable(QFRDRTableInterface* table, bool setProps=false) const;
 
         void clear();
 

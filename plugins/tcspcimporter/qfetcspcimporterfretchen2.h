@@ -6,6 +6,7 @@
 #include "qfpluginservices.h"
 #include "tttrtools.h"
 #include "qfplotter.h"
+#include "datatools.h"
 
 namespace Ui {
     class QFETCSPCImporterFretchen2;
@@ -34,6 +35,9 @@ class QFETCSPCImporterFretchen2 : public QDialog
         void on_btnApplyBurstSelection_clicked();
         void on_btnApplyBurstAnalysis_clicked();
 
+        void on_btnSaveToFile_clicked();
+        void on_btnSaveToProject_clicked();
+
         void setEditControlsEnabled(bool en);
 
         void updateFromFile();
@@ -43,6 +47,8 @@ class QFETCSPCImporterFretchen2 : public QDialog
         void updateBurstSelection();
         void loadTCSPCFiles();
         void updateAnalysisPlots();
+
+        void calcHistParams(const QVector<double>& PVec, double& pmin, double& pmax, int& nbins, double binw);
 
     private:
         Ui::QFETCSPCImporterFretchen2 *ui;
@@ -61,6 +67,11 @@ class QFETCSPCImporterFretchen2 : public QDialog
         JKQTPxFunctionLineGraph* plteMinBurstRate;
         JKQTPxFunctionLineGraph* plteMaxBurstRate;
         JKQTPbarHorizontalGraph* plteProximity;
+
+        QFDataExportTool outData;
+        QFDataExportTool outDataFiltered;
+        int outDataPCol;
+        int outDataECol;
 
 
 };

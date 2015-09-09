@@ -5,6 +5,10 @@
 #include "qfpluginservices.h"
 #include "qmodernprogresswidget.h"
 #include <QtConcurrent/QtConcurrent>
+#include "qfrdrcolumngraphsinterface.h"
+#include "qfrdrtableinterface.h"
+#include "qfproject.h"
+#include "qfrawdatarecord.h"
 
 QFETCSPCImporterFretchen2::QFETCSPCImporterFretchen2(QWidget *parent) :
     QDialog(parent),
@@ -91,6 +95,7 @@ QFETCSPCImporterFretchen2::~QFETCSPCImporterFretchen2()
 void QFETCSPCImporterFretchen2::writeSettings()
 {
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinCrosstalk,  "QFETCSPCImporterFretchen2/spinCrosstalk");
+    ProgramOptions::setConfigQDoubleSpinBox(ui->spinGamma,  "QFETCSPCImporterFretchen2/spinGamma");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinFDir,  "QFETCSPCImporterFretchen2/spinFDir");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinMinRate,  "QFETCSPCImporterFretchen2/spinMinRate");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinMaxRate,  "QFETCSPCImporterFretchen2/spinMaxRate");
@@ -99,11 +104,12 @@ void QFETCSPCImporterFretchen2::writeSettings()
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinMaxIPT,  "QFETCSPCImporterFretchen2/spinMaxIPT");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinLEESigma,  "QFETCSPCImporterFretchen2/spinLEESigma");
     ProgramOptions::setConfigQSpinBox(ui->spinLEERange,  "QFETCSPCImporterFretchen2/spinLEERange");
-    ProgramOptions::setConfigQSpinBox(ui->spinHBins,  "QFETCSPCImporterFretchen2/spinHBins");
+    ProgramOptions::setConfigQDoubleSpinBox(ui->spinHBinWidth,  "QFETCSPCImporterFretchen2/spinHBinWidth");
     ProgramOptions::setConfigQCheckBox( ui->chkLEE, "QFETCSPCImporterFretchen2/chkLEE");
     ProgramOptions::setConfigQCheckBox(ui->chkSHowFilteredIPT, "QFETCSPCImporterFretchen2/chkSHowFilteredIPT");
     ProgramOptions::setConfigQSpinBox(ui->spinMinBurstSize,  "QFETCSPCImporterFretchen2/spinMinBurstSize");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinDisplayLength, "QFETCSPCImporterFretchen2/spinDisplayLength");
+    ProgramOptions::setConfigQComboBox(ui->cmbAnaHistMode,  "QFETCSPCImporterFretchen2/cmbAnaHistMode");
     ProgramOptions::setConfigValue( "QFETCSPCImporterFretchen2/lastTCSPCFileFilter",lastTCSPCFileFilter);
     ProgramOptions::setConfigValue( "QFETCSPCImporterFretchen2/lastTCSPCFileDir",lastTCSPCFileDir);
     if (ui->cmbGreenChannel->count()>0 && ui->cmbGreenChannel->currentIndex()>=0) ProgramOptions::setConfigQComboBox(ui->cmbGreenChannel, "QFETCSPCImporterFretchen2/cmbGreenChannel");
@@ -112,7 +118,9 @@ void QFETCSPCImporterFretchen2::writeSettings()
 
 void QFETCSPCImporterFretchen2::readSettings()
 {
+    ProgramOptions::getConfigQComboBox(ui->cmbAnaHistMode,  "QFETCSPCImporterFretchen2/cmbAnaHistMode", 0);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinCrosstalk,  "QFETCSPCImporterFretchen2/spinCrosstalk", 4);
+    ProgramOptions::getConfigQDoubleSpinBox(ui->spinGamma,  "QFETCSPCImporterFretchen2/spinGamma", 1);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinFDir,  "QFETCSPCImporterFretchen2/spinFDir", 0);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinMinRate,  "QFETCSPCImporterFretchen2/spinMinRate", 10);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinMaxRate,  "QFETCSPCImporterFretchen2/spinMaxRate", 100);
@@ -120,7 +128,7 @@ void QFETCSPCImporterFretchen2::readSettings()
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinMaxIPT,  "QFETCSPCImporterFretchen2/spinMaxIPT", 70);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinLEESigma,  "QFETCSPCImporterFretchen2/spinLEESigma", 5);
     ProgramOptions::getConfigQSpinBox(ui->spinLEERange,  "QFETCSPCImporterFretchen2/spinLEERange", 8);
-    ProgramOptions::getConfigQSpinBox(ui->spinHBins,  "QFETCSPCImporterFretchen2/spinHBins", 35);
+    ProgramOptions::getConfigQDoubleSpinBox(ui->spinHBinWidth,  "QFETCSPCImporterFretchen2/spinHBinWidth", 0.05);
     ProgramOptions::getConfigQCheckBox( ui->chkLEE, "QFETCSPCImporterFretchen2/chkLEE",true);
     ProgramOptions::getConfigQCheckBox(ui->chkSHowFilteredIPT, "QFETCSPCImporterFretchen2/chkSHowFilteredIPT", true);
     ProgramOptions::getConfigQSpinBox(ui->spinMinBurstSize,  "QFETCSPCImporterFretchen2/spinMinBurstSize", 60);
@@ -217,6 +225,193 @@ void QFETCSPCImporterFretchen2::on_btnApplyBurstAnalysis_clicked()
     updateAnalysis();
 }
 
+void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
+{
+    QString grp=QFileInfo(ui->edtTCSPCFile->text()).fileName();
+    QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+    QFRawDataRecord* rdrA=p->addRawData("table", tr("%1 - spFRET Burst Analysis").arg(grp));
+    if (rdrA) {
+        rdrA->setGroup(p->addOrFindRDRGroup(grp));
+        rdrA->setFolder(grp);
+        rdrA->setDescription(outData.comment);
+        rdrA->setQFProperty("AUTOSCALEXY_PLOTS_ON_SHOWUP", true, false, false);
+
+        QFRDRColumnGraphsInterface* rdrAG=dynamic_cast<QFRDRColumnGraphsInterface*>(rdrA);
+        QFRDRTableInterface* rdrAT=dynamic_cast<QFRDRTableInterface*>(rdrA);
+        QFRawDataRecord* rdrF=p->addRawData("table", tr("%1 - spFRET Burst Analysis, filtered").arg(grp));
+        if (rdrF) {
+            rdrF->setGroup(p->addOrFindRDRGroup(grp));
+            rdrF->setFolder(grp);
+            rdrF->setDescription(outDataFiltered.comment);
+            rdrF->setQFProperty("AUTOSCALEXY_PLOTS_ON_SHOWUP", true, false, false);
+
+            QFRDRColumnGraphsInterface* rdrFG=dynamic_cast<QFRDRColumnGraphsInterface*>(rdrF);
+            QFRDRTableInterface* rdrFT=dynamic_cast<QFRDRTableInterface*>(rdrF);
+            int calcStart=8;
+            int histStart=12;
+            if ( rdrAT &&  rdrFT) {
+                outData.saveToTable(rdrAT, true);
+                outDataFiltered.saveToTable(rdrFT, true);
+
+
+
+                {
+                    double pmin=outData.properties.value("burstfiltered_histogram_P_min", 0).toDouble();
+                    double pmax=outData.properties.value("burstfiltered_histogram_P_max", 1).toDouble();
+                    int pbins=outData.properties.value("burstfiltered_histogram_P_bins", 31).toInt();
+                    double emin=outData.properties.value("burstfiltered_histogram_E_min", 0).toDouble();
+                    double emax=outData.properties.value("burstfiltered_histogram_E_max", 1).toDouble();
+                    int ebins=outData.properties.value("burstfiltered_histogram_E_bins", 31).toInt();
+                    QString pre=QString("// burst duration histogram:\nbdur_bins=21;\n// burst size histogram:\nbsize_bins=21;\n// burst countrate histogram:\nbrate_bins=21;\n// P-histogram bins:\npmin = %1;\npmax = %2;\npbins = %3;\n// E-histogram bins:\nemin = %4;\nemax = %5;\nebins = %6;\n")
+                                .arg(CDoubleToQString(pmin)).arg(CDoubleToQString(pmax)).arg(pbins)
+                                .arg(CDoubleToQString(emin)).arg(CDoubleToQString(emax)).arg(ebins);
+
+                    rdrAT->tableSetPreEvaluationExpression(pre);
+
+
+
+                    rdrAT->tableSetColumnTitle(calcStart, tr("Burst Duration: Delta T [ms]"));
+                    rdrAT->tableSetColumnExpression(calcStart, QString("column(6)*1e-3"));
+                    rdrAT->tableSetColumnTitle(calcStart+1, tr("Burst Size"));
+                    rdrAT->tableSetColumnExpression(calcStart+1, QString("column(4)+column(5)"));
+
+
+                    rdrAT->tableSetColumnTitle(histStart, tr("P-Histogram: P"));
+                    rdrAT->tableSetColumnExpression(histStart, QString("rangedhistogrambins(pmin, pmax, pbins)"));
+                    rdrAT->tableSetColumnTitle(histStart+1, tr("P-Histogram: frequency"));
+                    rdrAT->tableSetColumnExpression(histStart+1, QString("rangedhistogram(column(7), pmin, pmax, pbins)"));
+                    rdrAT->tableSetColumnTitle(histStart+2, tr("E-Histogram: E"));
+                    rdrAT->tableSetColumnExpression(histStart+2, QString("rangedhistogrambins(emin, emax, ebins)"));
+                    rdrAT->tableSetColumnTitle(histStart+3, tr("E-Histogram: frequency"));
+                    rdrAT->tableSetColumnExpression(histStart+3, QString("rangedhistogram(column(8), emin, emax, ebins)"));
+
+                    rdrAT->tableSetColumnTitle(histStart+4, tr("Burst Duration-Histogram: Delta T[ms]"));
+                    rdrAT->tableSetColumnExpression(histStart+4, QString("histogrambins(column(3)*1e3, bdur_bins)"));
+                    rdrAT->tableSetColumnTitle(histStart+5, tr("Burst Duration-Histogram: frequency"));
+                    rdrAT->tableSetColumnExpression(histStart+5, QString("histogram(column(3)*1e3, bdur_bins)"));
+
+                    rdrAT->tableSetColumnTitle(histStart+6, tr("Burst Size-Histogram: photons"));
+                    rdrAT->tableSetColumnExpression(histStart+6, QString("histogrambins(column(4)+column(5), bsize_bins)"));
+                    rdrAT->tableSetColumnTitle(histStart+7, tr("Burst Size-Histogram: frequency"));
+                    rdrAT->tableSetColumnExpression(histStart+7, QString("histogram(column(4)+column(5), bsize_bins)"));
+
+                    rdrAT->tableSetColumnTitle(histStart+8, tr("Burst Countrate-Histogram: countrate [kcps]"));
+                    rdrAT->tableSetColumnExpression(histStart+8, QString("histogrambins(column(6)*1e-3, brate_bins)"));
+                    rdrAT->tableSetColumnTitle(histStart+9, tr("Burst Countrate-Histogram: frequency"));
+                    rdrAT->tableSetColumnExpression(histStart+9, QString("histogram(column(6)*1e-3, brate_bins)"));
+
+
+
+                    rdrAT->tableReevaluateExpressions();
+
+                }
+
+
+                {
+                    double pmin=outDataFiltered.properties.value("burstfiltered_histogram_P_min", 0).toDouble();
+                    double pmax=outDataFiltered.properties.value("burstfiltered_histogram_P_max", 1).toDouble();
+                    int pbins=outDataFiltered.properties.value("burstfiltered_histogram_P_bins", 31).toInt();
+                    double emin=outDataFiltered.properties.value("burstfiltered_histogram_E_min", 0).toDouble();
+                    double emax=outDataFiltered.properties.value("burstfiltered_histogram_E_max", 1).toDouble();
+                    int ebins=outDataFiltered.properties.value("burstfiltered_histogram_E_bins", 31).toInt();
+                    QString pre=QString("// burst duration histogram:\nbdur_bins=21;\n// burst size histogram:\nbsize_bins=21;\n// burst countrate histogram:\nbrate_bins=21;\n// P-histogram bins:\npmin = %1;\npmax = %2;\npbins = %3;\n// E-histogram bins:\nemin = %4;\nemax = %5;\nebins = %6;\n")
+                                .arg(CDoubleToQString(pmin)).arg(CDoubleToQString(pmax)).arg(pbins)
+                                .arg(CDoubleToQString(emin)).arg(CDoubleToQString(emax)).arg(ebins);
+
+                    rdrFT->tableSetPreEvaluationExpression(pre);
+
+
+                    rdrFT->tableSetColumnTitle(calcStart, tr("Burst Duration: Delta T [ms]"));
+                    rdrFT->tableSetColumnExpression(calcStart, QString("column(6)*1e-3"));
+                    rdrFT->tableSetColumnTitle(calcStart+1, tr("Burst Size"));
+                    rdrFT->tableSetColumnExpression(calcStart+1, QString("column(4)+column(5)"));
+
+
+                    rdrFT->tableSetColumnTitle(histStart, tr("P-Histogram: P"));
+                    rdrFT->tableSetColumnExpression(histStart, QString("rangedhistogrambins(pmin, pmax, pbins)"));
+                    rdrFT->tableSetColumnTitle(histStart+1, tr("P-Histogram: frequency"));
+                    rdrFT->tableSetColumnExpression(histStart+1, QString("rangedhistogram(column(7), pmin, pmax, pbins)"));
+                    rdrFT->tableSetColumnTitle(histStart+2, tr("E-Histogram: E"));
+                    rdrFT->tableSetColumnExpression(histStart+2, QString("rangedhistogrambins(emin, emax, ebins)"));
+                    rdrFT->tableSetColumnTitle(histStart+3, tr("E-Histogram: frequency"));
+                    rdrFT->tableSetColumnExpression(histStart+3, QString("rangedhistogram(column(8), emin, emax, ebins)"));
+
+                    rdrFT->tableSetColumnTitle(histStart+4, tr("Burst Duration-Histogram: Delta T[ms]"));
+                    rdrFT->tableSetColumnExpression(histStart+4, QString("histogrambins(column(3)*1e3, bdur_bins)"));
+                    rdrFT->tableSetColumnTitle(histStart+5, tr("Burst Duration-Histogram: frequency"));
+                    rdrFT->tableSetColumnExpression(histStart+5, QString("histogram(column(3)*1e3, bdur_bins)"));
+
+                    rdrFT->tableSetColumnTitle(histStart+6, tr("Burst Size-Histogram: photons"));
+                    rdrFT->tableSetColumnExpression(histStart+6, QString("histogrambins(column(4)+column(5), bsize_bins)"));
+                    rdrFT->tableSetColumnTitle(histStart+7, tr("Burst Size-Histogram: frequency"));
+                    rdrFT->tableSetColumnExpression(histStart+7, QString("histogram(column(4)+column(5), bsize_bins)"));
+
+                    rdrFT->tableSetColumnTitle(histStart+8, tr("Burst Countrate-Histogram: countrate [kcps]"));
+                    rdrFT->tableSetColumnExpression(histStart+8, QString("histogrambins(column(6)*1e-3, brate_bins)"));
+                    rdrFT->tableSetColumnTitle(histStart+9, tr("Burst Countrate-Histogram: frequency"));
+                    rdrFT->tableSetColumnExpression(histStart+9, QString("histogram(column(6)*1e-3, brate_bins)"));
+
+
+                    rdrFT->tableReevaluateExpressions();
+
+                }
+
+
+            }
+            if ( rdrAG) {
+                QFRDRColumnGraphsInterface* cg=rdrAG;
+                int g;
+                g=cg->colgraphAddPlot(tr("proximity ratio histogram"), tr("proximity ratio P"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart, histStart+1, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("FRET ratio histogram"), tr("FRET ratio E"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart+2, histStart+3, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("burst duration histogram"), tr("burst duration \\Delta t_{Burst} [ms]"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart+4, histStart+5, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("burst size histogram"), tr("burst size [photons]"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart+6, histStart+7, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("burst countrate histogram"), tr("burst countrate [kcps]"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart+8, histStart+9, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("burst size vs. duration"), tr("burst size [photons]"), tr("burst duration [ms]"));
+                cg->colgraphAddGraph(g, calcStart+1,calcStart, QFRDRColumnGraphsInterface::cgtPoints, "");
+
+            }
+            if ( rdrFG) {
+                QFRDRColumnGraphsInterface* cg=rdrFG;
+                int g;
+                g=cg->colgraphAddPlot(tr("proximity ratio histogram"), tr("proximity ratio P"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart, histStart+1, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("FRET ratio histogram"), tr("FRET ratio E"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart+2, histStart+3, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("burst duration histogram"), tr("burst duration \\Delta t_{Burst} [ms]"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart+4, histStart+5, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("burst size histogram"), tr("burst size [photons]"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart+6, histStart+7, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("burst countrate histogram"), tr("burst countrate [kcps]"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart+8, histStart+9, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("burst size vs. duration"), tr("burst size [photons]"), tr("burst duration [ms]"));
+                cg->colgraphAddGraph(g, calcStart+1,calcStart, QFRDRColumnGraphsInterface::cgtPoints, "");
+
+            }
+        } else {
+            QFPluginServices::getInstance()->log_error(tr("error adding record to project"));
+        }
+    } else {
+        QFPluginServices::getInstance()->log_error(tr("error adding record to project"));
+    }
+}
+
+void QFETCSPCImporterFretchen2::on_btnSaveToFile_clicked()
+{
+    QStringList f=QFDataExportHandler::getFormats();
+    QString selFilter;
+    QString fn=qfGetSaveFileNameSet("QFETCSPCImporterFretchen2/savetofile/", this, tr("Save burst data to file"), "", f.join(";;"), &selFilter);
+    if (fn.size()>0) {
+        QFileInfo fi(fn);
+        outData.save(fn, /*fi.absoluteDir().absoluteFilePath(fi.completeBaseName()+".full."+fi.suffix()),*/ f.indexOf(selFilter));
+        outData.save(fi.absoluteDir().absoluteFilePath(fi.completeBaseName()+".filtered."+fi.suffix()), f.indexOf(selFilter));
+    }
+}
+
 
 
 void QFETCSPCImporterFretchen2::setEditControlsEnabled(bool en)
@@ -245,6 +440,8 @@ void QFETCSPCImporterFretchen2::updateFromFile()
         progress.show();
         progress.raise();
         QApplication::processEvents();
+        QApplication::processEvents();
+        QApplication::processEvents();
 
         QFTCSPCReader* reader=QFTCSPCReader::getImporter(ui->cmbFileformat->currentIndex());
         if (reader) {
@@ -263,8 +460,15 @@ void QFETCSPCImporterFretchen2::updateFromFile()
                     ui->cmbRedChannel->addItem(tr("channel %1 (%2 kHz)").arg(i).arg(cr, 0, 'f', 3));
                     if (cr>0) channels<<i;
                 }
+                ui->spinRangeStart->setRange(0, reader->measurementDuration());
+                ui->spinRangeEnd->setRange(0, reader->measurementDuration());
+                ui->spinRangeEnd->setValue(reader->measurementDuration());
+                ui->spinRangeStart->setValue(0);
                 ProgramOptions::getConfigQComboBox(ui->cmbGreenChannel, "QFETCSPCImporterFretchen2/cmbGreenChannel", channels.value(0,0));
                 ProgramOptions::getConfigQComboBox(ui->cmbRedChannel, "QFETCSPCImporterFretchen2/cmbRedChannel", channels.value(1,1));
+                reader->close();
+                delete reader;
+                reader=NULL;
             }
         }
         QApplication::restoreOverrideCursor();
@@ -284,32 +488,39 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
     JKQTPdatastore* ds=ui->pltTrace->getDatastore();
     ds->clear();
     QVector<double> x, y;
-    //qDebug()<<s<<l<<photons.firstPhoton<<photons.duration;
+    x.reserve(photons.photondata.size()/1000+10);
+    y.reserve(photons.photondata.size()/1000+10);
+    qDebug()<<s<<l<<photons.firstPhoton<<photons.duration<<photons.photondata.size()<<(ui->chkSHowFilteredIPT->isChecked() && photons.lastLEEWindowSize>0);
     if (ui->chkSHowFilteredIPT->isChecked() && photons.lastLEEWindowSize>0) {
         for (int i=0; i<photons.photondata.size(); i++) {
-            const double at=photons.photondata[i].arrivaltime;
-            const double ipt=photons.photondata[i].IPT_filtered*1e6;
+            const double at=photons.photondata.at(i).arrivaltime;
+            const double ipt=photons.photondata.at(i).IPT_filtered*1e6;
+            //Debug()<<i<<at<<ipt;
             if (at>=s && at<=s+l) {
                 x<<at;
                 y<<ipt;
+                //qDebug()<<i<<"IPT_f ";
             }
-            if (i%5000==0) QApplication::processEvents();
+            if (i>0 && i%100000==0) QApplication::processEvents();
         }
         plteInterphotonTimes->set_title(tr("all photons, LEE filtered"));
         plteInterphotonTimes->set_drawLine(true);
     } else {
         for (int i=0; i<photons.photondata.size(); i++) {
-            const double at=photons.photondata[i].arrivaltime;
-            const double ipt=photons.photondata[i].IPT*1e6;
+            const double at=photons.photondata.at(i).arrivaltime;
+            const double ipt=photons.photondata.at(i).IPT*1e6;
+            //qDebug()<<i<<at<<ipt;
             if (at>=s && at<=s+l) {
                 x<<at;
                 y<<ipt;
+                //qDebug()<<i;
             }
-            if (i%5000==0) QApplication::processEvents();
+            if (i>0 && i%100000==0) QApplication::processEvents();
         }
         plteInterphotonTimes->set_drawLine(false);
         plteInterphotonTimes->set_title(tr("all photons"));
     }
+    qDebug()<<x.size()<<y.size();
     plteInterphotonTimes->set_xColumn(ds->addCopiedColumn(x, tr("Arrivaltime [s]")));
     plteInterphotonTimes->set_yColumn(ds->addCopiedColumn(y, tr("Inter-Photon Time IPT [microseconds]")));
 
@@ -335,7 +546,30 @@ void QFETCSPCImporterFretchen2::updateAnalysis()
     p.backR=ui->spinBackR->value();
     p.crosstalk=ui->spinCrosstalk->value()/100.0;
     p.fdirect=ui->spinFDir->value();
+    p.gamma=ui->spinGamma->value();
     TTTRCalcBurstProperties(&bursts, p);
+
+    outData.properties["burstanalysis_background_green_Hz"]=p.backG;
+    outData.properties["burstanalysis_background_red_Hz"]=p.backR;
+    outData.properties["burstanalysis_crosstalk"]=p.crosstalk;
+    outData.properties["burstanalysis_fdirect"]=p.fdirect;
+    outData.properties["burstanalysis_gamma"]=p.gamma;
+
+    while (outData.data.size()<8) {
+        outData.data.append(QList<QVariant>());
+    }
+    if (outDataPCol>=0 && outDataPCol<outData.data.size()) {
+        outData.data[outDataPCol].clear();
+        for (int i=0; i<bursts.burstdata.size(); i++) {
+            outData.data[outDataPCol]<<bursts.burstdata[i].P;
+        }
+    }
+    if (outDataECol>=0 && outDataECol<outData.data.size()) {
+        outData.data[outDataECol].clear();
+        for (int i=0; i<bursts.burstdata.size(); i++) {
+            outData.data[outDataECol]<<bursts.burstdata[i].E;
+        }
+    }
 
     updateAnalysisPlots();
 
@@ -355,9 +589,18 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     dsB->clear();
     dsP->clear();
 
-    QVector<double> PVec, DVec, RVec, SAllVec, DAllVec;
+    QVector<double> PVec, EVec, DVec, RVec, SAllVec, DAllVec;
     const double mir=ui->spinMinRate->value()*1e3;
     const double mar=ui->spinMaxRate->value()*1e3;
+
+    outDataFiltered=outData;
+    outDataFiltered.properties["burstfiltered"]=true;
+    outDataFiltered.properties["burstfiltered_minimum_rate_kHz"]=mir;
+    outDataFiltered.properties["burstfiltered_minimum_rate_kHz"]=mar;
+
+
+    while (outDataFiltered.data.size()<8) outDataFiltered.data.append(QList<QVariant>());
+    for (int i=0; i<outDataFiltered.data.size(); i++) outDataFiltered.data[i].clear();
 
     for (int i=0; i<bursts.burstdata.size(); i++) {
         const double r=bursts.burstdata[i].getRate();
@@ -367,6 +610,15 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
             RVec<<r;
             DVec<<(bursts.burstdata[i].duration);
             PVec<<bursts.burstdata[i].P;
+            EVec<<bursts.burstdata[i].E;
+            outDataFiltered.data[0]<<i;
+            outDataFiltered.data[1]<<bursts.burstdata.at(i).start;
+            outDataFiltered.data[2]<<bursts.burstdata.at(i).duration;
+            outDataFiltered.data[3]<<bursts.burstdata.at(i).photonG;
+            outDataFiltered.data[4]<<bursts.burstdata.at(i).photonR;
+            outDataFiltered.data[5]<<bursts.burstdata.at(i).getRate();
+            outDataFiltered.data[6]<<bursts.burstdata.at(i).P;
+            outDataFiltered.data[7]<<bursts.burstdata.at(i).E;
         }
     }
 
@@ -374,13 +626,55 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     ui->labAvgBDuration->setText(QString("%1 ms").arg(qfstatisticsAverage(DVec)*1e3, 0, 'f', 4));
     ui->labAvgRate->setText(QString("%1 kHz").arg(qfstatisticsAverage(RVec)*1e-3, 0, 'f', 3));
     ui->labAvgP->setText(QString("%1").arg(qfstatisticsAverage(PVec), 0, 'f', 4));
+    ui->labAvgE->setText(QString("%1").arg(qfstatisticsAverage(EVec), 0, 'f', 4));
 
-    int nbins=ui->spinHBins->value();
-    QVector<double> HX(nbins,0.0);
-    QVector<double> HY(nbins,0.0);
-    statisticsHistogram(PVec.data(), PVec.size(), HX.data(), HY.data(), nbins);
-    plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("P histogram: P")));
-    plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("P histogram: frequency")));
+    int nbins=1;
+    double binw=ui->spinHBinWidth->value();
+    double dmin=0, dmax=0;
+
+    {
+        nbins=1;
+        dmin=dmax=0;
+        calcHistParams(PVec, dmin,dmax,nbins,binw);
+        outDataFiltered.properties["burstfiltered_histogram_P_min"]=dmin;
+        outDataFiltered.properties["burstfiltered_histogram_P_max"]=dmax;
+        outDataFiltered.properties["burstfiltered_histogram_P_bins"]=nbins;
+        outDataFiltered.properties["burstfiltered_histogram_P_binwidth"]=binw;
+    }
+    {
+        nbins=1;
+        dmin=dmax=0;
+        calcHistParams(EVec, dmin,dmax,nbins,binw);
+        outDataFiltered.properties["burstfiltered_histogram_E_min"]=dmin;
+        outDataFiltered.properties["burstfiltered_histogram_E_max"]=dmax;
+        outDataFiltered.properties["burstfiltered_histogram_E_bins"]=nbins;
+        outDataFiltered.properties["burstfiltered_histogram_E_binwidth"]=binw;
+    }
+
+    nbins=1;
+    dmin=dmax=0;
+
+    if (ui->cmbAnaHistMode->currentIndex()==0) {
+        calcHistParams(PVec, dmin,dmax,nbins,binw);
+        QVector<double> HX(nbins,0.0);
+        QVector<double> HY(nbins,0.0);
+        statisticsHistogramRanged(PVec.data(), PVec.size(), dmin, dmax, HX.data(), HY.data(), nbins);
+
+        plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("P histogram: P")));
+        plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("P histogram: frequency")));
+        ui->pltProximity->getXAxis()->set_axisLabel(tr("proximity ratio P"));
+    } else {
+        calcHistParams(EVec, dmin,dmax,nbins,binw);
+        QVector<double> HX(nbins,0.0);
+        QVector<double> HY(nbins,0.0);
+        statisticsHistogramRanged(EVec.data(), EVec.size(), dmin, dmax, HX.data(), HY.data(), nbins);
+
+        plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("E histogram: E")));
+        plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("E histogram: frequency")));
+        ui->pltProximity->getXAxis()->set_axisLabel(tr("FRET ratio E"));
+    }
+
+    ui->labHistParams->setText(tr("%3 bins in [%1..%2]").arg(dmin,0,'f',4).arg(dmax,0,'f',4).arg(nbins));
 
     plteBurstRate->set_xColumn(dsB->addCopiedColumn(SAllVec, tr("burst size [photons]")));
     plteBurstRate->set_yColumn(dsB->addCopiedColumn(DAllVec, tr("burst duration [ms]")));
@@ -395,6 +689,19 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     ui->pltBurstRate->update_plot();
     ui->pltProximity->update_plot();
     QApplication::restoreOverrideCursor();
+}
+
+void QFETCSPCImporterFretchen2::calcHistParams(const QVector<double> &PVec, double &dmin, double &dmax, int &nbins, double binw)
+{
+    dmin=0;
+    dmax=0;
+    statisticsMinMax(PVec.data(), PVec.size(), dmin, dmax);
+    if (dmax<1) dmax=1;
+    if (dmin>0) dmin=0;
+    if (dmin<0) dmin=floor(dmin/binw)*binw;
+    else dmin=ceil(dmin/binw)*binw;
+    dmax=ceil(dmax/binw)*binw;
+    nbins=ceil(fabs(dmax-dmin)/binw);
 }
 
 
@@ -440,10 +747,12 @@ void QFETCSPCImporterFretchen2::updateBurstSelection()
     progress.setMode(true, false);
     progress.show();
     progress.raise();
+    outData.properties["lee_filtered"]=false;
     if (ui->chkLEE->isChecked()) {
         QFETCSPCImporterFretchen2LEEFilterer exe(&photons);
         QFuture<void> opened=QtConcurrent::run(exe, ui->spinLEERange->value(), ui->spinLEESigma->value()*1e-3);
         progress.setLabelText(tr("applying LEE filter ..."));
+        outData.properties["lee_filteres"]=true;
         //photons.applyLEEFilter(ui->spinLEERange->value(), ui->spinLEESigma->value()*1e-3);
         while (!opened.isFinished()) {
             QApplication::processEvents();
@@ -452,7 +761,11 @@ void QFETCSPCImporterFretchen2::updateBurstSelection()
     if (photons.lastLEEWindowSize>0) {
         ui->labLEEWindow->setText(QString::number(photons.lastLEEWindowSize));
         ui->labLEESigma0->setText(QString("%1 ms").arg(photons.lastLEESigma0*1e3, 0, 'f', 3));
+        outData.properties["lee_filtered"]=true;
+        outData.properties["lee_windowsize"]=photons.lastLEEWindowSize;
+        outData.properties["lee_sigma0"]=photons.lastLEESigma0;
     } else {
+        outData.properties["lee_filtered"]=false;
         ui->labLEEWindow->setText(QString("---"));
         ui->labLEESigma0->setText(QString("---"));
     }
@@ -467,13 +780,49 @@ void QFETCSPCImporterFretchen2::updateBurstSelection()
     props.chG=ui->cmbGreenChannel->currentIndex();
     props.chR=ui->cmbRedChannel->currentIndex();
     props.filtered=ui->chkLEE->isChecked();
+    outData.properties["burstselect_max_burst_duration_ms"]=props.maxBurstDuration;
+    outData.properties["burstselect_max_ipt_microseconds"]=props.maxIPT;
+    outData.properties["burstselect_min_burst_size_photons"]=props.minBurstSize;
+    outData.properties["lee_filtered"]=props.filtered;
     QFuture<void> opened=QtConcurrent::run(burstFinder, props);
     while (!opened.isFinished()) {
         QApplication::processEvents();
     }
     bursts=b;
+    outData.properties["burstselect_burstcount"]=bursts.burstdata.size();
+    outData.properties["burstselect_avg_burst_duration_ms"]=bursts.avgDuration*1e3;
 
     ui->labBursts->setText(tr("count: %1,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;avg. duration: %2 ms").arg(bursts.burstdata.size()).arg(bursts.avgDuration*1e3,0,'f',3));
+
+    outData.colHeaders.clear();
+    for (int i=0; i<8; i++) {
+        if (i<outData.data.size()) {
+            outData.data[i].clear();
+        }
+    }
+    while (outData.data.size()<8) {
+        outData.data.append(QList<QVariant>());
+    }
+    outData.colHeaders<<tr("burst");
+    outData.colHeaders<<tr("start [s]");
+    outData.colHeaders<<tr("duration [s]");
+    outData.colHeaders<<tr("photons_green");
+    outData.colHeaders<<tr("photons_red");
+    outData.colHeaders<<tr("avg_countrate [cps]");
+    outData.colHeaders<<tr("Prxoimity_Ratio");
+    outData.colHeaders<<tr("FRET_Ratio");
+    outDataPCol=6;
+    outDataECol=7;
+    for (int i=0; i<bursts.burstdata.size(); i++) {
+        outData.data[0]<<i;
+        outData.data[1]<<bursts.burstdata.at(i).start;
+        outData.data[2]<<bursts.burstdata.at(i).duration;
+        outData.data[3]<<bursts.burstdata.at(i).photonG;
+        outData.data[4]<<bursts.burstdata.at(i).photonR;
+        outData.data[5]<<bursts.burstdata.at(i).getRate();
+        //outData.data[6]<<P;
+        //outData.data[7]<<E;
+    }
 
     updateCTRTrace();
     updateAnalysis();
@@ -489,6 +838,12 @@ void QFETCSPCImporterFretchen2::loadTCSPCFiles()
     if (QFile::exists(filename)) {
         //updateFromFile();
         setEditControlsEnabled(true);
+        outData.clear();
+        outDataFiltered.clear();
+        outDataECol=-1;
+        outDataPCol=-1;
+        outData.properties["input_file"]=filename;
+        outData.properties["background_file"]=filenameB;
 
 
         QModernProgressDialog progress(this);
@@ -539,17 +894,35 @@ void QFETCSPCImporterFretchen2::loadTCSPCFiles()
         if (readTCSPC.result()) {
             photons=photonsNew;
 
+            outData.properties["range_start"]=qMax(0.0, props.start);
+            outData.properties["range_end"]=(props.end>=0)?props.end:reader->measurementDuration();
+            outData.properties["channel_green"]=props.chG;
+            outData.properties["channel_red"]=props.chR;
+            outData.properties["first_photon"]=photons.firstPhoton;
+            outData.properties["duration"]=photons.duration;
+            if (readerBack) {
+                outData.properties["background_duration"]=readerBack->measurementDuration();
+            }
+
             ui->spinDisplayStart->setMaximum(photons.duration+photons.firstPhoton);
             ui->spinDisplayStart->setMinimum(photons.firstPhoton);
             ui->spinDisplayStart->setValue(0);
             ui->labDuration->setText(QString("%1 s").arg(photons.duration, 0, 'f', 2));
             ui->labP->setText(QString("%1").arg(photons.photondata.size()));
+            outData.properties["photons"]=photons.photondata.size();
             ui->labPGreen->setText(QString("%1").arg(photons.photonsG));
+            outData.properties["photons_green"]=photons.photonsG;
             ui->labPRed->setText(QString("%1").arg(photons.photonsR));
+            outData.properties["photons_red"]=photons.photonsR;
             ui->labAvgIPT->setText(QString("%1 &mu;s").arg(photons.avg_IPT, 0, 'f', 3));
+            outData.properties["avg_ipt_all"]=photons.avg_IPT;
 
             ui->labCGreen->setText(QString("%1 (B: %2) kHz").arg(photons.avgrate.value(ui->cmbGreenChannel->currentIndex())*1e-3, 0, 'f', 3).arg(photons.backgroundrate.value(ui->cmbGreenChannel->currentIndex())*1e-3, 0, 'f', 3));
+            outData.properties["countrate_green_avg_fromfile"]=photons.avgrate.value(ui->cmbGreenChannel->currentIndex());
+            outData.properties["background_green_avg_fromfile"]=photons.backgroundrate.value(ui->cmbGreenChannel->currentIndex());
             ui->labCRed->setText(QString("%1 (B: %2) kHz").arg(photons.avgrate.value(ui->cmbRedChannel->currentIndex())*1e-3, 0, 'f', 3).arg(photons.backgroundrate.value(ui->cmbRedChannel->currentIndex())*1e-3, 0, 'f', 3));
+            outData.properties["countrate_red_avg_fromfile"]=photons.avgrate.value(ui->cmbRedChannel->currentIndex());
+            outData.properties["background_red_avg_fromfile"]=photons.backgroundrate.value(ui->cmbRedChannel->currentIndex());
             ui->labBackG->setText(QString("%1 Hz").arg(photons.backgroundrate.value(ui->cmbGreenChannel->currentIndex()), 0, 'f', 3));
             ui->labBackR->setText(QString("%1 Hz").arg(photons.backgroundrate.value(ui->cmbRedChannel->currentIndex()), 0, 'f', 3));
             ui->spinBackG->setValue(photons.backgroundrate.value(ui->cmbGreenChannel->currentIndex(),0));
@@ -561,6 +934,14 @@ void QFETCSPCImporterFretchen2::loadTCSPCFiles()
             ui->tabWidget->setCurrentIndex(1);
             ui->tabWidget->setTabEnabled(1, true);
             updateCTRTrace();
+        }
+        reader->close();
+        delete reader;
+        reader=NULL;
+        if (readerBack) {
+            readerBack->close();
+            delete readerBack;
+            readerBack=NULL;
         }
     } else {
         setEditControlsEnabled(false);

@@ -26,6 +26,7 @@
 #include <QVector4D>
 #include <QMatrix4x4>
 #include "programoptions.h"
+#include "qfrawdatarecord.h"
 
 QList<QVector<double> > dataRotate(const QList<QVector<double> >& data) {
     QList<QVector<double> > result;
@@ -632,7 +633,7 @@ void QFDataExportHandler::save(const QList<QList<QVariant> > &data, int format, 
     for (int i=0; i<cl.size(); i++) {
         cl[i]="# "+cl[i];
     }
-    cl.append("# ");
+    if(cl.size()>0) cl.append("# \n");
     c=cl.join("\n");
     QString p;
     QMapIterator<QString, QVariant> it(properties);
@@ -866,6 +867,25 @@ int dataGetRows(const QList<QList<QVariant> >& data) {
 void QFDataExportTool::save(const QString &filename, int format) const
 {
     QFDataExportHandler::save(data, format, filename, colHeaders, rowHeaders, comment, properties);
+}
+
+void QFDataExportTool::saveToTable(QFRDRTableInterface *table, bool setProps) const
+{
+    for (int i=0; i<colHeaders.size(); i++) {
+        table->tableSetColumnTitle(i, colHeaders[i]);
+    }
+    for (int i=0; i<data.size(); i++) {
+        table->tableSetColumnData(i, data[i]);
+    }
+
+    QFRawDataRecord* rdr=dynamic_cast<QFRawDataRecord*>(table);
+    if (rdr&&setProps) {
+        QMapIterator<QString, QVariant> itF(properties);
+        while (itF.hasNext()) {
+            itF.next();
+            rdr->setQFPropertyIfNotUserEditable(itF.key(), itF.value(), false, true);
+        }
+    }
 }
 
 void QFDataExportTool::clear()
