@@ -70,6 +70,7 @@ class QFETCSPCImporterFretchen2 : public QDialog
         void saveData(const QFDataExportTool& outData, const QString &filename, int filterID);
         void saveToProject(const QFDataExportTool& outData, const QFDataExportTool& outDataFiltered, const QString& grp, int calcStart=10, int histStart=14, int coloffset=0);
         void saveToProject(const QFDataExportTool& outData, const QString& grp, const QString &nameAdd, int calcStart=10, int histStart=14, int coloffset=0);
+        int collectMultiData(QFDataExportTool& out, QFDataExportTool& outF, QStringList& files);
 
     private:
         Ui::QFETCSPCImporterFretchen2 *ui;

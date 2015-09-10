@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1011</width>
-    <height>598</height>
+    <width>1013</width>
+    <height>599</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1786,6 +1786,16 @@ In any case, an additional column will contain the file ID</string>
            </property>
            <property name="text">
             <string>renumber bursts</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkMSAddFileID">
+           <property name="toolTip">
+            <string>If checked (default), the output file/table will contain an additional colum with an integer number identifying the file.</string>
+           </property>
+           <property name="text">
+            <string>add file-ID column</string>
            </property>
           </widget>
          </item>

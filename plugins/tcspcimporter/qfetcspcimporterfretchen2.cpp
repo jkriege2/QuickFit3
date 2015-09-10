@@ -17,8 +17,10 @@ QFETCSPCImporterFretchen2::QFETCSPCImporterFretchen2(QWidget *parent) :
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
     ui->setupUi(this);
-    ui->tabMultiFile->setVisible(true);//false);
+    //ui->tabMultiFile->setVisible(true);//false);
     ui->lstMultiFile->setModel(&ms_model);
+    //resetEditControls();
+    updateMultiFile();
     ms_model.setEditable(true);
     lastTCSPCFileDir="";
 
@@ -99,6 +101,7 @@ QFETCSPCImporterFretchen2::~QFETCSPCImporterFretchen2()
 void QFETCSPCImporterFretchen2::writeSettings()
 {
     ProgramOptions::setConfigQCheckBox(ui->chkMSRenumberBursts,  "QFETCSPCImporterFretchen2/chkMSRenumberBursts");
+    ProgramOptions::setConfigQCheckBox(ui->chkMSAddFileID,  "QFETCSPCImporterFretchen2/chkMSAddFileID");
     ProgramOptions::setConfigQCheckBox(ui->chkNormHistogram,  "QFETCSPCImporterFretchen2/chkNormHistogram");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinCrosstalk,  "QFETCSPCImporterFretchen2/spinCrosstalk");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinGamma,  "QFETCSPCImporterFretchen2/spinGamma");
@@ -125,6 +128,7 @@ void QFETCSPCImporterFretchen2::writeSettings()
 void QFETCSPCImporterFretchen2::readSettings()
 {
     ProgramOptions::getConfigQCheckBox(ui->chkMSRenumberBursts,  "QFETCSPCImporterFretchen2/chkMSRenumberBursts", true);
+    ProgramOptions::getConfigQCheckBox(ui->chkMSAddFileID,  "QFETCSPCImporterFretchen2/chkMSAddFileID", true);
     ProgramOptions::getConfigQCheckBox(ui->chkNormHistogram,  "QFETCSPCImporterFretchen2/chkNormHistogram", true);
     ProgramOptions::getConfigQComboBox(ui->cmbAnaHistMode,  "QFETCSPCImporterFretchen2/cmbAnaHistMode", 0);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinCrosstalk,  "QFETCSPCImporterFretchen2/spinCrosstalk", 4);
@@ -347,6 +351,7 @@ void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, c
     }
 }
 
+
 void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
 {
     QString grp=QFileInfo(ui->edtTCSPCFile->text()).fileName();
@@ -363,46 +368,19 @@ void QFETCSPCImporterFretchen2::on_btnAppendToMulti_clicked()
 
 void QFETCSPCImporterFretchen2::on_btnSaveToMulti_clicked()
 {
-    if (ms_model.rowCount()>0) {
-        QFDataExportTool out, outF;
-        QStringList files;
-        int cnt=0;
-        for (int i=0; i<ms_model.rowCount(); i++) {
-            if (ms_model.isChecked(i) && i<ms_outData.size() && i<ms_outDataFiltered.size()) {
-                if (cnt==0) {
-                    out=ms_outData[i];
-                    outF=ms_outDataFiltered[i];
-                } else {
-                    int rc=out.getRowCount();
-                    for (int j=0; j<out.data.size(); j++) {
-                        while (out.data[j].size()<rc) out.data[j].append(QVariant());
-                        out.data[j]<<ms_outData[i].data[j];
-                    }
-                    rc=outF.getRowCount();
-                    for (int j=0; j<outF.data.size(); j++) {
-                        while (outF.data[j].size()<rc) outF.data[j].append(QVariant());
-                        outF.data[j]<<ms_outDataFiltered[i].data[j];
-                    }
-                }
-                files<<ms_model.data(ms_model.index(i), Qt::DisplayRole).toString();
-                cnt++;
-            }
-        }
-        if (cnt>0) {
-            out.properties.remove("input_file");
-            out.properties["input_files"]=files.join(";   ");
-            outF.properties.remove("input_file");
-            outF.properties["input_files"]=files.join(";   ");
-            saveData(out, outF);
-        }
+    QFDataExportTool out, outF;
+    QStringList files;
+    int cnt=collectMultiData(out, outF, files);
+    if (cnt>0) {
+        saveData(out, outF);
     }
+
 }
 
-void QFETCSPCImporterFretchen2::on_btnSaveMultiToProject_clicked()
+
+int QFETCSPCImporterFretchen2::collectMultiData(QFDataExportTool &out, QFDataExportTool &outF, QStringList &files)
 {
     if (ms_model.rowCount()>0) {
-        QFDataExportTool out, outF;
-        QStringList files;
         int cnt=0;
         QVariantList vlfid, vlfidF;
         int c=0, cF=0;
@@ -417,14 +395,24 @@ void QFETCSPCImporterFretchen2::on_btnSaveMultiToProject_clicked()
                     for (int j=0; j<out.data.size(); j++) {
                         while (out.data[j].size()<rc) out.data[j].append(QVariant());
                         out.data[j]<<ms_outData[i].data[j];
-                        vlfid<<cnt;
+                        if (j==0) {
+                            for (int n=0; n<out.data[j].size(); n++) {
+                                vlfid<<cnt;
+                            }
+                        }
 
                     }
+
                     rc=outF.getRowCount();
                     for (int j=0; j<outF.data.size(); j++) {
                         while (outF.data[j].size()<rc) outF.data[j].append(QVariant());
                         outF.data[j]<<ms_outDataFiltered[i].data[j];
-                        vlfidF<<cnt;
+                        if (j==0) {
+                            for (int n=0; n<outF.data[j].size(); n++) {
+                                vlfid<<cnt;
+                            }
+                        }
+                        //vlfidF<<cnt;
                     }
 
                 }
@@ -446,16 +434,30 @@ void QFETCSPCImporterFretchen2::on_btnSaveMultiToProject_clicked()
             }
         }
         if (cnt>0) {
-            out.data.append(vlfid);
-            outF.data.append(vlfidF);
-            out.colHeaders.append(tr("file-ID"));
-            outF.colHeaders.append(tr("file-ID"));
+            if (ui->chkMSAddFileID->isChecked()) {
+                out.data.append(vlfid);
+                outF.data.append(vlfidF);
+                out.colHeaders.append(tr("file-ID"));
+                outF.colHeaders.append(tr("file-ID"));
+            }
             out.properties.remove("input_file");
             out.properties["input_files"]=files.join(";   ");
             outF.properties.remove("input_file");
             outF.properties["input_files"]=files.join(";   ");
-            saveToProject(out, outF, files.join(", "), 1);
+            //
         }
+        return cnt;
+    }
+    return 0;
+}
+
+void QFETCSPCImporterFretchen2::on_btnSaveMultiToProject_clicked()
+{
+    QFDataExportTool out, outF;
+    QStringList files;
+    int cnt=collectMultiData(out, outF, files);
+    if (cnt>0) {
+        saveToProject(out, outF, files.join(", "), 1);
     }
 }
 
@@ -592,19 +594,22 @@ void QFETCSPCImporterFretchen2::updateFromFile()
         progress.setHasCancel(false);
         progress.setLabelText(tr("reading TCSPC file ..."));
         progress.setMode(true, false);
-        progress.show();
+        progress.open();
         progress.raise();
         QApplication::processEvents();
-        QApplication::processEvents();
-        QApplication::processEvents();
+
 
         QFTCSPCReader* reader=QFTCSPCReader::getImporter(ui->cmbFileformat->currentIndex());
+        QApplication::processEvents();
+        QApplication::processEvents();
         if (reader) {
             QFTCSPCReaderOpener opener(reader);
             QFuture<bool> opened=QtConcurrent::run(opener,filename, QString());
+            QApplication::processEvents();
             while (!opened.isFinished()) {
                 QApplication::processEvents();
             }
+            QApplication::processEvents();
             if (opened.result()) {
                 // && reader->open(filename)) {
                 int ccnt=reader->inputChannels();
