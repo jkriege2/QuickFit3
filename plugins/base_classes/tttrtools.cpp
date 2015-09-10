@@ -150,7 +150,8 @@ void TTTRFindBursts(TCSPCBurstsData *output, const TCSPCPhotonsData &photons, TT
     TCSPCBurstData b;
     for (int i=0; i<photons.photondata.size()-props.minBurstSize; i++) {
         if (isBurst) {
-            if (photons.photondata[i].IPT>props.maxIPT) {
+            if ((props.filtered && photons.photondata[i].IPT_filtered>props.maxIPT)
+                    ||(!props.filtered && photons.photondata[i].IPT>props.maxIPT)) {
                 isBurst=false;
                 if (b.duration<=props.maxBurstDuration && b.size>=props.minBurstSize) {
                     output->burstdata.append(b);

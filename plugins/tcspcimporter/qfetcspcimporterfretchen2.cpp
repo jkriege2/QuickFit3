@@ -17,6 +17,9 @@ QFETCSPCImporterFretchen2::QFETCSPCImporterFretchen2(QWidget *parent) :
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
     ui->setupUi(this);
+    ui->tabMultiFile->setVisible(true);//false);
+    ui->lstMultiFile->setModel(&ms_model);
+    ms_model.setEditable(true);
     lastTCSPCFileDir="";
 
     tcspcFilters.clear();
@@ -89,11 +92,13 @@ QFETCSPCImporterFretchen2::QFETCSPCImporterFretchen2(QWidget *parent) :
 
 QFETCSPCImporterFretchen2::~QFETCSPCImporterFretchen2()
 {
+    writeSettings();
     delete ui;
 }
 
 void QFETCSPCImporterFretchen2::writeSettings()
 {
+    ProgramOptions::setConfigQCheckBox(ui->chkNormHistogram,  "QFETCSPCImporterFretchen2/chkNormHistogram");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinCrosstalk,  "QFETCSPCImporterFretchen2/spinCrosstalk");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinGamma,  "QFETCSPCImporterFretchen2/spinGamma");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinFDir,  "QFETCSPCImporterFretchen2/spinFDir");
@@ -118,6 +123,7 @@ void QFETCSPCImporterFretchen2::writeSettings()
 
 void QFETCSPCImporterFretchen2::readSettings()
 {
+    ProgramOptions::getConfigQCheckBox(ui->chkNormHistogram,  "QFETCSPCImporterFretchen2/chkNormHistogram", true);
     ProgramOptions::getConfigQComboBox(ui->cmbAnaHistMode,  "QFETCSPCImporterFretchen2/cmbAnaHistMode", 0);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinCrosstalk,  "QFETCSPCImporterFretchen2/spinCrosstalk", 4);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinGamma,  "QFETCSPCImporterFretchen2/spinGamma", 1);
@@ -225,9 +231,9 @@ void QFETCSPCImporterFretchen2::on_btnApplyBurstAnalysis_clicked()
     updateAnalysis();
 }
 
-void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
+
+void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, const QFDataExportTool &outDataFiltered, const QString &grp, int coloffset)
 {
-    QString grp=QFileInfo(ui->edtTCSPCFile->text()).fileName();
     QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
     QFRawDataRecord* rdrA=p->addRawData("table", tr("%1 - spFRET Burst Analysis").arg(grp));
     if (rdrA) {
@@ -247,8 +253,8 @@ void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
 
             QFRDRColumnGraphsInterface* rdrFG=dynamic_cast<QFRDRColumnGraphsInterface*>(rdrF);
             QFRDRTableInterface* rdrFT=dynamic_cast<QFRDRTableInterface*>(rdrF);
-            int calcStart=8;
-            int histStart=12;
+            int calcStart=coloffset+8;
+            int histStart=coloffset+12;
             if ( rdrAT &&  rdrFT) {
                 outData.saveToTable(rdrAT, true);
                 outDataFiltered.saveToTable(rdrFT, true);
@@ -262,43 +268,44 @@ void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
                     double emin=outData.properties.value("burstfiltered_histogram_E_min", 0).toDouble();
                     double emax=outData.properties.value("burstfiltered_histogram_E_max", 1).toDouble();
                     int ebins=outData.properties.value("burstfiltered_histogram_E_bins", 31).toInt();
-                    QString pre=QString("// burst duration histogram:\nbdur_bins=21;\n\n// burst size histogram:\nbsize_bins=21;\n\n// burst countrate histogram:\nbrate_bins=21;\n\n// P-histogram bins:\npmin = %1;\npmax = %2;\npbins = %3;\n\n// E-histogram bins:\nemin = %4;\nemax = %5;\nebins = %6;\n")
+                    QString pre=QString("// normalize histograms:\nhistograms_normalized = %7;\n\n// burst duration histogram:\nbdur_bins=21;\n\n// burst size histogram:\nbsize_bins=21;\n\n// burst countrate histogram:\nbrate_bins=21;\n\n// P-histogram bins:\npmin = %1;\npmax = %2;\npbins = %3;\n\n// E-histogram bins:\nemin = %4;\nemax = %5;\nebins = %6;\n")
                                 .arg(CDoubleToQString(pmin)).arg(CDoubleToQString(pmax)).arg(pbins)
-                                .arg(CDoubleToQString(emin)).arg(CDoubleToQString(emax)).arg(ebins);
+                                .arg(CDoubleToQString(emin)).arg(CDoubleToQString(emax)).arg(ebins)
+                                .arg(boolToQString(ui->chkNormHistogram->isChecked()));
 
                     rdrAT->tableSetPreEvaluationExpression(pre);
 
 
 
                     rdrAT->tableSetColumnTitle(calcStart, tr("Burst Duration: Delta T [ms]"));
-                    rdrAT->tableSetColumnExpression(calcStart, QString("column(6)*1e-3"));
+                    rdrAT->tableSetColumnExpression(calcStart, QString("column(%1)*1e-3").arg(coloffset+6));
                     rdrAT->tableSetColumnTitle(calcStart+1, tr("Burst Size"));
-                    rdrAT->tableSetColumnExpression(calcStart+1, QString("column(4)+column(5)"));
+                    rdrAT->tableSetColumnExpression(calcStart+1, QString("column(%1)+column(%2)").arg(coloffset+4).arg(coloffset+5));
 
 
                     rdrAT->tableSetColumnTitle(histStart, tr("P-Histogram: P"));
                     rdrAT->tableSetColumnExpression(histStart, QString("rangedhistogrambins(pmin, pmax, pbins)"));
                     rdrAT->tableSetColumnTitle(histStart+1, tr("P-Histogram: frequency"));
-                    rdrAT->tableSetColumnExpression(histStart+1, QString("rangedhistogram(column(7), pmin, pmax, pbins)"));
+                    rdrAT->tableSetColumnExpression(histStart+1, QString("rangedhistogram(column(%1), pmin, pmax, pbins, histograms_normalized)").arg(coloffset+7));
                     rdrAT->tableSetColumnTitle(histStart+2, tr("E-Histogram: E"));
                     rdrAT->tableSetColumnExpression(histStart+2, QString("rangedhistogrambins(emin, emax, ebins)"));
                     rdrAT->tableSetColumnTitle(histStart+3, tr("E-Histogram: frequency"));
-                    rdrAT->tableSetColumnExpression(histStart+3, QString("rangedhistogram(column(8), emin, emax, ebins)"));
+                    rdrAT->tableSetColumnExpression(histStart+3, QString("rangedhistogram(column(%1), emin, emax, ebins, histograms_normalized)").arg(coloffset+8));
 
                     rdrAT->tableSetColumnTitle(histStart+4, tr("Burst Duration-Histogram: Delta T[ms]"));
-                    rdrAT->tableSetColumnExpression(histStart+4, QString("histogrambins(column(3)*1e3, bdur_bins)"));
+                    rdrAT->tableSetColumnExpression(histStart+4, QString("histogrambins(column(%1)*1e3, bdur_bins)").arg(coloffset+3));
                     rdrAT->tableSetColumnTitle(histStart+5, tr("Burst Duration-Histogram: frequency"));
-                    rdrAT->tableSetColumnExpression(histStart+5, QString("histogram(column(3)*1e3, bdur_bins)"));
+                    rdrAT->tableSetColumnExpression(histStart+5, QString("histogram(column(%1)*1e3, bdur_bins, histograms_normalized)").arg(coloffset+3));
 
                     rdrAT->tableSetColumnTitle(histStart+6, tr("Burst Size-Histogram: photons"));
-                    rdrAT->tableSetColumnExpression(histStart+6, QString("histogrambins(column(4)+column(5), bsize_bins)"));
+                    rdrAT->tableSetColumnExpression(histStart+6, QString("histogrambins(column(%1)+column(%2), bsize_bins)").arg(coloffset+4).arg(coloffset+5));
                     rdrAT->tableSetColumnTitle(histStart+7, tr("Burst Size-Histogram: frequency"));
-                    rdrAT->tableSetColumnExpression(histStart+7, QString("histogram(column(4)+column(5), bsize_bins)"));
+                    rdrAT->tableSetColumnExpression(histStart+7, QString("histogram(column(%1)+column(%2), bsize_bins, histograms_normalized)").arg(coloffset+4).arg(coloffset+5));
 
                     rdrAT->tableSetColumnTitle(histStart+8, tr("Burst Countrate-Histogram: countrate [kcps]"));
-                    rdrAT->tableSetColumnExpression(histStart+8, QString("histogrambins(column(6)*1e-3, brate_bins)"));
+                    rdrAT->tableSetColumnExpression(histStart+8, QString("histogrambins(column(%1)*1e-3, brate_bins)").arg(coloffset+6));
                     rdrAT->tableSetColumnTitle(histStart+9, tr("Burst Countrate-Histogram: frequency"));
-                    rdrAT->tableSetColumnExpression(histStart+9, QString("histogram(column(6)*1e-3, brate_bins)"));
+                    rdrAT->tableSetColumnExpression(histStart+9, QString("histogram(column(%1)*1e-3, brate_bins, histograms_normalized)").arg(coloffset+6));
 
 
 
@@ -315,42 +322,43 @@ void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
                     double emin=outDataFiltered.properties.value("burstfiltered_histogram_E_min", 0).toDouble();
                     double emax=outDataFiltered.properties.value("burstfiltered_histogram_E_max", 1).toDouble();
                     int ebins=outDataFiltered.properties.value("burstfiltered_histogram_E_bins", 31).toInt();
-                    QString pre=QString("// burst duration histogram:\nbdur_bins=21;\n// burst size histogram:\nbsize_bins=21;\n// burst countrate histogram:\nbrate_bins=21;\n// P-histogram bins:\npmin = %1;\npmax = %2;\npbins = %3;\n// E-histogram bins:\nemin = %4;\nemax = %5;\nebins = %6;\n")
+                    QString pre=QString("// normalize histograms:\nhistograms_normalized = %7;\n\n// burst duration histogram:\nbdur_bins=21;\n\n// burst size histogram:\nbsize_bins=21;\n\n// burst countrate histogram:\nbrate_bins=21;\n\n// P-histogram bins:\npmin = %1;\npmax = %2;\npbins = %3;\n\n// E-histogram bins:\nemin = %4;\nemax = %5;\nebins = %6;\n")
                                 .arg(CDoubleToQString(pmin)).arg(CDoubleToQString(pmax)).arg(pbins)
-                                .arg(CDoubleToQString(emin)).arg(CDoubleToQString(emax)).arg(ebins);
+                                .arg(CDoubleToQString(emin)).arg(CDoubleToQString(emax)).arg(ebins)
+                                .arg(boolToQString(ui->chkNormHistogram->isChecked()));
 
                     rdrFT->tableSetPreEvaluationExpression(pre);
 
 
                     rdrFT->tableSetColumnTitle(calcStart, tr("Burst Duration: Delta T [ms]"));
-                    rdrFT->tableSetColumnExpression(calcStart, QString("column(6)*1e-3"));
+                    rdrFT->tableSetColumnExpression(calcStart, QString("column(%1)*1e-3").arg(coloffset+6));
                     rdrFT->tableSetColumnTitle(calcStart+1, tr("Burst Size"));
-                    rdrFT->tableSetColumnExpression(calcStart+1, QString("column(4)+column(5)"));
+                    rdrFT->tableSetColumnExpression(calcStart+1, QString("column(%1)+column(%2)").arg(coloffset+4).arg(coloffset+5));
 
 
                     rdrFT->tableSetColumnTitle(histStart, tr("P-Histogram: P"));
                     rdrFT->tableSetColumnExpression(histStart, QString("rangedhistogrambins(pmin, pmax, pbins)"));
                     rdrFT->tableSetColumnTitle(histStart+1, tr("P-Histogram: frequency"));
-                    rdrFT->tableSetColumnExpression(histStart+1, QString("rangedhistogram(column(7), pmin, pmax, pbins)"));
+                    rdrFT->tableSetColumnExpression(histStart+1, QString("rangedhistogram(column(%1), pmin, pmax, pbins, histograms_normalized)").arg(coloffset+7));
                     rdrFT->tableSetColumnTitle(histStart+2, tr("E-Histogram: E"));
                     rdrFT->tableSetColumnExpression(histStart+2, QString("rangedhistogrambins(emin, emax, ebins)"));
                     rdrFT->tableSetColumnTitle(histStart+3, tr("E-Histogram: frequency"));
-                    rdrFT->tableSetColumnExpression(histStart+3, QString("rangedhistogram(column(8), emin, emax, ebins)"));
+                    rdrFT->tableSetColumnExpression(histStart+3, QString("rangedhistogram(column(%1), emin, emax, ebins, histograms_normalized)").arg(coloffset+8));
 
                     rdrFT->tableSetColumnTitle(histStart+4, tr("Burst Duration-Histogram: Delta T[ms]"));
-                    rdrFT->tableSetColumnExpression(histStart+4, QString("histogrambins(column(3)*1e3, bdur_bins)"));
+                    rdrFT->tableSetColumnExpression(histStart+4, QString("histogrambins(column(%1)*1e3, bdur_bins)").arg(coloffset+3));
                     rdrFT->tableSetColumnTitle(histStart+5, tr("Burst Duration-Histogram: frequency"));
-                    rdrFT->tableSetColumnExpression(histStart+5, QString("histogram(column(3)*1e3, bdur_bins)"));
+                    rdrFT->tableSetColumnExpression(histStart+5, QString("histogram(column(%1)*1e3, bdur_bins, histograms_normalized)").arg(coloffset+3));
 
                     rdrFT->tableSetColumnTitle(histStart+6, tr("Burst Size-Histogram: photons"));
-                    rdrFT->tableSetColumnExpression(histStart+6, QString("histogrambins(column(4)+column(5), bsize_bins)"));
+                    rdrFT->tableSetColumnExpression(histStart+6, QString("histogrambins(column(%1)+column(%2), bsize_bins)").arg(coloffset+4).arg(coloffset+5));
                     rdrFT->tableSetColumnTitle(histStart+7, tr("Burst Size-Histogram: frequency"));
-                    rdrFT->tableSetColumnExpression(histStart+7, QString("histogram(column(4)+column(5), bsize_bins)"));
+                    rdrFT->tableSetColumnExpression(histStart+7, QString("histogram(column(%1)+column(%2), bsize_bins, histograms_normalized)").arg(coloffset+4).arg(coloffset+5));
 
                     rdrFT->tableSetColumnTitle(histStart+8, tr("Burst Countrate-Histogram: countrate [kcps]"));
-                    rdrFT->tableSetColumnExpression(histStart+8, QString("histogrambins(column(6)*1e-3, brate_bins)"));
+                    rdrFT->tableSetColumnExpression(histStart+8, QString("histogrambins(column(%1)*1e-3, brate_bins)").arg(coloffset+6));
                     rdrFT->tableSetColumnTitle(histStart+9, tr("Burst Countrate-Histogram: frequency"));
-                    rdrFT->tableSetColumnExpression(histStart+9, QString("histogram(column(6)*1e-3, brate_bins)"));
+                    rdrFT->tableSetColumnExpression(histStart+9, QString("histogram(column(%1)*1e-3, brate_bins, histograms_normalized)").arg(coloffset+6));
 
 
                     rdrFT->tableReevaluateExpressions();
@@ -402,17 +410,201 @@ void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
     }
 }
 
-void QFETCSPCImporterFretchen2::on_btnSaveToFile_clicked()
+void QFETCSPCImporterFretchen2::on_btnSaveToProject_clicked()
+{
+    QString grp=QFileInfo(ui->edtTCSPCFile->text()).fileName();
+    saveToProject(outData, outDataFiltered, grp);
+}
+
+void QFETCSPCImporterFretchen2::on_btnAppendToMulti_clicked()
+{
+    ms_outData.append(outData);
+    ms_outDataFiltered.append(outDataFiltered);
+    ms_model.addItem(QFileInfo(ui->edtTCSPCFile->text()).fileName(), true, ms_outData.size()-1);
+    updateMultiFile();
+}
+
+void QFETCSPCImporterFretchen2::on_btnSaveToMulti_clicked()
+{
+    if (ms_model.rowCount()>0) {
+        QFDataExportTool out, outF;
+        QStringList files;
+        int cnt=0;
+        for (int i=0; i<ms_model.rowCount(); i++) {
+            if (ms_model.isChecked(i) && i<ms_outData.size() && i<ms_outDataFiltered.size()) {
+                if (cnt==0) {
+                    out=ms_outData[i];
+                    outF=ms_outDataFiltered[i];
+                } else {
+                    int rc=out.getRowCount();
+                    for (int j=0; j<out.data.size(); j++) {
+                        while (out.data[j].size()<rc) out.data[j].append(QVariant());
+                        out.data[j]<<ms_outData[i].data[j];
+                    }
+                    rc=outF.getRowCount();
+                    for (int j=0; j<outF.data.size(); j++) {
+                        while (outF.data[j].size()<rc) outF.data[j].append(QVariant());
+                        outF.data[j]<<ms_outDataFiltered[i].data[j];
+                    }
+                }
+                files<<ms_model.data(ms_model.index(i), Qt::DisplayRole).toString();
+                cnt++;
+            }
+        }
+        if (cnt>0) {
+            out.properties.remove("input_file");
+            out.properties["input_files"]=files.join(";   ");
+            outF.properties.remove("input_file");
+            outF.properties["input_files"]=files.join(";   ");
+            saveData(out, outF);
+        }
+    }
+}
+
+void QFETCSPCImporterFretchen2::on_btnSaveMultiToProject_clicked()
+{
+    if (ms_model.rowCount()>0) {
+        QFDataExportTool out, outF;
+        QStringList files;
+        int cnt=0;
+        QVariantList vlfid, vlfidF;
+        for (int i=0; i<ms_model.rowCount(); i++) {
+            if (ms_model.isChecked(i) && i<ms_outData.size() && i<ms_outDataFiltered.size()) {
+                if (cnt==0) {
+                    out=ms_outData[i];
+                    outF=ms_outDataFiltered[i];
+                } else {
+                    int rc=out.getRowCount();
+                    for (int j=0; j<out.data.size(); j++) {
+                        while (out.data[j].size()<rc) out.data[j].append(QVariant());
+                        out.data[j]<<ms_outData[i].data[j];
+                        vlfid<<cnt;
+                    }
+                    rc=outF.getRowCount();
+                    for (int j=0; j<outF.data.size(); j++) {
+                        while (outF.data[j].size()<rc) outF.data[j].append(QVariant());
+                        outF.data[j]<<ms_outDataFiltered[i].data[j];
+                        vlfidF<<cnt;
+                    }
+
+                }
+                files<<ms_model.data(ms_model.index(i), Qt::DisplayRole).toString();
+                cnt++;
+            }
+        }
+        if (cnt>0) {
+            out.data.prepend(vlfid);
+            outF.data.prepend(vlfidF);
+            out.colHeaders.prepend(tr("file-ID"));
+            outF.colHeaders.prepend(tr("file-ID"));
+            out.properties.remove("input_file");
+            out.properties["input_files"]=files.join(";   ");
+            outF.properties.remove("input_file");
+            outF.properties["input_files"]=files.join(";   ");
+            saveToProject(out, outF, files.join(", "), 1);
+        }
+    }
+}
+
+void QFETCSPCImporterFretchen2::on_btnClear_clicked()
+{
+    ms_outData.clear();
+    ms_outDataFiltered.clear();
+    ms_model.clear();
+    updateMultiFile();
+}
+
+void QFETCSPCImporterFretchen2::on_btnDelete_clicked()
+{
+    int i=ui->lstMultiFile->currentIndex().row();
+    if (i>=0 && i<ms_model.rowCount()) {
+        //int id=ms_model.data(ms_model.index(i), Qt::UserRole).toInt();
+        ms_model.removeItem(i);
+        if (i>=0 && i<ms_outData.size()) ms_outData.removeAt(i);
+        if (i>=0 && i<ms_outDataFiltered.size()) ms_outDataFiltered.removeAt(i);
+    }
+    updateMultiFile();
+}
+
+void QFETCSPCImporterFretchen2::on_btnDown_clicked()
+{
+    int i=ui->lstMultiFile->currentIndex().row();
+    if (i>=0 && i<ms_model.rowCount()-1) {
+        //int id=ms_model.data(ms_model.index(i), Qt::UserRole).toInt();
+        ms_model.swapItems(i,i+1);
+        if (i>=0 && i<ms_outData.size()-1) ms_outData.swap(i, i+1);
+        if (i>=0 && i<ms_outDataFiltered.size()-1) ms_outDataFiltered.swap(i, i+1);
+    }
+    updateMultiFile();
+}
+
+void QFETCSPCImporterFretchen2::on_btnUp_clicked()
+{
+    int i=ui->lstMultiFile->currentIndex().row();
+    if (i>=1 && i<ms_model.rowCount()) {
+        //int id=ms_model.data(ms_model.index(i), Qt::UserRole).toInt();
+        ms_model.swapItems(i,i-1);
+        if (i>=1 && i<ms_outData.size()) ms_outData.swap(i, i-1);
+        if (i>=1 && i<ms_outDataFiltered.size()) ms_outDataFiltered.swap(i, i-1);
+    }
+    updateMultiFile();
+}
+
+void QFETCSPCImporterFretchen2::on_btnLeftBG_clicked()
+{
+    ui->spinBackG->setValue(photons.backgroundrate.value(ui->cmbGreenChannel->currentIndex(), 0));
+}
+
+void QFETCSPCImporterFretchen2::on_btnLeftBR_clicked()
+{
+    ui->spinBackR->setValue(photons.backgroundrate.value(ui->cmbRedChannel->currentIndex(), 0));
+}
+
+
+void QFETCSPCImporterFretchen2::saveData(const QFDataExportTool &outData, const QFDataExportTool &outDataFiltered)
 {
     QStringList f=QFDataExportHandler::getFormats();
     QString selFilter;
     QString fn=qfGetSaveFileNameSet("QFETCSPCImporterFretchen2/savetofile/", this, tr("Save burst data to file"), "", f.join(";;"), &selFilter);
     if (fn.size()>0) {
         QFileInfo fi(fn);
-        outData.save(fn, /*fi.absoluteDir().absoluteFilePath(fi.completeBaseName()+".full."+fi.suffix()),*/ f.indexOf(selFilter));
-        outData.save(fi.absoluteDir().absoluteFilePath(fi.completeBaseName()+".filtered."+fi.suffix()), f.indexOf(selFilter));
+        int filterID=f.indexOf(selFilter);
+
+        saveData(outData, fn, filterID);
+        saveData(outDataFiltered, fi.absoluteDir().absoluteFilePath(fi.completeBaseName()+".filtered."+fi.suffix()), filterID);
     }
 }
+
+void QFETCSPCImporterFretchen2::saveData(const QFDataExportTool &outData, const QString& filename, int filterID)
+{
+    QFileInfo fi(filename);
+    outData.save(filename, /*fi.absoluteDir().absoluteFilePath(fi.completeBaseName()+".full."+fi.suffix()),*/ filterID);
+
+    if (6<outData.data.size()) {
+        QFDataExportTool outDataFretchen=outData;
+        outDataFretchen.data.swap(5,6);
+        while (outDataFretchen.data.size()>7) {
+            outDataFretchen.data.removeLast();
+        }
+        outDataFretchen.colHeaders.clear();
+        outDataFretchen.properties.clear();
+        outDataFretchen.comment.clear();
+        outDataFretchen.rowHeaders.clear();
+        QVariantList vl=outDataFretchen.data[6];
+        for (int i=0; i<vl.size(); i++) {
+            vl[i]=vl[i].toDouble()*1e-3;
+        }
+        outDataFretchen.data[6]=vl;
+        outDataFretchen.saveCSV(fi.absoluteDir().absoluteFilePath(fi.completeBaseName()+".fretchen.txt"), '.', "\t ", false, '\"', "#!", 7);
+    }
+}
+
+
+void QFETCSPCImporterFretchen2::on_btnSaveToFile_clicked()
+{
+    saveData(outData, outDataFiltered);
+}
+
 
 
 
@@ -480,6 +672,7 @@ void QFETCSPCImporterFretchen2::updateFromFile()
 
 void QFETCSPCImporterFretchen2::updateCTRTrace()
 {
+
     //qDebug()<<ui->tabWidget->isTabEnabled(0)<<ui->tabWidget->isTabEnabled(1)<<ui->tabWidget->isTabEnabled(2);
     if (!ui->tabWidget->isTabEnabled(1)) return;
 
@@ -539,6 +732,7 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
 
 void QFETCSPCImporterFretchen2::updateAnalysis()
 {
+    //writeSettings();
     if (!ui->tabWidget->isTabEnabled(2)) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
@@ -581,6 +775,7 @@ void QFETCSPCImporterFretchen2::updateAnalysis()
 
 void QFETCSPCImporterFretchen2::updateAnalysisPlots()
 {
+    //writeSettings();
     if (!ui->tabWidget->isTabEnabled(2)) return;
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -591,7 +786,7 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     dsB->clear();
     dsP->clear();
 
-    QVector<double> PVec, EVec, PVecAll, EVecAll, DVec, RVec, SAllVec, DAllVec;
+    QVector<double> PVec, EVec, PVecAll, EVecAll, DVec, RVec, SAllVec, DAllVec, RRVec, RGVec;
     const double mir=ui->spinMinRate->value()*1e3;
     const double mar=ui->spinMaxRate->value()*1e3;
 
@@ -615,6 +810,8 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
             DVec<<(bursts.burstdata[i].duration);
             PVec<<bursts.burstdata[i].P;
             EVec<<bursts.burstdata[i].E;
+            RGVec<<(double(bursts.burstdata[i].photonG)/bursts.burstdata[i].duration);
+            RRVec<<(double(bursts.burstdata[i].photonR)/bursts.burstdata[i].duration);
             outDataFiltered.data[0]<<i;
             outDataFiltered.data[1]<<bursts.burstdata.at(i).start;
             outDataFiltered.data[2]<<bursts.burstdata.at(i).duration;
@@ -629,6 +826,8 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     ui->labNBursts->setText(QString::number(PVec.size()));
     ui->labAvgBDuration->setText(QString("%1 ms").arg(qfstatisticsAverage(DVec)*1e3, 0, 'f', 4));
     ui->labAvgRate->setText(QString("%1 kHz").arg(qfstatisticsAverage(RVec)*1e-3, 0, 'f', 3));
+    ui->labAvgRateG->setText(QString("%1 kHz").arg(qfstatisticsAverage(RGVec)*1e-3, 0, 'f', 3));
+    ui->labAvgRateR->setText(QString("%1 kHz").arg(qfstatisticsAverage(RRVec)*1e-3, 0, 'f', 3));
     ui->labAvgP->setText(QString("%1").arg(qfstatisticsAverage(PVec), 0, 'f', 4));
     ui->labAvgE->setText(QString("%1").arg(qfstatisticsAverage(EVec), 0, 'f', 4));
 
@@ -682,7 +881,7 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
         calcHistParams(PVec, dmin,dmax,nbins,binw);
         QVector<double> HX(nbins,0.0);
         QVector<double> HY(nbins,0.0);
-        statisticsHistogramRanged(PVec.data(), PVec.size(), dmin, dmax, HX.data(), HY.data(), nbins);
+        statisticsHistogramRanged(PVec.data(), PVec.size(), dmin, dmax, HX.data(), HY.data(), nbins, ui->chkNormHistogram->isChecked());
 
         plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("P histogram: P")));
         plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("P histogram: frequency")));
@@ -691,7 +890,7 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
         calcHistParams(EVec, dmin,dmax,nbins,binw);
         QVector<double> HX(nbins,0.0);
         QVector<double> HY(nbins,0.0);
-        statisticsHistogramRanged(EVec.data(), EVec.size(), dmin, dmax, HX.data(), HY.data(), nbins);
+        statisticsHistogramRanged(EVec.data(), EVec.size(), dmin, dmax, HX.data(), HY.data(), nbins, ui->chkNormHistogram->isChecked());
 
         plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("E histogram: E")));
         plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("E histogram: frequency")));
@@ -715,6 +914,11 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     QApplication::restoreOverrideCursor();
 }
 
+void QFETCSPCImporterFretchen2::updateMultiFile()
+{
+    ui->tabMultiFile->setVisible(true);//ms_model.rowCount()>0);
+}
+
 void QFETCSPCImporterFretchen2::calcHistParams(const QVector<double> &PVec, double &dmin, double &dmax, int &nbins, double binw)
 {
     dmin=0;
@@ -727,6 +931,7 @@ void QFETCSPCImporterFretchen2::calcHistParams(const QVector<double> &PVec, doub
     dmax=ceil(dmax/binw)*binw;
     nbins=ceil(fabs(dmax-dmin)/binw);
 }
+
 
 
 class QFETCSPCImporterFretchen2LEEFilterer {
@@ -764,6 +969,7 @@ class QFETCSPCImporterFretchen2BurstFinder {
 
 void QFETCSPCImporterFretchen2::updateBurstSelection()
 {
+    writeSettings();
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QModernProgressDialog progress(this);
     progress.setHasCancel(false);
@@ -833,7 +1039,7 @@ void QFETCSPCImporterFretchen2::updateBurstSelection()
     outData.colHeaders<<tr("photons_green");
     outData.colHeaders<<tr("photons_red");
     outData.colHeaders<<tr("avg_countrate [cps]");
-    outData.colHeaders<<tr("Prxoimity_Ratio");
+    outData.colHeaders<<tr("Proximity_Ratio");
     outData.colHeaders<<tr("FRET_Ratio");
     outDataPCol=6;
     outDataECol=7;
@@ -855,6 +1061,7 @@ void QFETCSPCImporterFretchen2::updateBurstSelection()
 
 void QFETCSPCImporterFretchen2::loadTCSPCFiles()
 {
+    writeSettings();
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QString filename=ui->edtTCSPCFile->text();
     QString filenameB=ui->edtTCSPCBackground->text();
@@ -947,8 +1154,8 @@ void QFETCSPCImporterFretchen2::loadTCSPCFiles()
             ui->labCRed->setText(QString("%1 (B: %2) kHz").arg(photons.avgrate.value(ui->cmbRedChannel->currentIndex())*1e-3, 0, 'f', 3).arg(photons.backgroundrate.value(ui->cmbRedChannel->currentIndex())*1e-3, 0, 'f', 3));
             outData.properties["countrate_red_avg_fromfile"]=photons.avgrate.value(ui->cmbRedChannel->currentIndex());
             outData.properties["background_red_avg_fromfile"]=photons.backgroundrate.value(ui->cmbRedChannel->currentIndex());
-            ui->labBackG->setText(QString("%1 Hz").arg(photons.backgroundrate.value(ui->cmbGreenChannel->currentIndex()), 0, 'f', 3));
-            ui->labBackR->setText(QString("%1 Hz").arg(photons.backgroundrate.value(ui->cmbRedChannel->currentIndex()), 0, 'f', 3));
+            ui->btnLeftBG->setText(QString("%1 Hz").arg(photons.backgroundrate.value(ui->cmbGreenChannel->currentIndex()), 0, 'f', 3));
+            ui->btnLeftBR->setText(QString("%1 Hz").arg(photons.backgroundrate.value(ui->cmbRedChannel->currentIndex()), 0, 'f', 3));
             ui->spinBackG->setValue(photons.backgroundrate.value(ui->cmbGreenChannel->currentIndex(),0));
             ui->spinBackR->setValue(photons.backgroundrate.value(ui->cmbRedChannel->currentIndex(),0));
 

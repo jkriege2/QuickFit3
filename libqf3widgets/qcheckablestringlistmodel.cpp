@@ -21,7 +21,7 @@ void QCheckableStringListModel::setUnChecked(int i) {
 }
 
 bool QCheckableStringListModel::isChecked(int i) const {
-    qDebug()<<i<<m_check;
+    //qDebug()<<i<<m_check;
     return m_check.contains(i);
 }
 
@@ -75,6 +75,77 @@ QVector<bool> QCheckableStringListModel::getIsChecked() const
         res<<isChecked(i);
     }
     return res;
+}
+
+void QCheckableStringListModel::addItem(const QString &item, bool checked, const QVariant& userData)
+{
+    int r=rowCount();
+    insertRow(r);
+    setData(index(r), item);
+    if (userData.isValid()) setData(index(r), userData, Qt::UserRole);
+    setChecked(r, checked);
+}
+
+void QCheckableStringListModel::removeItem(int i)
+{
+    if (i>=0 && i<rowCount()) {
+        QSet<int> ns;
+        {
+            QSetIterator<int> it(m_check);
+            while (it.hasNext()) {
+                int rr=it.next();
+                if (rr<i) ns.insert(rr);
+                else if (rr>i) ns.insert(rr-1);
+            }
+        }
+        m_check=ns;
+        removeRow(i);
+    }
+}
+
+void QCheckableStringListModel::swapItems(int i, int j)
+{
+    if (i>=0 && j>=0 && i<rowCount() && j<rowCount()) {
+        QVariant di=data(index(i), Qt::EditRole);
+        QVariant dj=data(index(j), Qt::EditRole);
+        QVariant ddi=data(index(i), Qt::DisplayRole);
+        QVariant ddj=data(index(j), Qt::DisplayRole);
+        QVariant dui=data(index(i), Qt::UserRole);
+        QVariant duj=data(index(j), Qt::UserRole);
+        bool isCi=isChecked(i);
+        bool isCj=isChecked(j);
+        setData(index(i), dj);
+        setData(index(j), di);
+        setData(index(i), duj, Qt::UserRole);
+        setData(index(j), dui, Qt::UserRole);
+        setData(index(i), ddi, Qt::DisplayRole);
+        setData(index(j), ddj, Qt::DisplayRole);
+        setChecked(i, isCj);
+        setChecked(j, isCi);
+    }
+}
+
+void QCheckableStringListModel::moveUp(int i)
+{
+    if (i>=1 && i<rowCount()) {
+        swapItems(i, i-1);
+    }
+}
+
+void QCheckableStringListModel::moveDown(int i)
+{
+    if (i>=0 && i<rowCount()-1) {
+        swapItems(i, i+1);
+    }
+}
+
+void QCheckableStringListModel::clear()
+{
+
+    m_check.clear();
+    setStringList(QStringList());
+    beginResetModel();
+    endResetModel();
 }
 
 void QCheckableStringListModel::setEditable(bool editable) {

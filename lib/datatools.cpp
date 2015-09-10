@@ -641,7 +641,7 @@ void QFDataExportHandler::save(const QList<QList<QVariant> > &data, int format, 
         it.next();
         p+=QString("# %1 = %2\n").arg(it.key()).arg(getQVariantData(it.value()));
     }
-    p+="# \n";
+    if (p.size()>0) p+="# \n";
 
     int f=0;
     if (format==f++) { // CSV
@@ -867,6 +867,29 @@ int dataGetRows(const QList<QList<QVariant> >& data) {
 void QFDataExportTool::save(const QString &filename, int format) const
 {
     QFDataExportHandler::save(data, format, filename, colHeaders, rowHeaders, comment, properties);
+}
+
+void QFDataExportTool::saveCSV(const QString &filename, QChar decimalSep, const QString colSep, bool withHeaders, QChar stringDelimiter, const QString &headerSep, int precision) const
+{
+    QString c, p;
+    if (comment.size()>0) {
+        QStringList cl=comment.split('\n');
+        for (int i=0; i<cl.size(); i++) {
+            cl[i]="# "+cl[i];
+        }
+        if(cl.size()>0) cl.append("# \n");
+        c=cl.join("\n");
+    }
+    if (properties.size()>0) {
+        QMapIterator<QString, QVariant> it(properties);
+        while (it.hasNext()) {
+            it.next();
+            p+=QString("# %1 = %2\n").arg(it.key()).arg(getQVariantData(it.value()));
+        }
+        if (p.size()>0) p+="# \n";
+    }
+
+    saveStringToFile(filename, c+p+toCSV(data, colHeaders, rowHeaders, decimalSep, colSep, withHeaders, stringDelimiter, headerSep, precision));
 }
 
 void QFDataExportTool::saveToTable(QFRDRTableInterface *table, bool setProps) const

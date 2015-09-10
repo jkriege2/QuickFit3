@@ -7,6 +7,7 @@
 #include "tttrtools.h"
 #include "qfplotter.h"
 #include "datatools.h"
+#include "qcheckablestringlistmodel.h"
 
 namespace Ui {
     class QFETCSPCImporterFretchen2;
@@ -38,6 +39,18 @@ class QFETCSPCImporterFretchen2 : public QDialog
         void on_btnSaveToFile_clicked();
         void on_btnSaveToProject_clicked();
 
+        void on_btnAppendToMulti_clicked();
+        void on_btnSaveToMulti_clicked();
+        void on_btnSaveMultiToProject_clicked();
+        void on_btnClear_clicked();
+        void on_btnDelete_clicked();
+        void on_btnDown_clicked();
+        void on_btnUp_clicked();
+
+        void on_btnLeftBG_clicked();
+        void on_btnLeftBR_clicked();
+
+
         void setEditControlsEnabled(bool en);
 
         void updateFromFile();
@@ -48,7 +61,13 @@ class QFETCSPCImporterFretchen2 : public QDialog
         void loadTCSPCFiles();
         void updateAnalysisPlots();
 
+        void updateMultiFile();
+
+    protected:
         void calcHistParams(const QVector<double>& PVec, double& pmin, double& pmax, int& nbins, double binw);
+        void saveData(const QFDataExportTool& outData, const QFDataExportTool& outDataFiltered);
+        void saveData(const QFDataExportTool& outData, const QString &filename, int filterID);
+        void saveToProject(const QFDataExportTool& outData, const QFDataExportTool& outDataFiltered, const QString& grp, int coloffset=0);
 
     private:
         Ui::QFETCSPCImporterFretchen2 *ui;
@@ -70,6 +89,10 @@ class QFETCSPCImporterFretchen2 : public QDialog
 
         QFDataExportTool outData;
         QFDataExportTool outDataFiltered;
+
+        QList<QFDataExportTool> ms_outData;
+        QList<QFDataExportTool> ms_outDataFiltered;
+        QCheckableStringListModel ms_model;
         int outDataPCol;
         int outDataECol;
 

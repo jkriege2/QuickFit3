@@ -172,6 +172,7 @@ class QFLIB_EXPORT QFDataExportTool {
         QMap<QString, QVariant> properties;
 
         void save(const QString& filename, int format) const;
+        void saveCSV(const QString& filename, QChar decimalSep='.', const QString colSep=QString(", "), bool withHeaders=true, QChar stringDelimiter=QLatin1Char('\"'), const QString& headerSep=QString("#! "), int precision=15) const;
         void saveToTable(QFRDRTableInterface* table, bool setProps=false) const;
 
         void clear();
@@ -183,6 +184,8 @@ class QFLIB_EXPORT QFDataExportTool {
         int getRowCount() const;
         int getColCount() const;
         QVariant get(int col, int row) const;
+
+
 
 
 

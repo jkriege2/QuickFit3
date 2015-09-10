@@ -352,7 +352,7 @@ void QFETCSPCImporterDialog::on_btnSelectFile_clicked() {
 }
 
 void QFETCSPCImporterDialog::on_btnHelp_clicked() {
-    pluginServices->displayHelpWindow(pluginServices->getPluginHelpDirectory("tcspcimporter")+"tcspcimporter.html");
+    pluginServices->displayHelpWindow(pluginServices->getPluginHelpDirectory("tcspcimporter")+"tcspcimporter_corr.html");
 }
 
 void QFETCSPCImporterDialog::on_btnLoad_clicked() {

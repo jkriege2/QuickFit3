@@ -6,5 +6,23 @@
     </head>
     <body>
         $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        
+        <h2>Introduction</h2>
+<p>This tool allows to read data from single-photon counting (or time-correlated single-photon counting, TCSPC) experiments. Then it tries to detect fluorescence bursts from single molecules passing the focus of the microscope, used for detection. This analysis assumes that two detection channels ("green"/"red") are used. The intensities in these two channels can then be used to calculate FRET-properties of the observed molecules. For each such burst, several properties are measured:
+<ul>
+    <li>when did the burst occur $(t_\text{burst})$</li>
+    <li>burst duration $(\Delta t_\text{burst})$</li>
+    <li>accumulated photon count $(N_g, N_r)$ during the burst in two detection channels (green/red)</li>
+</ul>
+Together with additional data, such as:
+
+<ul>
+    <li>background count-rates $(B_g,B_r)$ in the two channels</li>
+    <li>crosstalk-coefficient $(\kappa_{gr})$ in the two channels</li>
+</ul>
+</p>
+        
+        <a name="#usage"><h2>Usage</h2>
+        The basic usage of the tool is the same for all options mentioned above:
     </body>
 </html>

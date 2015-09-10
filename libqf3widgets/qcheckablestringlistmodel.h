@@ -31,6 +31,13 @@ public:
     QList<int> getChecked() const;
     QVector<bool> getIsChecked() const;
 
+    void addItem(const QString& item, bool checked=false, const QVariant &userData=QVariant());
+    void removeItem(int i);
+    void swapItems(int i, int j);
+    void moveUp(int i);
+    void moveDown(int i);
+
+    void clear();
 
 protected:
     QSet<int> m_check;
