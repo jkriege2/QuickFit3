@@ -101,14 +101,14 @@ QFLIB_EXPORT QList<QList<QVariant> > csvDataRotate(const QList<QList<QVariant> >
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT QString toCSV(const QList<QVector<double> >& data, const QStringList& columnsNames, const QStringList& rowNames, QChar decimalSep='.', const QString colSep=QString(", "), bool withHeaders=true, QChar stringDelimiter=QLatin1Char('\"'), const QString& headerSep=QString("#! "), int precision=15);
+QFLIB_EXPORT QString toCSV(const QList<QVector<double> >& data, const QStringList& columnsNames, const QStringList& rowNames, QChar decimalSep='.', const QString colSep=QString(", "), bool withHeaders=true, QChar stringDelimiter=QLatin1Char('\"'), const QString& headerSep=QString("#! "), int precision=15, int fieldWidth=-1);
 
 /*! \brief convert the given data to CSV
     \ingroup qf3lib_tools
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnsNames, const QStringList& rowNames, QChar decimalSep='.', const QString colSep=QString(", "), bool withHeaders=true, QChar stringDelimiter=QLatin1Char('\"'), const QString& headerSep=QString("#! "), int precision=15);
+QFLIB_EXPORT QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnsNames, const QStringList& rowNames, QChar decimalSep='.', const QString colSep=QString(", "), bool withHeaders=true, QChar stringDelimiter=QLatin1Char('\"'), const QString& headerSep=QString("#! "), int precision=15, int fieldWidth=-1);
 
 /*! \brief true to guess the CSV parameters in a given string data
     \ingroup qf3lib_tools

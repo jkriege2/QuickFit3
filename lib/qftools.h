@@ -2060,6 +2060,8 @@ QFLIB_EXPORT QVariant qfStringToVariantAutoRecognizeType(const QString& value);
 QFLIB_EXPORT QString qfCanonicalOrAbsoluteFilePath(const QString& file);
 
 QFLIB_EXPORT QString qfHTMLEscape(const QString& input);
+QFLIB_EXPORT QString qfLeftPaddedString(const QString& input, int fieldWidth, QChar padchar=QChar(' '));
+QFLIB_EXPORT QString qfRightPaddedString(const QString& input, int fieldWidth, QChar padchar=QChar(' '));
 
 QFLIB_EXPORT QHBoxLayout* qfBuildQHBoxLayout(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
 QFLIB_EXPORT QVBoxLayout* qfBuildQVBoxLayout(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);

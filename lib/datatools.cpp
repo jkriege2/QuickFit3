@@ -869,7 +869,7 @@ void QFDataExportTool::save(const QString &filename, int format) const
     QFDataExportHandler::save(data, format, filename, colHeaders, rowHeaders, comment, properties);
 }
 
-void QFDataExportTool::saveCSV(const QString &filename, QChar decimalSep, const QString colSep, bool withHeaders, QChar stringDelimiter, const QString &headerSep, int precision) const
+void QFDataExportTool::saveCSV(const QString &filename, QChar decimalSep, const QString colSep, bool withHeaders, QChar stringDelimiter, const QString &headerSep, int precision, int fieldWidth) const
 {
     QString c, p;
     if (comment.size()>0) {
@@ -889,7 +889,7 @@ void QFDataExportTool::saveCSV(const QString &filename, QChar decimalSep, const 
         if (p.size()>0) p+="# \n";
     }
 
-    saveStringToFile(filename, c+p+toCSV(data, colHeaders, rowHeaders, decimalSep, colSep, withHeaders, stringDelimiter, headerSep, precision));
+    saveStringToFile(filename, c+p+toCSV(data, colHeaders, rowHeaders, decimalSep, colSep, withHeaders, stringDelimiter, headerSep, precision, fieldWidth));
 }
 
 void QFDataExportTool::saveToTable(QFRDRTableInterface *table, bool setProps) const

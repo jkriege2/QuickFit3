@@ -52,6 +52,7 @@ class QFETCSPCImporterFretchen2 : public QDialog
 
 
         void setEditControlsEnabled(bool en);
+        void resetEditControls();
 
         void updateFromFile();
 
@@ -67,7 +68,8 @@ class QFETCSPCImporterFretchen2 : public QDialog
         void calcHistParams(const QVector<double>& PVec, double& pmin, double& pmax, int& nbins, double binw);
         void saveData(const QFDataExportTool& outData, const QFDataExportTool& outDataFiltered);
         void saveData(const QFDataExportTool& outData, const QString &filename, int filterID);
-        void saveToProject(const QFDataExportTool& outData, const QFDataExportTool& outDataFiltered, const QString& grp, int coloffset=0);
+        void saveToProject(const QFDataExportTool& outData, const QFDataExportTool& outDataFiltered, const QString& grp, int calcStart=10, int histStart=14, int coloffset=0);
+        void saveToProject(const QFDataExportTool& outData, const QString& grp, const QString &nameAdd, int calcStart=10, int histStart=14, int coloffset=0);
 
     private:
         Ui::QFETCSPCImporterFretchen2 *ui;

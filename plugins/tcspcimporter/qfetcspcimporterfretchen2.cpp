@@ -98,6 +98,7 @@ QFETCSPCImporterFretchen2::~QFETCSPCImporterFretchen2()
 
 void QFETCSPCImporterFretchen2::writeSettings()
 {
+    ProgramOptions::setConfigQCheckBox(ui->chkMSRenumberBursts,  "QFETCSPCImporterFretchen2/chkMSRenumberBursts");
     ProgramOptions::setConfigQCheckBox(ui->chkNormHistogram,  "QFETCSPCImporterFretchen2/chkNormHistogram");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinCrosstalk,  "QFETCSPCImporterFretchen2/spinCrosstalk");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinGamma,  "QFETCSPCImporterFretchen2/spinGamma");
@@ -123,6 +124,7 @@ void QFETCSPCImporterFretchen2::writeSettings()
 
 void QFETCSPCImporterFretchen2::readSettings()
 {
+    ProgramOptions::getConfigQCheckBox(ui->chkMSRenumberBursts,  "QFETCSPCImporterFretchen2/chkMSRenumberBursts", true);
     ProgramOptions::getConfigQCheckBox(ui->chkNormHistogram,  "QFETCSPCImporterFretchen2/chkNormHistogram", true);
     ProgramOptions::getConfigQComboBox(ui->cmbAnaHistMode,  "QFETCSPCImporterFretchen2/cmbAnaHistMode", 0);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinCrosstalk,  "QFETCSPCImporterFretchen2/spinCrosstalk", 4);
@@ -161,12 +163,15 @@ void QFETCSPCImporterFretchen2::on_btnSelectFile_clicked()
 {
     QString fileName = qfGetOpenFileName(this, tr("Select TCSPC File ..."), lastTCSPCFileDir, tcspcFilters.join(";;"), &lastTCSPCFileFilter);
     if (!fileName.isEmpty()) {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        QApplication::processEvents();
         lastTCSPCFileDir=QFileInfo(fileName).dir().absolutePath();
         ui->cmbFileformat->setCurrentIndex(tcspcFilters.indexOf(lastTCSPCFileFilter));
         ui->edtTCSPCFile->setText(fileName);
         ui->edtTCSPCFile->setFocus(Qt::MouseFocusReason);
         on_btnLoad_clicked();
         writeSettings();
+        QApplication::restoreOverrideCursor();
     }
 
 }
@@ -175,25 +180,31 @@ void QFETCSPCImporterFretchen2::on_btnSelectBackground_clicked()
 {
     QString fileName = qfGetOpenFileName(this, tr("Select TCSPC File ..."), lastTCSPCFileDir, lastTCSPCFileFilter);
     if (!fileName.isEmpty()) {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        QApplication::processEvents();
         lastTCSPCFileDir=QFileInfo(fileName).dir().absolutePath();
         ui->edtTCSPCBackground->setText(fileName);
         ui->edtTCSPCBackground->setFocus(Qt::MouseFocusReason);
         //updateFromFile();
         writeSettings();
+        QApplication::restoreOverrideCursor();
     }
 }
 
 void QFETCSPCImporterFretchen2::on_btnLoad_clicked()
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QApplication::processEvents();
     QString filename=ui->edtTCSPCFile->text();
     if (QFile::exists(filename)) {
         updateFromFile();
-        setEditControlsEnabled(true);
+        resetEditControls();
     } else {
         setEditControlsEnabled(false);
         QMessageBox::critical(this, tr("TCSPC Burst Analyzer"), tr("The file '%1' does not exist.\nPlease select an existing file!").arg(filename));
     }
     writeSettings();
+    QApplication::restoreOverrideCursor();
 }
 
 
@@ -232,10 +243,16 @@ void QFETCSPCImporterFretchen2::on_btnApplyBurstAnalysis_clicked()
 }
 
 
-void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, const QFDataExportTool &outDataFiltered, const QString &grp, int coloffset)
+void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, const QFDataExportTool &outDataFiltered, const QString &grp, int calcStartIn, int histStartIn, int coloffset)
+{
+    saveToProject(outData, grp, tr(" - all bursts"), calcStartIn, histStartIn, coloffset);
+    saveToProject(outDataFiltered, grp, tr(" - rate-filtered bursts"), calcStartIn, histStartIn, coloffset);
+}
+
+void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, const QString &grp, const QString& nameAdd, int calcStartIn, int histStartIn, int coloffset)
 {
     QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-    QFRawDataRecord* rdrA=p->addRawData("table", tr("%1 - spFRET Burst Analysis").arg(grp));
+    QFRawDataRecord* rdrA=p->addRawData("table", tr("%1 - spFRET Burst Analysis%2").arg(grp).arg(nameAdd));
     if (rdrA) {
         rdrA->setGroup(p->addOrFindRDRGroup(grp));
         rdrA->setFolder(grp);
@@ -244,20 +261,11 @@ void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, c
 
         QFRDRColumnGraphsInterface* rdrAG=dynamic_cast<QFRDRColumnGraphsInterface*>(rdrA);
         QFRDRTableInterface* rdrAT=dynamic_cast<QFRDRTableInterface*>(rdrA);
-        QFRawDataRecord* rdrF=p->addRawData("table", tr("%1 - spFRET Burst Analysis, filtered").arg(grp));
-        if (rdrF) {
-            rdrF->setGroup(p->addOrFindRDRGroup(grp));
-            rdrF->setFolder(grp);
-            rdrF->setDescription(outDataFiltered.comment);
-            rdrF->setQFProperty("AUTOSCALEXY_PLOTS_ON_SHOWUP", true, false, false);
 
-            QFRDRColumnGraphsInterface* rdrFG=dynamic_cast<QFRDRColumnGraphsInterface*>(rdrF);
-            QFRDRTableInterface* rdrFT=dynamic_cast<QFRDRTableInterface*>(rdrF);
-            int calcStart=coloffset+8;
-            int histStart=coloffset+12;
-            if ( rdrAT &&  rdrFT) {
+            int calcStart=coloffset+calcStartIn;
+            int histStart=coloffset+histStartIn;
+            if ( rdrAT ) {
                 outData.saveToTable(rdrAT, true);
-                outDataFiltered.saveToTable(rdrFT, true);
 
 
 
@@ -315,58 +323,6 @@ void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, c
                 }
 
 
-                {
-                    double pmin=outDataFiltered.properties.value("burstfiltered_histogram_P_min", 0).toDouble();
-                    double pmax=outDataFiltered.properties.value("burstfiltered_histogram_P_max", 1).toDouble();
-                    int pbins=outDataFiltered.properties.value("burstfiltered_histogram_P_bins", 31).toInt();
-                    double emin=outDataFiltered.properties.value("burstfiltered_histogram_E_min", 0).toDouble();
-                    double emax=outDataFiltered.properties.value("burstfiltered_histogram_E_max", 1).toDouble();
-                    int ebins=outDataFiltered.properties.value("burstfiltered_histogram_E_bins", 31).toInt();
-                    QString pre=QString("// normalize histograms:\nhistograms_normalized = %7;\n\n// burst duration histogram:\nbdur_bins=21;\n\n// burst size histogram:\nbsize_bins=21;\n\n// burst countrate histogram:\nbrate_bins=21;\n\n// P-histogram bins:\npmin = %1;\npmax = %2;\npbins = %3;\n\n// E-histogram bins:\nemin = %4;\nemax = %5;\nebins = %6;\n")
-                                .arg(CDoubleToQString(pmin)).arg(CDoubleToQString(pmax)).arg(pbins)
-                                .arg(CDoubleToQString(emin)).arg(CDoubleToQString(emax)).arg(ebins)
-                                .arg(boolToQString(ui->chkNormHistogram->isChecked()));
-
-                    rdrFT->tableSetPreEvaluationExpression(pre);
-
-
-                    rdrFT->tableSetColumnTitle(calcStart, tr("Burst Duration: Delta T [ms]"));
-                    rdrFT->tableSetColumnExpression(calcStart, QString("column(%1)*1e-3").arg(coloffset+6));
-                    rdrFT->tableSetColumnTitle(calcStart+1, tr("Burst Size"));
-                    rdrFT->tableSetColumnExpression(calcStart+1, QString("column(%1)+column(%2)").arg(coloffset+4).arg(coloffset+5));
-
-
-                    rdrFT->tableSetColumnTitle(histStart, tr("P-Histogram: P"));
-                    rdrFT->tableSetColumnExpression(histStart, QString("rangedhistogrambins(pmin, pmax, pbins)"));
-                    rdrFT->tableSetColumnTitle(histStart+1, tr("P-Histogram: frequency"));
-                    rdrFT->tableSetColumnExpression(histStart+1, QString("rangedhistogram(column(%1), pmin, pmax, pbins, histograms_normalized)").arg(coloffset+7));
-                    rdrFT->tableSetColumnTitle(histStart+2, tr("E-Histogram: E"));
-                    rdrFT->tableSetColumnExpression(histStart+2, QString("rangedhistogrambins(emin, emax, ebins)"));
-                    rdrFT->tableSetColumnTitle(histStart+3, tr("E-Histogram: frequency"));
-                    rdrFT->tableSetColumnExpression(histStart+3, QString("rangedhistogram(column(%1), emin, emax, ebins, histograms_normalized)").arg(coloffset+8));
-
-                    rdrFT->tableSetColumnTitle(histStart+4, tr("Burst Duration-Histogram: Delta T[ms]"));
-                    rdrFT->tableSetColumnExpression(histStart+4, QString("histogrambins(column(%1)*1e3, bdur_bins)").arg(coloffset+3));
-                    rdrFT->tableSetColumnTitle(histStart+5, tr("Burst Duration-Histogram: frequency"));
-                    rdrFT->tableSetColumnExpression(histStart+5, QString("histogram(column(%1)*1e3, bdur_bins, histograms_normalized)").arg(coloffset+3));
-
-                    rdrFT->tableSetColumnTitle(histStart+6, tr("Burst Size-Histogram: photons"));
-                    rdrFT->tableSetColumnExpression(histStart+6, QString("histogrambins(column(%1)+column(%2), bsize_bins)").arg(coloffset+4).arg(coloffset+5));
-                    rdrFT->tableSetColumnTitle(histStart+7, tr("Burst Size-Histogram: frequency"));
-                    rdrFT->tableSetColumnExpression(histStart+7, QString("histogram(column(%1)+column(%2), bsize_bins, histograms_normalized)").arg(coloffset+4).arg(coloffset+5));
-
-                    rdrFT->tableSetColumnTitle(histStart+8, tr("Burst Countrate-Histogram: countrate [kcps]"));
-                    rdrFT->tableSetColumnExpression(histStart+8, QString("histogrambins(column(%1)*1e-3, brate_bins)").arg(coloffset+6));
-                    rdrFT->tableSetColumnTitle(histStart+9, tr("Burst Countrate-Histogram: frequency"));
-                    rdrFT->tableSetColumnExpression(histStart+9, QString("histogram(column(%1)*1e-3, brate_bins, histograms_normalized)").arg(coloffset+6));
-
-
-                    rdrFT->tableReevaluateExpressions();
-                    rdrFT->tableReevaluateExpressions();
-
-                }
-
-
             }
             if ( rdrAG) {
                 QFRDRColumnGraphsInterface* cg=rdrAG;
@@ -385,26 +341,7 @@ void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, c
                 cg->colgraphAddGraph(g, calcStart+1,calcStart, QFRDRColumnGraphsInterface::cgtPoints, "");
 
             }
-            if ( rdrFG) {
-                QFRDRColumnGraphsInterface* cg=rdrFG;
-                int g;
-                g=cg->colgraphAddPlot(tr("proximity ratio histogram"), tr("proximity ratio P"), tr("frequency"));
-                cg->colgraphAddGraph(g, histStart, histStart+1, QFRDRColumnGraphsInterface::cgtBars, "");
-                g=cg->colgraphAddPlot(tr("FRET ratio histogram"), tr("FRET ratio E"), tr("frequency"));
-                cg->colgraphAddGraph(g, histStart+2, histStart+3, QFRDRColumnGraphsInterface::cgtBars, "");
-                g=cg->colgraphAddPlot(tr("burst duration histogram"), tr("burst duration \\Delta t_{Burst} [ms]"), tr("frequency"));
-                cg->colgraphAddGraph(g, histStart+4, histStart+5, QFRDRColumnGraphsInterface::cgtBars, "");
-                g=cg->colgraphAddPlot(tr("burst size histogram"), tr("burst size [photons]"), tr("frequency"));
-                cg->colgraphAddGraph(g, histStart+6, histStart+7, QFRDRColumnGraphsInterface::cgtBars, "");
-                g=cg->colgraphAddPlot(tr("burst countrate histogram"), tr("burst countrate [kcps]"), tr("frequency"));
-                cg->colgraphAddGraph(g, histStart+8, histStart+9, QFRDRColumnGraphsInterface::cgtBars, "");
-                g=cg->colgraphAddPlot(tr("burst size vs. duration"), tr("burst size [photons]"), tr("burst duration [ms]"));
-                cg->colgraphAddGraph(g, calcStart+1,calcStart, QFRDRColumnGraphsInterface::cgtPoints, "");
 
-            }
-        } else {
-            QFPluginServices::getInstance()->log_error(tr("error adding record to project"));
-        }
     } else {
         QFPluginServices::getInstance()->log_error(tr("error adding record to project"));
     }
@@ -468,6 +405,8 @@ void QFETCSPCImporterFretchen2::on_btnSaveMultiToProject_clicked()
         QStringList files;
         int cnt=0;
         QVariantList vlfid, vlfidF;
+        int c=0, cF=0;
+
         for (int i=0; i<ms_model.rowCount(); i++) {
             if (ms_model.isChecked(i) && i<ms_outData.size() && i<ms_outDataFiltered.size()) {
                 if (cnt==0) {
@@ -479,6 +418,7 @@ void QFETCSPCImporterFretchen2::on_btnSaveMultiToProject_clicked()
                         while (out.data[j].size()<rc) out.data[j].append(QVariant());
                         out.data[j]<<ms_outData[i].data[j];
                         vlfid<<cnt;
+
                     }
                     rc=outF.getRowCount();
                     for (int j=0; j<outF.data.size(); j++) {
@@ -492,11 +432,24 @@ void QFETCSPCImporterFretchen2::on_btnSaveMultiToProject_clicked()
                 cnt++;
             }
         }
+        bool renumber=ui->chkMSRenumberBursts->isChecked();
+        if (renumber && cnt>0) {
+            if (out.data.size()>0) {
+                for (int i=0; i<out.data[0].size(); i++) {
+                    out.data[0].operator [](i)=i;
+                }
+            }
+            if (outF.data.size()>0) {
+                for (int i=0; i<outF.data[0].size(); i++) {
+                    outF.data[0].operator [](i)=i;
+                }
+            }
+        }
         if (cnt>0) {
-            out.data.prepend(vlfid);
-            outF.data.prepend(vlfidF);
-            out.colHeaders.prepend(tr("file-ID"));
-            outF.colHeaders.prepend(tr("file-ID"));
+            out.data.append(vlfid);
+            outF.data.append(vlfidF);
+            out.colHeaders.append(tr("file-ID"));
+            outF.colHeaders.append(tr("file-ID"));
             out.properties.remove("input_file");
             out.properties["input_files"]=files.join(";   ");
             outF.properties.remove("input_file");
@@ -595,7 +548,7 @@ void QFETCSPCImporterFretchen2::saveData(const QFDataExportTool &outData, const 
             vl[i]=vl[i].toDouble()*1e-3;
         }
         outDataFretchen.data[6]=vl;
-        outDataFretchen.saveCSV(fi.absoluteDir().absoluteFilePath(fi.completeBaseName()+".fretchen.txt"), '.', "\t ", false, '\"', "#!", 7);
+        outDataFretchen.saveCSV(fi.absoluteDir().absoluteFilePath(fi.completeBaseName()+".fretchen.txt"), '.', " ", false, '\"', "#!", 7, 15);
     }
 }
 
@@ -620,6 +573,12 @@ void QFETCSPCImporterFretchen2::setEditControlsEnabled(bool en)
     }
 }
 
+void QFETCSPCImporterFretchen2::resetEditControls()
+{
+    setEditControlsEnabled(false);
+    setEditControlsEnabled(true);
+}
+
 void QFETCSPCImporterFretchen2::updateFromFile()
 {
     ui->cmbGreenChannel->clear();
@@ -628,6 +587,8 @@ void QFETCSPCImporterFretchen2::updateFromFile()
     if (QFile::exists(filename)) {
         QApplication::setOverrideCursor(Qt::WaitCursor);
         QModernProgressDialog progress(this);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setModal(true);
         progress.setHasCancel(false);
         progress.setLabelText(tr("reading TCSPC file ..."));
         progress.setMode(true, false);
@@ -916,7 +877,15 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
 
 void QFETCSPCImporterFretchen2::updateMultiFile()
 {
-    ui->tabMultiFile->setVisible(true);//ms_model.rowCount()>0);
+    bool vis=ms_model.rowCount()>0;
+    ui->tabMultiFile->setVisible(vis);
+    if (vis && ui->layTabs->indexOf(ui->tabMultiFile)<0) {
+        ui->layTabs->insertWidget(1,ui->tabMultiFile,1);
+        ui->layTabs->setStretch(0,4);
+    }
+    if (!vis && ui->layTabs->indexOf(ui->tabMultiFile)>=0) {
+        ui->layTabs->removeWidget(ui->tabMultiFile);
+    }
 }
 
 void QFETCSPCImporterFretchen2::calcHistParams(const QVector<double> &PVec, double &dmin, double &dmax, int &nbins, double binw)
@@ -972,6 +941,9 @@ void QFETCSPCImporterFretchen2::updateBurstSelection()
     writeSettings();
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QModernProgressDialog progress(this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setModal(true);
+
     progress.setHasCancel(false);
     progress.setLabelText(tr("performing burst selection ..."));
     progress.setMode(true, false);
@@ -1078,6 +1050,9 @@ void QFETCSPCImporterFretchen2::loadTCSPCFiles()
 
 
         QModernProgressDialog progress(this);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setModal(true);
+
         progress.setHasCancel(false);
         progress.setLabelText(tr("opening TCSPC file ..."));
         progress.setMode(true, false);

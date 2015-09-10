@@ -1949,3 +1949,15 @@ QVariant qfStringToVariantAutoRecognizeType(const QString& value) {
         return value;
     }
 }
+
+QString qfLeftPaddedString(const QString& input, int fieldWidth, QChar padchar) {
+    if (fieldWidth<=0 || input.size()>=fieldWidth) return input;
+    QString pad(fieldWidth-input.size(), padchar);
+    return pad+input;
+}
+
+QString qfRightPaddedString(const QString& input, int fieldWidth, QChar padchar) {
+    if (fieldWidth<=0 || input.size()>=fieldWidth) return input;
+    QString pad(fieldWidth-input.size(), padchar);
+    return input+pad;
+}
