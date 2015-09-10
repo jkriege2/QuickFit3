@@ -172,9 +172,9 @@ void QFETCSPCImporterFretchen2::on_btnSelectFile_clicked()
         lastTCSPCFileDir=QFileInfo(fileName).dir().absolutePath();
         ui->cmbFileformat->setCurrentIndex(tcspcFilters.indexOf(lastTCSPCFileFilter));
         ui->edtTCSPCFile->setText(fileName);
-        ui->edtTCSPCFile->setFocus(Qt::MouseFocusReason);
+        //ui->edtTCSPCFile->setFocus(Qt::MouseFocusReason);
         on_btnLoad_clicked();
-        writeSettings();
+        //writeSettings();
         QApplication::restoreOverrideCursor();
     }
 
@@ -189,8 +189,7 @@ void QFETCSPCImporterFretchen2::on_btnSelectBackground_clicked()
         lastTCSPCFileDir=QFileInfo(fileName).dir().absolutePath();
         ui->edtTCSPCBackground->setText(fileName);
         ui->edtTCSPCBackground->setFocus(Qt::MouseFocusReason);
-        //updateFromFile();
-        writeSettings();
+        //writeSettings();
         QApplication::restoreOverrideCursor();
     }
 }
@@ -198,6 +197,16 @@ void QFETCSPCImporterFretchen2::on_btnSelectBackground_clicked()
 void QFETCSPCImporterFretchen2::on_btnLoad_clicked()
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
+    QModernProgressDialog progress(this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setModal(true);
+    progress.setHasCancel(false);
+    progress.setLabelText(tr("reading TCSPC file ..."));
+    progress.setMode(true, false);
+    progress.open();
+    progress.raise();
+    QApplication::processEvents();
+
     QApplication::processEvents();
     QString filename=ui->edtTCSPCFile->text();
     if (QFile::exists(filename)) {
@@ -393,28 +402,33 @@ int QFETCSPCImporterFretchen2::collectMultiData(QFDataExportTool &out, QFDataExp
                 } else {
                     int rc=out.getRowCount();
                     for (int j=0; j<out.data.size(); j++) {
-                        while (out.data[j].size()<rc) out.data[j].append(QVariant());
-                        out.data[j]<<ms_outData[i].data[j];
-                        if (j==0) {
-                            for (int n=0; n<out.data[j].size(); n++) {
-                                vlfid<<cnt;
-                            }
-                        }
+                        while (out.data.at(j).size()<rc) out.data[j].append(QVariant());
+                        out.data[j]<<ms_outData[i].data.value(j, QVariantList());
+
 
                     }
 
                     rc=outF.getRowCount();
                     for (int j=0; j<outF.data.size(); j++) {
-                        while (outF.data[j].size()<rc) outF.data[j].append(QVariant());
-                        outF.data[j]<<ms_outDataFiltered[i].data[j];
-                        if (j==0) {
-                            for (int n=0; n<outF.data[j].size(); n++) {
-                                vlfid<<cnt;
-                            }
-                        }
+                        while (outF.data.at(j).size()<rc) outF.data[j].append(QVariant());
+                        outF.data[j]<<ms_outDataFiltered[i].data.value(j, QVariantList());
+
                         //vlfidF<<cnt;
                     }
 
+                }
+
+                int rc=ms_outData[i].getRowCount();
+                if (rc>0) {
+                    for (int n=0; n<rc; n++) {
+                        vlfid<<cnt;
+                    }
+                }
+                rc=ms_outDataFiltered[i].getRowCount();
+                if (rc>0) {
+                    for (int n=0; n<rc; n++) {
+                        vlfidF<<cnt;
+                    }
                 }
                 files<<ms_model.data(ms_model.index(i), Qt::DisplayRole).toString();
                 cnt++;
@@ -587,16 +601,6 @@ void QFETCSPCImporterFretchen2::updateFromFile()
     ui->cmbRedChannel->clear();
     QString filename=ui->edtTCSPCFile->text();
     if (QFile::exists(filename)) {
-        QApplication::setOverrideCursor(Qt::WaitCursor);
-        QModernProgressDialog progress(this);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.setModal(true);
-        progress.setHasCancel(false);
-        progress.setLabelText(tr("reading TCSPC file ..."));
-        progress.setMode(true, false);
-        progress.open();
-        progress.raise();
-        QApplication::processEvents();
 
 
         QFTCSPCReader* reader=QFTCSPCReader::getImporter(ui->cmbFileformat->currentIndex());
@@ -631,7 +635,6 @@ void QFETCSPCImporterFretchen2::updateFromFile()
                 reader=NULL;
             }
         }
-        QApplication::restoreOverrideCursor();
     }
 
 }
@@ -1044,7 +1047,6 @@ void QFETCSPCImporterFretchen2::loadTCSPCFiles()
     QString filenameB=ui->edtTCSPCBackground->text();
     writeSettings();
     if (QFile::exists(filename)) {
-        //updateFromFile();
         setEditControlsEnabled(true);
         outData.clear();
         outDataFiltered.clear();
