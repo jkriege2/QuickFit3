@@ -2058,6 +2058,7 @@ QFLIB_EXPORT QVariant qfStringToVariantAutoRecognizeType(const QString& value);
 
 
 QFLIB_EXPORT QString qfCanonicalOrAbsoluteFilePath(const QString& file);
+QFLIB_EXPORT QString qfRemoveMultipleWhitespaces(const QString& line);
 
 QFLIB_EXPORT QString qfHTMLEscape(const QString& input);
 QFLIB_EXPORT QString qfLeftPaddedString(const QString& input, int fieldWidth, QChar padchar=QChar(' '));
@@ -2133,6 +2134,7 @@ QVector<QPair<T,T> > qfConsecutiveIncIntsToRange(const QVector<T>& data, T incre
     }
     return res;
 }
+
 
 
 #endif // QFTOOLS_H

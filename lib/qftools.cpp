@@ -1970,3 +1970,34 @@ QString qfRightPaddedString(const QString& input, int fieldWidth, QChar padchar)
     QString pad(fieldWidth-input.size(), padchar);
     return input+pad;
 }
+
+QString qfRemoveMultipleWhitespaces(const QString& line) {
+    bool isQuot=false;
+    bool isApo=false;
+    QString l=line.trimmed();
+    QString ll;
+    for (int i=0; i<l.size(); i++) {
+        if (isQuot) {
+            ll.append(l[i]);
+            if (l[i]=='"') isQuot=false;
+        } else if (isApo) {
+            ll.append(l[i]);
+            if (l[i]=='\'') isApo=false;
+        } else {
+            if (l[i]=='\'') {
+                isApo=true;
+                ll.append(l[i]);
+            } else if (l[i]=='\"') {
+                isQuot=true;
+                ll.append(l[i]);
+            } else {
+                if (l[i]==' ' && ll.size()>0 && ll[ll.size()-1]!=' ') {
+                    ll.append(l[i]);
+                } else if (l[i]!=' ') {
+                    ll.append(ll[i]);
+                }
+            }
+        }
+    }
+    return ll;
+}

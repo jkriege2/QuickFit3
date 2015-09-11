@@ -1461,6 +1461,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     while (!line.isNull()) {
         bool dataread=false;
         line=line;
+        if (column_separator==' ') line=qfRemoveMultipleWhitespaces(line);
         //std::cout<<"read: <"<<line.toStdString()<<">\n";
         if (line.size()>0) {
             if (line.startsWith(header_start)) {
