@@ -389,6 +389,12 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \brief load private data format of Oleg Kriechevsky's group */
         bool loadOlegData(QString filenames);
 
+        /** \brief load data from an ASCII file with FCS curves, exported from the PicoQuant TTTR correlator v6.x software (*.cor) */
+        bool loadCorrelationCurvesFromPicoQuantCOR(QString filenames);
+    public:
+        /** \brief read some metadata from an ASCII file with FCS curves, exported from the PicoQuant TTTR correlator v6.x software (*.cor) */
+        static bool analyzeCorrelationCurvesFromPicoQuantCOR(QString filenames, int* channels);
+    protected:
         /** \brief load data from an ASCII file with FCS curves, exported from the PicoQuant software */
         bool loadCorrelationCurvesFromPicoQuantASCIIFCS(QString filenames, bool weights);
         /** \brief load data from an ASCII file with FCS curves, exported from the PicoQuant software */

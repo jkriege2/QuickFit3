@@ -1941,13 +1941,22 @@ QByteArray qfGetCrytographicHashForFile(const QString& file, QCryptographicHash:
 QVariant qfStringToVariantAutoRecognizeType(const QString& value) {
     QRegExp rxInt("[+|-]?\\d+");
     QRegExp rxDouble("[+|-]?\\d+[\\.]?\\d*[eE]?\\d*");
+    QRegExp rxDate1("(\\d+)\\/(\\d+)\\/(\\d+)\\s+(\\d+)\\:(\\d+)\\:(\\d+)");
+    QRegExp rxDate2("(\\d+)\\/(\\d+)\\/(\\d+)");
     if (rxInt.exactMatch(value)) {
         return value.toInt();
     } else if (rxDouble.exactMatch(value)) {
         return QStringToDouble(value);
+    } else if (rxDate1.exactMatch(value)) {
+        return QDateTime(QDate(rxDate1.cap(3).toInt(), rxDate1.cap(2).toInt(), rxDate1.cap(1).toInt()), QTime(rxDate1.cap(4).toInt(),rxDate1.cap(5).toInt(),rxDate1.cap(6).toInt()));
+    } else if (rxDate2.exactMatch(value)) {
+        return QDate(rxDate2.cap(3).toInt(), rxDate2.cap(2).toInt(), rxDate2.cap(1).toInt());
     } else {
-        return value;
+        if (value.trimmed().toLower()=="true") return QVariant(true);
+        else if (value.trimmed().toLower()=="false") return QVariant(false);
+        else return value;
     }
+    return value;
 }
 
 QString qfLeftPaddedString(const QString& input, int fieldWidth, QChar padchar) {

@@ -79,11 +79,11 @@ QList<QVector<double> > readCSV(QTextStream& f, QChar separator_char, QChar /*de
     return dataRotate(res);
 }
 
-QVector<double> csvReadline(QString f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars) {
+QVector<double> csvReadline(QString f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars, QString* lineOut) {
     QTextStream ff(&f);
-    return csvReadline(ff, separator_char, comment_char,  non_value,  eolChars,  ignoreChars);
+    return csvReadline(ff, separator_char, comment_char,  non_value,  eolChars,  ignoreChars, lineOut);
 }
-QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars) {
+QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars, QString* lineOut) {
     //const QString line=f.readLine();
     QString line="";
     QString ch=f.read(1);
@@ -101,6 +101,7 @@ QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_
     bool isComment=false;
     bool ok=false;
     double d=0;
+    if (lineOut) *lineOut=line;
     //for (int i=0; i<line.size(); i++) {
     for (QString::const_iterator i=line.begin(); i!=line.end(); ++i) {
         const QChar ch=*i;//line[i];

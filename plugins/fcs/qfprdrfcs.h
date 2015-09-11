@@ -157,6 +157,7 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         void insertDiffusion4File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
         void insertOlegFile(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
         void insertPicoQuantASCIIFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
+        void insertPicoQuantCORFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
 
         /*! \brief add a Zeiss Confocor3 file to the current project
 

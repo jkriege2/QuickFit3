@@ -129,6 +129,7 @@ QList<QPair<QString, QString> > QFRDRFCSData::getFileTypesAndFilters()
     ft.append(qMakePair(QString("CORRELATOR.COM_SIN"), tr("correlator.com files (*.sin)")));
     ft.append(qMakePair(QString("CONFOCOR3"), tr("Zeiss Confocor3 files (*.fcs)")));
     ft.append(qMakePair(QString("ISS_ALBA"), tr("ISS Alba Files (*.csv)")));
+    ft.append(qMakePair(QString("PICOQUANT_ASCII_COR"), tr("PicoQuant FCS Files from v6.0 TTTR correlator (*.cor)")));
     ft.append(qMakePair(QString("PICOQUANT_ASCII_FCS_W"), tr("PicoQuant ASCII FCS Curves Files with weights (*.dat)")));
     ft.append(qMakePair(QString("PICOQUANT_ASCII_FCS"), tr("PicoQuant ASCII FCS Curves Files (*.dat)")));
     ft.append(qMakePair(QString("QF3ASCIICORR"), tr("QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)")));
@@ -223,6 +224,8 @@ void QFRDRFCSData::fileFiltersSetFCSFilterProperties(QMap<QString, QVariant> &p,
         p["FILETYPE"]="PICOQUANT_ASCII_FCS";
     } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("PICOQUANT_ASCII_FCS_W")) {
         p["FILETYPE"]="PICOQUANT_ASCII_FCS_W";
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("PICOQUANT_ASCII_COR")) {
+        p["FILETYPE"]="PICOQUANT_ASCII_COR";
     } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("DIFFUSION4_SIMRESULTS")) {
         p["FILETYPE"]="DIFFUSION4_SIMRESULTS";
         p["CSV_SEPARATOR"]=",";
@@ -1030,7 +1033,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromALBA(QStringList filenames) {
             // search for [Data] in file
             do {
                 line=stream.readLine().toLower();
-            } while ((!line.isNull()) && (!line.contains("[data]")));
+            } while (!stream.atEnd() && !line.isNull() && !line.contains("[data]"));
             if (line.contains("[data]")) {
                 QList<double> tdata, cdata;
                 do {
@@ -2583,6 +2586,18 @@ bool QFRDRFCSData::reloadFromFiles() {
             return false;
         }
         return loadCorrelationCurvesFromALBA(files);
+    } else if (filetype.toUpper()=="PICOQUANT_ASCII_COR") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return false;
+        }
+        bool res=false;
+        if (files.size()==1) {
+            res=loadCorrelationCurvesFromPicoQuantCOR(files[0]);
+        } else if (files.size()>1) {
+            loadSeveral(res, files, loadCorrelationCurvesFromPicoQuantCOR);
+        }
+        return res;
     } else if (filetype.toUpper()=="PICOQUANT_ASCII_FCS_W") {
         if (files.size()<=0) {
             setError(tr("there are no files in the FCS record!"));
@@ -2967,6 +2982,111 @@ bool QFRDRFCSData::loadOlegData(QString filename)
     return ok;
 }
 
+bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantCOR(QString filename)
+{
+    if (!QFile::exists(filename)) {
+        QString msg;
+        setError(msg=tr("data file '%1' does not exist!\n").arg(filename));
+        QFPluginServices::getInstance()->log_warning(msg);
+        return false;
+    }
+
+    QFile f(filename);
+    if (f.open(QFile::ReadOnly|QFile::Text)) {
+        QTextStream txt(&f);
+        QList<QVector<double> > corr;
+        while (!txt.atEnd()) {
+            QString line;
+            QVector<double> data=csvReadline(txt, ' ', '#', 0, "\n", "\r", &line);
+            bool added=false;
+            if (data.size()>=3 && QFFloatIsOK(data[0]) && data[0]>0 && QFFloatIsOK(data[1])) {
+                //data.removeFirst();
+                corr<<data;
+                added=true;
+                qDebug()<<1<<data;
+            } else {
+                QRegExp rxc("#?([^\\:]+)\\s*\\:\\s*(.+)");
+                qDebug()<<2<<line;
+                if (rxc.exactMatch(line) && rxc.cap(1).trimmed().size()>0 && rxc.cap(2).trimmed().size()>0) {
+                    QString name=rxc.cap(1).trimmed();
+                    QString value=rxc.cap(2).trimmed();
+                    setQFProperty(name, qfStringToVariantAutoRecognizeType(value), false, true);
+                    //qDebug()<<2<<name<<value<<qfStringToVariantAutoRecognizeType(value);
+                }
+            }
+        }
+        f.close();
+        if (corr.size()>0) {
+            //double taumin=corr[0].at(0)*1e-3;
+            resizeCorrelations(corr.size(), 1);
+            //qDebug()<<"correlationN="<<correlationN;
+            bool cok=false;
+            int col=getQFProperty("COLUMNS", "2").toInt(&cok);
+            if (!cok) col=2;
+            int taucol=1;
+            for (int i=0; i<correlationN; i++) {
+                if (taucol<corr[i].size()) {
+                    correlationT[i]=corr[i].at(taucol);
+                }
+                if (col<corr[i].size()) {
+                    correlation[i]=corr[i].at(col);
+                    //if (weights && corr[i].size()>=3) correlationErrors[i]=1/corr[i].at(2);
+                } else {
+                    correlation[i]=0;
+                }
+            }
+            recalculateCorrelations();
+            emitRawDataChanged();
+            return true;
+        } else {
+            setError(tr("Error while reading correlation functions from PicoQuant ASCII file '%1': %2").arg(filename).arg(tr("No valid data found in file")));
+            return false;
+        }
+    } else {
+        setError(tr("Error while reading correlation functions from PicoQuant ASCII file '%1': %2").arg(filename).arg(f.errorString()));
+        return false;
+    }
+
+    return false;
+}
+
+bool QFRDRFCSData::analyzeCorrelationCurvesFromPicoQuantCOR(QString filename, int *channels)
+{
+    if (!QFile::exists(filename)) {
+        qDebug()<<"file does not exist";
+        return false;
+    }
+
+
+    QFile f(filename);
+    if (f.open(QFile::ReadOnly|QFile::Text)) {
+        QTextStream txt(&f);
+        while (!txt.atEnd()) {
+            QString line;
+            QVector<double> data=csvReadline(txt, ' ', '#', 0, "\n", "\r", &line);
+            //qDebug()<<line;
+            if (data.size()>=3 && QFFloatIsOK(data[0]) && data[0]>0 && QFFloatIsOK(data[1])) {
+                //qDebug()<< "  -> "<<data<< "  -> chanels ="<<data.size()-2;
+                if (channels) *channels=data.size()-2;
+                f.close();
+                return true;
+            } else {
+//                QRegExp rxc("#?(.+)[\\=|\\:](.+)");
+//                qDebug()<<2<<line;
+//                if (rxc.exactMatch(line) && rxc.cap(1).trimmed().size()>0 && rxc.cap(2).trimmed().size()>0) {
+//                    QString name=rxc.cap(1).trimmed();
+//                    QString value=rxc.cap(2).trimmed();
+//                    setQFProperty(name, qfStringToVariantAutoRecognizeType(value), false, true);
+//                    qDebug()<<2<<name<<value<<qfStringToVariantAutoRecognizeType(value);
+//                }
+            }
+            //qDebug()<<txt.atEnd()<<f.atEnd();
+        }
+        f.close();
+    }
+    return false;
+}
+
 bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantASCIIFCS(QString filename, bool weights)
 {
     if (!QFile::exists(filename)) {
@@ -2980,7 +3100,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantASCIIFCS(QString filename, 
     if (f.open(QFile::ReadOnly|QFile::Text)) {
         QTextStream txt(&f);
         QList<QVector<double> > corr;
-        while (!f.atEnd()) {
+        while (!txt.atEnd()) {
             QVector<double> data=csvReadline(txt, ' ', '#', 0, "\n", "\r");
             bool added=false;
             if (data.size()>=2 && QFFloatIsOK(data[0]) && data[0]>0 && QFFloatIsOK(data[1])) {

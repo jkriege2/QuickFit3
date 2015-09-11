@@ -192,7 +192,8 @@ HEADERS += dlgnewproperty.h \
     highrestimer.h \
     ticktock.h \
     jkiniparser2.h \
-    cpptools.h
+    cpptools.h \
+    qfrdrcurvesinterface.h
 
 
 SOURCES += dlgnewproperty.cpp \
