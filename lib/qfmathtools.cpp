@@ -73,6 +73,50 @@ double qfFaddeevaRealW( double xi) {
     return w.real();
 }
 
+uint64_t qfFactorial( uint64_t kmax) {
+    if (kmax<=1) return 1;
+    else if (kmax==2) return 2;
+    else if (kmax==3) return 6;
+    else if (kmax==4) return 24;
+    else if (kmax==5) return 120;
+    else if (kmax==6) return 720;
+    else if (kmax==7) return 5040;
+    else if (kmax==8) return 40320;
+    else if (kmax==9) return 362880;
+    else if (kmax==10) return 3628800;
+    uint64_t k=3628800;
+    for (uint64_t i=11; i<=kmax; i++) {
+        k=k*i;
+    }
+    return k;
+}
+
+uint64_t qfBinomialCoefficient(int64_t n, int64_t k) {
+    if (n<0 || k<0) return 0;
+    if (k>n) return 0;
+    if (k==n) return 1;
+    if (k==0) return 1;
+    uint64_t r1=1;
+    uint64_t r2=1;
+    for (uint64_t j=1; j<=k; j++) {
+        r1=r1*(n+1+j);
+        r2=r2*j;
+    }
+    return r1/r2;
+}
+
+double qfPoissonDist(int64_t k, double lambda) {
+    if (k<0) return 0;
+    return pow(lambda, k)*exp(-lambda)/double(qfFactorial(uint64_t(k)));
+}
+
+double qfBinomialDist(int64_t k, int64_t N, double p) {
+    if (k<0 || N<0) return 0;
+    if (p<=0 || p>1) return 0;
+    if (N<k) return 0;
+    return double(qfBinomialCoefficient(N,k))*pow(p, k)*pow(1.0-p, N-k);
+}
+
 template <class T>
 double qf_statisticsAverage(const T* data, long long N) {
     if (N<=0) return 0;

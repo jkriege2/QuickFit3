@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <QVector>
 #include <QString>
+#include <stdint.h>
 
 /*!
     \defgroup tools_math_stat QuickFit Statistics tools
@@ -248,6 +249,56 @@ inline double qfCauchy(double x, double A, double fwhm, double center) {
     \f[ w(\mathrm{i}\xi)=\exp(\xi^2)\cdot\mbox{erfc}(\xi) \f]
  */
 QFLIB_EXPORT double qfFaddeevaRealW( double xi);
+
+
+/** \brief factorial \f$ k!=k\cdot (k-1)\cdot(k-2)\cdot...\cdot2\cdot1\f$ of a number k
+    \ingroup tools_math_stat
+
+ */
+QFLIB_EXPORT uint64_t qfFactorial( uint64_t kmax);
+
+/** \brief factorial \f$ k!=k\cdot (k-1)\cdot(k-2)\cdot...\cdot2\cdot1\f$ of a number k
+    \ingroup tools_math_stat
+
+ */
+inline double qfFactorial( double kmax) {
+    if (kmax<=1) return 1;
+    return qfFactorial(uint64_t(round(kmax)));
+}
+
+
+/** \brief binomial coefficient \$\left(\stackrel{n}{k}\right)\f$
+    \ingroup tools_math_stat
+
+     \[ \left(\stackrel{n}{k}\right)=\frac{n!}{k!\cdot(n-k)!}=\prod\limits_{j=1}^k\frac{n+1-j}{j}  \f]
+ */
+QFLIB_EXPORT uint64_t qfBinomialCoefficient(int64_t n, int64_t k);
+
+
+/** \brief factorial \f$ k!=k\cdot (k-1)\cdot(k-2)\cdot...\cdot2\cdot1\f$ of a number k
+    \ingroup tools_math_stat
+
+ */
+inline double qfBinomialCoefficient( double n, double k) {
+    return qfBinomialCoefficient(int64_t(round(n)), int64_t(round(k)));
+}
+
+
+/** \brief Poisson distribution
+    \ingroup tools_math_stat
+
+     \[ P_\lambda(k)=\frac{\lambda^k}{k!}\cdot\mathrm{e}^{-\lambda} \f]
+ */
+QFLIB_EXPORT double qfPoissonDist(int64_t k, double lambda);
+
+
+/** \brief Poisson distribution
+    \ingroup tools_math_stat
+
+     \[ B(k|N,p)=\left(\stackrel{N}{k}\right)\cdotp^k\cdot(1-p)^{N-k} \f]
+ */
+QFLIB_EXPORT double qfBinomialDist(int64_t k, int64_t N, double p);
+
 
 /** \brief calculate the error propagation for <code>factorA*a+factorB*b</code> or <code>factorA*a-factorB*b</code> with errors \a ea and \a eb
     \ingroup tools_math_stat

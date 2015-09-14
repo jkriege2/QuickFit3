@@ -438,15 +438,15 @@ void QFETCSPCImporterDialog::readSettings() {
 
     tmFCSLifetimeFilter->fromCSV(options->getQSettings()->value("tcspcimporter/dlg_correlate/tmFCSLifetimeFilter", "").toString());
 
-    ui->spinSegments->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/segments", ui->spinSegments->value()).toInt());
-    ui->spinSegDuration->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/spinSegDuration", ui->spinSegDuration->value()).toDouble());
     ui->radSegDuration->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/radSegDuration", ui->radSegDuration->isChecked()).toBool());
     ui->radSegNum->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/radSegNum", ui->radSegNum->isChecked()).toBool());
+    if (ui->radSegDuration->isChecked()) ui->spinSegDuration->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/spinSegDuration", ui->spinSegDuration->value()).toDouble());
+    else ui->spinSegments->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/segments", ui->spinSegments->value()).toInt());
 
-    ui->spinSegmentsLT->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/segmentsLT", ui->spinSegmentsLT->value()).toInt());
-    ui->spinSegDurationLT->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/spinSegDurationLT", ui->spinSegDurationLT->value()).toDouble());
     ui->radSegDurationLT->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/radSegDurationLT", ui->radSegDurationLT->isChecked()).toBool());
     ui->radSegNumLT->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/radSegNumLT", ui->radSegNumLT->isChecked()).toBool());
+    if (ui->radSegDurationLT->isChecked()) ui->spinSegDurationLT->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/spinSegDurationLT", ui->spinSegDurationLT->value()).toDouble());
+    else ui->spinSegmentsLT->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/segmentsLT", ui->spinSegmentsLT->value()).toInt());
 
 
 }

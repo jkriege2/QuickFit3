@@ -1,0 +1,14 @@
+prob=0.0014;
+N=32;
+avg=N*prob;
+
+
+fak(k)=if(k>1,k*fak(k-1),1);
+binom(n,k)=fak(n)/fak(n-k)/fak(k);
+
+x=0:30;
+p=for(k,x,avg^k/fak(k)*exp(-avg));
+b=for(k,x,binom(N,k)*(prob^k)*((1-prob)^(N-k)));
+
+plot(x,p*100,"bo",x,b*100,"r+");
+

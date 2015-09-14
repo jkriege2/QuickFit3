@@ -110,6 +110,12 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("structsaveget", QFMathParser_DefaultLib::fStructGetSave);
     p->addFunction("sinc", QFMathParser_DefaultLib::fSinc, NULL, qfSinc);
     p->addFunction("faddeeva_real", QFMathParser_DefaultLib::fFaddeevaRealW, NULL, qfFaddeevaRealW);
+    p->addFunction("factorial", QFMathParser_DefaultLib::fFactorial, NULL, qfFactorial);
+    p->addFunction("binomial", QFMathParser_DefaultLib::fBinom);
+    p->addFunction("poisspdf", QFMathParser_DefaultLib::fPoissonPDF);
+    p->addFunction("binopdf", QFMathParser_DefaultLib::fBinomialPDF);
+    p->addFunction("poissonpdf", QFMathParser_DefaultLib::fPoissonPDF);
+    p->addFunction("binomialpdf", QFMathParser_DefaultLib::fBinomialPDF);
     p->addFunction("asin", QFMathParser_DefaultLib::fASin, NULL, asin);
     p->addFunction("acos", QFMathParser_DefaultLib::fACos, NULL, acos);
     p->addFunction("atan", QFMathParser_DefaultLib::fATan, NULL, atan);

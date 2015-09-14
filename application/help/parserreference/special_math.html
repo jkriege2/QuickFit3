@@ -7,15 +7,7 @@
   <body> 
   $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
   
-  
-  
-  $$funcref_start$$<a name="sigmoid"/><!-- func:sigmoid -->
-  <b><tt><!-- template -->sigmoid(x)<!-- /template --></tt> - <i>sigmoidal function </i>:</b>
-$$funcref_description$$
-  $$bmath:\mathrm{sigmoid}(x)=\frac{1}{1+\exp(-x)}$$
-  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
-  <!-- /func:sigmoid -->  
-$$funcref_end$$
+  <h3>Sign, Theta-function, ...</h2>
   
   $$funcref_start$$<a name="sign"/><!-- func:sign -->
   <b><tt><!-- template -->sign(x)<!-- /template --></tt> - <i>sign function </i>:</b>
@@ -32,22 +24,16 @@ $$funcref_description$$
   The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
   <!-- /func:theta -->  
 $$funcref_end$$
-  
+
+
+
+  <h3>Functions, related to trigonometric functions</h3>
   $$funcref_start$$<a name="tanc"/><!-- func:tanc -->
   <b><tt><!-- template -->tanc(x)<!-- /template --></tt> - <i>tanc function </i>:</b>
 $$funcref_description$$
   $$bmath:\mbox{tanc}(x)=\begin{cases}1 & x\equiv0\\\frac{\tan(x)}{x}&\mathrm{elsewhere}\end{cases}$$
   The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
   <!-- /func:tanc -->  
-$$funcref_end$$
-  
-  
-  $$funcref_start$$<a name="slit"/><!-- func:slit -->
-  <b><tt><!-- template -->slit(x,a)<!-- /template --></tt> - <i>slit function (two step function) </i>:</b>
-$$funcref_description$$
-  $$bmath:\mbox{slit}(x,a)=\begin{cases}1 & -a/2 \geq x\geq a/2 \\0 & \text{elsewhere}\end{cases}$$
-  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
-  <!-- /func:slit -->  
 $$funcref_end$$
   
   
@@ -59,6 +45,30 @@ $$funcref_description$$
   <!-- /func:sinc -->  
 $$funcref_end$$
   
+  
+  $$funcref_start$$<a name="slit"/><!-- func:slit -->
+  <b><tt><!-- template -->slit(x,a)<!-- /template --></tt> - <i>slit function (two step function) </i>:</b>
+$$funcref_description$$
+  $$bmath:\mbox{slit}(x,a)=\begin{cases}1 & -a/2 \geq x\geq a/2 \\0 & \text{elsewhere}\end{cases}$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:slit -->  
+$$funcref_end$$
+  
+
+  
+  
+  
+  <h3>Error function, sigmoidal functions, ...</h3>
+
+  $$funcref_start$$<a name="sigmoid"/><!-- func:sigmoid -->
+  <b><tt><!-- template -->sigmoid(x)<!-- /template --></tt> - <i>sigmoidal function </i>:</b>
+$$funcref_description$$
+  $$bmath:\mathrm{sigmoid}(x)=\frac{1}{1+\exp(-x)}$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:sigmoid -->  
+$$funcref_end$$
+
+
   $$funcref_start$$<a name="erf"/><!-- func:erf -->
   <b><tt><!-- template -->erf(x)<!-- /template --></tt> - <i>error function </i>:</b>
 $$funcref_description$$
@@ -75,6 +85,12 @@ $$funcref_description$$
   <!-- /func:erfc -->  
 $$funcref_end$$
   
+  
+  
+  
+  
+  
+  <h3>Gamma-function</h3>
   $$funcref_start$$<a name="lgamma"/><!-- func:lgamma -->
   <b><tt><!-- template -->lgamma(x)<!-- /template --></tt> - <i>logarithmic gamma function </i>:</b>
 $$funcref_description$$
@@ -91,6 +107,12 @@ $$funcref_description$$
   <!-- /func:tgamma -->  
 $$funcref_end$$
   
+  
+  
+  
+  
+  
+  <h3>Bessel Functions</h3>
   $$funcref_start$$<a name="j0"/><!-- func:j0 -->
   <b><tt><!-- template -->j0(x)<!-- /template --></tt> - <i>Bessel functions of the first kind </i>:</b>
 $$funcref_description$$
@@ -134,6 +156,13 @@ $$funcref_description$$
 $$funcref_end$$
 
 
+
+
+
+
+
+
+<h3>Min/Max-functions ...</h3>
   $$funcref_start$$<a name="min"/><!-- func:min -->
   <b><tt><!-- template -->min(x,y)<!-- /template --></tt> - <i>returns the smaller of the two arguments </i>:</b>
 $$funcref_description$$
@@ -146,6 +175,13 @@ $$funcref_description$$
   <!-- /func:max -->  
 $$funcref_end$$
   
+  
+  
+  
+  
+  
+  
+  <h3>Modulo ...</h3>
   $$funcref_start$$<a name="fmod"/><!-- func:fmod -->
   <b><tt><!-- template -->fmod(x,y)<!-- /template --></tt> - <i>returns the reminder after division x/y division </i>:</b>
 $$funcref_description$$
@@ -153,7 +189,32 @@ $$funcref_description$$
   <!-- /func:fmod -->  
 $$funcref_end$$
 
+  
+  
+  
+  
+  
+  <h3>Factorials, Binomial coefficients ...</h3>
+  $$funcref_start$$<a name="factorial"/><!-- func:factorial -->
+  <b><tt><!-- template -->factorial(k)<!-- /template --></tt> - <i>returns the factorial $(k!=k\cdot (k-1)\cdot(k-2)\cdot...\cdot2\cdot1)$ of an integer number $(k\geq1)$ </i>:</b>
+$$funcref_description$$
+  
+  <!-- /func:factorial -->  
+$$funcref_end$$
 
+  $$funcref_start$$<a name="binomial"/><!-- func:binomial -->
+  <b><tt><!-- template -->binomial(N,k)<!-- /template --></tt> - <i>returns the binomial coefficient $(\left(\stackrel{N}{k}\right))$, which equal the number of possibilities to choose $(k)$ items out of $(N)$ items, without putting them back </i>:</b>
+$$funcref_description$$
+  The arguments <tt>N</tt> and <tt>k</tt> must be positive integers and $(N\geq k)$. The binomial coefficients are defined as:
+  $[\left(\stackrel{n}{k}\right)=\frac{n!}{k!\cdot(n-k)!}=\prod\limits_{j=1}^k\frac{n+1-j}{j}$
+  <!-- /func:binomial -->  
+$$funcref_end$$
+
+
+
+
+
+<h3>Other special functions</h3>
   $$funcref_start$$<a name="faddeeva_real"/><!-- func:faddeeva_real -->
   <b><tt><!-- template -->faddeeva_real(xi)<!-- /template --></tt> - <i>returns the real-part of the Faddeeva function $(w(\mathrm{i}\xi),\ \ \ \xi\in\mathbb{R})$</i>:</b>
 $$funcref_description$$
@@ -162,7 +223,14 @@ $$funcref_description$$
   <!-- /func:faddeeva_real -->  
 $$funcref_end$$
   
-  
+    $$funcref_start$$<a name="gaussnn"/><!-- func:gaussnn -->
+  <b><tt><!-- template -->gaussnn(x, sigma)<!-- /template --></tt> - <i>non-normalized gaussian function </i>:</b>
+$$funcref_description$$
+  $$bmath:\mbox{gaussnn}(x,\sigma)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right)$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:gaussnn -->  
+$$funcref_end$$
+
   </body>
   </html>
   

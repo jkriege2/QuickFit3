@@ -7,12 +7,12 @@
     <li><b><a href="$$mainhelpdir$$/parserreference/type_tools.html">data type tool functions</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/type_conversion.html">data type conversion functions</a></b></li></ul></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/floatingpointfunctions.html">floating-point special functions (isnan etc.)</a></b></li>
-<li><b>Special Functions</b>:<ul>
+<li><b>Special Infrastructure Functions</b>:<ul>
+    <li><b><a href="$$mainhelpdir$$/parserreference/special_functionlike.html">function-like constructs (if, cases, for, sum, ...)</a></b></li>    
 	<li><b><a href="$$mainhelpdir$$/parserreference/struct.html">struct functions</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/vector.html">vector manipulation functions</a></b></li>
-    <li><b><a href="$$mainhelpdir$$/parserreference/special.html">special functions</a></b></li>
-    <li><b><a href="$$mainhelpdir$$/parserreference/special_functionlike.html">function-like constructs (if, cases, for, sum, ...)</a></b></li>    
 	<li><b><a href="$$mainhelpdir$$/parserreference/parsetree.html">parsetree access/expression print functions</a></b></li>
+    <li><b><a href="$$mainhelpdir$$/parserreference/special.html">diverse mathematical special functions</a></b></li>
 </ul></li>
 <li><b>Mathematical Functions</b>:<ul>
     <li><b><a href="$$mainhelpdir$$/parserreference/trig.html">trigonometric functions</a></b></li>
@@ -20,11 +20,9 @@
     <li><b><a href="$$mainhelpdir$$/parserreference/power_roots.html">powers and roots</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/round_abs.html">rounding and absolute values</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/special_math.html">special math functions</a></b></li>
+    <li><b><a href="$$mainhelpdir$$/parserreference/special_stat.html">special functions from statistics</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/fitfunctions.html">QuickFit fit function accesss</a></b></li>
-</ul></li>
-<li><b>Advanced Mathematical Functions</b>:<ul>
     <li><b><a href="$$mainhelpdir$$/parserreference/polynomials.html">polynomial functions</a></b></li>
-    <li><b><a href="$$mainhelpdir$$/parserreference/distributions.html">distribution functions</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/intdiff.html">integration/differentiation</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/unit.html">unit conversion functions</a></b></li>
 </ul></li>
