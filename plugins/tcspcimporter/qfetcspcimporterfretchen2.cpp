@@ -1305,9 +1305,9 @@ void QFETCSPCImporterFretchen2::loadTCSPCFiles()
             ui->labP->setText(QString("%1").arg(photons.photondata.size()));
             outData.properties["photons"]=photons.photondata.size();
             ui->labPGreen->setText(QString("%1").arg(photons.photonsG));
-            outData.properties["photons_green"]=photons.photonsG;
+            outData.properties["photons_green"]=quint64(photons.photonsG);
             ui->labPRed->setText(QString("%1").arg(photons.photonsR));
-            outData.properties["photons_red"]=photons.photonsR;
+            outData.properties["photons_red"]=quint64(photons.photonsR);
             ui->labAvgIPT->setText(QString("%1 &mu;s").arg(photons.avg_IPT, 0, 'f', 3));
             outData.properties["avg_ipt_all"]=photons.avg_IPT;
 
