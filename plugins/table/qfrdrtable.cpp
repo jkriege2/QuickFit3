@@ -2490,7 +2490,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
     datamodel->setReadonly(false);
     if (files.size()>0 && !getQFProperty("DONT_READWRITE_FILE", false).toBool() ) {
         QString format=getQFProperty("READFILE_FILEFORMAT", "CSV").toString().trimmed().toUpper();
-        if (format=="") {
+        if (format=="" || format=="QFTABLEXML" || format=="XML") {
             datamodel->readXMLFile(files[0]);
             QDomDocument docxml;
             if (docxml.setContent(readFile(files[0]))) {
@@ -2502,7 +2502,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     }
                 }
             }
-        } else {
+        } else if (format=="CSV"){
             //qDebug()<<"    reading CSV\n";
             QString s=getProperty("column_separator", ",").toString();
             char column_separator=(s.size()>0)?s[0].toLatin1():',';

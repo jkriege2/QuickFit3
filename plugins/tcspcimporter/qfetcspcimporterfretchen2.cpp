@@ -43,21 +43,31 @@ QFETCSPCImporterFretchen2::QFETCSPCImporterFretchen2(QWidget *parent) :
     plteInterphotonTimes->set_yColumn(1);
     plteInterphotonTimes->set_color(QColor("darkblue"));
     plteInterphotonTimes->set_lineWidth(0.5);
+    plteInterphotonTimes2=new JKQTPxyLineGraph(ui->pltTrace);
+    plteInterphotonTimes2->set_drawLine(false);
+    plteInterphotonTimes2->set_symbol(JKQTPnoSymbol);
+    plteInterphotonTimes2->set_title(tr("red photons"));
+    plteInterphotonTimes2->set_xColumn(-1);
+    plteInterphotonTimes2->set_yColumn(-1);
+    plteInterphotonTimes2->set_color(QColor("red"));
+    plteInterphotonTimes2->set_lineWidth(0.5);
+    plteInterphotonTimes2->set_visible(false);
     plteIPTLevelLine=new JKQTPgeoLine(ui->pltTrace,0,0,0,0);
     plteIPTLevelLine->set_color(QColor("red"));
     ui->pltTrace->addGraph(plteInterphotonTimes);
+    ui->pltTrace->addGraph(plteInterphotonTimes2);
     ui->pltTrace->addGraph(plteIPTLevelLine);
     ui->pltTrace->getYAxis()->set_logAxis(true);
     ui->pltTrace->getYAxis()->set_axisLabel(tr("interphoton time [{\\mu}s]"));
     ui->pltTrace->getXAxis()->set_axisLabel(tr("arrivaltime [s]"));
 
-    plteBurstRate=new JKQTPxyLineGraph(ui->pltBurstRate);
+    plteBurstRate=new JKQTPxyParametrizedScatterGraph(ui->pltBurstRate);
     plteBurstRate->set_drawLine(false);
     plteBurstRate->set_symbol(JKQTPfilledCircle);
     plteBurstRate->set_title("");
     plteBurstRate->set_xColumn(0);
     plteBurstRate->set_yColumn(1);
-    plteBurstRate->set_symbolSize(4);
+    plteBurstRate->set_symbolSize(3);
     plteBurstRate->set_color(QColor("darkblue"));
     plteBurstRate->set_fillColor(QColor("darkblue").lighter());
     plteBurstRate->set_lineWidth(0.5);
@@ -112,7 +122,9 @@ void QFETCSPCImporterFretchen2::writeSettings()
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinMaxBurstDuration,  "QFETCSPCImporterFretchen2/spinMaxBurstDuration");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinMaxIPT,  "QFETCSPCImporterFretchen2/spinMaxIPT");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinLEESigma,  "QFETCSPCImporterFretchen2/spinLEESigma");
+    ProgramOptions::setConfigQDoubleSpinBox(ui->spinDisplayBin,  "QFETCSPCImporterFretchen2/spinDisplayBin");
     ProgramOptions::setConfigQSpinBox(ui->spinLEERange,  "QFETCSPCImporterFretchen2/spinLEERange");
+    ProgramOptions::setConfigQSpinBox(ui->spinHBins,  "QFETCSPCImporterFretchen2/spinHBins");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinHBinWidth,  "QFETCSPCImporterFretchen2/spinHBinWidth");
     ProgramOptions::setConfigQCheckBox( ui->chkLEE, "QFETCSPCImporterFretchen2/chkLEE");
     ProgramOptions::setConfigQCheckBox(ui->chkSHowFilteredIPT, "QFETCSPCImporterFretchen2/chkSHowFilteredIPT");
@@ -131,6 +143,7 @@ void QFETCSPCImporterFretchen2::readSettings()
     ProgramOptions::getConfigQCheckBox(ui->chkMSAddFileID,  "QFETCSPCImporterFretchen2/chkMSAddFileID", true);
     ProgramOptions::getConfigQCheckBox(ui->chkNormHistogram,  "QFETCSPCImporterFretchen2/chkNormHistogram", true);
     ProgramOptions::getConfigQComboBox(ui->cmbAnaHistMode,  "QFETCSPCImporterFretchen2/cmbAnaHistMode", 0);
+    ProgramOptions::getConfigQDoubleSpinBox(ui->spinDisplayBin,  "QFETCSPCImporterFretchen2/spinDisplayBin", 1);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinCrosstalk,  "QFETCSPCImporterFretchen2/spinCrosstalk", 4);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinGamma,  "QFETCSPCImporterFretchen2/spinGamma", 1);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinFDir,  "QFETCSPCImporterFretchen2/spinFDir", 0);
@@ -140,6 +153,7 @@ void QFETCSPCImporterFretchen2::readSettings()
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinMaxIPT,  "QFETCSPCImporterFretchen2/spinMaxIPT", 70);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinLEESigma,  "QFETCSPCImporterFretchen2/spinLEESigma", 5);
     ProgramOptions::getConfigQSpinBox(ui->spinLEERange,  "QFETCSPCImporterFretchen2/spinLEERange", 8);
+    ProgramOptions::getConfigQSpinBox(ui->spinHBins,  "QFETCSPCImporterFretchen2/spinHBins", 31);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinHBinWidth,  "QFETCSPCImporterFretchen2/spinHBinWidth", 0.05);
     ProgramOptions::getConfigQCheckBox( ui->chkLEE, "QFETCSPCImporterFretchen2/chkLEE",true);
     ProgramOptions::getConfigQCheckBox(ui->chkSHowFilteredIPT, "QFETCSPCImporterFretchen2/chkSHowFilteredIPT", true);
@@ -651,47 +665,113 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
     ui->pltTrace->set_doDrawing(false);
     JKQTPdatastore* ds=ui->pltTrace->getDatastore();
     ds->clear();
-    QVector<double> x, y;
-    x.reserve(photons.photondata.size()/1000+10);
-    y.reserve(photons.photondata.size()/1000+10);
-    //qDebug()<<s<<l<<photons.firstPhoton<<photons.duration<<photons.photondata.size()<<(ui->chkSHowFilteredIPT->isChecked() && photons.lastLEEWindowSize>0);
-    if (ui->chkSHowFilteredIPT->isChecked() && photons.lastLEEWindowSize>0) {
+
+    if (ui->cmbBurstSelPlotMode->currentIndex()==0) {
+
+        QVector<double> x, y;
+        x.reserve(photons.photondata.size()/1000+10);
+        y.reserve(photons.photondata.size()/1000+10);
+        //qDebug()<<s<<l<<photons.firstPhoton<<photons.duration<<photons.photondata.size()<<(ui->chkSHowFilteredIPT->isChecked() && photons.lastLEEWindowSize>0);
+        if (ui->chkSHowFilteredIPT->isChecked() && photons.lastLEEWindowSize>0) {
+            for (int i=0; i<photons.photondata.size(); i++) {
+                const double at=photons.photondata.at(i).arrivaltime;
+                const double ipt=photons.photondata.at(i).IPT_filtered*1e6;
+                //Debug()<<i<<at<<ipt;
+                if (at>=s && at<=s+l) {
+                    x<<at;
+                    y<<ipt;
+                    //qDebug()<<i<<"IPT_f ";
+                }
+                if (i>0 && i%100000==0) QApplication::processEvents();
+            }
+            plteInterphotonTimes->set_title(tr("all photons, LEE filtered"));
+            plteInterphotonTimes->set_drawLine(true);
+            plteInterphotonTimes->set_symbol(JKQTPnoSymbol);
+            plteInterphotonTimes->set_color(QColor("darkblue"));
+        } else {
+            for (int i=0; i<photons.photondata.size(); i++) {
+                const double at=photons.photondata.at(i).arrivaltime;
+                const double ipt=photons.photondata.at(i).IPT*1e6;
+                //qDebug()<<i<<at<<ipt;
+                if (at>=s && at<=s+l) {
+                    x<<at;
+                    y<<ipt;
+                    //qDebug()<<i;
+                }
+                if (i>0 && i%100000==0) QApplication::processEvents();
+            }
+            plteInterphotonTimes->set_drawLine(false);
+            plteInterphotonTimes->set_title(tr("all photons"));
+            plteInterphotonTimes->set_symbol(JKQTPdot);
+            plteInterphotonTimes->set_color(QColor("darkblue"));
+        }
+        //qDebug()<<x.size()<<y.size();
+        plteInterphotonTimes->set_xColumn(ds->addCopiedColumn(x, tr("Arrivaltime [s]")));
+        plteInterphotonTimes->set_yColumn(ds->addCopiedColumn(y, tr("Inter-Photon Time IPT [microseconds]")));
+        plteInterphotonTimes2->set_visible(false);
+        plteIPTLevelLine->set_x1(s);
+        plteIPTLevelLine->set_x2(s+l);
+        plteIPTLevelLine->set_y1(ui->spinMaxIPT->value());
+        plteIPTLevelLine->set_y2(ui->spinMaxIPT->value());
+        plteIPTLevelLine->set_visible(true);
+        ui->pltTrace->getYAxis()->set_axisLabel(tr("interphoton time [{\\mu}s]"));
+        ui->pltTrace->getYAxis()->set_logAxis(true);
+    } else if (ui->cmbBurstSelPlotMode->currentIndex()==1) {
+        plteIPTLevelLine->set_visible(false);
+        double bin=ui->spinDisplayBin->value()*1e-3;
+        QVector<double> x, yg, yr;
+        x.reserve(photons.photondata.size()/1000+10);
+        yg.reserve(photons.photondata.size()/1000+10);
+        yr.reserve(photons.photondata.size()/1000+10);
+        double tn=s;
+        double cg=0;
+        double cr=0;
+        //qDebug()<<s<<l<<photons.firstPhoton<<photons.duration<<photons.photondata.size()<<(ui->chkSHowFilteredIPT->isChecked() && photons.lastLEEWindowSize>0);
         for (int i=0; i<photons.photondata.size(); i++) {
             const double at=photons.photondata.at(i).arrivaltime;
-            const double ipt=photons.photondata.at(i).IPT_filtered*1e6;
+            const int ch=photons.photondata.at(i).channel;
+            const int chg=ui->cmbGreenChannel->currentIndex();
+            const int chr=ui->cmbRedChannel->currentIndex();
+
             //Debug()<<i<<at<<ipt;
             if (at>=s && at<=s+l) {
-                x<<at;
-                y<<ipt;
+                if (at>=tn+bin) {
+                    x<<tn;
+                    yg<<(cg/bin*1e-3);
+                    yr<<(cr/bin*1e-3);
+                    tn=tn+bin;
+                    cg=0;
+                    cr=0;
+                    while (at>=tn+bin) {
+                        x<<tn;
+                        yg<<0;
+                        yr<<0;
+                        tn+=bin;
+                    }
+                } else {
+                    if (ch==chg) cg++;
+                    else if (ch==chr) cr++;
+                }
+
                 //qDebug()<<i<<"IPT_f ";
             }
             if (i>0 && i%100000==0) QApplication::processEvents();
         }
-        plteInterphotonTimes->set_title(tr("all photons, LEE filtered"));
+        plteInterphotonTimes->set_title(tr("green photons"));
         plteInterphotonTimes->set_drawLine(true);
-    } else {
-        for (int i=0; i<photons.photondata.size(); i++) {
-            const double at=photons.photondata.at(i).arrivaltime;
-            const double ipt=photons.photondata.at(i).IPT*1e6;
-            //qDebug()<<i<<at<<ipt;
-            if (at>=s && at<=s+l) {
-                x<<at;
-                y<<ipt;
-                //qDebug()<<i;
-            }
-            if (i>0 && i%100000==0) QApplication::processEvents();
-        }
-        plteInterphotonTimes->set_drawLine(false);
-        plteInterphotonTimes->set_title(tr("all photons"));
-    }
-    //qDebug()<<x.size()<<y.size();
-    plteInterphotonTimes->set_xColumn(ds->addCopiedColumn(x, tr("Arrivaltime [s]")));
-    plteInterphotonTimes->set_yColumn(ds->addCopiedColumn(y, tr("Inter-Photon Time IPT [microseconds]")));
+        plteInterphotonTimes->set_symbol(JKQTPnoSymbol);
+        plteInterphotonTimes->set_color(QColor("darkgreen"));
+        plteInterphotonTimes2->set_visible(true);
 
-    plteIPTLevelLine->set_x1(s);
-    plteIPTLevelLine->set_x2(s+l);
-    plteIPTLevelLine->set_y1(ui->spinMaxIPT->value());
-    plteIPTLevelLine->set_y2(ui->spinMaxIPT->value());
+        //qDebug()<<x.size()<<y.size();
+        plteInterphotonTimes->set_xColumn(ds->addCopiedColumn(x, tr("Arrivaltime [s]")));
+        plteInterphotonTimes->set_yColumn(ds->addCopiedColumn(yg, tr("green countrate [kcps]")));
+        plteInterphotonTimes2->set_xColumn(plteInterphotonTimes->get_xColumn());
+        plteInterphotonTimes2->set_yColumn(ds->addCopiedColumn(yr, tr("red countrate [kcps]")));
+        ui->pltTrace->getYAxis()->set_axisLabel(tr("countrate [kcps]"));
+        ui->pltTrace->getYAxis()->set_logAxis(false);
+    }
+
     ui->pltTrace->zoomToFit();
     ui->pltTrace->set_doDrawing(true);
     ui->pltTrace->update_plot();
@@ -755,7 +835,7 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     dsB->clear();
     dsP->clear();
 
-    QVector<double> PVec, EVec, PVecAll, EVecAll, DVec, RVec, SAllVec, DAllVec, RRVec, RGVec;
+    QVector<double> PVec, EVec, PVecAll, RVecAll, EVecAll, DVec, RVec, SAllVec, DAllVec, RRVec, RGVec, SVec;
     const double mir=ui->spinMinRate->value()*1e3;
     const double mar=ui->spinMaxRate->value()*1e3;
 
@@ -774,9 +854,11 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
         DAllVec<<(bursts.burstdata[i].duration*1e3);
         PVecAll<<bursts.burstdata[i].P;
         EVecAll<<bursts.burstdata[i].E;
+        RVecAll<<(r*1e-3);
         if (r>=mir && r<=mar) {
-            RVec<<r;
-            DVec<<(bursts.burstdata[i].duration);
+            RVec<<(r*1e-3);
+            DVec<<(bursts.burstdata[i].duration*1e3);
+            SVec<<(bursts.burstdata[i].photonG+bursts.burstdata[i].photonR);
             PVec<<bursts.burstdata[i].P;
             EVec<<bursts.burstdata[i].E;
             RGVec<<(double(bursts.burstdata[i].photonG)/bursts.burstdata[i].duration);
@@ -793,8 +875,8 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     }
 
     ui->labNBursts->setText(QString::number(PVec.size()));
-    ui->labAvgBDuration->setText(QString("%1 ms").arg(qfstatisticsAverage(DVec)*1e3, 0, 'f', 4));
-    ui->labAvgRate->setText(QString("%1 kHz").arg(qfstatisticsAverage(RVec)*1e-3, 0, 'f', 3));
+    ui->labAvgBDuration->setText(QString("%1 ms").arg(qfstatisticsAverage(DVec), 0, 'f', 4));
+    ui->labAvgRate->setText(QString("%1 kHz").arg(qfstatisticsAverage(RVec), 0, 'f', 3));
     ui->labAvgRateG->setText(QString("%1 kHz").arg(qfstatisticsAverage(RGVec)*1e-3, 0, 'f', 3));
     ui->labAvgRateR->setText(QString("%1 kHz").arg(qfstatisticsAverage(RRVec)*1e-3, 0, 'f', 3));
     ui->labAvgP->setText(QString("%1").arg(qfstatisticsAverage(PVec), 0, 'f', 4));
@@ -846,6 +928,12 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     nbins=1;
     dmin=dmax=0;
 
+    ui->spinHBins->setEnabled(ui->cmbAnaHistMode->currentIndex()>1);
+    ui->labHBins->setEnabled(ui->cmbAnaHistMode->currentIndex()>1);
+    ui->spinHBinWidth->setEnabled(ui->cmbAnaHistMode->currentIndex()<=1);
+    ui->labHBinWidth->setEnabled(ui->cmbAnaHistMode->currentIndex()<=1);
+    ui->labHistParams->setVisible(ui->cmbAnaHistMode->currentIndex()<=1);
+
     if (ui->cmbAnaHistMode->currentIndex()==0) {
         calcHistParams(PVec, dmin,dmax,nbins,binw);
         QVector<double> HX(nbins,0.0);
@@ -855,7 +943,7 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
         plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("P histogram: P")));
         plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("P histogram: frequency")));
         ui->pltProximity->getXAxis()->set_axisLabel(tr("proximity ratio P"));
-    } else {
+    } else if (ui->cmbAnaHistMode->currentIndex()==1) {
         calcHistParams(EVec, dmin,dmax,nbins,binw);
         QVector<double> HX(nbins,0.0);
         QVector<double> HY(nbins,0.0);
@@ -864,17 +952,110 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
         plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("E histogram: E")));
         plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("E histogram: frequency")));
         ui->pltProximity->getXAxis()->set_axisLabel(tr("FRET ratio E"));
+    } else if (ui->cmbAnaHistMode->currentIndex()==2) {
+        nbins=ui->spinHBins->value();
+        QVector<double> HX(nbins,0.0);
+        QVector<double> HY(nbins,0.0);
+        statisticsHistogram(DVec.data(), DVec.size(),HX.data(), HY.data(), nbins, ui->chkNormHistogram->isChecked());
+
+        plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("Burst duration histogram: duration [ms]")));
+        plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("Burst duration histogram: frequency")));
+        ui->pltProximity->getXAxis()->set_axisLabel(tr("Burst duration \\Delta t_{burst} [ms]"));
+    } else if (ui->cmbAnaHistMode->currentIndex()==3) {
+        nbins=ui->spinHBins->value();
+        QVector<double> HX(nbins,0.0);
+        QVector<double> HY(nbins,0.0);
+        statisticsHistogram(SVec.data(), SVec.size(),HX.data(), HY.data(), nbins, ui->chkNormHistogram->isChecked());
+
+        plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("Burst size histogram: size [photons]")));
+        plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("Burst size histogram: frequency")));
+        ui->pltProximity->getXAxis()->set_axisLabel(tr("Burst size N_g+N_r [photons]"));
+    } else if (ui->cmbAnaHistMode->currentIndex()==4) {
+        nbins=ui->spinHBins->value();
+        QVector<double> HX(nbins,0.0);
+        QVector<double> HY(nbins,0.0);
+        statisticsHistogram(RVec.data(), RVec.size(),HX.data(), HY.data(), nbins, ui->chkNormHistogram->isChecked());
+
+        plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("Burst rate histogram: rate [kcps]")));
+        plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("Burst rate histogram: frequency")));
+        ui->pltProximity->getXAxis()->set_axisLabel(tr("Burst rate (N_g+N_r)/\\Delta t_{burst} [kcps]"));
     }
 
     ui->labHistParams->setText(tr("%3 bins in [%1..%2]").arg(dmin,0,'f',4).arg(dmax,0,'f',4).arg(nbins));
 
-    plteBurstRate->set_xColumn(dsB->addCopiedColumn(SAllVec, tr("burst size [photons]")));
-    plteBurstRate->set_yColumn(dsB->addCopiedColumn(DAllVec, tr("burst duration [ms]")));
+    if (ui->cmbAnaCorrMode->currentIndex()==0) {
+        plteBurstRate->set_xColumn(dsB->addCopiedColumn(SAllVec, tr("burst size [photons]")));
+        plteBurstRate->set_yColumn(dsB->addCopiedColumn(DAllVec, tr("burst duration [ms]")));
 
-    plteMinBurstRate->set_paramsV(0, 1e3/mir);
-    plteMaxBurstRate->set_paramsV(0, 1e3/mar);
+        plteMinBurstRate->set_paramsV(0, 1e3/mir);
+        plteMaxBurstRate->set_paramsV(0, 1e3/mar);
+        plteMaxBurstRate->set_visible(true);
+        plteMinBurstRate->set_visible(true);
+        ui->pltBurstRate->getXAxis()->set_axisLabel(tr("burst size N_g+N_r [photons]"));
+        ui->pltBurstRate->getYAxis()->set_axisLabel(tr("burst duration \\Delta t_{burst} [ms]"));
 
-    ui->pltBurstRate->zoomToFit(true, true, true, true);
+    } else if (ui->cmbAnaCorrMode->currentIndex()==1) {
+        plteBurstRate->set_xColumn(dsB->addCopiedColumn(SVec, tr("burst size [photons]")));
+        plteBurstRate->set_yColumn(dsB->addCopiedColumn(PVec, tr("proximity ratio")));
+
+        plteMaxBurstRate->set_visible(false);
+        plteMinBurstRate->set_visible(false);
+        ui->pltBurstRate->getXAxis()->set_axisLabel(tr("burst size N_g+N_r [photons]"));
+        ui->pltBurstRate->getYAxis()->set_axisLabel(tr("proximity ratio P"));
+    } else if (ui->cmbAnaCorrMode->currentIndex()==2) {
+        plteBurstRate->set_xColumn(dsB->addCopiedColumn(DVec, tr("burst duration [ms]")));
+        plteBurstRate->set_yColumn(dsB->addCopiedColumn(PVec, tr("proximity ratio")));
+
+        plteMaxBurstRate->set_visible(false);
+        plteMinBurstRate->set_visible(false);
+        ui->pltBurstRate->getXAxis()->set_axisLabel(tr("burst duration \\Delta t_{burst} [ms]"));
+        ui->pltBurstRate->getYAxis()->set_axisLabel(tr("proximity ratio P"));
+    } else if (ui->cmbAnaCorrMode->currentIndex()==3) {
+        plteBurstRate->set_xColumn(dsB->addCopiedColumn(RVec, tr("burst rate [kcps]")));
+        plteBurstRate->set_yColumn(dsB->addCopiedColumn(PVec, tr("proximity ratio")));
+
+        plteMaxBurstRate->set_visible(false);
+        plteMinBurstRate->set_visible(false);
+        ui->pltBurstRate->getXAxis()->set_axisLabel(tr("burst rate (N_g+N_r)/\\Delta t_{burst} [kcps]"));
+        ui->pltBurstRate->getYAxis()->set_axisLabel(tr("proximity ratio P"));
+
+    }
+
+    if (ui->cmbColorCol->currentIndex()==0) {
+        plteBurstRate->set_colorBarRightVisible(false);
+        plteBurstRate->set_colorBarTopVisible(false);
+        plteBurstRate->set_colorColumn(-1);
+    } else if (ui->cmbColorCol->currentIndex()==1) {
+        plteBurstRate->set_colorBarRightVisible(true);
+        plteBurstRate->set_colorBarTopVisible(false);
+        plteBurstRate->get_colorBarRightAxis()->set_axisLabel(tr("proximity ratio P"));
+        if (ui->cmbAnaCorrMode->currentIndex()==0)  plteBurstRate->set_colorColumn(dsB->addCopiedColumn(PVecAll, tr("proximity ratio")));
+        else plteBurstRate->set_colorColumn(dsB->addCopiedColumn(PVec, tr("proximity ratio")));
+    } else if (ui->cmbColorCol->currentIndex()==2) {
+        plteBurstRate->set_colorBarRightVisible(true);
+        plteBurstRate->set_colorBarTopVisible(false);
+        plteBurstRate->get_colorBarRightAxis()->set_axisLabel(tr("burst size N_g+N_r [photons]"));
+        if (ui->cmbAnaCorrMode->currentIndex()==0)  plteBurstRate->set_colorColumn(dsB->addCopiedColumn(SAllVec, tr("burst size [photons]")));
+        else plteBurstRate->set_colorColumn(dsB->addCopiedColumn(SVec, tr("burst size [photons]")));
+    } else if (ui->cmbColorCol->currentIndex()==3) {
+        plteBurstRate->set_colorBarRightVisible(true);
+        plteBurstRate->set_colorBarTopVisible(false);
+        plteBurstRate->get_colorBarRightAxis()->set_axisLabel(tr("burst duration \\Delta t_{Burst} [ms]"));
+        if (ui->cmbAnaCorrMode->currentIndex()==0)  plteBurstRate->set_colorColumn(dsB->addCopiedColumn(DAllVec, tr("burst duration [ms]")));
+        else plteBurstRate->set_colorColumn(dsB->addCopiedColumn(DVec, tr("burst duration [ms]")));
+    } else if (ui->cmbColorCol->currentIndex()==4) {
+        plteBurstRate->set_colorBarRightVisible(true);
+        plteBurstRate->set_colorBarTopVisible(false);
+        plteBurstRate->get_colorBarRightAxis()->set_axisLabel(tr("burst rate (N_g+N_r)/\\Delta t_{Burst} [kcps]"));
+        if (ui->cmbAnaCorrMode->currentIndex()==0)  plteBurstRate->set_colorColumn(dsB->addCopiedColumn(RVecAll, tr("burst rate [kcps]")));
+        else plteBurstRate->set_colorColumn(dsB->addCopiedColumn(RVec, tr("burst rate [kcps]")));
+    }
+
+    if (ui->cmbAnaCorrMode->currentIndex()==0) {
+        ui->pltBurstRate->zoomToFit(true, true, true, true);
+    } else {
+        ui->pltBurstRate->zoomToFit();
+    }
     ui->pltProximity->zoomToFit();
     ui->pltBurstRate->set_doDrawing(true);
     ui->pltProximity->set_doDrawing(true);
@@ -1163,3 +1344,4 @@ void QFETCSPCImporterFretchen2::loadTCSPCFiles()
 
     QApplication::restoreOverrideCursor();
 }
+

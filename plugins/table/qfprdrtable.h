@@ -87,7 +87,8 @@ class QFPRDRTable : public QObject, public QFPluginRawDataRecordBase {
         void insertTable();
 
         /** \brief insert a file as read-only table */
-        void insertTableFile();
+        void insertTableFile(bool editable=false);
+        void insertTableFileEdit();
 
     private:
 };

@@ -6,23 +6,97 @@
     </head>
     <body>
         $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-        
+        $$invisibleref:GANSEN08:Gansen A  (2008) Chromatin at the Nanolevel. Dissertational Thesis. Available at: <a href="http://archiv.ub.uni-heidelberg.de/volltextserver/8342/1/Dissertation_Gansen.pdf">http://archiv.ub.uni-heidelberg.de/volltextserver/8342/1/Dissertation_Gansen.pdf</a> $$
         <h2>Introduction</h2>
+<h3>Burst Analysis</h3>
 <p>This tool allows to read data from single-photon counting (or time-correlated single-photon counting, TCSPC) experiments. Then it tries to detect fluorescence bursts from single molecules passing the focus of the microscope, used for detection. This analysis assumes that two detection channels ("green"/"red") are used. The intensities in these two channels can then be used to calculate FRET-properties of the observed molecules. For each such burst, several properties are measured:
 <ul>
     <li>when did the burst occur $(t_\text{burst})$</li>
     <li>burst duration $(\Delta t_\text{burst})$</li>
     <li>accumulated photon count $(N_g, N_r)$ during the burst in two detection channels (green/red)</li>
+    <li>the photon countrate during a burst: $(\mbox{CR}=(N_g+N_r)/\Delta t_\text{burst})$</li>
 </ul>
-Together with additional data, such as:
-
+These are used to calculate additional burst properties together with additional data:
 <ul>
     <li>background count-rates $(B_g,B_r)$ in the two channels</li>
-    <li>crosstalk-coefficient $(\kappa_{gr})$ in the two channels</li>
+    <li>crosstalk-coefficient $(\kappa_{gr})$ from the green into the red channel</li>
+    <li>direct excitation rate $(f_{direct})$ of the donor fluorophore with the excitation wavelength</li>
+    <li>FRET detection factor $[ \gamma=\frac{\eta_A\phi_A}{\eta_D\phi_D}, ]$where $(\eta_A,\eta_D)$ are detection efficiencies in the two channels and $(\phi_A,\phi_D)$ are the quantum yields of the acceptor and donor fluorophore.</li>
 </ul>
+The major burst-property is the FRET proximity ratio:
+$[ P=\frac{N_A}{N_A+N_B} ]$
+with the background-, crosstalk- and direct-excitation-corrected number of photons in the acceptor- and donor-channels:
+$[N_D=N_g-B_g\cdot\Delta t_\text{burst}]$
+$[N_A=N_r-(B_r+f_\text{direct})\cdot\Delta t_\text{burst}-\kappa_{gr}\cdot N_D]$
+If in addition, the detection factor $(\gamma)$ is known, also the actual FRET-efficiency can be calculated
+$[ E=\frac{N_A}{N_A+\gamma\cdot N_B}=\frac{1}{1+\gamma\cdot\frac{1-P}{P}}, ]$
+which can be recalculated into a distance $(r_{DA})$ between donor and acceptor, if the F&ouml;rster-radius $(R_0)$ of the fluorophore pair is known:
+$[E(r_{DA})=\frac{1}{1+\left(\frac{r_{DA}}{R_0}\right)^6}]$
 </p>
-        
-        <a name="#usage"><h2>Usage</h2>
-        The basic usage of the tool is the same for all options mentioned above:
+
+
+<h3>Burst Search</h3>
+<p>In order to perform a burst analysis, the bursts have to be identified first. This is done by a search algorithm, which relies on the interphoton-time (IPT) $(\delta t_i)$ between two consecutive photons $(i)$ and $(i+1)$. Inside bursts, the photons are spaced more closely, than during section with background only. This can be seen in the following interphoton time trace:
+<center><a name="fretchen_pic001"><img src="./pic/fretchen_pic001.png" border="1">
+</center>
+In this image, you can see three bursts, at approximately 1.04s, 1.23s and 1.46s. The burst search algorithm identifies bursts with the following properties:
+<ol>
+    <li>a bursts consists of at least $(N_{burst-min})$ photons</li>
+    <li>the interphoton times inside a burst habe to be shorter than a maximum value of $(\mbox{IPT}_{burst-max})$.</li>
+    <li>A burst has a maximum length of $(\Delta t_\text{burst-max})$</li>
+</ol>
+</p>
+<h3>LEE-Filtering</h3>
+<p>
+The algorithm performance can be optimized, if the IPTs are filtered with a LEE-filter before applying the burst search. The LEE-filter smoothes out outlierst from the data. The IPT-trace above will look as follows if LEE-filtered:
+<center><a name="fretchen_pic002"><img src="./pic/fretchen_pic002.png" border="1">
+</center>
+The LEE-filter works as follows:<br>
+Each IPT is transformed:
+$[ \delta t_i'=\overline{\delta t}_i+(\delta t_i-\overline{\delta t}_i)\cdot\frac{\sigma_i^2}{\sigma_i^2+\sigma_0^2} ]$
+with:
+$[\overline{\delta t}_i=\frac{1}{2m+1}\cdot\sum_{j=-m}^m\delta t_{i+j}]$
+$[\sigma_i^2=\frac{1}{2m+1}\cdot\sum_{j=-m}^m(\delta t_{i+j} - \overline{\delta t}_{i+j})^2.]$
+The LEE filter is then characterized by its two parameters:
+<ul>
+    <li>the window size $(2m+1)$</li>
+    <li>the parameter $(\sigma_0)$, which is usually set to $(\sigma_0=5\;\mathrm{ms})$.</li>
+</ul>
+
+</p>
+
+
+<a name="#usage"><a name="#tutorial"><h2>Usage/Tutorial</h2>
+<h3>Basic Workflow</h3>
+<p>The basic usage of the tool works as follows:
+<ol>
+    <li>Start the burst analyzer by clicking <b>Data Items | Insert Raw Data | <img width="16" src=":tcspcimporter/burstanalyzer.png"> TCSPC Burst Analyzer ...</b> in the main window. <img src="pic/fretchen_pic003.png">$$note:The tool may also be started several times to compare the results from several input raw data files!$$</li>
+    <li>Select the TCSPC raw data file to be processed by clicking <img src=":tcspcimporter/fileopen.png"> and wait until the further widgets are actiavted:
+<center><a name="fretchen_pic004"><img src="./pic/fretchen_pic004.png" border="1">
+</center>
+</li>
+    <li>Now you can perform some basic settings:
+    <ul>
+        <li>You can specify a temporal data-range within the measurement, if you don't want to evaluate the full dataset.</li>
+        <li>set which input channel detected green photons (default: 0, the avg. countrate for the different channels is shown in parantheses)</li>
+        <li>set which input channel detected red photons (default: 1, the avg. countrate for the different channels is shown in parantheses)</li>
+        <li>You can also specify a second TCSPC file (of the same dataformat!), which contains a background measurement (e.g. of the buffer without fluorescent molecules). The countrate in this file is average to yield $(B_g, B_r)$.</li>
+    </ul></li>
+    <li> FInally click on 
+    <center><a name="fretchen_pic005"><img src="./pic/fretchen_pic005.png" border="1">
+    </center>
+    to read in the sepcified datasets. $$note: If you change any of the settings above lateron, you will have to click this button again!$$</li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ol>
+</p>
+
+<h3>Multi-File Workflow</h3>
+<p>The basic usage of the tool works as follows
+</p>
+
+<h2>References</h2>
+<p>$$references$$</p>
     </body>
 </html>

@@ -1451,6 +1451,10 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     if (clearTable) clear();
     //std::cout<<"      opening '"<<filename.toStdString()<<"'\n";
     QString line=in.readLine();
+    if (column_separator==' ') {
+        //qDebug()<<line<<"\n  -> "<<qfRemoveMultipleWhitespaces(line);
+        line=qfRemoveMultipleWhitespaces(line);
+    }
     //bool header_read=false;
     quint32 row=0, column=0;
     QLocale loc=QLocale::c();
@@ -1461,7 +1465,8 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     while (!line.isNull()) {
         bool dataread=false;
         line=line;
-        if (column_separator==' ') line=qfRemoveMultipleWhitespaces(line);
+
+
         //std::cout<<"read: <"<<line.toStdString()<<">\n";
         if (line.size()>0) {
             if (line.startsWith(header_start)) {
@@ -1597,6 +1602,10 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
             }
         }
         line = in.readLine();
+        if (column_separator==' ') {
+            // qDebug()<<line<<"\n  -> "<<qfRemoveMultipleWhitespaces(line);
+            line=qfRemoveMultipleWhitespaces(line);
+        }
         if (dataread) row++;
         if (row+1>state.rows) state.rows=row+1;
         if (column+1>state.columns) state.columns=column+1;

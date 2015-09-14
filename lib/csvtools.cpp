@@ -655,6 +655,7 @@ bool guessCSVParameters(QString data, char* out_sep, char* out_dec, char* out_co
         int cntSem=d.count(';');
         int cntCom=d.count(',');
         int cntTab=d.count('\t');
+        int cntSPACE=d.trimmed().count(' ');
         //qDebug()<<"icntDot="<<icntDot<<"  icntCom="<<icntCom<<"  cnt="<<cnt<<"  cntSem="<<cntSem<<"  cntCom="<<cntCom<<"  cntTab="<<cntTab;
         if (cntSem>=cnt && ';'!=dec) sep=';';
         if (cntCom>=cnt && ','!=dec) sep=',';
@@ -667,6 +668,7 @@ bool guessCSVParameters(QString data, char* out_sep, char* out_dec, char* out_co
         if (icntDot>0 && icntCom>0) { dec='.'; sep=',';}
         if (sep==';' && comment==';') { comment='#'; headercomment=""; }
         if (headercomment.size()<=0) { headercomment=comment; headercomment+="!"; }
+        if (sep=='\t' && cntTab<=0 && cntSPACE>0) sep=' ';
         //qDebug()<<"out_comment="<<QChar(comment);
         //qDebug()<<"out_dec="<<QChar(dec);
         //qDebug()<<"out_sep="<<QChar(sep);

@@ -83,9 +83,10 @@ class QFETCSPCImporterFretchen2 : public QDialog
         TCSPCPhotonsData photons;
         TCSPCBurstsData bursts;
         JKQTPxyLineGraph* plteInterphotonTimes;
+        JKQTPxyLineGraph* plteInterphotonTimes2;
         JKQTPgeoLine* plteIPTLevelLine;
 
-        JKQTPxyLineGraph* plteBurstRate;
+        JKQTPxyParametrizedScatterGraph* plteBurstRate;
         JKQTPxFunctionLineGraph* plteMinBurstRate;
         JKQTPxFunctionLineGraph* plteMaxBurstRate;
         JKQTPbarHorizontalGraph* plteProximity;

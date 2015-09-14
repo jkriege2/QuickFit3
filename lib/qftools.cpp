@@ -1991,13 +1991,14 @@ QString qfRemoveMultipleWhitespaces(const QString& line) {
                 isQuot=true;
                 ll.append(l[i]);
             } else {
-                if (l[i]==' ' && ll.size()>0 && ll[ll.size()-1]!=' ') {
+                if (l[i]==' ' &&(/*ll.size()<=0 ||*/ (ll.size()>0 && ll[ll.size()-1]!=' '))) {
                     ll.append(l[i]);
                 } else if (l[i]!=' ') {
-                    ll.append(ll[i]);
+                    ll.append(l[i]);
                 }
             }
         }
     }
+    //qDebug()<<"\n\n"<<"qfRemoveMultipleWhitespaces('"<<line<<"'):\n  -> '"<<l<<"'\n  -> '"<<ll<<"'\n\n";
     return ll;
 }

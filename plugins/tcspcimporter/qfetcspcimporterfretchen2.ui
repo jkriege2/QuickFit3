@@ -494,7 +494,7 @@ p, li { white-space: pre-wrap; }
            </item>
            <item>
             <layout class="QGridLayout" name="gridLayout_2">
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QDoubleSpinBox" name="spinDisplayStart">
                <property name="suffix">
                 <string> s</string>
@@ -513,21 +513,21 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item row="0" column="0">
+             <item row="1" column="0">
               <widget class="QLabel" name="label">
                <property name="text">
                 <string>display duration:</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
+             <item row="2" column="0">
               <widget class="QLabel" name="label_2">
                <property name="text">
                 <string>display position:</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
+             <item row="1" column="1">
               <widget class="QDoubleSpinBox" name="spinDisplayLength">
                <property name="suffix">
                 <string> ms</string>
@@ -549,7 +549,7 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="5" column="1">
               <spacer name="verticalSpacer_3">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -562,7 +562,7 @@ p, li { white-space: pre-wrap; }
                </property>
               </spacer>
              </item>
-             <item row="4" column="0" colspan="2">
+             <item row="6" column="0" colspan="2">
               <widget class="QGroupBox" name="groupBox_2">
                <property name="minimumSize">
                 <size>
@@ -784,13 +784,63 @@ p, li { white-space: pre-wrap; }
                </layout>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="3" column="1">
               <widget class="QCheckBox" name="chkSHowFilteredIPT">
                <property name="text">
                 <string>filtered IPT</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_43">
+               <property name="text">
+                <string>mode:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="cmbBurstSelPlotMode">
+               <item>
+                <property name="text">
+                 <string>interphoton time IPT</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>countrate</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QDoubleSpinBox" name="spinDisplayBin">
+               <property name="suffix">
+                <string> ms</string>
+               </property>
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="minimum">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100000000000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_44">
+               <property name="text">
+                <string>countrate binning:</string>
                </property>
               </widget>
              </item>
@@ -1512,13 +1562,6 @@ p, li { white-space: pre-wrap; }
                 </property>
                </widget>
               </item>
-              <item row="4" column="0" colspan="2">
-               <widget class="QCheckBox" name="chkNormHistogram">
-                <property name="text">
-                 <string>norm. histogram</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="1">
                <widget class="QDoubleSpinBox" name="spinMinRate">
                 <property name="suffix">
@@ -1539,7 +1582,7 @@ p, li { white-space: pre-wrap; }
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
+              <item row="6" column="1">
                <spacer name="verticalSpacer_6">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
@@ -1569,13 +1612,13 @@ p, li { white-space: pre-wrap; }
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="label_35">
+               <widget class="QLabel" name="labHBinWidth">
                 <property name="text">
                  <string>histogram bin width:</string>
                 </property>
                </widget>
               </item>
-              <item row="8" column="0" colspan="2">
+              <item row="9" column="0" colspan="2">
                <layout class="QHBoxLayout" name="horizontalLayout_14">
                 <item>
                  <widget class="QPushButton" name="btnSaveToFile">
@@ -1601,7 +1644,7 @@ p, li { white-space: pre-wrap; }
                 </item>
                </layout>
               </item>
-              <item row="7" column="0" colspan="2">
+              <item row="8" column="0" colspan="2">
                <widget class="QPushButton" name="btnSaveToProject">
                 <property name="text">
                  <string>Save to Project</string>
@@ -1641,15 +1684,51 @@ p, li { white-space: pre-wrap; }
                 </property>
                </widget>
               </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="labHBins">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>histogram bins:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QSpinBox" name="spinHBins">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="minimum">
+                 <number>2</number>
+                </property>
+                <property name="maximum">
+                 <number>1000</number>
+                </property>
+                <property name="value">
+                 <number>31</number>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QCheckBox" name="chkNormHistogram">
+                <property name="text">
+                 <string>norm. histogram</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>
           </widget>
          </item>
          <item row="0" column="0" colspan="2">
-          <layout class="QGridLayout" name="gridLayout_5">
-           <item row="1" column="2">
+          <layout class="QGridLayout" name="gridLayout_5" columnstretch="1,1">
+           <item row="1" column="1">
             <widget class="QFPlotter" name="pltBurstRate" native="true"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QFPlotter" name="pltProximity" native="true"/>
            </item>
            <item row="0" column="0">
             <widget class="QComboBox" name="cmbAnaHistMode">
@@ -1663,10 +1742,89 @@ p, li { white-space: pre-wrap; }
                <string>FRET histogram</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>Burst length histogram</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Burst size histogram</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Burst rate histogram</string>
+              </property>
+             </item>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QFPlotter" name="pltProximity" native="true"/>
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="1,0,1">
+             <item>
+              <widget class="QComboBox" name="cmbAnaCorrMode">
+               <item>
+                <property name="text">
+                 <string>burst size vs. rate</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst size vs. proximity ratio</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst duration vs. proximity ratio</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst rate vs. proximity ratio</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_35">
+               <property name="text">
+                <string>color: </string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="cmbColorCol">
+               <item>
+                <property name="text">
+                 <string>--- none ---</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>proximity ratio</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst size</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst duration</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst rate</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
@@ -1911,8 +2069,8 @@ In any case, an additional column will contain the file ID</string>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="qfetcspcimporter.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="qfetcspcimporter.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -1922,8 +2080,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateCTRTrace()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>763</x>
-     <y>61</y>
+     <x>807</x>
+     <y>88</y>
     </hint>
     <hint type="destinationlabel">
      <x>338</x>
@@ -1938,8 +2096,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateCTRTrace()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>763</x>
-     <y>87</y>
+     <x>807</x>
+     <y>114</y>
     </hint>
     <hint type="destinationlabel">
      <x>526</x>
@@ -1954,12 +2112,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>62</x>
-     <y>42</y>
+     <x>63</x>
+     <y>43</y>
     </hint>
     <hint type="destinationlabel">
-     <x>51</x>
-     <y>42</y>
+     <x>52</x>
+     <y>43</y>
     </hint>
    </hints>
   </connection>
@@ -1970,12 +2128,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>94</x>
-     <y>42</y>
+     <x>95</x>
+     <y>43</y>
     </hint>
     <hint type="destinationlabel">
-     <x>84</x>
-     <y>42</y>
+     <x>85</x>
+     <y>43</y>
     </hint>
    </hints>
   </connection>
@@ -2066,8 +2224,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateCTRTrace()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>763</x>
-     <y>110</y>
+     <x>807</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>558</x>
@@ -2083,7 +2241,7 @@ In any case, an additional column will contain the file ID</string>
    <hints>
     <hint type="sourcelabel">
      <x>625</x>
-     <y>292</y>
+     <y>266</y>
     </hint>
     <hint type="destinationlabel">
      <x>376</x>
@@ -2099,7 +2257,7 @@ In any case, an additional column will contain the file ID</string>
    <hints>
     <hint type="sourcelabel">
      <x>625</x>
-     <y>318</y>
+     <y>292</y>
     </hint>
     <hint type="destinationlabel">
      <x>888</x>
@@ -2130,8 +2288,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>625</x>
-     <y>386</y>
+     <x>484</x>
+     <y>360</y>
     </hint>
     <hint type="destinationlabel">
      <x>522</x>
@@ -2147,11 +2305,91 @@ In any case, an additional column will contain the file ID</string>
    <hints>
     <hint type="sourcelabel">
      <x>625</x>
-     <y>344</y>
+     <y>318</y>
     </hint>
     <hint type="destinationlabel">
      <x>497</x>
      <y>-2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinHBins</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>626</x>
+     <y>386</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>121</x>
+     <y>-3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbAnaCorrMode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>565</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>225</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbColorCol</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>692</x>
+     <y>52</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>22</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinDisplayBin</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateCTRTrace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>737</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>60</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbBurstSelPlotMode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateCTRTrace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>727</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>95</y>
     </hint>
    </hints>
   </connection>
