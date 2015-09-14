@@ -751,7 +751,7 @@ void QFETCSPCImporterJobThread::run() {
                             fp.dataForInsert.append(lt_segments);
                             fp.dataForInsert.append(usedCH);
                             fp.dataForInsert.append(maxLT);
-                            fp.dataForInsert.append(maxCnt);
+                            fp.dataForInsert.append(quint64(maxCnt));
                             addFiles.append(fp);
 
                             f.close();
