@@ -101,6 +101,7 @@ class QFLIB_EXPORT qfmpCustomResult {
         QFLIB_EXPORT virtual int length() const;
         /** \brief the dimensions in the datatype */
         QFLIB_EXPORT virtual int dimensions() const;
+
         /** \brief clear all contained data */
         QFLIB_EXPORT virtual void clear();
 
@@ -249,6 +250,7 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT void setString(int size=0, QChar defaultChar=QLatin1Char(' '));
         QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
         QFLIB_EXPORT void setDoubleVec(int size=0, double defaultVal=0.0);
+        QFLIB_EXPORT void setDoubleMatrix(int size=0, int cols=1, double  defaultVal=0);
         template <typename T>
         inline void setDoubleVec(T* data, int size) {
             setDoubleVec(size,0.0);
@@ -263,6 +265,7 @@ struct QFLIB_EXPORT qfmpResult {
 
         QFLIB_EXPORT void setBoolVec(const QVector<bool>& val);
         QFLIB_EXPORT void setBoolVec(int size=0, bool defaultVal=false);
+        QFLIB_EXPORT void setBoolMatrix(int size=0, int cols=1, bool defaultVal=false);
 
         template <typename T>
         inline void setBoolVec(T* data, int size) {

@@ -25,10 +25,13 @@
 #  define DO_SPECIALS false
 #endif
 #ifndef DO_STRUCT
-#  define DO_STRUCT true
+#  define DO_STRUCT false
 #endif
 #ifndef DO_LIST
-#  define DO_LIST true
+#  define DO_LIST false
+#endif
+#ifndef DO_MATRIX
+#  define DO_MATRIX true
 #endif
 
 #define TEST(expr) {\
@@ -722,6 +725,35 @@ int main(int argc, char *argv[])
         TEST("{1,2,4:5,true,[false,true],\"hello\",[\"World\",\"!\"], {\"Hello\",\" World\", \"!\"}}")
         TEST("l={{1},{2},{3}}; for(i,l,listappend(i,pi))")
 
+    }
+
+    if (DO_MATRIX) {
+        TEST("m=doublematrix()");
+        TEST("m=doublematrix(2)");
+        TEST("m=doublematrix(2,3)");
+        TEST("m=doublematrix(2,3,pi)");
+        TEST("m2=doublematrix(2,3,1)");
+        TEST("m3=doublematrix(3,2,1)");
+        TEST("size(m)");
+        TEST("sizerows(m)");
+        TEST("sizecolumns(m)");
+        TEST("m+m2");
+        TEST("m3+m2");
+        TEST("m+1");
+        TEST("m==m3");
+        TEST("m!=m2");
+        TEST("m=[1,2,3;4,5,6;6,7,8]");
+        TEST("{size(m), sizerows(m), sizecolumns(m), dimensions(m),ismatrix(m),isvector(m)}");
+        TEST("m=[1,2,3;4,5,6;6,7,8,9]");
+        TEST("m=[1,2,3,4;4,5,6;6,7,8,9]");
+        TEST("m=[1,2,3;4,5;6,7,8]");
+
+        TEST("m=boolmatrix()");
+        TEST("m=boolmatrix(2)");
+        TEST("m=boolmatrix(2,3)");
+        TEST("m=boolmatrix(2,3,true)");
+        TEST("m=[true,false,true;false,true,false;true,false,true]");
+        TEST("{size(m), sizerows(m), sizecolumns(m), dimensions(m),ismatrix(m),isvector(m)}");
     }
 
     return 0;

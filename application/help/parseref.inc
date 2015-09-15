@@ -12,6 +12,7 @@
 	<li><b><a href="$$mainhelpdir$$/parserreference/struct.html">struct functions</a></b></li>
 	<li><b><a href="$$mainhelpdir$$/parserreference/lists.html">list functions</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/vector.html">vector manipulation functions</a></b></li>
+    <li><b><a href="$$mainhelpdir$$/parserreference/matrix.html">matrix manipulation functions</a></b></li>
 	<li><b><a href="$$mainhelpdir$$/parserreference/parsetree.html">parsetree access/expression print functions</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/special.html">diverse mathematical special functions</a></b></li>
 </ul></li>

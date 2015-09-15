@@ -540,14 +540,14 @@ QString doubleMatrixToQString(const QVector<double>& value, int columns, int pre
     QString out="";
     bool first=true;
     for (int i=0; i<value.size(); i++) {
-        if (first) out+=itemSeparator;
+        if (!first) out+=itemSeparator;
         first=false;
         QString res=loc.toString(value[i], f, prec);
         if (loc.decimalPoint()!=decimalSeparator) {
             res=res.replace(loc.decimalPoint(), decimalSeparator);
         }
-        out+=res;
-        if (i>0 && i<value.size()-1 && i%columns==0) {
+        out+= qfLeftPaddedString(res, 2*prec, ' ');
+        if (i<value.size()-1 && (i%columns)==(columns-1)) {
             out+=columnSeparator;
             first=true;
         }
@@ -561,12 +561,12 @@ QString boolMatrixToQString(const QVector<bool>& value, int columns, const QStri
     QString out="";
     bool first=true;
     for (int i=0; i<value.size(); i++) {
-        if (first) out+=itemSeparator;
+        if (!first) out+=itemSeparator;
         first=false;
         if (value[i]) out+=trueName;
         else out+=falseName;
 
-        if (i>0 && i<value.size()-1 && i%columns==0) {
+        if (i<value.size()-1 && (i%columns)==(columns-1)) {
             out+=columnSeparator;
             first=true;
         }

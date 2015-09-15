@@ -161,9 +161,17 @@ namespace QFMathParser_DefaultLib {
     void fListGet(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fListGetSave(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fListInsert(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fVec2List(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsList(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsStruct(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsDoubleMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsBoolMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
+    void fDoubleMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fBoolMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     void fShuffle(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
-
 
     void fComment(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fAllTrue(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);

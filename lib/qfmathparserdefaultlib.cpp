@@ -105,22 +105,32 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("repeatstring", QFMathParser_DefaultLib::fRepeatString);
     p->addFunction("repeat", QFMathParser_DefaultLib::fRepeat);
 
+
+    p->addFunction("doublematrix", QFMathParser_DefaultLib::fDoubleMatrix);
+    p->addFunction("nummatrix", QFMathParser_DefaultLib::fDoubleMatrix);
+    p->addFunction("boolmatrix", QFMathParser_DefaultLib::fBoolMatrix);
+
     p->addFunction("list", QFMathParser_DefaultLib::fList);
     p->addFunction("listappend", QFMathParser_DefaultLib::fListAppend);
     p->addFunction("listinsert", QFMathParser_DefaultLib::fListInsert);
     p->addFunction("listremove", QFMathParser_DefaultLib::fListRemove);
     p->addFunction("listget", QFMathParser_DefaultLib::fListGet);
     p->addFunction("listgetsave", QFMathParser_DefaultLib::fListGetSave);
+    p->addFunction("vec2list", QFMathParser_DefaultLib::fVec2List);
     p->addFunction("dimensions", QFMathParser_DefaultLib::fDimensions);
     p->addFunction("size", QFMathParser_DefaultLib::fSize);
     p->addFunction("sizerows", QFMathParser_DefaultLib::fRows);
     p->addFunction("sizecols", QFMathParser_DefaultLib::fColumns);
+    p->addFunction("sizecolumns", QFMathParser_DefaultLib::fColumns);
+    p->addFunction("islist", QFMathParser_DefaultLib::fIsList);
+    p->addFunction("vec2list", QFMathParser_DefaultLib::fVec2List);
 
 
     p->addFunction("struct", QFMathParser_DefaultLib::fStruct);
     p->addFunction("structkeys", QFMathParser_DefaultLib::fStructKeys);
     p->addFunction("structget", QFMathParser_DefaultLib::fStructGet);
     p->addFunction("structsaveget", QFMathParser_DefaultLib::fStructGetSave);
+    p->addFunction("isstruct", QFMathParser_DefaultLib::fIsStruct);
 
     p->addFunction("sinc", QFMathParser_DefaultLib::fSinc, NULL, qfSinc);
     p->addFunction("faddeeva_real", QFMathParser_DefaultLib::fFaddeevaRealW, NULL, qfFaddeevaRealW);
@@ -205,7 +215,6 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("toupper", QFMathParser_DefaultLib::fToUpper);
     p->addFunction("tolower", QFMathParser_DefaultLib::fToLower);
     p->addFunction("length", QFMathParser_DefaultLib::fLength);
-    p->addFunction("size", QFMathParser_DefaultLib::fLength);
     p->addFunction("sort", QFMathParser_DefaultLib::fSort);
     p->addFunction("dsort", QFMathParser_DefaultLib::fDSort);
     p->addFunction("count", QFMathParser_DefaultLib::fCountOccurences);
@@ -270,6 +279,11 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("isnumbervector", QFMathParser_DefaultLib::fIsDoubleVector);
     p->addFunction("isboolvector", QFMathParser_DefaultLib::fIsBoolVector);
     p->addFunction("isstringvector", QFMathParser_DefaultLib::fIsStringVector);
+    p->addFunction("ismatrix", QFMathParser_DefaultLib::fIsMatrix);
+    p->addFunction("isvector", QFMathParser_DefaultLib::fIsVector);
+    p->addFunction("isboolmatrix", QFMathParser_DefaultLib::fIsBoolMatrix);
+    p->addFunction("isnumbermatrix", QFMathParser_DefaultLib::fIsDoubleMatrix);
+    p->addFunction("isdoublematrix", QFMathParser_DefaultLib::fIsDoubleMatrix);
 
     p->addFunction("unique", QFMathParser_DefaultLib::fUnique);
     p->addFunction("indexedmean", QFMathParser_DefaultLib::fIndexedAvg);
@@ -1331,7 +1345,6 @@ namespace QFMathParser_DefaultLib {
 
     void fSize(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
     {
-        r.setInvalid();
         if (n!=1) {
             p->qfmpError(QObject::tr("size(x) need one argument"));
             r.setInvalid();
@@ -4565,6 +4578,79 @@ namespace QFMathParser_DefaultLib {
 
 
 
+    void fDoubleMatrix(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        r.setDoubleMatrix();
+        if (n==1) {
+            if (params[0].isUInt()) {
+                int ro=params[0].toUInt();
+                r.setDoubleMatrix(ro*ro, ro);
+            } else {
+                p->qfmpError("doublematrix(rows_or_cols) requires one unsigned integer argument ");
+                r.setInvalid();
+                return;
+            }
+        } else if (n==2) {
+            if (params[0].isUInt() && params[1].isUInt()) {
+                int ro=params[0].toUInt();
+                int co=params[1].toUInt();
+                r.setDoubleMatrix(ro*co, co);
+            } else {
+                p->qfmpError("doublematrix(rows,cols) requires two unsigned integer arguments");
+                r.setInvalid();
+                return;
+            }
+        } else if (n==3) {
+            if (params[0].isUInt() && params[1].isUInt() && params[2].type==qfmpDouble) {
+                int ro=params[0].toUInt();
+                int co=params[1].toUInt();
+                r.setDoubleMatrix(ro*co, co, params[2].num);
+            } else {
+                p->qfmpError("doublematrix(rows,cols, value) requires two unsigned integer arguments and one floating-point number");
+                r.setInvalid();
+                return;
+            }
+        }
+
+    }
+
+    void fBoolMatrix(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        r.setBoolMatrix();
+        if (n==1) {
+            if (params[0].isUInt()) {
+                int ro=params[0].toUInt();
+                r.setBoolMatrix(ro*ro, ro, false);
+            } else {
+                p->qfmpError("boolmatrix(rows_or_cols) requires one unsigned integer argument ");
+                r.setInvalid();
+                return;
+            }
+        } else if (n==2) {
+            if (params[0].isUInt() && params[1].isUInt()) {
+                int ro=params[0].toUInt();
+                int co=params[1].toUInt();
+                r.setBoolMatrix(ro*co, co, false);
+            } else {
+                p->qfmpError("boolmatrix(rows,cols) requires two unsigned integer arguments");
+                r.setInvalid();
+                return;
+            }
+        } else if (n==3) {
+            if (params[0].isUInt() && params[1].isUInt() && params[2].type==qfmpBool) {
+                int ro=params[0].toUInt();
+                int co=params[1].toUInt();
+                r.setBoolMatrix(ro*co, co, params[2].boolean);
+            } else {
+                p->qfmpError("boolmatrix(rows,cols, value) requires two unsigned integer arguments and one boolean");
+                r.setInvalid();
+                return;
+            }
+        }
+
+    }
+
+
 
     void fList(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser */*p*/)
     {
@@ -4653,6 +4739,91 @@ namespace QFMathParser_DefaultLib {
         } else {
             if (n<3) p->qfmpError(QObject::tr("listget(list_in, items) requires one list and one integer/boolean-vector/integer-vector arguments, but only %1 arguments given").arg(n));
             else if (n>=3) p->qfmpError(QObject::tr("listget(list_in, items) requires one list and one integer/boolean-vector/integer-vector arguments, but arguments of type %1, %2 given").arg(params[0].typeName()).arg(params[1].typeName()).arg(params[2].typeName()));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fVec2List(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==1) {
+            r.setInvalid();
+            if (params[0].type==qfmpDoubleVector) {
+                r.setList(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.listData[i].setDouble(params[0].numVec[i]);
+                }
+            } else if (params[0].type==qfmpStringVector) {
+                r.setList(params[0].strVec.size());
+                for (int i=0; i<params[0].strVec.size(); i++) {
+                    r.listData[i].setString(params[0].strVec[i]);
+                }
+            } else if (params[0].type==qfmpBoolVector) {
+                r.setList(params[0].boolVec.size());
+                for (int i=0; i<params[0].boolVec.size(); i++) {
+                    r.listData[i].setString(params[0].boolVec[i]);
+                }
+            } else {
+                p->qfmpError(QObject::tr("vec2list(x) requires one vector of double/string/boolean as argument, but the argument x is a %1").arg(params[0].typeName()));
+                r.setInvalid();
+                return;
+            }
+        } else {
+            p->qfmpError(QObject::tr("vec2list(x) requires one vector of double/string/boolean as argument, but only %1 arguments given").arg(n));
+            r.setInvalid();
+            return;
+        }
+    }
+    void fIsList(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==1) {
+            r.setBoolean(params[0].type==qfmpList);
+        } else {
+            p->qfmpError(QObject::tr("islist(x) requires one argument, but %1 arguments given").arg(n));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fIsStruct(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==1) {
+            r.setBoolean(params[0].type==qfmpStruct);
+        } else {
+            p->qfmpError(QObject::tr("isstruct(x) requires one argument, but %1 arguments given").arg(n));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fIsMatrix(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==1) {
+            r.setBoolean((params[0].type==qfmpBoolMatrix)||(params[0].type==qfmpDoubleMatrix));
+        } else {
+            p->qfmpError(QObject::tr("ismatrix(x) requires one argument, but %1 arguments given").arg(n));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fIsDoubleMatrix(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==1) {
+            r.setBoolean(params[0].type==qfmpDoubleMatrix);
+        } else {
+            p->qfmpError(QObject::tr("isdoublematrix(x) requires one argument, but %1 arguments given").arg(n));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fIsBoolMatrix(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==1) {
+            r.setBoolean(params[0].type==qfmpBoolMatrix);
+        } else {
+            p->qfmpError(QObject::tr("isboolmatrix(x) requires one argument, but %1 arguments given").arg(n));
             r.setInvalid();
             return;
         }
