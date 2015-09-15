@@ -105,12 +105,29 @@
 	  <li><tt>x[[2,5,8]]=y[1,2,3]</tt>: assigns the elements 1, 2, and 3 of vector y to the elements 2, 5 and 8 of vector x </li>
 	  <li><tt>x[[2,5,8]]=0</tt>: assigns 0 to elements 2, 5 and 8 of vector x </li>
 	</ul>
-	$$note:All vector indices are 0-based, so the 5 elements of a 5-element vector are accessed with indizes 0,1,2,3,4. It is also possible to give floating-point numbers as vector indices. In that case the index is <u>truncated</u> to an integer! $$
-		</p>
+	$$note:All vector indices are 0-based, so the 5 elements of a 5-element vector are accessed with indizes 0,1,2,3,4. It is also possible to give floating-point numbers as vector indices. In that case the index is <u>truncated</u> to an integer! $$</p>
+
+	<a name="lists"><h3>Lists</h3>
+	<p>Lists assemble an index-adressable set of results (each element can have a different type). You can create lists, using curly braces <tt>{...}</tt>, e.g.:
+	<ul>
+	  <li><tt>{1,2,3}</tt></li>
+	  <li><tt>{1,[2,3,4],"Hello"}</tt></li>
+	</ul>
+	Item access is possible with the standard <tt>lst[index]</tt> operator, all the same as for vectors:
+	<ul>
+	  <li><tt>lst={1,[2,3,4],"Hello"}</tt></li>
+	  <li><tt>lst[2] --> "Hello"</tt></li>
+	  <li><tt>lst[ [0,1] ] --> {1,[2,3,4]}</tt></li>
+	</ul>
+	
+	$$see: A set of <a href="lists.html">list-functions</a> are defined, that ease working with lists.$$
+	</p>
+
 
 	<a name="structs"><h3>Structures/structs</h3>
 	<p>You can also create structs, which are a composite of several (named) items of possibly different type. Structs can be created using the function <tt>struct(nam1, value1, name2, value2, ...)</tt> and you can access a single entry using the dot '.' operator, e.g. <tt>st=struct("a", 1, "b", true)</tt> for the creation and <tt>st.a</tt> for the access to element 'a'.</p>
 	<p>In order to set an element in a struct, use <tt>struct(st, 'a', 'newvalue')</tt>.
+	$$see: A set of <a href="struct.html">struct-functions</a> are defined, that ease working with structs.$$
 	</p>
 
 	<a name="functions"><h3>Functions</h3>
@@ -191,7 +208,8 @@ logical_expression ->  logical_term
                  | NAME<b>(</b> parameter_list <b>)</b>
                  | NAME(parametername_list) <b>=</b> logical_expression
                  | <b>(</b> logical_expression <b>)</b>
-					  | <b>[</b> vector_list <b>]</b></pre>
+				 | <b>[</b> vector_list <b>]</b></pre>
+				 | <b>{</b> vector_list <b>}</b></pre>
 <pre>string_constant -> <b>&quot;</b> STRING <b>&quot;</b> | <b>&apos;</b> STRING <b>&apos;</b></pre>
 <pre>parameter_list  ->  &lambda; | logical_expression | logical_expression <b>,</b> parameter_list</pre>
 <pre>parametername_list ->  &lambda; | NAME | NAME <b>,</b> parametername_list</pre>

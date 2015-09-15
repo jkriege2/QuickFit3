@@ -104,10 +104,24 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("comment", QFMathParser_DefaultLib::fComment);
     p->addFunction("repeatstring", QFMathParser_DefaultLib::fRepeatString);
     p->addFunction("repeat", QFMathParser_DefaultLib::fRepeat);
+
+    p->addFunction("list", QFMathParser_DefaultLib::fList);
+    p->addFunction("listappend", QFMathParser_DefaultLib::fListAppend);
+    p->addFunction("listinsert", QFMathParser_DefaultLib::fListInsert);
+    p->addFunction("listremove", QFMathParser_DefaultLib::fListRemove);
+    p->addFunction("listget", QFMathParser_DefaultLib::fListGet);
+    p->addFunction("listgetsave", QFMathParser_DefaultLib::fListGetSave);
+    p->addFunction("dimensions", QFMathParser_DefaultLib::fDimensions);
+    p->addFunction("size", QFMathParser_DefaultLib::fSize);
+    p->addFunction("sizerows", QFMathParser_DefaultLib::fRows);
+    p->addFunction("sizecols", QFMathParser_DefaultLib::fColumns);
+
+
     p->addFunction("struct", QFMathParser_DefaultLib::fStruct);
     p->addFunction("structkeys", QFMathParser_DefaultLib::fStructKeys);
     p->addFunction("structget", QFMathParser_DefaultLib::fStructGet);
     p->addFunction("structsaveget", QFMathParser_DefaultLib::fStructGetSave);
+
     p->addFunction("sinc", QFMathParser_DefaultLib::fSinc, NULL, qfSinc);
     p->addFunction("faddeeva_real", QFMathParser_DefaultLib::fFaddeevaRealW, NULL, qfFaddeevaRealW);
     p->addFunction("factorial", QFMathParser_DefaultLib::fFactorial, NULL, qfFactorial);
@@ -916,7 +930,6 @@ namespace QFMathParser_DefaultLib {
             p->qfmpError(QObject::tr("%1(x, value) argument 1 has to be a vector of numbers/booleans/strings and argument 2 the according item type number/string/boolean").arg("countoccurences"));
             r.setInvalid();
         }
-        return;
     }
 
     qfmpResult fSRand(const qfmpResult* params, unsigned int  n, QFMathParser* p){
@@ -1304,6 +1317,57 @@ namespace QFMathParser_DefaultLib {
         r.setDouble(params[0].length());
     }
 
+
+    void fDimensions(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("dimensions(x) need one argument"));
+            r.setInvalid();
+            return;
+        }
+        r.setDouble(params[0].dimensions());
+    }
+
+    void fSize(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("size(x) need one argument"));
+            r.setInvalid();
+            return;
+        }
+        r.setDoubleVec(0);
+        if (params[0].isMatrix()) {
+            r.numVec<<params[0].sizeY()<<params[0].sizeX();
+        } else {
+            r.numVec<<params[0].sizeX();
+        }
+    }
+
+
+    void fColumns(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("sizecols(x) need one argument"));
+            r.setInvalid();
+            return;
+        }
+        r.setDouble(params[0].columns());
+    }
+
+    void fRows(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("sizerows(x) need one argument"));
+            r.setInvalid();
+            return;
+        }
+        r.setDouble(params[0].rows());
+    }
+
     void fRemove(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
         r.setInvalid();
         if (n==2 && params[0].type==qfmpDoubleVector && params[1].convertsToIntVector()) {
@@ -1358,7 +1422,32 @@ namespace QFMathParser_DefaultLib {
     void fConcat(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p){
         r.setInvalid();
         if (n>0) {
-            if (params[0].type==qfmpDouble || params[0].type==qfmpDoubleVector) {
+            if (params[0].type==qfmpList) {
+                r.setList(params[0].listData);
+                for (unsigned int i=1; i<n; i++) {
+                    if (params[i].type==qfmpList) {
+                        r.listData<<params[i].listData;
+                    } else {
+                        r.listData<<params[i];
+                    }
+                }
+            } else if (params[0].type==qfmpStruct) {
+                r.setStruct();
+                r.structData=params[0].structData;
+                for (unsigned int i=1; i<n; i++) {
+                    if (params[i].type==qfmpStruct) {
+                        QMapIterator<QString, qfmpResult> it(params[i].structData);
+                        while (it.hasNext()) {
+                            it.next();
+                            r.structData[it.key()]=it.value();
+                        }
+                    } else {
+                        p->qfmpError(QObject::tr("concat(x1, x2, ...) can only concatenate maps to  other maps, not to %1 in argument %2").arg(params[i].typeName()).arg(i+1));
+                        r.setInvalid();
+                        return;
+                    }
+                }
+            } else if (params[0].type==qfmpDouble || params[0].type==qfmpDoubleVector) {
                 r.type=qfmpDoubleVector;
                 r.numVec.clear();
                 for (unsigned int i=0; i<n; i++) {
@@ -4046,7 +4135,7 @@ namespace QFMathParser_DefaultLib {
         r.numVec.clear();
         r.numVec.resize(np+1);
         for (int i=0; i<np+1; i++) r.numVec[i]=0.0;
-        bool ok=statisticsPolyFit(X.data(), Y.data(), qMin(X.size(), Y.size()), np, r.numVec.data());
+        statisticsPolyFit(X.data(), Y.data(), qMin(X.size(), Y.size()), np, r.numVec.data());
 
     }
 
@@ -4418,9 +4507,11 @@ namespace QFMathParser_DefaultLib {
         } else {
             r.setStruct();
         }
-        if (n>NN && (n-NN)%2==0) {
+        if (n>=NN+2 && (n-NN)%2==0) {
             for (unsigned int i=NN; i<n; i=i+2) {
+
                 if (params[i].type==qfmpString) {
+                    //qDebug()<<"### "<<i<<": "<<params[i].str<<params[i].toTypeString()<<params[i+1].toTypeString();
                     r.structData[params[i].str]=params[i+1];
                 } else {
                     p->qfmpError(QObject::tr("struct([struct_in,] name1, value1, ...) requires a string as parameter %2").arg(i+1));
@@ -4475,6 +4566,146 @@ namespace QFMathParser_DefaultLib {
 
 
 
+    void fList(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser */*p*/)
+    {
+        r.setList();
+
+        for (unsigned int i=0; i<n; i++) {
+            r.listData.append(params[i]);
+        }
+    }
+
+
+    void fListAppend(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n>=2 && params[0].type==qfmpList) {
+            r=params[0];
+            for (unsigned int i=1; i<n; i++) {
+                r.listData.append(params[i]);
+            }
+        } else {
+            if (n<2) p->qfmpError(QObject::tr("listappend(list_in, item, ...) requires one list and at least one further argument, but only %1 arguments given").arg(n));
+            else if (n>=2) p->qfmpError(QObject::tr("listappend(list_in, item, ...) requires one list and at least one further argument, but arguments of type %1, %2, ... given").arg(params[0].typeName()).arg(params[1].typeName()));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fListGet(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==2 && params[0].type==qfmpList) {
+            r.setInvalid();
+            if (params[1].isDoubleVector()) {
+                r=params[0].getListItem(params[1].toUInt());
+            } else if (params[1].isUIntVector()) {
+                QVector<uint32_t> l=params[1].toUIntVector();
+                r.setList(l.size());
+                for (int i=0; i<l.size(); i++) {
+                    r.listData[i]=params[0].getListItem(l[i]);
+                }
+            } else if (params[1].isBoolVector()) {
+                QVector<bool> l=params[1].boolVec;
+                r.setList(l.size());
+                if (l.size()==r.listData.size()) {
+                    for (int i=0; i<l.size(); i++) {
+                        if (l[i]) r.listData[i]=params[0].getListItem(i);
+                    }
+                } else {
+                    p->qfmpError(QObject::tr("listget(list_in, boolvec) wrong number of items in boolvec (#%1): requires boolvec to have the same number of entries, as list_in (#%2)").arg(l.size()).arg(r.listData.size()));
+                    r.setInvalid();
+                    return;
+                }
+            }
+        } else {
+            if (n<2) p->qfmpError(QObject::tr("listget(list_in, items) requires one list and one integer/boolean-vector/integer-vector arguments, but only %1 arguments given").arg(n));
+            else if (n>=2) p->qfmpError(QObject::tr("listget(list_in, items) requires one list and one integer/boolean-vector/integer-vector arguments, but arguments of type %1, %2 given").arg(params[0].typeName()).arg(params[1].typeName()));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fListGetSave(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==3 && params[0].type==qfmpList) {
+            r.setInvalid();
+            if (params[1].isDoubleVector()) {
+                r=params[0].getListItem(params[1].toUInt(), params[2]);
+            } else if (params[1].isUIntVector()) {
+                QVector<uint32_t> l=params[1].toUIntVector();
+                r.setList(l.size());
+                for (int i=0; i<l.size(); i++) {
+                    r.listData[i]=params[0].getListItem(l[i], params[2]);
+                }
+            } else if (params[1].isBoolVector()) {
+                QVector<bool> l=params[1].boolVec;
+                r.setList(r.listData.size());
+                if (l.size()==r.listData.size()) {
+                    for (int i=0; i<l.size(); i++) {
+                        if (l[i]) r.listData[i]=params[0].getListItem(i);
+                        else r.listData[i]=params[2];
+                    }
+                } else {
+                    p->qfmpError(QObject::tr("listgetsave(list_in, boolvec) wrong number of items in boolvec (#%1): requires boolvec to have the same number of entries, as list_in (#%2)").arg(l.size()).arg(r.listData.size()));
+                    r.setInvalid();
+                    return;
+                }
+            }
+        } else {
+            if (n<3) p->qfmpError(QObject::tr("listget(list_in, items) requires one list and one integer/boolean-vector/integer-vector arguments, but only %1 arguments given").arg(n));
+            else if (n>=3) p->qfmpError(QObject::tr("listget(list_in, items) requires one list and one integer/boolean-vector/integer-vector arguments, but arguments of type %1, %2 given").arg(params[0].typeName()).arg(params[1].typeName()).arg(params[2].typeName()));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fListRemove(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==2 && params[0].type==qfmpList) {
+            r=params[0];
+            if (params[1].isDoubleVector()) {
+                r.removeListItem(params[1].toUInt());
+            } else if (params[1].isUIntVector()) {
+                QVector<uint32_t> l=params[1].toUIntVector();
+                qSort(l);
+                for (int i=l.size()-1; i>=0; i--) {
+                    r.removeListItem(l[i]);
+                }
+            } else if (params[1].isBoolVector()) {
+                QVector<bool> l=params[1].boolVec;
+                if (l.size()==r.listData.size()) {
+                    for (int i=l.size()-1; i>=0; i--) {
+                        if (l[i]) r.removeListItem(i);
+                    }
+                } else {
+                    p->qfmpError(QObject::tr("listaremove(list_in, boolvec) wrong number of items in boolvec (#%1): requires boolvec to have the same number of entries, as list_in (#%2)").arg(l.size()).arg(r.listData.size()));
+                    r.setInvalid();
+                    return;
+                }
+            }
+        } else {
+            if (n<2) p->qfmpError(QObject::tr("listaremove(list_in, items) requires one list and one integer/boolean-vector/integer-vector arguments, but only %1 arguments given").arg(n));
+            else if (n>=2) p->qfmpError(QObject::tr("listaremove(list_in, items) requires one list and one integer/boolean-vector/integer-vector arguments, but arguments of type %1, %2 given").arg(params[0].typeName()).arg(params[1].typeName()));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fListInsert(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n>=3 && params[0].type==qfmpList && params[1].isUInt()) {
+            r=params[0];
+            int idx=params[1].toUInt();
+            for (unsigned int i=2; i<n; i++) {
+                r.listData.insert(idx+i-2, params[i]);
+            }
+        } else {
+            if (n<3) p->qfmpError(QObject::tr("listinsert(list_in, index, items) requires one list and one integer/boolean-vector/integer-vector arguments, but only %1 arguments given").arg(n));
+            else if (n>=3) p->qfmpError(QObject::tr("listinsert(list_in, index, items) requires one list and one integer/boolean-vector/integer-vector arguments, but arguments of type %1, %2, %3 given").arg(params[0].typeName()).arg(params[1].typeName()).arg(params[2].typeName()));
+            r.setInvalid();
+            return;
+        }
+    }
+
     qfmpResult fLastInVector(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
         qfmpResult res=qfmpResult::invalidResult();
 
@@ -4511,6 +4742,9 @@ namespace QFMathParser_DefaultLib {
         p->qfmpError("firstinvector(x): x had no entries or unrecognized type");
         return res;
     }
+
+
+
 
 
 

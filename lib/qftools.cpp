@@ -534,6 +534,46 @@ QString doubleVecToQString(const QVector<double>& value, int prec, char f, QChar
     return out;
 }
 
+QString doubleMatrixToQString(const QVector<double>& value, int columns, int prec , char f , QChar decimalSeparator, const QString& itemSeparator, const QString& columnSeparator) {
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    QString out="";
+    bool first=true;
+    for (int i=0; i<value.size(); i++) {
+        if (first) out+=itemSeparator;
+        first=false;
+        QString res=loc.toString(value[i], f, prec);
+        if (loc.decimalPoint()!=decimalSeparator) {
+            res=res.replace(loc.decimalPoint(), decimalSeparator);
+        }
+        out+=res;
+        if (i>0 && i<value.size()-1 && i%columns==0) {
+            out+=columnSeparator;
+            first=true;
+        }
+    }
+    return out;
+}
+
+QString boolMatrixToQString(const QVector<bool>& value, int columns, const QString& itemSeparator, const QString& columnSeparator, const QString& trueName, const QString& falseName) {
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    QString out="";
+    bool first=true;
+    for (int i=0; i<value.size(); i++) {
+        if (first) out+=itemSeparator;
+        first=false;
+        if (value[i]) out+=trueName;
+        else out+=falseName;
+
+        if (i>0 && i<value.size()-1 && i%columns==0) {
+            out+=columnSeparator;
+            first=true;
+        }
+    }
+    return out;
+}
+
 QString bitarrayToQString(const QBitArray& value, const QString itemSeparator, const QString& trueName, const QString& falseName ) {
     QString out="";
     for (int i=0; i<value.size(); i++) {
@@ -809,7 +849,11 @@ QStringList deescapifyList(const QString& text) {
 QString	qfGetExistingDirectory ( QWidget * parent, const QString & caption, const QString & dir, QFileDialog::Options options ) {
     QFileDialog::Options opt=options;
 
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#else
+    if (false) {
+#endif
         opt=options;
     } else {
         opt=options|QFileDialog::DontUseNativeDialog;
@@ -892,7 +936,11 @@ QString qfGetSaveFileNameSet (const QString& setPrefix,  QWidget * parent , cons
 QString	qfGetOpenFileName ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options ) {
     QFileDialog::Options opt=options;
 
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#else
+    if (false) {
+#endif
         opt=options;
     } else {
         opt=options|QFileDialog::DontUseNativeDialog;
@@ -905,7 +953,11 @@ QString	qfGetOpenFileName ( QWidget * parent, const QString & caption, const QSt
 QStringList	qfGetOpenFileNames ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options ) {
     QFileDialog::Options opt=options;
 
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#else
+    if (false) {
+#endif
         opt=options;
     } else {
         opt=options|QFileDialog::DontUseNativeDialog;
@@ -921,7 +973,11 @@ QString	qfGetSaveFileName ( QWidget * parent, const QString & caption, const QSt
 
     QFileDialog::Options opt=options;
 
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#else
+    if (false) {
+#endif
         opt=options;
     } else {
         opt=options|QFileDialog::DontUseNativeDialog;
@@ -929,7 +985,11 @@ QString	qfGetSaveFileName ( QWidget * parent, const QString & caption, const QSt
 
     s= QFileDialog::getSaveFileName(parent, caption, dir, filter, &selF, opt);
 
-    if (!ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#ifndef QFMATHPARSER_MATHPARSERTEST
+    if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#else
+    if (false) {
+#endif
         // this regexp recognizes the first file extension in filters like "Name File (*.cpw *.abc);; Filename 2 (*.txt)" then the first
         // extension is appended to the filename, if it does not already contain a suffix
         QRegExp rx(".*\\(\\*\\.(\\S+).*\\)\\w*[;;.]*", Qt::CaseInsensitive);
@@ -1451,11 +1511,12 @@ QString qfCEscaped(const QString& data) {
 QString qfGetTempFilename(const QString& templateName, bool usesSystemAlways) {
     QString tempPath;
     bool useDefaultTemp=true;
-
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (!usesSystemAlways){
         tempPath=ProgramOptions::getConfigValue("quickfit/temp_folder", QFileInfo(qfGetTempFilename(templateName, true)).absolutePath()).toString();
         useDefaultTemp=ProgramOptions::getConfigValue("quickfit/temp_folder_default", true).toBool();
     }
+#endif
 
     QString fn="";
     if (useDefaultTemp || usesSystemAlways || tempPath.isEmpty()) {

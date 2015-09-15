@@ -26,26 +26,26 @@ $$funcref_description$$goes through the parameter list and first tests c1, if it
 $$funcref_end$$
     
   $$funcref_start$$<a name="for"/><!-- func:for -->
-  <b><tt><!-- template -->for(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>for(VAR, start, end, expression)</tt> or <tt>for(VAR, value_vector, expression)</tt> - <i>returns a vector of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b> 
+  <b><tt><!-- template -->for(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>for(VAR, start, end, expression)</tt> or <tt>for(VAR, value_vector, expression)</tt> - <i>returns a vector of <tt>expression</tt>, evaluated one time for every value in the vector/list <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b> 
 $$funcref_description$$example: <code>for(i,1,2,5,i^2)</code> will return <code>[1^2, 3^2, 5^2]=[1,9,25]</code>
   <!-- /func:for -->  
 $$funcref_end$$
    
   $$funcref_start$$<a name="defaultfor"/><!-- func:defaultfor -->
-  <b><tt><!-- template -->defaultfor(VAR, start, delta, end, expression, default)<!-- /template --></tt>, <tt>defaultfor(VAR, start, end, expression, default)</tt> or <tt>defaultfor(VAR, value_vector, expression, default)</tt> - <i>returns a vector of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>. If <tt>expression</tt> evaluates to an incompatible type, <tt>, default</tt> is evaluated and the result added to the output vector:</b> 
+  <b><tt><!-- template -->defaultfor(VAR, start, delta, end, expression, default)<!-- /template --></tt>, <tt>defaultfor(VAR, start, end, expression, default)</tt> or <tt>defaultfor(VAR, value_vector, expression, default)</tt> - <i>returns a vector of <tt>expression</tt>, evaluated one time for every value in the vector/list <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>. If <tt>expression</tt> evaluates to an incompatible type, <tt>, default</tt> is evaluated and the result added to the output vector:</b> 
 $$funcref_description$$example: <code>defaultfor(i,1,5,if(i>3,"bla",i^2), -1)</code> will return <code>[1^2, 2^2, 3^2, -1, -1]=[1,9,25,-1,-1]</code>,<br>whereas <code>for(i,1,5,if(i>3,"bla",i^2))</code> will result in an error.
   <!-- /func:defaultfor -->  
 $$funcref_end$$
      
   $$funcref_start$$<a name="savefor"/><!-- func:savefor -->
-  <b><tt><!-- template -->savefor(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>savefor(VAR, start, end, expression)</tt> or <tt>savefor(VAR, value_vector, expression)</tt> - <i>returns a vector of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration (save versioN!)</i>:</b> 
+  <b><tt><!-- template -->savefor(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>savefor(VAR, start, end, expression)</tt> or <tt>savefor(VAR, value_vector, expression)</tt> - <i>returns a vector of <tt>expression</tt>, evaluated one time for every value in the vector/list <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration (save versioN!)</i>:</b> 
 $$funcref_description$$example: <code>savefor(i,1,2,5,i^2)</code> will return <code>[1^2, 3^2, 5^2]=[1,9,25]</code>
   $$note:This is a save version of the command <tt>for(---)</tt>, if the expression does not evaluate to the expected type, it is simply ignored and no error is caused!$$
   <!-- /func:savefor -->  
 $$funcref_end$$
 
   $$funcref_start$$<a name="filterfor"/><!-- func:filterfor -->
-  <b><tt><!-- template -->filterfor(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>filterfor(VAR, start, end, expression)</tt> or <tt>filterfor(VAR, value_vector, expression)</tt> - <i>returns a vector with those elements in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1), for which the <tt>expression</tt> evaluates to true. The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b> 
+  <b><tt><!-- template -->filterfor(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>filterfor(VAR, start, end, expression)</tt> or <tt>filterfor(VAR, value_vector, expression)</tt> - <i>returns a vector with those elements in the vector/list <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1), for which the <tt>expression</tt> evaluates to true. The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b> 
 $$funcref_description$$example: <code>filterfor(i,1,10,i&lt;4)</code> will return <code>[1,2,3]</code><br>
 example: <code>filterfor(s, ["Hi Susy", "Hi Mark", "Bye Susy", "Bye Mark", "Hi Alonso"],contains(s, "Hi"))</code> will return <code>["Hi Susy", "Hi Mark", "Hi Alonso"]</code>
   <!-- /func:filterfor -->  

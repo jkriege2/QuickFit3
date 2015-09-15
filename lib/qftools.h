@@ -398,6 +398,16 @@ QFLIB_EXPORT QString intToOctQString(int64_t value);
 
 */
 QFLIB_EXPORT QString doubleVecToQString(const QVector<double>& value, int prec = 10, char f = 'g', QChar decimalSeparator='.', const QString itemSeparator=", " );
+/*! \brief convert a matrix of numbers to a QString with a given decimalSeparator
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString doubleMatrixToQString(const QVector<double>& value, int columns, int prec = 10, char f = 'g', QChar decimalSeparator='.', const QString& itemSeparator=", ", const QString& columnSeparator="\n");
+/*! \brief convert a matrix of numbers to a QString with a given decimalSeparator
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString boolMatrixToQString(const QVector<bool>& value, int columns, const QString& itemSeparator=", ", const QString& columnSeparator="\n", const QString& trueName=QString("true"), const QString& falseName=QString("false"));
 /*! \brief convert a vector of booleans to a QString
     \ingroup qf3lib_tools
 
@@ -1332,20 +1342,46 @@ inline T* copyArrayOrDefault(T* out, const T* input, long long N, T defaultValue
 
 */
 template <class T>
-inline QString arrayToString(const T* input, long long N, bool withBrackets=true) {
+inline QString arrayToString(const T* input, long long N, bool withBrackets=true, const QString& inRowseparator=QString(", "), const QString& openBrack="[", const QString& closeBrack="]") {
     QString res;
     {
         QTextStream txt(&res, QIODevice::WriteOnly);
         bool first=true;
         for (int i=0; i<N; i++) {
             if (!first) {
-                txt<<QString(", ");
+                txt<<inRowseparator;
             }
             txt<<input[i];
             first=false;
         }
     }
-    if (withBrackets) return QString("[ %1 ]").arg(res);
+    if (withBrackets) return openBrack+res+closeBrack;
+    return res;
+}
+
+/*! \brief builds a string out of a given array, which is interpreted as a row-major matrix
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+inline QString matrixToString(const T* input, long long N, long long columns, bool withBrackets=true, const QString& inRowseparator=QString(", "), const QString& columnSeparator=QString("\n"), const QString& openBrack="[ ", const QString& closeBrack=" ]") {
+    QString res;
+    {
+        QTextStream txt(&res, QIODevice::WriteOnly);
+        bool first=true;
+        for (int i=0; i<N; i++) {
+            if (!first) {
+                txt<<inRowseparator;
+            }
+            txt<<input[i];
+            first=false;
+            if (i>0 && i%columns==0 && i<N-1) {
+                txt<<columnSeparator;
+                first=true;
+            }
+        }
+    }
+    if (withBrackets) return openBrack+res+closeBrack;
     return res;
 }
 

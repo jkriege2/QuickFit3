@@ -139,12 +139,13 @@ $$funcref_end$$
 
 
 
-<h2>Vector Concatenation</h2>
+<h2>Vector/List/Map Concatenation</h2>
   
   $$funcref_start$$<a name="concat"/><!-- func:concat -->
   <b><tt><!-- template -->concat(x1, x2, ...)<!-- /template --></tt> - <i>concatenate the parameter vectors <tt>x1, x2, ...</tt> </i>:</b>
 $$funcref_description$$
   $$example: <tt>concat([1,2,3], [4,5,6]) -> [1,2,3,4,5,6]</tt>$$
+  This function also concatenates lists and maps, if the first argument is a list or map. NOte however, that maps can only be concatenated to maps. The operation that is done for maps is a unit, i.e. the keys in the second, third, ... arguments are inserted into the first map and possibly overwrites already existing entries.
   <!-- /func:concat -->  
 $$funcref_end$$
   
@@ -376,7 +377,7 @@ $$funcref_end$$
 
 <h2>Vector Properties</h2>
   $$funcref_start$$<a name="length"/><!-- func:length -->
-  <b><tt><!-- template -->length(x)<!-- /template --></tt> - <i>returns the length of vector <tt>x</tt> </i>:</b>
+  <b><tt><!-- template -->length(x)<!-- /template --></tt> - <i>returns the length of vector <tt>x</tt>. If <tt>x</tt> is a matrix, <tt>length(x)</tt> returns rows*columns, i.e. the number of entries in the matrix </i>:</b>
 $$funcref_description$$
   <!-- /func:length -->  
 $$funcref_end$$
@@ -390,6 +391,38 @@ $$funcref_description$$
   <!-- /func:count-->  
 $$funcref_end$$
 
+
+
+ <h2>Matrix Properties</h2>
+ 
+  $$funcref_start$$<a name="sizerows"/><!-- func:sizerows -->
+  <b><tt><!-- template -->sizerows(x)<!-- /template --></tt> - <i>returns the number of rows in a matrix <tt>x</tt>.</i>:</b>
+$$funcref_description$$
+  <!-- /func:sizerows-->  
+$$funcref_end$$
+
+  $$funcref_start$$<a name="sizecols"/><!-- func:sizecols -->
+  <b><tt><!-- template -->sizecols(x)<!-- /template --></tt> - <i>returns the number of columns in a matrix <tt>x</tt>.</i>:</b>
+$$funcref_description$$
+  <!-- /func:sizecols-->  
+$$funcref_end$$
+
+
+<h2>General Properties</h2>
+  $$funcref_start$$<a name="size"/><!-- func:size -->
+  <b><tt><!-- template -->size(x)<!-- /template --></tt> - <i>returns the size of variable <tt>x</tt> </i>:</b>
+$$funcref_description$$
+  For single values, this function resturn a vector <tt>[1]</tt>. For vectors it returns a vector  <tt>[N]</tt>, where <i>N</i> is the number of entries and for matrices it returns a vector <tt>[rows,columns]</tt> with the number of columns and rows in the vector.
+  <!-- /func:size -->  
+$$funcref_end$$
+
+
+  $$funcref_start$$<a name="dimensions"/><!-- func:dimensions -->
+  <b><tt><!-- template -->dimensions(x)<!-- /template --></tt> - <i>returns the number of dimensions of a variable <tt>x</tt>.</i>:</b>
+$$funcref_description$$
+  This return <tt>2</tt> for matrices and <tt>1</tt> for any other valid datatype.
+  <!-- /func:dimensions-->  
+$$funcref_end$$
 
 
 

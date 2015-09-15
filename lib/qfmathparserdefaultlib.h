@@ -155,6 +155,13 @@ namespace QFMathParser_DefaultLib {
     void fStructGet(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fStructGetSave(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
+    void fList(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fListAppend(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fListRemove(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fListGet(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fListGetSave(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fListInsert(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
     void fShuffle(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
 
@@ -356,6 +363,10 @@ namespace QFMathParser_DefaultLib {
 
 
     void fLength(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fSize(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDimensions(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRows(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fColumns(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fRemove(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fReverse(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fDot(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);

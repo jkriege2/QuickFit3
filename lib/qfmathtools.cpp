@@ -98,7 +98,7 @@ uint64_t qfBinomialCoefficient(int64_t n, int64_t k) {
     if (k==0) return 1;
     uint64_t r1=1;
     uint64_t r2=1;
-    for (uint64_t j=1; j<=k; j++) {
+    for (uint64_t j=1; j<=uint64_t(k); j++) {
         r1=r1*(n+1+j);
         r2=r2*j;
     }
@@ -317,7 +317,7 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
     result.rmaxw=0;      // max of weighted residuals
     result.weightSum=0; // weight sum (for normalization)
     bool hfirst=true;
-    bool hasWeights=(weights!=NULL);
+    //bool hasWeights=(weights!=NULL);
     bool allWeightsOne=true;
     bool allWeightsEqual=true;
     //double prodsigma=1.0;
@@ -421,7 +421,7 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
 
     if (QFFloatIsOK(paramrange_size) && QFFloatIsOK(detCOV)){
         const double k=double(result.fitparamN);
-        const double n=double(result.dataSize);
+        //const double n=double(result.dataSize);
         const double chi2=result.residWeightSqrSum;
         const double ln2pi=log(2.0*M_PI);
 
