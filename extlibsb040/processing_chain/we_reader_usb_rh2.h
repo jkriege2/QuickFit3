@@ -4,8 +4,8 @@
 #include "worker_thread.h"
 #include "worker_element.h"
 #include "qqueue.h"
-#include "../../../../LIB/trunk/frame.h"
-#include "../../../../LIB/trunk/helper.h"
+#include "frame.h"
+#include "helper.h"
 
 #include <libusb-1.0/libusb.h>         // Main header file of the libusb library.
 

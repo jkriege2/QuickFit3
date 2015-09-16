@@ -95,7 +95,7 @@ class QFImageReaderTinyTIFF: public QFImporterImageSeries
             QMutexLocker lock(mutex);
             if (fLibTIFFLog) {
                 fprintf(fLibTIFFLog, "error (%s): ", module);
-                fprintf(fLibTIFFLog, message.toLocal8Bit().data());
+                fputs(message.toLocal8Bit().data(), fLibTIFFLog);
                 fflush(fLibTIFFLog);
             }
         }
@@ -104,7 +104,7 @@ class QFImageReaderTinyTIFF: public QFImporterImageSeries
             QMutexLocker lock(mutex);
             if (fLibTIFFLog) {
                 fprintf(fLibTIFFLog, "warning (%s): ", module);
-                fprintf(fLibTIFFLog, message.toLocal8Bit().data());
+                fputs(message.toLocal8Bit().data(),fLibTIFFLog);
                 fflush(fLibTIFFLog);
             }
         }
@@ -113,7 +113,7 @@ class QFImageReaderTinyTIFF: public QFImporterImageSeries
             QMutexLocker lock(mutex);
             if (fLibTIFFLog) {
                 fprintf(fLibTIFFLog, "message (%s): ", module);
-                fprintf(fLibTIFFLog, message.toLocal8Bit().data());
+                fputs(message.toLocal8Bit().data(), fLibTIFFLog);
                 fflush(fLibTIFFLog);
             }
         }

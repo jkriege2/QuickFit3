@@ -11,10 +11,10 @@
 
 #include "we_sink_source.h"
 #include "worker_thread.h"
-#include "../../../../LIB/trunk/frame.h"
-#include "../../../../LIB/trunk/correlator_multitau.h"
+#include "frame.h"
+#include "correlator_multitau.h"
 
-#include "../../../../LIB/trunk/qt/jkqtfastplotter.h"
+#include "jkqtfastplotter.h"
 #include <QGridLayout>
 
 class we_display_graph_thread : public worker_thread

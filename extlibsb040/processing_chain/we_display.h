@@ -2,8 +2,8 @@
 #define __WE_DISPLAY_H__
 
 #include "worker_element.h"
-#include "../../../../LIB/trunk/lut.h"
-#include "../../../../LIB/trunk/helper.h"
+#include "lut.h"
+#include "helper.h"
 
 #include <QPixmap>
 #include <QPainter>

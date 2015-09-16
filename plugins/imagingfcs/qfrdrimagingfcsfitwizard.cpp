@@ -8,7 +8,9 @@ QFRDRImagingFCSFitWizard::QFRDRImagingFCSFitWizard(QWidget *parent):
 {
     QLabel* lab;
 
-    setOption(QWizard::NoCancelButtonOnLastPage);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        setOption(QWizard::NoCancelButtonOnLastPage);
+#endif
     setOption(QWizard::NoBackButtonOnLastPage);
     setOption(QWizard::NoBackButtonOnStartPage);
 
@@ -306,13 +308,13 @@ void QFRDRImagingFCSFitWizard::finalizeAndModifyProject(QFRDRImagingFCSPlugin */
 
 
                 if (!acfmodel.isEmpty()) {
-                    e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListFromItems(acfmodel, constructQStringListWithMultipleItems(ccfmodel, Nccf)).join(';'), false, false);
-                    e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListFromItems("acf", constructQStringListWithMultipleItems("dccf", Nccf)).join(';'), false, false);
+                    e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListFromItems(acfmodel, constructQStringListWithMultipleItems(ccfmodel, Nccf)).join(";"), false, false);
+                    e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListFromItems("acf", constructQStringListWithMultipleItems("dccf", Nccf)).join(";"), false, false);
                 } else {
-                    e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListWithMultipleItems(ccfmodel, Nccf).join(';'), false, false);
-                    e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListWithMultipleItems("dccf", Nccf).join(';'), false, false);
+                    e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListWithMultipleItems(ccfmodel, Nccf).join(";"), false, false);
+                    e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListWithMultipleItems("dccf", Nccf).join(";"), false, false);
                 }
-                e->setQFProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST", globalparams.join(';'), false, false);
+                e->setQFProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST", globalparams.join(";"), false, false);
 
             }
         }

@@ -149,7 +149,9 @@ void JKTetrisFrame::start()
     setLinesRemoved(0,0);
     fastDown=false;
     dropping=false;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     timer->setTimerType(Qt::PreciseTimer);
+#endif
     timer->setInterval(getInterval());
     timer->setSingleShot(true);
     timer->start();

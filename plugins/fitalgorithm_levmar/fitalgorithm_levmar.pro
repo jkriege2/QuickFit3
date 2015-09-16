@@ -47,7 +47,7 @@ RESOURCES +=
 TRANSLATIONS= ./translations/de.fitalgorithm_levmar.ts
 
 INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/
+               ../../libqf3widgets/ \
                .
 #SRC_DISTRIBUTED.files = $$HEADERS \
 #                        $$SOURCES \

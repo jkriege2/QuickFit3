@@ -28,8 +28,8 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include <QtGlobal>
 
-#include<QWindowList>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include<QWindowList>
 #include <QtWidgets>
 #else
 #include <QtGui>

@@ -29,7 +29,7 @@
 #else
 #include <QtGui>
 #endif
-#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrentRun>
 
 #include <QDebug>
 #include "qmodernprogresswidget.h"

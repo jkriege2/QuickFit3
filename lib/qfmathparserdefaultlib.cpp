@@ -562,14 +562,14 @@ namespace QFMathParser_DefaultLib {
                 } else if (params[1].type==qfmpDoubleVector) {
                     r.setDoubleVec(N*params[1].length());
                     for (uint32_t i=0; i<N*params[1].length(); i++) {
-                        r.numVec[i]=params[1].numVec[i%params[1].numVec.length()];
+                        r.numVec[i]=params[1].numVec[i%params[1].numVec.size()];
                     }
                 } else if (params[1].type==qfmpBool) {
                     r.setBoolVec(N, params[1].boolean);
                 } else if (params[1].type==qfmpBoolVector) {
                     r.setBoolVec(N*params[1].length());
                     for (uint32_t i=0; i<N*params[1].length(); i++) {
-                        r.boolVec[i]=params[1].boolVec[i%params[1].boolVec.length()];
+                        r.boolVec[i]=params[1].boolVec[i%params[1].boolVec.size()];
                     }
                 } else if (params[1].type==qfmpString) {
                     r.setStringVec(N, params[1].str);

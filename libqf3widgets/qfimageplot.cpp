@@ -7,7 +7,9 @@
 #include "qfimportermanager.h"
 #include "qfimporter.h"
 #include "image_tools.h"
-#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrentRun>
+#include <QFuture>
+
 
 QFImagePlot::QFImagePlot(QWidget *parent, const QString &prefix):
     QWidget(parent),

@@ -9,8 +9,10 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 {
     QLabel* lab;
     frame_data_io=NULL;
-
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     setOption(QWizard::NoCancelButtonOnLastPage);
+#endif
+
     setOption(QWizard::NoBackButtonOnLastPage);
     setOption(QWizard::NoBackButtonOnStartPage);
 
@@ -379,7 +381,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     chk2ColorFCCS=new QCheckBox(wizCorrelation);
     chk2ColorFCCS->setChecked(false);
     wizCorrelation->addRow(tr("calculate 2-color FCCS:"), chk2ColorFCCS);
-    cmb2PixelFCCS=new QComboBox(wizCorrelation);
+    cmb2PixelFCCS=new QFEnhancedComboBox(wizCorrelation);
     cmb2PixelFCCS->addItem(tr("none"),0);
     cmb2PixelFCCS->addItem(tr("4 direct neighbors"), 4); // user data is number of CCFs
     cmb2PixelFCCS->addItem(tr("8 direct neighbors"), 8);
@@ -723,13 +725,13 @@ void QFRDRImagingFCSWizard::finalizeAndModifyProject(bool projectwizard, QFRDRIm
 
 
                     if (!acfmodel.isEmpty()) {
-                        e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListFromItems(acfmodel, constructQStringListWithMultipleItems(ccfmodel, Nccf)).join(';'), false, false);
-                        e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListFromItems("acf", constructQStringListWithMultipleItems("dccf", Nccf)).join(';'), false, false);
+                        e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListFromItems(acfmodel, constructQStringListWithMultipleItems(ccfmodel, Nccf)).join(";"), false, false);
+                        e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListFromItems(QString("acf"), constructQStringListWithMultipleItems(QString("dccf"), Nccf)).join(";"), false, false);
                     } else {
-                        e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListWithMultipleItems(ccfmodel, Nccf).join(';'), false, false);
-                        e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListWithMultipleItems("dccf", Nccf).join(';'), false, false);
+                        e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListWithMultipleItems(ccfmodel, Nccf).join(";"), false, false);
+                        e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListWithMultipleItems("dccf", Nccf).join(";"), false, false);
                     }
-                    e->setQFProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST", globalparams.join(';'), false, false);
+                    e->setQFProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST", globalparams.join(";"), false, false);
 
                 }
             }

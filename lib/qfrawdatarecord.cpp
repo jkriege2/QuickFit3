@@ -150,7 +150,9 @@ bool QFRawDataRecord::writeTryLock(int timeout_ms, int repeats) const
         if (writeTryLock(timeout_ms)) {
             return true;
         }
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
         QThread::currentThread()->sleep(10);
+#endif
     }
     return false;
 }

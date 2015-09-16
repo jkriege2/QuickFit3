@@ -411,7 +411,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitalg"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_fitalg.html\">Fit Algorithms Help</a>")));
     htmlReplaceList.append(qMakePair(QString("qf_further_reading"), QString("")));
 
-    htmlReplaceList.append(qMakePair(QString("qf_css_mainfile"), readFile(settings->getMainHelpDirectory()+"/qf3style.css")));
+    htmlReplaceList.append(qMakePair(QString("qf_css_mainfile"), QString(readFile(settings->getMainHelpDirectory()+"/qf3style.css"))));
     htmlReplaceList.append(qMakePair(QString("qf_css_mainfile_block"), QString("<style>\n$$qf_css_mainfile$$\n</style>\n")));
     htmlReplaceList.append(qMakePair(QString("fitfunc_lib_searchdirs_list"), QString("<ol><li><tt>%1</tt></li></ol>\n").arg(QFFitFunctionManager::getUserFitFunctionSearchDirectories(true).join("</tt></li><li><tt>"))));
     htmlReplaceList.append(qMakePair(QString("fitfunc_parser_searchdirs_list"), QString("<ol><li><tt>%1</tt></li></ol>\n").arg(QFFitFunctionManager::getUserFitFunctionSearchDirectories(false).join("</tt></li><li><tt>"))));

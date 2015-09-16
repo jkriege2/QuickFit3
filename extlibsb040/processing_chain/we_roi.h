@@ -13,7 +13,7 @@
 
 #include "we_sink_source.h"
 #include "worker_thread.h"
-#include "../../../../LIB/trunk/helper.h"
+#include "helper.h"
 
 class we_roi_thread : public worker_thread
 {  

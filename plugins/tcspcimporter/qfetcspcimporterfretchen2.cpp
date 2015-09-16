@@ -4,7 +4,7 @@
 #include "programoptions.h"
 #include "qfpluginservices.h"
 #include "qmodernprogresswidget.h"
-#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrentRun>
 #include "qfrdrcolumngraphsinterface.h"
 #include "qfrdrtableinterface.h"
 #include "qfproject.h"

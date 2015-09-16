@@ -2,9 +2,9 @@
 #define __WE_DISPLAY2_H__
 
 #include "worker_element.h"
-#include "../../../../LIB/trunk/lut.h"
-#include "../../../../LIB/trunk/helper.h"
-#include "../../../../LIB/trunk/histogram.h"
+#include "lut.h"
+#include "helper.h"
+#include "histogram.h"
 
 #include <QPixmap>
 #include <QPainter>

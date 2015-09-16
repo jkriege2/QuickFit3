@@ -2,10 +2,10 @@
 #define __WE_CORRELATOR_HW_H__
 
 #include "worker_element.h"
-#include "../../../../LIB/trunk/lut.h"
-#include "../../../../LIB/trunk/helper.h"
-#include "../../../../LIB/trunk/correlator_multitau.h"
-#include "../../../../LIB/trunk/textcolor.h"
+#include "lut.h"
+#include "helper.h"
+#include "correlator_multitau.h"
+#include "textcolor.h"
 #include <iomanip>
 
 const unsigned int b=14;

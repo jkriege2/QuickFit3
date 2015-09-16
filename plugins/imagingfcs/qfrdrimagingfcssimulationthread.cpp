@@ -779,7 +779,11 @@ void QFRDRImagingFCSSimulationThread::calcMSD(QList<QVector<double> >& msdout, c
                     //qDebug()<<"     start: maxlen="<<maxlen<<"   msdtemp: "<<msdtemp.size();
                     statisticsMSDMultiTau2D<float,double,float>(msdtemp.data(), x.data(), y.data(), qMin(x.size(), y.size()), tau.data(), tau.size());
                     while (msdtemp.last()<=0) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
                         msdtemp.removeLast();
+#else
+                        msdtemp.pop_back();
+#endif
                     }
                     maxlen=qMax(maxlen, msdtemp.size());
                     msdlst.append(msdtemp);

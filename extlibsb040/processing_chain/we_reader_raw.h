@@ -9,8 +9,8 @@
 
 #include "worker_element.h"
 #include "qqueue.h"
-#include "../../../../LIB/trunk/frame.h"
-#include "../../../../LIB/trunk/helper.h"
+#include "frame.h"
+#include "helper.h"
 
 #define FRAMES_COUNT (256)
 #define FRAMES_SIZE (1024)

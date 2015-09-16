@@ -21,6 +21,7 @@
 
 include(../../extlibsb040/processing_chain/processing_chain.pri)
 
+
 QMAKE_CXXFLAGS += -ggdb
 
 TEMPLATE = lib

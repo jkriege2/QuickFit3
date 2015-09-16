@@ -8,8 +8,8 @@
 #include "worker_element.h"
 #include "worker_thread.h"
 
-#include "../../../../LIB/trunk/qt/qqueue.h"
-#include "../../../../LIB/trunk/frame.h"
+#include "qqueue.h"
+#include "frame.h"
 
 #include <unistd.h>
 

@@ -200,7 +200,7 @@ class JKImage {
 
         /** \brief access image pixel */
         inline T& operator()(uint32_t i) {
-            if ((i<iwidth*iheight)&&(i>=0)) {
+            if ((i<iwidth*iheight)) {
                 return d[i];
             }
             return dummy;

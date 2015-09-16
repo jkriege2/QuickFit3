@@ -159,7 +159,7 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QFFormWizardPage* wizCorrelation;
         QCheckBox* chkACF;
         QCheckBox* chk2ColorFCCS;
-        QComboBox* cmb2PixelFCCS;
+        QFEnhancedComboBox* cmb2PixelFCCS;
         QDoubleSpinBox* spinTauMax;
         QSpinBox* spinSegments;
         QLabel* labSegments;

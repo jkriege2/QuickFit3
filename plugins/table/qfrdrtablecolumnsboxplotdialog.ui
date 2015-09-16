@@ -34,7 +34,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QComboBox" name="cmbMode">
+      <widget class="QFEnhancedComboBox" name="cmbMode">
        <item>
         <property name="text">
          <string>full boxplots (min, q25, median, mean, q75, max, SD)</string>
@@ -60,7 +60,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QComboBox" name="cmbResults"/>
+      <widget class="QFEnhancedComboBox" name="cmbResults"/>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_3">
@@ -70,7 +70,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QComboBox" name="cmbPlots"/>
+      <widget class="QFEnhancedComboBox" name="cmbPlots"/>
      </item>
     </layout>
    </item>
@@ -86,6 +86,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFEnhancedComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfenhancedcombobox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
