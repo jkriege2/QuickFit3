@@ -3,12 +3,12 @@
 
 #include <QStringListModel>
 #include <QSet>
-#include "libwid_imexport.h"
+#include "lib_imexport.h"
 #include <QList>
 #include <QVector>
 #include <QVariant>
 
-class QFWIDLIB_EXPORT QCheckableStringListModel : public QStringListModel {
+class QFLIB_EXPORT QCheckableStringListModel : public QStringListModel {
     Q_OBJECT
 public:
     explicit QCheckableStringListModel(QObject *parent = 0);
@@ -19,6 +19,9 @@ public:
     bool isChecked(int i) const;
     void unCheckAll();
     void checkAll();
+
+    void setCheckable(bool en);
+    bool isCheckable() const  { return m_checkable; }
 
     void setEditable(bool editable);
     bool isEditable() const { return m_editable; }
@@ -42,6 +45,7 @@ public:
 protected:
     QSet<int> m_check;
     bool m_editable;
+    bool m_checkable;
 };
 
 #endif // QCHECKABLESTRINGLISTMODEL_H

@@ -26,6 +26,7 @@
 #include <QMessageBox>
 #include "lib_imexport.h"
 #include "qftablemodel.h"
+#include "qcheckablestringlistmodel.h"
 namespace Ui {
     class QFDlgCSVParameters; // forward
 }
@@ -59,6 +60,22 @@ class QFLIB_EXPORT QFDlgCSVParameters : public QDialog
         void set_header_start(const QString& data) {  header_start=data; }
         /** \brief display a preview of the file */
         void setFileContents(const QString& filename);
+        void setShowColumnsSelection(bool en);
+
+        inline QList<int> getChecked() const {
+            return colslistCheckable.getChecked();
+        }
+        inline QVector<bool> getIsChecked() const {
+            return colslistCheckable.getIsChecked();
+        }
+        inline bool isChecked(int i) const {
+            return colslistCheckable.isChecked(i);
+        }
+
+        void addColSelComboBox(const QString& name);
+        int getColSelComboBoxCurrentIndex(int i) ;
+
+
     public slots:
         void guessParameters();
     protected slots:
@@ -74,6 +91,12 @@ class QFLIB_EXPORT QFDlgCSVParameters : public QDialog
         QString filename;
         Ui::QFDlgCSVParameters* ui;
         QFTableModel* tabmodel;
+        bool show_sel_columns;
+        QCheckableStringListModel colslistCheckable;
+        QCheckableStringListModel colslist;
+        QList<QComboBox*> colCmb;
+        int colselcombos;
+        QStringList colCmbNames;
 };
 
 #endif // QFQFDlgCSVParameters_H

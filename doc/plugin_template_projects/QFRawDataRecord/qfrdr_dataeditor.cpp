@@ -32,7 +32,7 @@ Copyright (c) 2014
 #endif
 #include <QtCore>
 
-QFRDRDataEditor::QFRDRDataEditor(QFPluginServices* services,  QFRawDataPropertyEditor* QWidget* parent):
+QFRDRDataEditor::QFRDRDataEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
 {
     createWidgets();

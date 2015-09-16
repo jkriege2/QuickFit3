@@ -36,6 +36,7 @@
 QFDlgCSVParameters::QFDlgCSVParameters(QWidget* parent, QString columnSeparator, QString decimalSeparator, QString commentStart, QString headerStart):
     QDialog(parent), ui(new Ui::QFDlgCSVParameters)
 {
+    colselcombos=0;
     tabmodel=new QFTableModel(this);
     ui->setupUi(this);
     ui->widConfig->registerWidget("column_separator", ui->edtColumn);
@@ -57,6 +58,8 @@ QFDlgCSVParameters::QFDlgCSVParameters(QWidget* parent, QString columnSeparator,
     ProgramOptions::getConfigWindowGeometry(this, "QFDlgCSVParameters/window/");
     ProgramOptions::getConfigQSplitter(ui->splitter, "QFDlgCSVParameters/splitter/");
     ui->widConfig->setCurrentConfig(ProgramOptions::getConfigValue("QFDlgCSVParameters/config/", "").toString());
+    setShowColumnsSelection(false);
+    ui->lstColumns->setModel(&colslistCheckable);
     guessParameters();
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 }
@@ -87,6 +90,35 @@ void QFDlgCSVParameters::setFileContents(const QString& filename) {
     guessParameters();
 
     reloadCSV();
+
+    for (int i=0; i<colCmb.size(); i++) {
+        colCmb[i]->setCurrentIndex(i);
+    }
+}
+
+void QFDlgCSVParameters::setShowColumnsSelection(bool en)
+{
+    show_sel_columns=en;
+    ui->lstColumns->setVisible(en);
+    ui->labColumns->setVisible(en);
+}
+
+void QFDlgCSVParameters::addColSelComboBox(const QString &name)
+{
+    colselcombos++;
+    colCmbNames<<name;
+    QComboBox* cmb=new QComboBox(this);
+    cmb->setModel(&colslist);
+    ui->mainFormLayout->addRow(name, cmb);
+    colCmb<<cmb;
+}
+
+int QFDlgCSVParameters::getColSelComboBoxCurrentIndex(int i)
+{
+    if (i>=0 && i<colCmb.size()) {
+        return colCmb[i]->currentIndex();
+    }
+    return -1;
 }
 
 void QFDlgCSVParameters::checkValues(bool doAccept) {
@@ -145,6 +177,27 @@ void QFDlgCSVParameters::reloadCSV()
         tabmodel->readCSV(filename, get_column_separator(), get_decimal_separator(), get_header_start(), get_comment_start());
     }
     ui->tableView->setVisible(ex);
+    ui->lstColumns->setModel(NULL);
+    QList<int> oldidx;
+    for (int i=0; i<colCmb.size(); i++) {
+        oldidx<<colCmb[i]->currentIndex();
+        colCmb[i]->setModel(NULL);
+    }
+    colslistCheckable.setEditable(true);
+    colslistCheckable.clear();
+    colslist.setEditable(true);
+    colslist.clear();
+    for (int i=0; i<tabmodel->columnCount(); i++) {
+        colslistCheckable.addItem(tabmodel->columnTitle(i), true);
+        colslist.addItem(tabmodel->columnTitle(i));
+    }
+    colslist.setEditable(false);
+    colslistCheckable.setEditable(false);
+    for (int i=0; i<colCmb.size(); i++) {
+        colCmb[i]->setModel(&colslist);
+        colCmb[i]->setCurrentIndex(oldidx.value(i, i));
+    }
+    ui->lstColumns->setModel(&colslistCheckable);
     tabmodel->setReadonly(true);
     QApplication::restoreOverrideCursor();
 }

@@ -5,6 +5,7 @@ QCheckableStringListModel::QCheckableStringListModel(QObject *parent) :
 {
     m_check.clear();
     m_editable=false;
+    m_checkable=true;
 }
 
 void QCheckableStringListModel::setChecked(int i) {
@@ -36,6 +37,12 @@ void QCheckableStringListModel::checkAll() {
     }
 }
 
+void QCheckableStringListModel::setCheckable(bool en)
+{
+    m_checkable=en;
+
+}
+
 QVariant QCheckableStringListModel::data(const QModelIndex &index, int role) const {
     if (role==Qt::CheckStateRole) {
         if (isChecked(index.row())) return QVariant(Qt::Checked);
@@ -55,8 +62,13 @@ bool QCheckableStringListModel::setData(const QModelIndex &index, const QVariant
 }
 
 Qt::ItemFlags QCheckableStringListModel::flags(const QModelIndex &/*index*/) const {
-    if (m_editable) return Qt::ItemIsUserCheckable|Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
-    else return Qt::ItemIsUserCheckable|Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+    if (m_checkable) {
+        if (m_editable) return Qt::ItemIsUserCheckable|Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
+        else return Qt::ItemIsUserCheckable|Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+    } else {
+        if (m_editable) return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
+        else return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+    }
 }
 
 QList<int> QCheckableStringListModel::getChecked() const
