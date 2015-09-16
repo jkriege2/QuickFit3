@@ -46,7 +46,7 @@ QFETCSPCImporterFretchen2::QFETCSPCImporterFretchen2(QWidget *parent) :
     plteInterphotonTimes->set_xColumn(0);
     plteInterphotonTimes->set_yColumn(1);
     plteInterphotonTimes->set_color(QColor("darkblue"));
-    plteInterphotonTimes->set_lineWidth(0.5);
+    plteInterphotonTimes->set_lineWidth(1);
     plteInterphotonTimes2=new JKQTPxyLineGraph(ui->pltTrace);
     plteInterphotonTimes2->set_drawLine(false);
     plteInterphotonTimes2->set_symbol(JKQTPnoSymbol);
@@ -54,7 +54,7 @@ QFETCSPCImporterFretchen2::QFETCSPCImporterFretchen2(QWidget *parent) :
     plteInterphotonTimes2->set_xColumn(-1);
     plteInterphotonTimes2->set_yColumn(-1);
     plteInterphotonTimes2->set_color(QColor("red"));
-    plteInterphotonTimes2->set_lineWidth(0.5);
+    plteInterphotonTimes2->set_lineWidth(1);
     plteInterphotonTimes2->set_visible(false);
     plteIPTLevelLine=new JKQTPgeoLine(ui->pltTrace,0,0,0,0);
     plteIPTLevelLine->set_color(QColor("red"));
@@ -697,7 +697,7 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
                 const double at=photons.photondata.at(i).arrivaltime;
                 const double ipt=photons.photondata.at(i).IPT*1e6;
                 //qDebug()<<i<<at<<ipt;
-                if (at>=s && at<=s+l) {
+                if (at>=s && at<=s+l  ) {
                     x<<at;
                     y<<ipt;
                     //qDebug()<<i;
@@ -766,6 +766,10 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
         plteInterphotonTimes->set_symbol(JKQTPnoSymbol);
         plteInterphotonTimes->set_color(QColor("darkgreen"));
         plteInterphotonTimes2->set_visible(true);
+        plteInterphotonTimes2->set_color(QColor("red"));
+        plteInterphotonTimes2->set_title(tr("red photons"));
+        plteInterphotonTimes2->set_drawLine(true);
+        plteInterphotonTimes2->set_symbol(JKQTPnoSymbol);
 
         //qDebug()<<x.size()<<y.size();
         plteInterphotonTimes->set_xColumn(ds->addCopiedColumn(x, tr("Arrivaltime [s]")));
