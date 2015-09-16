@@ -7,7 +7,11 @@
 #include "qfimportermanager.h"
 #include "qfimporter.h"
 #include "image_tools.h"
-#include <QtConcurrentRun>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#  include <QtConcurrent/QtConcurrent>
+#else
+#  include <QtConcurrentRun>
+#endif
 #include <QFuture>
 
 

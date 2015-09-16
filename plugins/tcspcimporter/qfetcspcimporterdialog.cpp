@@ -29,7 +29,11 @@
 #else
 #include <QtGui>
 #endif
-#include <QtConcurrentRun>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#  include <QtConcurrent/QtConcurrent>
+#else
+#  include <QtConcurrentRun>
+#endif
 
 #include <QDebug>
 #include "qmodernprogresswidget.h"
