@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="curves/qfrdrcurve.png">./images/qfrdrcurve.png</file>
+    <file alias="curves/qfrdrcurve_small.png">./images/qfrdrcurve_small.png</file>
+</qresource>
+</RCC>

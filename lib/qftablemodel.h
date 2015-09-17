@@ -378,6 +378,10 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         QStringList getColumnTitles() const;
         /** \brief return a list of all row titles */
         QStringList getRowTitles() const;
+        /** \brief return a column title */
+        QString getColumnTitle(int i) const;
+        /** \brief return arow title */
+        QString getRowTitle(int i) const;
 
 
         /** \brief save the contents in a <a href="http://en.wikipedia.org/wiki/SYmbolic_LinK_(SYLK)">SYLK file (SYmbolic LinK)</a>

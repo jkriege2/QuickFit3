@@ -1465,7 +1465,7 @@ QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& filters) {
 }
 
 
-QList<int> stringToIntList(const QString& data) {
+QList<int> stringToIntList(const QString& data, const QList<int>& defaultList) {
     QList<int> res;
     QStringList sl=data.trimmed().split(',');
     for (int i=0; i<sl.size(); i++) {
@@ -1473,9 +1473,26 @@ QList<int> stringToIntList(const QString& data) {
         int val=sl[i].toInt(&ok);
         if (ok) res<<val;
     }
-    return res;
+    if (res.isEmpty()) return defaultList;
+    else return res;
 }
 
+QList<bool> stringToBoolList(const QString& data, const QList<bool>& defaultList) {
+    QList<bool> res;
+    QStringList sl=data.trimmed().split(',');
+    for (int i=0; i<sl.size(); i++) {
+        bool val=false;
+        QString s=sl[i].toLower().trimmed().simplified();
+        if (s=="1") val=true;
+        else if (s=="true") val=true;
+        else if (s=="ja") val=true;
+        else if (s=="yes") val=true;
+        else if (s=="oui") val=true;
+        res<<val;
+    }
+    if (res.isEmpty()) return defaultList;
+    else return res;
+}
 
 bool qfQStringCompareLengthDecreasing(const QString &s1, const QString &s2) {
     return s1.size() > s2.size();

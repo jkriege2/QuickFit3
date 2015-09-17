@@ -1390,8 +1390,21 @@ inline QString matrixToString(const T* input, long long N, long long columns, bo
     \ingroup qf3lib_tools
 
 */
+QFLIB_EXPORT QList<int> stringToIntList(const QString& data, const QList<int>& defaultList=QList<int>());
+inline QList<int> stringToIntList(const QString& data, int defaultOneItemListItem) {
+    QList<int> l; l<<defaultOneItemListItem;
+    return stringToIntList(data, l);
+}
 
-QFLIB_EXPORT QList<int> stringToIntList(const QString& data);
+/*! \brief takes an array of booleans, e.g. "true,false,false,true" and returns it as a QList<bool>
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QList<bool> stringToBoolList(const QString& data, const QList<bool>& defaultList=QList<bool>());
+inline QList<bool> stringToBoolList(const QString& data, bool defaultOneItemListItem) {
+    QList<bool> l; l<<defaultOneItemListItem;
+    return stringToBoolList(data, l);
+}
 
 /*! \brief builds a string out of a given container (with size() and operator[]). If \a withIDs is \c true, the index will be output in front of each value.
     \ingroup qf3lib_tools
@@ -2105,6 +2118,16 @@ QFLIB_EXPORT QVBoxLayout* qfBuildQVBoxLayout(QWidget* w1, QWidget* w2, QWidget* 
 QFLIB_EXPORT QHBoxLayout* qfBuildQHBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
 QFLIB_EXPORT QVBoxLayout* qfBuildQVBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
 QFLIB_EXPORT QFormLayout* qfBuildQFormLayout(const QString& l1, QWidget* w1, const QString& l2, QWidget* w2, const QString& l3=QString(), QWidget* w3=NULL, const QString& l4=QString(), QWidget* w4=NULL, const QString& l5=QString(), QWidget* w5=NULL, const QString& l6=QString(), QWidget* w6=NULL, const QString& l7=QString(), QWidget* w7=NULL, const QString& l8=QString(), QWidget* w8=NULL, const QString& l9=QString(), QWidget* w9=NULL);
+
+inline QChar qfGetFirstChar( const QString& data, QChar defaultChar='\0') {
+    if (data.size()>0) return data[0];
+    return defaultChar;
+}
+
+inline QChar qfGetChar( const QString& data, int idx, QChar defaultChar='\0') {
+    if (idx>=0 && idx<data.size()) return data[idx];
+    return defaultChar;
+}
 
 
 /** \brief return a list of ranges, which compress consecutive, increasing integers */

@@ -194,3 +194,6 @@ release
 /output/source/cairo4qtv2
 /output/source/extlibs
 /output/source/plugins
+/plugins/qfrdrcurve/form.cpp
+/plugins/qfrdrcurve/form.h
+/plugins/qfrdrcurve/form.ui

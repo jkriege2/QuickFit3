@@ -1132,6 +1132,18 @@ QStringList QFTableModel::getRowTitles() const
     return sl;
 }
 
+QString QFTableModel::getColumnTitle(int i) const
+{
+    if (i>=0 && i<columnCount()) return headerData(i, Qt::Horizontal).toString();
+    return QString();
+}
+
+QString QFTableModel::getRowTitle(int i) const
+{
+    if (i>=0 && i<rowCount()) return headerData(i, Qt::Vertical).toString();
+    return QString();
+}
+
 QVariant QFTableModel::cell(quint32 row, quint32 column) const {
     if ((row>=state.rows) || (column>=state.columns)) return QVariant();
     quint64 a=xyAdressToUInt64(row, column);
