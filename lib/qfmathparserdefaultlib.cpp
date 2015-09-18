@@ -125,6 +125,10 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("islist", QFMathParser_DefaultLib::fIsList);
     p->addFunction("vec2list", QFMathParser_DefaultLib::fVec2List);
 
+    p->addFunction("vec2mat", QFMathParser_DefaultLib::fVec2Mat);
+    p->addFunction("mat2vec", QFMathParser_DefaultLib::fMat2Vec);
+    p->addFunction("reshape", QFMathParser_DefaultLib::fReshape);
+
 
     p->addFunction("struct", QFMathParser_DefaultLib::fStruct);
     p->addFunction("structkeys", QFMathParser_DefaultLib::fStructKeys);
@@ -636,7 +640,94 @@ namespace QFMathParser_DefaultLib {
 
 
 
+    void fMat2Vec(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==1 && params[0].type==qfmpDoubleMatrix) {
+            r.setDoubleVec(params[0].numVec);
+        } else if (n==1 && params[0].type==qfmpBoolMatrix) {
+            r.setBoolVec(params[0].boolVec);
+        } else {
+            p->qfmpError(QObject::tr("mat2vec(x) needs one matrix argument"));
+            r.setInvalid();
+            return;
+        }
+    }
+    void fVec2Mat(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        int cols=1;
+        if (n>=1 && params[1].isUInt()) cols=params[1].toUInt();
+        else if (n>=1) {
+            p->qfmpError(QObject::tr("vec2mat(x, cols) cols has to be an unsigned inetegr!"));
+            r.setInvalid();
+            return;
+        }
+        if (cols<1) {
+            p->qfmpError(QObject::tr("vec2mat(x, cols) cols has to be a positive integer, but was <=0 !"));
+            r.setInvalid();
+            return;
+        }
+        if (n>0 && params[0].type==qfmpDoubleVector) {
+            int rows=params[0].numVec.size()/cols;
+            if (params[0].numVec.size()!=rows*cols) {
+                p->qfmpError(QObject::tr("vec2mat(x[, cols]) determined a matrix size of %1x%2 = %3 entries, but the vector has %4 elements").arg(rows).arg(cols).arg(rows*cols).arg(params[0].numVec.size()));
+                r.setInvalid();
+                return;
+            }
+            r=params[0];
+            r.type=qfmpDoubleMatrix;
+            r.matrix_columns=cols;
+        } else if (n>0 && params[0].type==qfmpBoolVector) {
+            int rows=params[0].boolVec.size()/cols;
+            if (params[0].boolVec.size()!=rows*cols) {
+                p->qfmpError(QObject::tr("vec2mat(x[, cols]) determined a matrix size of %1x%2 = %3 entries, but the vector has %4 elements").arg(rows).arg(cols).arg(rows*cols).arg(params[0].boolVec.size()));
+                r.setInvalid();
+                return;
+            }
+            r=params[0];
+            r.type=qfmpBoolMatrix;
+            r.matrix_columns=cols;
+        } else {
+            p->qfmpError(QObject::tr("vec2mat(x[, cols]) needs one number or boolean vector argument"));
+            r.setInvalid();
+            return;
+        }
+    }
+    void fReshape(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
 
+        if (n==3 && (params[0].type==qfmpDoubleVector || params[0].type==qfmpDoubleMatrix || params[0].type==qfmpBoolVector || params[0].type==qfmpBoolMatrix) && params[1].isUInt() && params[2].isUInt()) {
+            int rows=params[1].toUInt();
+            int cols=params[2].toUInt();
+
+            if (n>0 && (params[0].type==qfmpDoubleVector || params[0].type==qfmpDoubleMatrix)) {
+                if (params[0].numVec.size()!=rows*cols) {
+                    p->qfmpError(QObject::tr("reshape(x, rows, cols) requires a matrix of size %1x%2 = %3 entries, but the matrix has %4 elements").arg(rows).arg(cols).arg(rows*cols).arg(params[0].numVec.size()));
+                    r.setInvalid();
+                    return;
+                }
+                r=params[0];
+                r.type=qfmpDoubleMatrix;
+                r.matrix_columns=cols;
+            } else if (n>0 &&(params[0].type==qfmpBoolVector || params[0].type==qfmpBoolMatrix)) {
+                if (params[0].boolVec.size()!=rows*cols) {
+                    p->qfmpError(QObject::tr("reshape(x, rows, cols) requires a matrix of size %1x%2 = %3 entries, but the matrix has %4 elements").arg(rows).arg(cols).arg(rows*cols).arg(params[0].boolVec.size()));
+                    r.setInvalid();
+                    return;
+                }
+                r=params[0];
+                r.type=qfmpBoolMatrix;
+                r.matrix_columns=cols;
+            } else {
+                p->qfmpError(QObject::tr("reshape(x, rows, cols) unsupported matrix type!"));
+                r.setInvalid();
+                return;
+            }
+        } else {
+            p->qfmpError(QObject::tr("reshape(x, rows, cols) needs exactly three arguments, one matrix and two positive integers!"));
+            r.setInvalid();
+            return;
+        }
+    }
     void fPrintExpression(qfmpResult& r,  QFMathParser::qfmpNode** params, unsigned int n, QFMathParser* p){
         if (n==1) {
             r.setString(params[0]->print());
@@ -7220,6 +7311,7 @@ namespace QFMathParser_DefaultLib {
             }
         }
     }
+
 
 
 #endif

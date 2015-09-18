@@ -23,6 +23,7 @@
 
 #include <QObject>
 #include <QAction>
+#include "qfrdrcurvesinterface.h"
 class QFPlotter; // forward
 class QFRDRColumnGraphsInterface;
 class JKQTPgraph;
@@ -38,12 +39,23 @@ class QFPlotterPrivate : public QObject
         
     public slots:
         void copyToTable();
+        void copyToCurve();
         void showHelp();
 
     protected:
         QAction* actCopyToTable;
+        QAction* actCopyToCurve;
         QAction* actHelp;
         QFPlotter* plotter;
+
+        struct CurveData {
+            QString name;
+            int xcol;
+            int ycol;
+            int xerr;
+            int yerr;
+            QFRDRCurvesInterface::CurveType type;
+        };
     private:
         void setErrorProps(int plotid, int graphid, QFRDRColumnGraphsInterface *cols, JKQTPgraph *g, QColor color, QMap<int, int> &columns);
 

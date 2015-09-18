@@ -34,11 +34,13 @@ DESTDIR = $$QFOUTPUT/plugins
 # Input
 HEADERS += qfrdrcurve.h \
            qfrdrcurve_data.h \
-                   qfrdrcurve_dataeditor.h
+                   qfrdrcurve_dataeditor.h \
+    qfrdrcurveparserfunctions.h
 
 SOURCES += qfrdrcurve.cpp \
            qfrdrcurve_data.cpp \
-                   qfrdrcurve_dataeditor.cpp
+                   qfrdrcurve_dataeditor.cpp \
+    qfrdrcurveparserfunctions.cpp
 
 FORMS = \ 
     qfrdrcurve_dataeditor.ui

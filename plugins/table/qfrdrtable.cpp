@@ -124,6 +124,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     rangeCenterColorTransparent=1;
     rangeCenterStyle=Qt::DashLine;
     rangeCenterWidth=1;
+    rangeMode=rgmRange;
 
     errorColorAuto=true;
     fillColorAuto=true;
@@ -2061,6 +2062,7 @@ void QFRDRTable::readGraphInfo(GraphInfo& graph, QDomElement ge) {
     graph.rangeInverted=QStringToBool(ge.attribute("range_inverted", "false"));
     graph.rangeFill=QStringToBool(ge.attribute("range_fill", "true"));
     graph.rangeDrawCenter=QStringToBool(ge.attribute("range_drawcenter", "true"));
+    graph.rangeMode=String2RangeGraphMode(ge.attribute("range_mode", "RANGE"));
 
     graph.errorColorAuto=QStringToBool(ge.attribute("error_color_auto", "true"));
     graph.fillColorAuto=QStringToBool(ge.attribute("fill_color_auto", "true"));
@@ -2312,6 +2314,7 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
     w.writeAttribute("range_end", CDoubleToQString(graph.rangeEnd));
     w.writeAttribute("range_center", CDoubleToQString(graph.rangeCenter));
     w.writeAttribute("range_cwidth", CDoubleToQString(graph.rangeCenterWidth));
+    w.writeAttribute("range_mode", RangeGraphMode2String(graph.rangeMode));
     w.writeAttribute("range_ccolort", CDoubleToQString(graph.rangeCenterColorTransparent));
 
     w.writeAttribute("range_ccolor", QColor2String(graph.rangeCenterColor));

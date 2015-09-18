@@ -30,6 +30,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrawdatapropertyeditor.h"
 #include "qffitfunctionplottools.h"
 #include "qfmathparserxfunctionlinegraph.h"
+#include "qfselectionlistdialog.h"
 
 class MyQFSelectRDRDialogMatchFunctor: public QFMatchRDRFunctor {
     public:
@@ -50,6 +51,8 @@ QFPlotterPrivate::QFPlotterPrivate(QFPlotter *plotter, QObject *parent) :
     this->plotter=plotter;
     actCopyToTable=new QAction(QIcon(":/libqf3widgets/qfplotter_copytotable.png"), tr("copy plot data to table RDR"), this);
     connect(actCopyToTable, SIGNAL(triggered()), this, SLOT(copyToTable()));
+    actCopyToCurve=new QAction(QIcon(":/libqf3widgets/qfplotter_copytocurve.png"), tr("copy graph(s) to curve RDR"), this);
+    connect(actCopyToCurve, SIGNAL(triggered()), this, SLOT(copyToCurve()));
     actHelp=new QAction(QIcon(":/lib/help.png"), tr("Help on plotter widgets"), this);
     connect(actHelp, SIGNAL(triggered()), this, SLOT(showHelp()));
 }
@@ -506,6 +509,126 @@ void QFPlotterPrivate::copyToTable()
         }
     }
     delete dlg;
+}
+
+
+
+void QFPlotterPrivate::copyToCurve()
+{
+    QList<CurveData> cur;
+    QStringList names;
+    for (unsigned int i=0; i<plotter->getGraphCount(); i++) {
+        JKQTPgraph* g=plotter->getGraph(i);
+        if (g && g->get_visible()) {
+            CurveData c;
+            c.type=QFRDRCurvesInterface::ctPoints;
+            c.name=g->get_title();
+            c.xcol=c.ycol=c.xerr=c.yerr=-1;
+
+            JKQTPxyGraph* xyg=dynamic_cast<JKQTPxyGraph*>(g);
+            JKQTPxyLineGraph* xylg=dynamic_cast<JKQTPxyLineGraph*>(g);
+            JKQTPxGraphErrors* xeg=dynamic_cast<JKQTPxGraphErrors*>(g);
+            JKQTPyGraphErrors* yeg=dynamic_cast<JKQTPyGraphErrors*>(g);
+            JKQTPxyGraphErrors* xyeg=dynamic_cast<JKQTPxyGraphErrors*>(g);
+            JKQTPbarHorizontalGraph* hbg=dynamic_cast<JKQTPbarHorizontalGraph*>(g);
+            JKQTPbarVerticalGraph* vbg=dynamic_cast<JKQTPbarVerticalGraph*>(g);
+            if (xyg) {
+                c.xcol=xyg->get_xColumn();
+                c.ycol=xyg->get_yColumn();
+            }
+            if (xyeg) {
+                c.xerr=xyeg->get_xErrorColumn();
+                c.yerr=xyeg->get_yErrorColumn();
+            } else if (xeg) {
+                c.xerr=xeg->get_xErrorColumn();
+            } else if (yeg) {
+                c.yerr=yeg->get_yErrorColumn();
+            }
+
+            if (xylg) {
+                if (xylg->get_drawLine()) {
+                    c.type=QFRDRCurvesInterface::ctLines;
+                }
+            }
+            if (hbg || vbg)  {
+                c.type=QFRDRCurvesInterface::ctBars;
+            }
+
+            if (c.xcol>=0 || c.ycol>=0) {
+                names<<c.name;
+                cur<<c;
+            }
+        }
+    }
+    if (cur.size()>0) {
+        QFSelectionListDialog* dlg=new QFSelectionListDialog(plotter, false);
+        dlg->init(names);
+        dlg->setLabel(tr("select the graphs that you want to add to the new curve RDR."));
+        dlg->setHelpPage(QFPluginServices::getInstance()->getMainHelpDirectory()+QString("/jkqtplotter.html"));
+        QList<int> sel; sel<<0;
+        if (cur.size()==1 || dlg->exec()) {
+            if (cur.size()>1) sel=dlg->getSelectedIndexes();
+        } else {
+            sel.clear();
+        }
+        if (sel.size()>0) {
+            QFProject* pro=QFPluginServices::getInstance()->getCurrentProject();
+            QMap<QString, QVariant> par;
+            QString csv;
+            {
+                QTextStream csvstr(&csv);
+                plotter->getDatastore()->saveCSV(csvstr, QSet<int>(), ", ", ".", "#");
+            }
+
+            par["CSV"]=csv;
+            par["csv_column_separator"]=QString(",");
+            par["decimal_separator"]=QString(".");
+            par["comment_start"]=QString("#");
+            par["header_start"]=QString("#!");
+            par["FILETYPE"]=QString("CSV_INTERNAL");
+            par["xlabel"]=plotter->getXAxis()->get_axisLabel();
+            par["xlog"]=plotter->getXAxis()->get_logAxis();
+            par["ylabel"]=plotter->getYAxis()->get_axisLabel();
+            par["ylog"]=plotter->getYAxis()->get_logAxis();
+            QStringList slNames, slTypes, slX, slXE, slY, slYE;
+            for (int j=0; j<sel.size(); j++) {
+                if (sel[j]>=0 && sel[j]<cur.size()) {
+                    slNames<<cur[sel[j]].name;
+                    slX<<QString::number(cur[sel[j]].xcol);
+                    slY<<QString::number(cur[sel[j]].ycol);
+                    slXE<<QString::number(cur[sel[j]].xerr);
+                    slYE<<QString::number(cur[sel[j]].yerr);
+                    switch(cur[sel[j]].type) {
+                        case QFRDRCurvesInterface::ctLines:
+                            slTypes<<"lines";
+                            break;
+                        case QFRDRCurvesInterface::ctBars:
+                            slTypes<<"histogram";
+                            break;
+                        default:
+                        case QFRDRCurvesInterface::ctPoints:
+                            slTypes<<"points";
+                            break;
+                     }
+                }
+            }
+            if (slX.size()<=0) slX<<"-1";
+            if (slXE.size()<=0) slXE<<"-1";
+            if (slY.size()<=0) slY<<"-1";
+            if (slYE.size()<=0) slYE<<"-1";
+            par["curvename"]=slNames;
+            par["curvetype"]=slTypes;
+            par["column_x"]=slX.join(",");
+            par["column_y"]=slY.join(",");
+            par["column_xerr"]=slXE.join(",");
+            par["column_yerr"]=slYE.join(",");
+
+
+            pro->addRawData(QString("curve"), tr("Curves From Plotter: %1").arg(plotter->get_plotter()->get_plotLabel()), QString(), QStringList(), par, par.keys());
+        }
+
+        delete dlg;
+    }
 }
 
 void QFPlotterPrivate::showHelp()

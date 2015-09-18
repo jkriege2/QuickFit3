@@ -33,6 +33,29 @@
         <!-- /func:boolmatrix -->
   $$funcref_end$$
 
+  <h2>Matrix conversion</h2>
+  $$funcref_start$$<a name="mat2vec"/><!-- func:mat2vec -->
+    <b><tt><!-- template -->mat2vec(x)<!-- /template --> - <i> creates a vector with all entries (row-major order) from the given matrix <tt>x</tt></i>:</b>
+  $$funcref_description$$
+        <!-- /func:mat2vec -->
+  $$funcref_end$$
+  
+ $$funcref_start$$<a name="vec2mat"/><!-- func:vec2mat -->
+    <b><tt><!-- template -->vec2mat(x,cols)<!-- /template --> - <i> creates a matrix with all entries (row-major order) from the given vector <tt>x</tt>. The matrix will have <tt>cols</tt> entries</i>:</b>
+  $$funcref_description$$
+        If <tt>x</tt> does not have enough entries to fill the matrix, an error will be generated. The number of rows in tzhe output matrix is $(\mbox{rows}=\lfloor \mbox{entries}/\mbox{cols} \rfloor)$
+        <!-- /func:vec2mat -->
+  $$funcref_end$$
+  
+  <h2>Matrix reshaping</h2>
+  
+  
+ $$funcref_start$$<a name="reshape"/><!-- func:reshape -->
+    <b><tt><!-- template -->reshape(x, rows, cols)<!-- /template --> - <i> creates a matrix with all entries (row-major order) from the given matrix <tt>x</tt>, but with a new size of  <tt>rows</tt> * <tt>cols</tt> entries</i>:</b>
+  $$funcref_description$$
+        If <tt>x</tt> does not have enough entries to fill the new matrix, an error will be generated.
+        <!-- /func:reshape -->
+  $$funcref_end$$
   </body>
   </html>
   

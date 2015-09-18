@@ -167,6 +167,9 @@ namespace QFMathParser_DefaultLib {
     void fIsMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fIsDoubleMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fIsBoolMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fMat2Vec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fVec2Mat(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fReshape(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     void fDoubleMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fBoolMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);

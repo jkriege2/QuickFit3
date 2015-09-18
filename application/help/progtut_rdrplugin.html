@@ -710,6 +710,132 @@ virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol"); 
 
 <p>The <code>plugins/qfrdrcurve</code> directory contains a subdir <code>plugins/qfrdrcurve/examples</code>. This directory contains several test-dataset and example projects for this plugin. Its contents will be automatically installed by the QuickFit 3 installer 8on WIndows/MacOS X), if you bind the plugin into the QuickFit 3 main project!!!</p>
 
+
+<h1>
+<a id="user-content-add-parser-functions-that-allow-to-access-the-curve-data" class="anchor" href="#add-parser-functions-that-allow-to-access-the-curve-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Add parser functions that allow to access the curve-data</h1>
+
+<p>In many cases it is convenient to be able to access the data from an RDR with functions in the internal expression parser <code>QFMathParser</code>, e.g. to read curve-data into a table. To register such functions, you simply have to define the function as a C-function <code>fParserFunction()</code> and then call</p>
+
+<blockquote>
+<pre><code>   QFMathParser::addGlobalFunction("parser_function_name", fParserFunction);
+</code></pre>
+</blockquote>
+
+<p>when the plugin is initialized, i.e. add a function</p>
+
+<blockquote>
+<pre><code>   virtual void init();
+</code></pre>
+</blockquote>
+
+<p>To the class <code>QFRDRCurvePlugin</code> and register all functions there. It is good practice to simply collect all these function in an additional CPP/H-file, e.g. <code>qfrdrcurveparserfunctions.h/cpp</code>. One typical parser function looks like this:</p>
+
+<blockquote>
+<pre><code>   // res is the function result, params is a vector of the function parameters and n is its count. 
+   // The final parameter p is a pointer to the QFMathParser object that can e.g. be used for error reporting.
+   void fCurve_getCount(qfmpResult &amp;res, const qfmpResult *params, unsigned int n, QFMathParser *p)
+   {
+       // default return value is invalid
+       res.setInvalid();
+       // get a pointer to the current QFProject
+       QFProject* p=QFPluginServices::getInstance()-&gt;getCurrentProject();
+       if (p)  {
+           // the first parameter has to be a number (qfmpDouble) and specifies the RDR ID
+           int evalID=-1;
+           if (n==1 &amp;&amp; params[0].isUInt()) {
+               evalID=params[0].toInteger();
+               // get the specified RDR from the project and check whether it is a curve RDR (i.e. implements the interface QFRDRCurvesInterface)
+               QFRDRCurvesInterface* rdr=dynamic_cast&lt;QFRDRCurvesInterface*&gt;(p-&gt;getRawDataByID(evalID));
+               if (rdr ) {
+                   // if all is OK, return the nuber of curves in the RDR
+                   res.setDouble(rdr-&gt;curvesGetCount());
+               } else {
+                   // report an error
+                   parser-&gt;qfmpError(QObject::tr("curve_getcount(rdrid): the specified RDR is no curve record"));
+                   res.setInvalid();
+                   return;
+               }
+           } else {
+               parser-&gt;qfmpError(QObject::tr("curve_getcount(rdrid) needs one unsigned integer arguments (%1 given)").arg(n));
+               res.setInvalid();
+               return;
+           }
+       }
+   }
+</code></pre>
+</blockquote>
+
+<p>This function returns the number of curves in a curve RDR. A second function will return the x-data of a specified curve in a given RDR:</p>
+
+<blockquote>
+<pre><code>   void fCurve_getDataX(qfmpResult &amp;res, const qfmpResult *params, unsigned int n, QFMathParser *p)
+   {
+       res.setInvalid();
+       QFProject* p=QFPluginServices::getInstance()-&gt;getCurrentProject();
+       if (p)  {
+           int RDRID=-1;
+           if (n&gt;=1 &amp;&amp; n&lt;=2 &amp;&amp; params[0].type==qfmpDouble) {
+               RDRID=params[0].toInteger();
+               QFRDRCurvesInterface* rdr=dynamic_cast&lt;QFRDRCurvesInterface*&gt;(p-&gt;getRawDataByID(RDRID));
+               int curve=0;
+               if (n&gt;=2 &amp;&amp; params[1].type==qfmpDouble ) {
+                   curve=params[1].toInteger();
+               } else  if (n&lt;=0 || n&gt;2){
+                   parser-&gt;qfmpError(QObject::tr("curve_getx(rdrid, curve=0) requires 1-2  integer arguments (%1 given)").arg(n));
+                   res.setInvalid();
+                   return;
+               }
+               if (rdr &amp;&amp; curve&gt;=0 &amp;&amp; curve&lt;rdr-&gt;curvesGetCount()) {
+                   res.setDoubleVec(rdr-&gt;curvesGetX(curve));
+               } else {
+                   if (!rdr) {
+                       parser-&gt;qfmpError(QObject::tr("curve_getx(rdrid, curve=0): the specified RDR is no curve record"));
+                       res.setInvalid();
+                       return;
+                   } else if (!(curve&gt;=0 &amp;&amp; curve&lt;rdr-&gt;curvesGetCount())) {
+                       parser-&gt;qfmpError(QObject::tr("curve_getx(rdrid, curve=0): the specified curve (%1) is not available in the RDR (only %2 curves are available)").arg(channel).arg(rdr-&gt;curvesGetCount()));
+                       res.setInvalid();
+                       return;
+                   }
+               }
+           } else {
+               parser-&gt;qfmpError(QObject::tr("curve_getx(rdrid, curve=0) needs 1-2 integer arguments (%1 given)").arg(n));
+               res.setInvalid();
+               return;
+           }
+       }
+   }
+</code></pre>
+</blockquote>
+
+<p>This function basically works like the last one, but has an additrional optional parameter to specify a curve inside the RDR (default is 0):
+1. get a pointer to the current QFProject
+2. read the RDR ID from the function parameters
+3. get a pointer to the specified RDR and cast it to the QFRDRCurvesInterface interface, used to access the data
+4. now read the curve and check whether it is available in the RDR.
+5. if the curve and RDR are OK, return the X-data as vector, otherwise return an invalid result and emit an error message.</p>
+
+<p>The online-help for the parser function follows a special format. It is stored in the file <code>plugins/qfrdrcurve/help/parserreference/curves.html</code>. This file has to be referenced in a file <code>plugins/qfrdrcurve/help/parserref.inc</code> with the following contents that adds a link to the main parser function reference:</p>
+
+<blockquote>
+<pre><code>   &lt;li&gt;&lt;b&gt;&lt;a href="$$plugin_info:helpdir:curves$$/parserreference/curve.html"&gt;Curve RDR data access&lt;/a&gt;&lt;/b&gt;&lt;/li&gt;
+</code></pre>
+</blockquote>
+
+<p>In addition, you have to add these lines to the function QFRDRCurvePlugin::init(), which finally registers the parser online-help directory:</p>
+
+<blockquote>
+<pre><code>       QFPluginServices::getInstance()-&gt;appendOrAddHTMLReplacement("qfmathparser_ref", QString("$$insert:%1/parserref.inc$$").arg(QFPluginServices::getInstance()-&gt;getPluginHelpDirectory(getID())));
+       QStringList sl=QFPluginServices::getInstance()-&gt;getGlobalConfigValue("QFMathParser_ref").toStringList();
+       sl.append(QFPluginServices::getInstance()-&gt;getPluginHelpDirectory(getID())+QString("/parserreference/"));
+       QFPluginServices::getInstance()-&gt;setGlobalConfigValue("QFMathParser_ref", sl);           
+       QFPluginServices::getInstance()-&gt;addQFMathParserRefernceDir(QFPluginServices::getInstance()-&gt;getPluginHelpDirectory(getID())+QString("/parserreference/"));
+</code></pre>
+</blockquote>
+
+<p>The first line adds the <code>parserref.inc</code> file to the help replace <code>$$qfmathparser_ref$$</code>, which is used to display a list of all parser-reference help pages. The remaining four add the directory with the parser refernce HTML file to the central list of such directories.</p>
+
+
     </div>
     </body>
 </html>

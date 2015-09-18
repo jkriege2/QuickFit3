@@ -252,7 +252,28 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         }
 
 
+        enum RangeGraphMode {
+            rgmRange=0,
+            rgmLineError=1,
+            rgmLineOnly=2
+        };
 
+
+        static QString RangeGraphMode2String(RangeGraphMode type) {
+            switch(type) {
+                case rgmLineError: return QString("LINEERR");
+                case rgmLineOnly: return QString("LINE");
+                default:
+                case rgmRange: return QString("RANGE");
+            }
+
+        }
+        static RangeGraphMode String2RangeGraphMode(const QString& type) {
+            if(type.toUpper()=="LINEERR") return rgmLineError;
+            if(type.toUpper()=="LINE") return rgmLineOnly;
+            if(type.toUpper()=="RANGE") return rgmRange;
+            return rgmRange;
+        }
 
         struct GraphInfo {
             GraphInfo();
@@ -369,6 +390,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             Qt::PenStyle rangeCenterStyle;
             double rangeCenterWidth;
             bool rangeDrawCenter;
+            RangeGraphMode rangeMode;
 
             bool errorColorAuto;
             bool fillColorAuto;

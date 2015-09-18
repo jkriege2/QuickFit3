@@ -221,6 +221,75 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_23">
+     <item>
+      <widget class="QLineEdit" name="edtGraphTitle">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkShowTitle">
+       <property name="text">
+        <string>show</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labFuctionType">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Function Type:</string>
+     </property>
+     <property name="buddy">
+      <cstring>edtFunction</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QComboBox" name="cmbFunctionType">
+     <item>
+      <property name="text">
+       <string>user defined</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>polynomial</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>exponential</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>power law</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>internal fit function</string>
+      </property>
+     </item>
+    </widget>
+   </item>
    <item row="4" column="0">
     <widget class="QLabel" name="labFuction">
      <property name="font">
@@ -286,6 +355,69 @@
      </layout>
     </widget>
    </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="labQFFitFuction">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Function:</string>
+     </property>
+     <property name="buddy">
+      <cstring>edtFunction</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QFFitFunctionComboBox" name="cmbQFFitFunction"/>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="labQFFitFuction2">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Function-Sublot:</string>
+     </property>
+     <property name="buddy">
+      <cstring>edtFunction</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QWidget" name="widQFFitFunctionSubplot" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="1,0">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QComboBox" name="cmbQFFitFunctionSubplot"/>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chkQFFitFunctionSubplotAll">
+        <property name="text">
+         <string>show all</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item row="7" column="0">
     <widget class="QLabel" name="labDataX">
      <property name="font">
@@ -301,6 +433,508 @@
       <cstring>cmbLinesXData</cstring>
      </property>
     </widget>
+   </item>
+   <item row="7" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QFEnhancedComboBox" name="cmbLinesXData">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnClearLinesXData">
+       <property name="text">
+        <string>clear this column</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnAutoX">
+       <property name="toolTip">
+        <string>try to determine the other X-columns automatically ...</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfrdrtable.qrc">
+         <normaloff>:/table/wizard.png</normaloff>:/table/wizard.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="labErrorX">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Error column X:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QWidget" name="widErrorX" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QFEnhancedComboBox" name="cmbLinesXError">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnClearLinesXError">
+        <property name="text">
+         <string>clear this column</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QWidget" name="widErrorX2" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_14">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="chkXErrSym">
+        <property name="text">
+         <string>symmetric errors   </string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFEnhancedComboBox" name="cmbLinesXError2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnClearLinesXError2">
+        <property name="text">
+         <string>clear this column</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="labDataY">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Data column Y:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbLinesYData</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QFEnhancedComboBox" name="cmbLinesYData">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnClearLinesYData">
+       <property name="text">
+        <string>clear this column</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnAutoY">
+       <property name="toolTip">
+        <string>try to determine the other X-columns automatically ...</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfrdrtable.qrc">
+         <normaloff>:/table/wizard.png</normaloff>:/table/wizard.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="labErrorY">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Error column Y:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="QWidget" name="widErrorY" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_8">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QFEnhancedComboBox" name="cmbLinesYError">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnClearLinesYError">
+        <property name="text">
+         <string>clear this column</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="13" column="1">
+    <widget class="QWidget" name="widErrorY2" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_15">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="chkYErrSym">
+        <property name="text">
+         <string>symmetric errors   </string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFEnhancedComboBox" name="cmbLinesYError2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnClearLinesYError2">
+        <property name="text">
+         <string>clear this column</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="14" column="0">
+    <widget class="QLabel" name="labMean">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Mean column:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_11">
+     <item>
+      <widget class="QFEnhancedComboBox" name="cmbLinesMean">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnClearLinesMean">
+       <property name="text">
+        <string>clear this column</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="15" column="0">
+    <widget class="QLabel" name="labQ75">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>75% quantile col.:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QFEnhancedComboBox" name="cmbLinesQ75">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnClearLinesQ75">
+       <property name="text">
+        <string>clear this column</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="16" column="0">
+    <widget class="QLabel" name="labMax">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>max. column:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_10">
+     <item>
+      <widget class="QFEnhancedComboBox" name="cmbLinesMax">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnClearLinesMax">
+       <property name="text">
+        <string>clear this column</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="18" column="0">
+    <widget class="QLabel" name="labFuctionParameters">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>function params:</string>
+     </property>
+     <property name="buddy">
+      <cstring>edtFunction</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="18" column="1">
+    <widget class="QEnhancedTableView" name="tabFunctionParameters"/>
    </item>
    <item row="19" column="0">
     <widget class="QCheckBox" name="chkSTrided">
@@ -379,6 +1013,471 @@
          </size>
         </property>
        </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="20" column="0">
+    <widget class="QCheckBox" name="chkSelectData">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>select data:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="20" column="1">
+    <widget class="QWidget" name="widDataSelect" native="true">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="1" column="1">
+       <widget class="QFEnhancedComboBox" name="cmbSelectDataColumn_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QComboBox" name="cmbSelectDataLogic12">
+        <item>
+         <property name="text">
+          <string>none</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>and</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>or</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>xor</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QComboBox" name="cmbSelectDataCompare_2">
+        <item>
+         <property name="text">
+          <string>==</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>!=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>in-range</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>out-of-range</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue2_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QFEnhancedComboBox" name="cmbSelectDataColumn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QComboBox" name="cmbSelectDataCompare">
+        <item>
+         <property name="text">
+          <string>==</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>!=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>in-range</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>out-of-range</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QComboBox" name="cmbSelectDataLogic23">
+        <item>
+         <property name="text">
+          <string>none</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>and</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>or</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>xor</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QFEnhancedComboBox" name="cmbSelectDataColumn_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QComboBox" name="cmbSelectDataCompare_3">
+        <item>
+         <property name="text">
+          <string>==</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>!=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>in-range</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>out-of-range</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue2_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="21" column="0">
+    <widget class="QLabel" name="labSort">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>sort order:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="21" column="1">
+    <widget class="QComboBox" name="cmbSort">
+     <item>
+      <property name="text">
+       <string>as in table (unsorted)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>sort in X direction</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>sort in Y direction</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="22" column="0">
+    <widget class="QLabel" name="labRangeData">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>range data:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbColormap</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="22" column="1">
+    <widget class="QWidget" name="widRangeData" native="true">
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="1" column="2">
+       <widget class="QLabel" name="labRangeMode">
+        <property name="text">
+         <string>mode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QComboBox" name="cmbRangeMode">
+        <item>
+         <property name="text">
+          <string>full range</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>line +/- error</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>line-only</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labRangeCenter">
+        <property name="text">
+         <string>center:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QFDoubleEdit" name="edtRangeCenter">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labRangeStart">
+        <property name="text">
+         <string>start:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QFDoubleEdit" name="edtRangeStart">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="labRangeEnd">
+        <property name="text">
+         <string>end:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QFDoubleEdit" name="edtRangeEnd">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -840,6 +1939,186 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item row="27" column="0">
+    <widget class="QLabel" name="labWidth">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>width:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbColormap</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="27" column="1">
+    <widget class="QWidget" name="widWidth" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QDoubleSpinBox" name="edtWidth">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> %</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labShift">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>shift:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="edtShift">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> %</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnShiftAuto">
+        <property name="text">
+         <string>auto</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="labWhisker">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string> whisker:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="LineStyleComboBox" name="cmbWhiskerStyle">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="28" column="0">
+    <widget class="QLabel" name="labOffset">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>offset:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbColormap</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="28" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_13">
+     <item>
+      <widget class="QFDoubleEdit" name="edtOffset">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item row="29" column="0">
     <widget class="QLabel" name="labErrorStyle">
@@ -1813,368 +3092,6 @@
      </layout>
     </widget>
    </item>
-   <item row="34" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnRefit">
-       <property name="text">
-        <string>refit</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfrdrtable.qrc">
-         <normaloff>:/table/fit.png</normaloff>:/table/fit.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>16</width>
-         <height>16</height>
-        </size>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnFit">
-       <property name="text">
-        <string>&amp;Fit</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfrdrtable.qrc">
-         <normaloff>:/table/fit.png</normaloff>:/table/fit.png</iconset>
-       </property>
-       <property name="popupMode">
-        <enum>QToolButton::InstantPopup</enum>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
-       <property name="arrowType">
-        <enum>Qt::NoArrow</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="labFuctionType">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Function Type:</string>
-     </property>
-     <property name="buddy">
-      <cstring>edtFunction</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QComboBox" name="cmbFunctionType">
-     <item>
-      <property name="text">
-       <string>user defined</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>polynomial</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>exponential</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>power law</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>internal fit function</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="labQFFitFuction">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Function:</string>
-     </property>
-     <property name="buddy">
-      <cstring>edtFunction</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="QFFitFunctionComboBox" name="cmbQFFitFunction"/>
-   </item>
-   <item row="18" column="0">
-    <widget class="QLabel" name="labFuctionParameters">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>function params:</string>
-     </property>
-     <property name="buddy">
-      <cstring>edtFunction</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="18" column="1">
-    <widget class="QEnhancedTableView" name="tabFunctionParameters"/>
-   </item>
-   <item row="27" column="0">
-    <widget class="QLabel" name="labWidth">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>width:</string>
-     </property>
-     <property name="buddy">
-      <cstring>cmbColormap</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="27" column="1">
-    <widget class="QWidget" name="widWidth" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QDoubleSpinBox" name="edtWidth">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="suffix">
-         <string> %</string>
-        </property>
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <double>100.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="labShift">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>shift:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDoubleSpinBox" name="edtShift">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="suffix">
-         <string> %</string>
-        </property>
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="minimum">
-         <double>-100.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>100.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnShiftAuto">
-        <property name="text">
-         <string>auto</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="labWhisker">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string> whisker:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="LineStyleComboBox" name="cmbWhiskerStyle">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="22" column="0">
-    <widget class="QLabel" name="labRangeData">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>range data:</string>
-     </property>
-     <property name="buddy">
-      <cstring>cmbColormap</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="22" column="1">
-    <widget class="QWidget" name="widRangeData" native="true">
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>start:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>end:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QFDoubleEdit" name="edtRangeEnd">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>center:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QFDoubleEdit" name="edtRangeCenter">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QFDoubleEdit" name="edtRangeStart">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item row="32" column="0">
     <widget class="QLabel" name="labRangeStyle">
      <property name="font">
@@ -2355,622 +3272,10 @@
      </layout>
     </widget>
    </item>
-   <item row="7" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
+   <item row="34" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QFEnhancedComboBox" name="cmbLinesXData">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>80</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnClearLinesXData">
-       <property name="text">
-        <string>clear this column</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
-         <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnAutoX">
-       <property name="toolTip">
-        <string>try to determine the other X-columns automatically ...</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfrdrtable.qrc">
-         <normaloff>:/table/wizard.png</normaloff>:/table/wizard.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="11" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_6">
-     <item>
-      <widget class="QFEnhancedComboBox" name="cmbLinesYData">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>80</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnClearLinesYData">
-       <property name="text">
-        <string>clear this column</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
-         <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnAutoY">
-       <property name="toolTip">
-        <string>try to determine the other X-columns automatically ...</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfrdrtable.qrc">
-         <normaloff>:/table/wizard.png</normaloff>:/table/wizard.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="11" column="0">
-    <widget class="QLabel" name="labDataY">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Data column Y:</string>
-     </property>
-     <property name="buddy">
-      <cstring>cmbLinesYData</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0">
-    <widget class="QLabel" name="labErrorX">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Error column X:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="12" column="0">
-    <widget class="QLabel" name="labErrorY">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Error column Y:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="14" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_11">
-     <item>
-      <widget class="QFEnhancedComboBox" name="cmbLinesMean">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>80</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnClearLinesMean">
-       <property name="text">
-        <string>clear this column</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
-         <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="14" column="0">
-    <widget class="QLabel" name="labMean">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Mean column:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="15" column="0">
-    <widget class="QLabel" name="labQ75">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>75% quantile col.:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="15" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_9">
-     <item>
-      <widget class="QFEnhancedComboBox" name="cmbLinesQ75">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>80</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnClearLinesQ75">
-       <property name="text">
-        <string>clear this column</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
-         <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="16" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_10">
-     <item>
-      <widget class="QFEnhancedComboBox" name="cmbLinesMax">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>80</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnClearLinesMax">
-       <property name="text">
-        <string>clear this column</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
-         <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="16" column="0">
-    <widget class="QLabel" name="labMax">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>max. column:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="20" column="0">
-    <widget class="QCheckBox" name="chkSelectData">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>select data:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="20" column="1">
-    <widget class="QWidget" name="widDataSelect" native="true">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_6">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item row="1" column="1">
-       <widget class="QFEnhancedComboBox" name="cmbSelectDataColumn_2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QComboBox" name="cmbSelectDataLogic12">
-        <item>
-         <property name="text">
-          <string>none</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>and</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>or</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>xor</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QComboBox" name="cmbSelectDataCompare_2">
-        <item>
-         <property name="text">
-          <string>==</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>!=</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&gt;=</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&lt;=</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&gt;</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&lt;</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>in-range</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>out-of-range</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QFDoubleEdit" name="edtSelectDataValue_2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="QFDoubleEdit" name="edtSelectDataValue2_2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QFEnhancedComboBox" name="cmbSelectDataColumn">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QFDoubleEdit" name="edtSelectDataValue">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QFDoubleEdit" name="edtSelectDataValue2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QComboBox" name="cmbSelectDataCompare">
-        <item>
-         <property name="text">
-          <string>==</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>!=</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&gt;=</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&lt;=</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&gt;</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&lt;</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>in-range</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>out-of-range</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QComboBox" name="cmbSelectDataLogic23">
-        <item>
-         <property name="text">
-          <string>none</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>and</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>or</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>xor</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QFEnhancedComboBox" name="cmbSelectDataColumn_3">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QComboBox" name="cmbSelectDataCompare_3">
-        <item>
-         <property name="text">
-          <string>==</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>!=</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&gt;=</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&lt;=</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&gt;</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>&lt;</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>in-range</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>out-of-range</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <widget class="QFDoubleEdit" name="edtSelectDataValue_3">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
-       <widget class="QFDoubleEdit" name="edtSelectDataValue2_3">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="28" column="0">
-    <widget class="QLabel" name="labOffset">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>offset:</string>
-     </property>
-     <property name="buddy">
-      <cstring>cmbColormap</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="28" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_13">
-     <item>
-      <widget class="QFDoubleEdit" name="edtOffset">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
+      <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -2982,326 +3287,47 @@
        </property>
       </spacer>
      </item>
-    </layout>
-   </item>
-   <item row="12" column="1">
-    <widget class="QWidget" name="widErrorY" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_8">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QFEnhancedComboBox" name="cmbLinesYError">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="btnClearLinesYError">
-        <property name="text">
-         <string>clear this column</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../lib/lib.qrc">
-          <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="13" column="1">
-    <widget class="QWidget" name="widErrorY2" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_15">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QCheckBox" name="chkYErrSym">
-        <property name="text">
-         <string>symmetric errors   </string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QFEnhancedComboBox" name="cmbLinesYError2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="btnClearLinesYError2">
-        <property name="text">
-         <string>clear this column</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../lib/lib.qrc">
-          <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="10" column="1">
-    <widget class="QWidget" name="widErrorX2" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_14">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QCheckBox" name="chkXErrSym">
-        <property name="text">
-         <string>symmetric errors   </string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QFEnhancedComboBox" name="cmbLinesXError2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="btnClearLinesXError2">
-        <property name="text">
-         <string>clear this column</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../lib/lib.qrc">
-          <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="9" column="1">
-    <widget class="QWidget" name="widErrorX" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_7">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QFEnhancedComboBox" name="cmbLinesXError">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="btnClearLinesXError">
-        <property name="text">
-         <string>clear this column</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../lib/lib.qrc">
-          <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_23">
      <item>
-      <widget class="QLineEdit" name="edtGraphTitle">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="chkShowTitle">
+      <widget class="QToolButton" name="btnRefit">
        <property name="text">
-        <string>show</string>
+        <string>refit</string>
        </property>
-       <property name="checked">
-        <bool>true</bool>
+       <property name="icon">
+        <iconset resource="qfrdrtable.qrc">
+         <normaloff>:/table/fit.png</normaloff>:/table/fit.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnFit">
+       <property name="text">
+        <string>&amp;Fit</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfrdrtable.qrc">
+         <normaloff>:/table/fit.png</normaloff>:/table/fit.png</iconset>
+       </property>
+       <property name="popupMode">
+        <enum>QToolButton::InstantPopup</enum>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+       <property name="arrowType">
+        <enum>Qt::NoArrow</enum>
        </property>
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="21" column="0">
-    <widget class="QLabel" name="labSort">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>sort order:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="21" column="1">
-    <widget class="QComboBox" name="cmbSort">
-     <item>
-      <property name="text">
-       <string>as in table (unsorted)</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>sort in X direction</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>sort in Y direction</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="labQFFitFuction2">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Function-Sublot:</string>
-     </property>
-     <property name="buddy">
-      <cstring>edtFunction</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="QWidget" name="widQFFitFunctionSubplot" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="1,0">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QComboBox" name="cmbQFFitFunctionSubplot"/>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="chkQFFitFunctionSubplotAll">
-        <property name="text">
-         <string>show all</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
    </item>
   </layout>
  </widget>
@@ -3417,8 +3443,6 @@
   <tabstop>edtSelectDataValue_3</tabstop>
   <tabstop>edtSelectDataValue2_3</tabstop>
   <tabstop>cmbSort</tabstop>
-  <tabstop>edtRangeStart</tabstop>
-  <tabstop>edtRangeEnd</tabstop>
   <tabstop>edtRangeCenter</tabstop>
   <tabstop>cmbLineColor</tabstop>
   <tabstop>sliderPlotTransparent</tabstop>

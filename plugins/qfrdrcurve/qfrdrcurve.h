@@ -54,6 +54,8 @@ class QFRDRCurvePlugin : public QObject, public QFPluginRawDataRecordBase {
         */
         virtual void registerToMenu(QMenu* menu);
 
+        virtual void init();
+
         /** \brief short ID for the plugin */
         virtual QString getID() const  { return tr("curves"); }
 

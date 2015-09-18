@@ -1603,6 +1603,44 @@ static inline void FName(qfmpResult& r, const qfmpResult* params, unsigned int  
 #define QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC_SIMPLE(FName, CFUNC) QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC(FName, CFUNC, CFUNC)
 
 
+
+/*! \brief a parser function of the type rdr_is...(rdr_id) that checks the RDR referenced by the given ID for beeing castableto a specified class
+
+    The resulting function will:
+      - check the number of arguments
+      - apply the C-function to any number parameter
+      - apply the C-function item-wise to any number vector parameter, i.e. [ fmod(x1,y1), fmod(x2,y2), ... ]
+      - result is also a number or number vector
+    .
+    \param FName name of the function to declare
+    \param NAME_IN_PARSER name the function should have in the parser (used for error messages only)
+    \param CFUNC name of the C function to call
+*/
+#define QFMATHPARSER_DEFINE_RDRIS_FUNC(FName, NAME_IN_PARSER, CHECK_CLASS) \
+static inline void FName(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* parser){\
+    res.setInvalid();\
+    QFProject* p=QFPluginServices::getInstance()->getCurrentProject();\
+    if (p)  {\
+        int evalID=-1;\
+        if (n==1 && params[0].type==qfmpDouble) {\
+            evalID=params[0].toInteger();\
+            CHECK_CLASS* rdr=dynamic_cast<CHECK_CLASS*>(p->getRawDataByID(evalID));\
+            res.setBoolean(rdr);\
+        } else if (n==1 && params[0].type==qfmpDoubleVector) {\
+            res.setBoolVec(params[0].numVec.size()); \
+            for (int i=0; i<params[0].numVec.size(); i++) {\
+                evalID=params[0].numVec[i];\
+                CHECK_CLASS* rdr=dynamic_cast<CHECK_CLASS*>(p->getRawDataByID(evalID));\
+                res.boolVec[i]=rdr;\
+            }\
+        } else {\
+            parser->qfmpError(QObject::tr("%1(rdrid) needs one integer arguments (%2 given)").arg(#NAME_IN_PARSER).arg(n)); \
+            res.setInvalid();\
+            return;\
+        }\
+    }\
+}
+
 /*@}*/
 
 #endif // QFMATHPARSERTOOLS_H

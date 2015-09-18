@@ -324,6 +324,9 @@ void QFRDRCurveData::intReadData(QDomElement* e) {
         }
         if (csv.isEmpty()) {
             csv=getQFProperty("CSV", "").toString();
+            if (propertyExists("CSV")) {
+                setQFProperty("CSV", getQFProperty("CSV"), false, false);
+            }
         }
         if (csv.size()>0) {
             QFTableModel* table=new QFTableModel();

@@ -24,6 +24,8 @@ Copyright (c) 2015
 #include "qfrdrcurve_data.h"
 #include "qfrdrcurve_dataeditor.h"
 #include "qfdlgcsvparameters.h"
+#include "qfmathparser.h"
+#include "qfrdrcurveparserfunctions.h"
 
 QFRDRCurvePlugin::QFRDRCurvePlugin(QObject* parent):
     QObject(parent)
@@ -57,6 +59,23 @@ void QFRDRCurvePlugin::registerToMenu(QMenu* menu) {
     action->setStatusTip(tr("Insert a new record, which represents several curves form several files in one RDR"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertMultiFileRecord()));
     m->addAction(action);
+}
+
+void QFRDRCurvePlugin::init()
+{
+    QFPluginServices::getInstance()->appendOrAddHTMLReplacement("qfmathparser_ref", QString("$$insert:%1/parserref.inc$$").arg(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())));
+    QStringList sl=QFPluginServices::getInstance()->getGlobalConfigValue("QFMathParser_ref").toStringList();
+    sl.append(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+    QFPluginServices::getInstance()->setGlobalConfigValue("QFMathParser_ref", sl);
+    QFPluginServices::getInstance()->addQFMathParserRefernceDir(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+
+
+    QFMathParser::addGlobalFunction("rdr_iscurve", fRDR_iscurve);
+    QFMathParser::addGlobalFunction("curve_getcount", fCurve_getCount);
+    QFMathParser::addGlobalFunction("curve_getx", fCurve_getDataX);
+    QFMathParser::addGlobalFunction("curve_getxerror", fCurve_getDataXError);
+    QFMathParser::addGlobalFunction("curve_gety", fCurve_getDataY);
+    QFMathParser::addGlobalFunction("curve_getyerror", fCurve_getDataYError);
 }
 
 

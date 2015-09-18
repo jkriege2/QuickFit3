@@ -109,6 +109,7 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     updating=false;
     if (ProgramOptions::getInstance() && ProgramOptions::getInstance()->getQSettings()) readSettings(*(ProgramOptions::getInstance()->getQSettings()), "table/QFRDRTablePlotWidget/");
     updatePlotWidgetVisibility();
+
 }
 
 QFTableGraphSettings::~QFTableGraphSettings()
@@ -198,7 +199,12 @@ QIcon QFTableGraphSettings::getGraphIcon(int i) const
 
 void QFTableGraphSettings::writeGraphData()
 {
+    QWidget* wid=focusWidget();
     emit graphDataChanged();
+    QApplication::processEvents();
+    QApplication::processEvents();
+    QApplication::processEvents();
+    if (wid) wid->setFocus();
 }
 
 void QFTableGraphSettings::reloadColumns(QComboBox *combo)
@@ -367,6 +373,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.rangeStart=ui->edtRangeStart->value();
         graph.rangeEnd=ui->edtRangeEnd->value();
         graph.rangeCenterWidth=ui->spinRangeCenterWidth->value();
+        graph.rangeMode=(QFRDRTable::RangeGraphMode)ui->cmbRangeMode->currentIndex();
         graph.rangeCenterColor=ui->cmbRangeCenterColor->currentColor();
         graph.rangeCenterColorTransparent=double(ui->sliderRangeCenterTransparency->value())/255.0;
         graph.rangeCenterStyle=ui->cmbRangeCenterStyle->currentLineStyle();
@@ -530,6 +537,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->edtRangeStart->setValue(graph.rangeStart);
     ui->edtRangeEnd->setValue(graph.rangeEnd);
     ui->spinRangeCenterWidth->setValue(graph.rangeCenterWidth);
+    ui->cmbRangeMode->setCurrentIndex((int)graph.rangeMode);
     ui->cmbRangeCenterColor->setCurrentColor(graph.rangeCenterColor);
     ui->sliderRangeCenterTransparency->setValue(graph.rangeCenterColorTransparent*255.0);
     ui->spinRangeCenterTransparency->setValue(ui->sliderRangeCenterTransparency->value());
@@ -563,6 +571,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         updateSelectDataEnabled();
 
         this->setVisible(true);
+
+        on_cmbRangeMode_currentIndexChanged(ui->cmbRangeMode->currentIndex());
 
         ui->widErrorStyle->setVisible(true);
         ui->widFillColor->setVisible(true);
@@ -1710,6 +1720,37 @@ void QFTableGraphSettings::on_cmbSelectDataCompare_currentIndexChanged(int index
     ui->edtSelectDataValue2->setVisible(index==QFRDRTable::dsoInRange || index==QFRDRTable::dsoOutOfRange);
 }
 
+void QFTableGraphSettings::on_cmbRangeMode_currentIndexChanged(int index)
+{
+    switch(index) {
+        case 1: //line+/-error
+            ui->labRangeStart->setEnabled(true);
+            ui->labRangeStart->setText(tr("error:"));
+            ui->edtRangeStart->setEnabled(true);
+            ui->labRangeEnd->setText(tr("end:"));
+            ui->labRangeEnd->setEnabled(false);
+            ui->edtRangeEnd->setEnabled(false);
+            break;
+        case 2: //line only
+            ui->labRangeStart->setEnabled(false);
+            ui->labRangeStart->setText(tr("start:"));
+            ui->edtRangeStart->setEnabled(false);
+            ui->labRangeEnd->setText(tr("end:"));
+            ui->labRangeEnd->setEnabled(false);
+            ui->edtRangeEnd->setEnabled(false);
+            break;
+        default:
+        case 0: //range
+            ui->labRangeStart->setEnabled(true);
+            ui->labRangeStart->setText(tr("start:"));
+            ui->edtRangeStart->setEnabled(true);
+            ui->labRangeEnd->setText(tr("end:"));
+            ui->labRangeEnd->setEnabled(true);
+            ui->edtRangeEnd->setEnabled(true);
+            break;
+    }
+}
+
 void QFTableGraphSettings::on_btnClearLinesXData_clicked()
 {
     ui->cmbLinesXData->setCurrentData(-1);
@@ -1882,3 +1923,4 @@ void QFTableGraphSettings::on_btnFunctionHelp_clicked()
      if (current)
          QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("table")+"/mathparser.html");
 }
+

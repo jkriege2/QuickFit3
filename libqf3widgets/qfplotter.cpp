@@ -85,6 +85,7 @@ void QFPlotter::initQFPlotter()
 void QFPlotter::modifyContextMenu(QMenu *menu)
 {
     menu->insertAction(plotter->get_actCopyMatlab(), p->actCopyToTable);
+    menu->insertAction(plotter->get_actCopyMatlab(), p->actCopyToCurve);
     menu->addSeparator();
     menu->addAction(p->actHelp);
 }
@@ -93,6 +94,7 @@ void QFPlotter::populateToolbar(QToolBar *toolbar) const
 {
     JKQtPlotter::populateToolbar(toolbar);
     toolbar->insertAction(plotter->get_actCopyMatlab(), p->actCopyToTable);
+    toolbar->insertAction(plotter->get_actCopyMatlab(), p->actCopyToCurve);
     toolbar->addSeparator();
     toolbar->addAction(p->actHelp);
 }
@@ -100,6 +102,11 @@ void QFPlotter::populateToolbar(QToolBar *toolbar) const
 QAction *QFPlotter::get_actCopyToTable() const
 {
     return p->actCopyToTable;
+}
+
+QAction *QFPlotter::get_actCopyToCurve() const
+{
+    return p->actCopyToCurve;
 }
 
 QAction *QFPlotter::get_actHelp() const
