@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
      <item>
       <widget class="QLabel" name="label">
        <property name="font">
@@ -31,6 +31,13 @@
      </item>
      <item>
       <widget class="QComboBox" name="cmbCurve"/>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkOverlay">
+       <property name="text">
+        <string>overlay all curves from this RDR</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
