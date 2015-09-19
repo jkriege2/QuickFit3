@@ -1553,7 +1553,7 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
                             useColExpressionsForData=true;
                             prop_expression=QString("prop_id = \"%1\";\nfor(c, column(col-%2), rdr_getproperty(c, prop_id))");
                             data_expression=QString("result_id = \"%1\";\nfor(r, 1:length(column(col-%3)), firstinvector(rdr_getresult(data(r, col-%3), data(r, col-%2), result_id, NAN)))");
-                            error_expression=QString("result_id = \"%1\";\nfor(r, 1:length(column(col-%3)), firstinvector(rdr_getresulterror(data(row, col-%3), data(row, col-%2), result_id, NAN)))");
+                            error_expression=QString("result_id = \"%1\";\nfor(r, 1:length(column(col-%3)), firstinvector(rdr_getresulterror(data(r, col-%3), data(r, col-%2), result_id, NAN)))");
                             //simple_data_expression=QString("result_id = \"%1\";\nrdr_getresult(%3, %2, result_id)");
                             //simple_error_expression=QString("result_id = \"%1\";\nrdr_getresulterror(%3, %2, result_id)");
                         }
@@ -1566,8 +1566,11 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
                         rdrid_col=col;
                         evalid_col=col+2;
                         tab->tableSetColumnTitle(col, dlg->getPrefix()+"RDR_ID");
+                        tab->tableSetColumnExpression(col, QVariant());
                         tab->tableSetColumnTitle(col+1, dlg->getPrefix()+"FILENAME");
+                        tab->tableSetColumnExpression(col+1, QVariant());
                         tab->tableSetColumnTitle(col+2, dlg->getPrefix()+"EVAL_ID");
+                        tab->tableSetColumnExpression(col+2, QVariant());
                         if (chkUseColExpressions->isChecked()) {
                             tab->tableSetColumnExpression(col+2);
                         }
