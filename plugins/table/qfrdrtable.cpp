@@ -200,7 +200,7 @@ QFRDRTable::PlotInfo::PlotInfo()
     showTitle=true;
     graphAutosize=true;
     graphWidth=120;
-    graphHeight=70;
+    graphHeight=90;
     title="";
     xAxis=AxisInfo();
     yAxis=AxisInfo();
@@ -472,7 +472,8 @@ void QFRDRTable::tableSetExpression(quint32 row, quint32 column, const QString &
 void QFRDRTable::tableSetColumnExpression(quint32 column, const QString &expression)
 {
     if (datamodel)  {
-        datamodel->setColumnHeaderData(column, QFRDRTable::ColumnExpressionRole, expression);
+        if (expression.isEmpty()) datamodel->setColumnHeaderData(column, QFRDRTable::ColumnExpressionRole, QVariant());
+        else datamodel->setColumnHeaderData(column, QFRDRTable::ColumnExpressionRole, expression);
     }
 }
 

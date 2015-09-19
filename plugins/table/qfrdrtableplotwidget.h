@@ -68,6 +68,10 @@ class QFRDRTablePlotWidget : public QWidget
         void performRegression(int xCol, int yCol, int sigmaCol, int plot,int graph, QFRDRTable::GraphDataSelection sel,bool xlog,bool ylog);
         void performRefit(int plot, int graph);
     protected slots:
+        inline void emitPlotTitleChanged(int plot, QString title) {
+            emit plotTitleChanged(plot, title);
+        }
+
         void doFit(int xCol, int yCol, int sigmaCol, int plot, QString function, QFRDRTable::GraphDataSelection sel);
         void doRegression(int xCol, int yCol, int sigmaCol, int plot, QFRDRTable::GraphDataSelection sel);
         void doRefit(int plot);

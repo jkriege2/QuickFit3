@@ -35,6 +35,7 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QFTableGraphSettings)
 {
+    m_connected=false;
     headerModel=new QFTableModelColumnHeaderModel(NULL, this);
     //headerModel=new QStringListModel(this);
     functionRef=new QFFunctionReferenceTool(NULL);
@@ -199,12 +200,13 @@ QIcon QFTableGraphSettings::getGraphIcon(int i) const
 
 void QFTableGraphSettings::writeGraphData()
 {
-    QWidget* wid=focusWidget();
+    //QWidget* wid=focusWidget();
     emit graphDataChanged();
+    //QApplication::processEvents();
+    //QApplication::processEvents();
     QApplication::processEvents();
-    QApplication::processEvents();
-    QApplication::processEvents();
-    if (wid) wid->setFocus();
+    //if (wid) qDebug()<<wid<<wid->isVisible();
+    //if (wid) wid->setFocus();
 }
 
 void QFTableGraphSettings::reloadColumns(QComboBox *combo)
@@ -562,6 +564,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
 void QFTableGraphSettings::updatePlotWidgetVisibility()
 {
     if (current) {
+        QWidget* widFocus=focusWidget();
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
 
 
@@ -1228,7 +1231,12 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 break;
         }
 
+//        bool isConn=m_connected;
+//        disconnectWidgets();
+//        if (widFocus && widFocus->isVisible() && focusWidget()!=widFocus) widFocus->setFocus();
         if (isVisible()) setUpdatesEnabled(updt);
+//        if (isConn) connectWidgets();
+
 
     }
 }
@@ -1236,7 +1244,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
 void QFTableGraphSettings::connectWidgets()
 {
     //qDebug()<<"connectWidgets";
-
+    m_connected=true;
 
     connect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->edtGraphTitle, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
@@ -1244,6 +1252,7 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesXError2, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbRangeMode, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->chkShowTitle, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkXErrSym, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkYErrSym, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
@@ -1348,12 +1357,13 @@ void QFTableGraphSettings::connectWidgets()
 void QFTableGraphSettings::disconnectWidgets()
 {
     //qDebug()<<"disconnectWidgets";
-
+    m_connected=false;
     disconnect(ui->edtWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->edtShift, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
     disconnect(ui->edtOffset, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->cmbSort, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbRangeMode, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
 
     disconnect(ui->cmbLinesQ75, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));

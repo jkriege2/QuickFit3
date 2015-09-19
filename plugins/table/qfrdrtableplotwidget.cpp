@@ -68,6 +68,7 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     connect(ui->widGraphSettings, SIGNAL(performFit(int,int,int,int,QString,QFRDRTable::GraphDataSelection)), this, SLOT(doFit(int,int,int,int,QString,QFRDRTable::GraphDataSelection)));
     connect(ui->widGraphSettings, SIGNAL(performRegression(int,int,int,int, QFRDRTable::GraphDataSelection)), this, SLOT(doRegression(int,int,int,int,QFRDRTable::GraphDataSelection)));
     connect(ui->widSystemSettings, SIGNAL(plotSettingsChanged()), this, SLOT(delayedUpdateGraph()));
+    connect(ui->widSystemSettings, SIGNAL(plotTitleChanged(int,QString)), this, SLOT(emitPlotTitleChanged(int,QString)));
     connect(ui->widGraphSettings, SIGNAL(reloadGraph()), this, SLOT(delayedReloadGraphData()));
 
     //ui->formLayout_3->removeWidget(ui->widSaveCoordSettings);

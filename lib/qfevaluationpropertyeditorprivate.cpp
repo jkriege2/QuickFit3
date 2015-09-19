@@ -1566,11 +1566,11 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
                         rdrid_col=col;
                         evalid_col=col+2;
                         tab->tableSetColumnTitle(col, dlg->getPrefix()+"RDR_ID");
-                        tab->tableSetColumnExpression(col, QVariant());
+                        tab->tableSetColumnExpression(col, QString());
                         tab->tableSetColumnTitle(col+1, dlg->getPrefix()+"FILENAME");
-                        tab->tableSetColumnExpression(col+1, QVariant());
+                        tab->tableSetColumnExpression(col+1, QString());
                         tab->tableSetColumnTitle(col+2, dlg->getPrefix()+"EVAL_ID");
-                        tab->tableSetColumnExpression(col+2, QVariant());
+                        tab->tableSetColumnExpression(col+2, QString());
                         if (chkUseColExpressions->isChecked()) {
                             tab->tableSetColumnExpression(col+2);
                         }

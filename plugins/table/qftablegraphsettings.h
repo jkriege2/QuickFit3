@@ -127,6 +127,8 @@ class QFTableGraphSettings : public QWidget
         QAction* actRegression;
 
         bool isFitResult;
+
+        bool m_connected;
 };
 
 #endif // QFTABLEGRAPHSETTINGS_H
