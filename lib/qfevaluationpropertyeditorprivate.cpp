@@ -1577,7 +1577,7 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
                             if (!chkUseColExpressions->isChecked()) tab->tableSetExpression(r, col+1, QLatin1String("rdr_getname(data(row, col-1))"));
                         }
                         if (chkUseColExpressions->isChecked()) {
-                            tab->tableSetColumnExpression(col+2, QLatin1String("for(r, column(col-1), rdr_getname(r))"));
+                            tab->tableSetColumnExpression(col+1, QLatin1String("for(r, column(col-1), rdr_getname(r))"));
                         }
 
                         //tab->tableSetColumnExpression(col+1, QLatin1String("for(r, column(col-1), rdr_getname(r))"));

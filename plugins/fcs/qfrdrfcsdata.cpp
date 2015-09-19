@@ -3003,10 +3003,10 @@ bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantCOR(QString filename)
                 //data.removeFirst();
                 corr<<data;
                 added=true;
-                qDebug()<<1<<data;
+                //qDebug()<<1<<data;
             } else {
                 QRegExp rxc("#?([^\\:]+)\\s*\\:\\s*(.+)");
-                qDebug()<<2<<line;
+                //qDebug()<<2<<line;
                 if (rxc.exactMatch(line) && rxc.cap(1).trimmed().size()>0 && rxc.cap(2).trimmed().size()>0) {
                     QString name=rxc.cap(1).trimmed();
                     QString value=rxc.cap(2).trimmed();
@@ -3053,7 +3053,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantCOR(QString filename)
 bool QFRDRFCSData::analyzeCorrelationCurvesFromPicoQuantCOR(QString filename, int *channels)
 {
     if (!QFile::exists(filename)) {
-        qDebug()<<"file does not exist";
+        //qDebug()<<"file does not exist";
         return false;
     }
 

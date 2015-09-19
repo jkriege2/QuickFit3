@@ -624,7 +624,7 @@ void QFPlotterPrivate::copyToCurve()
             par["column_yerr"]=slYE.join(",");
 
 
-            pro->addRawData(QString("curve"), tr("Curves From Plotter: %1").arg(plotter->get_plotter()->get_plotLabel()), QString(), QStringList(), par, par.keys());
+            pro->addRawData(QString("curves"), tr("Curves From Plotter: %1").arg(plotter->get_plotter()->get_plotLabel()), QString(), QStringList(), par, par.keys());
         }
 
         delete dlg;
