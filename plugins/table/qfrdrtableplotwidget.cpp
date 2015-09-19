@@ -1407,9 +1407,19 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_invertedRange(g.rangeInverted);
                 pg->set_plotCenterLine(g.rangeDrawCenter);
                 pg->set_plotRangeLines(g.drawLine);
-                pg->set_rangeMin(g.rangeStart);
-                pg->set_rangeMax(g.rangeEnd);
-                pg->set_rangeCenter(g.rangeCenter);
+                if (g.rangeMode==QFRDRTable::rgmRange) {
+                    pg->set_rangeMin(g.rangeStart);
+                    pg->set_rangeMax(g.rangeEnd);
+                    pg->set_rangeCenter(g.rangeCenter);
+                } else if (g.rangeMode==QFRDRTable::rgmLineError) {
+                    pg->set_rangeMin(g.rangeCenter-g.rangeStart);
+                    pg->set_rangeMax(g.rangeCenter+g.rangeStart);
+                    pg->set_rangeCenter(g.rangeCenter);
+                } else if (g.rangeMode==QFRDRTable::rgmLineOnly) {
+                    pg->set_rangeMin(g.rangeCenter);
+                    pg->set_rangeMax(g.rangeCenter);
+                    pg->set_rangeCenter(g.rangeCenter);
+                }
                 pg->set_centerLineWidth(g.rangeCenterStyle);
                 pg->set_centerStyle(g.rangeCenterStyle);
                 pg->set_lineWidth(g.linewidth);
