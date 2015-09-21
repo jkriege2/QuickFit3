@@ -114,25 +114,27 @@ double QFDoubleEdit::value() const {
 }
 
 void QFDoubleEdit::setValue(double valueIn) {
-    double value=valueIn;
-    if (m_Integer) value=round(valueIn);
-    if (m_checkMaximum && (value>m_maximum)) { value=m_maximum; }
-    if (m_checkMaximum && (value<m_minimum)) { value=m_minimum; }
-    if (m_Integer) value=round(valueIn);
+    double val=valueIn;
+    if (m_Integer) val=round(valueIn);
+    if (m_checkMaximum && (val>m_maximum)) { val=m_maximum; }
+    if (m_checkMaximum && (val<m_minimum)) { val=m_minimum; }
+    if (m_Integer) val=round(valueIn);
     if (m_logscale) {
-        if (value<=0) {
-            if (m_Integer) value=1;
-            else value=DBL_MIN;
+        if (val<=0) {
+            if (m_Integer) val=1;
+            else val=DBL_MIN;
         }
     }
 
+
+
     QString txt;
-    txt=txt.sprintf(QString("%."+QString::number(m_decimals)+"g").toLatin1().data(), value);
+    txt=txt.sprintf(QString("%."+QString::number(m_decimals)+"g").toLatin1().data(), val);
     txt.replace('.', QLocale::system().decimalPoint());
     txt.replace(',', QLocale::system().decimalPoint());
     if (txt!=text()) {
         setText(txt);
-        if (!hasFocus()) setCursorPosition(0);
+        //if (!hasFocus()) setCursorPosition(0);
     }
 }
 
@@ -254,7 +256,10 @@ void QFDoubleEdit::focusOutEvent ( QFocusEvent * event ) {
 void QFDoubleEdit::keyPressEvent ( QKeyEvent * event )  {
     //std::cout<<"key="<<event->key()<<"   modifiers="<<event->modifiers()<<std::endl;
     if  ((event->modifiers()==Qt::NoModifier)&&((event->key()==44) || (event->key()==46) || (event->key()==Qt::Key_Comma) || (event->key()==Qt::Key_Period))) { // convert '.' and ',' to the current locle's decimal point!
-        QKeyEvent key(QEvent::KeyPress, 0, Qt::NoModifier, QString(QLocale::system().decimalPoint()));
+        QKeyEvent key;
+        if (QLocale::system().decimalPoint()=='.') key=QKeyEvent(QEvent::KeyPress, Qt::Key_Period, event->modifiers(), QString("."));
+        else if (QLocale::system().decimalPoint()==',') key=QKeyEvent(QEvent::KeyPress, Qt::Key_Comma, event->modifiers(), QString(","));
+        else key=QKeyEvent(QEvent::KeyPress, 0, event->modifiers(), QString(QLocale::system().decimalPoint()));
         QLineEdit::keyPressEvent(&key);
         event->accept();
     } else if (m_updownKeyEnabled && (event->modifiers()==Qt::NoModifier)&&(event->key()==Qt::Key_Up)) {
