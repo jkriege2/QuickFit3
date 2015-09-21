@@ -26,7 +26,7 @@ CONFIG += plugin
 TARGET = imfcsfit
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibs/cimg.pri)

@@ -26,7 +26,7 @@ CONFIG += plugin
 TARGET = qfrdrtable
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 include(../../libquickfitwidgets.pri)

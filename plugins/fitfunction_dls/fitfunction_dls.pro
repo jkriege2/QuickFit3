@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = fitfunctions_dls
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/gsl.pri)
 
 

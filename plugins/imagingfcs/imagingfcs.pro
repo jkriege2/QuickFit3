@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = imaging_fcs
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibs/lmfit.pri)

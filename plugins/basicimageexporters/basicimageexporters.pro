@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = exporters_basicimage
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 include(../../extlibs/zlib.pri)

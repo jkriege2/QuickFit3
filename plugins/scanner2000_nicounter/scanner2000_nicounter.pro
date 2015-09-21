@@ -26,7 +26,7 @@ DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/nidaqmx.pri)
 
 

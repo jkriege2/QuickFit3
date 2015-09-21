@@ -61,3 +61,4 @@ win32 {
 
 
 message(AUTOVERSIONING DONE IN $$PWD)
+

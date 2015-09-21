@@ -32,7 +32,7 @@ DEPENDPATH += ./
 
 LIBS += -lusb
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/usb1.0.pri)
 
 DESTDIR = $$QFOUTPUT/plugins

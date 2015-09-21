@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = fitfunction_general
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input

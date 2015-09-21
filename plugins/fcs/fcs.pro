@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = qfrdrfcs
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 DEFINES += TARGETNAME=$$TARGET
 

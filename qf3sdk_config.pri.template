@@ -1,0 +1,3 @@
+
+# let this point to the output directory of your QF3 installation:
+# QFOUTPUT = $$PWD../../$${OUTPUTDIR_NAME}

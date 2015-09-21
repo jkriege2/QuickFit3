@@ -24,7 +24,7 @@ CONFIG += plugin
 TARGET = fitalgorithm_levmar
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/levmar.pri)
 
 DESTDIR = $$QFOUTPUT/plugins

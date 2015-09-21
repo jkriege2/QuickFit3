@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = cam_radhard2
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/usb.pri)
 
 DESTDIR = $$QFOUTPUT/plugins

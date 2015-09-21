@@ -340,11 +340,7 @@ plg_cam_server.depends = lib libqf3widgets
     }
 }
 
-RESOURCES += \
-    ../lib/lib.qrc
 
-DISTFILES += \
-    quickfit3.supp
 
 
 # if you have custom plugins, add them to a file userplugins.inc:

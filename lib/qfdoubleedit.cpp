@@ -256,7 +256,7 @@ void QFDoubleEdit::focusOutEvent ( QFocusEvent * event ) {
 void QFDoubleEdit::keyPressEvent ( QKeyEvent * event )  {
     //std::cout<<"key="<<event->key()<<"   modifiers="<<event->modifiers()<<std::endl;
     if  ((event->modifiers()==Qt::NoModifier)&&((event->key()==44) || (event->key()==46) || (event->key()==Qt::Key_Comma) || (event->key()==Qt::Key_Period))) { // convert '.' and ',' to the current locle's decimal point!
-        QKeyEvent key;
+        QKeyEvent key=QKeyEvent(QEvent::KeyPress, 0, event->modifiers(), QString(QLocale::system().decimalPoint()));
         if (QLocale::system().decimalPoint()=='.') key=QKeyEvent(QEvent::KeyPress, Qt::Key_Period, event->modifiers(), QString("."));
         else if (QLocale::system().decimalPoint()==',') key=QKeyEvent(QEvent::KeyPress, Qt::Key_Comma, event->modifiers(), QString(","));
         else key=QKeyEvent(QEvent::KeyPress, 0, event->modifiers(), QString(QLocale::system().decimalPoint()));

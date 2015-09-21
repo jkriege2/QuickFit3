@@ -1,3 +1,4 @@
+
 #
 #    Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 #	
@@ -19,43 +20,34 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-TEMPLATE = lib
-CONFIG += plugin
+# NOTE: This shouldn't be built as a SHADOW build
+!equals(PWD, $${OUT_PWD}) {
+    warning(This project should not be built as a shadow build!!!)
+}
 
-TARGET = cam_server
-DEFINES += TARGETNAME=$$TARGET
-DEPENDPATH += ./
-
-include(../../qf3plugins.pri)
-include(../../libquickfitwidgets.pri)
-
-DESTDIR = $${QFOUTPUT}/plugins/
+include("quickfit3.pri")
 
 
-# Input
-HEADERS += qfecamserver.h \
-           ../interfaces/qfextensioncamera.h \
-    ../interfaces/qfextensionmeasurementdevice.h
-
-SOURCES += qfecamserver.cpp
-
-FORMS =
-
-RESOURCES += qfecamserver.qrc
-
-TRANSLATIONS= ./translations/de.cam_server.ts
-
-INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/
-include(../../quickfit3_configqtwidgets.pri)
+CONFIG(release, debug|release):message("building QuickFit in RELEASE mode")
+CONFIG(debug, debug|release):message("building QuickFit in DEBUG mode")
 
 
-EXAMPLESTINYTIFF_FILES.files = ../../extlibsb040/TinyTIFF/*.*
-EXAMPLESTINYTIFF_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
-EXAMPLESHIGHRESTIMER_FILES.files = ../../lib/highrestimer.* ../../lib/lib_imexport.h
-EXAMPLESHIGHRESTIMER_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
+TEMPLATE = subdirs
+
+# if you have custom plugins, add them to a file userplugins.inc:
+# with syntax, e.g. as:
+#
+# SUBDIRS += plg_mypluginname
+# plg_mypluginname.subdir=./plugins/myplugin
+# plg_mypluginname.depends = lib libqf3widgets
+exists(userplugins.inc):include(userplugins.inc)
 
 
-INSTALLS += EXAMPLESTINYTIFF_FILES EXAMPLESHIGHRESTIMER_FILES
 
+
+RESOURCES += \
+    ../lib/lib.qrc
+
+DISTFILES += \
+    quickfit3.supp
 

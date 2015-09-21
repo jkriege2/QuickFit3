@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = fit_nlopt
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/nlopt.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
