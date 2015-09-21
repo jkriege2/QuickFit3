@@ -100,20 +100,29 @@ INSTALLER_BASENAME=quickfit3_win32${SPECIALS}_${SVNVER}
 INSTALLER_INSTDIR="\$PROGRAMFILES32"
 ZIPFILE=quickfit3_win32${SPECIALS}_${SVNVER}.zip
 ZIPFILESPIM=quickfit3_win32${SPECIALS}_spimplugins_${SVNVER}.zip
+ZIPFILEFCS=quickfit3_win32${SPECIALS}_fcsplugins_${SVNVER}.zip
+ZIPFILEIMFCS=quickfit3_win32${SPECIALS}_imfcsplugins_${SVNVER}.zip
+ZIPFILEMICROSCOPY=quickfit3_win32${SPECIALS}_microscopyplugins_${SVNVER}.zip
 ZIPFILESPECIAL=quickfit3_win32${SPECIALS}_special_${SVNVER}.zip
 if [ "${BITDEPTH}" == "64" ]; then
 	INSTALLER_INSTDIR="\$PROGRAMFILES64"
 	INSTALLER_BASENAME=quickfit3_win64${SPECIALS}_${SVNVER}
 	ZIPFILE=quickfit3_win64${SPECIALS}_${SVNVER}.zip
 	ZIPFILESPIM=quickfit3_win64${SPECIALS}_spimplugins_${SVNVER}.zip
+	ZIPFILEFCS=quickfit3_win64${SPECIALS}_fcsplugins_${SVNVER}.zip
+	ZIPFILEIMFCS=quickfit3_win64${SPECIALS}_imfcsplugins_${SVNVER}.zip
 	ZIPFILESPECIAL=quickfit3_win64${SPECIALS}_special_${SVNVER}.zip
+	ZIPFILEMICROSCOPY=quickfit3_win64${SPECIALS}_microscopyplugins_${SVNVER}.zip
 fi
+FCSPLUGINS=" fcs fccsfit fcsfit fcs_fitfuctions fcsmsdevaluation fitfunction_2ffcs fitfunction_dls fitfunction_fccs fitfunction_fcsdistribution fitfunction_spimfcs fitfunction_tirfcs importers_simpletcspcimporter photoncounts picoquantimporters qffcsmaxentevaluation tcspcimporter"
+IMFCSPLUGINS=" imagingfcs imfccsfit imfcsfit numberandbrightness"
+MICROSCOPYPLUGINS=" qfevalbeadscanpsf qfevalcolocalization qfevalcameracalibration fitfunctions_lightsheet spim_lightsheet_eval "
 SPIMPLUGINS=" cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino filterc_test cam_systemcam filterc_tmcl lights_b040laserbox lights_pccsled lights_coboltlaser stage_pi863_2 meas_b040resheater lights_coboltlaser servo_pololu_maestro shutter_relais_arduino"
 SPECIALPLUGINS=""
 if [ "${deployspecials}" == "1" ]; then
 	SPECIALPLUGINS=
 fi
-REMOVEPLUGINS=" ${SPECIALPLUGINS} ${SPIMPLUGINS} cam_radhard2 cam_rh2v2  b040_ffmcontrol alv_autocorrelator5000 multicontrol_stage qfe_acquisitiontest scanner2000_nicounter"
+REMOVEPLUGINS=" ${SPECIALPLUGINS} ${SPIMPLUGINS} ${FCSPLUGINS} ${IMFCSPLUGINS} ${MICROSCOPYPLUGINS} cam_radhard2 cam_rh2v2  b040_ffmcontrol alv_autocorrelator5000 multicontrol_stage qfe_acquisitiontest scanner2000_nicounter"
 SPIMONLYQTMODULES=" QtScript4.dll QtScriptTools4.dll Qt5Script.dll Qt5ScriptTools.dll"
 SPECIALONLYQTMODULES=""
 
@@ -122,11 +131,19 @@ if [ "${create_deploy}" != "0" ]; then
 
 	rm -rf deploy
 	rm -rf deployspim
+	rm -rf deployfcs
+	rm -rf deployimfcs
 	rm -rf deployspecial
 	cp ${ZIPFILE} "${ZIPFILE}.backup"
 	rm ${ZIPFILE}
 	cp ${ZIPFILESPIM} "${ZIPFILESPIM}.backup"
 	rm ${ZIPFILESPIM}
+	cp ${ZIPFILEFCS} "${ZIPFILEFCS}.backup"
+	rm ${ZIPFILEFCS}
+	cp ${ZIPFILEIMFCS} "${ZIPFILEIMFCS}.backup"
+	rm ${ZIPFILEIMFCS}
+	cp ${ZIPFILEMICROSCOPY} "${ZIPFILEMICROSCOPY}.backup"
+	rm ${ZIPFILEMICROSCOPY}
 	cp ${ZIPFILESPECIAL} "${ZIPFILESPECIAL}.backup"
 	rm ${ZIPFILESPECIAL}
 
@@ -226,6 +243,43 @@ if [ "${create_deploy}" != "0" ]; then
 	mkdir ../deployspim/assets/plugins
 	mkdir ../deployspim/assets/plugins/help
 
+	mkdir ../deployfcs
+	mkdir ../deployfcs/plugins
+	mkdir ../deployfcs/fitfunctionplugins
+	mkdir ../deployfcs/globalconfig_templates
+	mkdir ../deployfcs/source
+	mkdir ../deployfcs/assets
+	mkdir ../deployfcs/sdk
+	mkdir ../deployfcs/sdk/fitfunctions/
+	mkdir ../deployfcs/examples
+	mkdir ../deployfcs/assets/plugins
+	mkdir ../deployfcs/assets/plugins/help
+
+	mkdir ../deployimfcs
+	mkdir ../deployimfcs/plugins
+	mkdir ../deployimfcs/fitfunctionplugins
+	mkdir ../deployimfcs/globalconfig_templates
+	mkdir ../deployimfcs/source
+	mkdir ../deployimfcs/assets
+	mkdir ../deployimfcs/sdk
+	mkdir ../deployimfcs/sdk/fitfunctions/
+	mkdir ../deployimfcs/examples
+	mkdir ../deployimfcs/assets/plugins
+	mkdir ../deployimfcs/assets/plugins/help
+
+
+	mkdir ../deploymicroscopy
+	mkdir ../deploymicroscopy/plugins
+	mkdir ../deploymicroscopy/fitfunctionplugins
+	mkdir ../deploymicroscopy/globalconfig_templates
+	mkdir ../deploymicroscopy/source
+	mkdir ../deploymicroscopy/assets
+	mkdir ../deploymicroscopy/sdk
+	mkdir ../deploymicroscopy/sdk/fitfunctions/
+	mkdir ../deploymicroscopy/examples
+	mkdir ../deploymicroscopy/assets/plugins
+	mkdir ../deploymicroscopy/assets/plugins/help
+
 	mkdir ../deployspecial
 	mkdir ../deployspecial/plugins
 	mkdir ../deployspecial/fitfunctionplugins
@@ -237,10 +291,16 @@ if [ "${create_deploy}" != "0" ]; then
 	mkdir ../deployspecial/assets/plugins/help
 	mkdir ../deployspecial/sdk/fitfunctions/
 
+	cp -rf ./sdk/fitfunctions/* ../deployfcs/sdk/fitfunctions
+	cp -rf ./sdk/fitfunctions/* ../deployimfcs/sdk/fitfunctions
 	cp -rf ./sdk/fitfunctions/* ../deployspim/sdk/fitfunctions
 	cp -rf ./sdk/fitfunctions/* ../deployspecial/sdk/fitfunctions
+	cp -rf ./sdk/fitfunctions/* ../deploymicroscopy/sdk/fitfunctions
+	cp -rf ./globalconfig_templates/* ../deployfcs/globalconfig_templates
+	cp -rf ./globalconfig_templates/* ../deployimfcs/globalconfig_templates
 	cp -rf ./globalconfig_templates/* ../deployspim/globalconfig_templates
 	cp -rf ./globalconfig_templates/* ../deployspecial/globalconfig_templates
+	cp -rf ./globalconfig_templates/* ../deploymicroscopy/globalconfig_templates
 	for f in $SPIMONLYQTMODULES
 	do
 		cp -rf "../${f}" ../deployspim
@@ -254,15 +314,44 @@ if [ "${create_deploy}" != "0" ]; then
 		mkdir "../deployspim/assets/plugins/${f}"
 		mkdir "../deployspim/assets/plugins/help/${f}"
 		cp -rf  "./assets/plugins/${f}" "../deployspim/assets/plugins/"
-		cp -rf  "./examples/${f}" "../deployspecial/examples/"
+		cp -rf  "./examples/${f}" "../deployspim/examples/"
 		cp -rf  "./assets/plugins/help/${f}" "../deployspim/assets/help/plugins/"
 		find -name "${f}.*" -exec cp -rf "{}" "../deployspim/{}" \;
+	done
+
+	for f in $FCSPLUGINS
+	do
+		mkdir "../deployfcs/assets/plugins/${f}"
+		mkdir "../deployfcs/assets/plugins/help/${f}"
+		cp -rf  "./assets/plugins/${f}" "../deployfcs/assets/plugins/"
+		cp -rf  "./examples/${f}" "../deployfcs/examples/"
+		cp -rf  "./assets/plugins/help/${f}" "../deployfcs/assets/help/plugins/"
+		find -name "${f}.*" -exec cp -rf "{}" "../deployfcs/{}" \;
+	done
+
+	for f in $IMFCSPLUGINS
+	do
+		mkdir "../deployimfcs/assets/plugins/${f}"
+		mkdir "../deployimfcs/assets/plugins/help/${f}"
+		cp -rf  "./assets/plugins/${f}" "../deployimfcs/assets/plugins/"
+		cp -rf  "./examples/${f}" "../deployimfcs/examples/"
+		cp -rf  "./assets/plugins/help/${f}" "../deployimfcs/assets/help/plugins/"
+		find -name "${f}.*" -exec cp -rf "{}" "../deployimfcs/{}" \;
+	done
+
+	for f in $MICROSCOPYPLUGINS
+	do
+		mkdir "../deploymicroscopy/assets/plugins/${f}"
+		mkdir "../deploymicroscopy/assets/plugins/help/${f}"
+		cp -rf  "./assets/plugins/${f}" "../deploymicroscopy/assets/plugins/"
+		cp -rf  "./examples/${f}" "../deploymicroscopy/examples/"
+		cp -rf  "./assets/plugins/help/${f}" "../deploymicroscopy/assets/help/plugins/"
+		find -name "${f}.*" -exec cp -rf "{}" "../deploymicroscopy/{}" \;
 	done
 
 	for f in $SPECIALPLUGINS
 	do
 		mkdir "../deployspecial/assets/plugins/${f}"
-		mkdir "../deployspecial/examples/${f}"
 		mkdir "../deployspecial/assets/plugins/help/${f}"
 		cp -rf  "./assets/plugins/${f}" "../deployspecial/assets/plugins/"
 		cp -rf  "./examples/${f}" "../deployspecial/examples/"
@@ -320,6 +409,15 @@ if [ "${createZIP}" != "0" ]; then
 	cd deployspim
 	zip -rv9 ../${ZIPFILESPIM} *
 	cd ..
+	cd deployfcs
+	zip -rv9 ../${ZIPFILEFCS} *
+	cd ..
+	cd deployimfcs
+	zip -rv9 ../${ZIPFILEIMFCS} *
+	cd ..
+	cd deploymicroscopy
+	zip -rv9 ../${ZIPFILEMICROSCOPY} *
+	cd ..
 	cd deployspecial
 	zip -rv9 ../${ZIPFILESPECIAL} *
 	cd ..
@@ -374,6 +472,75 @@ CreateDirectory  \"\$INSTDIR\\$fn\""
 done
 cd ..
 
+cd deployfcs
+FCSINSTALLER_FILES=
+FCSUNINSTALLER_FILES=
+for f in `find . -type f`
+do
+    fn=${f//\//\\\\}
+	fn=${fn//.\\\\/}
+    FCSINSTALLER_FILES="${FCSINSTALLER_FILES}\\
+File \"\\/oname=$fn\" \"$fn\""
+    FCSUNINSTALLER_FILES="${FCSUNINSTALLER_FILES}\\
+Delete \\/REBOOTOK \"\$INSTDIR\\\\$fn\""
+done
+FCSINSTALLER_DIRS=
+for f in `find . -type d`
+do
+    fn=${f//\//\\\\}
+	fn=${fn//.\\/}
+    FCSINSTALLER_DIRS="${FCSINSTALLER_DIRS}\\
+CreateDirectory  \"\$INSTDIR\\$fn\""
+    
+done
+cd ..
+
+cd deployimfcs
+IMFCSINSTALLER_FILES=
+IMFCSUNINSTALLER_FILES=
+for f in `find . -type f`
+do
+    fn=${f//\//\\\\}
+	fn=${fn//.\\\\/}
+    IMFCSINSTALLER_FILES="${IMFCSINSTALLER_FILES}\\
+File \"\\/oname=$fn\" \"$fn\""
+    IMFCSUNINSTALLER_FILES="${IMFCSUNINSTALLER_FILES}\\
+Delete \\/REBOOTOK \"\$INSTDIR\\\\$fn\""
+done
+IMFCSINSTALLER_DIRS=
+for f in `find . -type d`
+do
+    fn=${f//\//\\\\}
+	fn=${fn//.\\/}
+    IMFCSINSTALLER_DIRS="${IMFCSINSTALLER_DIRS}\\
+CreateDirectory  \"\$INSTDIR\\$fn\""
+    
+done
+cd ..
+
+cd deploymicroscopy
+MICROSCOPYINSTALLER_FILES=
+MICROSCOPYUNINSTALLER_FILES=
+for f in `find . -type f`
+do
+    fn=${f//\//\\\\}
+	fn=${fn//.\\\\/}
+    MICROSCOPYINSTALLER_FILES="${MICROSCOPYINSTALLER_FILES}\\
+File \"\\/oname=$fn\" \"$fn\""
+    MICROSCOPYUNINSTALLER_FILES="${MICROSCOPYUNINSTALLER_FILES}\\
+Delete \\/REBOOTOK \"\$INSTDIR\\\\$fn\""
+done
+MICROSCOPYINSTALLER_DIRS=
+for f in `find . -type d`
+do
+    fn=${f//\//\\\\}
+	fn=${fn//.\\/}
+    MICROSCOPYINSTALLER_DIRS="${MICROSCOPYINSTALLER_DIRS}\\
+CreateDirectory  \"\$INSTDIR\\$fn\""
+    
+done
+cd ..
+
 echo $SPIMINSTALLER_FILES
 echo $SPIMUNINSTALLER_FILES
 echo $SPIMINSTALLER_DIRS
@@ -392,6 +559,36 @@ ls -l *.~*
 sed "s/%%SPIMINSTALLER_DIRS%%/$SPIMINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
+
+sed "s/%%FCSINSTALLER_FILES%%/$FCSINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+sed "s/%%FCSUNINSTALLER_FILES%%/$FCSUNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+sed "s/%%FCSINSTALLER_DIRS%%/$FCSINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+sed "s/%%IMFCSINSTALLER_FILES%%/$IMFCSINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+sed "s/%%IMFCSUNINSTALLER_FILES%%/$IMFCSUNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+sed "s/%%IMFCSINSTALLER_DIRS%%/$IMFCSINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+
+sed "s/%%MICROSCOPYINSTALLER_FILES%%/$MICROSCOPYINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+sed "s/%%MICROSCOPYUNINSTALLER_FILES%%/$MICROSCOPYUNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+sed "s/%%MICROSCOPYINSTALLER_DIRS%%/$MICROSCOPYINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+
 sed "s/%%INSTALLER_INSTDIR%%/$INSTALLER_INSTDIR/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
@@ -437,8 +634,14 @@ if [ "${delete_deploy}" != "0" ]; then
 
 	rm -rf deploy
 	rm -rf deployspim
+	rm -rf deployfcs
+	rm -rf deployimfcs
+	rm -rf deploymicroscopy
 	rm -rf deployspecial
 	rm "${ZIPFILE}.backup"
 	rm "${ZIPFILESPIM}.backup"
+	rm "${ZIPFILEFCS}.backup"
+	rm "${ZIPFILEIMFCS}.backup"
+	rm "${ZIPFILEMICROSCOPY}.backup"
 	rm "${ZIPFILESPECIAL}.backup"
 fi

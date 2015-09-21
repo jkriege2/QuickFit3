@@ -16,7 +16,7 @@ RequestExecutionLevel admin
 
 # Set some basic installer properties
 Name "${PRODUCT_NAME}"
-BrandingText "Copyright (c) 2013 by Jan W. Krieger (German Cancer research Center - DKFZ)"
+BrandingText "Copyright (c) 2013-2015 by Jan W. Krieger (German Cancer research Center - DKFZ)"
 ShowInstDetails show
 ShowUninstDetails show
 SetCompressor /FINAL  LZMA 
@@ -205,7 +205,59 @@ SectionEnd
 
 
 
-# This installs the SPIM plugins
+# This installs the FCS plugins
+Section "FCS/FCCS Plugins" sec_fcs
+	Push $OUTDIR ; Store previous output directory
+	SetOutPath "$INSTDIR\" ; Set output directory
+	
+	# automatically created list of install files
+	%%FCSINSTALLER_DIRS%%
+	%%FCSINSTALLER_FILES%%
+	
+	# Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
+	 ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+	IntFmt $0 "0x%08X" $0
+	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "EstimatedSize" "$0"
+
+	Pop $OUTDIR ; Restore the original output directory
+SectionEnd
+
+# This installs the FCS plugins
+Section "imaging FCS/FCCS Plugins" sec_imfcs
+	Push $OUTDIR ; Store previous output directory
+	SetOutPath "$INSTDIR\" ; Set output directory
+	
+	# automatically created list of install files
+	%%IMFCSINSTALLER_DIRS%%
+	%%IMFCSINSTALLER_FILES%%
+	
+	# Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
+	 ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+	IntFmt $0 "0x%08X" $0
+	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "EstimatedSize" "$0"
+
+	Pop $OUTDIR ; Restore the original output directory
+SectionEnd
+
+# This installs the microscopy plugins
+Section "Microscopy Plugins (beadscan, colocalization, camera calibration ...)" sec_microscopy
+	Push $OUTDIR ; Store previous output directory
+	SetOutPath "$INSTDIR\" ; Set output directory
+	
+	# automatically created list of install files
+	%%MICROSCOPYINSTALLER_DIRS%%
+	%%MICROSCOPYINSTALLER_FILES%%
+	
+	# Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
+	 ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+	IntFmt $0 "0x%08X" $0
+	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "EstimatedSize" "$0"
+
+	Pop $OUTDIR ; Restore the original output directory
+SectionEnd
+
+
+# This installs the SPIM conrol plugins
 Section "Microscope Control Plugins (SPIM...)" sec_spim
 	Push $OUTDIR ; Store previous output directory
 	SetOutPath "$INSTDIR\" ; Set output directory
@@ -258,8 +310,12 @@ function .onInit
 	  IntOp $0 ${SF_SELECTED} | ${SF_RO}
 	  IntOp $0 $0 | ${SF_BOLD}
 	  IntOp $1 ${SF_SELECTED} | ${SF_BOLD}
+	  IntOp $2 ${SF_SELECTED}
       SectionSetFlags ${sec_main} $0
       SectionSetFlags ${sec_assoc} $1
+      SectionSetFlags ${sec_fcs} $1
+      SectionSetFlags ${sec_imfcs} $1
+      SectionSetFlags ${sec_microscopy} $1
       SectionSetFlags ${sec_spim} 0
 
 functionEnd
@@ -297,6 +353,9 @@ Section "un.${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_un_main
 
 	# automatically created list of install files
 	%%SPIMUNINSTALLER_FILES%%
+	%%FCSUNINSTALLER_FILES%%
+	%%IMFCSUNINSTALLER_FILES%%
+	%%MICROSCOPYUNINSTALLER_FILES%%
 	%%UNINSTALLER_FILES%%
 	RMDir /REBOOTOK "$SMPROGRAMS${COMPANY_NAME}"
 	
