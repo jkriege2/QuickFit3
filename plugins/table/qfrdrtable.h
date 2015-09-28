@@ -38,6 +38,7 @@
 #include <QMultiMap>
 #include "datatools.h"
 #include "qffitalgorithmparameterstorage.h"
+#include "qfrdrcurvesinterface.h"
 class QFRDRTableEditor; // forward
 
 /*! \brief this class is used to manage a table of values (strings/numbers)
@@ -46,9 +47,9 @@ class QFRDRTableEditor; // forward
     The data is stored in a QFTablePluginModel object which is also externally accessible for data access.
  */
 
-class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QFRDRColumnGraphsInterface, public QFFitAlgorithmParameterStorage {
+class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QFRDRColumnGraphsInterface, public QFFitAlgorithmParameterStorage, public QFRDRCurvesInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRTableInterface QFRDRColumnGraphsInterface)
+        Q_INTERFACES(QFRDRTableInterface QFRDRColumnGraphsInterface QFRDRCurvesInterface)
     public:
         enum {
             TableExpressionRole = Qt::UserRole+1,
@@ -398,6 +399,10 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
             QMap<QString, QVariant> moreProperties;
 
+            QFRDRCurvesInterface::CurveType getCurvesCurveType() const;
+            bool isCurvesCurve() const;
+
+
         };
 
         struct GraphDataSelection {
@@ -644,6 +649,19 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual bool colgraphGetPlotYAxisLog(int plot);
         virtual void colgraphSetColorPalette(int plotid, int graphid, ImageColorPalette palette);
         void colgraphToolsSetGraphtype(QFRDRTable::GraphInfo& g, QFRDRColumnGraphsInterface::ColumnGraphTypes type);
+
+
+        virtual int curvesGetCount() const;
+        virtual QString curvesGetName(int index) const;
+        virtual QVector<double> curvesGetX(int index) const;
+        virtual QVector<double> curvesGetXError(int index) const;
+        virtual QVector<double> curvesGetY(int index) const;
+        virtual QVector<double> curvesGetYError(int index) const;
+        virtual bool curvesGetLogX(int index) const;
+        virtual bool curvesGetLogY(int index) const;
+        virtual CurveType curvesGetType(int index) const;
+        virtual QString curvesGetXLabel(int index) const;
+        virtual QString curvesGetYLabel(int index) const;
 
 
         int getPlotCount() const;

@@ -153,6 +153,49 @@ QFRDRTable::GraphInfo::GraphInfo() {
     yerrorcolumnlower=-1;
 }
 
+QFRDRCurvesInterface::CurveType QFRDRTable::GraphInfo::getCurvesCurveType() const
+{
+    switch(type) {
+        case QFRDRTable::gtLines:
+        case QFRDRTable::gtParametrizedScatter:
+            if (drawLine) return QFRDRCurvesInterface::ctLines;
+            else return QFRDRCurvesInterface::ctPoints;
+        case QFRDRTable::gtFilledCurveX:
+        case QFRDRTable::gtFilledCurveY:
+            return QFRDRCurvesInterface::ctLines;
+        case QFRDRTable::gtImpulsesVertical:
+        case QFRDRTable::gtImpulsesHorizontal:
+        case QFRDRTable::gtStepsHorizontal:
+        case QFRDRTable::gtStepsVertical:
+        case QFRDRTable::gtBarsHorizontal:
+        case QFRDRTable::gtBarsVertical:
+            return QFRDRCurvesInterface::ctBars;
+        default:
+            return QFRDRCurvesInterface::ctPoints;
+    }
+    return QFRDRCurvesInterface::ctPoints;
+}
+
+bool QFRDRTable::GraphInfo::isCurvesCurve() const
+{
+    switch(type) {
+        case QFRDRTable::gtLines:
+        case QFRDRTable::gtParametrizedScatter:
+        case QFRDRTable::gtFilledCurveX:
+        case QFRDRTable::gtFilledCurveY:
+        case QFRDRTable::gtImpulsesVertical:
+        case QFRDRTable::gtImpulsesHorizontal:
+        case QFRDRTable::gtStepsHorizontal:
+        case QFRDRTable::gtStepsVertical:
+        case QFRDRTable::gtBarsHorizontal:
+        case QFRDRTable::gtBarsVertical:
+            return true;
+        default:
+            return false;
+    }
+    return false;
+}
+
 QFRDRTable::AxisInfo::AxisInfo()
 {
     label="x";
@@ -906,6 +949,191 @@ void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumn
             g.symbol=JKQTPnoSymbol;
             break;
     }
+}
+
+int QFRDRTable::curvesGetCount() const
+{
+    int cnt=0;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                cnt++;
+            }
+        }
+    }
+    return cnt;
+}
+
+QString QFRDRTable::curvesGetName(int index) const
+{
+    int cnt=0;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                if (cnt==index) return plots[i].graphs[j].title;
+                cnt++;
+            }
+        }
+    }
+    return QString();
+}
+
+QVector<double> QFRDRTable::curvesGetX(int index) const
+{
+    int cnt=0;
+    QVector<double> dat;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                if (cnt==index) {
+                    QFRDRTable::GraphDataSelection sel;
+                    sel=plots[i].graphs[j];
+                    if (!sel.getDataWithStride(&dat, NULL, plots[i].graphs[j].xcolumn, this, NULL, NULL)) {
+                        dat.clear();
+                    }
+                    return dat;
+                }
+                cnt++;
+            }
+        }
+    }
+    return dat;
+}
+
+QVector<double> QFRDRTable::curvesGetXError(int index) const
+{
+    int cnt=0;
+    QVector<double> dat;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                if (cnt==index) {
+                    QFRDRTable::GraphDataSelection sel;
+                    sel=plots[i].graphs[j];
+                    if (!sel.getDataWithStride(&dat, NULL, plots[i].graphs[j].xerrorcolumn, this, NULL, NULL)) {
+                        dat.clear();
+                    }
+                    return dat;
+                }
+                cnt++;
+            }
+        }
+    }
+    return dat;
+}
+
+QVector<double> QFRDRTable::curvesGetY(int index) const
+{
+    int cnt=0;
+    QVector<double> dat;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                if (cnt==index) {
+                    QFRDRTable::GraphDataSelection sel;
+                    sel=plots[i].graphs[j];
+                    if (!sel.getDataWithStride(&dat, NULL, plots[i].graphs[j].ycolumn, this, NULL, NULL)) {
+                        dat.clear();
+                    }
+                    return dat;
+                }
+                cnt++;
+            }
+        }
+    }
+    return dat;
+}
+
+QVector<double> QFRDRTable::curvesGetYError(int index) const
+{
+    int cnt=0;
+    QVector<double> dat;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                if (cnt==index) {
+                    QFRDRTable::GraphDataSelection sel;
+                    sel=plots[i].graphs[j];
+                    if (!sel.getDataWithStride(&dat, NULL, plots[i].graphs[j].yerrorcolumn, this, NULL, NULL)) {
+                        dat.clear();
+                    }
+                    return dat;
+                }
+                cnt++;
+            }
+        }
+    }
+    return dat;
+}
+
+bool QFRDRTable::curvesGetLogX(int index) const
+{
+    int cnt=0;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                if (cnt==index) return plots[i].xAxis.log;
+                cnt++;
+            }
+        }
+    }
+    return false;
+}
+
+bool QFRDRTable::curvesGetLogY(int index) const
+{
+    int cnt=0;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                if (cnt==index) return plots[i].yAxis.log;
+                cnt++;
+            }
+        }
+    }
+    return false;
+}
+
+QFRDRCurvesInterface::CurveType QFRDRTable::curvesGetType(int index) const
+{
+    int cnt=0;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                if (cnt==index) return plots[i].graphs[j].getCurvesCurveType();
+                cnt++;
+            }
+        }
+    }
+    return QFRDRCurvesInterface::ctPoints;
+}
+
+QString QFRDRTable::curvesGetXLabel(int index) const
+{
+    int cnt=0;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                if (cnt==index) return plots[i].xAxis.label;
+                cnt++;
+            }
+        }
+    }
+    return QString("x");
+}
+
+QString QFRDRTable::curvesGetYLabel(int index) const
+{
+    int cnt=0;
+    for (int i=0; i<plots.size(); i++) {
+        for (int j=0; j<plots[i].graphs.size(); j++) {
+            if (plots[i].graphs[j].isCurvesCurve()) {
+                if (cnt==index) return plots[i].yAxis.label;
+                cnt++;
+            }
+        }
+    }
+    return QString("y");
 }
 
 int QFRDRTable::colgraphAddGraph(int plotid, int columnX, int columnY, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title)
