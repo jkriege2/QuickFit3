@@ -290,8 +290,8 @@ bool QFSerialConnection::open() {
   unixPortHandle = ::open(port.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
   if (unixPortHandle<0) {
       errorOccured=true;
-      lastError="unable to open port '"+port+"'";
-      return false; /* Fehler beim �ffnen der Schnittstelle ist aufgetreten */
+      lastError="unable to open port '"+port+"', error "+inttostr(unixPortHandle)+": "+std::string(strerror(unixPortHandle));
+      return false; /* Fehler beim oeffnen der Schnittstelle ist aufgetreten */
   }
   //std::cout<<"port oppened\n";
   fcntl(unixPortHandle, F_SETFL, 0);
