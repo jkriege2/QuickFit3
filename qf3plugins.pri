@@ -34,7 +34,9 @@ INCLUDEPATH += $$PWD/lib/ \
                $$PWD/interfaces \
                $$PWD/base_classes \
                $$PWD/extlibs/ \
-               $$PWD/extlibs/StatisticsTools
+               $$PWD/extlibs/StatisticsTools \
+               $$PWD/plugins/interfaces \
+               $$PWD/plugins/base_classes
 
 
 MOC_DIR = ./.mocs/
