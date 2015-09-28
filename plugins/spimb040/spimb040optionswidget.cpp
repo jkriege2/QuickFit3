@@ -44,7 +44,7 @@ SPIMB040OptionsWidget::~SPIMB040OptionsWidget()
 void SPIMB040OptionsWidget::readSettings(ProgramOptions *options)
 {
     ui->edtOptSetupDir->setText(options->getConfigValue("spimb040/optsetup_directory", options->getGlobalConfigFileDirectory()).toString());
-    ui->edtOptSetupConfigDir->setText(options->getConfigValue("spimb040/optsetup_config_directory", options->getConfigFileDirectory()).toString());
+    ui->edtOptSetupConfigDir->setText(options->getConfigValue("spimb040/optsetup_config_directory", options->getConfigFileDirectory()+"/plugins/ext_spimb040/").toString());
     ui->edtOptSetupConfigDirReadonly->setText(options->getConfigValue("spimb040/optsetup_config_directory_readonly", options->getGlobalConfigFileDirectory()).toString());
     ui->cmbStyle->setCurrentIndex(ui->cmbStyle->findText(options->getConfigValue("spimb040/style", ProgramOptions::getInstance()->getStyle()).toString(), Qt::MatchExactly ));
     ui->cmbStylesheet->setCurrentIndex(ui->cmbStylesheet->findText(options->getConfigValue("spimb040/stylesheet", ProgramOptions::getInstance()->getStylesheet()).toString(), Qt::MatchExactly ));
