@@ -8,7 +8,7 @@
         $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
         $$invisibleref:GANSEN08:Gansen A  (2008) Chromatin at the Nanolevel. Dissertational Thesis. Available at: <a href="http://archiv.ub.uni-heidelberg.de/volltextserver/8342/1/Dissertation_Gansen.pdf">http://archiv.ub.uni-heidelberg.de/volltextserver/8342/1/Dissertation_Gansen.pdf</a> $$
         <h2>Introduction</h2>
-<h3>Burst Analysis</h3>
+<a name="burstanalysis"><h3>Burst Analysis</h3>
 <p>This tool allows to read data from single-photon counting (or time-correlated single-photon counting, TCSPC) experiments. Then it tries to detect fluorescence bursts from single molecules passing the focus of the microscope, used for detection. This analysis assumes that two detection channels ("green"/"red") are used. The intensities in these two channels can then be used to calculate FRET-properties of the observed molecules. For each such burst, several properties are measured:
 <ul>
     <li>when did the burst occur $(t_\text{burst})$</li>
@@ -35,7 +35,7 @@ $[E(r_{DA})=\frac{1}{1+\left(\frac{r_{DA}}{R_0}\right)^6}]$
 </p>
 
 
-<h3>Burst Search</h3>
+<a name="burstsearch"><h3>Burst Search</h3>
 <p>In order to perform a burst analysis, the bursts have to be identified first. This is done by a search algorithm, which relies on the interphoton-time (IPT) $(\delta t_i)$ between two consecutive photons $(i)$ and $(i+1)$. Inside bursts, the photons are spaced more closely, than during section with background only. This can be seen in the following interphoton time trace:
 <center><a name="fretchen_pic001"><img src="./pic/fretchen_pic001.png" border="1">
 </center>
@@ -46,7 +46,7 @@ In this image, you can see three bursts, at approximately 1.04s, 1.23s and 1.46s
     <li>A burst has a maximum length of $(\Delta t_\text{burst-max})$</li>
 </ol>
 </p>
-<h3>LEE-Filtering</h3>
+<a name="leefilter"><h3>LEE-Filtering</h3>
 <p>
 The algorithm performance can be optimized, if the IPTs are filtered with a LEE-filter before applying the burst search. The LEE-filter smoothes out outlierst from the data. The IPT-trace above will look as follows if LEE-filtered:
 <center><a name="fretchen_pic002"><img src="./pic/fretchen_pic002.png" border="1">
@@ -59,8 +59,12 @@ $[\overline{\delta t}_i=\frac{1}{2m+1}\cdot\sum_{j=-m}^m\delta t_{i+j}]$
 $[\sigma_i^2=\frac{1}{2m+1}\cdot\sum_{j=-m}^m(\delta t_{i+j} - \overline{\delta t}_{i+j})^2.]$
 The LEE filter is then characterized by its two parameters:
 <ul>
-    <li>the window size $(2m+1)$</li>
-    <li>the parameter $(\sigma_0)$, which is usually set to $(\sigma_0=5\;\mathrm{ms})$.</li>
+    <li>the window size $(M_{LEE}=2m+1)$. The following image shows the influence of this parameter on the result of the filter:<center><a name="fretchen_pic011"><img src="./pic/fretchen_pic011.png" border="1">
+</center></li>
+    <li>the parameter $(\sigma_0)$, which is usually set to $(\sigma_0=5\;\mathrm{ms})$. This parameter has only a minor influence of the result of the filter:
+<center><a name="fretchen_pic012"><img src="./pic/fretchen_pic012.png" border="1">
+</center>
+</li>
 </ul>
 
 </p>
@@ -96,17 +100,115 @@ You can chhose how these are displayed on the top-right corner (red box) of the 
 </center>
 If you compare the countrate-trace and the IPT-trace, you can make out burst easily in each on. In the countrate, bursts show up as peaks, while in the IPT-trace they show up as groups of photons with low IPTs.
 </li>
-    <li>Now you can configure and perform the burst search.</li>
-    <li></li>
-    <li></li>
-    <li></li>
-    <li></li>
-    <li></li>
+    <li>Now you can configure and perform the burst search. This is done, as <a href="fretchel.html#burstsearch">described in the introduction</a>, i.e. by finding a stretch in the experiment, during which the interphoton time (IPT) for several photons is shorter than a pre-defined level. Here are two images that show the countrate trace and the correspinding (smoothed, see below) IPT-trace with a burst at $(t\approx41.22\mathrm{s})$:
+<center><a name="fretchen_pic009"><img src="./pic/fretchen_pic009.png" border="1">
+&nbsp;&nbsp;&nbsp;<a name="fretchen_pic010"><img src="./pic/fretchen_pic010.png" border="1">
+</center>
+The IPT-level is shown as a red line. The burst search is configure below the graphs:
+<center><a name="fretchen_pic013"><img src="./pic/fretchen_pic013.png" border="1">
+</center>
+ Set these parameters as follows:
+<ol>
+    <li>Define the settings of the LEE-filter that is used to smoothes the IPT. Typical settings with good results for confocal single-photon measurements (e.g. for spFRET) are a window-size of $(M_{LEE}=10-20\mathrm{photons})$ and $(\sigma_0=5\mathrm{ms})$. Here is a comparison of different settings of the major parameter $(M_{LEE})$:
+<center><a name="fretchen_pic011"><img src="./pic/fretchen_pic011.png" border="1">
+</center>
+Usually you can leave $(\sigma_0)$ at its preset $(\sigma_0=5\mathrm{ms})$, as there is only a minor influence of this value:
+<center><a name="fretchen_pic012"><img src="./pic/fretchen_pic012.png" border="1">
+</center>
+    <li>Now set the other parameters of the burst search: Depending on the expected brightness and speed of motion (diffusion coefficient) of your sample, you can set the minimum number of photons in a burst and the maximum burst duration. If a burst has too few photons it might be a particle that oly swiftly enters the focus and does not provide good statistics. If the burst is too long, chances are that this is a slow-moving aggregate, or a double-molecule event. FInally you should set the level of the IPT to a value that is well above the background level. This can easily be done by visual inspection of the IPT-plot with the level shown as red horizontal line.</li>
+    <li>When all settings are satisfactory, click on 
+    <center><a name="fretchen_pic014"><img src="./pic/fretchen_pic014.png" border="1">
+    </center>
+    Now the filter and burst search will be applied, the graph will be updated and below the editing widgets, the number of found bursts will be displayed:
+    <center><a name="fretchen_pic015"><img src="./pic/fretchen_pic015.png" border="1">
+    </center>
+    Also the last tab <b>"3. Burst Analysis"</b> will be activated.
+    </li>
+    <li>If you are not satisfied with the found bursts, repeat the steps above and click on
+    <center><a name="fretchen_pic014"><img src="./pic/fretchen_pic014.png" border="1">
+    </center> to update the results. </li>
+
+ </li>
 </ol>
+</li>
+    <li>Now switch to the last tab <b>"3. Burst Analysis"</b> which shows diverse histograms and correlation plots of the extracted properties of the bursts:
+    <center><a name="fretchen_pic016"><img src="./pic/fretchen_pic016.png" border="1">
+    </center>
+    </li>
+    <li>Here you can still filter the bursts for their countrate, which also helps to further exclude double-labeled, or double-moleucle events:
+    <center><a name="fretchen_pic017"><img src="./pic/fretchen_pic017.png" border="1">
+    </center>
+    <center><a name="fretchen_pic018"><img src="./pic/fretchen_pic018.png" border="1">
+    </center>
+    
+    </li>
+    <li> From the filtered data, several histograms can be caluated. These are shown at the top-left (1) and you can use the conmbobox (2) above the plot to select a different histogramming parameters:
+<center><a name="fretchen_pic019"><img src="./pic/fretchen_pic019.png" border="1">
+</center>
+Below the histogram plotter, you can set the parameters used to calculate the parameters for the histograms (e.g. background intensities for the proximity values, or crosstalk-factors for the FRET-efficiencies):
+<center><a name="fretchen_pic023"><img src="./pic/fretchen_pic023.png" border="1">
+</center>
+A click on "Apply" recalculates the histograms with the new parameters. $$note:The buttons <img src="./pic/fretchen_pic024.png" border="1"> next to the background edit widgets allow to set the background intensity to the given value, which was extracted from the buffer measurement, if one was applied!$$
+On the rhs of the window, a list of basic statistical figures about the sample is given (and updated after a click on "Apply"):
+<center><a name="fretchen_pic025"><img src="./pic/fretchen_pic025.png" border="1">
+</center>
+
+</li>
+    <li>Finally you can store the results, as tables, where each row is one burst and the columns contain the different burst parameters:
+    <center><a name="fretchen_pic020"><img src="./pic/fretchen_pic020.png" border="1">
+    </center>
+    This is done with the buttons
+    <center><a name="fretchen_pic021"><img src="./pic/fretchen_pic021.png" border="1">&nbsp;&nbsp;<a name="fretchen_pic022"><img src="./pic/fretchen_pic022.png" border="1">
+    </center>
+    These store the tables either to a <a href="$$plugin_info:help:table$$">table RDR</a> in the current project (including updatable histograms!), or to a data-file (e.g. CSV, Matlab or Excel).
+$$note:If you want to compare different settings of the analysis parameters, you can set the initial parameters and then store the results. Then set new parameters and store again. This way you get several tables in the project, or several files on the harddisk that you can compare. The previoulsy stored results will NOT be overwritten updates (autonatically).$$</li>
+</ol>
+
+
 </p>
 
 <h3>Multi-File Workflow</h3>
-<p>The basic usage of the tool works as follows
+<p>The burst analyzer also allows to summarize several files into one evaluation. To do so:
+<ol>
+    <li>Follow the steps above for the first file. When saving the results in the final step, use the button
+<center><a name="fretchen_pic026"><img src="./pic/fretchen_pic026.png" border="1">
+</center>
+Then a new list <b>Multi-File Store</b> will open on the rhs of the dialog:
+<center><a name="fretchen_pic027"><img src="./pic/fretchen_pic027.png" border="1">
+</center>
+This list is initialized with an entry for the current file and can be edited with the buttons above the list:
+<center><a name="fretchen_pic028"><img src="./pic/fretchen_pic028.png" border="1">
+</center>
+These allow to clear the list, delete the selected entry, or move the selected entry up or down.</li>
+<li>Return to the first tab <b>"1. File Selection"</b>, select a new "Input TCSPC file", set all other settings and load it with <center><a name="fretchen_pic005"><img src="./pic/fretchen_pic005.png" border="1">
+    </center> Then follow the rest of the evaluation steps, as for the first file until you can save the results. </li>
+    <li>Click on the button
+<center><a name="fretchen_pic026"><img src="./pic/fretchen_pic026.png" border="1">
+</center>
+again and a second entry will be added to the <b>Multi-File Store</b>:
+<center><a name="fretchen_pic029"><img src="./pic/fretchen_pic029.png" border="1">
+</center>
+Repeat these steps for all files that make up your measurement.
+</li>
+<li>Finally you can store a table with the properties of all bursts (and a numeric file-id in one column), by clicking on the buttons below the Multi-File Store list:
+<center><a name="fretchen_pic030"><img src="./pic/fretchen_pic030.png" border="1">
+</center>
+these will again create either a file with the table as CSV/Excel/Matlab/..., or a <a href="$$plugin_info:help:table$$">table RDR</a> in the current project (including updatable histograms!). The two check-boxes above the buttons allow to set whether:
+<ul>
+    <li>the bursts should be renumbered. If checked, each bursts receives a continuous numebr that is unique over all files, otherwise the burst enumeration restarts at 0 for each file.</li>
+    <li>a columne with a file-ID (as an integer number) should be added to the table (as alast column).</li>
+</ul></li>
+</ol>
+$$note:The histograms in the Burst-Analysis tab always only show the results of the current file, not the histograms over all files. To view these:
+<ol>
+    <li>Click on <img src="./pic/fretchen_pic031.png" border="1"> after evaluating all files</li>
+    <li>Double-click the new entry in the project:
+    <center><a name="fretchen_pic032"><img src="./pic/fretchen_pic032.png" border="1">
+    </center>
+    </li>
+    <li>In the table RDR-editor window, choose "Plots" and then the histogram you are interested in.</li>
+</ol>$$
+
 </p>
 
 <h2>References</h2>
