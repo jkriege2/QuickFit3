@@ -37,7 +37,7 @@ class SPIMB040OptionsWidget : public QFPluginOptionsWidget
         
     public:
         explicit SPIMB040OptionsWidget(QObject* pluginObject, QWidget *parent = 0);
-        ~SPIMB040OptionsWidget();
+        virtual ~SPIMB040OptionsWidget();
         
         /** \brief read the widget contents from the program options */
         void readSettings(ProgramOptions* options);

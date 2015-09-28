@@ -479,7 +479,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
 }
 
 void QFESPIMB040SampleStageConfig::createActions() {
-    std::cout<<">>>> createActions()\n";
+    qDebug()<<">>>> QFESPIMB040SampleStageConfig::createActions()\n";
     actConnectX=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect x-axis ..."), this);
     actConnectX->setCheckable(true);
     connect(actConnectX, SIGNAL(triggered()), this, SLOT(disConnectX()));

@@ -77,22 +77,22 @@ QString SPIMB040OptionsWidget::getStyle()
 }
 
 void SPIMB040OptionsWidget::on_cmbStylesheet_currentIndexChanged( int index ) {
-    QString fn=ui->cmbStylesheet->itemData(index).toString();
-    QFile f(fn);
-    QString qss="";
-    if (f.open(QFile::ReadOnly)) {
-        QTextStream s(&f);
-        qss=s.readAll();
-    }
-    this->setStyleSheet(qss);
+//    QString fn=ui->cmbStylesheet->itemData(index).toString();
+//    QFile f(fn);
+//    QString qss="";
+//    if (f.open(QFile::ReadOnly)) {
+//        QTextStream s(&f);
+//        qss=s.readAll();
+//    }
+//    this->setStyleSheet(qss);
 
     emit styleChanged(getStyle(), getStylesheet());
 }
 
 
 void SPIMB040OptionsWidget::on_cmbStyle_currentIndexChanged( const QString & text ) {
-    parentWidget()->setStyle(QStyleFactory::create(text));
-    parentWidget()->setPalette(parentWidget()->style()->standardPalette());
+//    parentWidget()->setStyle(QStyleFactory::create(text));
+//    parentWidget()->setPalette(parentWidget()->style()->standardPalette());
     emit styleChanged(getStyle(), getStylesheet());
 }
 

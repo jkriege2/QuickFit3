@@ -34,6 +34,7 @@ QFESPIMB040::QFESPIMB040(QObject* parent):
     QObject(parent)
 {
     main=NULL;
+    menuOptSetups=NULL;
 
 }
 
@@ -67,8 +68,8 @@ QIcon QFESPIMB040::pluginOptionsIcon() const
 QFPluginOptionsWidget *QFESPIMB040::createOptionsWidget(QWidget *parent)
 {
     SPIMB040OptionsWidget* wid= new SPIMB040OptionsWidget(this, parent);
-    connect(wid, SIGNAL(styleChanged(QString,QString)), this, SLOT(emitStyleChanged(QString,QString)));
-    connect(wid, SIGNAL(destroyed()), this, SLOT(updateFromConfig()));
+    //connect(wid, SIGNAL(styleChanged(QString,QString)), this, SLOT(emitStyleChanged(QString,QString)));
+    //connect(wid, SIGNAL(destroyed()), this, SLOT(updateFromConfig()));
     return wid;
 
 }
@@ -83,10 +84,12 @@ void QFESPIMB040::updateFromConfig()
     emitStyleChanged(ProgramOptions::getConfigValue("spimb040/style", ProgramOptions::getInstance()->getStyle()).toString(), ProgramOptions::getConfigValue("spimb040/stylesheet", ProgramOptions::getInstance()->getStylesheet()).toString());
 
     for (int i=0; i<actsOptSetups.size(); i++) {
-        menuOptSetups->removeAction(actsOptSetups[i]);
-        actsOptSetups[i]->deleteLater();
+        if (actsOptSetups[i]) {
+            if (menuOptSetups) menuOptSetups->removeAction(actsOptSetups[i]);
+            actsOptSetups[i]->deleteLater();
+        }
     }
-    menuOptSetups->clear();
+    if (menuOptSetups) menuOptSetups->clear();
 
     QStringList dirs;
     QString d;
@@ -119,9 +122,9 @@ void QFESPIMB040::updateFromConfig()
             act->setData(globalDir.absoluteFilePath(files[i]));
             connect(act, SIGNAL(triggered()), this, SLOT(startPluginNew()));
             actsOptSetups.append(act);
-            menuOptSetups->addAction(act);
+            if (menuOptSetups) menuOptSetups->addAction(act);
         }
-        menuOptSetups->addSeparator();
+        if (menuOptSetups) menuOptSetups->addSeparator();
     }
 }
 
