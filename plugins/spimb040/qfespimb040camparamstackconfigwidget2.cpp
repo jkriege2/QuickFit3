@@ -346,8 +346,9 @@ void QFESPIMB040CamParamStackConfigWidget2::on_btnSaveTemplate_clicked()
 {
     if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
     if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
-    QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
+    QString tdir=ProgramOptions::getInstance()->getConfigValue("spimb040/templates_directory", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
+    QDir().mkpath(tdir);
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", tdir).toString();
     QString filename=qfGetSaveFileName(this, tr("save as template ..."), dir, tr("camera parameter stack configuration (*.cpsc)"))    ;
     if (!filename.isEmpty()) {
         bool ok=true;
@@ -372,8 +373,9 @@ void QFESPIMB040CamParamStackConfigWidget2::on_btnLoadTemplate_clicked()
 {
     if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
     if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
-    QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
+    QString tdir=ProgramOptions::getInstance()->getConfigValue("spimb040/templates_directory", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
+    QDir().mkpath(tdir);
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", tdir).toString();
     QString filename=qfGetOpenFileName(this, tr("open template ..."), dir, tr("camera parameter stack configuration (*.cpsc)"))    ;
     if (!filename.isEmpty()) {
         QSettings set(filename, QSettings::IniFormat);
