@@ -132,6 +132,7 @@ void QFETCSPCImporterFretchen2::writeSettings()
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinHBinWidth,  "QFETCSPCImporterFretchen2/spinHBinWidth");
     ProgramOptions::setConfigQCheckBox( ui->chkLEE, "QFETCSPCImporterFretchen2/chkLEE");
     ProgramOptions::setConfigQCheckBox(ui->chkSHowFilteredIPT, "QFETCSPCImporterFretchen2/chkSHowFilteredIPT");
+    ProgramOptions::setConfigQCheckBox(ui->chkShowBursts, "QFETCSPCImporterFretchen2/chkShowBursts");
     ProgramOptions::setConfigQSpinBox(ui->spinMinBurstSize,  "QFETCSPCImporterFretchen2/spinMinBurstSize");
     ProgramOptions::setConfigQDoubleSpinBox(ui->spinDisplayLength, "QFETCSPCImporterFretchen2/spinDisplayLength");
     ProgramOptions::setConfigQComboBox(ui->cmbAnaHistMode,  "QFETCSPCImporterFretchen2/cmbAnaHistMode");
@@ -161,6 +162,7 @@ void QFETCSPCImporterFretchen2::readSettings()
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinHBinWidth,  "QFETCSPCImporterFretchen2/spinHBinWidth", 0.05);
     ProgramOptions::getConfigQCheckBox( ui->chkLEE, "QFETCSPCImporterFretchen2/chkLEE",true);
     ProgramOptions::getConfigQCheckBox(ui->chkSHowFilteredIPT, "QFETCSPCImporterFretchen2/chkSHowFilteredIPT", true);
+    ProgramOptions::getConfigQCheckBox(ui->chkShowBursts, "QFETCSPCImporterFretchen2/chkShowBursts", true);
     ProgramOptions::getConfigQSpinBox(ui->spinMinBurstSize,  "QFETCSPCImporterFretchen2/spinMinBurstSize", 60);
     ProgramOptions::getConfigQDoubleSpinBox(ui->spinDisplayLength, "QFETCSPCImporterFretchen2/spinDisplayLength", 500);
     ProgramOptions::getConfigWindowGeometry(this, "QFETCSPCImporterFretchen2/geometry");
