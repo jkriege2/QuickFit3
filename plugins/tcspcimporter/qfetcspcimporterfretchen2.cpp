@@ -483,6 +483,16 @@ int QFETCSPCImporterFretchen2::collectMultiData(QFDataExportTool &out, QFDataExp
     return 0;
 }
 
+void QFETCSPCImporterFretchen2::clearRanges()
+{
+    for (int i=0; i<plteRanges.size(); i++) {
+        if (plteRanges[i]) {
+            ui->pltTrace->deleteGraph(plteRanges[i], true);
+        }
+    }
+    plteRanges.clear();
+}
+
 void QFETCSPCImporterFretchen2::on_btnSaveMultiToProject_clicked()
 {
     QFDataExportTool out, outF;
@@ -780,7 +790,49 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
         ui->pltTrace->getYAxis()->set_logAxis(false);
     }
 
+    clearRanges();
     ui->pltTrace->zoomToFit();
+    if (ui->chkShowBursts->isChecked()) {
+        double tmin=ui->pltTrace->getXMin();
+        double tmax=ui->pltTrace->getXMax();
+        bool first=true;
+        for (int i=0; i<bursts.burstdata.size(); i++) {
+            double t0=bursts.burstdata[i].start;
+            double t1=t0+bursts.burstdata[i].duration;
+            QColor colrange("silver");
+            colrange.setAlphaF(0.5);
+
+            if ((t0>=tmin && t1<=tmax) || (t1>=tmin && t1<=tmax) || (t0>=tmin && t0<=tmax) || (t1>=tmin && t1<=tmax)) {
+                plteRanges.append(new JKQTPverticalRange(ui->pltTrace));
+                plteRanges.last()->set_fillColor(colrange);
+                plteRanges.last()->set_centerColor(colrange);
+                plteRanges.last()->set_color(colrange);
+                plteRanges.last()->set_plotCenterLine(false);
+                plteRanges.last()->set_rangeMin(t0);
+                plteRanges.last()->set_rangeMax(t1);
+                plteRanges.last()->set_rangeCenter((t0+t1)/2.0);
+                plteRanges.last()->set_plotRange(true);
+                plteRanges.last()->set_plotRangeLines(true);
+                plteRanges.last()->set_invertedRange(false);
+                plteRanges.last()->set_unlimitedSizeMin(true);
+                plteRanges.last()->set_unlimitedSizeMax(true);
+                if (first) {
+                    plteRanges.last()->set_title(tr("bursts"));
+                } else {
+                    plteRanges.last()->set_title(QString());
+                }
+
+                ui->pltTrace->addGraph(plteRanges.last());
+                first=false;
+            }
+        }
+        for (int i=0; i<plteRanges.size(); i++) {
+            ui->pltTrace->moveGraphBottom(plteRanges[i]);
+        }
+        ui->pltTrace->moveGraphTop(plteInterphotonTimes2);
+        ui->pltTrace->moveGraphTop(plteInterphotonTimes);
+    }
+
     ui->pltTrace->set_doDrawing(true);
     ui->pltTrace->update_plot();
     QApplication::restoreOverrideCursor();

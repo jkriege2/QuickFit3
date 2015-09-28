@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1013</width>
-    <height>599</height>
+    <height>651</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -494,75 +494,7 @@ p, li { white-space: pre-wrap; }
            </item>
            <item>
             <layout class="QGridLayout" name="gridLayout_2">
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="spinDisplayStart">
-               <property name="suffix">
-                <string> s</string>
-               </property>
-               <property name="decimals">
-                <number>1</number>
-               </property>
-               <property name="minimum">
-                <double>0.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>1000000000.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>display duration:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_2">
-               <property name="text">
-                <string>display position:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="spinDisplayLength">
-               <property name="suffix">
-                <string> ms</string>
-               </property>
-               <property name="decimals">
-                <number>1</number>
-               </property>
-               <property name="minimum">
-                <double>1.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>100000000000.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>100.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>500.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <spacer name="verticalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="6" column="0" colspan="2">
+             <item row="7" column="0" colspan="2">
               <widget class="QGroupBox" name="groupBox_2">
                <property name="minimumSize">
                 <size>
@@ -801,21 +733,7 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="cmbBurstSelPlotMode">
-               <item>
-                <property name="text">
-                 <string>interphoton time IPT</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>countrate</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="4" column="1">
+             <item row="5" column="1">
               <widget class="QDoubleSpinBox" name="spinDisplayBin">
                <property name="suffix">
                 <string> ms</string>
@@ -837,10 +755,102 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
+             <item row="5" column="0">
               <widget class="QLabel" name="label_44">
                <property name="text">
                 <string>countrate binning:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="spinDisplayStart">
+               <property name="suffix">
+                <string> s</string>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="minimum">
+                <double>0.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1000000000.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>display duration:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>display position:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="spinDisplayLength">
+               <property name="suffix">
+                <string> ms</string>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="minimum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100000000000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>500.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <spacer name="verticalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="cmbBurstSelPlotMode">
+               <item>
+                <property name="text">
+                 <string>interphoton time IPT</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>countrate</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QCheckBox" name="chkShowBursts">
+               <property name="text">
+                <string>highlight bursts</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -2067,10 +2077,10 @@ In any case, an additional column will contain the file ID</string>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfetcspcimporter.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -2085,7 +2095,7 @@ In any case, an additional column will contain the file ID</string>
     </hint>
     <hint type="destinationlabel">
      <x>338</x>
-     <y>-4</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -2144,8 +2154,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateCTRTrace()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>168</x>
-     <y>373</y>
+     <x>258</x>
+     <y>425</y>
     </hint>
     <hint type="destinationlabel">
      <x>400</x>
@@ -2160,12 +2170,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>358</x>
-     <y>371</y>
+     <x>411</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
-     <x>474</x>
-     <y>373</y>
+     <x>518</x>
+     <y>425</y>
     </hint>
    </hints>
   </connection>
@@ -2176,12 +2186,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>358</x>
-     <y>371</y>
+     <x>411</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
-     <x>589</x>
-     <y>373</y>
+     <x>645</x>
+     <y>425</y>
     </hint>
    </hints>
   </connection>
@@ -2192,12 +2202,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>358</x>
-     <y>371</y>
+     <x>411</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
-     <x>474</x>
-     <y>399</y>
+     <x>518</x>
+     <y>451</y>
     </hint>
    </hints>
   </connection>
@@ -2208,12 +2218,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>358</x>
-     <y>371</y>
+     <x>411</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
-     <x>589</x>
-     <y>399</y>
+     <x>645</x>
+     <y>451</y>
     </hint>
    </hints>
   </connection>
@@ -2240,8 +2250,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>625</x>
-     <y>266</y>
+     <x>51</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
      <x>376</x>
@@ -2256,8 +2266,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>625</x>
-     <y>292</y>
+     <x>51</x>
+     <y>72</y>
     </hint>
     <hint type="destinationlabel">
      <x>888</x>
@@ -2272,8 +2282,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>275</x>
-     <y>60</y>
+     <x>58</x>
+     <y>41</y>
     </hint>
     <hint type="destinationlabel">
      <x>95</x>
@@ -2288,12 +2298,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>484</x>
-     <y>360</y>
+     <x>47</x>
+     <y>76</y>
     </hint>
     <hint type="destinationlabel">
      <x>522</x>
-     <y>-8</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -2304,12 +2314,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>625</x>
-     <y>318</y>
+     <x>51</x>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>497</x>
-     <y>-2</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -2320,12 +2330,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>626</x>
-     <y>386</y>
+     <x>51</x>
+     <y>78</y>
     </hint>
     <hint type="destinationlabel">
      <x>121</x>
-     <y>-3</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -2336,8 +2346,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>565</x>
-     <y>49</y>
+     <x>73</x>
+     <y>42</y>
     </hint>
     <hint type="destinationlabel">
      <x>225</x>
@@ -2352,8 +2362,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>692</x>
-     <y>52</y>
+     <x>100</x>
+     <y>42</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -2368,8 +2378,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateCTRTrace()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>737</x>
-     <y>160</y>
+     <x>807</x>
+     <y>186</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2390,6 +2400,22 @@ In any case, an additional column will contain the file ID</string>
     <hint type="destinationlabel">
      <x>3</x>
      <y>95</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkShowBursts</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateCTRTrace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>682</x>
+     <y>152</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>131</y>
     </hint>
    </hints>
   </connection>
