@@ -60,7 +60,7 @@ class OptionsDialog : public QDialog, public Ui::OptionsDlg {
 
     private:
         ProgramOptions* m_options;
-        QList<QFPluginOptionsWidget*> m_plugins;
+        QList<QPointer<QFPluginOptionsWidget> > m_plugins;
 };
 
 #endif // OPTIONSDIALOG_H

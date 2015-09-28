@@ -61,6 +61,14 @@ OptionsDialog::OptionsDialog(QWidget* parent):
 
 OptionsDialog::~OptionsDialog()
 {
+    for (int i=0; i<m_plugins.size(); i++) {
+        if (m_plugins[i]) m_plugins[i]->deleteLater();
+    }
+    m_plugins.clear();
+
+    disconnect(cmbStyle, SIGNAL(currentIndexChanged(QString)), this, SLOT(styleChanged(QString)));
+
+    disconnect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(stylesheetChanged(QString)));
     //dtor
 }
 
@@ -272,6 +280,9 @@ void OptionsDialog::open(ProgramOptions* options) {
 
 void OptionsDialog::setPlugins(const QList<QFPluginOptionsDialogInterface *> &plugins)
 {
+    for (int i=0; i<m_plugins.size(); i++) {
+        if (m_plugins[i]) m_plugins[i]->deleteLater();
+    }
     m_plugins.clear();
     for (int i=0; i<plugins.size(); i++) {
         QFPluginOptionsWidget* w=plugins[i]->createOptionsWidget(this);

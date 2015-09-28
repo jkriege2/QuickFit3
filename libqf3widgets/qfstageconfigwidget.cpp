@@ -306,7 +306,7 @@ void QFStageConfigWidget::createWidgets() {
 }
 
 void QFStageConfigWidget::createActions() {
-    std::cout<<">>>> createActions()\n";
+    std::cout<<">>>> QFStageConfigWidget::createActions()\n";
     actConnectX=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect x-axis ..."), this);
     actConnectX->setCheckable(true);
     connect(actConnectX, SIGNAL(triggered()), this, SLOT(disConnectX()));

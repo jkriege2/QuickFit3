@@ -126,8 +126,9 @@ void QFESPIMB040ExperimentDescription::updateTime() {
 }
 
 void QFESPIMB040ExperimentDescription::on_btnSaveTemplate_clicked() {
-    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/ed_templates/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ExperimentDescription/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/ed_templates/").toString();
+    QString tdir=ProgramOptions::getInstance()->getConfigValue("spimb040/templates_directory", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
+    QDir().mkpath(tdir);
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ExperimentDescription/lasttemplatedir", tdir).toString();
     QString filename=qfGetSaveFileName(this, tr("save as template ..."), dir, tr("exp. description template (*.edt)"))    ;
     if (!filename.isEmpty()) {
         bool ok=true;
@@ -147,8 +148,9 @@ void QFESPIMB040ExperimentDescription::on_btnSaveTemplate_clicked() {
 }
 
 void QFESPIMB040ExperimentDescription::on_btnLoadTemplate_clicked() {
-    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/ed_templates/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ExperimentDescription/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/ed_templates/").toString();
+    QString tdir=ProgramOptions::getInstance()->getConfigValue("spimb040/templates_directory", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
+    QDir().mkpath(tdir);
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ExperimentDescription/lasttemplatedir", tdir).toString();
     QString filename=qfGetOpenFileName(this, tr("open template ..."), dir, tr("exp. description template (*.edt)"))    ;
     if (!filename.isEmpty()) {
         QSettings set(filename, QSettings::IniFormat);

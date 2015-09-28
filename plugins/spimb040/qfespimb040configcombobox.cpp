@@ -32,6 +32,7 @@ QFESPIMB040ConfigComboBox::QFESPIMB040ConfigComboBox(QWidget *parent) :
     updating=false;
     connect(this, SIGNAL(activated(int)), this, SLOT(cmbCurrentIndexChanged(int)));
     baseDir=QApplication::applicationDirPath();
+    baseDirAux="";
     m_ext="ini";
     icon=QIcon(":/spimb040/lightpath.png");
     clear();
@@ -61,6 +62,15 @@ void QFESPIMB040ConfigComboBox::setIcon(QIcon icon) {
 
 void QFESPIMB040ConfigComboBox::init(QString baseDir, QString extension) {
     this->baseDir=baseDir;
+    this->baseDirAux="";
+    this->m_ext=extension;
+    updateItems();
+}
+
+void QFESPIMB040ConfigComboBox::init(QString baseDir, QString baseDirAux, QString extension)
+{
+    this->baseDir=baseDir;
+    this->baseDirAux=baseDirAux;
     this->m_ext=extension;
     updateItems();
 }
@@ -74,15 +84,26 @@ void QFESPIMB040ConfigComboBox::updateItems(const QString &newCurrent) {
     updating=true;
     clear();
     addItem(tr("--- none ---"), "");
-
-    QDir dir=QDir(baseDir, "*."+m_ext);
-    //std::cout<<"should have created all dirs: '"<<directory.toStdString()<<"'"<<std::endl;
-    QStringList filenames=dir.entryList(QDir::Files);
     QFESPIMB040OpticsSetupItems configs;
-    foreach (QString fileName, filenames) {
-        QString absfn=dir.absoluteFilePath(fileName);
-        configs.append(qMakeTriple(getConfigIcon(absfn), getConfigName(absfn), absfn));
-        addItem(getConfigIcon(absfn), getConfigName(absfn), absfn);
+    {
+        QDir dir=QDir(baseDirAux, "*."+m_ext);
+        //std::cout<<"should have created all dirs: '"<<directory.toStdString()<<"'"<<std::endl;
+        QStringList filenames=dir.entryList(QDir::Files);
+        foreach (QString fileName, filenames) {
+            QString absfn=dir.absoluteFilePath(fileName);
+            configs.append(qMakeTriple(getConfigIcon(absfn), getConfigName(absfn), absfn));
+            addItem(getConfigIcon(absfn), getConfigName(absfn), absfn);
+        }
+    }
+    {
+        QDir dir=QDir(baseDir, "*."+m_ext);
+        //std::cout<<"should have created all dirs: '"<<directory.toStdString()<<"'"<<std::endl;
+        QStringList filenames=dir.entryList(QDir::Files);
+        foreach (QString fileName, filenames) {
+            QString absfn=dir.absoluteFilePath(fileName);
+            configs.append(qMakeTriple(getConfigIcon(absfn), getConfigName(absfn), absfn));
+            addItem(getConfigIcon(absfn), getConfigName(absfn), absfn);
+        }
     }
 
     updating=false;

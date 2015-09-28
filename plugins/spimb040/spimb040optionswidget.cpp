@@ -31,6 +31,7 @@ SPIMB040OptionsWidget::SPIMB040OptionsWidget(QObject* pluginObject, QWidget *par
 {
     ui->setupUi(this);
     reloadStylesheets(true);
+    ui->edtOptTemplatesDir->addButton(new QFStyledButton(QFStyledButton::SelectDirectory, ui->edtOptTemplatesDir, ui->edtOptTemplatesDir));
     ui->edtOptSetupDir->addButton(new QFStyledButton(QFStyledButton::SelectDirectory, ui->edtOptSetupDir, ui->edtOptSetupDir));
     ui->edtOptSetupConfigDir->addButton(new QFStyledButton(QFStyledButton::SelectDirectory, ui->edtOptSetupConfigDir, ui->edtOptSetupConfigDir));
     ui->edtOptSetupConfigDirReadonly->addButton(new QFStyledButton(QFStyledButton::SelectDirectory, ui->edtOptSetupConfigDirReadonly, ui->edtOptSetupConfigDirReadonly));
@@ -43,6 +44,9 @@ SPIMB040OptionsWidget::~SPIMB040OptionsWidget()
 
 void SPIMB040OptionsWidget::readSettings(ProgramOptions *options)
 {
+    QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
+    ui->edtOptTemplatesDir->setText(options->getConfigValue("spimb040/templates_directory", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString());
+    ui->edtOptScriptsDir->setText(options->getConfigValue("spimb040/script_directory", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acquisitionScripts/").toString());
     ui->edtOptSetupDir->setText(options->getConfigValue("spimb040/optsetup_directory", options->getGlobalConfigFileDirectory()).toString());
     ui->edtOptSetupConfigDir->setText(options->getConfigValue("spimb040/optsetup_config_directory", options->getConfigFileDirectory()+"/plugins/ext_spimb040/").toString());
     ui->edtOptSetupConfigDirReadonly->setText(options->getConfigValue("spimb040/optsetup_config_directory_readonly", options->getGlobalConfigFileDirectory()).toString());
@@ -53,6 +57,8 @@ void SPIMB040OptionsWidget::readSettings(ProgramOptions *options)
 
 void SPIMB040OptionsWidget::writeSettings(ProgramOptions *options)
 {
+    options->setConfigValue("spimb040/script_directory", ui->edtOptScriptsDir->text());
+    options->setConfigValue("spimb040/templates_directory", ui->edtOptTemplatesDir->text());
     options->setConfigValue("spimb040/optsetup_directory", ui->edtOptSetupDir->text());
     options->setConfigValue("spimb040/optsetup_config_directory", ui->edtOptSetupConfigDir->text());
     options->setConfigValue("spimb040/optsetup_config_directory_readonly", ui->edtOptSetupConfigDirReadonly->text());
@@ -71,22 +77,22 @@ QString SPIMB040OptionsWidget::getStyle()
 }
 
 void SPIMB040OptionsWidget::on_cmbStylesheet_currentIndexChanged( int index ) {
-    QString fn=ui->cmbStylesheet->itemData(index).toString();
-    QFile f(fn);
-    QString qss="";
-    if (f.open(QFile::ReadOnly)) {
-        QTextStream s(&f);
-        qss=s.readAll();
-    }
-    this->setStyleSheet(qss);
+//    QString fn=ui->cmbStylesheet->itemData(index).toString();
+//    QFile f(fn);
+//    QString qss="";
+//    if (f.open(QFile::ReadOnly)) {
+//        QTextStream s(&f);
+//        qss=s.readAll();
+//    }
+//    this->setStyleSheet(qss);
 
     emit styleChanged(getStyle(), getStylesheet());
 }
 
 
 void SPIMB040OptionsWidget::on_cmbStyle_currentIndexChanged( const QString & text ) {
-    parentWidget()->setStyle(QStyleFactory::create(text));
-    parentWidget()->setPalette(parentWidget()->style()->standardPalette());
+//    parentWidget()->setStyle(QStyleFactory::create(text));
+//    parentWidget()->setPalette(parentWidget()->style()->standardPalette());
     emit styleChanged(getStyle(), getStylesheet());
 }
 

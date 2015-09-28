@@ -50,6 +50,7 @@ class QFESPIMB040ConfigComboBox : public QFEnhancedComboBox {
         QString currentConfig() const;
         void setIcon(QIcon icon);
         void init(QString baseDir, QString extension=QString("ini"));
+        void init(QString baseDir, QString baseDirAux, QString extension);
         void updateItems();
         void updateItems(const QString& newCurrent);
         QStringList getConfigs() const;
@@ -77,6 +78,7 @@ class QFESPIMB040ConfigComboBox : public QFEnhancedComboBox {
     protected:
         QIcon icon;
         QString baseDir;
+        QString baseDirAux;
         QString m_ext;
         bool updating;
     protected slots:

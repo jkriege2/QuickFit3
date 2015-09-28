@@ -62,6 +62,12 @@ void QFETCSPCImporter::deinit() {
             FRETDialogs[i]->close();
         }
     }
+    FRETDialogs.clear();
+    if (dlgCorrelate) {
+        dlgCorrelate->close();
+        delete dlgCorrelate;
+        dlgCorrelate=NULL;
+    }
 }
 
 void QFETCSPCImporter::projectChanged(QFProject* oldProject, QFProject* project) {
