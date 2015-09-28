@@ -82,10 +82,23 @@ The LEE filter is then characterized by its two parameters:
         <li>set which input channel detected red photons (default: 1, the avg. countrate for the different channels is shown in parantheses)</li>
         <li>You can also specify a second TCSPC file (of the same dataformat!), which contains a background measurement (e.g. of the buffer without fluorescent molecules). The countrate in this file is average to yield $(B_g, B_r)$.</li>
     </ul></li>
-    <li> FInally click on 
+    <li> Finally click on 
     <center><a name="fretchen_pic005"><img src="./pic/fretchen_pic005.png" border="1">
     </center>
     to read in the sepcified datasets. $$note: If you change any of the settings above lateron, you will have to click this button again!$$</li>
+    <li>Now you are presented with the second tab <b>"2. Burst Selection"</b> of the Burst Analyzer, which shows the <b>interphoton time trace IPT</b> of the measurement:<center><a name="fretchen_pic007"><img src="./pic/fretchen_pic007.png" border="1">
+</center>
+or the <b>countrate trace</b> of the measurement:
+<center><a name="fretchen_pic006"><img src="./pic/fretchen_pic006.png" border="1">
+</center>
+You can chhose how these are displayed on the top-right corner (red box) of the window. The IPT plot shows for each photon the duration until the next photon, agains the photons arrival time (macrotime). The countrate plot simply counts the number of photons in small time-bins (here 20ms) and shows the result trace. THe plot in this window shows only a fraction of the whole measurement. You can choose the length of this fraction ("display duration") and its position in the whole measurement ("display position") at the top-right. There you can also chose the bin width for the countrate trace. <br>Below the display mode settings, the dialog presents some basic statistics about the meausrement in the box "Info":
+<center><a name="fretchen_pic008"><img src="./pic/fretchen_pic008.png" border="1">
+</center>
+If you compare the countrate-trace and the IPT-trace, you can make out burst easily in each on. In the countrate, bursts show up as peaks, while in the IPT-trace they show up as groups of photons with low IPTs.
+</li>
+    <li>Now you can configure and perform the burst search.</li>
+    <li></li>
+    <li></li>
     <li></li>
     <li></li>
     <li></li>
