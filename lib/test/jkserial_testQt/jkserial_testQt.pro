@@ -12,11 +12,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    ../../jkserialconnection.cpp \
-    ../../tools.cpp
+    ../../QFSerialConnection.cpp \
+    ../../cpptools.cpp
 
 HEADERS  += mainwindow.h \
-    ../../jkserialconnection.h \
-    ../../tools.h
+    ../../QFSerialConnection.h \
+    ../../cpptools.h
 
 FORMS    += mainwindow.ui
