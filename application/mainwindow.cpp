@@ -375,6 +375,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("assetsdir"), settings->getAssetsDirectory()));
     htmlReplaceList.append(qMakePair(QString("examplesdir"), settings->getExamplesDirectory()));
     htmlReplaceList.append(qMakePair(QString("configdir"), settings->getConfigFileDirectory()));
+    htmlReplaceList.append(qMakePair(QString("globalconfigdir"), settings->getGlobalConfigFileDirectory()));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("settings_contents"), QString("<ul>")+createPluginDocSettings("<li>%1 settings:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("help_contents"), QString("<ul>")+createPluginDocHelp("<li>%1 help:<ul>", "</ul></li>")+QString("</ul>")));

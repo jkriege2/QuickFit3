@@ -28,6 +28,9 @@ QF3CONFIG+=nospecials
 # activate special hardware drivers for the FFM!
 #QF3CONFIG+=ffmdrivers
 
+# comment out, to compile plugins that depend on the NI-DAQmx driver
+QF3CONFIG+=nonidaqmx
+
 # if nlopt does not compile on your computer, use this switch
 #QF3CONFIG+=nonlopt
 

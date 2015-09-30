@@ -75,6 +75,9 @@ ASSETS_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}
 GLOBALCONFIG_FILES.files = ./globalconfig/*.*
 GLOBALCONFIG_FILES.path = $${QFOUTPUT}/globalconfig_templates/
 
+GLOBALCONFIG_FILES.files = ./globalconfig_direct/*.*
+GLOBALCONFIG_FILES.path = $${QFOUTPUT}/globalconfig/
+
 GLOBALCONFIGWIN32_FILES.files = ./globalconfig/win32/*.*
 GLOBALCONFIGWIN32_FILES.path = $${QFOUTPUT}/globalconfig_templates/
 

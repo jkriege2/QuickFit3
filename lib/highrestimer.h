@@ -31,9 +31,14 @@
  *  \ingroup highrestimer_group
  */
 
+
+#ifndef HIGHRESTIMER_H
+#define HIGHRESTIMER_H
+
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include "stdint.h"
 #include "lib_imexport.h"
 
 #ifndef __WINDOWS__
@@ -55,7 +60,8 @@
 #endif
 
 #if defined(__WINDOWS__)
-  #include<windows.h>
+#include<windows.h>
+#include<winnt.h>
 #elif defined(__LINUX__)
   #include <sys/time.h>
 #else
@@ -64,9 +70,6 @@
 #endif
 
 
-
-#ifndef HIGHRESTIMER_H
-#define HIGHRESTIMER_H
 
 
 /**

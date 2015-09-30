@@ -1,0 +1,19 @@
+parameters {
+  // add global parameters here
+  green=10;// might be changed later in the program
+}
+sequence {
+  event(0) { 
+    AO1=green; // green laser intensity
+    D0.1=1; // green marker
+    AO2=0;
+    D0.2=0;    
+	AO3=10; //blanking channel
+  }
+  event(500m) {
+    AO1=green; // green laser intensity
+    D0.1=0; // green marker
+    AO2=0;
+    D0.2=0;    
+	}
+}

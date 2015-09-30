@@ -1,0 +1,11 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="qfe_alexcontrol/qfe_alexcontrol.png">qfe_alexcontrol.png</file>
+</qresource>
+    <qresource prefix="/ALEXControl">
+        <file>sequence.svg</file>
+        <file>AlternationInfo.svg</file>
+        <file>AlternationInfo.png</file>
+        <file>AlexControlIcon.png</file>
+    </qresource>
+</RCC>

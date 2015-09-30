@@ -1,0 +1,39 @@
+parameters {
+  // add global parameters here
+  t1=100u;
+  t2=20u;
+  t3=100u;
+  t4=20u;
+  blue=10;
+  green=10;
+}
+sequence {
+  event(0) { 
+    AO1=0;
+    D0.1=0;
+    AO2=blue; // blue laser intensity
+    D0.2=1; // blue marker
+    AO3=10; //blanking channel
+  }
+  event(t1) { // first break
+    AO2=0;
+    D0.2=0;
+  }
+  
+  event(t1+t2) {// acceptor excitation
+    AO1=green; // green laser intensity
+    D0.1=1; // green marker
+    }
+    
+  event(t1+t2+t3) { // second break
+    AO1=0;
+    D0.1=0;
+  }
+  event(t1+t2+t3+t4) { // end
+    AO1=0;
+    D0.1=0;
+    AO2=0;
+    D0.2=0;
+    AO3=10; //blanking channel
+  }
+}

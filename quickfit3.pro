@@ -323,6 +323,12 @@ plg_cam_server.depends = lib libqf3widgets
                     plg_qfextensioncoboltlaser.subdir=./plugins/lights_b040laserbox
                     plg_lights_b040laserbox.depends = lib libqf3widgets
 
+                    !contains(QF3CONFIG, nonidaqmx) {
+                        SUBDIRS += plg_qfe_alexcontrol
+                        plg_qfe_alexcontrol.subdir=./plugins/qfe_alexcontrol
+                        plg_qfe_alexcontrol.depends = lib libqf3widgets
+                    }
+
                     contains(QF3CONFIG, ffmdrivers) {
                             SUBDIRS += plg_b040_ffmcontrol
                             plg_b040_ffmcontrol.subdir=./plugins/b040_ffmcontrol
@@ -336,9 +342,11 @@ plg_cam_server.depends = lib libqf3widgets
                             plg_alv_autocorrelator5000.subdir=./plugins/alv_autocorrelator5000
                             plg_alv_autocorrelator5000.depends = lib libqf3widgets
 
-                            SUBDIRS += plg_scanner2000_nicounter
-                            plg_scanner2000_nicounter.subdir=./plugins/scanner2000_nicounter
-                            plg_scanner2000_nicounter.depends = lib libqf3widgets
+                            !contains(QF3CONFIG, nonidaqmx) {
+                                SUBDIRS += plg_scanner2000_nicounter
+                                plg_scanner2000_nicounter.subdir=./plugins/scanner2000_nicounter
+                                plg_scanner2000_nicounter.depends = lib libqf3widgets
+                            }
                     }
             }
     }

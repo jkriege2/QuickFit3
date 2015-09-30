@@ -23,3 +23,7 @@
 	url = https://github.com/jkriege2/cairoQPaintDevice.git
 	branch = master
 	
+[submodule "extlibsb040/sdfflib"]
+	path = extlibsb040/sdfflib
+	url = https://github.com/jkriege2/sdfflib
+	branch = master
