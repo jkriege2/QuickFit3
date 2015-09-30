@@ -67,15 +67,22 @@
      where you only have to change the Qt-path accordingly.
 
 ================================================================================
-== Unpack QuickFit Sources                                                    ==
+== Download/Unpack QuickFit Sources                                           ==
 ================================================================================
 2. The full sourcecode is available on GitHub:
          https://github.com/jkriege2/QuickFit3.git
-   Download and unpack the source ZIP file
-   or checkout the repository from GitHub (ensure to make a "recursive" checkout,
-   as the repository contains some other repositories as submodules, which will
-   be cloned when giving the option --recursive):
-         git clone --recursive "https://github.com/jkriege2/QuickFit3.git" "./QuickFit3.git"
+   To set up the source code on your machine, you have two possibilities:
+      (i) Download and unpack the source ZIP file
+     (ii) [PREFERED]: Checkout the repository from GitHub (ensure to make a 
+          "recursive" checkout, as the repository contains some other repositories 
+          as submodules, which will  be cloned when giving the option --recursive):
+             git clone --recursive "https://github.com/jkriege2/QuickFit3.git" "./QuickFit3.git"
+          Now ensure that all submodules (all in the subfolder './extlibsb040' are
+          up to date. To do so, execute in the base directory of the repository:
+             git submodule update --remote
+          If (for any reason) the submodules are not yet initialized, call instead:
+             git submodule update --remote --init
+   
    Afterwards you will have a source repository with this contents:
      * The base directory contains the main QMake project quickfit.pro
      * All plugins are contained in the ./plugins/ subdirectory
@@ -142,57 +149,52 @@ system!!!
                  Linux:   NO
        3.2.8 build these libraries:
 
-              library       | Linux               | Windows                            | MacOS X
-             ---------------+---------------------+----------------------------------------------------------------
-              zlib          | y (but is usually   | y                                  | n (there is a zlib on MacOS X!)
-                            |    available anyways|                                    |
-                            |    so if this doesnt|                                    |
-                            |    work, QF3 will   |                                    |
-                            |    still compile)   |                                    |
-              lmfit         | y                   | y                                  | y
-              lmfit v5      | y                   | y                                  | y
-              levmar        | y                   | y                                  | y
-                                        for all systems: have lapack: "n"
-              libpng        | y                   | y                                  | y
-              libjpeg       | y                   | y                                  | y
-              libtiff       | y                   | y                                  | y
-              gsl           | y                   | y                                  | y
-              libusb-win32  | n (libusb has to be | y (if you want to build some       | n
-                            |    available on your|    of the hardware drivers)        |
-                            |    computer, if you | USE PREBUILT: n                    |
-                            |    want to use the  |                                    |
-                            |    Radhrad2 and     |                                    |
-                            |    RH2V2 plugins!   |                                    |
-                            |    By default these |                                    |
-                            |    plugins are deac-|                                    |
-                            |    tivated!)        |                                    |
-              libNIDAQmx    | n (currently no     | n (this is for future              | n
-                            |    working LINUX    |    extensions!)                    |
-                            |    driver from Nat. |                                    |
-                            |    Instruments avail|                                    |
-                            |    able!!!)         |                                    |
-              libAndor      | n (you will have to | n (y only if you want to           | n
-                            |    install the andor|    build the Andor driver,         |
-                            |    SDK, as advised  |    which has to be activated       |
-                            |    by Andor and make|    explicitly in quickfit.inc!!!)  |
-                            |    sure, that gcc   |                                    |
-                            |    finds the SDK    |                                    |
-                    If you don't have libAndor, you'll have to set QF3CONFIG+=noandor in quickfit.inc
-                                 which switches off all macros that use libAndor!
-              eigen         | y                   | y                                  | y
-              cimg          | y                   | y                                  | y
-              nlopt         | y                   | y                                  | n (currently does not compile on MacOS X)
-                               If this does not compile on your system, set
-                                   QF3CONFIG+=nonlopt in quickfit.inc
-              OOL           | y                   | y                                  | n (currently does not compile on MacOS X)
-              pixman        | y                   | y                                  | n (currently does not compile on MacOS X)
-                               If this does not compile on your system, set
-                                   QF3CONFIG+=nocairo in quickfit.inc
-                                    Also, building cairo will fail!
-              cairo         | y                   | y                                  | n (currently does not compile on MacOS X)
-                               If this does not compile on your system, set
-                                   QF3CONFIG+=nocairo in quickfit.inc
-                            |                     |                                    |
+library       | Linux               | Windows                            | MacOS X
+---------------+---------------------+----------------------------------------------------------------
+zlib          | y (but is usually   | y                                  | n (there is a zlib on MacOS X!)
+              |    available anyways|                                    |
+              |    so if this doesnt|                                    |
+              |    work, QF3 will   |                                    |
+              |    still compile)   |                                    |
+lmfit         | y                   | y                                  | y
+lmfit v5      | y                   | y                                  | y
+levmar        | y                   | y                                  | y
+libpng        | y                   | y                                  | y
+libjpeg       | y                   | y                                  | y
+libtiff       | y                   | y                                  | y
+gsl           | y                   | y                                  | y
+libusb        | y (if you want to   | y (if you want to build some       | n
+              |    build some of the|    of the hardware drivers)        |
+              |    hardware drivers)|                                    |
+libNIDAQmx    | n (currently no     | n (this is for future              | n
+              |    working LINUX    |    extensions!)                    |
+              |    driver from Nat. |                                    |
+              |    Instruments avail|                                    |
+              |    able!!!)         |                                    |
+libAndor      | n (you will have to | n (y only if you want to           | n
+              |    install the andor|    build the Andor driver,         |
+              |    SDK, as advised  |    which has to be activated       |
+              |    by Andor and make|    explicitly in quickfit.inc!!!)  |
+              |    sure, that gcc   |                                    |
+              |    finds the SDK    |                                    |
+              If you don't have libAndor, you'll have to set QF3CONFIG+=noandor in quickfit.inc
+                           which switches off all macros that use libAndor!
+eigen         | y                   | y                                  | y
+cimg          | y                   | y                                  | y
+nlopt         | y                   | y                                  | n (currently does not compile on MacOS X)
+                        If this does not compile on your system, set
+                              QF3CONFIG+=nonlopt in quickfit.inc
+OOL           | y                   | y                                  | n (currently does not compile on MacOS X)
+pixman        | y                   | y                                  | n (currently does not compile on MacOS X)
+                        If this does not compile on your system, set
+                              QF3CONFIG+=nocairo in quickfit.inc
+                                Also, building cairo will fail!
+cairo         | y                   | y                                  | n (currently does not compile on MacOS X)
+                        If this does not compile on your system, set
+                              QF3CONFIG+=nocairo in quickfit.inc
+              |                     |                                    |
+              
+              
              Note: these libraries will not be installed globally for the system!!!
                    So they will not interfere with version already available!!!
 
@@ -229,13 +231,15 @@ system!!!
              If you get errors about _aligned_malloc() not fopund, set:
                 DEFINES += QF_DONT_USE_ALIGNED_MALLOC
 
-            Note: There are templates for such a file under different conditions.
+            
 
-       3.3.3 run (make sure that your qmake points to the qmake of the Qt version
+       3.3.3 change to the base-driectory of the repository and
+             run (make sure that your qmake points to the qmake of the Qt version
              you want to use ... possibly you'll have to add the absolute path
              to that tool!!!)
                RELEASE:   qmake quickfit3.pro "CONFIG+=release"
                DEBUG:     qmake quickfit3.pro
+               
        3.3.4 run twice:
                make -jN
              where N=1 for a 1-core system 2 for a 2-core syste ... or leave
@@ -245,6 +249,7 @@ system!!!
              dependency checking of qmake, so simply run
                make -jN
              again.
+             
        3.3.5 run
                make install -j16
              Now the online-help, examples and other asset files will be copied
