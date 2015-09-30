@@ -1,18 +1,24 @@
 [submodule "extlibsb040/StatisticsTools"]
 	path = extlibsb040/StatisticsTools
 	url = https://github.com/jkriege2/StatisticsTools.git
+	branch = master
 [submodule "extlibsb040/JKQtPlotter"]
 	path = extlibsb040/JKQtPlotter
 	url = https://github.com/jkriege2/JKQtPlotter.git
+	branch = master
 [submodule "extlibsb040/TinyTIFF"]
 	path = extlibsb040/TinyTIFF
 	url = https://github.com/jkriege2/TinyTIFF.git
+	branch = master
 [submodule "extlibsb040/libtiff_tools"]
 	path = extlibsb040/libtiff_tools
 	url = https://github.com/jkriege2/libtiff_tools.git
+	branch = master
 [submodule "extlibsb040/TinyMAT"]
 	path = extlibsb040/TinyMAT
 	url = https://github.com/jkriege2/TinyMAT.git
+	branch = master
 [submodule "extlibsb040/cairoQPaintDevice"]
 	path = extlibsb040/cairoQPaintDevice
 	url = https://github.com/jkriege2/cairoQPaintDevice.git
+	branch = master
