@@ -27,7 +27,7 @@ DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
 
@@ -43,10 +43,6 @@ RESOURCES += qfextensiontestfilterchanger.qrc
 
 TRANSLATIONS= ./translations/de.filterc_test.ts
 
-INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

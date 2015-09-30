@@ -27,7 +27,7 @@ TARGET = target_id
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../libquickfitwidgets.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
@@ -46,10 +46,6 @@ RESOURCES += qfrdr.qrc
 
 TRANSLATIONS= ./translations/de.target_id.ts
 
-INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 

@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = target_id
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input
@@ -42,7 +42,6 @@ RESOURCES +=
 TRANSLATIONS= ./translations/de.target_id.ts
 
 
-INCLUDEPATH += ../../lib/
 
 
 include(../../quickfit3_configqt.pri)

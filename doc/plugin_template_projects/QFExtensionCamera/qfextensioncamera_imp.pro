@@ -26,7 +26,7 @@ TARGET = target_id
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
 
@@ -43,10 +43,6 @@ RESOURCES += qfextensioncamera_imp.qrc
 
 TRANSLATIONS= ./translations/de.target_id.ts
 
-INCLUDEPATH += ../../lib/ \
-               ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
 
 include(../../quickfit3_configqtwidgets.pri)
 
