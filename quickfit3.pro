@@ -126,6 +126,10 @@ plg_cam_server.depends = lib libqf3widgets
     plg_tcspcimporter.subdir = ./plugins/tcspcimporter
     plg_tcspcimporter.depends = lib libqf3widgets
 
+    SUBDIRS += plg_qfe_alexeval
+    plg_qfe_alexeval.subdir = ./plugins/qfe_alexeval
+    plg_qfe_alexeval.depends = lib libqf3widgets
+
     SUBDIRS += plg_importers_simpletcspcimporter
     plg_importers_simpletcspcimporter.subdir = ./plugins/importers_simpletcspcimporter
     plg_importers_simpletcspcimporter.depends = lib libqf3widgets

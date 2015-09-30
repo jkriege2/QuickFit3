@@ -905,6 +905,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
     double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
     int firstline=getProperty("CSV_FIRSTLINE", 1).toInt();
     int mode=getProperty("CSV_MODE", 0).toInt();
+    int column=getProperty("CSV_COLUMN", 1).toInt();
     if (d.size()>0) separatorchar=d[0];
     d=getProperty("CSV_COMMENT", "#").toString().toStdString();
     if (d.size()>0) commentchar=d[0];
@@ -934,6 +935,8 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
                 rruns=rruns+columns-1;
             } else if (mode==1) { // tau, corr, error, corr, error, ...
                 rruns=rruns+(columns-1)/2;
+            } else if (mode==2) { // tau, corr, corr, ... -> select only one column
+                rruns=1;
             }
             ccorrN=qMax(lines, ccorrN);
         } catch(datatable2_exception& e) {   // error handling with exceptions
@@ -977,6 +980,9 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
                             }
                         }
                         runincrement=(columns-1)/2;
+                    } else if (mode==2) { // tau, corr, corr, ... -> select only one column
+                        if (column<data[ii].tab->get_column_count()) correlation[(run0)*correlationN+l]=data[ii].tab->get(column, l);
+                        runincrement=1;
                     }
                 }
                 run0=run0+runincrement;

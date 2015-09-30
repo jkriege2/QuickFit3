@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogReconstructMarkerRecords</class>
+ <widget class="QDialog" name="DialogReconstructMarkerRecords">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>541</width>
+    <height>377</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="4" column="0">
+    <widget class="QLabel" name="labelExcPeriod">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>&amp;Period of
+donor excitation</string>
+     </property>
+     <property name="buddy">
+      <cstring>doubleSpinBoxPeriod</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1" colspan="4">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxOffset">
+     <property name="suffix">
+      <string>us</string>
+     </property>
+     <property name="maximum">
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>100.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="5">
+    <widget class="QLabel" name="labelInfo">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" colspan="2">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>in the other channel.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>an &amp;offset of</string>
+     </property>
+     <property name="buddy">
+      <cstring>doubleSpinBoxOffset</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="4">
+    <widget class="QRadioButton" name="radioButtonFullConstruct">
+     <property name="text">
+      <string>Construct all marker events with</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QComboBox" name="comboBox">
+     <item>
+      <property name="text">
+       <string>donor</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>acceptor</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QRadioButton" name="radioButtonReconstruct">
+     <property name="text">
+      <string>Reconstruct marker events from</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="5">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="0">
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxStartTime">
+       <property name="suffix">
+        <string>us</string>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>&amp;Period of
+Donor excitation</string>
+       </property>
+       <property name="buddy">
+        <cstring>doubleSpinBoxDonorPeriod</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxFullOffset">
+       <property name="suffix">
+        <string>us</string>
+       </property>
+       <property name="maximum">
+        <double>10000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>100.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>&amp;Offset to the start of
+acceptor excitation</string>
+       </property>
+       <property name="buddy">
+        <cstring>doubleSpinBoxFullOffset</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxDonorPeriod">
+       <property name="suffix">
+        <string>us</string>
+       </property>
+       <property name="maximum">
+        <double>10000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>200.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>&amp;start time</string>
+       </property>
+       <property name="buddy">
+        <cstring>doubleSpinBoxStartTime</cstring>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0" colspan="5">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>The following is an estimate of the excitation period which is used to
+check the marker events. When many markers are missing,
+the estimate is bad and it is useful to enter the excitation period here.  </string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxPeriod">
+     <property name="suffix">
+      <string>us</string>
+     </property>
+     <property name="maximum">
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>200.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>marker &amp;channel using</string>
+     </property>
+     <property name="buddy">
+      <cstring>comboBox</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="5" rowspan="7">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>1</width>
+       <height>138</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="0" colspan="4">
+    <widget class="QRadioButton" name="radioButtonFRET">
+     <property name="text">
+      <string>FRET experiment with single wavelength excitation</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>radioButtonReconstruct</tabstop>
+  <tabstop>radioButtonFRET</tabstop>
+  <tabstop>radioButtonFullConstruct</tabstop>
+  <tabstop>doubleSpinBoxOffset</tabstop>
+  <tabstop>doubleSpinBoxPeriod</tabstop>
+  <tabstop>doubleSpinBoxStartTime</tabstop>
+  <tabstop>doubleSpinBoxDonorPeriod</tabstop>
+  <tabstop>doubleSpinBoxFullOffset</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>comboBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>DialogReconstructMarkerRecords</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>367</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>194</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>DialogReconstructMarkerRecords</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>367</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>194</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBoxOffset</sender>
+   <signal>editingFinished()</signal>
+   <receiver>radioButtonReconstruct</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>186</x>
+     <y>123</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>124</x>
+     <y>95</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBoxStartTime</sender>
+   <signal>editingFinished()</signal>
+   <receiver>radioButtonFullConstruct</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>108</x>
+     <y>337</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>89</x>
+     <y>269</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBoxDonorPeriod</sender>
+   <signal>editingFinished()</signal>
+   <receiver>radioButtonFullConstruct</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>249</x>
+     <y>337</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>180</x>
+     <y>269</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBoxFullOffset</sender>
+   <signal>editingFinished()</signal>
+   <receiver>radioButtonFullConstruct</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>372</x>
+     <y>337</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>307</x>
+     <y>269</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBoxPeriod</sender>
+   <signal>editingFinished()</signal>
+   <receiver>radioButtonReconstruct</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>186</x>
+     <y>220</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>151</x>
+     <y>95</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
