@@ -88,12 +88,16 @@ SUBDIRS += plg_qfe_helpeditor
 plg_qfe_helpeditor.subdir=./plugins/qfe_helpeditor
 plg_qfe_helpeditor.depends = lib libqf3widgets
 
-SUBDIRS += plg_cam_server
-plg_cam_server.subdir=./plugins/cam_server
-plg_cam_server.depends = lib libqf3widgets
+SUBDIRS += plg_qfqtimageimporter
+plg_qfqtimageimporter.subdir=./plugins/qfqtimageimporter
+plg_qfqtimageimporter.depends = lib libqf3widgets
 
 
 !contains(QF3CONFIG,basicqfpluginsonly) {
+    SUBDIRS += plg_cam_server
+    plg_cam_server.subdir=./plugins/cam_server
+    plg_cam_server.depends = lib libqf3widgets
+
     SUBDIRS += plg_fcs
     plg_fcs.subdir = ./plugins/fcs
     plg_fcs.depends = lib libqf3widgets

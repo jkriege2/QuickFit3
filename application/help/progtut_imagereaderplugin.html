@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Programming Tutorial: How to Write an image series importer plugin for QuickFit $$version$$</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+<p>This page explains how to write an image series importer plugin. It basically explains the plugin <strong>qtimagerimporters</strong>, which is part of QuickFit. So you find the complete sourcecode in that plugin.</p>
+
+<p>An image series importer plugin has to be derived from the <code>QFPluginImporters</code>, whcih can also be used to implement other importers, such as for TCSPC data.  This base-class specifies two virtual main-function (in addition to the basic plugin-function) that you will ahve to implement: <code>virtual QStringList getIDs() const;</code> and <code>virtual QFImporter* createImporter(QString id) const;</code> the first one returns a list of the available readers in this plugin and the second one serves as a factory method for the readers.</p>
+
+<p>Each reader, in turn, has to be derived from the class <code>QFImporterImageSeries</code> which specifies the interface for image readers (defined in <code>/lib/qfimporterimageseries.h</code>). As all importers, this is a child-class of the basic interface <code>QFImporter</code>.</p>
+
+<h1>
+<a id="user-content-setup-of-the-plugin" class="anchor" href="#setup-of-the-plugin" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setup of the Plugin</h1>
+
+<ol>
+<li>execute the shell script <code>doc/plugin_template_projects/QFImporter/instance.sh</code>. It will generate a basic template for our importer plugin.</li>
+<li>The script will ask you four parameters:
+
+<ul>
+<li>a class-name for the plugin. Use <code>QFQtImageImporter</code>
+</li>
+<li>an ID for the plugin. Use <code>importers_qtimages</code>
+</li>
+<li>a class-name for the first importer class. Use <code>QFQtImageImporterPNG</code>, as it will import PNG files</li>
+<li>an ID for the first importer class. Use <code>importer_qt_png_qtimages</code>
+</li>
+</ul>
+</li>
+<li>Now you have a new subfolder <code>qfqtimageimporter</code> in <code>doc/plugin_template_projects/QFImporter/instance.sh</code>, which you can copy into the plugins su-folder of QuickFit. </li>
+<li>
+<p>Now you'll have to register this plugin in the QuickFit main project. If you are a QuickFit main developer, you can register the new plugin directly in <code>quickfit3.pro</code> by adding these lines to the file:</p>
+
+<pre><code>SUBDIRS += plg_qfqtimageimporter
+plg_qfqtimageimporter.subdir=./plugins/qfqtimageimporter
+plg_qfqtimageimporter.depends = lib libqf3widgets
+</code></pre>
+
+<p>If you are not a main developer, you can alternatively add these lines to the file <code>userplugins.inc</code> (create it if it does not exist yet and it will be evaluated automatically by <code>quickfit3.pro</code>!)</p>
+</li>
+</ol>
+
+<p>The plugin consists of five files in the plugin-main directory:</p>
+
+<ul>
+<li>
+<code>qfqtimageimporter.pro</code> is the plugin project file for qmake</li>
+<li>
+<code>qfqtimageimporter.h/cpp</code> implements the main class of the plugin</li>
+<li>
+<code>qfqtimageimporterpng.h/cpp</code> implements the reader for PNG files</li>
+</ul>
+
+<p>In addition there are two help files in the <code>help</code>-subdirectory of the plugin-directory:</p>
+
+<ul>
+<li>
+<code>importers_qtimages.html</code>documents the plugin (note that this file has the same name as the plugin-ID, otherwise it won't be found by QuickFit's Online-Help system.</li>
+<li>
+<code>importer_qt_png.html</code>documents the PNG-importer (note that this file has the same name as the importer-ID, otherwise it won't be found by QuickFit's Online-Help system.</li>
+</ul>
+
+<h1>
+<a id="user-content-edit-the-basic-plugin-properties" class="anchor" href="#edit-the-basic-plugin-properties" aria-hidden="true"><span class="octicon octicon-link"></span></a>Edit the basic plugin properties</h1>
+
+<p>Now open the file <code>qfqtimageimporter.h</code> and set the basic plugin metadata as follows:</p>
+
+<pre><code>        /** \brief name for the plugin */
+        virtual QString getName() const { return tr("Image Importer Plugin for Qt Image readers"); }
+
+        /** \brief short description for the plugin */
+        virtual QString getDescription() const { return getName(); }
+
+        /** \brief author the plugin */
+        virtual QString getAuthor() const { return QString("Jan W. Krieger"); }
+
+        /** \brief copyright information the plugin */
+        virtual QString getCopyright() const { return tr("(c) 2015 by Jan W. Krieger"); }
+
+        /** \brief weblink for the plugin */
+        virtual QString getWeblink() const { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
+
+        /** \copydoc QFPlugin::getID()  */
+        virtual QString getID() const { return "importers_qtimages"; }
+
+        /** \copydoc QFPlugin::getIconFilename()  */
+        virtual QString getIconFilename() const { return ":/lib/importer_icon.png"; }
+</code></pre>
+
+<p>Here you can provide the plugin author, names, icons etc. Note the function <code>getID()</code> which returns the plugin-id, as provided to the bash-script in the last step! The plugin will be identified by QuickFit under this name, which has to be unique. So possible add a pre- or postfix specifying you institutio to ensure this!</p>
+
+<h1>
+<a id="user-content-edit-the-reader-factory-methods" class="anchor" href="#edit-the-reader-factory-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Edit the reader factory methods</h1>
+
+<p>The instance.sh script has already implemented a basic version of the two factory classes for the image-reader plugin:</p>
+
+<pre><code>    QStringList QFQtImageImporter::getIDs() const {
+        QStringList res;
+        res&lt;&lt;"importer_qt_png";
+        return res;
+    }
+
+    QFImporter* QFQtImageImporter::createImporter(QString id) const  {
+        if (id=="importer_qt_png") {
+            return new QFQtImageImporterPNG();
+        } 
+        return NULL;
+    }
+</code></pre>
+
+<p>The first class returns a list of all available image readers in this plugin and the second one creates instances of the reader-classes. In teh form above, only one reader is available, anmely <code>ìmporter_qt_png</code><code>for PNG-files. Therefore the function</code><code>createImporter()</code>` also only creates one type of importer classes. If you implement more image formats (see the full version of the pligin in the GIT-repostory), these have to be simply added to these two functions.</p>
+
+<h1>
+<a id="user-content-writing-the-qfimporterimageseries-implementation-for-png-files" class="anchor" href="#writing-the-qfimporterimageseries-implementation-for-png-files" aria-hidden="true"><span class="octicon octicon-link"></span></a>Writing the QFImporterImageSeries implementation for PNG-files</h1>
+
+<p>Now we edit the files <code>. First you will have to ensure that the class</code> for our reader is derived from <code>QFImporterImageSeries</code>. then you'll have to add all the virtual functions from this base-class to the new class. The class definition should then look as follows:</p>
+
+<pre><code>   class QFQtImageImporterPNG: public QFImporterImageSeries {
+        public:
+            QFQtImageImporterPNG();
+            virtual ~QFQtImageImporterPNG();
+            /*! \copydoc QFFitFunction::filter()   */
+            virtual QString filter() const ;
+            /*! \copydoc QFFitFunction::formatName()   */
+            virtual QString formatName() const ;
+
+            /** \brief open the given image sequence file
+             *  \param filename name of the image sequence file
+             *  \return \c true on success
+             */
+            virtual bool open(QString filename);
+            /** \brief close the currently opened image file */
+            virtual void close();
+            /** \brief return the number of frames in the files.
+             *
+             *  This does not change the state of the class. This method may have a long runtime, if it has to really count the frames!
+             */
+            virtual uint32_t countFrames();
+            /** \brief move the reading pointer back to the first frame */
+            virtual void reset();
+            /** \brief move on to the next frame in the file. return \c false if no further image exists */
+            virtual bool nextFrame();
+
+        protected:
+            /** \brief return the width of the frames (valid after open() returned \c true */
+            virtual uint32_t intFrameWidth();
+            /** \brief return the height of the frames (valid after open() returned \c true */
+            virtual uint32_t intFrameHeight();
+            /** \brief return the number of channels in a frame (valid after open() returned \c true
+             *
+             *  \note The dfeault implementation of this function returns 1!
+             */
+            virtual uint32_t intFrameChannels();
+            /** \brief read a new frame into the given array of floating point numbers */
+            virtual bool intReadFrameFloat(float* data, int channel=0);
+            /** \brief read a new frame into the given array of floating point numbers */
+            virtual bool intReadFrameDouble(double* data, int channel=0);
+            /** \brief read a new frame into the given array of integers */
+            virtual bool intReadFrameUINT16(uint16_t* data, int channel=0);
+
+            /** \brief this QPixmap is used to represent the image-file */
+            QImage img;
+            /** \brief \c true, if this is a greyscale image */
+            bool allGrey;
+    };
+</code></pre>
+
+<p>The functions <code>formatName()</code> and <code>filter()</code> specify the name (e.g. "<code>PNG-files [Qt]</code>") and a file-name filter string (e.g. <code>"PNG-files [Qt] (*.png)"</code>) for our new file-format.</p>
+
+<p>The methods <code>open()</code>,  <code>close()</code>,  <code>reset()</code> are sue to open and close the image file and to return to the start of the file, i.e. the first frame (if available). the method <code>nextFrame()</code> navigates to the next frame (if available). Finally <code>countFrames()</code> returns the number of frames in the file (here 1). The implementation of these functions is very simple:</p>
+
+<pre><code>    bool QFQtImageImporterPNG::open(QString filename)
+    {
+        // load the frame from the file into the internal datastore
+        if (img.load(filename, "PNG")) {
+            allGrey=img.allGray(); // check for greyscale
+            return !img.isNull();
+        } else {
+            return false;
+        }
+    }
+
+    void QFQtImageImporterPNG::close()
+    {
+        // reset internal image to a NULL-image
+        img=QImage();
+    }
+
+    uint32_t QFQtImageImporterPNG::countFrames()
+    {
+        return 1; // there is only one frame per PNG-file
+    }
+
+    void QFQtImageImporterPNG::reset()
+    {
+        // there is only one frame, so we have to do nothing
+    }
+
+    bool QFQtImageImporterPNG::nextFrame()
+    {
+        // only one frame, so there is no next frame!
+        return false;
+    }
+</code></pre>
+
+<p>The remainder of the functions return the frame-size and number of channels:</p>
+
+<pre><code>    uint32_t QFQtImageImporterPNG::intFrameWidth()
+    {
+        return img.width();
+    }
+
+    uint32_t QFQtImageImporterPNG::intFrameHeight()
+    {
+        return img.height();
+    }
+
+    uint32_t QFQtImageImporterPNG::intFrameChannels()
+    {
+        if (allGrey) return 1;
+        else return 3;
+    }
+</code></pre>
+
+<p>and read the contents of the frame(s):</p>
+
+<pre><code>    bool QFQtImageImporterPNG::intReadFrameFloat(float *data, int channel)
+    {
+        // all images will be 8-bit images. therefore we only implement intReadFrameUINT16() and use it here
+        uint16_t* d=(uint16_t*)qfMalloc(img.width()*img.height()*sizeof(uint16_t));
+        bool ok=intReadFrameUINT16(d, channel);
+        if (ok) for (int i=0; i&lt;img.width()*img.height(); i++) data[i]=d[i];
+        qfFree(d);
+        return ok;
+    }
+
+    bool QFQtImageImporterPNG::intReadFrameDouble(double *data, int channel)
+    {
+        // all images will be 8-bit images. therefore we only implement intReadFrameUINT16() and use it here
+        uint16_t* d=(uint16_t*)qfMalloc(img.width()*img.height()*sizeof(uint16_t));
+        bool ok=intReadFrameUINT16(d, channel);
+        if (ok) for (int i=0; i&lt;img.width()*img.height(); i++) data[i]=d[i];
+        qfFree(d);
+        return ok;
+    }
+
+    bool QFQtImageImporterPNG::intReadFrameUINT16(uint16_t *data, int channel)
+    {
+        if (allGrey) {
+            for (int y=0; y&lt;img.height(); y++) {
+                for (int x=0; x&lt;img.width(); x++) {
+                    data[y*img.width()+x]= qGray(img.pixel(x,y));
+                }
+            }
+            return true;
+        } else if (channel==0){
+            for (int y=0; y&lt;img.height(); y++) {
+                for (int x=0; x&lt;img.width(); x++) {
+                    data[y*img.width()+x]= qRed(img.pixel(x,y));
+                }
+            }
+            return true;
+        } else if (channel==1){
+            for (int y=0; y&lt;img.height(); y++) {
+                for (int x=0; x&lt;img.width(); x++) {
+                    data[y*img.width()+x]= qGreen(img.pixel(x,y));
+                }
+            }
+            return true;
+        } else if (channel==2){
+            for (int y=0; y&lt;img.height(); y++) {
+                for (int x=0; x&lt;img.width(); x++) {
+                    data[y*img.width()+x]= qBlue(img.pixel(x,y));
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+</code></pre>
+
+<p>Internally QuickFit represents most images as double-arrays for each channel. However, some plugins may read another dataformat and QuickFt provides three of them in the readers: double, float and uint16_t. As we can savely assume that all images read from a Qt Image reader are 8-bit images (possibly with 3 color-channels), we only implement the method <code>intReadFrameDouble(double *data, int channel)</code>, which reads the specified channel from the current frame into the given data array <code>data</code>. This function first checks whether we have a greyscale image, or an RGB-image and reads the channels accordingly. The methods that read float and double-images then use this function internally by creting a temportaty uint16_t image and then casting&amp;copying the results to their output-array (see above!). </p>
+    </body>
+</html>

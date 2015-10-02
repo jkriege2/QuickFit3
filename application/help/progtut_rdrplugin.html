@@ -23,15 +23,17 @@
 <li>Now the script generates a subfolder <code>qfrdrcurve</code> with the plugin project files Initially three classes are created <code>QFRDRCurvePlugin</code> in 'qfrdrcurve.h/cpp' which represents the plugin and serves as a factory-class for the actual RDR-objects. The class <code>QFRDRCurveData</code> in <code>qfrdrcurve_data.h/cpp</code> represents an RDR object class. Finally <code>QFRDRCurveDataEditor</code> in <code>qfrdrcurve_dataeditor.h/cpp/ui</code>  represents an editor widget, which displays the data in the RDR-editor. The file <code>qfrdrcurve.pro</code> is the qmake-project for this plugin and <code>qfrdrcurve.qrc</code> contains the resources (e.g. icons from the sub-folder <code>images</code>). The sub-folder <code>help</code> finally contains the online-help for this plugin, with the main help in <code>help/curves.html</code> and a tutorial in <code>help/tutorial.html</code>, which is registered in <code>help/tutorial..ini</code>.</li>
 </ol>
 </li>
-<li>copy the folder <code>qfrdrcurve</code> into the plugins folder of the Git-repository and add the following lines to <code>quickfit3.pro</code>:</li>
-</ol>
+<li><p>copy the folder <code>qfrdrcurve</code> into the plugins folder of the Git-repository and add the following lines to <code>quickfit3.pro</code> (if you are a QuickFit main-developer):</p>
 
-<blockquote>
 <pre><code>SUBDIRS += plg_qfrdrcurve
 plg_qfrdrcurve.subdir=./plugins/qfrdrcurve
 plg_qfrdrcurve.depends = lib libqf3widgets
 </code></pre>
-</blockquote>
+
+<p>If you are not a main developer, you can alternatively add these lines to the file <code>userplugins.inc</code> (create it if it does not exist yet and it will be evaluated automatically by <code>quickfit3.pro</code>!)</p></li>
+
+
+</ol>
 
 <h1>
 <a id="user-content-editing-the-plugin-source-code-in-qfrdrcurvehpp" class="anchor" href="#editing-the-plugin-source-code-in-qfrdrcurvehpp" aria-hidden="true"><span class="octicon octicon-link"></span></a>Editing the plugin source-code in <code>qfrdrcurve.h/pp</code>
@@ -818,14 +820,14 @@ virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol"); 
 <p>The online-help for the parser function follows a special format. It is stored in the file <code>plugins/qfrdrcurve/help/parserreference/curves.html</code>. This file has to be referenced in a file <code>plugins/qfrdrcurve/help/parserref.inc</code> with the following contents that adds a link to the main parser function reference:</p>
 
 <blockquote>
-<pre><code>   &lt;li&gt;&lt;b&gt;&lt;a href="$$plugin_info:helpdir:curves$$/parserreference/curve.html"&gt;Curve RDR data access&lt;/a&gt;&lt;/b&gt;&lt;/li&gt;
+<pre><code>   &lt;li&gt;&lt;b&gt;&lt;a href="&dollar;&dollar;plugin_info:helpdir:curves&dollar;&dollar;/parserreference/curve.html"&gt;Curve RDR data access&lt;/a&gt;&lt;/b&gt;&lt;/li&gt;
 </code></pre>
 </blockquote>
 
 <p>In addition, you have to add these lines to the function QFRDRCurvePlugin::init(), which finally registers the parser online-help directory:</p>
 
 <blockquote>
-<pre><code>       QFPluginServices::getInstance()-&gt;appendOrAddHTMLReplacement("qfmathparser_ref", QString("$$insert:%1/parserref.inc$$").arg(QFPluginServices::getInstance()-&gt;getPluginHelpDirectory(getID())));
+<pre><code>       QFPluginServices::getInstance()-&gt;appendOrAddHTMLReplacement("qfmathparser_ref", QString("&dollar;&dollar;insert:%1/parserref.inc&dollar;&dollar;").arg(QFPluginServices::getInstance()-&gt;getPluginHelpDirectory(getID())));
        QStringList sl=QFPluginServices::getInstance()-&gt;getGlobalConfigValue("QFMathParser_ref").toStringList();
        sl.append(QFPluginServices::getInstance()-&gt;getPluginHelpDirectory(getID())+QString("/parserreference/"));
        QFPluginServices::getInstance()-&gt;setGlobalConfigValue("QFMathParser_ref", sl);           
@@ -833,7 +835,7 @@ virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol"); 
 </code></pre>
 </blockquote>
 
-<p>The first line adds the <code>parserref.inc</code> file to the help replace <code>$$qfmathparser_ref$$</code>, which is used to display a list of all parser-reference help pages. The remaining four add the directory with the parser refernce HTML file to the central list of such directories.</p>
+<p>The first line adds the <code>parserref.inc</code> file to the help replace <code>&dollar;&dollar;qfmathparser_ref&dollar;&dollar;</code>, which is used to display a list of all parser-reference help pages. The remaining four add the directory with the parser refernce HTML file to the central list of such directories.</p>
 
 
     </div>
