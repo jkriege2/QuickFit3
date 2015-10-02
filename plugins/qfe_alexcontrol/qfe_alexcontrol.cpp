@@ -29,6 +29,7 @@ Copyright (c) 2014
 #include <QtPlugin>
 #include <iostream>
 #include "controlWidget.h"
+#include "optionswidget.h"
 
 #define LOG_PREFIX QString("qfe_alexcontrol >>> ").toUpper()
 
@@ -70,6 +71,9 @@ void QFE_ALEXControl::initExtension() {
     if (extm) {
         extm->addAction(actStartPlugin);
     }
+
+    services->registerSettingsPane(this);
+
     services->log_global_text(tr("initializing extension '%1' ... DONE\n").arg(getName()));
 
 }
@@ -100,6 +104,24 @@ void QFE_ALEXControl::storeSettings(ProgramOptions* settingspo) {
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
 	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
+}
+
+QString QFE_ALEXControl::pluginOptionsName() const
+{
+    return tr("ALEX Control");
+}
+
+QIcon QFE_ALEXControl::pluginOptionsIcon() const
+{
+    return QIcon(getIconFilename());
+}
+
+QFPluginOptionsWidget *QFE_ALEXControl::createOptionsWidget(QWidget *parent)
+{
+    OptionsWidget* o= new OptionsWidget(this, parent);
+    if (win && o) connect(o, SIGNAL(writingSettings()), win, SLOT(loadQF3Settings()));
+    //qDebug()<<"*QFE_ALEXControl::createOptionsWidget("<<parent<<"): "<<o;
+    return o;
 }
 
 void QFE_ALEXControl::log_text(QString message) {

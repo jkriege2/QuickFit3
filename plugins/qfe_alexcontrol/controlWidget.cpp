@@ -6,11 +6,13 @@
 #include <QTime>
 #include "qfpluginservices.h"
 #include "programoptions.h"
+#include "alexceditsettingsfiles.h"
 
 controlWidget::controlWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::controlWidget)
 {
+    //errorModel=new ErrorModel()
     ui->setupUi(this);
     this->setWindowTitle("ALEX Control");
 //    this->setWindowIcon(QIcon("sequence.svg"));
@@ -29,9 +31,10 @@ controlWidget::controlWidget(QWidget *parent) :
     ui->comboBoxSequence->setDisabled(true);
 
     cmanager = new SDFFLib::channelManager;
+    ui->edtSDFF->setReadOnly(true);
 
 
-    loadSettings(*(ProgramOptions::getInstance()->getQSettings()));
+    loadQF3Settings();
 
     ni_driver=NULL;
     checkIniFiles();
@@ -70,29 +73,34 @@ void controlWidget::saveSettings(QSettings &settings, QString prefix)
 void controlWidget::loadSettings(QSettings &settings, QString prefix)
 {
     ui->spinBoxTimestep->setValue(settings.value(prefix+"spinBoxTimestep",10).toInt());
-    ui->spinBox_1->setValue(settings.value("spinBox_T_D",100).toInt());
-    ui->spinBox_2->setValue(settings.value("spinBox_Tbreak1",10).toInt());
-    ui->spinBox_3->setValue(settings.value("spinBox_T_A",100).toInt());
-    ui->spinBox_4->setValue(settings.value("spinBox_Tbreak2",10).toInt());
-    ui->comboBoxSequence->setCurrentIndex(settings.value("comboBoxSequence",0).toInt());
-    ui->doubleSpinBoxIntensityGreen->setValue(settings.value("doubleSpinBoxIntensityGreen",10).toDouble());
-    ui->doubleSpinBoxIntensityBlue->setValue(settings.value("doubleSpinBoxIntensityBlue",10).toDouble());
-    ui->lineEdit->setText(settings.value("lineEdit","").toString());
+    ui->spinBox_1->setValue(settings.value(prefix+"spinBox_T_D",100).toInt());
+    ui->spinBox_2->setValue(settings.value(prefix+"spinBox_Tbreak1",10).toInt());
+    ui->spinBox_3->setValue(settings.value(prefix+"spinBox_T_A",100).toInt());
+    ui->spinBox_4->setValue(settings.value(prefix+"spinBox_Tbreak2",10).toInt());
+    ui->comboBoxSequence->setCurrentIndex(settings.value(prefix+"comboBoxSequence",0).toInt());
+    ui->doubleSpinBoxIntensityGreen->setValue(settings.value(prefix+"doubleSpinBoxIntensityGreen",10).toDouble());
+    ui->doubleSpinBoxIntensityBlue->setValue(settings.value(prefix+"doubleSpinBoxIntensityBlue",10).toDouble());
+    ui->lineEdit->setText(settings.value(prefix+"lineEdit","").toString());
 
-    this->restoreGeometry(settings.value("geometry",this->geometry()).toByteArray());
-    ui->checkBoxOptions->setChecked(settings.value("checkBoxOptions",false).toBool());
-    channelsFilename = settings.value("channelsFilename",QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_channels.ini").toString();
-    portFilename = settings.value("portFilename",QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_ports.ini").toString();
-    timingFilename = settings.value("timingFilename",QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_timing.ini").toString();
-    curFile = settings.value("curFile",QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_alexcontrol")+"/ALEX_sequence.sdff").toString();
-    directory = settings.value("directory",QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_alexcontrol")).toString();
-    sdffSequence = settings.value("sdffSequence",QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_alexcontrol")+"/ALEX_sequence.sdff").toString();
+    this->restoreGeometry(settings.value(prefix+"geometry",this->geometry()).toByteArray());
+    ui->checkBoxOptions->setChecked(settings.value(prefix+"checkBoxOptions",false).toBool());
+    channelsFilename = settings.value(prefix+"channelsFilename",QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_channels.ini").toString();
+    portFilename = settings.value(prefix+"portFilename",QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_ports.ini").toString();
+    timingFilename = settings.value(prefix+"timingFilename",QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_timing.ini").toString();
+    curFile = settings.value(prefix+"curFile",QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_alexcontrol")+"/ALEX_sequence.sdff").toString();
+    directory = settings.value(prefix+"directory",QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_alexcontrol")).toString();
+    sdffSequence = settings.value(prefix+"sdffSequence",QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_alexcontrol")+"/ALEX_sequence.sdff").toString();
 }
 
 void controlWidget::closeEvent(QCloseEvent *event)
 {
     //QSettings settings(QApplication::applicationDirPath()+"/" FILENAME_SETTINGS,QSettings::IniFormat);
     this->saveSettings(*(ProgramOptions::getInstance()->getQSettings()));
+}
+
+void controlWidget::loadQF3Settings()
+{
+    loadSettings(*(ProgramOptions::getInstance()->getQSettings()));
 }
 
 void controlWidget::openFileDialog()
@@ -107,7 +115,7 @@ void controlWidget::openFileDialog()
 
 void controlWidget::setSDFFfile(QString filename)
 {
-    qDebug()<<"setSDFFfile filename = "<<filename;
+    ui->widLog->log_text_linebreak(QString("setSDFFfile filename = ")+filename);
     curFile=filename;
 }
 
@@ -127,7 +135,7 @@ void controlWidget::setSequence(int index)
     case 5:
         curFile=ui->lineEdit->text(); break;
     default:
-        qWarning("unknown sequence");
+        ui->widLog->log_warning_linebreak("unknown sequence");
     }
 //    if(index>0) {
 //        ui->spinBox_1->setDisabled(true);
@@ -142,7 +150,7 @@ void controlWidget::setSequence(int index)
 //        ui->spinBox_4->setDisabled(false);
 //        ui->checkBoxSlow->setDisabled(false);
 //    }
-    qDebug()<<"setSequence = "<<curFile;
+    ui->widLog->log_text_linebreak(QString("setSequence = ")+curFile);
 }
 
 void controlWidget::setExternalSDFF()
@@ -177,13 +185,16 @@ void controlWidget::setSlowAlternation(bool toggle)
 
 void controlWidget::connectToHardware() {
 
-    qDebug("connect to hardware");
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    if (ni_driver) delete ni_driver;
+    if (ni_driver) {
+        ui->widLog->log_text_linebreak("\n\nDisconnect from hardware");
+        delete ni_driver;
+    }
     bool ok=true;
 
-    qDebug("try: ");
+    ui->widLog->log_text_linebreak("\n\nConnect to hardware");
+    ui->widLog->log_text_linebreak("try: ");
     try {
         cmanager->read_ini(std::string(channelsFilename.toLocal8Bit().data()));
         ni_driver=new SDFFLib::NIdriver(cmanager);
@@ -198,7 +209,8 @@ void controlWidget::connectToHardware() {
         ev.stext=ev.text;
         ev.num=E.get_number();
         ev.filename="";
-        errorModel->addEvent(ev);
+        //errorModel->addEvent(ev);
+        ui->widLog->log_error_linebreak(tr("\nSDFF-ERROR: %1 (line %2 in %3)\n").arg(E.get_message().c_str()).arg(E.get_line()).arg("SDFF-Sequence"));
         ok=false;
     } catch (std::exception& E) {
         SDFFLib::bi_event ev;
@@ -209,10 +221,11 @@ void controlWidget::connectToHardware() {
         ev.stext=ev.text;
         ev.num=-1;
         ev.filename="";
-        errorModel->addEvent(ev);
+        //errorModel->addEvent(ev);
+        ui->widLog->log_error_linebreak(tr("\nINTERNAL-ERROR: %1\n").arg(E.what()));
         ok=false;
     }
-    qDebug("success");
+    ui->widLog->log_text_linebreak("success");
 
     QApplication::restoreOverrideCursor();
 }
@@ -229,12 +242,13 @@ void controlWidget::runSDFFOnHardware() {
         return;
     }
     sdffParser=NULL;
-    qDebug("try: ");
+    ui->widLog->log_text_linebreak("\n\nRun SDFF on hardware:");
+    ui->widLog->log_text_linebreak("try: ");
     try {
 
         QApplication::setOverrideCursor(Qt::WaitCursor);
         cmanager->read_ini(std::string(channelsFilename.toLocal8Bit().data()));
-        qDebug("successfully read channels.ini");
+        ui->widLog->log_text_linebreak("successfully read channels.ini");
         double timestep=ui->spinBoxTimestep->value(); // in us
 
         SDFFLib::NIsequenceGenerator* nisg=new SDFFLib::NIsequenceGenerator();
@@ -244,7 +258,7 @@ void controlWidget::runSDFFOnHardware() {
 
         ni_driver->set_continuoustask(true);
         sdffParser = new SDFFLib::SDFFparser(nisg, cmanager);
-        qDebug("NIsequenceGenerator initialized.\nloading file..");
+        ui->widLog->log_text_linebreak("NIsequenceGenerator initialized.\nloading file..");
         if(!QFile(curFile).exists()) {
             QApplication::restoreOverrideCursor();
             QMessageBox::warning(this,"Warning","The file \"" + curFile + "\" does not exist");
@@ -254,7 +268,7 @@ void controlWidget::runSDFFOnHardware() {
 
         int r=sdffParser->import(fn);
         if(r) {
-//            qDebug(sdffParser->get_report().c_str());
+//            ui->widLog->log_text_linebreak(sdffParser->get_report().c_str());
             QMessageBox msgImportError(this);
             msgImportError.setIcon(QMessageBox::Warning);
             msgImportError.setWindowTitle("Warning");
@@ -284,27 +298,29 @@ void controlWidget::runSDFFOnHardware() {
                 params= "blue="  + QString::number(ui->doubleSpinBoxIntensityBlue->value()) +
                         ";\ngreen=" + QString::number(ui->doubleSpinBoxIntensityGreen->value()) +
                         ";";
-            qDebug() << params;
+            ui->widLog->log_text_linebreak(QString("Parameter:\n%1\n").arg(params));
             SDFFLib::sdff_result *res=new SDFFLib::sdff_result();
             sdffParser->evaluate_parameters(params.toStdString(), res);
             delete res;
 
-            // qDebug(SDFFLib::sdff_resulttostr(*res).c_str());
-//            qDebug(sdffParser->report_contents().c_str());
-//            qDebug(sdffParser->get_cmd_manager()->report().c_str());
+            // ui->widLog->log_text_linebreak(SDFFLib::sdff_resulttostr(*res).c_str());
+//            ui->widLog->log_text_linebreak(sdffParser->report_contents().c_str());
+//            ui->widLog->log_text_linebreak(sdffParser->get_cmd_manager()->report().c_str());
             sdffSequence=sdffParser->get_current_sdff_code().c_str();
             qDebug(sdffParser->get_current_sdff_code().c_str());
         }
+        ui->edtSDFF->setPlainText(sdffParser->get_current_sdff_code().c_str());
+        ui->edtSDFF->setReadOnly(true);
 
-        qDebug("running SDFF on hardware ... generate ...");
+        ui->widLog->log_text_linebreak("running SDFF on hardware ... generate ...");
 
         r=sdffParser->generate(timestep);
 
-        qDebug("Bind...");
+        ui->widLog->log_text_linebreak("Bind...");
 
         ni_driver->bind(nisg);
 
-        qDebug("Start...");
+        ui->widLog->log_text_linebreak("Start...");
 
         ni_driver->start();
 
@@ -342,7 +358,8 @@ void controlWidget::runSDFFOnHardware() {
         ev.stext=ev.text;
         ev.num=E.get_number();
         ev.filename="";
-        errorModel->addEvent(ev);
+        //errorModel->addEvent(ev);
+        ui->widLog->log_error_linebreak(tr("\nSDFF-ERROR: %1 (line %2 in %3)\n").arg(E.get_message().c_str()).arg(E.get_line()).arg("SDFF-Sequence"));
     } catch (std::exception& E) {
         SDFFLib::bi_event ev;
         ev.type=SDFFLib::biError;
@@ -352,7 +369,8 @@ void controlWidget::runSDFFOnHardware() {
         ev.stext=ev.text;
         ev.num=-1;
         ev.filename="";
-        errorModel->addEvent(ev);
+        //errorModel->addEvent(ev);
+        ui->widLog->log_error_linebreak(tr("\nINTERNAL-ERROR: %1\n").arg(E.what()));
     }
     if(sdffParser!=NULL) delete sdffParser;
     sdffParser=NULL;
@@ -372,8 +390,9 @@ void controlWidget::checkIniFiles()
     msgIniMissing.setWindowTitle("Warning");
     msgIniMissing.addButton(QMessageBox::Open);
     msgIniMissing.setDefaultButton(QMessageBox::Open);
-    msgIniMissing.addButton(QMessageBox::Close);
-    msgIniMissing.setEscapeButton(QMessageBox::Close);
+    msgIniMissing.addButton(QMessageBox::RestoreDefaults);
+    msgIniMissing.addButton(QMessageBox::Cancel);
+    msgIniMissing.setEscapeButton(QMessageBox::Cancel);
     QString explanation=tr("\n\nThis file configures the NI hardware and defines which IOs to use for what. Examples for this file are available in the directory:\n   %1").arg(ProgramOptions::getInstance()->getApplicationDirectory()+"/globalconfig_templates");
     while(ok && !QFile(channelsFilename).exists()) {
         msgIniMissing.setText(tr("The file alexc_channels.ini is missing. %1\n\nLooking for file: %2").arg(explanation).arg(channelsFilename));
@@ -381,6 +400,21 @@ void controlWidget::checkIniFiles()
         if(QMessageBox::Open==ret) {
             channelsFilename=QFileDialog::getOpenFileName(this, tr("Open Channel Settings"),
                                                           directory, tr("ini Files (*.ini);;All Files (*.*)"));
+        } else if (ret==QMessageBox::RestoreDefaults) {
+            channelsFilename=qfGetSaveFileName(this,tr("new channels INI-file"), QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_channels.ini", tr("INI-files (*.ini)"));
+            if (channelsFilename.isEmpty()) {
+                close();
+                ok=false;
+                break;
+            } else {
+                QFile f(channelsFilename);
+                if (f.open(QFile::WriteOnly|QFile::Text)) {
+                    f.write(readFile(":/ALEXControl/alexc_channels.ini"));
+                    f.close();
+                } else {
+                    QMessageBox::critical(this, tr("Error writing default INI file"), tr("Could not write to file\n   %1\nPlease select another file").arg(channelsFilename),QMessageBox::Ok, QMessageBox::Ok);
+                }
+            }
         } else {
             close();
             ok=false;
@@ -393,6 +427,21 @@ void controlWidget::checkIniFiles()
         if(QMessageBox::Open==ret) {
             timingFilename=QFileDialog::getOpenFileName(this, tr("Open Timing Settings"),
                                                           directory, tr("ini Files (*.ini);;All Files (*.*)"));
+        } else if (ret==QMessageBox::RestoreDefaults) {
+            timingFilename=qfGetSaveFileName(this,tr("new timing INI-file"), QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_timing.ini", tr("INI-files (*.ini)"));
+            if (timingFilename.isEmpty()) {
+                close();
+                ok=false;
+                break;
+            } else {
+                QFile f(timingFilename);
+                if (f.open(QFile::WriteOnly|QFile::Text)) {
+                    f.write(readFile(":/ALEXControl/alexc_timing.ini"));
+                    f.close();
+                } else {
+                    QMessageBox::critical(this, tr("Error writing default INI file"), tr("Could not write to file\n   %1\nPlease select another file").arg(timingFilename),QMessageBox::Ok, QMessageBox::Ok);
+                }
+            }
         } else {
             close();
             ok=false;
@@ -405,6 +454,21 @@ void controlWidget::checkIniFiles()
         if(QMessageBox::Open==ret) {
             portFilename=QFileDialog::getOpenFileName(this, tr("Open Port Settings"),
                                                           directory, tr("ini Files (*.ini);;All Files (*.*)"));
+        } else if (ret==QMessageBox::RestoreDefaults) {
+            portFilename=qfGetSaveFileName(this,tr("new ports INI-file"), QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_ports.ini", tr("INI-files (*.ini)"));
+            if (portFilename.isEmpty()) {
+                close();
+                ok=false;
+                break;
+            } else {
+                QFile f(portFilename);
+                if (f.open(QFile::WriteOnly|QFile::Text)) {
+                    f.write(readFile(":/ALEXControl/alexc_ports.ini"));
+                    f.close();
+                } else {
+                    QMessageBox::critical(this, tr("Error writing default INI file"), tr("Could not write to file\n   %1\nPlease select another file").arg(portFilename),QMessageBox::Ok, QMessageBox::Ok);
+                }
+            }
         } else {
             close();
             ok=false;
@@ -416,6 +480,93 @@ void controlWidget::checkIniFiles()
         close();
         deleteLater();
     }
+
+    ui->labConfigFiles->setText(QString("channels: %1\ntiming: %2\nports: %3").arg(qfShortenString(channelsFilename,250,50)).arg(qfShortenString(timingFilename,250,50)).arg(qfShortenString(portFilename,250,50)));
+}
+
+void controlWidget::on_btnEditHardwareSettings_clicked()
+{
+    ALEXCEditSettingsFiles* dlg=new ALEXCEditSettingsFiles(channelsFilename, timingFilename, portFilename, this);
+    if (dlg->exec()) {
+        if ((readFile(channelsFilename)!=dlg->getChannels().toLocal8Bit()) && (!QFileInfo(channelsFilename).isWritable())) {
+            bool ok=false;
+            if (QMessageBox::critical(this, tr("INI-File is readonly"), tr("The channels INI-file\n   %1\nis read-only. Do you want to save it under a new name?\n   [If you choose NO, the changes will be discarded!]").arg(channelsFilename), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                while (!ok) {
+                    QString fn=qfGetOpenFileName(this, tr("CHANNELS ini-filename ..."), channelsFilename, tr("INI-file (*.ini)"));
+                    if (!fn.isEmpty()) {
+                        QFile f(fn);
+                        if (f.open(QFile::WriteOnly|QFile::Text)) {
+                            f.write(dlg->getChannels().toLocal8Bit());
+                            f.close();
+                            channelsFilename=fn;
+                            ok=true;
+                        } else {
+                            if (QMessageBox::critical(this, tr("Could not write INI-File"), tr("Could not write to INI-file\n   %1\n   reason: %2\nSelect a new file?\n   [No will discard all changes!]").arg(fn).arg(f.errorString()),  QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::No) {
+                                ok=true;
+                            }
+                        }
+
+                    } else {
+                        ok=true;
+                    }
+                }
+            }
+
+        }
+        if ((readFile(portFilename)!=dlg->getPorts().toLocal8Bit()) && (!QFileInfo(portFilename).isWritable())) {
+            bool ok=false;
+            if (QMessageBox::critical(this, tr("INI-File is readonly"), tr("The ports INI-file\n   %1\nis read-only. Do you want to save it under a new name?\n   [If you choose NO, the changes will be discarded!]").arg(portFilename), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                while (!ok) {
+                    QString fn=qfGetOpenFileName(this, tr("PORTS ini-filename ..."), portFilename, tr("INI-file (*.ini)"));
+                    if (!fn.isEmpty()) {
+                        QFile f(fn);
+                        if (f.open(QFile::WriteOnly|QFile::Text)) {
+                            f.write(dlg->getPorts().toLocal8Bit());
+                            f.close();
+                            portFilename=fn;
+                            ok=true;
+                        } else {
+                            if (QMessageBox::critical(this, tr("Could not write INI-File"), tr("Could not write to INI-file\n   %1\n   reason: %2\nSelect a new file?\n   [No will discard all changes!]").arg(fn).arg(f.errorString()),  QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::No) {
+                                ok=true;
+                            }
+                        }
+
+                    } else {
+                        ok=true;
+                    }
+                }
+            }
+
+        }
+
+        if ((readFile(timingFilename)!=dlg->getTiming().toLocal8Bit()) && (!QFileInfo(timingFilename).isWritable())) {
+            bool ok=false;
+            if (QMessageBox::critical(this, tr("INI-File is readonly"), tr("The timing INI-file\n   %1\nis read-only. Do you want to save it under a new name?\n   [If you choose NO, the changes will be discarded!]").arg(timingFilename), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                while (!ok) {
+                    QString fn=qfGetOpenFileName(this, tr("TIMING ini-filename ..."), timingFilename, tr("INI-file (*.ini)"));
+                    if (!fn.isEmpty()) {
+                        QFile f(fn);
+                        if (f.open(QFile::WriteOnly|QFile::Text)) {
+                            f.write(dlg->getTiming().toLocal8Bit());
+                            f.close();
+                            timingFilename=fn;
+                            ok=true;
+                        } else {
+                            if (QMessageBox::critical(this, tr("Could not write INI-File"), tr("Could not write to INI-file\n   %1\n   reason: %2\nSelect a new file?\n   [No will discard all changes!]").arg(fn).arg(f.errorString()),  QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::No) {
+                                ok=true;
+                            }
+                        }
+
+                    } else {
+                        ok=true;
+                    }
+                }
+            }
+
+        }
+        connectToHardware();
+    }
+    delete dlg;
 }
 
 
@@ -431,8 +582,9 @@ void controlWidget::on_doubleSpinBoxIntensityGreen_editingFinished()// only exec
     else runSDFFOnHardware();
 }
 
-void controlWidget::on_comboBoxSequence_editingFinished()
+void controlWidget::on_comboBoxSequence_currentIndexChanged(int idx)
 {
+    Q_UNUSED(idx);
     if(!ui->comboBoxSequence->hasFocus()) return;
     else runSDFFOnHardware();
 }
@@ -485,7 +637,7 @@ void controlWidget::saveSDFF() // FIXME
 
     qDebug()<<filename;
     QFile file(filename);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {qWarning()<<"could not open file"<<filename; return;}
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {ui->widLog->log_warning_linebreak(QString("could not open file")+filename); return;}
     QTextStream out(&file);
     out<<"test\n";
     out <<"channels: "          <<  channelsFilename

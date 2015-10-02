@@ -28,12 +28,13 @@ class controlWidget : public QWidget
 public:
     explicit controlWidget(QWidget *parent = 0);
     ~controlWidget();
-    void saveSettings(QSettings &settings,QString prefix=QString(""));
-    void loadSettings(QSettings &settings,QString prefix=QString(""));
+    void saveSettings(QSettings &settings,QString prefix=QString("qfe_alexcontrol/"));
+    void loadSettings(QSettings &settings,QString prefix=QString("qfe_alexcontrol/"));
 protected:
     /// called when the application is closed. It will call the storeSettings() functions of all widgets
     virtual void closeEvent(QCloseEvent* event);
-
+public slots:
+    void loadQF3Settings();
 signals:
     /** \brief emitted when the filename of a current sdff file has changed*/
     void fileChanged(QString);
@@ -57,9 +58,11 @@ private slots:
     /** \brief checks if all required .ini files exist */
     void checkIniFiles();
 
+    void on_btnEditHardwareSettings_clicked();
+
     void on_doubleSpinBoxIntensityBlue_editingFinished();
     void on_doubleSpinBoxIntensityGreen_editingFinished();
-    void on_comboBoxSequence_editingFinished();
+    void on_comboBoxSequence_currentIndexChanged(int idx);
     void on_pushButtonPlay_clicked();
     void on_pushButtonD_clicked();
     void on_pushButtonA_clicked();

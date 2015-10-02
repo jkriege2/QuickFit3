@@ -23,3 +23,7 @@ LIBS+= -L$$PWD/nidaqmx -lNIDAQmx
 INCLUDEPATH += $$PWD/nidaqmx
 
 DEFINES += QF_HAS_NIDAQMX
+
+!exists($$PWD/nidaqmx/libNIDAQmx.a) {
+    error("didn't find the link-library libNIDAQmx.a for the National Instruments DAQmx driver. If you don't have that library, add a line 'QF3CONFIG+=nonidaqmx' to your quickfit.inc file to prevent plugins that rely on NIDAQmx to be built!!!")
+}

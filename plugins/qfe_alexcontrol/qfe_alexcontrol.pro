@@ -36,14 +36,20 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qfe_alexcontrol.h \
            controlWidget.h \
-           errormodel.h
+           errormodel.h \
+    alexceditsettingsfiles.h \
+    optionswidget.h
 
 SOURCES += qfe_alexcontrol.cpp \
            controlWidget.cpp \
-           errormodel.cpp
+           errormodel.cpp \
+    alexceditsettingsfiles.cpp \
+    optionswidget.cpp
 
 FORMS += \
-    controlWidget.ui
+    controlWidget.ui \
+    alexceditsettingsfiles.ui \
+    optionswidget.ui
 
 RESOURCES += qfe_alexcontrol.qrc
 

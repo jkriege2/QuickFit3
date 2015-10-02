@@ -67,7 +67,7 @@ class QFLIB_EXPORT QFPluginOptionsWidget : public QWidget
     \ingroup qf3plugins
 
     If you want to create a config pane in the main options dialog, implement this interface in your QFPlugin class and use the function
-    QFPluginTools
+    QFPluginServices::registerSettingsPane() to geister the widget.
 */
 class QFPluginOptionsDialogInterface {
     public:

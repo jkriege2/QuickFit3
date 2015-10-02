@@ -51,7 +51,8 @@ SOURCES += qfpbasicimageexporters.cpp\
 FORMS = \
     qfbasicimageexportersoptionswidget.ui
 
-RESOURCES +=
+RESOURCES += \
+    basicimageexporters.qrc
 
 TRANSLATIONS= ./translations/de.exporters_basicimage.ts
 

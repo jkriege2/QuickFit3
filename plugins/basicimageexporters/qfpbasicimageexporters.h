@@ -53,7 +53,7 @@ class QFPBasicImageExporters : public QObject, public QFPluginExporters, public 
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr("basic image series exporters");
+            return tr("Basic image series exporters");
         };
 
         /** \brief short description for the plugin */
@@ -84,7 +84,7 @@ class QFPBasicImageExporters : public QObject, public QFPluginExporters, public 
         /** \copydoc QFPlugin::getIconFilename()  */
         virtual QString getIconFilename() const {
             // replace with your icon if you have one ... or use this default icon
-            return ":/lib/exporter_icon.png";
+            return ":/exporters_basicimages/icon.png";
         };
 
         /** \brief plugin version  */

@@ -27,6 +27,8 @@ Copyright (c) 2014
 #include <QObject>
 #include "qfextension.h"
 #include "controlWidget.h"
+#include "qfpluginoptionsdialog.h"
+
 
 /*!
     \defgroup qf3ext_qfe_alexcontrol QFExtension implementation
@@ -36,9 +38,9 @@ Copyright (c) 2014
 /*! \brief QFExtension implementation
     \ingroup qf3ext_qfe_alexcontrol
  */
-class QFE_ALEXControl : public QObject, public QFExtensionBase {
+class QFE_ALEXControl : public QObject, public QFExtensionBase, public QFPluginOptionsDialogInterface {
         Q_OBJECT
-        Q_INTERFACES(QFExtension)
+        Q_INTERFACES(QFExtension QFPluginOptionsDialogInterface)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
         Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFE_ALEXControl")
 #endif	
@@ -74,6 +76,11 @@ class QFE_ALEXControl : public QObject, public QFExtensionBase {
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 
+        QString pluginOptionsName() const;
+        QIcon pluginOptionsIcon() const;
+        QFPluginOptionsWidget *createOptionsWidget(QWidget *parent);
+
+
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);
@@ -83,7 +90,6 @@ class QFE_ALEXControl : public QObject, public QFExtensionBase {
         virtual void loadSettings(ProgramOptions* settings);
         /** \copydoc QFExtensionBase::storeSettings() */
         virtual void storeSettings(ProgramOptions* settings);
-
 
 
         /** \brief log project text message
@@ -105,7 +111,6 @@ class QFE_ALEXControl : public QObject, public QFExtensionBase {
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */
         void startPlugin();
-
 
 };
 

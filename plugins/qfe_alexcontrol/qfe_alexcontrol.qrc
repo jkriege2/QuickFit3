@@ -1,8 +1,11 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file alias="qfe_alexcontrol/qfe_alexcontrol.png">qfe_alexcontrol.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file alias="qfe_alexcontrol/qfe_alexcontrol.png">qfe_alexcontrol.png</file>
+    </qresource>
     <qresource prefix="/ALEXControl">
+        <file alias="alexc_channels.ini">globalconfig/alexc_channels.ini</file>
+        <file alias="alexc_ports.ini">globalconfig/alexc_ports.ini</file>
+        <file alias="alexc_timing.ini">globalconfig/alexc_timing.ini</file>
         <file>sequence.svg</file>
         <file>AlternationInfo.svg</file>
         <file>AlternationInfo.png</file>
