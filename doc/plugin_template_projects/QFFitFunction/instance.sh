@@ -57,7 +57,7 @@ fi
 CLASSNAME_UC=`echo $CLASSNAME | tr a-z A-Z`
 CLASSNAMEFF_UC=`echo ${FITFUNCCLASSNAME} | tr a-z A-Z`
 
-FNAME=`echo $CLASSNAME | tr A-Z a-z`
+FNAME=`echo $TARGETNAME | tr A-Z a-z`
 echo -n "file name for QFFitFunction plugin implementation: " $FNAME ".*
 "
 FNAMEFF=`echo $FITFUNCCLASSNAME | tr A-Z a-z`

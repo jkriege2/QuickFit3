@@ -36,7 +36,7 @@ fi
 
 CLASSNAME_UC=`echo $CLASSNAME | tr a-z A-Z`
 
-FNAME=`echo $CLASSNAME | tr A-Z a-z`
+FNAME=`echo $TARGETNAME | tr A-Z a-z`
 echo -n "file name for QFExtensionLinearStage implementation: " $FNAME ".*
 "
 mkdir -p $FNAME

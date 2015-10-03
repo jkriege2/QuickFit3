@@ -27,16 +27,16 @@ else
 fi
 
 if [ "$TARGETNAME" == "" ]; then
-	echo -n "name for plugin library (also pligin ID): "
+	echo -n "name for plugin library (also plugin ID): "
 	read -e TARGETNAME
 else
-	echo -n "name for plugin library (also pligin ID): " $TARGETNAME "
+	echo -n "name for plugin library (also plugin ID): " $TARGETNAME "
 "
 fi
 
 CLASSNAME_UC=`echo $CLASSNAME | tr a-z A-Z`
 
-FNAME=`echo $CLASSNAME | tr A-Z a-z`
+FNAME=`echo $TARGETNAME | tr A-Z a-z`
 echo -n "file name for QFEvaluationItem implementation: " $FNAME ".*
 "
 mkdir -p $FNAME
