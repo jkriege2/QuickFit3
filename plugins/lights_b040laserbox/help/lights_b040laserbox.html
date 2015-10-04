@@ -6,13 +6,25 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-	 <p>This plugin controls laser (e.g. from Cobolt SE) which are connected to a RS232 remote box, as built/developed in B040/DKFZ.</p>
-	 <p>The controllers are configured by a global configuration file <tt>lights_b040laserbox.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated
-	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>lights_b040laserbox.ini</tt> either in
-	 the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/lights_b040laserbox/</tt>) for the plugin.
-	 </p>
-	 <p>In the <tt>lights_b040laserbox.ini</tt> you will have to tell the plugin which remote boxes are available and which serial ports they use. This is done inside a <tt>[<b>lightsource</b><i>N</i>]</tt> block for each light source <i>N</i> (default values are <u>underlined</u>):
-	 <blockquote><tt>
+     
+
+<center><a name="lights_b040laserbox_pic000"><img src="./pic/lights_b040laserbox_pic000.png" border="1">
+</center>
+
+     
+     <p>This plugin controls laser (e.g. from Cobolt SE) which are connected to a RS232 remote box, as built/developed in B040/DKFZ.</p>
+     $$startbox_note$$
+     The full hardware description (including schematics, PCBs, documentationa nd firmware) of this control-box is available within the QuickFit 3 installation:<ul>
+       <li>Documentation as PDF: <tt><a href="$$local_plugin_assets$$/electronics/doc/cobolt_laser_control.pdf">$$local_plugin_assets$$/electronics/doc/cobolt_laser_control.pdf</a></tt></li>
+       <li>Complete Package: <tt><a href="$$local_plugin_assets$$/electronics/">$$local_plugin_assets$$/electronics/</a></tt></li>
+     </ul>
+     $$endbox$$
+     <p>The controllers are configured by a global configuration file <tt>lights_b040laserbox.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated
+     config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>lights_b040laserbox.ini</tt> either in
+     the global config directory (<tt>$$globalconfigdir$$</tt>), the user config directory, or in the assets directory (<tt>$$local_plugin_assets$$</tt>) for the plugin.
+     </p>
+     <p>In the <tt>lights_b040laserbox.ini</tt> you will have to tell the plugin which remote boxes are available and which serial ports they use. This is done inside a <tt>[<b>lightsource</b><i>N</i>]</tt> block for each light source <i>N</i> (default values are <u>underlined</u>):
+     <blockquote><tt>
 [<b>lightsource</b><i>N</i>]<br>
 <b>port</b> = <i>port name (e.g. COM1 or /dev/tty0)</i><br>
 <b>id</b> = <i>id of the shutter in the driver connected to the given port (0 | 1 | 2 | 3)</i><br>
@@ -23,11 +35,13 @@
 <b>port_stopbits</b> = <i>port speed (<u>1</u> | 1.5 | 2)</i><br>
 <b>port_timeout</b> = <i>port timeout in milliseconds (default: <u>500</u>)</i><br>
 <br>
-	 </tt></blockquote> 
-	 The number of control boxes is stored in the variable <tt>lightsource_count</tt>.
-	 </p>
-	 <p>Here is an example configuration file for windows and two control boxes on COM1 and COM5:
-	 <blockquote><tt>
+     </tt></blockquote> 
+     The number of control boxes is stored in the variable <tt>lightsource_count</tt>.
+     </p>
+     <p>Here is an example configuration file for windows and two control boxes on COM1 and COM5:
+     <blockquote><tt>
+
+     
 lightsource_count=2<br><br>
 [lightsource1]<br>
 port=COM1<br>
@@ -35,7 +49,7 @@ port_speed=115200<br><br>
 [lightsource2]<br>
 port=COM5<br>
 port_speed=115200<br><br>
-	 </tt></blockquote></p>
+     </tt></blockquote></p>
 
 <p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>
 
