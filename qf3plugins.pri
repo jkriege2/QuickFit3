@@ -72,6 +72,18 @@ HELPPIC_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/pic/
 ASSETS_FILES.files = ./assets/*.*
 ASSETS_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}
 
+ASSETSELECTRONICS_FILES.files = ./assets/electronics/*.*
+ASSETSELECTRONICS_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/electronics
+
+ASSETSELECTRONICSDOC_FILES.files = ./assets/electronics/doc/*.*
+ASSETSELECTRONICSDOC_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/electronics/doc
+
+ASSETSELECTRONICSSRC_FILES.files = ./assets/electronics/src/*.*
+ASSETSELECTRONICSSRC_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/electronics/src
+
+ASSETSELECTRONICSCAD_FILES.files = ./assets/electronics/cad/*.*
+ASSETSELECTRONICSCAD_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/electronics/cad
+
 GLOBALCONFIG_FILES.files = ./globalconfig/*.*
 GLOBALCONFIG_FILES.path = $${QFOUTPUT}/globalconfig_templates/
 
@@ -114,7 +126,11 @@ INSTALLS += HELP_FILES \
             EXAMPLESTESTDATA_FILES \
             EXAMPLESTEST_DATA_FILES \
             EXAMPLESDATA_FILES \
-            EXAMPLESRESULTS_FILES
+            EXAMPLESRESULTS_FILES \
+            ASSETSELECTRONICS_FILES \
+            ASSETSELECTRONICSDOC_FILES \
+            ASSETSELECTRONICSSRC_FILES \
+            ASSETSELECTRONICSCAD_FILES
 
 win32 {
     INSTALLS += GLOBALCONFIGWIN32_FILES
