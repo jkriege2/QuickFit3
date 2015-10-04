@@ -6,13 +6,21 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-	 <p>This plugin controls up to four servos connected to an Arduino board running a custom written C program with a simple protocoll, developed by Jan Krieger (B040, DKFZ).</p>
-	 <p>The controllers are configured by a global configuration file <tt>shutter_servo_arduino.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated
-	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>shutter_servo_arduino.ini</tt> either in
-	 the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/shutter_servo_arduino/</tt>) for the plugin.
-	 </p>
-	 <p>In the <tt>shutter_servo_arduino.ini</tt> you will have to tell the plugin which stages are available and which serial ports they use. This is done inside a <tt>[<b>shutter</b><i>N</i>]</tt> block for each shutter <i>N</i> (default values are <u>underlined</u>):
-	 <blockquote><tt>
+     <p>This plugin controls up to four servos connected to an Arduino board running a custom written C program with a simple protocoll, developed by Jan Krieger (B040, DKFZ).</p>
+     
+     $$startbox_note$$
+     The full hardware description (including schematics, PCBs, documentationa and firmware) of this control-box is available within the QuickFit 3 installation:<ul>
+       <li>Documentation as PDF: <tt><a href="$$local_plugin_assets$$/electronics/doc/arduino_servocontroller.pdf">$$local_plugin_assets$$/electronics/doc/cobolt_laser_control.pdf</a></tt></li>
+       <li>Complete Package: <tt><a href="$$local_plugin_assets$$/electronics/">$$local_plugin_assets$$/electronics/</a></tt></li>
+     </ul>
+     $$endbox$$
+     
+     <p>The controllers are configured by a global configuration file <tt>shutter_servo_arduino.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated
+     config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>shutter_servo_arduino.ini</tt> either in
+     the global config directory, or the user config directory, or in the assets directory (<tt>$$local_plugin_assets$$</tt>) for the plugin.
+     </p>
+     <p>In the <tt>shutter_servo_arduino.ini</tt> you will have to tell the plugin which stages are available and which serial ports they use. This is done inside a <tt>[<b>shutter</b><i>N</i>]</tt> block for each shutter <i>N</i> (default values are <u>underlined</u>):
+     <blockquote><tt>
 [<b>shutter</b><i>N</i>]<br>
 <b>port</b> = <i>port name (e.g. COM1 or /dev/tty0)</i><br>
 <b>id</b> = <i>id of the shutter in the driver connected to the given port (0 | 1 | 2 | 3)</i><br>
@@ -24,11 +32,11 @@
 <b>port_timeout</b> = <i>port timeout in milliseconds (default: <u>500</u>)</i><br>
 <b>shutter_operation_duration</b> = <i>time for switching the shutter in milliseconds (default: <u>500</u>)</i><br>
 <br>
-	 </tt></blockquote> 
-	 The number of shutters is stored in the variable <tt>shutter_count</tt>.
-	 </p>
-	 <p>Here is an example configuration file for windows and three servos on two controllers connected to COM1 and COM5:
-	 <blockquote><tt>
+     </tt></blockquote> 
+     The number of shutters is stored in the variable <tt>shutter_count</tt>.
+     </p>
+     <p>Here is an example configuration file for windows and three servos on two controllers connected to COM1 and COM5:
+     <blockquote><tt>
 shutter_count=3<br><br>
 [shutter1]<br>
 port=COM1<br>
@@ -44,7 +52,7 @@ port=COM5<br>
 port_speed=19200
 id=1<br>
 shutter_operation_duration=750
-	 </tt></blockquote></p>
+     </tt></blockquote></p>
 
 <p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>
 
