@@ -69,7 +69,7 @@ class QFQtImageImporter : public QObject, public QFPluginImporters {
         virtual QString getID() const { return "importers_qtimages"; }
 
         /** \copydoc QFPlugin::getIconFilename()  */
-        virtual QString getIconFilename() const { return ":/lib/importer_icon.png"; }
+        virtual QString getIconFilename() const { return ":/lib/image_importer_icon.png"; }
 
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {

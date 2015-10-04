@@ -66,7 +66,7 @@ class QFEDataExportBasics : public QObject, public QFExtensionBase {
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
         /** \copydoc QFExtension::getIconFilename() */
-        virtual QString getIconFilename() const  { return QString(":/qfe_dataexportbasics/qfe_dataexportbasics.png"); };
+        virtual QString getIconFilename() const  { return QString(":/lib/exporter_icon.png"); };
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;

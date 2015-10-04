@@ -26,7 +26,6 @@ TARGET = qfe_dataexportbasics
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
-
 include(../../qf3plugins.pri)
 
 include(../../libquickfitwidgets.pri)
@@ -64,4 +63,5 @@ include(../../quickfit3_configqtwidgets.pri)
 #                        xlslib-package-2.4.0.zip
 
 OTHER_FILES += \
-    xlslib.pri
+    xlslib.pri \
+    libxlsxwriter.pri

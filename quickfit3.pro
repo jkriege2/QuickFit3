@@ -92,8 +92,48 @@ SUBDIRS += plg_qfqtimageimporter
 plg_qfqtimageimporter.subdir=./plugins/qfqtimageimporter
 plg_qfqtimageimporter.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfe_dataexportbasics
+plg_qfe_dataexportbasics.subdir=./plugins/qfe_dataexportbasics
+plg_qfe_dataexportbasics.depends = lib libqf3widgets
+
+SUBDIRS += plg_qfe_dataexportbasics_xlsx
+plg_qfe_dataexportbasics_xlsx.subdir=./plugins/qfe_dataexportbasics_xlsx
+plg_qfe_dataexportbasics_xlsx.depends = lib libqf3widgets
+
+SUBDIRS += plg_basicimageimporters
+plg_basicimageimporters.subdir=./plugins/basicimageimporters
+plg_basicimageimporters.depends = lib
+
+SUBDIRS += plg_basicimageexporters
+plg_basicimageexporters.subdir=./plugins/basicimageexporters
+plg_basicimageexporters.depends = lib
+
+SUBDIRS += plg_qfe_plotterexporterlatex
+plg_qfe_plotterexporterlatex.subdir=./plugins/qfe_plotterexporterlatex
+plg_qfe_plotterexporterlatex.depends = lib libqf3widgets
+
+SUBDIRS += plg_qfe_gslmathparserextensions
+plg_qfe_gslmathparserextensions.subdir=./plugins/qfe_gslmathparserextensions
+plg_qfe_gslmathparserextensions.depends = lib libqf3widgets
+
+
+SUBDIRS += plg_fitalgorithm_levmar
+plg_fitalgorithm_levmar.subdir=./plugins/fitalgorithm_levmar
+plg_fitalgorithm_levmar.depends = lib libqf3widgets
+
+
+SUBDIRS += plg_fitalgorithm_fit_gsl
+plg_fitalgorithm_fit_gsl.subdir=./plugins/fitalgorithm_fit_gsl
+plg_fitalgorithm_fit_gsl.depends = lib libqf3widgets
+
+!contains(QF3CONFIG, nonlopt) {
+    SUBDIRS += plg_fitalgorithm_fit_nlopt
+    plg_fitalgorithm_fit_nlopt.subdir=./plugins/fitalgorithm_fit_nlopt
+    plg_fitalgorithm_fit_nlopt.depends = lib libqf3widgets
+}
 
 !contains(QF3CONFIG,basicqfpluginsonly) {
+
     SUBDIRS += plg_cam_server
     plg_cam_server.subdir=./plugins/cam_server
     plg_cam_server.depends = lib libqf3widgets
@@ -170,28 +210,8 @@ plg_qfqtimageimporter.depends = lib libqf3widgets
     plg_fitfunction_2ffcs.subdir=./plugins/fitfunction_2ffcs
 
 
-    SUBDIRS += plg_fitalgorithm_levmar
-    plg_fitalgorithm_levmar.subdir=./plugins/fitalgorithm_levmar
-    plg_fitalgorithm_levmar.depends = lib libqf3widgets
 
 
-    SUBDIRS += plg_fitalgorithm_fit_gsl
-    plg_fitalgorithm_fit_gsl.subdir=./plugins/fitalgorithm_fit_gsl
-    plg_fitalgorithm_fit_gsl.depends = lib libqf3widgets
-
-    !contains(QF3CONFIG, nonlopt) {
-        SUBDIRS += plg_fitalgorithm_fit_nlopt
-        plg_fitalgorithm_fit_nlopt.subdir=./plugins/fitalgorithm_fit_nlopt
-        plg_fitalgorithm_fit_nlopt.depends = lib libqf3widgets
-    }
-
-    SUBDIRS += plg_basicimageimporters
-    plg_basicimageimporters.subdir=./plugins/basicimageimporters
-    plg_basicimageimporters.depends = lib
-
-    SUBDIRS += plg_basicimageexporters
-    plg_basicimageexporters.subdir=./plugins/basicimageexporters
-    plg_basicimageexporters.depends = lib
 
     SUBDIRS += plg_picoquantimporters
     plg_picoquantimporters.subdir=./plugins/picoquantimporters
@@ -211,9 +231,6 @@ plg_qfqtimageimporter.depends = lib libqf3widgets
     plg_qfe_spectraviewer.subdir=./plugins/qfe_spectraviewer
     plg_qfe_spectraviewer.depends = lib libqf3widgets
 
-    SUBDIRS += plg_qfe_plotterexporterlatex
-    plg_qfe_plotterexporterlatex.subdir=./plugins/qfe_plotterexporterlatex
-    plg_qfe_plotterexporterlatex.depends = lib libqf3widgets
 
         SUBDIRS += plg_numberandbrightness
     plg_numberandbrightness.subdir=./plugins/numberandbrightness
@@ -223,13 +240,6 @@ plg_qfqtimageimporter.depends = lib libqf3widgets
     plg_spim_lightsheet_eval.subdir=./plugins/spim_lightsheet_eval
     plg_spim_lightsheet_eval.depends = lib libqf3widgets
 
-    SUBDIRS += plg_qfe_gslmathparserextensions
-    plg_qfe_gslmathparserextensions.subdir=./plugins/qfe_gslmathparserextensions
-    plg_qfe_gslmathparserextensions.depends = lib libqf3widgets
-
-    SUBDIRS += plg_qfe_dataexportbasics
-    plg_qfe_dataexportbasics.subdir=./plugins/qfe_dataexportbasics
-    plg_qfe_dataexportbasics.depends = lib libqf3widgets
 
     SUBDIRS += plg_qfevalcameracalibration
     plg_qfevalcameracalibration.subdir=./plugins/qfevalcameracalibration

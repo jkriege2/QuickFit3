@@ -266,6 +266,12 @@
         <file alias="fit_fitallruns.png">icons/fit_fitallruns.png</file>
         <file alias="fit_fitcurrent.png">icons/fit_fitcurrent.png</file>
         <file alias="fit_fitcurrentrunallfiles.png">icons/fit_fitcurrentrunallfiles.png</file>
+
+        <file alias="image_importer_icon.png">icons/image_importer_icon.png</file>
+        <file alias="image_importer_icon_large.png">icons/image_importer_icon_large.png</file>
+        <file alias="image_exporter_icon.png">icons/image_exporter_icon.png</file>
+        <file alias="image_exporter_icon_large.png">icons/image_exporter_icon_large.png</file>
+
         <file>icons/1downarrow.png</file>
         <file>icons/1downarrow1.png</file>
         <file>icons/1leftarrow.png</file>
