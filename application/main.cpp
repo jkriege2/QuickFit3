@@ -68,6 +68,14 @@ int main(int argc, char * argv[])
             std::cout<<sizeof(void*)*8<<std::endl;
             return 0;
         }
+        if (QString(argv[i])=="--gitversion" || QString(argv[i])=="--svnversion") {
+            std::cout<<qfInfoGITVersion().toStdString()<<std::endl;
+            return 0;
+        }
+        if (QString(argv[i])=="--compiledate") {
+            std::cout<<qfInfoCompileDate().toStdString()<<std::endl;
+            return 0;
+        }
     }
 
 

@@ -274,6 +274,23 @@ Section "Microscope Control Plugins (SPIM...)" sec_spim
 	Pop $OUTDIR ; Restore the original output directory
 SectionEnd
 
+# This installs the NI-DAQmx conrol plugins
+Section "Plugins that use National Instruments DAQ-mx (Measurement-Reader, ALEWX-Control, ...)" sec_nitools
+	Push $OUTDIR ; Store previous output directory
+	SetOutPath "$INSTDIR\" ; Set output directory
+	
+	# automatically created list of install files
+	%%NITOOLSINSTALLER_DIRS%%
+	%%NITOOLSINSTALLER_FILES%%
+	
+	# Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
+	 ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+	IntFmt $0 "0x%08X" $0
+	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "EstimatedSize" "$0"
+
+	Pop $OUTDIR ; Restore the original output directory
+SectionEnd
+
 
 
 function .onInit
@@ -317,6 +334,7 @@ function .onInit
       SectionSetFlags ${sec_imfcs} $1
       SectionSetFlags ${sec_microscopy} $1
       SectionSetFlags ${sec_spim} 0
+      SectionSetFlags ${sec_nitools} 0
 
 functionEnd
 
@@ -337,7 +355,7 @@ function un.onInit
 functionEnd
 
 
-# This uninstalls the main application
+# This uninstalls the main application and everything else
 Section "un.${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_un_main
 
 	!insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
@@ -356,6 +374,7 @@ Section "un.${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_un_main
 	%%FCSUNINSTALLER_FILES%%
 	%%IMFCSUNINSTALLER_FILES%%
 	%%MICROSCOPYUNINSTALLER_FILES%%
+	%%NITOOLSUNINSTALLER_FILES%%
 	%%UNINSTALLER_FILES%%
 	RMDir /REBOOTOK "$SMPROGRAMS${COMPANY_NAME}"
 	
