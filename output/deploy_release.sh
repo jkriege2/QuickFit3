@@ -32,7 +32,7 @@ function module_prepare_cleandeploy {
 
 function module_final_cleandeploy {
 	rm -rf $1
-	rm ${$2}
+	rm ${2}
 }
 
 
@@ -77,6 +77,7 @@ function module_deploy_zip {
 
 function module_deploy_nsis {
 
+	echo "\nDEPLOY $1"
 	cd $1
 	local INSTALLER_FILES=
 	local UNINSTALLER_FILES=
