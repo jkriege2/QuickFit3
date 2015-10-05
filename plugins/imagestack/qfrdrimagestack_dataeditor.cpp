@@ -63,11 +63,16 @@ void QFRDRImageStackDataEditor::createWidgets() {
 
 
 
-    cmbHitogramMode=new QComboBox(this);
-    cmbHitogramMode->addItem(tr("current frame"));
-    cmbHitogramMode->addItem(tr("full stack"));
+    cmbHistogramMode=new QComboBox(this);
+    cmbHistogramMode->addItem(tr("current frame"));
+    cmbHistogramMode->addItem(tr("full stack"));
     layTop->addWidget(new QLabel(tr("<b>histogram:</b> mode: ")));
-    layTop->addWidget(cmbHitogramMode);
+    layTop->addWidget(cmbHistogramMode);
+    cmbHistogramStyle=new QComboBox(this);
+    cmbHistogramStyle->addItem(tr("bars"));
+    cmbHistogramStyle->addItem(tr("curves"));
+    layTop->addWidget(new QLabel(tr("  style: ")));
+    layTop->addWidget(cmbHistogramStyle);
     spinBins=new QSpinBox(this);
     spinBins->setRange(10,100000);
     spinBins->setValue(256);
@@ -111,11 +116,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
     layTop->addWidget(cmbColorbar);
 
 
-    layTop->addWidget(new QLabel(tr("<b>color-scaling mode:</b>")));
-    cmbColorScaleMode=new QComboBox(this);
-    cmbColorScaleMode->addItem(tr("current frame"));
-    cmbColorScaleMode->addItem(tr("all frames"));
-    layTop->addWidget(cmbColorScaleMode);
+
     layTop->addStretch();
 
     layTop->addWidget(new QLabel(tr("<b>mask color:</b>")));
@@ -160,8 +161,44 @@ void QFRDRImageStackDataEditor::createWidgets() {
     maskTools->registerPlotter(pltImage);
 
 
+    QVBoxLayout* vblData=new QVBoxLayout();
+    QWidget* widData=new QWidget(this);
+    vblData->setContentsMargins(0,0,0,0);
+    widData->setLayout(vblData);
 
-    pltData=new QFPlotter(this);
+    grpRanges=new QGroupBox(tr(" Channel Ranges "), widData);
+    vblData->addWidget(grpRanges);
+    QFormLayout* layRanges=new QFormLayout();
+    grpRanges->setLayout(layRanges);
+
+    cmbColorScaleMode=new QComboBox(this);
+    cmbColorScaleMode->addItem(tr("autoscale each frame separately"));
+    cmbColorScaleMode->addItem(tr("autoscale all frames"));
+    cmbColorScaleMode->addItem(tr("manual scaling"));
+    layRanges->addRow(tr("color-scaling mode:"), cmbColorScaleMode);
+    cmbChannelGrouping=new QComboBox(this);
+    cmbChannelGrouping->addItem(tr("channels separately"));
+    cmbChannelGrouping->addItem(tr("all channels equal"));
+    layRanges->addRow(tr("color-scaling grouping:"), cmbChannelGrouping);
+    chkChannelRangeMindMask=new QCheckBox(grpRanges);
+    chkChannelRangeMindMask->setChecked(true);
+    layRanges->addRow(tr("exclude masked pixels:"), chkChannelRangeMindMask);
+    for (int i=0; i<4; i++) {
+        QString lab=tr("range ch. %1:").arg(i+1);
+        edtChannelRange.append(new QFDoubleRangeEdit(grpRanges));
+        edtChannelRangeLabels.append(new QLabel(lab, grpRanges));
+        layRanges->addRow(edtChannelRangeLabels.last(), edtChannelRange.last());
+        if (i>0) {
+            edtChannelRange.last()->setEnabled(false);
+            edtChannelRangeLabels.last()->setEnabled(false);
+        }
+    }
+
+
+
+
+    pltData=new QFPlotter(widData);
+    vblData->addWidget(pltData,1);
     pltData->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltData->get_plotter()->getXAxis()->set_minTicks(5);
     pltData->get_plotter()->getYAxis()->set_minTicks(5);
@@ -176,12 +213,13 @@ void QFRDRImageStackDataEditor::createWidgets() {
     pltData->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
 
 
+
     splitter=new QVisibleHandleSplitter(Qt::Horizontal, this);
     splitter->addWidget(pltImage);
-    splitter->addWidget(pltData);
+    splitter->addWidget(widData);
     mainLay->addWidget(splitter, 1);
     QList<int> sizes;
-    sizes<<round(splitter->width()/2.0)<<round(splitter->width()/2.0);
+    sizes<<round(splitter->width()*2.0/3.0)<<round(splitter->width()/3.0);
     splitter->setSizes(sizes);
 
     QGridLayout* layLabels=new QGridLayout();
@@ -286,6 +324,8 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
 
     player->setPosition(current->getProperty("imstack_invrimgdisp_playpos", 0).toInt());
     cmbMaskColor->setCurrentColor(QStringToQColor(current->getProperty("imstack_invrimgdisp_maskcolor", "gray").toString()));
+    cmbChannelGrouping->setCurrentIndex(current->getProperty("imstack_channel_grouping", 0).toInt());
+    cmbChannelMode->setCurrentIndex(current->getProperty("imstack_channel_mode", 0).toInt());
     connect(cmbImageStack, SIGNAL(currentIndexChanged(int)), this, SLOT(stackChanged()));
     connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
     connect(cmbChannelMode, SIGNAL(currentIndexChanged(int)), this, SLOT(channelModeChanged()));
@@ -319,8 +359,11 @@ void QFRDRImageStackDataEditor::readSettings() {
     cmbColorbar->setCurrentIndex(settings->getQSettings()->value(prefix+"colorbar", JKQTPMathImageGRAY).toInt());
     cmbModifierMode->setCurrentIndex(settings->getQSettings()->value(prefix+"modifiermode", JKQTPMathImageBase::ModifyAlpha).toInt());
     spinBins->setValue(settings->getQSettings()->value(prefix+"bins", 100).toInt());
-    cmbHitogramMode->setCurrentIndex(settings->getQSettings()->value(prefix+"cmbHitogramMode", 0).toInt());
+    cmbHistogramMode->setCurrentIndex(settings->getQSettings()->value(prefix+"cmbHitogramMode", 0).toInt());
+    cmbHistogramStyle->setCurrentIndex(settings->getQSettings()->value(prefix+"cmbHistogramStyle", 0).toInt());
+    cmbChannelGrouping->setCurrentIndex(settings->getQSettings()->value(prefix+"cmbChannelGrouping", 0).toInt());
     chkHistogramLog->setChecked(settings->getQSettings()->value(prefix+"chkHistogramLog", false).toBool());
+    chkChannelRangeMindMask->setChecked(settings->getQSettings()->value(prefix+"chkChannelRangeMindMask", true).toBool());
     // chkHistogramLog cmbHitogramMode
     loadSplitter(*(settings->getQSettings()), splitter, prefix);
     setUpdatesEnabled(upd);
@@ -339,13 +382,16 @@ void QFRDRImageStackDataEditor::writeSettings() {
     settings->getQSettings()->setValue(prefix+"modifiermode", cmbModifierMode->currentIndex());
     settings->getQSettings()->setValue(prefix+"bins", spinBins->value());
     settings->getQSettings()->setValue(prefix+"chkHistogramLog", chkHistogramLog->isChecked());
-    settings->getQSettings()->setValue(prefix+"cmbHitogramMode", cmbHitogramMode->currentIndex());
+    settings->getQSettings()->setValue(prefix+"chkChannelRangeMindMask", chkChannelRangeMindMask->isChecked());
+    settings->getQSettings()->setValue(prefix+"cmbHitogramMode", cmbHistogramMode->currentIndex());
+    settings->getQSettings()->setValue(prefix+"cmbHistogramStyle", cmbHistogramStyle->currentIndex());
+    settings->getQSettings()->setValue(prefix+"cmbChannelGrouping", cmbChannelGrouping->currentIndex());
 
 
     saveSplitter(*(settings->getQSettings()), splitter, prefix);
 }
 
-void QFRDRImageStackDataEditor::addDataHistogram(double *data, bool* mask, int size, int maskSize, const QString &title, const QString &colX, const QString &colY, QColor col, double shift, double width) {
+void QFRDRImageStackDataEditor::addDataHistogram(double *data, bool* mask, int size, int maskSize, double dmin, double dmax, const QString &title, const QString &colX, const QString &colY, QColor col, double shift, double width) {
     JKQTPdatastore* dsData=pltData->getDatastore();
 
     double* histX=(double*)qfCalloc(spinBins->value(), sizeof(double));
@@ -354,23 +400,45 @@ void QFRDRImageStackDataEditor::addDataHistogram(double *data, bool* mask, int s
 
 
 
-    if (mask) {
-        statisticsHistogramModMasked(data, mask, size, maskSize, histX, histY, spinBins->value(), false);
-    } else statisticsHistogram(data, size, histX, histY, spinBins->value(), false);
+    if (dmax>dmin) {
+        if (mask) {
+            statisticsHistogramModMaskedRanged(data, mask, size, maskSize, dmin, dmax, histX, histY, spinBins->value(), false);
+        } else statisticsHistogramRanged(data, size, dmin, dmax, histX, histY, spinBins->value(), false);
+    } else {
+        if (mask) {
+            statisticsHistogramModMasked(data, mask, size, maskSize, histX, histY, spinBins->value(), false);
+        } else statisticsHistogram(data, size, histX, histY, spinBins->value(), false);
+    }
 
 
     size_t chx=dsData->addCopiedColumn(histX, spinBins->value(), colX);
     size_t chy=dsData->addCopiedColumn(histY, spinBins->value(), colY);
 
-    JKQTPbarHorizontalGraph* plteHistogram=new JKQTPbarHorizontalGraph(pltData->get_plotter());
-    plteHistogram->set_title(title);
-    plteHistogram->set_xColumn(chx);
-    plteHistogram->set_yColumn(chy);
-    plteHistogram->set_shift(shift);
-    plteHistogram->set_width(width);
-    plteHistogram->set_fillColor(col);
-    plteHistogram->set_color(col);
-    pltData->addGraph(plteHistogram);
+    if (cmbHistogramStyle->currentIndex()==0) {
+        QColor colf=col;
+        colf.setAlphaF(0.66);
+        JKQTPbarHorizontalGraph* plteHistogram=new JKQTPbarHorizontalGraph(pltData->get_plotter());
+        plteHistogram->set_title(title);
+        plteHistogram->set_xColumn(chx);
+        plteHistogram->set_yColumn(chy);
+        plteHistogram->set_shift(shift);
+        plteHistogram->set_width(width);
+        plteHistogram->set_fillColor(colf);
+        plteHistogram->set_color(col);
+        pltData->addGraph(plteHistogram);
+    } else {
+        QColor colf=col;
+        colf.setAlphaF(0.33);
+        JKQTPfilledCurveXGraph* plteHistogram=new JKQTPfilledCurveXGraph(pltData->get_plotter());
+        plteHistogram->set_title(title);
+        plteHistogram->set_xColumn(chx);
+        plteHistogram->set_yColumn(chy);
+        plteHistogram->set_fillColor(colf);
+        plteHistogram->set_color(col);
+        plteHistogram->set_drawLine(true);
+        pltData->addGraph(plteHistogram);
+    }
+
     pltData->getYAxis()->set_logAxis(chkHistogramLog->isChecked());
 
     qfFree(histX);
@@ -387,10 +455,15 @@ void QFRDRImageStackDataEditor::connectWidgets()
     connect(cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     connect(cmbMaskColor, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     connect(maskTools, SIGNAL(maskChanged()), this, SLOT(maskChanged()));
-    connect(cmbHitogramMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
+    connect(cmbHistogramMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
+    connect(cmbHistogramStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
     connect(chkHistogramLog, SIGNAL(toggled(bool)), this, SLOT(replotFrame()));
-    connect(cmbColorScaleMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
     connect(spinBins, SIGNAL(editingFinished()), this, SLOT(replotFrame()));
+
+    connect(cmbColorScaleMode, SIGNAL(currentIndexChanged(int)), this, SLOT(colorModeOrRangesChanged()));
+    connect(cmbChannelGrouping, SIGNAL(currentIndexChanged(int)), this, SLOT(colorModeOrRangesChanged()));
+    connect(chkChannelRangeMindMask, SIGNAL(toggled(bool)), this, SLOT(colorModeOrRangesChanged()));
+    connectDisconnectChannelRanges(true);
 }
 
 void QFRDRImageStackDataEditor::disconnectWidgets()
@@ -403,10 +476,15 @@ void QFRDRImageStackDataEditor::disconnectWidgets()
     disconnect(cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     disconnect(cmbMaskColor, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     disconnect(maskTools, SIGNAL(maskChanged()), this, SLOT(maskChanged()));
-    disconnect(cmbHitogramMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
+    disconnect(cmbHistogramMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
+    disconnect(cmbHistogramStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
     disconnect(chkHistogramLog, SIGNAL(toggled(bool)), this, SLOT(replotFrame()));
-    disconnect(cmbColorScaleMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
     disconnect(spinBins, SIGNAL(editingFinished()), this, SLOT(replotFrame()));
+
+    disconnect(cmbColorScaleMode, SIGNAL(currentIndexChanged(int)), this, SLOT(colorModeOrRangesChanged()));
+    disconnect(cmbChannelGrouping, SIGNAL(currentIndexChanged(int)), this, SLOT(colorModeOrRangesChanged()));
+    disconnect(chkChannelRangeMindMask, SIGNAL(toggled(bool)), this, SLOT(colorModeOrRangesChanged()));
+    connectDisconnectChannelRanges(false);
 }
 
 
@@ -419,6 +497,9 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
     pltData->set_doDrawing(false);
     current->setQFProperty("imstack_invrimgdisp_playpos", player->getPosition(), false, false);
     current->setQFProperty("imstack_invrimgdisp_maskcolor", cmbMaskColor->currentColor().name(), false, false);
+    current->setQFProperty("imstack_channel_grouping", cmbChannelGrouping->currentIndex(), false, false);
+    current->setQFProperty("imstack_channel_mode", cmbChannelMode->currentIndex(), false, false);
+
     pltImage->clearGraphs(false);
     pltData->clearGraphs(true);
     JKQTPdatastore* dsData=pltData->getDatastore();
@@ -428,6 +509,7 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
 
     QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
     if (mv && cmbImageStack->currentIndex()<mv->getImageStackCount()) {
+        updateChannelRanges();
         int idx=cmbImageStack->currentIndex();
         int width=mv->getImageStackWidth(idx);
         int height=mv->getImageStackHeight(idx);
@@ -435,20 +517,28 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
         double rwidth=(double)width*mv->getImageStackXUnitFactor(idx);
         double rheight=(double)height*mv->getImageStackYUnitFactor(idx);
 
-        int channel=cmbChannelR->currentIndex();
+        int channelR=cmbChannelR->currentIndex();
         int channelG=cmbChannelG->currentIndex();
         int channelB=cmbChannelB->currentIndex();
         int channelA=cmbChannelA->currentIndex();
         double* ar=NULL;
         double amin=0;
         double amax=0;
+        double cmin=0;
+        double cmax=0;
+        double gmin=0, gmax=0;
+        double bmin=0, bmax=0;
         if (channelA>=0 && channelA<mv->getImageStackChannels(idx)) ar=mv->getImageStack(idx, frame, channelA);
-        if (ar && mv->maskGet()) {
-            if (cmbColorScaleMode->currentIndex()==0) statisticsMaskedMinMax(ar, mv->maskGet(), width*height, amin, amax, false);
-            if (cmbColorScaleMode->currentIndex()==1) {
-                amin=mv->getImageStackMin(idx, channelA);
-                amax=mv->getImageStackMax(idx, channelA);
-            }
+//        if (ar && mv->maskGet()) {
+//            if (cmbColorScaleMode->currentIndex()==0) statisticsMaskedMinMax(ar, mv->maskGet(), width*height, amin, amax, false);
+//            if (cmbColorScaleMode->currentIndex()==1) {
+//                amin=mv->getImageStackMin(idx, channelA);
+//                amax=mv->getImageStackMax(idx, channelA);
+//            }
+//        }
+        if (channelA<edtChannelRange.size()) {
+            amin=edtChannelRange[channelA]->getMin();
+            amax=edtChannelRange[channelA]->getMax();
         }
 
 
@@ -479,7 +569,7 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
         if (cmbChannelMode->currentIndex()==0) {
             double* ir=NULL;
 
-            if (channel>=0 && channel<mv->getImageStackChannels(idx)) ir=mv->getImageStack(idx, frame, channel);
+            if (channelR>=0 && channelR<mv->getImageStackChannels(idx)) ir=mv->getImageStack(idx, frame, channelR);
             image->set_width(width);
             image->set_height(height);
             //qDebug()<<"frame="<<frame<<"   "<<ir;
@@ -500,12 +590,14 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
                 selectiontextD=tr("<b>D <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
             }
             if (mv->maskGet()) {
-                double cmin=0;
-                double cmax=0;
-                if (cmbColorScaleMode->currentIndex()==0) statisticsMaskedMinMax(ir, mv->maskGet(), width*height, cmin, cmax, false);
-                if (cmbColorScaleMode->currentIndex()==1) {
-                    cmin=mv->getImageStackMin(idx, channel);
-                    cmax=mv->getImageStackMax(idx, channel);
+//                if (cmbColorScaleMode->currentIndex()==0) statisticsMaskedMinMax(ir, mv->maskGet(), width*height, cmin, cmax, false);
+//                if (cmbColorScaleMode->currentIndex()==1) {
+//                    cmin=mv->getImageStackMin(idx, channel);
+//                    cmax=mv->getImageStackMax(idx, channel);
+//                }
+                if (channelR<edtChannelRange.size()) {
+                    cmin=edtChannelRange[channelR]->getMin();
+                    cmax=edtChannelRange[channelR]->getMax();
                 }
 
                 image->set_imageMin(cmin);
@@ -522,8 +614,8 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
 
 
             if (dataMode==QFRDRImageStackDataEditor::dmFullHistogram && ir) {
-                if (cmbHitogramMode->currentIndex()==0)  addDataHistogram(ir, mv->maskGet(), width*height, width*height, tr("frame histogram"), tr("histogram_x"), tr("histogram_y"));
-                else if (cmbHitogramMode->currentIndex()==1)  addDataHistogram(mv->getImageStack(idx, 0, channel), mv->maskGet(), width*height*frames, width*height, tr("full histogram"), tr("histogram_x"), tr("histogram_y"));
+                if (cmbHistogramMode->currentIndex()==0)  addDataHistogram(ir, mv->maskGet(), width*height, width*height, tr("frame histogram"), tr("histogram_x"), tr("histogram_y"));
+                else if (cmbHistogramMode->currentIndex()==1)  addDataHistogram(mv->getImageStack(idx, 0, channelR), mv->maskGet(), width*height*frames, width*height, tr("full histogram"), tr("histogram_x"), tr("histogram_y"));
             }
         } else {
             double* ir=NULL;
@@ -531,9 +623,23 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             double* ib=NULL;
 
 
-            if (channel>=0 && channel<mv->getImageStackChannels(idx)) ir=mv->getImageStack(idx, frame, channel);
+            if (channelR>=0 && channelR<mv->getImageStackChannels(idx)) ir=mv->getImageStack(idx, frame, channelR);
             if (channelG>=0 && channelG<mv->getImageStackChannels(idx)) ig=mv->getImageStack(idx, frame, channelG);
             if (channelB>=0 && channelB<mv->getImageStackChannels(idx)) ib=mv->getImageStack(idx, frame, channelB);
+
+            if (ir && channelR<edtChannelRange.size()) {
+                cmin=edtChannelRange[channelR]->getMin();
+                cmax=edtChannelRange[channelR]->getMax();
+            }
+            if (ig && channelG<edtChannelRange.size()) {
+                gmin=edtChannelRange[channelG]->getMin();
+                gmax=edtChannelRange[channelG]->getMax();
+            }
+            if (ib && channelB<edtChannelRange.size()) {
+                bmin=edtChannelRange[channelB]->getMin();
+                bmax=edtChannelRange[channelB]->getMax();
+            }
+
             //qDebug()<<"frame="<<frame<<"   "<<ir<<ig<<ib;
             imageRGB->set_data(ir, ig, ib, width, height, JKQTPMathImageBase::DoubleArray);
             imageRGB->set_width(width);
@@ -574,39 +680,38 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
                 selectiontextD+=tr("<b>B <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
             }
 
-            if (mv->maskGet()) {
-                double cmin=0;
-                double cmax=0;
+//            if (mv->maskGet()) {
                 if (ir) {
-                    if (cmbColorScaleMode->currentIndex()==0) statisticsMaskedMinMax(ir, mv->maskGet(), width*height, cmin, cmax, false);
-                    if (cmbColorScaleMode->currentIndex()==1) {
-                        cmin=mv->getImageStackMin(idx, channel);
-                        cmax=mv->getImageStackMax(idx, channel);
-                    }
+//                    if (cmbColorScaleMode->currentIndex()==0) statisticsMaskedMinMax(ir, mv->maskGet(), width*height, cmin, cmax, false);
+//                    if (cmbColorScaleMode->currentIndex()==1) {
+//                        cmin=mv->getImageStackMin(idx, channel);
+//                        cmax=mv->getImageStackMax(idx, channel);
+//                    }
+
                     imageRGB->set_imageMin(cmin);
                     imageRGB->set_imageMax(cmax);
                 }
 
                 if (ig) {
-                    cmin=cmax=0;
-                    if (cmbColorScaleMode->currentIndex()==0) statisticsMaskedMinMax(ig, mv->maskGet(), width*height, cmin, cmax, false);
-                    if (cmbColorScaleMode->currentIndex()==1) {
-                        cmin=mv->getImageStackMin(idx, channelG);
-                        cmax=mv->getImageStackMax(idx, channelG);
-                    }
-                    imageRGB->set_imageMinG(cmin);
-                    imageRGB->set_imageMaxG(cmax);
+//                    cmin=cmax=0;
+//                    if (cmbColorScaleMode->currentIndex()==0) statisticsMaskedMinMax(ig, mv->maskGet(), width*height, cmin, cmax, false);
+//                    if (cmbColorScaleMode->currentIndex()==1) {
+//                        cmin=mv->getImageStackMin(idx, channelG);
+//                        cmax=mv->getImageStackMax(idx, channelG);
+//                    }
+                    imageRGB->set_imageMinG(gmin);
+                    imageRGB->set_imageMaxG(gmax);
                 }
 
                 if (ib) {
-                    cmin=cmax=0;
-                    if (cmbColorScaleMode->currentIndex()==0) statisticsMaskedMinMax(ib, mv->maskGet(), width*height, cmin, cmax, false);
-                    if (cmbColorScaleMode->currentIndex()==1) {
-                        cmin=mv->getImageStackMin(idx, channelB);
-                        cmax=mv->getImageStackMax(idx, channelB);
-                    }
-                    imageRGB->set_imageMinB(cmin);
-                    imageRGB->set_imageMaxB(cmax);
+//                    cmin=cmax=0;
+//                    if (cmbColorScaleMode->currentIndex()==0) statisticsMaskedMinMax(ib, mv->maskGet(), width*height, cmin, cmax, false);
+//                    if (cmbColorScaleMode->currentIndex()==1) {
+//                        cmin=mv->getImageStackMin(idx, channelB);
+//                        cmax=mv->getImageStackMax(idx, channelB);
+//                    }
+                    imageRGB->set_imageMinB(bmin);
+                    imageRGB->set_imageMaxB(bmax);
                 }
 
                 imageRGB->set_autoImageRange(false);
@@ -614,34 +719,34 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
                 image->set_modifierMax(amax);
                 image->set_autoModifierRange(false);
 
-            } else {
-                imageRGB->set_autoImageRange(true);
-                image->set_autoModifierRange(true);
-            }
+//            } else {
+//                imageRGB->set_autoImageRange(true);
+//                image->set_autoModifierRange(true);
+//            }
 
 
             pltImage->addGraph(imageRGB);
             if (dataMode==QFRDRImageStackDataEditor::dmFullHistogram) {
-                if (cmbHitogramMode->currentIndex()==0)  {
-                    if (ir) addDataHistogram(ir, mv->maskGet(), width*height, width*height, tr("red frame histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("darkred"), 0, 0.3);
-                    if (ig) addDataHistogram(ig, mv->maskGet(), width*height, width*height, tr("green frame histogram"), tr("histogram_green_x"), tr("histogram_green_y"), QColor("darkgreen"),0.33, 0.3);
-                    if (ib) addDataHistogram(ib, mv->maskGet(), width*height, width*height, tr("blue frame histogram"), tr("histogram_blue_x"), tr("histogram_blue_y"), QColor("darkblue"), 0.66, 0.3);
+                if (cmbHistogramMode->currentIndex()==0)  {
+                    if (ir) addDataHistogram(ir, mv->maskGet(), width*height, width*height, tr("red frame histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("red"), 0, 0.3);
+                    if (ig) addDataHistogram(ig, mv->maskGet(), width*height, width*height, tr("green frame histogram"), tr("histogram_green_x"), tr("histogram_green_y"), QColor("green"),0.33, 0.3);
+                    if (ib) addDataHistogram(ib, mv->maskGet(), width*height, width*height, tr("blue frame histogram"), tr("histogram_blue_x"), tr("histogram_blue_y"), QColor("blue"), 0.66, 0.3);
 
-                } else if (cmbHitogramMode->currentIndex()==1) {
-                    if (ir) addDataHistogram(mv->getImageStack(idx, 0, channel), mv->maskGet(), width*height*frames, width*height, tr("red full histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("darkred"), 0, 0.3);
-                    if (ig) addDataHistogram(mv->getImageStack(idx, 0, channelG), mv->maskGet(), width*height*frames, width*height, tr("green full histogram"), tr("histogram_green_x"), tr("histogram_green_y"), QColor("darkgreen"),0.33, 0.3);
-                    if (ib) addDataHistogram(mv->getImageStack(idx, 0, channelB), mv->maskGet(), width*height*frames, width*height, tr("blue full histogram"), tr("histogram_blue_x"), tr("histogram_blue_y"), QColor("darkblue"), 0.66, 0.3);
+                } else if (cmbHistogramMode->currentIndex()==1) {
+                    if (ir) addDataHistogram(mv->getImageStack(idx, 0, channelR), mv->maskGet(), width*height*frames, width*height, tr("red full histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("red"), 0, 0.3);
+                    if (ig) addDataHistogram(mv->getImageStack(idx, 0, channelG), mv->maskGet(), width*height*frames, width*height, tr("green full histogram"), tr("histogram_green_x"), tr("histogram_green_y"), QColor("green"),0.33, 0.3);
+                    if (ib) addDataHistogram(mv->getImageStack(idx, 0, channelB), mv->maskGet(), width*height*frames, width*height, tr("blue full histogram"), tr("histogram_blue_x"), tr("histogram_blue_y"), QColor("blue"), 0.66, 0.3);
                 }
             }
 
         }
 
         if (dataMode==QFRDRImageStackDataEditor::dmFullHistogram) {
-            if (cmbHitogramMode->currentIndex()==0)  {
-                if (ar) addDataHistogram(ar, mv->maskGet(), width*height, width*height, tr("alpha frame histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("darkred"), 0, 0.3);
+            if (cmbHistogramMode->currentIndex()==0)  {
+                if (ar) addDataHistogram(ar, mv->maskGet(), width*height, width*height, tr("alpha frame histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("gray"), 0, 0.3);
 
-            } else if (cmbHitogramMode->currentIndex()==1) {
-                if (ar) addDataHistogram(mv->getImageStack(idx, 0, channelA), mv->maskGet(), width*height*frames, width*height, tr("alpha full histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("darkred"), 0, 0.3);
+            } else if (cmbHistogramMode->currentIndex()==1) {
+                if (ar) addDataHistogram(mv->getImageStack(idx, 0, channelA), mv->maskGet(), width*height*frames, width*height, tr("alpha full histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("gray"), 0, 0.3);
             }
 
          }
@@ -679,6 +784,216 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
         pltData->update_plot();
     }
     //qDebug()<<"showFrame("<<frame<<startPlayer<<"): done";
+}
+
+
+void QFRDRImageStackDataEditor::colorModeOrRangesChanged()
+{
+    QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
+    int idx=cmbImageStack->currentIndex();
+
+    // save color ranges in manual mode:
+    if (mv && cmbColorScaleMode->currentIndex()==2) {
+        for (int i=0; i<edtChannelRange.size(); i++) {
+            if (idx<mv->getImageStackCount() && i<mv->getImageStackChannels(idx)) {
+                mv->setQFProperty(QString("imstack_manualcolscaling_ch%1_min").arg(i), edtChannelRange[i]->getMin(), false, false);
+                mv->setQFProperty(QString("imstack_manualcolscaling_ch%1_max").arg(i), edtChannelRange[i]->getMax(), false, false);
+            }
+        }
+    }
+    updateChannelRanges();
+    replotFrame();
+}
+
+void QFRDRImageStackDataEditor::connectDisconnectChannelRanges(bool conn)
+{
+    edtChannelRangesConnected=conn;
+    for (int i=0; i<edtChannelRange.size(); i++) {
+        disconnect(edtChannelRange[i], SIGNAL(valueChanged(double,double)), this, SLOT(colorModeOrRangesChanged()));
+    }
+    if (conn) {
+        QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
+        int idx=cmbImageStack->currentIndex();
+        if (cmbColorScaleMode->currentIndex()==0) { // single-frame auto
+            // all disconnected
+        } else if (cmbColorScaleMode->currentIndex()==1) { // all frames auto
+            // all disconnected
+        } else if (cmbColorScaleMode->currentIndex()==2) { // manual
+            if (cmbChannelGrouping->currentIndex()==0) {// manual, channels separately
+                for (int i=0; i<edtChannelRange.size(); i++) {
+                    if (!mv || (mv && i<mv->getImageStackChannels(idx))) {
+                        connect(edtChannelRange[i], SIGNAL(valueChanged(double,double)), this, SLOT(colorModeOrRangesChanged()));
+                    }
+                }
+            } else if (cmbChannelGrouping->currentIndex()==1) {
+                for (int i=0; i<edtChannelRange.size(); i++) {// manual, channels together
+                    if (i==0) {
+                        connect(edtChannelRange[i], SIGNAL(valueChanged(double,double)), this, SLOT(colorModeOrRangesChanged()));
+                    }
+                }
+            }
+        }
+    }
+}
+
+void QFRDRImageStackDataEditor::updateChannelRanges()
+{
+    bool oldconn=edtChannelRangesConnected;
+    connectDisconnectChannelRanges(false);
+
+    if (cmbChannelMode->currentIndex()==0) {
+        for (int i=0; i<edtChannelRangeLabels.size(); i++) {
+            if (cmbChannelR->currentIndex()==i) {
+                edtChannelRangeLabels[i]->setText(tr("<font color=\"blue\"><b>range for channel %1 (data):</b></font>").arg(i+1));
+            } else if (cmbChannelA->currentIndex()==i) {
+                edtChannelRangeLabels[i]->setText(tr("<font color=\"gray\"><b>range for channel %1 (alpha):</b></font>").arg(i+1));
+            } else {
+                edtChannelRangeLabels[i]->setText(tr("range for channel %1:").arg(i+1));
+            }
+        }
+    } else if (cmbChannelMode->currentIndex()==1) {
+        for (int i=0; i<edtChannelRangeLabels.size(); i++) {
+            if (cmbChannelR->currentIndex()==i) {
+                edtChannelRangeLabels[i]->setText(tr("<font color=\"red\"><b>range for channel %1 (red):</b></font>").arg(i+1));
+            } else if (cmbChannelG->currentIndex()==i) {
+                edtChannelRangeLabels[i]->setText(tr("<font color=\"green\"><b>range for channel %1 (green):</b></font>").arg(i+1));
+            } else if (cmbChannelB->currentIndex()==i) {
+                edtChannelRangeLabels[i]->setText(tr("<font color=\"blue\"><b>range for channel %1 (blue):</b></font>").arg(i+1));
+            } else if (cmbChannelA->currentIndex()==i) {
+                edtChannelRangeLabels[i]->setText(tr("<font color=\"gray\"><b>range for channel %1 (alpha):</b></font>").arg(i+1));
+            } else {
+                edtChannelRangeLabels[i]->setText(tr("range for channel %1:").arg(i+1));
+            }
+        }
+    }
+
+    QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
+    int idx=cmbImageStack->currentIndex();
+    if (mv) {
+        if (cmbColorScaleMode->currentIndex()==0) { // single-frame auto
+            for (int i=0; i<edtChannelRange.size(); i++) {
+                edtChannelRange[i]->setEnabled(false);
+                edtChannelRangeLabels[i]->setEnabled(i<mv->getImageStackChannels(idx));
+                if (idx<mv->getImageStackCount() && i<mv->getImageStackChannels(idx)) {
+                    uint64_t size=0;
+                    double* img=getImageStackAndSizeForColorRanging(size, idx, i,true);
+                    double dmin=0, dmax=0;
+                    if (chkChannelRangeMindMask->isChecked()) {
+                        statisticsModMaskedMinMax(img, mv->maskGet(), size, mv->maskGetWidth()*mv->maskGetHeight(), dmin, dmax, false);
+                    } else {
+                        statisticsMinMax(img, size, dmin, dmax);
+                    }
+                    edtChannelRange[i]->setValues(dmin, dmax);
+                } else {
+                    edtChannelRange[i]->setValues(0,1);
+                }
+            }
+        } else if (cmbColorScaleMode->currentIndex()==1) { // all frames auto
+            for (int i=0; i<edtChannelRange.size(); i++) {
+                edtChannelRange[i]->setEnabled(false);
+                edtChannelRangeLabels[i]->setEnabled(i<mv->getImageStackChannels(idx));
+                if (idx<mv->getImageStackCount() && i<mv->getImageStackChannels(idx)) {
+                    uint64_t size=0;
+                    double* img=getImageStackAndSizeForColorRanging(size, idx, i,false);
+                    double dmin=0, dmax=0;
+                    if (chkChannelRangeMindMask->isChecked()) {
+                        statisticsModMaskedMinMax(img, mv->maskGet(), size, mv->maskGetWidth()*mv->maskGetHeight(), dmin, dmax, false);
+                    } else {
+                        statisticsMinMax(img, size, dmin, dmax);
+                    }
+                    edtChannelRange[i]->setValues(dmin, dmax);
+                } else {
+                    edtChannelRange[i]->setValues(0,1);
+                }
+            }
+        } else if (cmbColorScaleMode->currentIndex()==2) { // manual
+            if (cmbChannelGrouping->currentIndex()==0) {// manual, channels separately
+                for (int i=0; i<edtChannelRange.size(); i++) {
+                    if (idx<mv->getImageStackCount() && i<mv->getImageStackChannels(idx)) {
+                        edtChannelRange[i]->setEnabled(true);
+                        edtChannelRangeLabels[i]->setEnabled(true);
+                        uint64_t size=0;
+                        double dmin=mv->getQFProperty(QString("imstack_manualcolscaling_ch%1_min").arg(i), 0).toDouble();
+                        double dmax=mv->getQFProperty(QString("imstack_manualcolscaling_ch%1_max").arg(i), 1).toDouble();
+                        if (!mv->propertyExists(QString("imstack_manualcolscaling_ch%1_min").arg(i)) || !mv->propertyExists(QString("imstack_manualcolscaling_ch%1_max").arg(i))) {
+                            double* img=getImageStackAndSizeForColorRanging(size, idx, i,false);
+                            if (chkChannelRangeMindMask->isChecked()) {
+                                statisticsModMaskedMinMax(img, mv->maskGet(), size, mv->maskGetWidth()*mv->maskGetHeight(), dmin, dmax, false);
+                            } else {
+                                statisticsMinMax(img, size, dmin, dmax);
+                            }
+                            if (mv->propertyExists(QString("imstack_manualcolscaling_ch%1_min").arg(i))) dmin=mv->getQFProperty(QString("imstack_manualcolscaling_ch%1_min").arg(i), 0).toDouble();
+                            if (mv->propertyExists(QString("imstack_manualcolscaling_ch%1_max").arg(i))) dmax=mv->getQFProperty(QString("imstack_manualcolscaling_ch%1_max").arg(i), 1).toDouble();
+                        }
+                        edtChannelRange[i]->setValues(dmin, dmax);
+                    } else {
+                        edtChannelRange[i]->setEnabled(false);
+                        edtChannelRangeLabels[i]->setEnabled(false);
+                        edtChannelRange[i]->setValues(0,1);
+                    }
+                }
+            } else if (cmbChannelGrouping->currentIndex()==1) {
+                for (int i=0; i<edtChannelRange.size(); i++) {// manual, channels together
+                    if (idx<mv->getImageStackCount() && i==0) {
+                        edtChannelRange[i]->setEnabled(true);
+                        edtChannelRangeLabels[i]->setEnabled(true);
+                        uint64_t size=0;
+                        double dmin=mv->getQFProperty(QString("imstack_manualcolscaling_ch%1_min").arg(i), 0).toDouble();
+                        double dmax=mv->getQFProperty(QString("imstack_manualcolscaling_ch%1_max").arg(i), 1).toDouble();
+                        if (!mv->propertyExists(QString("imstack_manualcolscaling_ch%1_min").arg(i)) || !mv->propertyExists(QString("imstack_manualcolscaling_ch%1_max").arg(i))) {
+                            double* img=getImageStackAndSizeForColorRanging(size, idx, i,false);
+                            if (chkChannelRangeMindMask->isChecked()) {
+                                statisticsModMaskedMinMax(img, mv->maskGet(), size, mv->maskGetWidth()*mv->maskGetHeight(), dmin, dmax, false);
+                            } else {
+                                statisticsMinMax(img, size, dmin, dmax);
+                            }
+                            if (mv->propertyExists(QString("imstack_manualcolscaling_ch%1_min").arg(i))) dmin=mv->getQFProperty(QString("imstack_manualcolscaling_ch%1_min").arg(i), 0).toDouble();
+                            if (mv->propertyExists(QString("imstack_manualcolscaling_ch%1_max").arg(i))) dmax=mv->getQFProperty(QString("imstack_manualcolscaling_ch%1_max").arg(i), 1).toDouble();
+                        }
+                        edtChannelRange[i]->setValues(dmin, dmax);
+                    } else {
+                        edtChannelRange[i]->setEnabled(false);
+                        if (i<mv->getImageStackChannels(idx)) {
+                            edtChannelRangeLabels[i]->setEnabled(true);
+                            edtChannelRange[i]->setValues(edtChannelRange.first()->getMin(), edtChannelRange.first()->getMax());
+                        } else {
+                            edtChannelRangeLabels[i]->setEnabled(false);
+                            edtChannelRange[i]->setValues(0,1);
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    if (oldconn) {
+        connectDisconnectChannelRanges(true);
+    }
+}
+
+double *QFRDRImageStackDataEditor::getImageStackAndSizeForColorRanging(uint64_t &size, int stack, int channel, bool currentFrame)
+{
+    QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
+    int idx=cmbImageStack->currentIndex();
+    if (stack<0) stack=idx;
+    int f=0;
+    if (currentFrame) {
+        f=player->getPosition();
+    }
+    size=0;
+    double* dat=NULL;
+    if (mv && stack>=0 && channel>=0) {
+        if (stack<mv->getImageStackCount() && channel<mv->getImageStackChannels(stack)) {
+            dat=mv->getImageStack(stack,f,channel);
+            if (currentFrame) {
+                size=mv->getImageStackWidth(stack)*mv->getImageStackHeight(stack);
+            } else {
+                size=mv->getImageStackWidth(stack)*mv->getImageStackHeight(stack)*mv->getImageStackFrames(stack);
+            }
+        }
+    }
+    return dat;
 }
 
 void QFRDRImageStackDataEditor::replotFrame()
@@ -800,6 +1115,7 @@ void QFRDRImageStackDataEditor::channelModeChanged() {
     labModifierMode->setVisible(true);
 
     connectWidgets();
+    updateChannelRanges();
     displayImage();
 }
 
@@ -815,6 +1131,7 @@ void QFRDRImageStackDataEditor::show3DViewer()
     viewer3D->show();
     QApplication::restoreOverrideCursor();
 }
+
 
 
 

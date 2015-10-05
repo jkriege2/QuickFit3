@@ -12,7 +12,7 @@ class QFWIDLIB_EXPORT QFPixelSizeEdit : public QWidget
         Q_OBJECT
     public:
         explicit QFPixelSizeEdit(QWidget *parent = 0);
-        ~QFPixelSizeEdit();
+        virtual ~QFPixelSizeEdit();
 
         QSizeF getPixelSize() const;
         double getPixelWidth() const;

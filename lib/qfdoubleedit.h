@@ -72,18 +72,18 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         /** \brief add a new Key Event */
         void addKeyEvent(int key, Qt::KeyboardModifiers modifiers);
 
-        void setErrorColor(const QColor& color) { m_errorColor=color; updateWidget(text()); }
-        void setBackgroundColor(const QColor& color) { m_background=color; updateWidget(text()); }
-        double maximum() const { return m_maximum; }
-        double minimum() const { return m_minimum; }
-        double checkMaximum() const { return m_checkMaximum; }
-        double checkMinimum() const { return m_checkMinimum; }
-        double decimals() const { return m_decimals; }
-        QColor errorColor() const { return m_errorColor; }
-        QColor backgroundColor() const { return m_background; }
-        double increment() const { return m_increment; }
-        bool showUpDown() const { return m_showUpDown; }
-        bool isIntegerWidget() const { return m_Integer; }
+        inline void setErrorColor(const QColor& color) { m_errorColor=color; updateWidget(text()); }
+        inline void setBackgroundColor(const QColor& color) { m_background=color; updateWidget(text()); }
+        inline double maximum() const { return m_maximum; }
+        inline double minimum() const { return m_minimum; }
+        inline bool checkMaximum() const { return m_checkMaximum; }
+        inline bool checkMinimum() const { return m_checkMinimum; }
+        inline double decimals() const { return m_decimals; }
+        inline QColor errorColor() const { return m_errorColor; }
+        inline QColor backgroundColor() const { return m_background; }
+        inline double increment() const { return m_increment; }
+        inline bool showUpDown() const { return m_showUpDown; }
+        inline bool isIntegerWidget() const { return m_Integer; }
         bool logScale() const;
     public slots:
         void setCheckMaximum(bool check) { m_checkMaximum=check; }
