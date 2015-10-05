@@ -26,8 +26,8 @@ function help {
 
 function module_prepare_cleandeploy {
 	rm -rf $1
-	cp ${$2} "${$2}.backup"
-	rm ${$2}
+	cp ${2} "${2}.backup"
+	rm ${2}
 }
 
 function module_final_cleandeploy {
@@ -241,9 +241,6 @@ if [ "${create_deploy}" != "0" ]; then
 	mkdir -p deploy
 
 
-
-
-
 	if [ "${domake}" != "0" ]; then
 		cd ..
 		#rm compiledate.h
@@ -388,7 +385,7 @@ fi
 echo -e "\n\nWRITING WINDOWS INSTALLER SCRIPT:\n\n"
 
 
-cp nsis_basicscript.nsi > nsis_basicscript.~si
+cp nsis_basicscript.nsi  nsis_basicscript.~si
 
 module_deploy_nsis deploy INSTALLER_FILES UNINSTALLER_FILES INSTALLER_DIRS
 module_deploy_nsis deployspim SPIMINSTALLER_FILES SPIMUNINSTALLER_FILES SPIMINSTALLER_DIRS
@@ -432,6 +429,7 @@ fi
 
 
 cp nsis_basicscript.~si ${INSTALLER_BASENAME}.nsi
+cp ${INSTALLER_BASENAME}.nsi ../${INSTALLER_BASENAME}_lastdeploy.nsi
 #rm nsis_basicscript.~si
 rm *.~*
 

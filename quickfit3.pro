@@ -132,6 +132,12 @@ plg_fitalgorithm_fit_gsl.depends = lib libqf3widgets
     plg_fitalgorithm_fit_nlopt.depends = lib libqf3widgets
 }
 
+!contains(QF3CONFIG, nonidaqmx) {
+    SUBDIRS += plg_qfe_nidaqmxreader
+    plg_qfe_nidaqmxreader.subdir=./plugins/qfe_nidaqmxreader
+    plg_qfe_nidaqmxreader.depends = lib libqf3widgets
+}
+
 !contains(QF3CONFIG,basicqfpluginsonly) {
 
     SUBDIRS += plg_cam_server
@@ -342,6 +348,8 @@ plg_fitalgorithm_fit_gsl.depends = lib libqf3widgets
                         plg_qfe_alexcontrol.subdir=./plugins/qfe_alexcontrol
                         plg_qfe_alexcontrol.depends = lib libqf3widgets
                     }
+
+
 
                     contains(QF3CONFIG, ffmdrivers) {
                             SUBDIRS += plg_b040_ffmcontrol

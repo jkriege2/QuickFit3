@@ -36,11 +36,14 @@ include(../../extlibs/eigen.pri)
 DESTDIR = $${QFOUTPUT}/plugins/
 
 # Input
-HEADERS += qfe_alexeval.h
+HEADERS += qfe_alexeval.h \
+    optionswidget.h
 
-SOURCES += qfe_alexeval.cpp
+SOURCES += qfe_alexeval.cpp \
+    optionswidget.cpp
 
-FORMS +=
+FORMS += \
+    optionswidget.ui
 
 RESOURCES += qfe_alexeval.qrc
 

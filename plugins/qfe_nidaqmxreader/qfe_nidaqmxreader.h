@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2012-2015 by Sebastian Isbaner
-
-    last modification: $LastChangedDate$  (revision $Rev$)
+Copyright (c) 2014
+	
+	last modification: $LastChangedDate$  (revision $Rev$)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -20,60 +20,61 @@ Copyright (c) 2012-2015 by Sebastian Isbaner
 */
 
 
-
-#ifndef QFEALEXEVAL_H
-#define QFEALEXEVAL_H
+#ifndef QFENIDAQMXREADER_H
+#define QFENIDAQMXREADER_H
 
 #include <time.h>
 #include <QObject>
 #include "qfextension.h"
+#include "mainwindow.h"
 #include "qfpluginoptionsdialog.h"
 
 /*!
-    \defgroup qf3ext_qfe_alexeval QFExtension implementation
+    \defgroup qf3ext_qfe_nidaqmxreader QFExtension implementation
     \ingroup qf3extensionplugins
 */
 
 /*! \brief QFExtension implementation
-    \ingroup qf3ext_qfe_alexeval
+    \ingroup qf3ext_qfe_nidaqmxreader
  */
-class QFEAlexEval : public QObject, public QFExtensionBase, public QFPluginOptionsDialogInterface {
+class QFENIDAQmxReader : public QObject, public QFExtensionBase, public QFPluginOptionsDialogInterface {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFPluginOptionsDialogInterface)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFEAlexEval")
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFENIDAQmxReader")
 #endif	
     public:
         /** Default constructor */
-        QFEAlexEval(QObject* parent=NULL);
+        QFENIDAQmxReader(QObject* parent=NULL);
         /** Default destructor */
-        virtual ~QFEAlexEval();
+        virtual ~QFENIDAQmxReader();
 
 
     /////////////////////////////////////////////////////////////////////////////
     // QFExtension routines
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return QString("qfe_alexeval"); }
+        virtual QString getID() const  { return QString("qfe_nidaqmxreader"); }
         /** \copydoc QFExtension::getName() */
-        virtual QString getName() const  { return tr("ALEX spFRET Evaluation Plugin"); }
+        virtual QString getName() const  { return tr("NI-DAQmx Channel-Reader"); }
         /** \copydoc QFExtension::getDescription() */
-        virtual QString getDescription() const  { return getName(); }
+        virtual QString getDescription() const  { return tr("reads measurements from input-channels of one or more NI-DAQmx cards"); }
         /** \copydoc QFExtension::getAuthor() */
-        virtual QString getAuthor() const  { return tr("Sebastian Isbaner"); }
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); }
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2013-2015 by Sebastian Isbaner"); }
+        virtual QString getCopyright() const  { return tr("(c) 2015 by Jan W. Krieger"); }
         /** \copydoc QFExtension::getWeblink() */
-        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/"); }
+        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
         /** \copydoc QFExtension::getIconFilename() */
-        virtual QString getIconFilename() const  { return QString(":/qfe_alexeval/qfe_alexeval.png"); }
+        virtual QString getIconFilename() const  { return QString(":/qfe_nidaqmxreader/qfe_nidaqmxreader_large.png"); }
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
             minor=0;
-        }
+        };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
+
         QString pluginOptionsName() const;
         QIcon pluginOptionsIcon() const;
         QFPluginOptionsWidget *createOptionsWidget(QWidget *parent);
@@ -104,14 +105,16 @@ class QFEAlexEval : public QObject, public QFExtensionBase, public QFPluginOptio
         virtual void log_error(QString message);
 
 	protected:
-        QAction* actStartPlugin;
         QFPluginLogService* logService;
+        QPointer<MainWindow> win;
+        QAction* actStartPlugin;
 		
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */
         void startPlugin();
 
         void optionsFinished();
+
 };
 
-#endif // QFEALEXEVAL_H
+#endif // QFENIDAQMXREADER_H

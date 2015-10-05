@@ -199,3 +199,13 @@ release
 /plugins/qfrdrcurve/form.ui
 /plugins/qfe_dataexportbasics/libxlsxwriter-master-2015_10_03.zip
 /plugins/qfe_dataexportbasics/libxlsxwriter-master
+/extlibs/test.sh
+/output/*.ini
+/output/deployspim
+/output/deployfcs
+/output/deployimfcs
+/output/deploymicroscopy
+/output/deploynitools
+/output/deployspecial
+/output/globalconfig
+/output/releasenotes.html

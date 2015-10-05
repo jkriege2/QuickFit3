@@ -49,9 +49,9 @@ QFPlotterPrivate::QFPlotterPrivate(QFPlotter *plotter, QObject *parent) :
     QObject(parent)
 {
     this->plotter=plotter;
-    actCopyToTable=new QAction(QIcon(":/libqf3widgets/qfplotter_copytotable.png"), tr("copy plot data to table RDR"), this);
+    actCopyToTable=new QAction(QIcon(":/libqf3widgets/qfplotter_copytotable.png"), tr("Copy Plot Data to Table RDR"), this);
     connect(actCopyToTable, SIGNAL(triggered()), this, SLOT(copyToTable()));
-    actCopyToCurve=new QAction(QIcon(":/libqf3widgets/qfplotter_copytocurve.png"), tr("copy graph(s) to curve RDR"), this);
+    actCopyToCurve=new QAction(QIcon(":/libqf3widgets/qfplotter_copytocurve.png"), tr("Copy Graph(s) to Curve RDR"), this);
     connect(actCopyToCurve, SIGNAL(triggered()), this, SLOT(copyToCurve()));
     actHelp=new QAction(QIcon(":/lib/help.png"), tr("Help on plotter widgets"), this);
     connect(actHelp, SIGNAL(triggered()), this, SLOT(showHelp()));

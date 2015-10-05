@@ -108,10 +108,12 @@ class QFE_ALEXControl : public QObject, public QFExtensionBase, public QFPluginO
 	protected:
         QFPluginLogService* logService;
         QPointer<controlWidget> win;
+        QAction* actStartPlugin;
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */
         void startPlugin();
 
+        void optionsFinished();
 };
 
 #endif // QFE_ALEXCONTROL_H

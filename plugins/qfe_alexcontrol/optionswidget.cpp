@@ -55,6 +55,7 @@ void OptionsWidget::readSettings(ProgramOptions *options)
     ui->edtChannels->setText(options->getConfigValue("qfe_alexcontrol/channelsFilename", QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_channels.ini").toString());
     ui->edtPorts->setText(options->getConfigValue("qfe_alexcontrol/portFilename", QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_ports.ini").toString());
     ui->edtTiming->setText(options->getConfigValue("qfe_alexcontrol/timingFilename", QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/alexc_timing.ini").toString());
+    ui->chkShowToolbarIcon->setChecked(options->getConfigValue("qfe_alexcontrol/show_toolbar_button", false).toBool());
 }
 
 void OptionsWidget::writeSettings(ProgramOptions *options)
@@ -63,5 +64,6 @@ void OptionsWidget::writeSettings(ProgramOptions *options)
     options->setConfigValue("qfe_alexcontrol/channelsFilename", ui->edtChannels->text());
     options->setConfigValue("qfe_alexcontrol/portFilename", ui->edtPorts->text());
     options->setConfigValue("qfe_alexcontrol/timingFilename", ui->edtTiming->text());
+    options->setConfigValue("qfe_alexcontrol/show_toolbar_button", ui->chkShowToolbarIcon->isChecked());
     emit writingSettings();
 }

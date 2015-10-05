@@ -31,6 +31,7 @@ Copyright (c) 2012-2015 by Sebastian Isbaner
 #include <QtPlugin>
 #include <iostream>
 #include "mainwindow.h"
+#include "optionswidget.h"
 
 #define LOG_PREFIX QString("qfe_alexeval >>> ").toUpper()
 
@@ -46,7 +47,28 @@ QFEAlexEval::~QFEAlexEval() {
 
 
 void QFEAlexEval::deinit() {
-	/* add code for cleanup here */
+    /* add code for cleanup here */
+}
+
+QString QFEAlexEval::pluginOptionsName() const
+{
+    return getName();
+}
+
+QIcon QFEAlexEval::pluginOptionsIcon() const
+{
+    return QIcon(getIconFilename());
+}
+
+QFPluginOptionsWidget *QFEAlexEval::createOptionsWidget(QWidget *parent)
+{
+    OptionsWidget* o= new OptionsWidget(this, parent);
+    if (o) {
+        connect(o, SIGNAL(writingSettings()), this, SLOT(optionsFinished()));
+    }
+    //qDebug()<<"*QFE_ALEXControl::createOptionsWidget("<<parent<<"): "<<o;
+    return o;
+
 }
 
 void QFEAlexEval::projectChanged(QFProject* oldProject, QFProject* project) {
@@ -62,16 +84,15 @@ void QFEAlexEval::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
     services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
     
-    QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Start ALEX Evaluation (for spFRET)"), this);
+    actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Start ALEX Evaluation (for spFRET)"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
-    QToolBar* exttb=services->getToolbar("extension");
-    if (exttb) {
-        exttb->addAction(actStartPlugin);
-    }
+
     QMenu* extm=services->getMenu("extensions");
     if (extm) {
         extm->addAction(actStartPlugin);
     }
+    optionsFinished();
+    services->registerSettingsPane(this);
     services->log_global_text(tr("initializing extension '%1' ... DONE\n").arg(getName()));
 
 }
@@ -119,5 +140,16 @@ void QFEAlexEval::log_error(QString message) {
 	else if (services) services->log_error(LOG_PREFIX+message);
 }
 
+void QFEAlexEval::optionsFinished()
+{
+    QToolBar* exttb=services->getToolbar("extensions");
+    if (exttb) {
+        if (ProgramOptions::getConfigValue("qfe_alexeval/show_toolbar_button", false).toBool()) {
+            exttb->addAction(actStartPlugin);
+        } else {
+            exttb->removeAction(actStartPlugin);
+        }
+    }
+}
 
 Q_EXPORT_PLUGIN2(qfe_alexeval, QFEAlexEval)
