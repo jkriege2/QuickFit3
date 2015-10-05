@@ -82,7 +82,7 @@ SOURCES += dlgcsvparameters.cpp \
 
 FORMS = dlg_csvparameters.ui \
     qfrdrfcsfitfunctionsimulator.ui \
-    ../base_classes/qffcsfitchi2landscapedialog.ui \
+    ../base_classes/qffitchi2landscapedialog.ui \
     ../base_classes/qffinderroneouscorrelationdlg.ui
 
 RESOURCES += qfrdrfcs.qrc

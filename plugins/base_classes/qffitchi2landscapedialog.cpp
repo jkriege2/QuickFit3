@@ -19,15 +19,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "qffcsfitchi2landscapedialog.h"
-#include "ui_qffcsfitchi2landscapedialog.h"
+#include "qffitchi2landscapedialog.h"
+#include "ui_qffitchi2landscapedialog.h"
 
 
 
 
-QFFCSFitChi2LandscapeDialog::QFFCSFitChi2LandscapeDialog(QFFitResultsByIndexEvaluation* item, QFRawDataRecord *rec, int index, QFFitFunction *fitfunction, QWidget *parent) :
+QFFitChi2LandscapeDialog::QFFitChi2LandscapeDialog(QFFitResultsByIndexEvaluation* item, QFRawDataRecord *rec, int index, QFFitFunction *fitfunction, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::QFFCSFitChi2LandscapeDialog)
+    ui(new Ui::QFFitChi2LandscapeDialog)
 {
     this->item=item;
     this->index=index;
@@ -54,12 +54,12 @@ QFFCSFitChi2LandscapeDialog::QFFCSFitChi2LandscapeDialog(QFFitResultsByIndexEval
 
 }
 
-QFFCSFitChi2LandscapeDialog::~QFFCSFitChi2LandscapeDialog()
+QFFitChi2LandscapeDialog::~QFFitChi2LandscapeDialog()
 {
     delete ui;
 }
 
-void QFFCSFitChi2LandscapeDialog::updateInputs()
+void QFFitChi2LandscapeDialog::updateInputs()
 {
     ui->spinXMax->setMaximum(DBL_MAX);
     ui->spinYMax->setMaximum(DBL_MAX);
@@ -69,7 +69,7 @@ void QFFCSFitChi2LandscapeDialog::updateInputs()
     else ui->spinYMin->setMinimum(1e-15);
 }
 
-void QFFCSFitChi2LandscapeDialog::on_btnPlot_clicked()
+void QFFitChi2LandscapeDialog::on_btnPlot_clicked()
 {
     ui->plotter->set_doDrawing(false);
     ui->plotter->getDatastore()->clear();

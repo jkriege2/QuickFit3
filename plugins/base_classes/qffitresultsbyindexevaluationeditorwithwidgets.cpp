@@ -37,7 +37,7 @@
 #include "qffitalgorithmmanager.h"
 #include "dlgqfprogressdialog.h"
 #include "qffitresultsbyindexevaluationfittools.h"
-#include "qffcsfitchi2landscapedialog.h"
+#include "qffitchi2landscapedialog.h"
 #include "qfselectrdrdialog.h"
 #include "qfoverlayplotdialog.h"
 
@@ -141,7 +141,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     QFont boldfont=font();
     boldfont.setBold(true);
 
-    toolbar=new QToolBar("toolbar_fcs_fit", this);
+    toolbar=new QToolBar("toolbar_fit", this);
     vbl->addWidget(toolbar);
     /*actSaveReport=new QAction(QIcon(":/fcsfit/fit_savereport.png"), tr("Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
@@ -1936,7 +1936,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::plotChi2Landscape()
 {
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!data) return;
-    QFFCSFitChi2LandscapeDialog* dlgChi2=new QFFCSFitChi2LandscapeDialog(data, data->getHighlightedRecord(), data->getCurrentIndex(), data->getFitFunction(), this);
+    QFFitChi2LandscapeDialog* dlgChi2=new QFFitChi2LandscapeDialog(data, data->getHighlightedRecord(), data->getCurrentIndex(), data->getFitFunction(), this);
     dlgChi2->exec();
 
     delete dlgChi2;

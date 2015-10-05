@@ -39,7 +39,6 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "cpptools.h"
 #include "dlgqfprogressdialog.h"
 #include "qmoretextobject.h"
-#include "qffcsfitchi2landscapedialog.h"
 #include "qffitfunctionmanager.h"
 #include "qffitresultsbyindexevaluationfitthread.h"
 #include "qffitfunctionconfigforglobalfittools.h"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QFFCSFitChi2LandscapeDialog</class>
- <widget class="QDialog" name="QFFCSFitChi2LandscapeDialog">
+ <class>QFFitChi2LandscapeDialog</class>
+ <widget class="QDialog" name="QFFitChi2LandscapeDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -246,7 +246,7 @@
   <connection>
    <sender>btnClose</sender>
    <signal>clicked()</signal>
-   <receiver>QFFCSFitChi2LandscapeDialog</receiver>
+   <receiver>QFFitChi2LandscapeDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -262,7 +262,7 @@
   <connection>
    <sender>cmbModeX</sender>
    <signal>currentIndexChanged(int)</signal>
-   <receiver>QFFCSFitChi2LandscapeDialog</receiver>
+   <receiver>QFFitChi2LandscapeDialog</receiver>
    <slot>updateInputs()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -278,7 +278,7 @@
   <connection>
    <sender>cmbModeY</sender>
    <signal>currentIndexChanged(int)</signal>
-   <receiver>QFFCSFitChi2LandscapeDialog</receiver>
+   <receiver>QFFitChi2LandscapeDialog</receiver>
    <slot>updateInputs()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -294,7 +294,7 @@
   <connection>
    <sender>chkLogscale</sender>
    <signal>toggled(bool)</signal>
-   <receiver>QFFCSFitChi2LandscapeDialog</receiver>
+   <receiver>QFFitChi2LandscapeDialog</receiver>
    <slot>on_btnPlot_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
