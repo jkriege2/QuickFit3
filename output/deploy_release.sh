@@ -111,6 +111,8 @@ function module_deploy_nsis {
 	cp -f nsis_basicscript.~~s nsis_basicscript.~si
 	ls -l *.~*
 	
+	cp nsis_basicscript.~si ../nsis_basicscript_step${1}.nsi
+	
 	eval $2="'$INSTALLER_FILES'"
 	eval $3="'$UNINSTALLER_FILES'"
 	eval $4="'$INSTALLER_DIRS'"
