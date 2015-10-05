@@ -257,7 +257,8 @@ if [ "${create_deploy}" != "0" ]; then
 		cd output
 	fi
 
-
+	PWDD=`pwd`
+	echo "NOW IN  ${PWDD}";
 	for f in *
 	do
 		if [ $f != "deploy" ]; then
@@ -270,6 +271,9 @@ if [ "${create_deploy}" != "0" ]; then
 	done
 
 	if ! cd deploy; then echo "could not create ./deploy/"; exit 1; fi
+	PWDDEP=`pwd`
+	echo "NOW IN  ${PWDDEP}";
+	
 	rm ./globalconfig/*
 	rm -rf ./globalconfig
 	mkdir globalconfig
@@ -309,27 +313,41 @@ if [ "${create_deploy}" != "0" ]; then
 	find -name "*.ts" -exec rm -rf {} \;
 	find -name "*.cpt" -exec rm -rf {} \;
 	
-	cd qtplugins
 	PWDD=`pwd`
-	 echo "going to ./qtplugins/  ${PWDD}";
-	find -name "*d4.dll" -exec rm -rf {} \;
-	find -name "q*d.dll" -exec rm -rf {} \;
-	find -name "dsengined.dll" -exec rm -rf {} \;
-	find -name "eglvideonoded.dll" -exec rm -rf {} \;
-	find -name "windowsprintersupportd.dll" -exec rm -rf {} \;
-	find -name "*.a" -exec rm -rf {} \;
-	cd ..
+	echo "NOW IN  ${PWDD}";
+	if cd qtplugins; then
+		PWDD=`pwd`
+		echo "going to ./qtplugins/  ${PWDD}";
+		find -name "*d4.dll" -exec rm -rf {} \;
+		find -name "q*d.dll" -exec rm -rf {} \;
+		find -name "dsengined.dll" -exec rm -rf {} \;
+		find -name "eglvideonoded.dll" -exec rm -rf {} \;
+		find -name "windowsprintersupportd.dll" -exec rm -rf {} \;
+		find -name "*.a" -exec rm -rf {} \;
+		cd $PWDDEP
+		PWDD=`pwd`
+		echo "returning from ./qtplugins/ ${PWDD}";
+	else	
+		echo "could not cd to ./qtplugins/ ";
+		cd $PWDDEP
+	fi
 	PWDD=`pwd`
-	echo "returning from ./qtplugins/ ${PWDD}";
+	echo "NOW IN  ${PWDD}";
 
 
 
 	module_prepare deployspim $SPIMPLUGINS $SPIMONLYQTMODULES
+	cd $PWDDEP
 	module_prepare deployfcs $FCSPLUGINS ""
+	cd $PWDDEP
 	module_prepare deployimfcs $IMFCSPLUGINS ""
+	cd $PWDDEP
 	module_prepare deploymicroscopy $MICROSCOPYPLUGINS ""
+	cd $PWDDEP
 	module_prepare deployspecial $SPECIALPLUGINS $SPECIALONLYQTMODULES
+	cd $PWDDEP
 	module_prepare deploynitools $NITOOLS ""
+	cd $PWDDEP
 	
 
 	for f in $REMOVEPLUGINS
