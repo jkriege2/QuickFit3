@@ -107,8 +107,9 @@ QString qfInfoCompileDate() {
     QRegExp rx("\\s*(\\d\\d)\\.(\\d\\d)\\.(\\d\\d\\d\\d)\\s*");
     rx.setCaseSensitivity(Qt::CaseInsensitive);
     if (rx.indexIn(s)==0 && rx.matchedLength()==s.length()) {
-        s=QDate(rx.cap(3).toInt(), rx.cap(2).toInt(), rx.cap(1).toInt()).toString("yyyy/MM/dd");
+        s=QDate(rx.cap(3).toInt(), rx.cap(2).toInt(), rx.cap(1).toInt()).toString("yyyy-MM-dd");
     }
+    s=s.replace('/', '-');
     return s;
 }
 

@@ -210,3 +210,7 @@ release
 /output/globalconfig
 /output/releasenotes.html
 /output/deploy
+/output/deployalextools
+/output/deploymain
+/output/test.sh
+/releasenotes.html

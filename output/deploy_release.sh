@@ -37,6 +37,14 @@ function module_final_cleandeploy {
 
 
 function module_prepare {
+	echo "PREPARE $1"
+	echo "module_prepare.1 = $1"
+	local l2=
+	eval l2=\$$2
+	local l3=
+	eval l3=\$$3
+	echo "module_prepare.2 = $2 = $l2"
+	echo "module_prepare.3 = $3 = $l3"
 	mkdir ../$1
 	mkdir ../$1/plugins
 	mkdir ../$1/fitfunctionplugins
@@ -51,18 +59,28 @@ function module_prepare {
 	cp -rf ./sdk/fitfunctions/* ../$1/sdk/fitfunctions
 	cp -rf ./globalconfig_templates/* ../$1/globalconfig_templates
 
-	for f in $3
+	for f in $l3
 	do
 		cp -rf "../${f}" ../$1
 	done
 	
-	for f in $2
+	for f in $l2
 	do
-		mkdir "../$1/assets/plugins/${f}"
-		mkdir "../$1/assets/plugins/help/${f}"
-		cp -rf  "./assets/plugins/${f}" "../$1/assets/plugins/"
-		cp -rf  "./examples/${f}" "../$1/examples/"
-		cp -rf  "./assets/plugins/help/${f}" "../$1/assets/help/plugins/"
+		if [ "$(ls -A ./assets/plugins/${f})" ]; then
+			echo "    --> MAKING DIR ../$1/assets/plugins/${f}"
+			mkdir "../$1/assets/plugins/${f}"
+			cp -rf  "./assets/plugins/${f}" "../$1/assets/plugins/"
+		fi	
+		if [ "$(ls -A ./assets/plugins/help/${f})" ]; then
+			echo "    --> MAKING DIR ../$1/assets/plugins/help/${f}"
+			mkdir "../$1/assets/plugins/help/${f}"
+			cp -rf  "./assets/plugins/help/${f}" "../$1/assets/plugins/help/"
+		fi	
+		if [ "$(ls -A ./examples/${f})" ]; then
+			echo "    --> MAKING DIR ../$1/examples/${f}"
+			mkdir "../$1/examples/${f}"
+			cp -rf  "./examples/${f}" "../$1/examples/"
+		fi	
 		find -name "${f}.*" -exec cp -rf "{}" "../$1/{}" \;
 	done
 
@@ -77,7 +95,7 @@ function module_deploy_zip {
 
 function module_deploy_nsis {
 
-	echo "\nDEPLOY $1"
+	echo "DEPLOY $1"
 	cd $1
 	local INSTALLER_FILES=
 	local UNINSTALLER_FILES=
@@ -111,7 +129,7 @@ function module_deploy_nsis {
 	cp -f nsis_basicscript.~~s nsis_basicscript.~si
 	ls -l *.~*
 	
-	cp nsis_basicscript.~si ../nsis_basicscript_step${1}.nsi
+	#cp -v nsis_basicscript.~si "nsis_basicscript_step${1}.nsi"
 	
 	eval $2="'$INSTALLER_FILES'"
 	eval $3="'$UNINSTALLER_FILES'"
@@ -202,6 +220,7 @@ ZIPFILEFCS=quickfit3_win${BITDEPTH}${SPECIALS}_fcsplugins_${SVNVER}.zip
 ZIPFILEIMFCS=quickfit3_win${BITDEPTH}${SPECIALS}_imfcsplugins_${SVNVER}.zip
 ZIPFILEMICROSCOPY=quickfit3_win${BITDEPTH}${SPECIALS}_microscopyplugins_${SVNVER}.zip
 ZIPFILENITOOLS=quickfit3_win${BITDEPTH}${SPECIALS}_nitools_${SVNVER}.zip
+ZIPFILEALEXTOOLS=quickfit3_win${BITDEPTH}${SPECIALS}_alextools_${SVNVER}.zip
 ZIPFILESPECIAL=quickfit3_win${BITDEPTH}${SPECIALS}_special_${SVNVER}.zip
 #if [ "${BITDEPTH}" == "64" ]; then
 #	INSTALLER_INSTDIR="\$PROGRAMFILES64"
@@ -213,23 +232,24 @@ ZIPFILESPECIAL=quickfit3_win${BITDEPTH}${SPECIALS}_special_${SVNVER}.zip
 #	ZIPFILESPECIAL=quickfit3_win64${SPECIALS}_special_${SVNVER}.zip
 #	ZIPFILEMICROSCOPY=quickfit3_win64${SPECIALS}_microscopyplugins_${SVNVER}.zip
 #fi
-FCSPLUGINS=" fcs fccsfit fcsfit fcs_fitfuctions fcsmsdevaluation fitfunction_2ffcs fitfunction_dls fitfunction_fccs fitfunction_fcsdistribution fitfunction_spimfcs fitfunction_tirfcs importers_simpletcspcimporter photoncounts picoquantimporters qffcsmaxentevaluation tcspcimporter qfe_alexeval"
-IMFCSPLUGINS=" imagingfcs imfccsfit imfcsfit numberandbrightness"
-MICROSCOPYPLUGINS=" qfevalbeadscanpsf qfevalcolocalization qfevalcameracalibration fitfunctions_lightsheet spim_lightsheet_eval "
-SPIMPLUGINS=" cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino filterc_test cam_systemcam filterc_tmcl lights_b040laserbox lights_pccsled lights_coboltlaser stage_pi863_2 meas_b040resheater lights_coboltlaser servo_pololu_maestro shutter_relais_arduino"
-NITOOLS=" qfe_nidaqmxreader plg_qfe_alexcontrol"
+FCSPLUGINS=" fcs qfrdrfcs qfevalfcsfit fccsfit fccs_fit fcsfit qffcsfitfuncs fcs_fitfuctions fcsmsdevaluation fitfunction_2ffcs fitfunction_dls fitfunction_fccs fitfunction_fcsdistribution fitfunction_spimfcs fitfunction_tirfcs fitfunctions_2ffcs fitfunctions_dls fitfunctions_fccs fitfunctions_fcsdistribution fitfunctions_spimfcs fitfunctions_tirfcs importers_simpletcspcimporter photoncounts importers_picoquant picoquantimporters qffcsmaxentevaluation fcs_maxent tcspcimporter  "
+IMFCSPLUGINS=" imagingfcs imaging_fcs imfccsfit imfccs_fit imfcsfit numberandbrightness number_and_brightness fitfunctions_spimfcs fitfunctions_tirfcs fitfunctions_2ffcs "
+MICROSCOPYPLUGINS=" qfevalbeadscanpsf eval_beadscanpsf eval_cameracalibration eval_colocalization qfevalcolocalization qfevalcameracalibration fitfunctions_lightsheet spim_lightsheet_eval "
+SPIMPLUGINS=" cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino filterc_test cam_systemcam filterc_tmcl lights_b040laserbox lights_pccsled lights_coboltlaser stage_pi863_2 meas_b040resheater lights_coboltlaser servo_pololu_maestro shutter_relais_arduino  cam_server meas_spadmeasurement"
+NITOOLS=" qfe_nidaqmxreader "
+ALEXTOOLS=" qfe_alexeval qfe_alexcontrol"
 SPECIALPLUGINS=""
 if [ "${deployspecials}" == "1" ]; then
 	SPECIALPLUGINS=
 fi
-REMOVEPLUGINS=" ${SPECIALPLUGINS} ${SPIMPLUGINS} ${FCSPLUGINS} ${IMFCSPLUGINS} ${NITOOLS} ${MICROSCOPYPLUGINS} cam_radhard2 cam_rh2v2  b040_ffmcontrol alv_autocorrelator5000 multicontrol_stage qfe_acquisitiontest scanner2000_nicounter"
+REMOVEPLUGINS=" ${SPECIALPLUGINS} ${SPIMPLUGINS} ${FCSPLUGINS} ${IMFCSPLUGINS} ${NITOOLS} ${ALEXTOOLS} ${MICROSCOPYPLUGINS} cam_radhard2 cam_rh2v2  b040_ffmcontrol alv_autocorrelator5000 multicontrol_stage qfe_acquisitiontest scanner2000_nicounter"
 SPIMONLYQTMODULES=" QtScript4.dll QtScriptTools4.dll Qt5Script.dll Qt5ScriptTools.dll"
 SPECIALONLYQTMODULES=""
 
 
 if [ "${create_deploy}" != "0" ]; then
 
-	rm -rf deploy
+	rm -rf deploymain
 	cp ${ZIPFILE} "${ZIPFILE}.backup"
 	rm ${ZIPFILE}
 	
@@ -240,8 +260,9 @@ if [ "${create_deploy}" != "0" ]; then
 	module_prepare_cleandeploy deploymicroscopy ${ZIPFILEMICROSCOPY}
 	module_prepare_cleandeploy deployspecial ${ZIPFILESPECIAL}
 	module_prepare_cleandeploy deploynitools ${ZIPFILENITOOLS}
+	module_prepare_cleandeploy deployalextools ${ZIPFILEALEXTOOLS}
 
-	mkdir -p deploy
+	mkdir -p deploymain
 
 
 	if [ "${domake}" != "0" ]; then
@@ -259,21 +280,24 @@ if [ "${create_deploy}" != "0" ]; then
 
 	PWDD=`pwd`
 	echo "NOW IN  ${PWDD}";
+	echo "PREPARING DEPLOY-DIRECTORY ./deploymain/"
 	for f in *
 	do
-		if [ $f != "deploy" ]; then
-		  if [[ "$f" != *setup.exe ]]; then
-			if [[ "$f" != quickfit3_*.* ]]; then
-				cp -rv $f ./deploy
+		if [ $f != "deploy" ] && [ $f != "deploymain" ]; then
+		  if [[ "$f" != *setup.exe ]] && [[ "$f" != deploy* ]]; then
+			if [[ "$f" != quickfit3_*.* ]] && [[ "$f" != Qt5*d.dll ]]; then
+			    echo "  ==> copy $f"
+				cp -rf $f ./deploymain
 			fi	
 		  fi
 		fi
 	done
 
-	if ! cd deploy; then echo "could not create ./deploy/"; exit 1; fi
+	if ! cd deploymain; then echo "could not create ./deploymain/"; exit 1; fi
 	PWDDEP=`pwd`
 	echo "NOW IN  ${PWDDEP}";
 	
+	echo "CLEANING DEPLOY-DIRECTORY ./deploymain/"
 	rm ./globalconfig/*
 	rm -rf ./globalconfig
 	mkdir globalconfig
@@ -292,15 +316,7 @@ if [ "${create_deploy}" != "0" ]; then
 	rm ./qf3infotool*.*
 	rm ./qf3infotool
 
-	for f in $SPIMONLYQTMODULES
-	do
-		rm -rf  "./${f}"
-	done
 
-	for f in $SPECIALONLYQTMODULES
-	do
-		rm -rf  "./${f}"
-	done
 
 	find -name "quickfit3_*.zip" -exec rm -rf {} \;
 	find -name "*.sh" -exec rm -rf {} \;
@@ -314,10 +330,11 @@ if [ "${create_deploy}" != "0" ]; then
 	find -name "*.cpt" -exec rm -rf {} \;
 	
 	PWDD=`pwd`
-	echo "NOW IN  ${PWDD}";
+	echo "NOW IN  ${PWDD}"
+	#ls -alph
 	if cd qtplugins; then
 		PWDD=`pwd`
-		echo "going to ./qtplugins/  ${PWDD}";
+		echo "going to ./qtplugins/  ${PWDD}"
 		find -name "*d4.dll" -exec rm -rf {} \;
 		find -name "q*d.dll" -exec rm -rf {} \;
 		find -name "dsengined.dll" -exec rm -rf {} \;
@@ -326,34 +343,47 @@ if [ "${create_deploy}" != "0" ]; then
 		find -name "*.a" -exec rm -rf {} \;
 		cd $PWDDEP
 		PWDD=`pwd`
-		echo "returning from ./qtplugins/ ${PWDD}";
+		echo "returning from ./qtplugins/ ${PWDD}"
 	else	
-		echo "could not cd to ./qtplugins/ ";
+		echo "could not cd to ./qtplugins/ "
 		cd $PWDDEP
 	fi
 	PWDD=`pwd`
-	echo "NOW IN  ${PWDD}";
+	echo "NOW IN  ${PWDD}"
 
-
-
-	module_prepare deployspim $SPIMPLUGINS $SPIMONLYQTMODULES
-	cd $PWDDEP
-	module_prepare deployfcs $FCSPLUGINS ""
-	cd $PWDDEP
-	module_prepare deployimfcs $IMFCSPLUGINS ""
-	cd $PWDDEP
-	module_prepare deploymicroscopy $MICROSCOPYPLUGINS ""
-	cd $PWDDEP
-	module_prepare deployspecial $SPECIALPLUGINS $SPECIALONLYQTMODULES
-	cd $PWDDEP
-	module_prepare deploynitools $NITOOLS ""
-	cd $PWDDEP
 	
 
+	module_prepare deployspim SPIMPLUGINS SPIMONLYQTMODULES
+	cd $PWDDEP
+	module_prepare deployfcs FCSPLUGINS ""
+	cd $PWDDEP
+	module_prepare deployimfcs IMFCSPLUGINS ""
+	cd $PWDDEP
+	module_prepare deploymicroscopy MICROSCOPYPLUGINS ""
+	cd $PWDDEP
+	module_prepare deployspecial SPECIALPLUGINS SPECIALONLYQTMODULES
+	cd $PWDDEP
+	module_prepare deploynitools NITOOLS ""
+	cd $PWDDEP
+	module_prepare deployalextools ALEXTOOLS ""
+	cd $PWDDEP
+	
+	echo "CLEANING UNUSED Qt-MODULES FROM ./deploymain/"
+	for f in $SPIMONLYQTMODULES
+	do
+		rm -rf  "./${f}"
+	done
+
+	for f in $SPECIALONLYQTMODULES
+	do
+		rm -rf  "./${f}"
+	done
+	
 	for f in $REMOVEPLUGINS
 	do
 		rm -rf  "./assets/plugins/${f}"
 		rm -rf  "./assets/plugins/help/${f}"
+		rm -rf  "./examples/${f}"
 		find -name "${f}.*" -exec rm -rf {} \;
 	done
 
@@ -376,12 +406,15 @@ if [ "${create_deploy}" != "0" ]; then
 	rm releasenotes_template.html
 
 	echo -e "\n\nCREATING RELEASE NOTES:\n\n"
+	echo "  step 1"
 	sed "/%%RELEASE_NOTES%%/ {
 	  r ../../application/releasenote.html
 	  d  
 	}" ../releasenotes_template.html > releasenotes.~ht
+	echo "  step 2"
 	sed "s/\\\$\\\$SVN\\\$\\\$/$SVNVER/g" releasenotes.~ht > releasenotes.~~h
 	cp -f releasenotes.~~h releasenotes.~ht
+	echo "  step 3"
 	sed "s/\\\$\\\$COMPILEDATE\\\$\\\$/$COMPILEDATE/g" releasenotes.~ht > releasenotes.~~h
 	cp -f releasenotes.~~h releasenotes.~ht
 	cp releasenotes.~ht releasenotes.html
@@ -393,13 +426,14 @@ fi
 
 if [ "${createZIP}" != "0" ]; then
 	echo -e "\n\nCREATING ZIP ARCHIVES FOR DEPLOYMENT:\n\n"
-	module_deploy_zip deploy ${ZIPFILE}
+	module_deploy_zip deploymain ${ZIPFILE}
 	module_deploy_zip deployspim ${ZIPFILESPIM}
 	module_deploy_zip deployfcs ${ZIPFILEFCS}
 	module_deploy_zip deployimfcs ${ZIPFILEIMFCS}
 	module_deploy_zip deploymicroscopy ${ZIPFILEMICROSCOPY}
 	module_deploy_zip deployspecial ${ZIPFILESPECIAL}
 	module_deploy_zip deploynitools ${ZIPFILENITOOLS}
+	module_deploy_zip deployalextools ${ZIPFILEALEXTOOLS}
 fi
 
 
@@ -408,31 +442,37 @@ echo -e "\n\nWRITING WINDOWS INSTALLER SCRIPT:\n\n"
 
 cp nsis_basicscript.nsi  nsis_basicscript.~si
 
-module_deploy_nsis deploy INSTALLER_FILES UNINSTALLER_FILES INSTALLER_DIRS
+module_deploy_nsis deploymain INSTALLER_FILES UNINSTALLER_FILES INSTALLER_DIRS
 module_deploy_nsis deployspim SPIMINSTALLER_FILES SPIMUNINSTALLER_FILES SPIMINSTALLER_DIRS
 module_deploy_nsis deployfcs FCSINSTALLER_FILES FCSUNINSTALLER_FILES FCSINSTALLER_DIRS
 module_deploy_nsis deployimfcs IMFCSINSTALLER_FILES IMFCSUNINSTALLER_FILES IMFCSINSTALLER_DIRS
 module_deploy_nsis deploymicroscopy MICROSCOPYINSTALLER_FILES MICROSCOPYUNINSTALLER_FILES MICROSCOPYINSTALLER_DIRS
 module_deploy_nsis deploynitools NITOOLSINSTALLER_FILES NITOOLSUNINSTALLER_FILES NITOOLSINSTALLER_DIRS
+module_deploy_nsis deployalextools ALEXTOOLSINSTALLER_FILES ALEXTOOLSUNINSTALLER_FILES ALEXTOOLSINSTALLER_DIRS
 
-
-
-
+ls -l *.~*
+echo "COMPLETING INSTALLER SCRIPT"
+echo "   step 1"
 sed "s/%%INSTALLER_INSTDIR%%/$INSTALLER_INSTDIR/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
+echo "   step 2"
 sed "s/%%INSTALLER_BASENAME%%/$INSTALLER_BASENAME/" nsis_basicscript.~si > nsis_basicscript.~~s 
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
+echo "   step 3"
 sed "s/%%SVNVER%%/$SVNVER/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
+echo "   step 4"
 sed "s/%%COMPILEDATE%%/$COMPILEDATE/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
+echo "   step 5"
 sed "s/%%BITDEPTH%%/$BITDEPTH/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
+echo "   step 6"
 sed "s/%%INSTALLER_DIRS%%/$INSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
@@ -456,17 +496,19 @@ rm *.~*
 
 
 if [ "${runNSIS}" != "0" ]; then
+    echo "RUNNING NSIS INSTALLER GENERATOR"
 	makensis ${INSTALLER_BASENAME}.nsi
 fi
 
 if [ "${delete_deploy}" != "0" ]; then
 	echo -e "\n\nCLEANUP:\n\n"
 
-	module_final_cleandeploy deploy "${ZIPFILE}.backup"
+	module_final_cleandeploy deploymain "${ZIPFILE}.backup"
 	module_final_cleandeploy deployspim "${ZIPFILESPIM}.backup"
 	module_final_cleandeploy deployfcs "${ZIPFILEFCS}.backup"
 	module_final_cleandeploy deployimfcs "${ZIPFILEIMFCS}.backup"
 	module_final_cleandeploy deploymicroscopy "${ZIPFILEMICROSCOPY}.backup"
 	module_final_cleandeploy deployspecial "${ZIPFILESPECIAL}.backup"
 	module_final_cleandeploy deploynitools "${ZIPFILENITOOLS}.backup"
+	module_final_cleandeploy deployalextools "${ZIPFILEALEXTOOLS}.backup"
 fi

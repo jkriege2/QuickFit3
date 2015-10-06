@@ -52,6 +52,7 @@ Var StartMenuFolder
 !insertmacro MUI_PAGE_README "README.txt"
 !insertmacro MUI_PAGE_LICENSE "LICENSE.txt"
 !insertmacro MUI_PAGE_COMPONENTS
+!define MUI_COMPONENTSPAGE_NODESC
 !insertmacro MUI_PAGE_DIRECTORY
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM" 
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REG_KEY}
@@ -223,7 +224,7 @@ Section "FCS/FCCS Plugins" sec_fcs
 SectionEnd
 
 # This installs the FCS plugins
-Section "imaging FCS/FCCS Plugins" sec_imfcs
+Section "Imaging FCS/FCCS Plugins" sec_imfcs
 	Push $OUTDIR ; Store previous output directory
 	SetOutPath "$INSTDIR\" ; Set output directory
 	
@@ -240,7 +241,7 @@ Section "imaging FCS/FCCS Plugins" sec_imfcs
 SectionEnd
 
 # This installs the microscopy plugins
-Section "Microscopy Plugins (beadscan, colocalization, camera calibration ...)" sec_microscopy
+Section "Microscopy Characterization Plugins" sec_microscopy
 	Push $OUTDIR ; Store previous output directory
 	SetOutPath "$INSTDIR\" ; Set output directory
 	
@@ -257,25 +258,8 @@ Section "Microscopy Plugins (beadscan, colocalization, camera calibration ...)" 
 SectionEnd
 
 
-# This installs the SPIM conrol plugins
-Section "Microscope Control Plugins (SPIM...)" sec_spim
-	Push $OUTDIR ; Store previous output directory
-	SetOutPath "$INSTDIR\" ; Set output directory
-	
-	# automatically created list of install files
-	%%SPIMINSTALLER_DIRS%%
-	%%SPIMINSTALLER_FILES%%
-	
-	# Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
-	 ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
-	IntFmt $0 "0x%08X" $0
-	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "EstimatedSize" "$0"
-
-	Pop $OUTDIR ; Restore the original output directory
-SectionEnd
-
 # This installs the NI-DAQmx conrol plugins
-Section "Plugins that use National Instruments DAQ-mx (Measurement-Reader, ALEWX-Control, ...)" sec_nitools
+Section "National Instruments Hardware Control Plugins" sec_nitools
 	Push $OUTDIR ; Store previous output directory
 	SetOutPath "$INSTDIR\" ; Set output directory
 	
@@ -291,6 +275,39 @@ Section "Plugins that use National Instruments DAQ-mx (Measurement-Reader, ALEWX
 	Pop $OUTDIR ; Restore the original output directory
 SectionEnd
 
+# This installs the NI-DAQmx conrol plugins
+Section "B040 ALEX-Tools for spFRET" sec_alextools
+	Push $OUTDIR ; Store previous output directory
+	SetOutPath "$INSTDIR\" ; Set output directory
+	
+	# automatically created list of install files
+	%%ALEXTOOLSINSTALLER_DIRS%%
+	%%ALEXTOOLSINSTALLER_FILES%%
+	
+	# Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
+	 ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+	IntFmt $0 "0x%08X" $0
+	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "EstimatedSize" "$0"
+
+	Pop $OUTDIR ; Restore the original output directory
+SectionEnd
+
+# This installs the SPIM conrol plugins
+Section "B040 Microscope Instrument Control Plugins" sec_spim
+	Push $OUTDIR ; Store previous output directory
+	SetOutPath "$INSTDIR\" ; Set output directory
+	
+	# automatically created list of install files
+	%%SPIMINSTALLER_DIRS%%
+	%%SPIMINSTALLER_FILES%%
+	
+	# Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
+	 ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+	IntFmt $0 "0x%08X" $0
+	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "EstimatedSize" "$0"
+
+	Pop $OUTDIR ; Restore the original output directory
+SectionEnd
 
 
 function .onInit
@@ -327,7 +344,7 @@ function .onInit
 	  IntOp $0 ${SF_SELECTED} | ${SF_RO}
 	  IntOp $0 $0 | ${SF_BOLD}
 	  IntOp $1 ${SF_SELECTED} | ${SF_BOLD}
-	  IntOp $2 ${SF_SELECTED}
+	  IntOp $2 ${SF_SELECTED} | ${SF_SELECTED}
       SectionSetFlags ${sec_main} $0
       SectionSetFlags ${sec_assoc} $1
       SectionSetFlags ${sec_fcs} $1
@@ -335,6 +352,7 @@ function .onInit
       SectionSetFlags ${sec_microscopy} $1
       SectionSetFlags ${sec_spim} 0
       SectionSetFlags ${sec_nitools} 0
+      SectionSetFlags ${sec_alextools} 0
 
 functionEnd
 
@@ -375,6 +393,7 @@ Section "un.${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_un_main
 	%%IMFCSUNINSTALLER_FILES%%
 	%%MICROSCOPYUNINSTALLER_FILES%%
 	%%NITOOLSUNINSTALLER_FILES%%
+	%%ALEXTOOLSUNINSTALLER_FILES%%
 	%%UNINSTALLER_FILES%%
 	RMDir /REBOOTOK "$SMPROGRAMS${COMPANY_NAME}"
 	
