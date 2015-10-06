@@ -106,7 +106,9 @@ function module_deploy_nsis {
 		INSTALLER_FILES="${INSTALLER_FILES}\\
 	File \"\\/oname=$fn\" \"$fn\""
 		UNINSTALLER_FILES="${UNINSTALLER_FILES}\\
-	Delete \\/REBOOTOK \"\$INSTDIR\\\\$fn\""
+	Delete \"\$INSTDIR\\\\$fn\""
+#		UNINSTALLER_FILES="${UNINSTALLER_FILES}\\
+#	Delete \\/REBOOTOK \"\$INSTDIR\\\\$fn\""
 	done
 	local INSTALLER_DIRS=
 	for f in `find . -type d`
