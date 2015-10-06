@@ -52,13 +52,13 @@ INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/
 
 ASSETS_FW_FILES.files = ./assets/electronics/software_resheater/*.*
-ASSETS_FW_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/electronics/software_resheater/
+ASSETS_FW_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/electronics/software_resheater/
 
 ASSETS_FW2_FILES.files = ./assets/electronics/software_resheater/c_testread/*.*
-ASSETS_FW2_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/electronics/software_resheater/c_testread/
+ASSETS_FW2_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/electronics/software_resheater/c_testread/
 
 ASSETS_FW3_FILES.files = ./assets/electronics/software_resheater/Matlab/*.*
-ASSETS_FW3_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/electronics/software_resheater/Matlab/
+ASSETS_FW3_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/electronics/software_resheater/Matlab/
 
 INSTALLS += ASSETS_FW_FILES ASSETS_FW3_FILES ASSETS_FW2_FILES
 
