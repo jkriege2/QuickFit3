@@ -28,9 +28,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         !contains(LIBS, -lopengl32): LIBS += -lopengl32
         !contains(LIBS, -lglu32): LIBS += -lglu32
     }
-	greaterThan(QT_MINOR_VERSION, 3) {
-	    DEFINE += QFVisualize3DGLWidget_USES_QOPENGLWIDGET
-	}
+    greaterThan(QT_MINOR_VERSION, 3) {
+        DEFINE += QFVisualize3DGLWidget_USES_QOPENGLWIDGET
+    }
 }
 CONFIG += exceptions rtti stl link_prl
 INCLUDEPATH += $$PWD/extlibsb040/JKQtPlotter/ \
