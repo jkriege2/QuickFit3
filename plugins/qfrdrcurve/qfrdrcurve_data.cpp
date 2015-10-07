@@ -33,7 +33,7 @@ QFRDRCurveData::~QFRDRCurveData()
     clearCurves();
 }
 
-void QFRDRCurveData::exportData(const QString& format, const QString& filename)const  {
+void QFRDRCurveData::exportData(const QString& /*format*/, const QString& /*filename*/)const  {
 	// here you may export the data of the record into the specified format (see getExportFiletypes() )
     // THIS IS OPTIONAL
 }

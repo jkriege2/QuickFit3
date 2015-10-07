@@ -1013,8 +1013,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd cimg
 	mkdir build
-	tar xvf ./CImg-1.6.2.tar.bz2 -C ./build/
-	cd build/CImg-1.6.2/
+	tar xvf ./CImg-1.6.5.tar.gz -C ./build/
+	cd build/CImg-1.6.5/
 	cp -r * ../../
 	libOK=$?
 	if [ $libOK -ne 0 ] ; then		
