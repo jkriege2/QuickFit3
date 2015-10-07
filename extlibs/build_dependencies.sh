@@ -115,29 +115,29 @@ if [ $ISMSYS == "1" ] ; then
 		"-- COPYING: Qt DLLs                                                   --\n"\
 		"------------------------------------------------------------------------\n\n"
 		
-		cp /mingw/bin/mingwm10.dll ../output/
-		cp /mingw/bin/libstdc++*.dll ../output/
-		cp /mingw/bin/libgcc*.dll ../output/
-		cp /mingw/bin/pthread*.dll ../output/
-		cp /mingw/bin/libpthread*.dll ../output/
+		cp /mingw/bin/mingwm10.dll ../output/ &> /dev/null
+		cp /mingw/bin/libstdc++*.dll ../output/ &> /dev/null
+		cp /mingw/bin/libgcc*.dll ../output/ &> /dev/null
+		cp /mingw/bin/pthread*.dll ../output/ &> /dev/null
+		cp /mingw/bin/libpthread*.dll ../output/ &> / &> /dev/nullev/null
 		cp /mingw/bin/libwinpthread*.dll ../output/
 		
 		USEDQTMODULES="QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4 QtNetwork4"
 		USEDQTMODULES5="Qt5Core Qt5Gui Qt5Network Qt5OpenGL Qt5Script Qt5ScriptTools Qt5PrintSupport Qt5Svg Qt5Xml Qt5Widgets Qt5WinExtras"
 		USEDQTPLUGINS= "${QT_INFO_PLUGINS}/*"
 		mkdir ../output/qtplugins
-		for f in $USEDQTMODULES
+		for f in $USEDQTMODULES $USEDQTMODULES5
 		do
-			cp "${QT_INFO_BIN}/${f}d.dll"  "../output/"
-			cp "${QT_INFO_BIN}/${f}.dll"  "../output/"
+			cp "${QT_INFO_BIN}/${f}d.dll"  "../output/" &> /dev/null
+			cp "${QT_INFO_BIN}/${f}.dll"  "../output/" &> /dev/null
 		done
 		
 		cp -rf "${QT_INFO_BIN}/icu*.dll"  "../output/"
 		
 		for f in $USEDQTPLUGINS
 		do
-			cp -rf "${f}"  "../output/qtplugins/"
-			cp -rf "${f}"  "../output/qtplugins/"
+			cp -rf "${f}"  "../output/qtplugins/" &> /dev/null
+			cp -rf "${f}"  "../output/qtplugins/" &> /dev/null
 		done
 		qtOK=0
 	fi
