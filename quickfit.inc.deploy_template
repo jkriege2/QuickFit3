@@ -15,21 +15,19 @@
 # deactivate non-standard plugins:
 
 # prevents building of SPIM hardware drivers (cameras, stages, ...)
-QF3CONFIG+=nohardwaredrivers
+#QF3CONFIG+=nohardwaredrivers
 # prevents building of the camera plugins:
-QF3CONFIG+=nospecialdrivers
+#QF3CONFIG+=nospecialdrivers
 # if "nospecialdrivers" is not activated, this can be used to selectively deactive the ANDOR driver
-QF3CONFIG+=noandor
+#QF3CONFIG+=noandor
 # switch off some special plugins (e.g. pre-publication versions of imfccsfit)
-QF3CONFIG+=nospecials
+#QF3CONFIG+=nospecials
 # on Windows: set this if you use a 64-bit build, as it will deactivate plugins that do not work on 64-bit!
 #QF3CONFIG+=bits64
-
+# comment out, to compile plugins that depend on the NI-DAQmx driver
+#QF3CONFIG+=nonidaqmx
 # activate special hardware drivers for the FFM!
 #QF3CONFIG+=ffmdrivers
-
-# comment out, to compile plugins that depend on the NI-DAQmx driver
-QF3CONFIG+=nonidaqmx
 
 # if nlopt does not compile on your computer, use this switch
 #QF3CONFIG+=nonlopt
@@ -40,6 +38,7 @@ QF3CONFIG+=nonidaqmx
 
 # uncomment, so QF3 doesn't use _aligned_malloc ... on windows
 #DEFINES += QF_DONT_USE_ALIGNED_MALLOC
+
 
 # uncomment, so QF3 doesn't explicitly mutex lock the memory management routines qfMalloc, ... (e.g. if th system's memory management is already thread safe!)
 #DEFINES += QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC

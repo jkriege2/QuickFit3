@@ -292,8 +292,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	tar xvf lmfit-3.2.tar -C ./build/
 	cd build/lmfit-3.2
 	export LDFLAGS="${LDFLAGS} ${PICFLAGS} -lm"
-        export CFLAGS="${CFLAGS} ${PICFLAGS} "
-        export CPPFLAGS="${CPPFLAGS} ${PICFLAGS}"
+	export CFLAGS="${CFLAGS} ${PICFLAGS} "
+	export CPPFLAGS="${CPPFLAGS} ${PICFLAGS}"
 	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -lm" 
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
@@ -341,10 +341,10 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf lmfit-5.1.tar -C ./build/
 	cd build/lmfit-5.1
-        export LDFLAGS="${LDFLAGS} ${PICFLAGS} "
-        export CFLAGS="${CFLAGS} ${PICFLAGS} "
-        export CPPFLAGS="${CPPFLAGS} ${PICFLAGS}"
-        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
+        export LDFLAGS="${LDFLAGS}  "
+        export CFLAGS="${CFLAGS}  "
+        export CPPFLAGS="${CPPFLAGS} "
+        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS=" ${MORECFLAGS}" CPPFLAGS=" ${MORECFLAGS}"	LDFLAGS=" ${MORELDFLAGS}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -482,11 +482,15 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd libpng
 	mkdir build
-	tar xvf libpng-1.5.4.tar.gz -C ./build/
-	cd build/libpng-1.5.4
+	tar xvf libpng-1.6.18.tar.gz -C ./build/
+	cd build/libpng-1.6.18
+	ZLIBINC=../../../zlib/lib/include/
+	ZLIBLIB=../../../zlib/lib/
 	if [ -e ../../../zlib/lib/libz.a ] ; then
 		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -L${CURRENTDIR}/zlib/lib" CFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include" CXXFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include/ "
 	else
+		ZLIBINC=.
+		ZLIBLIB=.
 		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	fi
 	libOK=$?
@@ -504,7 +508,25 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 			libOK=-3
 		fi
 	else
-	    libOK=-2
+		echo "CONFIGURE-script failes. We will try it with a simple Makefile now!"
+		
+
+		echo -e 'ZLIBINC='$ZLIBINC'\nZLIBLIB='$ZLIBLIB | cat - ../../makefile.gcc > ./makefile.gcc
+		
+		make -j${MAKE_PARALLEL_BUILDS} -f makefile.gcc
+		
+		libOK=$?
+		if [ $libOK -ne 0 ] ; then		
+			libOK=-4
+		else
+			mkdir ../../include
+			mkdir ../../include/libpng16
+			mkdir ../../lib
+			
+			cp -f *.a ../../lib &> /dev/null
+			cp -f png*.h ../../include &> /dev/null
+			cp -f png*.h ../../include/libpng16 &> /dev/null
+		fi
 	fi
 	
 
