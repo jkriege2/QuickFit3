@@ -28,7 +28,7 @@ message(AUTOVERSIONING IN $$PWD)
 #try to read compiler name and version
 COMPILERVERSION=$$system($$QMAKE_CXX --version)
 COMPILERVERSION_MACHINE=$$system($$QMAKE_CXX -dumpmachine)
-message($$QMAKE_CXX  .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}main.cpp -o .$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX})
+#message($$QMAKE_CXX  .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}main.cpp -o .$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX})
 system($$QMAKE_CXX  .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}main.cpp -o .$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX})
 
 # try to read the SVN version
@@ -59,6 +59,7 @@ win32 {
 #    system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate1.h )
 #    system(echo \'$$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"\'  > compiledate1.h )
 
+include(bitdepth.pri)
 
 message(AUTOVERSIONING DONE IN $$PWD)
 

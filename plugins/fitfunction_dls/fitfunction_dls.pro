@@ -62,4 +62,4 @@ include(../../quickfit3_configqt.pri)
 #                        $$TRANSLATIONS \
 #                        $$GPL3LICENSE
 
-message("!!!!!! fitfunction_dls LIB=$$LIB  QFOUTPUT=$$QFOUTPUT")
+#message("!!!!!! fitfunction_dls LIB=$$LIB  QFOUTPUT=$$QFOUTPUT")
