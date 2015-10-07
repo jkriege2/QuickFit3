@@ -1048,9 +1048,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd pixman
 	mkdir build
-	tar xvf pixman-0.32.6.tar.gz -C ./build/
-	cd build/pixman-0.32.6
-	./configure --enable-static --disable-shared --enable-libpng --disable-gtk  --disable-dependency-tracking --prefix=${CURRENTDIR}/pixman   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" LDFLAGS=" ${zlib_LDFLAGS} ${MORELDFLAGS}" PNG_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib" PNG_CFLAGS=" -I${CURRENTDIR}/libpng -I${CURRENTDIR}/libpng/include"
+	tar xvf pixman-0.32.8.tar.gz -C ./build/
+	cd build/pixman-0.32.8
+	./configure --enable-static --disable-shared --enable-libpng --disable-gtk  --disable-dependency-tracking --prefix=${CURRENTDIR}/pixman   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" LDFLAGS=" ${zlib_LDFLAGS} ${MORELDFLAGS}" PNG_LIBS="-L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib -lpng ${zlib_LDFLAGS}" PNG_CFLAGS=" -I${CURRENTDIR}/libpng -I${CURRENTDIR}/libpng/include"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
