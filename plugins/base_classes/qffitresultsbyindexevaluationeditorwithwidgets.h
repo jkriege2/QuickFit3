@@ -77,7 +77,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 {
         Q_OBJECT
     public:
-        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false, const QString& runName=QString("run"));
+        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false, const QString& runName=QString("run"), bool useRunComboBox=false);
 
 
     protected slots:
@@ -97,6 +97,15 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
 
     protected:
+        virtual QString getPlotXLabel() const;
+        virtual QString getPlotYLabel() const;
+        virtual QString getFitName() const;
+        virtual bool getPlotXLog() const;
+        virtual bool getPlotYLog() const;
+
+        void setGuessingEnabled(bool enabled=true);
+
+
         QString m_runName;
         /** \brief label displaying the current record */
         QLabel* labRecord;
@@ -123,12 +132,11 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
         /** \brief QSpinBox that allows to select a special run */
         QSpinBox* spinRun;
+        QFEnhancedComboBox* cmbRun;
         /** \brief label for the run name */
         QLabel* labRun;
-        /** \brief help window for help on the current fit algorithm */
-        //QFHTMLHelpWindow* hlpAlgorithm;
-        /** \brief help window for help on the current fit model function */
-        //QFHTMLHelpWindow* hlpFunction;
+        QLabel* labRunLabel;
+
         /** \brief combobox to select a plotting style */
         QComboBox* cmbPlotStyle;
         /** \brief combobox to select a plotting style for the data errors */
@@ -170,6 +178,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QTabWidget* tabResidulas;
         /** \brief to fit current file */
         QAction* actFitCurrent;
+        /** \brief to guess current file */
+        QAction* actGuessCurrent;
         /** \brief to fit all runs in current file */
         QAction* actFitRunsCurrent;
         /** \brief to fit current run in all file */
@@ -251,9 +261,13 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
     protected:
         virtual void populateFitButtons(bool mulThreadEnabledInModel=true);
+        virtual void fillRunCombo(QFFitResultsByIndexEvaluation *eval, QFRawDataRecord *rdr);
+        int getCurrentRunFromWidget() const;
 
         /** \brief to fit current file */
         QToolButton* btnFitCurrent;
+        /** \brief to guess current file */
+        QToolButton* btnGuessCurrent;
         /** \brief to fit all runs in current file */
         QToolButton* btnFitRunsCurrent;
         /** \brief to fit current run in all file */
@@ -319,6 +333,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         void configFitAlgorithm();
         /** \brief called when the current run changes */
         void runChanged(int run);
+        void runCmbChanged(int run);
         /** \brief called when the fit model changes */
         void modelChanged(int model);
         /** \brief called when the fit algorithm changes */
@@ -359,6 +374,9 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /*! \brief fit model to current data
          */
         virtual void fitCurrent();
+        /*! \brief guess model-parameters to current data
+         */
+        virtual void guessCurrent();
         /** \brief fit all files (current run) */
         virtual void fitAll();
         /** \brief fit all files, all runs */
@@ -372,7 +390,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
     private:
         /** \brief create all widgets on the form */
-        void createWidgets(bool hasMultiThreaded, bool multiThreadPriority);
+        void createWidgets(bool hasMultiThreaded, bool multiThreadPriority, bool useRunCombobox);
 };
 
 #endif // QFFITRESULTSBYINDEXEVALUATIONEDITORWITHWIDGETS_H

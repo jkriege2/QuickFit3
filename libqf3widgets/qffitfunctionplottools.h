@@ -36,6 +36,7 @@ class QFWIDLIB_EXPORT JKQTPxQFFitFunctionLineGraph: public JKQTPxFunctionLineGra
 
         /** \brief class constructor */
         JKQTPxQFFitFunctionLineGraph(JKQtBasePlotter* parent=NULL);
+        JKQTPxQFFitFunctionLineGraph(JKQtPlotter* parent=NULL);
         ~JKQTPxQFFitFunctionLineGraph();
 
 
@@ -47,6 +48,7 @@ class QFWIDLIB_EXPORT JKQTPxQFFitFunctionLineGraph: public JKQTPxFunctionLineGra
         GET_SET_MACRO(int, subfunction)
 
         void set_fitFunction(QFFitFunction* fitFunction, bool ownsFunction=true);
+        void set_fitFunction(const QString& fitFunction);
     protected:
         QFFitFunction* fitFunction;
         bool ownsFunction;

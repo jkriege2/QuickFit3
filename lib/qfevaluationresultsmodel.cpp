@@ -48,7 +48,7 @@ QFEvaluationResultsModel::~QFEvaluationResultsModel()
 }
 
 void QFEvaluationResultsModel::init(QFEvaluationItem* evaluation, QString evalFilter) {
-    disconnect(this->evaluation, SIGNAL(resultsChanged(QFRawDataRecord* , const QString& , const QString& )), this, SLOT(resultsChanged(QFRawDataRecord* , const QString& , const QString& )));
+    if (this->evaluation) disconnect(this->evaluation, SIGNAL(resultsChanged(QFRawDataRecord* , const QString& , const QString& )), this, SLOT(resultsChanged(QFRawDataRecord* , const QString& , const QString& )));
     setParent(evaluation);
     this->evaluation=evaluation;
     this->evalFilter=evalFilter;

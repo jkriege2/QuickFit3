@@ -36,6 +36,25 @@
         <file alias="lib/file_openfile.png">icons/fileselect.png</file>
         <file alias="lib/file_open.png">icons/fileselect.png</file>
         <file alias="tetris.png">icons/tetris.png</file>
+		
+        <file alias="lib/fit_config.png">icons/fcsfit_configure.png</file>
+        <file alias="lib/fit_help.png">icons/fcsfit_help.png</file>
+        <file alias="lib/fit_savereport.png">icons/fcs_savereport_22.png</file>
+        <file alias="lib/fit_printreport.png">icons/fcs_printreport_22.png</file>
+        <file alias="lib/plot_saveplot.png">icons/fcsplot_saveplot.png</file>
+        <file alias="lib/plot_savedata.png">icons/fcsplot_savedata.png</file>
+        <file alias="lib/plot_print.png">icons/fcsplot_print.png</file>
+        <file alias="lib/plot_zoomall.png">icons/fcsplot_zoomall.png</file>
+        <file alias="lib/plot_points.png">icons/fcsplot_points.png</file>
+        <file alias="lib/plot_pointslines.png">icons/fcsplot_pointslines.png</file>
+        <file alias="lib/plot_lines.png">icons/fcsplot_lines.png</file>
+        <file alias="lib/plot_elines.png">icons/fcsplot_elines.png</file>
+        <file alias="lib/plot_elinesbars.png">icons/fcsplot_elinesbars.png</file>
+        <file alias="lib/plot_ebars.png">icons/fcsplot_ebars.png</file>
+        <file alias="lib/plot_enone.png">icons/fcsplot_enone.png</file>
+        <file alias="lib/fit_fit.png">icons/wizard.png</file>
+        <file alias="lib/param_load.png">icons/fileopen.png</file>
+        <file alias="lib/param_save.png">icons/filesave.png</file>
     </qresource>
     <qresource prefix="/lib/help">
         <file alias="tooltip.png">icons/tooltip.png</file>

@@ -1,0 +1,34 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="curve_fit.png">icons/curve_fit.png</file>
+        <file alias="curve_fit_logo.png">icons/curve_fit_large.png</file>
+        <file alias="curve_fit_large.png">icons/curve_fit_large.png</file>
+        <file alias="curve_fit/curve_fit.png">icons/curve_fit.png</file>
+        <file alias="curve_fit/curve_fit_logo.png">icons/curve_fit_large.png</file>
+        <file alias="curve_fit/curve_fit_large.png">icons/curve_fit_large.png</file>
+        <file alias="curve_fit/fit.png">icons/curve_fit.png</file>
+        <file alias="curve_fit/fit_logo.png">icons/curve_fit_large.png</file>
+        <file alias="curve_fit/fit_config.png">icons/fcsfit_configure.png</file>
+        <file alias="curve_fit/fit_help.png">icons/fcsfit_help.png</file>
+        <file alias="curve_fit/fit_savereport.png">icons/fcs_savereport_22.png</file>
+        <file alias="curve_fit/fit_printreport.png">icons/fcs_printreport_22.png</file>
+        <file alias="curve_fit/plot_saveplot.png">icons/fcsplot_saveplot.png</file>
+        <file alias="curve_fit/plot_savedata.png">icons/fcsplot_savedata.png</file>
+        <file alias="curve_fit/plot_print.png">icons/fcsplot_print.png</file>
+        <file alias="curve_fit/plot_zoomall.png">icons/fcsplot_zoomall.png</file>
+        <file alias="curve_fit/plot_points.png">icons/fcsplot_points.png</file>
+        <file alias="curve_fit/plot_pointslines.png">icons/fcsplot_pointslines.png</file>
+        <file alias="curve_fit/plot_lines.png">icons/fcsplot_lines.png</file>
+        <file alias="curve_fit/plot_elines.png">icons/fcsplot_elines.png</file>
+        <file alias="curve_fit/plot_elinesbars.png">icons/fcsplot_elinesbars.png</file>
+        <file alias="curve_fit/plot_ebars.png">icons/fcsplot_ebars.png</file>
+        <file alias="curve_fit/plot_enone.png">icons/fcsplot_enone.png</file>
+        <file alias="curve_fit/fit_fit.png">icons/wizard.png</file>
+        <file alias="curve_fit/fit_fitcurrent.png">icons/fit_fitcurrent.png</file>
+        <file alias="curve_fit/fit_fitallruns.png">icons/fit_fitallruns.png</file>
+        <file alias="curve_fit/fit_fitcurrentrunallfiles.png">icons/fit_fitcurrentrunallfiles.png</file>
+        <file alias="curve_fit/fit_fitall.png">icons/fit_fitall.png</file>
+        <file alias="curve_fit/param_load.png">icons/fileopen.png</file>
+        <file alias="curve_fit/param_save.png">icons/filesave.png</file>
+    </qresource>
+</RCC>

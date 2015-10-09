@@ -195,7 +195,8 @@ HEADERS += dlgnewproperty.h \
     cpptools.h \
     qfrdrcurvesinterface.h \
     qcheckablestringlistmodel.h \
-    qfdoublerangeedit.h
+    qfdoublerangeedit.h \
+    qfweightingtools.h
 
 
 SOURCES += dlgnewproperty.cpp \
@@ -315,7 +316,8 @@ SOURCES += dlgnewproperty.cpp \
     jkiniparser2.cpp \
     cpptools.cpp \
     qcheckablestringlistmodel.cpp \
-    qfdoublerangeedit.cpp
+    qfdoublerangeedit.cpp \
+    qfweightingtools.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

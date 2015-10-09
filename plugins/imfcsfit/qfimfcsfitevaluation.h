@@ -103,7 +103,7 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation, publi
             \note this method is intended to perform the fits one after the other or single fits. It will internally starts the fit algorithm
                   in its own thread. If you want to control the multithreading by yourself, use doFitForMultithread() instead !!!
           */
-        virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL, bool doLog=false);
+        virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL, bool doLog=false, bool guessOnly=false);
 
         /*! \brief perform a fit for the given \a record and \a run
 

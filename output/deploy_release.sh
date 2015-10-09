@@ -29,8 +29,8 @@ function module_prepare_cleandeploy {
 }
 
 function module_final_cleandeploy {
-	rm -rf $1 &>/dev/null
-	rm -f "quickfit3_win${BITDEPTH}_${SVNVER}_${1}.zip.backup" &>/dev/null
+	rm -rf ./$1 
+	rm -f "quickfit3_win${BITDEPTH}_${SVNVER}_${1}.zip.backup" 
 }
 
 function main_final_cleandeploy {

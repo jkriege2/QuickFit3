@@ -312,7 +312,7 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
 
 
 void QFRDRResultsModel::init(QFRawDataRecord* record) {
-    disconnect(this->record, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
+    if (this->record) disconnect(this->record, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
     setParent(record);
     this->record=record;
     connect(record, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));

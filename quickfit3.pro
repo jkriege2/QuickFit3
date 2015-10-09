@@ -138,6 +138,10 @@ plg_fitalgorithm_fit_gsl.depends = lib libqf3widgets
     plg_qfe_nidaqmxreader.depends = lib libqf3widgets
 }
 
+SUBDIRS += plg_curve_fit
+plg_curve_fit.subdir=./plugins/curve_fit
+plg_curve_fit.depends = lib libqf3widgets
+
 !contains(QF3CONFIG,basicqfpluginsonly) {
 
     SUBDIRS += plg_cam_server
@@ -270,7 +274,7 @@ plg_fitalgorithm_fit_gsl.depends = lib libqf3widgets
                     plg_cam_testcamera.subdir=./plugins/cam_testcamera
                     plg_cam_testcamera.depends = lib libqf3widgets
 
-                    !contains(BIT_DEPTH, 64) {
+                    !contains(BIT_DEPTH, 64) | linux {
                             SUBDIRS += plg_cam_systemcamera
                             plg_cam_systemcamera.subdir=./plugins/cam_systemcamera
                             plg_cam_systemcamera.depends = lib libqf3widgets

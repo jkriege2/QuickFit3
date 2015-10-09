@@ -218,7 +218,7 @@ QString QFImFCSFitEvaluation::getIndexName(const QFRawDataRecord *rec, int index
 
 
 
-void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter* dlgFitProgress, bool doLog) {
+void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter* dlgFitProgress, bool doLog, bool /*guessOnly*/) {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFitFunction* ffunc=getFitFunction();
     QFFitAlgorithm* falg=getFitAlgorithm();

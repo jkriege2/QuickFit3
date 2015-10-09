@@ -386,7 +386,7 @@ int QFFitResultsEvaluationEditorBase::getUserMin(QFRawDataRecord* rec, int defau
     const QString resultID=data->getEvaluationResultID(rec);
 
     // WORKROUND FOR OLD PROPERTY NAMES
-    int defaultM=rec->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
+    int defaultM=rec->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunctionID()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
 
     return rec->getProperty(resultID+"_datacut_min", defaultM).toInt();
 }
@@ -397,7 +397,7 @@ int QFFitResultsEvaluationEditorBase::getUserMax(QFRawDataRecord* rec, int defau
     const QString resultID=data->getEvaluationResultID(rec);
 
     // WORKROUND FOR OLD PROPERTY NAMES
-    int defaultM=rec->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
+    int defaultM=rec->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunctionID()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
 
     return rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
 }
@@ -411,26 +411,34 @@ int QFFitResultsEvaluationEditorBase::getUserMin(int defaultMin) {
     QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!data) return defaultMin;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID(rdr);
+    if (rdr) {
+        const QString resultID=data->getEvaluationResultID(rdr);
 
-    // WORKROUND FOR OLD PROPERTY NAMES
-    int defaultM=rdr->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
+        // WORKROUND FOR OLD PROPERTY NAMES
+        int defaultM=rdr->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunctionID()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
 
-    return rdr->getProperty(resultID+"_datacut_min", defaultM).toInt();
+        return rdr->getProperty(resultID+"_datacut_min", defaultM).toInt();
+    } else {
+        return defaultMin;
+    }
 }
 
 int QFFitResultsEvaluationEditorBase::getUserMax(int defaultMax) {
     QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!data) return defaultMax;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID(rdr);
+    if (rdr) {
+        const QString resultID=data->getEvaluationResultID(rdr);
 
 
 
-    // WORKROUND FOR OLD PROPERTY NAMES
-    int defaultM=rdr->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
+        // WORKROUND FOR OLD PROPERTY NAMES
+        int defaultM=rdr->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunctionID()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
 
-    return rdr->getProperty(resultID+"_datacut_max", defaultM).toInt();
+        return rdr->getProperty(resultID+"_datacut_max", defaultM).toInt();
+    } else {
+        return defaultMax;
+    }
 }
 
 

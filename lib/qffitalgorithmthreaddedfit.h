@@ -52,6 +52,8 @@ class QFLIB_EXPORT QFFitAlgorithmThreadedFit: public QThread {
         /** \brief return the runtime of the fit in milliseconds */
         double getDeltaTime() const { return deltaTime; }
 
+        void setGuessParamsOnly(bool guess);
+
     protected:
         QFFitAlgorithm* algorithm;
         double* paramsOut;
@@ -69,6 +71,7 @@ class QFLIB_EXPORT QFFitAlgorithmThreadedFit: public QThread {
         double deltaTime;
         bool fitLogY;
         QVector<double> *COV;
+        bool guess_params;
 
         int repeats;
 

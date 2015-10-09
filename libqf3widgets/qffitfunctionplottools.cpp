@@ -21,6 +21,9 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 #include "qffitfunctionplottools.h"
+#include "qffitfunctionmanager.h"
+#include "qfplotter.h"
+#include "jkqtplotter.h"
 
 struct JKQTPxQFFitFunctionLineGraphFunctionParams {
     QFFitFunction* function;
@@ -46,6 +49,17 @@ JKQTPxQFFitFunctionLineGraph::JKQTPxQFFitFunctionLineGraph(JKQtBasePlotter* pare
     subfunction=-1;
 }
 
+JKQTPxQFFitFunctionLineGraph::JKQTPxQFFitFunctionLineGraph(JKQtPlotter *parent):
+    JKQTPxFunctionLineGraph(parent?parent->get_plotter():NULL)
+{
+    intParam=new JKQTPxQFFitFunctionLineGraphFunctionParams;
+    fitFunction=NULL;
+    ownsFunction=false;
+    scaleX=1;
+    offsetX=0;
+    subfunction=-1;
+}
+
 JKQTPxQFFitFunctionLineGraph::~JKQTPxQFFitFunctionLineGraph()
 {
     delete intParam;
@@ -57,6 +71,12 @@ void JKQTPxQFFitFunctionLineGraph::set_fitFunction(QFFitFunction *fitFunction, b
     if (this->ownsFunction && this->fitFunction) delete this->fitFunction;
     this->fitFunction=fitFunction;
     this->ownsFunction=ownsFunction;
+}
+
+void JKQTPxQFFitFunctionLineGraph::set_fitFunction(const QString &fitFunction)
+{
+    QFFitFunction* ff=QFFitFunctionManager::getInstance()->createFunction(fitFunction);
+    set_fitFunction(ff, true);
 }
 
 void JKQTPxQFFitFunctionLineGraph::collectParameters()

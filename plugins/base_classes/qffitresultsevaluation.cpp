@@ -156,7 +156,7 @@ QStringList QFFitResultsEvaluation::getAvailableFitFunctions() const {
 }
 
 QFFitFunction* QFFitResultsEvaluation::getFitFunction(const QString& id) const {
-    if (m_fitFunctions.contains(id)) return m_fitFunctions[id];
+    if (m_fitFunctions.contains(id)) return m_fitFunctions.value(id, NULL);
     else return NULL;
 }
 

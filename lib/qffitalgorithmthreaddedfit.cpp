@@ -25,6 +25,8 @@
 QFFitAlgorithmThreadedFit::QFFitAlgorithmThreadedFit(QObject* parent): QThread(parent)
 {
     //ctor
+    guess_params=false;
+
 }
 
 QFFitAlgorithmThreadedFit::~QFFitAlgorithmThreadedFit()
@@ -48,17 +50,29 @@ void QFFitAlgorithmThreadedFit::init(QFFitAlgorithm* algorithm, double* paramsOu
     this->repeats=repeats;
     this->fitLogY=fitLogY;
     this->COV=COV;
+    guess_params=false;
+}
+
+void QFFitAlgorithmThreadedFit::setGuessParamsOnly(bool guess)
+{
+    guess_params=guess;
 };
 
 void QFFitAlgorithmThreadedFit::run() {
     QTime tstart=QTime::currentTime();
     double* init=duplicateArray(initialParams, model->paramCount());
-    for (int i=0; i<repeats; i++) {
-        result=algorithm->fit(paramsOut, paramErrorsOut, dataX, dataY, dataWeight, N, model, init, fixParams, paramsMin, paramsMax, fitLogY, NULL, COV);
-        copyArray(init, paramsOut, model->paramCount());
+    if (guess_params) {
+        if (model->estimateInitial(init,dataX, dataY,N, fixParams)) {
+            copyArray(paramsOut, init, model->paramCount());
+        }
+    } else {
+        for (int i=0; i<repeats; i++) {
+            result=algorithm->fit(paramsOut, paramErrorsOut, dataX, dataY, dataWeight, N, model, init, fixParams, paramsMin, paramsMax, fitLogY, NULL, COV);
+            copyArray(init, paramsOut, model->paramCount());
+        }
     }
     qfFree(init);
-    deltaTime=(double)tstart.msecsTo(QTime::currentTime());
+     deltaTime=(double)tstart.msecsTo(QTime::currentTime());
 };
 
 
