@@ -59,7 +59,8 @@ HEADERS += qfgeneralfitfunctionsplugin.h \
     qffitfunctiongeneralcdfcauchy.h \
     qffitfunctiongeneralpdfcauchy.h \
     qffitfunctiongeneralcdfloggaussian.h \
-    qffitfunctiongeneralpdfloggaussian.h
+    qffitfunctiongeneralpdfloggaussian.h \
+    qffitfunctiongeneralmultigaussianvar.h
 
 SOURCES += qfgeneralfitfunctionsplugin.cpp\
            qffitfunctiongeneralsigmoid.cpp \
@@ -91,7 +92,8 @@ SOURCES += qfgeneralfitfunctionsplugin.cpp\
     qffitfunctiongeneralcdfcauchy.cpp \
     qffitfunctiongeneralpdfcauchy.cpp \
     qffitfunctiongeneralcdfloggaussian.cpp \
-    qffitfunctiongeneralpdfloggaussian.cpp
+    qffitfunctiongeneralpdfloggaussian.cpp \
+    qffitfunctiongeneralmultigaussianvar.cpp
 
 FORMS =
 

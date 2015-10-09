@@ -342,6 +342,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     if (useRunCombobox) {
         cmbRun=new QFEnhancedComboBox(this);
         cmbRun->setMinimumWidth(100);
+        cmbRun->setMaximumWidth(300);
     } else {
         spinRun=new QSpinBox(this);
         spinRun->setMinimum(-1);
@@ -410,11 +411,11 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     layButtons=new QGridLayout();
     layButtons->setContentsMargins(0,0,0,0);
     int row=0;
-    btnGuessCurrent=createButtonAndActionShowText(actGuessCurrent, tr("&Guess Current"), this);
+    btnGuessCurrent=createButtonAndActionShowText(actGuessCurrent, QIcon(":/lib/fit_guesscurrent.png"), tr("&Guess Current"), this);
     btnGuessCurrent->setVisible(false);
     actGuessCurrent->setToolTip(tr("perform a parameter-guessing for the currently displayed file and %1").arg(m_runName));
     actGuessCurrent->setVisible(false);
-    layButtons->addWidget(btnGuessCurrent, row, 0);
+    layButtons->addWidget(btnGuessCurrent, row, 0, 1,2);
 
     row++;
     btnFitCurrent=createButtonAndActionShowText(actFitCurrent, QIcon(":/lib/fit_fitcurrent.png"), tr("&Fit Current"), this);
@@ -913,6 +914,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(QFRawDa
     if (formerRecord) disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
     bool modelChanged=false;
     if (currentRecord) {
+        if (!formerRecord) eval->setCurrentIndex(eval->getIndexMax(currentRecord));
         connect(currentRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
 
         datacut->disableSliderSignals();
@@ -929,13 +931,16 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(QFRawDa
             spinRun->setMinimum(eval->getIndexMin(currentRecord));
             //if (data->getCorrelationRuns()==1) spinRun->setMaximum(-1);
             spinRun->setValue(eval->getCurrentIndex());//currentRecord->getProperty(resultID+"_selected_run", -1).toInt());
+            if (eval->getCurrentIndex()!=spinRun->value()) eval->setCurrentIndex(spinRun->value());
             //if (data->getCorrelationRuns()>1)
             spinRun->setSuffix(QString(" / %2..%1").arg(eval->getIndexMax(currentRecord)).arg(eval->getIndexMin(currentRecord)));
         }
         if (cmbRun) {
             fillRunCombo(eval, currentRecord);
             cmbRun->setCurrentData(eval->getCurrentIndex());
+            if (cmbRun->currentIndex()<0) cmbRun->setCurrentIndex(0);
         }
+        if (eval->getCurrentIndex()!=getCurrentRunFromWidget()) eval->setCurrentIndex(getCurrentRunFromWidget());
         QString oldID=cmbModel->currentFitFunctionID();
         cmbModel->setCurrentFitFunction(eval->getFitFunction()->id());
         if (cmbModel->currentFitFunctionID()!=oldID) modelChanged=true;
@@ -957,9 +962,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
     if (!current) return;
     if (!cmbModel) return;
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    QFFitFunction* ffunc=eval->getFitFunction();
+    QFRawDataRecord* rdr=eval->getHighlightedRecord();
+    QFFitFunction* ffunc=eval->getFitFunction(rdr);
 
-    //qDebug()<<" **** displayModel()";
+    //qDebug()<<" **** displayModel() rdr="<<rdr<<"  idx="<<eval->getCurrentIndex()<<"  idxM="<<eval->getCurrentIndexM();
 
     if (!ffunc) {
         /////////////////////////////////////////////////////////////////////////////////////////////
@@ -1077,8 +1083,9 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         widParameters->setUpdatesEnabled(true);
     }
 
-    int crun=getCurrentRunFromWidget();
-    if (eval->getCurrentIndex()!=crun) eval->setCurrentIndex(crun);
+    /*int crun=getCurrentRunFromWidget();
+    if (eval->getCurrentIndex()!=crun) eval->setCurrentIndex(crun);*/
+    int crun=eval->getCurrentIndex();
 
     if (eval->hasFit()) {
         labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
@@ -1088,7 +1095,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         labFitResult->setText("");
     }
 
-    updateParameterValues(eval->getHighlightedRecord());
+    updateParameterValues(rdr);
     //setUpdatesEnabled(updEn);
 }
 

@@ -50,7 +50,7 @@ QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
     getEvaluationResultIDUsesFitFunction=true;
     matchFunctor=new QFImFCCSMatchRDRFunctor();
     m_weighting=EqualWeighting;
-    m_currentIndex=-1;
+    //m_currentIndex=-1;
     m_multiFitFunctions.clear();
     globalParamsChanged=true;
     lastGlobalParamsCount=0;
@@ -198,14 +198,13 @@ void QFImFCCSFitEvaluationItem::removeFitFile(int i)
 
 void QFImFCCSFitEvaluationItem::setCurrentIndex(int index)
 {
-    m_currentIndex=index;
+    setCurrentIndexM(index);
     QFRawDataRecord* r=getFitFile(0);
     if (r) {
-        if (index<=getIndexMin(r)) m_currentIndex=getIndexMin(r);
-        if (index<=getIndexMax(r)) m_currentIndex=index;
-        if (index>getIndexMax(r)) m_currentIndex=getIndexMax(r);
-        r->setQFProperty(QString(getType()+QString::number(getID())+"_last_index"), m_currentIndex, false, false);
-        emit currentIndexChanged(m_currentIndex);
+        if (index<getIndexMin(r)) setCurrentIndexM(getIndexMin(r));
+        if (index>getIndexMax(r)) setCurrentIndexM(getIndexMax(r));
+        r->setQFProperty(QString(getType()+QString::number(getID())+"_last_index"), getCurrentIndexM(), false, false);
+        emit currentIndexChanged(getCurrentIndexM());
     }
 }
 
@@ -655,7 +654,7 @@ QFMatchRDRFunctor *QFImFCCSFitEvaluationItem::getMatchFunctor() const
 int QFImFCCSFitEvaluationItem::getCurrentIndex() const
 {
     QFRawDataRecord* r=getFitFile(0);
-    int index=m_currentIndex;
+    int index=getCurrentIndexM();
     if (r!=NULL) {
         /*m_currentIndex=*/index=r->getProperty(QString(getType()+QString::number(getID())+"_last_index"), index).toInt();
     }

@@ -26,6 +26,7 @@
 #include <complex>
 #include "Faddeeva.hh"
 #include "statistics_tools.h"
+#include "programoptions.h"
 
 double qfTanc(  double x ) {
     if (x==0) return 1;
@@ -643,7 +644,7 @@ QString QFBasicFitStatistics::getAsHTMLTable(bool addExplanation, bool includeR2
         int n=floor(sqrt(COV.size()));
         std::string colorlegend;
         QString m=QString("<br><br>Var-Cov-Matrix:<blockquote><table border=\"1\" cellspacing=\"0\" cellpadding=\"3\"><tr><td>")
-                +QString::fromStdString(linalgMatrixToHTMLString(COV.data(), n, n, 9, 3, "g", " border=\"0\" cellpadding=\"3\" cellspacing=\"0\" ", "&nbsp;&nbsp;", "&nbsp;&nbsp;", true, true, &colorlegend))
+                +QString::fromStdString(linalgMatrixToHTMLString(COV.data(), n, n, 9, 3, "g", " border=\"0\" cellpadding=\"3\" cellspacing=\"0\" ", "&nbsp;&nbsp;", "&nbsp;&nbsp;", true, true, &colorlegend, ProgramOptions::getConfigValue("quickfit/nonlin_color_covmatrix_enabled", true).toBool(), ProgramOptions::getConfigValue("quickfit/nonlin_color_covmatrix_gamma", 0.25).toDouble(), " width=\"75%\" "))
                 +QString("</td></tr></table><br><br>Colors: ");
         m+=(QString::fromStdString(colorlegend)+QString("</blockquote>"));
         //m=m.replace("<td>", "<td>&nbsp;&nbsp;&nbsp;");

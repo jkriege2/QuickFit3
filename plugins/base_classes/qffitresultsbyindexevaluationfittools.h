@@ -71,7 +71,7 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
 
             \note THIS FUNCTION NEEDS TO BE THREAD SAFE!!!
           */
-        virtual void doFitForMultithread(QFFitAlgorithm* falg, QFFitFunction* ffunc, QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const =0;
+        virtual void doFitForMultithread(QFFitAlgorithm* falg, QFFitFunction* ffunc, QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL, bool guessOnly=false) const =0;
 
 
         /*! \brief perform a fit for the given \a record and \a run
@@ -83,7 +83,7 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
 
             \note THIS FUNCTION NEEDS TO BE THREAD SAFE!!!
           */
-        virtual void doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const =0;
+        virtual void doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL, bool guessOnly=false) const =0;
 
 
         /*! \brief This function should return a usable QFFitAlgoruthm and QFFitFunction as freshly created objects for the given record and run

@@ -418,13 +418,21 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual void setCurrentIndex(int index);
 
 
-
-    protected:
+    private:
         /** \brief current index to use */
         int m_currentIndex;
+    protected:
+
+        inline void setCurrentIndexM(int i) {
+            m_currentIndex=i;
+        }
+        inline int getCurrentIndexM() const {
+            return m_currentIndex;
+        }
 
         /** \brief indicates whether getEvaluationResultID() uses the fitfunction ID in it's return value (default: \c true ) */
         bool getEvaluationResultIDUsesFitFunction;
+
 
 
 

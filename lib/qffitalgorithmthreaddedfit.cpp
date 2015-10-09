@@ -62,8 +62,19 @@ void QFFitAlgorithmThreadedFit::run() {
     QTime tstart=QTime::currentTime();
     double* init=duplicateArray(initialParams, model->paramCount());
     if (guess_params) {
+        guessm=tr("parameter-guessing failed");
+        guessok=false;
         if (model->estimateInitial(init,dataX, dataY,N, fixParams)) {
-            copyArray(paramsOut, init, model->paramCount());
+            //copyArray(paramsOut, init, model->paramCount());
+            for (int i=0; i<model->paramCount(); i++) {
+                if (!fixParams || !fixParams[i]) {
+                    paramsOut[i]=init[i];
+                }
+
+                paramErrorsOut[i]=0;
+            }
+            guessm=tr("parameter-guessing successfull");
+            guessok=true;
         }
     } else {
         for (int i=0; i<repeats; i++) {

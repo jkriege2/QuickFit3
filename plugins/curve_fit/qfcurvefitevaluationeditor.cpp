@@ -202,16 +202,6 @@ void QFCurveFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerReco
 
 
 
-void QFCurveFitEvaluationEditor::displayModel(bool newWidget) {
-    QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(newWidget);
-    QFCurveFitEvaluation* eval=qobject_cast<QFCurveFitEvaluation*>(current);
-    if (newWidget && eval) {
-        QFFitFunction* ffunc=eval->getFitFunction();
-        if (ffunc) {
-
-        }
-    }
-}
 
 
 

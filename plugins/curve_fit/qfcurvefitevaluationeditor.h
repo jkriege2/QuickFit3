@@ -130,8 +130,6 @@ class QFCurveFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
         /** \brief replot curves */
         virtual void replotData();
-        /** \brief display all data and parameters describing the current record */
-        virtual void displayModel(bool newWidget);
 
 
         /*! \brief update the fit model function and the residuals in the graphs

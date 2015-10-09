@@ -30,7 +30,6 @@ QFCurveFitEvaluation::QFCurveFitEvaluation(QFProject* parent):
 {
 
     m_weighting=EqualWeighting;
-    m_currentIndex=-1;
     m_fitFunction="gen_line";
 
     if (m_fitAlgorithms.contains("fit_lmfit")) {
@@ -173,9 +172,9 @@ void QFCurveFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
         dlgFitProgress->setProgress(0);
 
         if (guessOnly) {
-            if (doLog) QFPluginLogTools::log_text(tr("running parameter-guess for model '%1' (%2) on raw data record '%3', run %4 ... \n").arg(ffunc->name()).arg(ffunc->id()).arg(record->getName()).arg(runname));
+            if (doLog) QFPluginLogTools::log_text(tr("running parameter-guess for model '%1' (%2) on raw data record '%3', curve %4 ... \n").arg(ffunc->name()).arg(ffunc->id()).arg(record->getName()).arg(runname));
         } else {
-            if (doLog) QFPluginLogTools::log_text(tr("running fit with '%1' (%2) and model '%3' (%4) on raw data record '%5', run %6 ... \n").arg(falg->name()).arg(falg->id()).arg(ffunc->name()).arg(ffunc->id()).arg(record->getName()).arg(runname));
+            if (doLog) QFPluginLogTools::log_text(tr("running fit with '%1' (%2) and model '%3' (%4) on raw data record '%5', curve %6 ... \n").arg(falg->name()).arg(falg->id()).arg(ffunc->name()).arg(ffunc->id()).arg(record->getName()).arg(runname));
         }
 
 
@@ -354,9 +353,9 @@ void QFCurveFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
                     if (!guessOnly) {
 
-                        record->resultsSetInteger(evalID, param="fit_used_run", run);
+                        record->resultsSetInteger(evalID, param="fit_used_curve", run);
                         record->resultsSetGroup(evalID, param, group);
-                        record->resultsSetLabel(evalID, param, tr("fit: used runs"));
+                        record->resultsSetLabel(evalID, param, tr("fit: used curves"));
 
                         record->resultsSetString(evalID, "fit_model_name", ffunc->id());
                         record->resultsSetGroup(evalID, param, group);
@@ -402,6 +401,19 @@ void QFCurveFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                             record->resultsSetGroup(evalID, param, group);
                             record->resultsSetLabel(evalID, param, it.value().label, it.value().label_rich);
                         }
+                    } else {
+                        record->resultsSetString(evalID, "fitalg_message", doFitThread->getGuessMessage());
+                        record->resultsSetGroup(evalID, param, group);
+                        record->resultsSetLabel(evalID, param, tr("guess: message"));
+
+                        record->resultsSetString(evalID, "fitalg_messageHTML", doFitThread->getGuessMessage());
+                        record->resultsSetGroup(evalID, param, group);
+                        record->resultsSetLabel(evalID, param, tr("guess: message (markup)"));
+
+                        record->resultsSetBoolean(evalID, "fitalg_success", doFitThread->getGuessOK());
+                        record->resultsSetGroup(evalID, param, group);
+                        record->resultsSetLabel(evalID, param, tr("guess: success"));
+
                     }
 
 
@@ -413,10 +425,14 @@ void QFCurveFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                     //record->enableEmitResultsChanged(false);
                     //emit resultsChanged();
                 } else {
-                    if (doLog) QFPluginLogTools::log_warning(tr("   - fit canceled by user!!!\n"));
+                    if (guessOnly) {
+                        if (doLog) QFPluginLogTools::log_warning(tr("   - parameter-guess canceled by user!!!\n"));
+                    } else {
+                        if (doLog) QFPluginLogTools::log_warning(tr("   - fit canceled by user!!!\n"));
+                    }
                 }
             } else {
-                if (doLog) QFPluginLogTools::log_error(tr("   - there are not enough datapoints for the fit (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount));
+                if (doLog) QFPluginLogTools::log_error(tr("   - there are not enough datapoints for the fit/parameter-guess (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount));
             }
             //set_doEmitPropertiesChanged(true);
             //set_doEmitResultsChanged(true);
@@ -428,7 +444,7 @@ void QFCurveFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
             if (erc) set_doEmitResultsChanged(true);
             if (rerc) record->enableEmitResultsChanged(true);
         } catch(std::exception& E) {
-            if (doLog) QFPluginLogTools::log_error(tr("error during fitting, error message: %1\n").arg(E.what()));
+            if (doLog) QFPluginLogTools::log_error(tr("error during fitting/guessing, error message: %1\n").arg(E.what()));
         }
 
         // clean temporary parameters
@@ -457,7 +473,7 @@ void QFCurveFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
 
 
-void QFCurveFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFunction *ffunc, QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+void QFCurveFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFunction *ffunc, QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice, bool guessOnly) const
 {
     QFRDRCurvesInterface* data=qobject_cast<QFRDRCurvesInterface*>(record);
     //QFFitFunction* ffunc=createFitFunction();
@@ -472,7 +488,6 @@ void QFCurveFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFuncti
     QVector<double> x,y,err;
     x=data->curvesGetX(run);
     y=data->curvesGetY(run);
-    err=data->curvesGetYError(run);
     long N=qMin(x.size(), y.size());
     int rangeMinDatarange=0;
     int rangeMaxDatarange=N;
@@ -492,7 +507,6 @@ void QFCurveFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFuncti
 
         double* px=x.data();
         double* py=y.data();
-        double* perr=err.data();
 
         // we also have to care for the data cutting
         int cut_low=rangeMinDatarange;
@@ -512,8 +526,10 @@ void QFCurveFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFuncti
         bool weightsOK=false;
         err=allocVecWeights(&weightsOK, record, run);
         if (!weightsOK && logservice) {
-            logservice->log_warning(tr("fitting file '%1', run %2:\n   weights have invalid values => setting all weights to 1\n").arg(record->getName()).arg(run));
+            logservice->log_warning(tr("fitting file '%1', curve %2:\n   weights have invalid values => setting all weights to 1\n").arg(record->getName()).arg(run));
         }
+        double* perr=err.data();
+
 
         // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
         // we are working with a complete set of parameters
@@ -554,10 +570,26 @@ void QFCurveFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFuncti
                 tstart.start();
                 double* init=duplicateArray(initialparams, ffunc->paramCount());
                 QFFitAlgorithm::FitResult result;
+                QString guessm="";
+                bool guessok=false;
 
-                for (int rep=0; rep<fitrepeats; rep++) {
-                    result=falg->fit(params, errors, &px[cut_low], &py[cut_low], &perr[cut_low], cut_N, ffunc, init, paramsFix, paramsMin, paramsMax, false, NULL, &COV);
-                    copyArray(init, params, ffunc->paramCount());
+                if (guessOnly) {
+                    guessm=tr("parameter-guessing failed");
+                    if (ffunc->estimateInitial(init, &px[cut_low], &py[cut_low], cut_N, paramsFix)) {
+                        for (int i=0; i<ffunc->paramCount(); i++) {
+                            if (!paramsFix || !paramsFix[i]) {
+                                params[i]=init[i];
+                            }
+                            errors[i]=0;
+                        }
+                        guessm=tr("parameter-guessing successfull");
+                        guessok=true;
+                    }
+                } else {
+                    for (int rep=0; rep<fitrepeats; rep++) {
+                        result=falg->fit(params, errors, &px[cut_low], &py[cut_low], &perr[cut_low], cut_N, ffunc, init, paramsFix, paramsMin, paramsMax, false, NULL, &COV);
+                        copyArray(init, params, ffunc->paramCount());
+                    }
                 }
                 qfFree(init);
 
@@ -642,85 +674,99 @@ void QFCurveFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFuncti
                 record->resultsSetEvaluationGroupIndex(evalID, run);
                 record->resultsSetEvaluationDescription(evalID, QString(""));
 
+                if (!guessOnly) {
+                    record->resultsSetString(evalID, "fit_model_name", ffunc->id());
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: model"));
 
-                record->resultsSetString(evalID, "fit_model_name", ffunc->id());
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: model"));
+                    record->resultsSetString(evalID, "fitalg_name", falg->id());
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: algorithm"));
 
-                record->resultsSetString(evalID, "fitalg_name", falg->id());
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: algorithm"));
+                    record->resultsSetNumber(evalID, "fitalg_runtime", deltaTime, "msecs");
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: runtime"));
 
-                record->resultsSetNumber(evalID, "fitalg_runtime", deltaTime, "msecs");
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: runtime"));
+                    record->resultsSetBoolean(evalID, "fitalg_success", result.fitOK);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: success"));
 
-                record->resultsSetBoolean(evalID, "fitalg_success", result.fitOK);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: success"));
+                    record->resultsSetString(evalID, "fitalg_message", result.messageSimple);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: message"));
 
-                record->resultsSetString(evalID, "fitalg_message", result.messageSimple);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: message"));
+                    record->resultsSetString(evalID, "fitalg_messageHTML", result.message);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: message (markup)"));
 
-                record->resultsSetString(evalID, "fitalg_messageHTML", result.message);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: message (markup)"));
+                    record->resultsSetInteger(evalID, "fit_datapoints", cut_N);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: datapoints"));
 
-                record->resultsSetInteger(evalID, "fit_datapoints", cut_N);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: datapoints"));
+                    record->resultsSetInteger(evalID, "fit_cut_low", cut_low);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: first point"));
 
-                record->resultsSetInteger(evalID, "fit_cut_low", cut_low);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: first point"));
+                    record->resultsSetInteger(evalID, "fit_cut_up", cut_up);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: last point"));
 
-                record->resultsSetInteger(evalID, "fit_cut_up", cut_up);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: last point"));
+                    QMapIterator<QString, QFRawDataRecord::evaluationResult> it(result.params);
+                    while (it.hasNext()) {
+                        it.next();
+                        param="";
+                        //record->resultsSet(evalID, param=("fitalg_"+it.key()), it.value());
+                        switch(it.value().type) {
+                            case QFRawDataRecord::qfrdreNumber:
+                                record->resultsSetNumber(evalID, param=("fitalg_"+it.key()), it.value().dvalue, it.value().unit);
+                                break;
+                            case QFRawDataRecord::qfrdreNumberError:
+                                record->resultsSetNumberError(evalID, param=("fitalg_"+it.key()), it.value().dvalue, it.value().derror, it.value().unit);
+                                break;
+                            case QFRawDataRecord::qfrdreInteger:
+                                record->resultsSetInteger(evalID, param=("fitalg_"+it.key()), it.value().ivalue, it.value().unit);
+                                break;
+                            case QFRawDataRecord::qfrdreBoolean:
+                                record->resultsSetBoolean(evalID, param=("fitalg_"+it.key()), it.value().bvalue);
+                                break;
+                            case QFRawDataRecord::qfrdreString:
+                                record->resultsSetString(evalID, param=("fitalg_"+it.key()), it.value().svalue);
+                                break;
 
+                            case QFRawDataRecord::qfrdreBooleanVector:
+                            case QFRawDataRecord::qfrdreBooleanMatrix:
+                            case QFRawDataRecord::qfrdreNumberVector:
+                            case QFRawDataRecord::qfrdreNumberMatrix:
+                            case QFRawDataRecord::qfrdreNumberErrorVector:
+                            case QFRawDataRecord::qfrdreNumberErrorMatrix:
+                            case QFRawDataRecord::qfrdreIntegerVector:
+                            case QFRawDataRecord::qfrdreIntegerMatrix:
+                                record->resultsSet(evalID, param=("fitalg_"+it.key()), it.value());
+                                break;
+                            default:
+                                break;
+                        }
 
-                QMapIterator<QString, QFRawDataRecord::evaluationResult> it(result.params);
-                while (it.hasNext()) {
-                    it.next();
-                    param="";
-                    //record->resultsSet(evalID, param=("fitalg_"+it.key()), it.value());
-                    switch(it.value().type) {
-                        case QFRawDataRecord::qfrdreNumber:
-                            record->resultsSetNumber(evalID, param=("fitalg_"+it.key()), it.value().dvalue, it.value().unit);
-                            break;
-                        case QFRawDataRecord::qfrdreNumberError:
-                            record->resultsSetNumberError(evalID, param=("fitalg_"+it.key()), it.value().dvalue, it.value().derror, it.value().unit);
-                            break;
-                        case QFRawDataRecord::qfrdreInteger:
-                            record->resultsSetInteger(evalID, param=("fitalg_"+it.key()), it.value().ivalue, it.value().unit);
-                            break;
-                        case QFRawDataRecord::qfrdreBoolean:
-                            record->resultsSetBoolean(evalID, param=("fitalg_"+it.key()), it.value().bvalue);
-                            break;
-                        case QFRawDataRecord::qfrdreString:
-                            record->resultsSetString(evalID, param=("fitalg_"+it.key()), it.value().svalue);
-                            break;
-
-                        case QFRawDataRecord::qfrdreBooleanVector:
-                        case QFRawDataRecord::qfrdreBooleanMatrix:
-                        case QFRawDataRecord::qfrdreNumberVector:
-                        case QFRawDataRecord::qfrdreNumberMatrix:
-                        case QFRawDataRecord::qfrdreNumberErrorVector:
-                        case QFRawDataRecord::qfrdreNumberErrorMatrix:
-                        case QFRawDataRecord::qfrdreIntegerVector:
-                        case QFRawDataRecord::qfrdreIntegerMatrix:
-                            record->resultsSet(evalID, param=("fitalg_"+it.key()), it.value());
-                            break;
-                        default:
-                            break;
+                        if (!param.isEmpty()) {
+                            record->resultsSetGroup(evalID, param, group);
+                            record->resultsSetLabel(evalID, param, it.value().label, it.value().label_rich);
+                        }
                     }
+                } else {
+                    record->resultsSetString(evalID, "fitalg_message", guessm);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("guess: message"));
 
-                    if (!param.isEmpty()) {
-                        record->resultsSetGroup(evalID, param, group);
-                        record->resultsSetLabel(evalID, param, it.value().label, it.value().label_rich);
-                    }
+                    record->resultsSetString(evalID, "fitalg_messageHTML", guessm);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("guess: message (markup)"));
+
+                    record->resultsSetBoolean(evalID, "fitalg_success", guessok);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("guess: success"));
                 }
+
+
 
 
                 {
@@ -730,11 +776,11 @@ void QFCurveFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFuncti
                 }
 
             } else {
-                if (logservice) logservice->log_error(tr("fitting file '%3', run %4:\n   there are not enough datapoints for the fit (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount).arg(record->getName()).arg(run));
+                if (logservice) logservice->log_error(tr("fitting file '%3', curve %4:\n   there are not enough datapoints for the fit (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount).arg(record->getName()).arg(run));
             }
 
          } catch(std::exception& E) {
-            if (logservice) logservice->log_error(tr("fitting file '%2', run %3:\n   error during fitting, error message: %1\n").arg(E.what()).arg(record->getName()).arg(run));
+            if (logservice) logservice->log_error(tr("fitting file '%2', curve %3:\n   error during fitting, error message: %1\n").arg(E.what()).arg(record->getName()).arg(run));
         }
 
         // clean temporary parameters
@@ -753,7 +799,7 @@ void QFCurveFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFuncti
 
 }
 
-void QFCurveFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord *record, int run, int /*defaultMinDatarange*/, int /*defaultMaxDatarange*/, QFPluginLogService */*logservice*/) const
+void QFCurveFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord *record, int run, int /*defaultMinDatarange*/, int /*defaultMaxDatarange*/, QFPluginLogService */*logservice*/, bool /*guessOnly*/) const
 {
     result.index=run;
     result.rdr=record;

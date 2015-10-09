@@ -24,6 +24,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <iostream>
 #include "qfstyledbutton.h"
 #include "qftools.h"
+#include "qmodernprogresswidget.h"
 
 #define TEST_MATH "g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\left(1+\\frac{\\tau}{\\tau_D}\\right)^{-1}\\cdot\\left(1+\\frac{\\tau}{\\gamma^2\\tau_D}\\right)^{-1/2}"
 
@@ -192,6 +193,8 @@ void OptionsDialog::open(ProgramOptions* options) {
     cmbHelpFont->setCurrentFont(QFont(options->getConfigValue("quickfit/help_font", font().family()).toString()));
     spinCodeFontsize->setValue(options->getConfigValue("quickfit/code_pointsize", 10).toInt());
     cmbCodeFont->setCurrentFont(QFont(options->getConfigValue("quickfit/code_font", "Hack").toString()));
+    chkVARCOVNonLin->setChecked(options->getConfigValue("quickfit/nonlin_color_covmatrix_enabled", true).toBool());
+    spinCodeFontsize->setValue(options->getConfigValue("quickfit/nonlin_color_covmatrix_gamma", 0.25).toDouble());
 
     cmbFileDialog->setCurrentIndex(0);
     if (!ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
@@ -224,33 +227,47 @@ void OptionsDialog::open(ProgramOptions* options) {
     }
 
     if (exec() == QDialog::Accepted ){
+        QModernProgressDialog progress(tr("Updating Configuration"), "", NULL);
+        progress.setWindowModality(Qt::ApplicationModal);
+        progress.setHasCancel(false);
+        progress.open();
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
+
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         options->setMaxThreads(spnMaxThreads->value());
         options->setLanguageID(cmbLanguage->currentText());
         options->setStylesheet(cmbStylesheet->currentText());
         options->setStyle(cmbStyle->currentText());
         options->setAutosave(spinAutosave->value());
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
         options->setChildWindowsStayOnTop(chkChildWindowsStayOnTop->isChecked());
         options->setUserSaveAfterFirstEdit(chkUserSaveAfterFirstEdit->isChecked());
         options->setHelpWindowsStayOnTop(chkHelpWindowsStayOnTop->isChecked());
         options->setProjectWindowsStayOnTop(chkProjectWindowsStayOnTop->isChecked());
         options->setDebugLogVisible(chkDebugMessages->isChecked());
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
         options->setProxyHost(edtProxyHost->text());
         options->setProxyPort(spinProxyPort->value());
         options->setProxyType(cmbProxyType->currentIndex());
         options->setConfigValue("quickfit/checkupdates", chkUpdates->isChecked());
         options->setConfigValue("quickfit/welcomescreen", chkStartupScreen->isChecked());
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
         options->setConfigValue("quickfit/user_fitfunctions", edtUserFitFunctions->text());
         options->setHomeQFDirectory(edtUserSettings->text());
         options->setGlobalConfigFileDirectory(edtGlobalSettings->text());
         options->setConfigValue("quickfit/math_pointsize", spinMath->value());
         options->setConfigValue("quickfit/help_pointsize", spinHelpFontsize->value());
         options->setConfigValue("quickfit/help_font", cmbHelpFont->currentFont().family());
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
         options->setConfigValue("quickfit/code_pointsize", spinCodeFontsize->value());
         options->setConfigValue("quickfit/code_fontsize", spinCodeFontsize->value());
         options->setConfigValue("quickfit/code_font", cmbCodeFont->currentFont().family());
         options->setConfigValue("quickfit/windowheadermode", cmbWindowHeader->currentIndex());
 
+        options->setConfigValue("quickfit/nonlin_color_covmatrix_enabled", chkVARCOVNonLin->isChecked());
+        options->setConfigValue("quickfit/nonlin_color_covmatrix_gamma", spinCodeFontsize->value());
+
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
         options->setConfigValue("quickfit/temp_folder", edtTempFolder->text());
         options->setConfigValue("quickfit/temp_folder_default", chkDefaultTempFolder->isChecked());
 
@@ -259,21 +276,27 @@ void OptionsDialog::open(ProgramOptions* options) {
         {
             QDir dir(edtUserFitFunctions->text());
             if (!dir.exists()) dir.mkpath(dir.absolutePath());
+            QApplication::processEvents(QEventLoop::AllEvents, 50);
         }
         {
             QDir dir(edtUserSettings->text());
             if (!dir.exists()) dir.mkpath(dir.absolutePath());
+            QApplication::processEvents(QEventLoop::AllEvents, 50);
         }
         {
             QDir dir(edtGlobalSettings->text());
             if (!dir.exists()) dir.mkpath(dir.absolutePath());
+            QApplication::processEvents(QEventLoop::AllEvents, 50);
         }
         options->setConfigValue("quickfit/native_file_dialog", (cmbFileDialog->currentIndex()==0));
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
 
         for (int i=0; i<m_plugins.size(); i++) {
             m_plugins[i]->writeSettings(options);
+            QApplication::processEvents(QEventLoop::AllEvents, 50);
         }
         options->writeSettings();
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
         QApplication::restoreOverrideCursor();
     }
 }

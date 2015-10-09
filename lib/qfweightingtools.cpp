@@ -118,7 +118,7 @@ QFCurveWeightingTools::DataWeight QFCurveWeightingTools::stringToDataWeight(QStr
 
 #define CHECK_WEIGHT \
     for (int i=0; i<N; i++) { \
-        if ((fabs(weights[i])<100*DBL_MIN)||(!QFFloatIsOK(weights[i]))) { \
+        if ((fabs(weights[i])<100.0*DBL_MIN)||(!QFFloatIsOK(weights[i]))) { \
             weightsOK=false; \
             break; \
         }; \
@@ -141,9 +141,11 @@ QFCurveWeightingTools::DataWeight QFCurveWeightingTools::stringToDataWeight(QStr
         if (i+jstart>=0 && i+jend<N) { \
             register double s=0, s2=0, cnt=0; \
             for (register int j=jstart; j<=jend; j++) { \
-                s=s+corrdat[i+j]; \
-                s2=s2+corrdat[i+j]*corrdat[i+j]; \
-                cnt++; \
+                if (i+j>=0 && i+j<N) {\
+                    s=s+corrdat[i+j]; \
+                    s2=s2+corrdat[i+j]*corrdat[i+j]; \
+                    cnt++; \
+                }\
             } \
             weights[i]=sqrt((s2-s*s/double(cnt))/double(cnt-1)); \
         } \
@@ -167,14 +169,16 @@ QFCurveWeightingTools::DataWeight QFCurveWeightingTools::stringToDataWeight(QStr
         if (i+jstart>=0 && i+jend<=N) { \
             double s=0, s2=0; \
             for (int j=jstart; j<jend; j++) { \
-                x<<log(taudat[i+j]); \
-                y<<corrdat[i+j]; \
+                if (i+j>=0 && i+j<N) { \
+                    x<<taudat[i+j]; \
+                    y<<corrdat[i+j]; \
+                }\
             } \
             QVector<double> p(P+1,0.0); \
             if (statisticsPolyFit<double>(x.data(), y.data(), x.size(), P, p.data())) { \
                 register double cn=0, s2=0; \
                 for (register int j=jstart; j<jend; j++) { \
-                    const double ee=corrdat[i+j]-statisticsPolyEval<double>(log(taudat[i]), p.data(), P); \
+                    const double ee=corrdat[i+j]-statisticsPolyEval<double>(taudat[i], p.data(), P); \
                     cn=cn+1.0; \
                     s2=s2+ee*ee; \
                 } \
@@ -301,7 +305,10 @@ QVector<double> QFCurveWeightingTools::allocVecWeights(bool *weightsOKK, const Q
         for (int i=0; i<N; i++) weights[i]=ww;
         if (weighting==QFCurveWeightingTools::EqualWeighting) weightsOK=true;
     }
-    //qDebug()<<"allocWeights weightsOK="<<weightsOK<<weights<<weighting;
+    //qDebug()<<"allocWeights x = "<<taudat;
+    //qDebug()<<"allocWeights y = "<<corrdat;
+    //qDebug()<<"allocWeights err = "<<err;
+    //qDebug()<<"allocWeights "<<QFCurveWeightingTools::dataWeightToString(weighting)<<" weightsOK="<<weightsOK<<weights;
 
     if (weightsOKK) *weightsOKK=weightsOK;
     //qDebug()<<"QFFCSWeightingTools::allocVecWeights "<<weights.size();

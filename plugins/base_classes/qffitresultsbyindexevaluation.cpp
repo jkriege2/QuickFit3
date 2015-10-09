@@ -60,11 +60,11 @@ QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction
 
 
 QString QFFitResultsByIndexEvaluation::getEvaluationResultID(const QFRawDataRecord *r) const {
-    return getEvaluationResultID(getFitFunctionID(r), m_currentIndex);
+    return getEvaluationResultID(getFitFunctionID(r), getCurrentIndex());
 }
 
 QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction) const {
-    return getEvaluationResultID(fitFunction, m_currentIndex);
+    return getEvaluationResultID(fitFunction, getCurrentIndex());
 }
 
 QString QFFitResultsByIndexEvaluation::getEvaluationResultID(int currentIndex, const QFRawDataRecord *r) const {
@@ -240,9 +240,11 @@ QVector<bool> QFFitResultsByIndexEvaluation::allocVecFillFix(const QFRawDataReco
 void QFFitResultsByIndexEvaluation::setCurrentIndex(int index) {
     QFRawDataRecord* r=getHighlightedRecord();
     if ((r!=NULL)) {
-        if (index<=getIndexMin(r)) m_currentIndex=getIndexMin(r);
-        if (index<=getIndexMax(r)) m_currentIndex=index;
-        if (index>getIndexMax(r)) m_currentIndex=getIndexMax(r);
+        m_currentIndex=index;
+        const int idxmin=getIndexMin(r);
+        if (index<idxmin) m_currentIndex=idxmin;
+        const int idxmax=getIndexMax(r);
+        if (index>idxmax) m_currentIndex=idxmax;
         r->setQFProperty(QString(getType()+QString::number(getID())+"_last_index"), m_currentIndex, false, false);
         emit currentIndexChanged(m_currentIndex);
     }
@@ -252,13 +254,16 @@ int QFFitResultsByIndexEvaluation::getCurrentIndex() const {
     QFRawDataRecord* r=getHighlightedRecord();
     int index=m_currentIndex;
     if (r!=NULL) {
-        /*m_currentIndex=*/index=r->getProperty(QString(getType()+QString::number(getID())+"_last_index"), index).toInt();
+        index=r->getProperty(QString(getType()+QString::number(getID())+"_last_index"), index).toInt();
     }
-    if (index<getIndexMin(r)) {
-        /*m_currentIndex=*/index=getIndexMin(r);
+
+    const int idxmin=getIndexMin(r);
+    if (index<idxmin) {
+        index=idxmin;
     }
-    if (index>getIndexMax(r)) {
-        /*m_currentIndex=*/index=getIndexMax(r);
+    const int idxmax=getIndexMax(r);
+    if (index>idxmax) {
+        index=idxmax;
     }
     return index;
 }
