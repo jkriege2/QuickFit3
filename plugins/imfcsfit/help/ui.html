@@ -85,10 +85,10 @@
      <p>$$note:This functionality os actually implemented in the fit-function plugins, so its availablility depends on those plugins!$$
      This plugin provides buttons that call an internal function (in the fit-function plugin) which takes a data-set (i.e. $(\hat{x}_i,\hat{g}_i)_{i\in\{1..N\}})$ and tries to estimate the model-parameters from it:
      <ul>
-       <li><strong><img src=":/fcsfit/fit_guesscurrent.png"> Guess Current:</strong> guess parameters from the currently displayed run only</li>
-       <li><strong><img src=":/fcsfit/fit_guessallfiles.png"> Guess All Files (Current Run):</strong> guess parameters from the currently displayed run in all files</li>
+       <li><strong><img src=":/lib/fit_guesscurrent.png"> Guess Current:</strong> guess parameters from the currently displayed run only</li>
+       <li><strong><img src=":/lib/fit_guessallfiles.png"> Guess All Files (Current Run):</strong> guess parameters from the currently displayed run in all files</li>
      </ul>
-      For FCS fit models, these functions typically guess the particle number $(N)$ or equivalently the particle concentration $(C=N/V_\text{eff})$ from the amplitude of the measured correlation curve (typically from the amplitude at $(\hat{\tau}_\approx10\mathrm{\mu s})$ to overcome problems with triplet blinking or other fast dynamics). The decay-time $(\tau_D)$ (or equivalently the diffusion coefficient $(D=w_{xy}^2/(4\tau_D)=A_\text{eff}/(4\tau_D))$) are then estimated from the curve by finding the time, where the curve first falls below $(\hat{g}_i<(1/N)/2)$, i.e. from the half-decay time. Finally the offset $(G_\infty)$ of the curves can be estimated from $(\hat{g}_i)$ at large lag-times.
+      For FCS fit models, these functions typically guess the particle number $(N)$ or equivalently the particle concentration $(C=N/V_\text{eff})$ from the amplitude of the measured correlation curve (typically from the amplitude at $(\hat{\tau}\approx10\mathrm{\mu s})$ to overcome problems with triplet blinking or other fast dynamics). The decay-time $(\tau_D)$ (or equivalently the diffusion coefficient $(D=w_{xy}^2/(4\tau_D)=A_\text{eff}/(4\tau_D))$) are then estimated from the curve by finding the time, where the curve first falls below $(\hat{g}_i<(1/N)/2)$, i.e. from the half-decay time. Finally the offset $(G_\infty)$ of the curves can be estimated from $(\hat{g}_i)$ at large lag-times.
      </p>
      <h4>User-assisted Guessing of Individual Fit Parameters</h4>
      <p>$$note:This functionality os actually implemented in the fit-function plugins, so its availablility depends on those plugins!$$
