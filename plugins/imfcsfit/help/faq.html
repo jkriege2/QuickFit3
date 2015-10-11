@@ -51,7 +51,7 @@ $$faq_end$$
 
 
 $$faq_start$$
-  <a name="FAQ_FREEZE"><b>What can I do if a multi-threaded fit freezes my QuickFit?</b>
+  <a name="FAQ_FREEZE"><b>What can I do if a multi-threaded imagingFCS fit freezes my QuickFit?</b>
 $$faq_answer$$
   This situation should not occur, but if: This may sometimes happen, if the multi-threaded fit ends up in an (unintended) dead-lock. You can do several things:
   <ol>
@@ -59,6 +59,26 @@ $$faq_answer$$
     <li>if this happens for the <b>newMT</b> default variant of the fits, use the <b>MT</b> variant instead (click on the down-arrow on the rhs of the fit buttons to select a different method), which is slower but uses a different scheme for coordination between the different threads.</li>
     <li>use the slower non-threaded fit (click on the down-arrow on the rhs of the fit buttons to select a different method)</li>
   </ol>
+$$faq_end$$
+
+$$faq_start$$
+  <a name="FAQ_GUESS"><b>How can I guess initial parameters for an imaging FCS fit?</b>
+$$faq_answer$$
+  The imaging FCS plugin provides <a href="ui.html#guess">several methods to guess initial parameters</a> for a fit:
+  <ol>
+      <li>you can use automatic guessing of some of the parameters, if provided by the used fit model. This function can be performed by clicking on one of the buttons
+      <center><a name="faq_pic002"><img src="./pic/faq_pic002.png" border="1">
+      </center>
+      below the fit parameter input widgets:
+       <center><a name="faq_pic001"><img src="./pic/faq_pic001.png" border="1">
+       </center>
+      Then the plugin tries to guess some of the function parameters (e.g. the particle number $(N)$ from the amplitude of the correlation curve at low lag-times: $(1/g(\(tau\approx10^{-5}\mathrm{s}))$, or the decay time $(\tau_D)$ from the half-decay time of the measured curve) from the measured correlation curve.
+        </li>
+       <li>You can provide values for single parameters with "user-assisted parameter-guessing", by right-clicking on the curve-plot and then choosing the parameter to guess from the context-submenu <b>Estimate Parameters</b>:<center><img src="./pic/ui_pic000.png" border="1">
+       </center>
+       The guess is then based on the xy-position that you clicked within the plot.</li> 
+  </ol>
+  $$note:This functionality os actually implemented in the fit-function plugins, so its availablility depends on those plugins!$$
 $$faq_end$$
   </body>
 </html>

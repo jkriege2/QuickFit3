@@ -62,5 +62,27 @@ $$faq_start$$
 $$faq_answer$$
   The fit calculates several <a href="$$mainhelpdir$$fit_statistics.html">fit statistics parameters</a>, which allow to compare models and to find the model, which best fits you data, while obeying the principle of parsimony, which requires to use the simplest model, which is compatible with your data. The simplest parameter is the residual sum of squares (RSS or $(\chi^2)$), which tells you how well a model fits, but does not incorporate the number of model parameters, i.e. the model complexity. Parameters, that are connected to the RSS; but in addition penalize the model complexity are the Akaike information criterion (AICc) and the bayes information criterion (BIC), which are also available.$$note:A <a href="tutorial_modelselection.html">detailed tutorial</a> explains how to perform such a model selection analysis for an FCS measurement.$$
 $$faq_end$$
+
+
+$$faq_start$$
+  <a name="FAQ_GUESS"><b>How can I guess initial parameters for an imaging FCS fit?</b>
+$$faq_answer$$
+  The imaging FCS plugin provides <a href="ui.html#guess">several methods to guess initial parameters</a> for a fit:
+  <ol>
+      <li>you can use automatic guessing of some of the parameters, if provided by the used fit model. This function can be performed by clicking on one of the buttons
+      <center><a name="faq_pic002"><img src="./pic/faq_pic002.png" border="1">
+      </center>
+      below the fit parameter input widgets:
+       <center><a name="faq_pic001"><img src="./pic/faq_pic001.png" border="1">
+       </center>
+      Then the plugin tries to guess some of the function parameters (e.g. the particle number $(N)$ from the amplitude of the correlation curve at low lag-times: $(1/g(\(tau\approx10^{-5}\mathrm{s}))$, or the decay time $(\tau_D)$ from the half-decay time of the measured curve) from the measured correlation curve.
+        </li>
+       <li>You can provide values for single parameters with "user-assisted parameter-guessing", by right-clicking on the curve-plot and then choosing the parameter to guess from the context-submenu <b>Estimate Parameters</b>:<center><img src="./pic/ui_pic000.png" border="1">
+       </center>
+       The guess is then based on the xy-position that you clicked within the plot.</li> 
+  </ol>
+  $$note:This functionality os actually implemented in the fit-function plugins, so its availablility depends on those plugins!$$
+$$faq_end$$
+
   </body>
 </html>
