@@ -24,7 +24,7 @@
 #ifndef QFFitFunctionGeneralPDFCauchy_H
 #define QFFitFunctionGeneralPDFCauchy_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +32,7 @@
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralPDFCauchy: public QFFitFunction {
+class QFFitFunctionGeneralPDFCauchy: public QFDistributionFitFunctionBase {
     public:
         QFFitFunctionGeneralPDFCauchy();
         virtual ~QFFitFunctionGeneralPDFCauchy() {}
@@ -59,7 +59,6 @@ class QFFitFunctionGeneralPDFCauchy: public QFFitFunction {
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params) const;
 
-        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionGeneralPDFCauchy_H

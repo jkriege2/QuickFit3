@@ -23,13 +23,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFitFunctionsTIRFCSADiffE2NewVeffE2_H
 #include "qfpluginfitfunction.h"
 
-
+#include "qfgeneralfitfunctionbase.h"
 
 /*! \brief QFFitFunction class for a TIR-FCS fit model with pure diffusion and lateral 1/e^2 width
     \ingroup qf3fitfunp_fitfunctions_tirfcs
 
 */
-class QFFitFunctionsTIRFCSADiffE2: public QFFitFunction {
+class QFFitFunctionsTIRFCSADiffE2: public QFFCSLargeFocusFitFunctionBase {
     public:
         QFFitFunctionsTIRFCSADiffE2();
         virtual ~QFFitFunctionsTIRFCSADiffE2() {}

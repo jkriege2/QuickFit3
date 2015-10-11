@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFitFunctionFCCSNormalDiff3D2Focus_H
 #define QFFitFunctionFCCSNormalDiff3D2Focus_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -30,7 +30,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3fitfunp_fitfunctions_2ffcs
 
 */
-class QFFitFunctionFCCSNormalDiff3D2Focus: public QFFitFunction {
+class QFFitFunctionFCCSNormalDiff3D2Focus: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCCSNormalDiff3D2Focus(bool hasGamma);
         virtual ~QFFitFunctionFCCSNormalDiff3D2Focus() {}

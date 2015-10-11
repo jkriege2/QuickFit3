@@ -411,11 +411,6 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     layButtons=new QGridLayout();
     layButtons->setContentsMargins(0,0,0,0);
     int row=0;
-    btnGuessCurrent=createButtonAndActionShowText(actGuessCurrent, QIcon(":/lib/fit_guesscurrent.png"), tr("&Guess Current"), this);
-    btnGuessCurrent->setVisible(false);
-    actGuessCurrent->setToolTip(tr("perform a parameter-guessing for the currently displayed file and %1").arg(m_runName));
-    actGuessCurrent->setVisible(false);
-    layButtons->addWidget(btnGuessCurrent, row, 0, 1,2);
 
     row++;
     btnFitCurrent=createButtonAndActionShowText(actFitCurrent, QIcon(":/lib/fit_fitcurrent.png"), tr("&Fit Current"), this);
@@ -462,6 +457,30 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     btnCopyToAllCurrentRun=createButtonAndActionShowText(actCopyToAllCurrentRun, tr("&Copy to All (Current %1)").arg(m_runName), this);
     actCopyToAllCurrentRun->setToolTip(tr("copy the currently displayed fit parameters to the set of\n initial parameters and also to all files, but only to the current %1 therein.").arg(m_runName));
     layButtons->addWidget(btnCopyToAllCurrentRun, row, 0);
+
+    guessrow=row;
+    btnGuessCurrent=createButtonAndActionShowText(actGuessCurrent, QIcon(":/lib/fit_guesscurrent.png"), tr("&Guess Current"), this);
+    actGuessCurrent->setToolTip(tr("perform a parameter-guessing for the currently displayed file and %1").arg(m_runName));
+    btnGuessCurrent->setVisible(false);
+    actGuessCurrent->setVisible(false);
+    layButtons->addWidget(btnGuessCurrent, row, 0);
+    btnGuessRunsCurrent=createButtonAndActionShowText(actGuessRunsCurrent, QIcon(":/lib/fit_guessallruns.png"), tr("Guess All &%1s").arg(m_runName), this);
+    actGuessRunsCurrent->setToolTip(tr("perform a parameter-guessing for all %1s in the currently selected file ").arg(m_runName));
+    btnGuessRunsCurrent->setVisible(false);
+    actGuessRunsCurrent->setVisible(false);
+    layButtons->addWidget(btnGuessRunsCurrent, row, 1);
+
+    row++;
+    btnGuessAll=createButtonAndActionShowText(actGuessAll, QIcon(":/lib/fit_guessallfiles.png"), tr("Guess All &Files (Current %1)").arg(m_runName), this);
+    actGuessAll->setToolTip(tr("perform a parameter-guessing for all files, but Guess in each file only the currently displayed %1").arg(m_runName));
+    btnGuessAll->setVisible(false);
+    actGuessAll->setVisible(false);
+    layButtons->addWidget(btnGuessAll, row, 0);
+    btnGuessRunsAll=createButtonAndActionShowText(actGuessRunsAll, QIcon(":/lib/fit_guessall.png"), tr("Guess &Everything"), this);
+    actGuessRunsAll->setToolTip(tr("perform a parameter-guessing for all %1s in all files").arg(m_runName));
+    btnGuessRunsAll->setVisible(false);
+    actGuessRunsAll->setVisible(false);
+    layButtons->addWidget(btnGuessRunsAll, row, 1);
 
     row++;
     actChi2Landscape=new QAction(tr("&Plot &Chi2 Landscape"), this);
@@ -549,10 +568,13 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     connect(pltResidualCorrelation, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
 
     connect(actFitCurrent, SIGNAL(triggered()), this, SLOT(fitCurrent()));
-    connect(actGuessCurrent, SIGNAL(triggered()), this, SLOT(guessCurrent()));
     connect(actFitAll, SIGNAL(triggered()), this, SLOT(fitAll()));
     connect(actFitRunsAll, SIGNAL(triggered()), this, SLOT(fitRunsAll()));
     connect(actFitRunsCurrent, SIGNAL(triggered()), this, SLOT(fitRunsCurrent()));
+    connect(actGuessCurrent, SIGNAL(triggered()), this, SLOT(guessCurrent()));
+    connect(actGuessAll, SIGNAL(triggered()), this, SLOT(guessAll()));
+    connect(actGuessRunsAll, SIGNAL(triggered()), this, SLOT(guessRunsAll()));
+    connect(actGuessRunsCurrent, SIGNAL(triggered()), this, SLOT(guessRunsCurrent()));
     connect(actResetCurrent, SIGNAL(triggered()), this, SLOT(resetCurrent()));
     connect(actResetAll, SIGNAL(triggered()), this, SLOT(resetAll()));
     connect(actCopyToAll, SIGNAL(triggered()), this, SLOT(copyToAll()));
@@ -588,6 +610,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
     menuFit=propertyEditor->addMenu("&Fit", 0);
     menuFit->addAction(actGuessCurrent);
+    menuFit->addAction(actGuessRunsCurrent);
+    menuFit->addAction(actGuessRunsAll);
+    menuFit->addAction(actGuessAll);
+    actFitSeparator=menuFit->addSeparator();
     menuFit->addAction(actFitCurrent);
     menuFit->addAction(actFitRunsCurrent);
     menuFit->addAction(actFitRunsAll);
@@ -645,6 +671,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
         menuFit->insertAction(actFitRunsCurrent, actFitAllThreaded);
         menuFit->insertSeparator(actFitRunsCurrent);
     }
+
+    menuEstimate=new QMenu(tr("Estimate Parameters ..."), this);
+    menuEstimate->setIcon(QIcon(":/lib/fit_guesscurrent.png"));
+    pltData->addAction(menuEstimate->menuAction());
+    connect(pltData, SIGNAL(contextMenuOpened(double,double,QMenu*)), this, SLOT(dataplotContextMenuOpened(double,double,QMenu*)));
+
 }
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEvaluationItem *current, QFEvaluationItem *old, bool updatePlots) {
@@ -806,6 +838,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues(QFRaw
         }
     }
 
+    QMapIterator<QAction*,QString> it(actsEstimate);
+    while (it.hasNext()) {
+        it.next();
+        it.key()->setVisible(ffunc->isParameterVisible(it.value(), fullParams));
+    }
+
     qfFree(fullParams);
     qfFree(errors);
 
@@ -815,6 +853,39 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues(QFRaw
 
     widParameters->setUpdatesEnabled(true);
 
+}
+
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::dataplotContextMenuOpened(double x, double y, QMenu */*contextMenu*/)
+{
+    if (!current) return;
+    if (!cmbModel) return;
+
+
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction(current->getHighlightedRecord());
+
+    if (!ffunc) return;
+
+    QVector<double> fullParams=eval->allocVecFillParameters(ffunc);
+    QVector<double> errors=eval->allocVecFillParameterErrors(ffunc);
+    ffunc->calcParameter(fullParams, errors);
+
+
+    QMapIterator<QAction*,QString> it(actsEstimate);
+    while (it.hasNext()) {
+        it.next();
+        if (it.key()->isVisible()) {
+            QString id=it.value();
+            double np=eval->getFitValue(eval->getHighlightedRecord(), eval->getCurrentIndex(), id);
+            if (ffunc->estimateParameterFromXY(np, id, x, y, fullParams)) {
+                QFFitFunction::ParameterDescription d=ffunc->getDescription(id);
+                it.key()->setText(tr("estimate '%1' = %2 %3").arg(d.name).arg(np).arg(d.unit));
+            }
+        }
+
+    }
 }
 
 QString QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotXLabel() const
@@ -842,10 +913,67 @@ bool QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotYLog() const
     return false;
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::setGuessingEnabled(bool enabled)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::setGuessingEnabled(bool enabled, bool currentOnly)
 {
     actGuessCurrent->setVisible(enabled);
     btnGuessCurrent->setVisible(enabled);
+
+    btnGuessAll->setVisible(enabled);
+    actGuessAll->setVisible(enabled);
+
+    bool enmulti=enabled;
+    if (currentOnly) enmulti=false;
+
+    btnGuessRunsCurrent->setVisible(enmulti);
+    actGuessRunsCurrent->setVisible(enmulti);
+
+    btnGuessRunsAll->setVisible(enmulti);
+    actGuessRunsAll->setVisible(enmulti);
+    if (currentOnly) {
+        layButtons->removeWidget(btnGuessRunsCurrent);
+        layButtons->removeWidget(btnGuessAll);
+        layButtons->addWidget(btnGuessAll, guessrow, 1);
+        layButtons->addWidget(btnGuessRunsCurrent, guessrow+1,0);
+    } else {
+        layButtons->removeWidget(btnGuessRunsCurrent);
+        layButtons->removeWidget(btnGuessAll);
+        layButtons->addWidget(btnGuessAll, guessrow+1,0);
+        layButtons->addWidget(btnGuessRunsCurrent, guessrow,1);
+    }
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::estimateActionClicked()
+{
+    if (!current) return;
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction(current->getHighlightedRecord());
+    if (!ffunc || !eval) return;
+    if (!eval->getHighlightedRecord()) return;
+    QFRawDataRecord* rdr=eval->getHighlightedRecord();
+
+    QAction* act=qobject_cast<QAction*>(sender());
+    if (act && actsEstimate.contains(act)) {
+        QString id=actsEstimate[act];
+        double np=eval->getFitValue(rdr, eval->getCurrentIndex(), id);
+        if (ffunc->estimateParameterFromXY(np, id, pltData->get_mouseContextX(), pltData->get_mouseContextY(), eval->allocVecFillParameters(ffunc))) {
+
+            eval->setFitValue(rdr, eval->getCurrentIndex(), id, np);
+            updateParameterValues(rdr);
+            updateFitFunctionsPlot();
+        }
+    }
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::clearEstimateActions()
+{
+    if (menuEstimate) {
+        for(int i=0; i<menuEstimate->actions().size(); i++) {
+            disconnect(menuEstimate->actions().at(i), SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
+        }
+        menuEstimate->clear();
+    }
+    actsEstimate.clear();
 }
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::populateFitButtons(bool mulThreadEnabledInModel)
@@ -988,6 +1116,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         }
         m_fitParameters.clear();
         widParameters->setUpdatesEnabled(true);
+        clearEstimateActions();
         //setUpdatesEnabled(updEn);
         return;
     }
@@ -1001,6 +1130,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         // first delete all fit parameter widgets
         /////////////////////////////////////////////////////////////////////////////////////////////
         widParameters->setUpdatesEnabled(false);
+        clearEstimateActions();
         for (int i=0; i<m_fitParameters.size(); i++) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
@@ -1081,6 +1211,30 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         // add stretcher item in bottom row
         layParameters->addItem(new QSpacerItem(5,5, QSizePolicy::Minimum, QSizePolicy::Expanding), layParameters->rowCount(), 0);
         widParameters->setUpdatesEnabled(true);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // create new parameter actions
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            QString id=ffunc->getParameterID(i);
+
+            QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+            if (ffunc->isParameterXYEstimateable(i)
+                    && (d.widgetType==QFFitFunction::LogFloatNumber || d.widgetType==QFFitFunction::FloatNumber)
+                    && (d.fit || d.userEditable)) {
+                QAction* act=new QAction(tr("estimate '%1'").arg(d.name), this);
+                connect(act, SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
+                actsEstimate.insert(act, id);
+                menuEstimate->addAction(act);
+            }
+        }
+        bool enGuess=ffunc->isEstimateInitialAvailable();
+        actGuessAll->setEnabled(enGuess);
+        actGuessCurrent->setEnabled(enGuess);
+        actGuessRunsAll->setEnabled(enGuess);
+        actGuessRunsCurrent->setEnabled(enGuess);
+
     }
 
     /*int crun=getCurrentRunFromWidget();
@@ -1690,8 +1844,239 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
 }
 
 
+void QFFitResultsByIndexEvaluationEditorWithWidgets::guessRunsCurrent() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!eval)||(!falg)) return;
 
 
+    int runmax=eval->getIndexMax(record);
+    int runmin=eval->getIndexMin(record);
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess all runs<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(runmax-runmin);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->setAllowCancel(true);
+    dlgFitProgress->display();
+    QApplication::processEvents();
+    QTime time;
+    time.start();
+    for (int run=runmin; run<=runmax; run++) {
+        bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+        if (doall || (!doall && rsel && !rsel->leaveoutRun(run))) {
+            falg->setReporter(dlgFitProgressReporter);
+            QString runname=tr("average");
+            if (run>=0) runname=QString::number(run);
+            double runtime=double(time.elapsed())/1.0e3;
+            double timeperfit=runtime/double(run-runmin);
+            double estimatedRuntime=double(runmax-runmin)*timeperfit;
+            double remaining=estimatedRuntime-runtime;
+            dlgFitProgress->reportSuperStatus(tr("parameter-guess '%1', run %3<br>using model '%2'<br>\nruntime: %4:%5       remaining: %6:%7 [min:secs]       %8 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+
+            //doFit(record, run);
+            feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool(), true);
+
+            dlgFitProgress->incSuperProgress();
+            QApplication::processEvents();
+            falg->setReporter(NULL);
+            if (dlgFitProgress->isCanceled()) break;
+        }
+    }
+    record->enableEmitResultsChanged(true);
+
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    QApplication::processEvents();
+
+    current->emitResultsChanged();
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::guessAll() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(current);
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!falg)) return;
+
+    int run=eval->getCurrentIndex();
+    QString runname=tr("average");
+    if (run>=0) runname=QString::number(run);
+
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess all files and current run (%2) therein<br>using model '%1'\n").arg(ffunc->name()).arg(runname));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(10);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->setAllowCancel(true);
+    dlgFitProgress->display();
+    QApplication::processEvents();
+
+
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+
+    // count the records and runs to work on (for proper superProgress
+    int items=recs.size();
+    dlgFitProgress->setSuperProgressMax(items);
+
+    // iterate through all records and all runs therein and do the fits
+    int jobsDone=0;
+    QTime time;
+    time.start();
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
+        //std::cout<<"i="<<i<<"   run="<<run<<"   record="<<record<<"   data="<<data<<"\n";
+        int runmax=eval->getIndexMax(record);
+        int runmin=eval->getIndexMin(record);
+
+        if (record) {
+            //std::cout<<"   corrN="<<data->getCorrelationN()<<"   corrRuns="<<data->getCorrelationRuns()<<"\n";
+            bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+            if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                falg->setReporter(dlgFitProgressReporter);
+                double runtime=double(time.elapsed())/1.0e3;
+                double timeperfit=runtime/double(jobsDone);
+                double estimatedRuntime=double(items)*timeperfit;
+                double remaining=estimatedRuntime-runtime;
+                dlgFitProgress->reportSuperStatus(QString(tr("parameter-guess '%1', ")+m_runName+tr(" %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec")).arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(uint(int(runtime)%60)),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+
+                //doFit(record, run);
+                feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool(), true);
+
+                falg->setReporter(NULL);
+                QApplication::processEvents();
+                if (dlgFitProgress->isCanceled()) break;
+                jobsDone++;
+            }
+            dlgFitProgress->incSuperProgress();
+            record->enableEmitResultsChanged(true);
+        }
+    }
+
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    QApplication::processEvents();
+
+    current->emitResultsChanged();
+
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::guessRunsAll() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!falg)) return;
+
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess all files and all %2s therein<br>using model '%1'\n").arg(ffunc->name()).arg(m_runName));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(10);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    dlgFitProgress->setAllowCancel(true);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->display();
+    QApplication::processEvents();
+
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+
+    // count the records and runs to work on (for proper superProgress
+    int items=0;
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+
+        if (record ) {
+            int runmax=eval->getIndexMax(record);
+            int runmin=eval->getIndexMin(record);
+            items=items+runmax-runmin+1;
+        }
+    }
+    dlgFitProgress->setSuperProgressMax(items);
+
+    // iterate through all records and all runs therein and do the fits
+    QTime time;
+    time.start();
+    int jobsDone=0;
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
+
+        if (record ) {
+            record->setResultsInitSize(qMax(1000, items));
+            record->setEvaluationIDMetadataInitSize(1000);
+            int runmax=eval->getIndexMax(record);
+            int runmin=eval->getIndexMin(record);
+            for (int run=runmin; run<=runmax; run++) {
+                bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+                if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                    falg->setReporter(dlgFitProgressReporter);
+                    QString runname=tr("average");
+                    if (run>=0) runname=QString::number(run);
+                    double runtime=double(time.elapsed())/1.0e3;
+                    double timeperfit=runtime/double(jobsDone);
+                    double estimatedRuntime=double(items)*timeperfit;
+                    double remaining=estimatedRuntime-runtime;
+                    dlgFitProgress->reportSuperStatus(QString("parameter-guess '%1', "+m_runName+" %3<br>using model '%2'<br>\nruntime: %4:%5       remaining: %6:%7 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+
+                    //doFit(record, run);
+                    feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool(), true);
+
+                    dlgFitProgress->incSuperProgress();
+                    QApplication::processEvents();
+                    falg->setReporter(NULL);
+                    if (dlgFitProgress->isCanceled()) break;
+                    jobsDone++;
+                }
+            }
+            record->enableEmitResultsChanged(true);
+        }
+    }
+
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    QApplication::processEvents();
+
+    current->emitResultsChanged();
+
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+}
 
 
 

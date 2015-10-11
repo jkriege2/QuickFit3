@@ -91,7 +91,8 @@ class QFLIB_EXPORT QFLibraryFitFunction : public QFFitFunction
         /*! \copydoc QFFitFunction::estimateInitial()  */
         virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL) const;
 
-
+        /*! \copydoc QFFitFunction::estimateParameterFromXY()  */
+        virtual bool estimateParameterFromXY(double& newparam, int param, double x, double y, const double* params=NULL) const;
     private:
         QFLibraryFitFunction_private* d;
 

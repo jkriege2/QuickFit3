@@ -23,7 +23,7 @@
 #ifndef QFFITFUNCTIONLIGHTSHEETGAUSSIAN_H
 #define QFFITFUNCTIONLIGHTSHEETGAUSSIAN_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -31,7 +31,7 @@
     \ingroup qf3fitfunp_fitfunctions_lightsheet
 
 */
-class QFFitFunctionLightsheetGaussian: public QFFitFunction {
+class QFFitFunctionLightsheetGaussian: public QFDistributionFitFunctionBase {
     public:
         QFFitFunctionLightsheetGaussian();
         virtual ~QFFitFunctionLightsheetGaussian() {}

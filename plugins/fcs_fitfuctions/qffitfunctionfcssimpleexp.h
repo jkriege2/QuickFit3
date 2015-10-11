@@ -23,13 +23,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFITFUNCTIONFCSSIMPLEEXP_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 /*! \brief plugin class for FCS exponential function
     \ingroup qf3fitfunp_fcs
 
 */
-class QFFitFunctionFCSSimpleExp: public QFFitFunction {
+class QFFitFunctionFCSSimpleExp: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSSimpleExp();
         virtual ~QFFitFunctionFCSSimpleExp() {}

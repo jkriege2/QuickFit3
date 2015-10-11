@@ -83,6 +83,8 @@ SOURCES += fcs_fitfuctions.cpp\
     qffitfunctionfcsdiff2d.cpp \
     qffitfunctionfcsdiff2dstretchpp.cpp
 
+
+
 FORMS +=
 
 RESOURCES +=

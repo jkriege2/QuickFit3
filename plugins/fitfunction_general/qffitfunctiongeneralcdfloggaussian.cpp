@@ -26,7 +26,9 @@
 #include <cmath>
 #include "statistics_tools.h"
 
-QFFitFunctionGeneralCDFLogGaussian::QFFitFunctionGeneralCDFLogGaussian() {
+QFFitFunctionGeneralCDFLogGaussian::QFFitFunctionGeneralCDFLogGaussian():
+    QFCDFFitFunctionBase(1.0/5.0, true)
+{
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "position",                "position",                                              "X<sub>0</sub>",                        "",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 0,            -1e10,    1e10,  1  );
     #define PARAM_POSITION 0
@@ -73,12 +75,3 @@ bool QFFitFunctionGeneralCDFLogGaussian::get_implementsDerivatives() const
     return false;
 }
 
-bool QFFitFunctionGeneralCDFLogGaussian::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix) const
-{
-    Q_UNUSED(dataX);
-    Q_UNUSED(params);
-    Q_UNUSED(dataY);
-    Q_UNUSED(N);
-    Q_UNUSED(fix);
-    return false;
-}

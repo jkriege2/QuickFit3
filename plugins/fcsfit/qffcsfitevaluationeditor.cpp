@@ -50,6 +50,7 @@ QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, Q
 
     createWidgets();
     btnFirstRun->setText(tr("avg."));
+    setGuessingEnabled(true, true);
 
 }
 
@@ -200,7 +201,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
 
 
 
-void QFFCSFitEvaluationEditor::updateFitFunctions() {
+void QFFCSFitEvaluationEditor::updateFitFunctionsPlot() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -957,7 +958,7 @@ void QFFCSFitEvaluationEditor::replotData() {
         //qDebug()<<"   d "<<t.elapsed()<<" ms";
         t.start();
 
-        updateFitFunctions();
+        updateFitFunctionsPlot();
         //qDebug()<<"   e "<<t.elapsed()<<" ms";
         t.start();
 

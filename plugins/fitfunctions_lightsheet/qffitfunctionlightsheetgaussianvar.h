@@ -24,7 +24,7 @@
 #ifndef QFFITFUNCTIONLIGHTSHEETGAUSSIANVAR_H
 #define QFFITFUNCTIONLIGHTSHEETGAUSSIANVAR_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +32,7 @@
     \ingroup qf3fitfunp_fitfunctions_lightsheet
 
 */
-class QFFitFunctionLightsheetGaussianVar: public QFFitFunction {
+class QFFitFunctionLightsheetGaussianVar: public QFDistributionFitFunctionBase {
     public:
         QFFitFunctionLightsheetGaussianVar();
         virtual ~QFFitFunctionLightsheetGaussianVar() {}

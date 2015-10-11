@@ -23,6 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFitFunctionCSFCSDiffD_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief plugin class for circle scanning FCS Normal Diffusion Fit Functions
@@ -30,7 +31,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 */
-class QFFitFunctionCSFCSDiffD: public QFFitFunction {
+class QFFitFunctionCSFCSDiffD: public QFFCSFitFunctionBase {
     public:
     QFFitFunctionCSFCSDiffD(bool hasGamma=true);
     virtual ~QFFitFunctionCSFCSDiffD() {}

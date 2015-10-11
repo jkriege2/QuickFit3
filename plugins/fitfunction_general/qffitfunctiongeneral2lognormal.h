@@ -26,13 +26,13 @@
 #include "qfpluginfitfunction.h"
 
 
-
+#include "qfgeneralfitfunctionbase.h"
 
 /*! \brief QFFitFunction class for fit function
     \ingroup qf3fitfunp_fitfunction_general
 
 */
-class QFFitFunctionGeneral2LogNormal: public QFFitFunction {
+class QFFitFunctionGeneral2LogNormal: public QFDistributionFitFunctionBase {
     public:
         QFFitFunctionGeneral2LogNormal();
         virtual ~QFFitFunctionGeneral2LogNormal() {}

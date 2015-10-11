@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFitFunctionFCSADiff2D_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief plugin class for FCS Anomalous Diffusion Fit Functions
@@ -61,7 +61,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 */
-class QFFitFunctionFCSADiff2D: public QFFitFunction {
+class QFFitFunctionFCSADiff2D: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSADiff2D(bool isTIRF=false);
         virtual ~QFFitFunctionFCSADiff2D() {}

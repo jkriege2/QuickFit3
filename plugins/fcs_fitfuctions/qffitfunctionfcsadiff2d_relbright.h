@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFitFunctionFCSADiff2DDifferentBrightness_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 /*! \brief plugin class for FCS Anomalous Diffusion Fit Functions with different brightnesses of the species
     \ingroup qf3fitfunp_fcs
@@ -62,7 +62,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
       \f[ \Delta \mbox{cpm}=\sqrt{\left(\Delta\mbox{cps}\cdot\frac{1}{N}\right)^2+\left(\Delta b\cdot\frac{1}{N}\right)^2+\left(\Delta N\cdot\frac{\mbox{cps}-b}{N^2}\right)^2} \f]
 
 */
-class QFFitFunctionFCSADiff2DDifferentBrightness: public QFFitFunction {
+class QFFitFunctionFCSADiff2DDifferentBrightness: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSADiff2DDifferentBrightness(bool isTIRF=false);
         virtual ~QFFitFunctionFCSADiff2DDifferentBrightness() {}

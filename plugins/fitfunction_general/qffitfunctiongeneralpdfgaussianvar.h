@@ -24,15 +24,15 @@
 #ifndef QFFitFunctionGeneralPDFGaussianVar_H
 #define QFFitFunctionGeneralPDFGaussianVar_H
 #include "qfpluginfitfunction.h"
+#include "qfgeneralfitfunctionbase.h"
 
 
 
 
 /*! \brief QFFitFunction class for fit function
     \ingroup qf3fitfunp_fitfunctions_general
-
 */
-class QFFitFunctionGeneralPDFGaussianVar: public QFFitFunction {
+class QFFitFunctionGeneralPDFGaussianVar: public QFDistributionFitFunctionBase {
     public:
         QFFitFunctionGeneralPDFGaussianVar();
         virtual ~QFFitFunctionGeneralPDFGaussianVar() {}
@@ -59,7 +59,6 @@ class QFFitFunctionGeneralPDFGaussianVar: public QFFitFunction {
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params) const;
 
-        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionGeneralPDFGaussianVar_H

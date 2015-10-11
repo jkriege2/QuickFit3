@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFITFUNCTIONSSPIMFCSADIFF_H
 #include "qfpluginfitfunction.h"
 
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief QFFitFunction class for a SPIM-FCS fit model with anomalous diffusion
@@ -36,7 +36,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \f[ C=\frac{N}{V_{\text{eff}}}=\frac{N}{2\cdot a^2\cdot \sigma_z} \f]
     \f[ \Delta C=\sqrt{\left(\frac{\Delta N}{2a^2\cdot\sigma_z}\right)^2+\left(\frac{\Delta\sigma_z\cdot N}{2a^2\sigma_z^2}\right)^2+\left(\frac{\Delta a\cdot N}{a^3\cdot\sigma_z}\right)^2} \f]
 */
-class QFFitFunctionsSPIMFCSADiff: public QFFitFunction {
+class QFFitFunctionsSPIMFCSADiff: public QFFCSLargeFocusFitFunctionBase {
     public:
         QFFitFunctionsSPIMFCSADiff();
         virtual ~QFFitFunctionsSPIMFCSADiff() {}

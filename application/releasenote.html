@@ -93,6 +93,7 @@
       <li>improved style-preview in settings dialog</li>
       <li>bugfix: QFFunctionReferenceTool: behaves nicer, when selecting several characters in a parser expression (before, several small help-prepare windows appeared in fast succession)</li>
       <li>added option to settings-dialog (View/General Settings), which allows to choose a nonlinear scaling of the color-coding in VAR-COV-matrices (with a gamma-transform and user-selectable gamma!)</li>
+      <li>extended QFitFunction with functions to estimate a specific parameter from an XY-location in a plot (also supported by library fit functions in a DLL/SOLIB...)</li>
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>
@@ -110,6 +111,7 @@
         <li>the fit statistics now display the var-cov-matrix of the fit with color-coded entries</li>
         <li>LMFit is now the default/proposed fit algorithm. It is comparable to levmar, but significantly fatser! Also it now calculates parameter errors from the Var-Cov-Matrix and so no reason exists to use the slower levmar.</li>
         <li>added option to general settings-dialog (View/General Settings), which allows to choose a nonlinear scaling of the color-coding in VAR-COV-matrices (with a gamma-transform and user-selectable gamma!)</li>
+        <li>added context-menu that allows to estimate fit parameters from the mouse-position in the main plot (if the model supports it)</li>
     </ul></li>
     <li><b>imaging FCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
@@ -119,6 +121,7 @@
         <li>the fit statistics now display the var-cov-matrix of the fit with color-coded entries</li>
         <li>The imFCS Calibration Wizard now shows an additional plot with the final wxy(a)/wxy(delta) curves and indicates the final result for wxy in the plot.</li>
         <li>added option to general settings-dialog (View/General Settings), which allows to choose a nonlinear scaling of the color-coding in VAR-COV-matrices (with a gamma-transform and user-selectable gamma!)</li>
+        <li>added context-menu that allows to estimate fit parameters from the mouse-position in the main plot (if the model supports it)</li>
     </ul></li>
     <li><b>FCCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
@@ -274,6 +277,9 @@
     <li><b>fitfunctions_general</b><ul>
       <li>license is now LGPL 2.1</li>
       <li>added fit function: Peaks: Multi-Component Gaussian function (1/sqrt(e) width)</li>
+    </ul></li>
+    <li><b>fcs_fitfunctions</b><ul>
+      <li>added code for single-parameter-estimation (from XY) and initial-parameter guessing</li>
     </ul></li>
 
     <li><b>qfe_dataexportbasics</b><ul>

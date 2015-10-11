@@ -78,39 +78,3 @@ bool QFFitFunctionGeneralHill::get_implementsDerivatives() const
 {
     return false;
 }
-
-
-bool QFFitFunctionGeneralHill::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
-{
-    //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
-    if (params && dataX && dataY) {
-
-        StatisticsScopedPointer<double> dX(statisticsDuplicateArray(dataX, N));
-        StatisticsScopedPointer<double> dY(statisticsDuplicateArray(dataY, N));
-
-        statisticsSort2(dX.data(), dY.data(), N);
-
-        double mi=0, ma=0;
-
-        statisticsMinMax(dY.data(), N, mi, ma);
-
-        double p=statisticsXatY50Sorted(dX.data(), dY.data(), N);
-
-        double rate=(ma-mi)/(dX[N-1]-dX[0]);
-        rate=rate/log(10)*4.0/(ma-mi);
-        if (dY[N-1]-dY[0]<0) {
-            rate=rate*(-1.0);
-        }
-
-        params[PARAM_BASE]=mi;
-        params[PARAM_MAX]=ma;
-        params[PARAM_POSITION]=p;
-        params[PARAM_RATE]=rate;
-
-
-
-    }
-
-    return true;
-
-}

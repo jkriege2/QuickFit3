@@ -79,35 +79,3 @@ bool QFFitFunctionGeneralGaussianDistVar::get_implementsDerivatives() const
     return false;
 }
 
-bool QFFitFunctionGeneralGaussianDistVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
-{
-    //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
-
-    if (params && dataX && dataY) {
-
-        StatisticsScopedPointer<double> dX(statisticsDuplicateArray(dataX, N));
-        StatisticsScopedPointer<double> dY(statisticsDuplicateArray(dataY, N));
-
-        statisticsSort2(dX.data(), dY.data(), N);
-
-        double mi=0, ma=0;
-
-        statisticsMinMax(dY.data(), N, mi, ma);
-
-        double p=statisticsXatY50Sorted(dX.data(), dY.data(), N);
-        double range=(dX[N-1]-dX[0])/5.0;
-        if (dY[N-1]-dY[0]<0) {
-            range=range*-1.0;
-        }
-
-        params[PARAM_OFFSET]=mi;
-        params[PARAM_AMPLITUDE]=ma-mi;
-        params[PARAM_POSITION]=p;
-        params[PARAM_WIDTH]=range/5.0;
-
-
-    }
-
-
-    return true;
-}

@@ -25,19 +25,19 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QVector>
 #include <QPair>
 #include <stdint.h>
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief QFFitFunction class for FCS fit with an assumed gaussian distribution of diffusion times
     \ingroup qf3fitfunp_fitfunctions_fcsdistribution
 
 */
-class QFFitFunctionFCSDistributionGaussian: public QFFitFunction {
+class QFFitFunctionFCSDistributionGaussian: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSDistributionGaussian();
         virtual ~QFFitFunctionFCSDistributionGaussian() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS SD: Normal Diffuion 3D with gaussian diffusion time distribution"); }
+        virtual QString name() const { return QString("FCS Dist: Normal Diffuion 3D with gaussian diffusion time distribution"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */

@@ -981,7 +981,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
                         }
                         runincrement=(columns-1)/2;
                     } else if (mode==2) { // tau, corr, corr, ... -> select only one column
-                        if (column<data[ii].tab->get_column_count()) correlation[(run0)*correlationN+l]=data[ii].tab->get(column, l);
+                        if (column<(long long)data[ii].tab->get_column_count()) correlation[(run0)*correlationN+l]=data[ii].tab->get(column, l);
                         runincrement=1;
                     }
                 }

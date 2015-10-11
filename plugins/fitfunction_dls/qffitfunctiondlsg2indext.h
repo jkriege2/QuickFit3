@@ -22,13 +22,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFitFunctionDLSG2inDINDEXT_H
 #define QFFitFunctionDLSG2inDINDEXT_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief QFFitFunction class for a multi exponential field autocorrelation function in DLS
     \ingroup qf3fitfunp_fitfunctions_dls
 */
-class QFFitFunctionDLSG2inDExt: public QFFitFunction {
+class QFFitFunctionDLSG2inDExt: public QFDLSFitFunctionBase {
     public:
         QFFitFunctionDLSG2inDExt();
         virtual ~QFFitFunctionDLSG2inDExt() {}

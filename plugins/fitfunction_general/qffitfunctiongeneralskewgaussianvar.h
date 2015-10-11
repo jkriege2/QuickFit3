@@ -24,7 +24,7 @@
 #ifndef QFFitFunctionGeneralSkewGaussianVar_H
 #define QFFitFunctionGeneralSkewGaussianVar_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +32,7 @@
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralSkewGaussianVar: public QFFitFunction {
+class QFFitFunctionGeneralSkewGaussianVar: public QFDistributionFitFunctionBase {
     public:
         QFFitFunctionGeneralSkewGaussianVar();
         virtual ~QFFitFunctionGeneralSkewGaussianVar() {}

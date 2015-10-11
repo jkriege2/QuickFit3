@@ -22,14 +22,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorCCF_H
 #define QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorCCF_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
 /*! \brief QFFitFunction class for a TIRF-FCCS fit model with pure diffusion for 2-color crosscorrelation and 1/e^2 lateral width
     \ingroup qf3fitfunp_fitfunctions_TIRFfcs
 */
-class QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorCCF: public QFFitFunction {
+class QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorCCF: public QFFCSLargeFocusFitFunctionBase {
     public:
         QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorCCF();
         virtual ~QFFitFunctionsTIRFFCCSFW2CSep2DDiffXY2ColorCCF() {}

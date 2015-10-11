@@ -24,7 +24,7 @@
 #ifndef QFFitFunctionGeneralGaussianDistVar_H
 #define QFFitFunctionGeneralGaussianDistVar_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +32,7 @@
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralGaussianDistVar: public QFFitFunction {
+class QFFitFunctionGeneralGaussianDistVar: public QFCDFFitFunctionBase {
     public:
         QFFitFunctionGeneralGaussianDistVar();
         virtual ~QFFitFunctionGeneralGaussianDistVar() {}
@@ -61,9 +61,6 @@ class QFFitFunctionGeneralGaussianDistVar: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() const;
-
-        /*! \copydoc QFFitFunction::evaluateDerivatives()   */
-        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionGeneralGaussianDistVar_H

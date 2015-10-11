@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFITFUNCTIONFCSROT_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -73,7 +73,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     .
 
 */
-class QFFitFunctionFCSRot: public QFFitFunction {
+class QFFitFunctionFCSRot: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSRot();
         virtual ~QFFitFunctionFCSRot() {}

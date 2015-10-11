@@ -62,6 +62,10 @@ Copyright (c) 2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), Germ
 #include "statistics_tools.h"
 #include "qfweightingtools.h"
 #include "qffitfunctionplottools.h"
+#include <QMap>
+#include <QString>
+#include <QAction>
+#include <QMenu>
 
 /*! \brief editor class for  least-square fits
     \ingroup qf3evalp_curvefit
@@ -102,6 +106,8 @@ class QFCurveFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         /** \brief write the settings */
         virtual void writeSettings();
 
+        //void dataplotContextMenuOpened(double x, double y, QMenu* contextMenu);
+
 
     protected:
         virtual void fillRunCombo(QFFitResultsByIndexEvaluation *eval, QFRawDataRecord *rdr);
@@ -111,10 +117,14 @@ class QFCurveFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         virtual bool getPlotXLog() const;
         virtual bool getPlotYLog() const;
 
+
+
         /** \brief combobox to select a model for the weighting */
         QFCurveWeightingCombobox* cmbWeights;
         QSpinBox* spinRepeats;
         QFFitAlgorithmErrorEstimateModeWidget* widFitErrorEstimate;
+        //QMenu* menuEstimate;
+        //QMap<QAction*,QString> actsEstimate;
 
 
         /** \brief create a report in a given QTextDocument object
@@ -123,9 +133,14 @@ class QFCurveFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
          */
         virtual void createReportDoc(QTextDocument* document);
 
+        //void updateParameterValues(QFRawDataRecord *rec);
+        //void displayModel(bool newWidget);
     protected slots:
         /** \brief activated when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
+
+        /*void estimateActionClicked();
+        void clearEstimateActions();*/
 
 
         /** \brief replot curves */
@@ -137,7 +152,7 @@ class QFCurveFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
             This function only adds the fit function plot objects and does NOT cause a replot of the graphs. It is called by
             replotData().
         */
-        virtual void updateFitFunctions();
+        virtual void updateFitFunctionsPlot();
 
         /** \brief called when the weights changes */
         void weightsChanged(int weight);

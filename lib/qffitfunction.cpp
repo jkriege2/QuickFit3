@@ -73,6 +73,18 @@ bool QFFitFunction::estimateInitial(double */*params*/, const double */*dataX*/,
     return false;
 }
 
+bool QFFitFunction::estimateParameterFromXY(double &/*newparam*/, int /*param*/, double /*x*/, double /*y*/, const double */*params*/) const
+{
+    return false;
+}
+
+bool QFFitFunction::isParameterXYEstimateable(int param) const
+{
+    double dummy=0;
+    return estimateParameterFromXY(dummy, param, NAN, NAN, NULL);
+}
+
+
 void QFFitFunction::evaluateNumericalDerivatives(double *derivatives, double x, const double *parameters, double stepsize) const
 {
     if (!parameters || !derivatives || stepsize==0) return;

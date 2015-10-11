@@ -24,7 +24,7 @@
 #ifndef QFFITFUNCTIONLIGHTSHEETSLIT_H
 #define QFFITFUNCTIONLIGHTSHEETSLIT_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +32,7 @@
     \ingroup qf3fitfunp_fitfunctions_lightsheet
 
 */
-class QFFitFunctionLightsheetSlit: public QFFitFunction {
+class QFFitFunctionLightsheetSlit: public QFDistributionFitFunctionBase {
     public:
         QFFitFunctionLightsheetSlit();
         virtual ~QFFitFunctionLightsheetSlit() {}

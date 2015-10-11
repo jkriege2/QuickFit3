@@ -27,7 +27,9 @@
 #include <cmath>
 
 
-QFFitFunctionGeneral2LogNormal::QFFitFunctionGeneral2LogNormal() {
+QFFitFunctionGeneral2LogNormal::QFFitFunctionGeneral2LogNormal():
+    QFDistributionFitFunctionBase(1.0/2.3548, true)
+{
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "offset",                  "offset",                                                "Y<sub>0</sub>",                          "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -1e10,    1e10,  1  );
     #define PARAM_OFFSET 0

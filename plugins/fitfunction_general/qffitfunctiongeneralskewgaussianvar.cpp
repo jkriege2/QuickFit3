@@ -83,31 +83,12 @@ bool QFFitFunctionGeneralSkewGaussianVar::get_implementsDerivatives() const
     return false;
 }
 
-bool QFFitFunctionGeneralSkewGaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
+bool QFFitFunctionGeneralSkewGaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix) const
 {
-    //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
-    if (params && dataX && dataY) {
-        double pW=0;
-        double pB=0;
-        double pH=0;
-        double pP=statisticsPeakFind(pW, dataX, dataY, N, 0.0, double(NAN), &pB, &pH);
-        if (statisticsFloatIsOK(pP)) {
-            double dx=0;
-            statisticsMinDistance(dataX, N, &dx);
-            if (dx>0) {
-                pW=qMax(pW,6.0*dx);
-            }
-            params[PARAM_OFFSET]=pB;
-            params[PARAM_AMPLITUDE]=pH;
-            params[PARAM_POSITION]=pP;
-            params[PARAM_WIDTH]=pW/2.3548;
-            params[PARAM_SKEW]=0;
-            return true;
-        } else {
-            return false;
-        }
-        return true;
+    bool ok=QFDistributionFitFunctionBase::estimateInitial(params, dataX, dataY, N, fix);
+    if (ok && params && dataX && dataY) {
+        params[PARAM_SKEW]=0;
     }
 
-    return true;
+    return ok;
 }

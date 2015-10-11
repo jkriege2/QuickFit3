@@ -130,9 +130,3 @@ bool QFFitFunctionGeneralSegmentedPowerLaw::get_implementsDerivatives() const
 }
 
 
-bool QFFitFunctionGeneralSegmentedPowerLaw::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
-{
-    //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
-
-    return QFFitFunction::estimateInitial(params, dataX, dataY, N);
-}

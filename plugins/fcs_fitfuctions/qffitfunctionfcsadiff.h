@@ -23,6 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFITFUNCTIONFCSADIFF_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -64,7 +65,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 */
-class QFFitFunctionFCSADiff: public QFFitFunction {
+class QFFitFunctionFCSADiff: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSADiff();
         virtual ~QFFitFunctionFCSADiff() {}

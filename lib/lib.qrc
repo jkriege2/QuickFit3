@@ -287,6 +287,10 @@
         <file alias="fit_fitcurrent.png">icons/fit_fitcurrent.png</file>
 
         <file alias="fit_guesscurrent.png">icons/fit_guesscurrent.png</file>
+        <file alias="fit_guessall.png">icons/fit_guessall.png</file>
+        <file alias="fit_guessallfiles.png">icons/fit_guessallfiles.png</file>
+        <file alias="fit_guessallruns.png">icons/fit_guessallruns.png</file>
+
         <file alias="image_importer_icon.png">icons/image_importer_icon.png</file>
         <file alias="image_importer_icon_large.png">icons/image_importer_icon_large.png</file>
         <file alias="image_exporter_icon.png">icons/image_exporter_icon.png</file>

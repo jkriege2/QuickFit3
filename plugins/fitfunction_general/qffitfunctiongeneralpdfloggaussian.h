@@ -24,7 +24,7 @@
 #ifndef QFFitFunctionGeneralPDFLogGaussian_H
 #define QFFitFunctionGeneralPDFLogGaussian_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +32,7 @@
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralPDFLogGaussian: public QFFitFunction {
+class QFFitFunctionGeneralPDFLogGaussian: public QFDistributionFitFunctionBase {
     public:
         QFFitFunctionGeneralPDFLogGaussian();
         virtual ~QFFitFunctionGeneralPDFLogGaussian() {}
@@ -59,7 +59,6 @@ class QFFitFunctionGeneralPDFLogGaussian: public QFFitFunction {
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params) const;
 
-        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionGeneralPDFLogGaussian_H

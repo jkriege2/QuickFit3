@@ -67,6 +67,8 @@ QFImFCSFitEvaluationEditor::QFImFCSFitEvaluationEditor(QFPluginServices *service
 
     populateFitButtons();
 
+    setGuessingEnabled(true, true);
+
 }
 
 QFImFCSFitEvaluationEditor::~QFImFCSFitEvaluationEditor()
@@ -656,7 +658,7 @@ void QFImFCSFitEvaluationEditor::replotData() {
         //qDebug()<<"   d "<<t.elapsed()<<" ms";
         t.start();
 
-        updateFitFunctions();
+        updateFitFunctionsPlot();
         //qDebug()<<"   e "<<t.elapsed()<<" ms";
         t.start();
 
@@ -702,7 +704,7 @@ void QFImFCSFitEvaluationEditor::replotData() {
 
 
 
-void QFImFCSFitEvaluationEditor::updateFitFunctions() {
+void QFImFCSFitEvaluationEditor::updateFitFunctionsPlot() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();

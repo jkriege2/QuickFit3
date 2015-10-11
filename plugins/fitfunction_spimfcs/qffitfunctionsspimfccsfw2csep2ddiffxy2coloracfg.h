@@ -22,14 +22,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG_H
 #define QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
 /*! \brief QFFitFunction class for a SPIM-FCCS fit model with pure diffusion for 2-color crosscorrelation and 1/e^2 lateral width
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 */
-class QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG: public QFFitFunction {
+class QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG: public QFFCSLargeFocusFitFunctionBase {
     public:
         QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG();
         virtual ~QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG() {}

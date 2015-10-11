@@ -70,7 +70,11 @@ QFEvaluationEditor* QFCurveFitEvaluation::createEditor(QFPluginServices* service
 };
 
 bool QFCurveFitEvaluation::isApplicable(const QFRawDataRecord *record) const {
-    return record->inherits("QFRDRCurvesInterface");
+    if (record->inherits("QFRDRCurvesInterface")) {
+        const QFRDRCurvesInterface* c=dynamic_cast<const QFRDRCurvesInterface*>(record);
+        if (c) return c->curvesGetCount()>0;
+    }
+    return false;
 }
 
 //bool QFCurveFitEvaluation::hasSpecial(const QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const {

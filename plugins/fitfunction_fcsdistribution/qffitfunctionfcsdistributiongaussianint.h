@@ -27,13 +27,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <stdint.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_errno.h>
-
+#include "qfgeneralfitfunctionbase.h"
 
 /*! \brief QFFitFunction class for FCS fit with an assumed gaussian distribution of diffusion times
     \ingroup qf3fitfunp_fitfunctions_fcsdistribution
 
 */
-class QFFitFunctionFCSDistributionIntGaussian: public QFFitFunction {
+class QFFitFunctionFCSDistributionIntGaussian: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSDistributionIntGaussian();
         virtual ~QFFitFunctionFCSDistributionIntGaussian();

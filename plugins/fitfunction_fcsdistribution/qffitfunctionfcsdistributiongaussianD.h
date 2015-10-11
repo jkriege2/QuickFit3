@@ -25,14 +25,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QVector>
 #include <QPair>
 #include <stdint.h>
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief QFFitFunction class for FCS fit with an assumed gaussian distribution of diffusion coefficients
     \ingroup qf3fitfunp_fitfunctions_fcsdistribution
 
 */
-class QFFitFunctionFCSDistributionGaussianD: public QFFitFunction {
+class QFFitFunctionFCSDistributionGaussianD: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSDistributionGaussianD();
         virtual ~QFFitFunctionFCSDistributionGaussianD() {}

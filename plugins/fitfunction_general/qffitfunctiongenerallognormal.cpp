@@ -27,7 +27,9 @@
 #include <cmath>
 
 
-QFFitFunctionGeneralLogNormal::QFFitFunctionGeneralLogNormal() {
+QFFitFunctionGeneralLogNormal::QFFitFunctionGeneralLogNormal():
+    QFDistributionFitFunctionBase(1.0/2.3548, true)
+{
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "offset",                  "offset",                                                "Y<sub>0</sub>",                          "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -1e10,    1e10,  1  );
     #define PARAM_OFFSET 0
@@ -78,32 +80,3 @@ bool QFFitFunctionGeneralLogNormal::get_implementsDerivatives() const
     return false;
 }
 
-
-bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
-{
-    //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
-    if (params && dataX && dataY) {
-        StatisticsScopedPointer<double> dX(statisticsDuplicateAndApply(dataX, N, log));
-        double pW=0;
-        double pB=0;
-        double pH=0;
-        double pP=statisticsPeakFind(pW, dX.data(), dataY, N, 0.0, (double)NAN, &pB, &pH);
-        if (statisticsFloatIsOK(pP)) {
-            double dx=0;
-            statisticsMinDistance(dataX, N, &dx);
-            if (dx>0) {
-                pW=qMax(pW,6.0*dx);
-            }
-            params[PARAM_OFFSET]=pB;
-            params[PARAM_AMPLITUDE]=pH;
-            params[PARAM_POSITION]=pP;
-            params[PARAM_WIDTH]=pW/2.3548;
-            return true;
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    return true;
-}

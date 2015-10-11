@@ -164,6 +164,44 @@ class QFLIB_EXPORT QFFitFunction: public QFFitFunctionBase {
             params.resize(m_parameters.size());
             return estimateInitial(params.data(), dataX.constData(), dataY.constData(), qMin(dataX.size(), dataY.size()), NULL);
         }
+        /** \brief returns \c true, if initial-parameter guessing is implemented (from a given dataset!).
+         *
+         * This function internally calls <code>estimateInitial(NULL, NULL, NULL, 0, NULL);</code>
+         */
+        inline bool isEstimateInitialAvailable() const {
+            return estimateInitial(NULL, NULL, NULL, 0, NULL);
+        }
+
+        /*! \brief if implemented (and returns \c true) this function tries to estimate a value for the given parameter from a point \f$(x,y)\f$ in the same coordinate system as the function \f$y=f(x)\f$
+         *
+         *  \param[out] newparam value of the new parameter
+         *  \param[in] param estimate the param-th parameter
+         *  \param[in] x x-value to base \a newparam on
+         *  \param[in] y y-value to base \a newparam on
+         *  \param[in] params a parameter vector, containing the current parameters
+         *
+         *  \note The parameter \a params is strictly OPTIONAL, so don't rely on getting a non-\c NULL pointer! However, if provided the size of the array has to be at least paramCount().
+         *
+         *  \note This function should ALWAYS return \c true, of the parameter can <u>in principle</u> be estimated and x and y are \a NAN, as this constellation is used to test for estimateable parameters!
+         */
+        virtual bool estimateParameterFromXY(double& newparam, int param, double x, double y, const double* params=NULL) const;
+        inline virtual bool estimateParameterFromXY(double& newparam, const QString& param, double x, double y, const double* params=NULL) const {
+            return estimateParameterFromXY(newparam, getParameterNum(param), x, y, params);
+        }
+        inline virtual bool estimateParameterFromXY(double& newparam, int param, double x, double y,const QVector<double>& params= QVector<double>()) const {
+            return estimateParameterFromXY(newparam, param, x, y, params.constData());
+        }
+        inline virtual bool estimateParameterFromXY(double& newparam, const QString& param, double x, double y, const QVector<double>& params= QVector<double>()) const {
+            return estimateParameterFromXY(newparam, getParameterNum(param), x, y, params.constData());
+        }
+
+        /** \brief returns \c true, if the given parameter can be estimated using estimateParameterFromXY(). */
+        bool isParameterXYEstimateable(int param) const;
+        /** \brief returns \c true, if the given parameter can be estimated using estimateParameterFromXY(). */
+        inline bool isParameterXYEstimateable(const QString& param) const {
+            return isParameterXYEstimateable(getParameterNum(param));
+        }
+
 
         /*! \brief numerically estimates the fitting function derivatives  \f$ J_n=\frac{\partial f}{\partial p_n}(x, \vec{p}) \f$ at the position
                    \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$

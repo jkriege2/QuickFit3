@@ -101,6 +101,7 @@ void QFCurveFitEvaluationEditor::createWidgets() {
     splitPlot->setStretchFactor(2,4);
     splitModel->setStretchFactor(0,1);
     splitModel->setStretchFactor(1,0);
+
 }
 
 
@@ -147,6 +148,7 @@ void QFCurveFitEvaluationEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/weights").arg(current->getType()).arg(current->getID()), cmbWeights->currentIndex());
 
 }
+
 
 void QFCurveFitEvaluationEditor::fillRunCombo(QFFitResultsByIndexEvaluation *cur, QFRawDataRecord *rdr)
 {
@@ -205,7 +207,8 @@ void QFCurveFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerReco
 
 
 
-void QFCurveFitEvaluationEditor::updateFitFunctions() {
+
+void QFCurveFitEvaluationEditor::updateFitFunctionsPlot() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -836,7 +839,7 @@ void QFCurveFitEvaluationEditor::replotData() {
         //qDebug()<<"   d "<<t.elapsed()<<" ms";
         t.start();
 
-        updateFitFunctions();
+        updateFitFunctionsPlot();
         //qDebug()<<"   e "<<t.elapsed()<<" ms";
         t.start();
 
@@ -882,8 +885,138 @@ void QFCurveFitEvaluationEditor::replotData() {
 
 
 
+//void QFCurveFitEvaluationEditor::displayModel(bool newWidget) {
+//    QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(newWidget);
+//    if (!current) return;
+//    if (!cmbModel) return;
+//    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+//    QFRawDataRecord* rdr=eval->getHighlightedRecord();
+//    QFFitFunction* ffunc=eval->getFitFunction(rdr);
 
 
+//    if (!ffunc) {
+//        /////////////////////////////////////////////////////////////////////////////////////////////
+//        // delete all fit parameter actions
+//        /////////////////////////////////////////////////////////////////////////////////////////////
+//        clearEstimateActions();
+//        return;
+//    }
+
+
+//    if (newWidget) {
+//        /////////////////////////////////////////////////////////////////////////////////////////////
+//        // first delete all fit parameter actions
+//        /////////////////////////////////////////////////////////////////////////////////////////////
+//        clearEstimateActions();
+
+//        /////////////////////////////////////////////////////////////////////////////////////////////
+//        // create new parameter actions
+//        /////////////////////////////////////////////////////////////////////////////////////////////
+
+//        for (int i=0; i<ffunc->paramCount(); i++) {
+//            QString id=ffunc->getParameterID(i);
+
+//            QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+//            if (ffunc->isParameterXYEstimateable(i)
+//                    && (d.widgetType==QFFitFunction::LogFloatNumber || d.widgetType==QFFitFunction::FloatNumber)
+//                    && d.fit) {
+//                QAction* act=new QAction(tr("estimate '%1'").arg(d.name), this);
+//                connect(act, SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
+//                actsEstimate.insert(act, id);
+//                menuEstimate->addAction(act);
+//            }
+
+//        }
+
+//    }
+
+//}
+
+//void QFCurveFitEvaluationEditor::updateParameterValues(QFRawDataRecord* rec)
+//{
+//    QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues(rec);
+//    if (!current) return;
+//    if (!cmbModel) return;
+
+
+//    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+//    QFFitFunction* ffunc=eval->getFitFunction(rec);
+
+//    if (!ffunc) return;
+
+//    QVector<double> fullParams=eval->allocVecFillParameters(ffunc);
+//    QVector<double> errors=eval->allocVecFillParameterErrors(ffunc);
+//    ffunc->calcParameter(fullParams, errors);
+
+
+//    QMapIterator<QAction*,QString> it(actsEstimate);
+//    while (it.hasNext()) {
+//        it.next();
+//        it.key()->setVisible(ffunc->isParameterVisible(it.value(), fullParams));
+//    }
+
+//}
+
+//void QFCurveFitEvaluationEditor::dataplotContextMenuOpened(double x, double y, QMenu */*contextMenu*/)
+//{
+//    if (!current) return;
+//    if (!cmbModel) return;
+
+
+//    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+//    if (!eval) return;
+//    QFFitFunction* ffunc=eval->getFitFunction(current->getHighlightedRecord());
+
+//    if (!ffunc) return;
+
+//    QVector<double> fullParams=eval->allocVecFillParameters(ffunc);
+//    QVector<double> errors=eval->allocVecFillParameterErrors(ffunc);
+//    ffunc->calcParameter(fullParams, errors);
+
+
+//    QMapIterator<QAction*,QString> it(actsEstimate);
+//    while (it.hasNext()) {
+//        it.next();
+//        if (it.key()->isVisible()) {
+//            QString id=it.value();
+//            double np=eval->getFitValue(eval->getHighlightedRecord(), eval->getCurrentIndex(), id);
+//            if (ffunc->estimateParameterFromXY(np, id, x, y, fullParams)) {
+//                QFFitFunction::ParameterDescription d=ffunc->getDescription(id);
+//                it.key()->setText(tr("estimate '%1' = %2 %3").arg(d.name).arg(np).arg(d.unit));
+//            }
+//        }
+
+//    }
+//}
+
+//void QFCurveFitEvaluationEditor::estimateActionClicked()
+//{
+//    if (!current) return;
+//    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+//    if (!eval) return;
+//    QFFitFunction* ffunc=eval->getFitFunction(current->getHighlightedRecord());
+//    if (!ffunc || !eval) return;
+//    if (!eval->getHighlightedRecord()) return;
+
+//    QAction* act=qobject_cast<QAction*>(sender());
+//    if (act && actsEstimate.contains(act)) {
+//        QString id=actsEstimate[act];
+//        double np=eval->getFitValue(eval->getHighlightedRecord(), eval->getCurrentIndex(), id);
+//        if (ffunc->estimateParameterFromXY(np, id, pltData->get_mouseContextX(), pltData->get_mouseContextY(), eval->allocVecFillParameters(ffunc))) {
+//            eval->setFitValue(eval->getHighlightedRecord(), eval->getCurrentIndex(), id, np);
+//        }
+//    }
+//}
+
+//void QFCurveFitEvaluationEditor::clearEstimateActions()
+//{
+//    for(int i=0; i<menuEstimate->actions().size(); i++) {
+//        disconnect(menuEstimate->actions().at(i), SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
+//    }
+//    menuEstimate->clear();
+//    actsEstimate.clear();
+
+//}
 
 
 
@@ -1146,3 +1279,5 @@ void QFCurveFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     cursor.insertFragment(QTextDocumentFragment::fromHtml(htmlBot));
 
 }
+
+

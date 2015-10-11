@@ -33,11 +33,11 @@ QFFitFunctionGeneralMultiGaussianVar::QFFitFunctionGeneralMultiGaussianVar() {
     addParameter(FloatNumber,  "offset",                  "offset",                                                "Y<sub>0</sub>",                     "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -1e10,    1e10,  1  );
     #define PARAM_OFFSET 1
 
-    addParameter(FloatNumber,  "amplitude1",               "amplitude 1",                                             "A<sub>1</sub>",                                 "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.5,       -1e10,    1e10,  1  );
+    addParameter(FloatNumber,  "amplitude",               "amplitude 1",                                             "A<sub>1</sub>",                                 "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.5,       -1e10,    1e10,  1  );
     #define PARAM_AMPLITUDE1 2
-    addParameter(FloatNumber,  "position1",                "position 1",                                              "X<sub>1</sub>",                     "",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 0,            -1e10,    1e10,  1  );
+    addParameter(FloatNumber,  "position",                "position 1",                                              "X<sub>1</sub>",                     "",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 0,            -1e10,    1e10,  1  );
     #define PARAM_POSITION1 3
-    addParameter(FloatNumber,  "width1",                   "1/sqrt(e) width 1",                                        "&sigma;<sub>1</sub>",                          "",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 1,            1e-10,    1e10,  1, 0  );
+    addParameter(FloatNumber,  "width",                   "1/sqrt(e) width 1",                                        "&sigma;<sub>1</sub>",                          "",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 1,            1e-10,    1e10,  1, 0  );
     #define PARAM_WIDTH1 4
 
     addParameter(FloatNumber,  "amplitude2",               "amplitude 2",                                             "A<sub>2</sub>",                                 "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.5,       -1e10,    1e10,  1  );
@@ -177,40 +177,3 @@ bool QFFitFunctionGeneralMultiGaussianVar::get_implementsDerivatives() const
     return false;
 }
 
-bool QFFitFunctionGeneralMultiGaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* /*fix*/) const
-{
-    //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
-    if (params && dataX && dataY) {
-        params[PARAM_COMPONENTS]=2;
-        double pW=0;
-        double pB=0;
-        double pH=0;
-        double pP=0;
-        double pW2=0;
-        double pH2=0;
-        double pP2=0;
-        if (statistics2PeakFind(pP, pW, pP2, pW2, dataX, dataY, N, 0.0, (double)NAN, &pB, &pH, &pH2)) {
-            double dx=0;
-            statisticsMinDistance(dataX, N, &dx);
-            if (dx>0) {
-                pW=qMax(pW,6.0*dx);
-                pW2=qMax(pW2,6.0*dx);
-            }
-            params[PARAM_OFFSET]=pB;
-            params[PARAM_AMPLITUDE1]=pH;
-            params[PARAM_POSITION1]=pP;
-            params[PARAM_WIDTH1]=pW/2.3548;
-            if (statisticsFloatIsOK(pP2)) {
-                params[PARAM_AMPLITUDE2]=pH2;
-                params[PARAM_POSITION2]=pP2;
-                params[PARAM_WIDTH2]=pW2/2.3548;
-            }
-            return true;
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    return false;
-}
