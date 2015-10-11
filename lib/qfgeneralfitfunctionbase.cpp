@@ -405,7 +405,7 @@ void QFDistributionFitFunctionBase::getParameterIDs() const
     QFFITFUNCTRIONBASE_GETPARAMID(id_width4, "width4");
     QFFITFUNCTRIONBASE_GETPARAMID(id_width5, "width5");
     QFFITFUNCTRIONBASE_GETPARAMID(id_width6, "width6");
-    qDebug()<<"QFDistributionFitFunctionBase id_offset="<<id_offset<<" id_components="<<id_components<<" id_amplitude="<<id_amplitude<<id_amplitude2<<id_amplitude3<<4<<id_amplitude5<<id_amplitude6<<" id_position="<<id_position<<id_position2<<id_position3<<id_position4<<id_position5<<id_position6<<" id_width="<<id_width<<id_width2<<id_width3<<id_width4<<id_width5<<id_width6;
+    //qDebug()<<"QFDistributionFitFunctionBase id_offset="<<id_offset<<" id_components="<<id_components<<" id_amplitude="<<id_amplitude<<id_amplitude2<<id_amplitude3<<4<<id_amplitude5<<id_amplitude6<<" id_position="<<id_position<<id_position2<<id_position3<<id_position4<<id_position5<<id_position6<<" id_width="<<id_width<<id_width2<<id_width3<<id_width4<<id_width5<<id_width6;
 
     ids_found=true;
 }
