@@ -674,8 +674,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
     menuEstimate=new QMenu(tr("Estimate Parameters ..."), this);
     menuEstimate->setIcon(QIcon(":/lib/fit_guesscurrent.png"));
+    menuEstimateDblClk=new QMenu(tr("Estimate Parameters ..."), this);
+    menuEstimateDblClk->setIcon(QIcon(":/lib/fit_guesscurrent.png"));
     pltData->addAction(menuEstimate->menuAction());
     connect(pltData, SIGNAL(contextMenuOpened(double,double,QMenu*)), this, SLOT(dataplotContextMenuOpened(double,double,QMenu*)));
+    pltData->set_leftDoubleClickAction(QFPlotter::LeftDoubleClickSpecialContextMenu);
+    pltData->set_menuSpecialContextMenu(menuEstimateDblClk);
 
 }
 
@@ -969,9 +973,15 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::clearEstimateActions()
 {
     if (menuEstimate) {
         for(int i=0; i<menuEstimate->actions().size(); i++) {
-            disconnect(menuEstimate->actions().at(i), SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
+            if (!menuEstimate->actions().at(i)->isSeparator()) disconnect(menuEstimate->actions().at(i), SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
         }
         menuEstimate->clear();
+    }
+    if (menuEstimateDblClk) {
+        for(int i=0; i<menuEstimateDblClk->actions().size(); i++) {
+            if (!menuEstimateDblClk->actions().at(i)->isSeparator()) disconnect(menuEstimateDblClk->actions().at(i), SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
+        }
+        menuEstimateDblClk->clear();
     }
     actsEstimate.clear();
 }
@@ -1215,6 +1225,9 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         /////////////////////////////////////////////////////////////////////////////////////////////
         // create new parameter actions
         /////////////////////////////////////////////////////////////////////////////////////////////
+        QAction* act=menuEstimateDblClk->addSection( tr("Estimate ..."));
+        if (act) act->setIcon(QIcon(":/lib/fit_guesscurrent.png"));
+        //menuEstimateDblClk->addSeparator();
 
         for (int i=0; i<ffunc->paramCount(); i++) {
             QString id=ffunc->getParameterID(i);
@@ -1223,10 +1236,11 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
             if (ffunc->isParameterXYEstimateable(i)
                     && (d.widgetType==QFFitFunction::LogFloatNumber || d.widgetType==QFFitFunction::FloatNumber)
                     && (d.fit || d.userEditable)) {
-                QAction* act=new QAction(tr("estimate '%1'").arg(d.name), this);
+                QAction* act=new QAction(tr("... parameter '%1'").arg(d.name), this);
                 connect(act, SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
                 actsEstimate.insert(act, id);
                 menuEstimate->addAction(act);
+                menuEstimateDblClk->addAction(act);
             }
         }
         bool enGuess=ffunc->isEstimateInitialAvailable();

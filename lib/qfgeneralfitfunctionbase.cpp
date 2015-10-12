@@ -236,7 +236,9 @@ QFDistributionFitFunctionBase::QFDistributionFitFunctionBase(double width_factor
 bool QFDistributionFitFunctionBase::estimateInitial(double *params, const double *dX, const double *dY, long N, const bool *fix) const
 {
     getParameterIDs();
-    if (id_amplitude>=0 && id_position>=0 && id_width>=0 && id_amplitude2>=0 && id_position2>=0 && id_width2>=0 && id_amplitude3>=0 && id_position3>=0 && id_width3>=0) {
+    int c=-1;
+    if (id_components>=0 && params) c=params[id_components];
+    if ((c<0 || c>=3) && id_amplitude>=0 && id_position>=0 && id_width>=0 && id_amplitude2>=0 && id_position2>=0 && id_width2>=0 && id_amplitude3>=0 && id_position3>=0 && id_width3>=0) {
         if (params && dX && dY && N>0) {
             StatisticsScopedPointer<double> dataX, dataY;
             if (logX) dataX=statisticsDuplicateAndApply(dX, N, log);
@@ -284,7 +286,7 @@ bool QFDistributionFitFunctionBase::estimateInitial(double *params, const double
             }
         }
         return true;
-    } else if (id_amplitude>=0 && id_position>=0 && id_width>=0 && id_amplitude2>=0 && id_position2>=0 && id_width2>=0) {
+    } else if ((c<0 || c>=2) && id_amplitude>=0 && id_position>=0 && id_width>=0 && id_amplitude2>=0 && id_position2>=0 && id_width2>=0) {
         if (params && dX && dY && N>0) {
             StatisticsScopedPointer<double> dataX, dataY;
             if (logX) dataX=statisticsDuplicateAndApply(dX, N, log);

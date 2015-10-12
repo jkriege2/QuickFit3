@@ -107,6 +107,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
         void clearEstimateActions();
         QMenu* menuEstimate;
+        QMenu* menuEstimateDblClk;
         QMap<QAction*,QString> actsEstimate;
 
         QString m_runName;
