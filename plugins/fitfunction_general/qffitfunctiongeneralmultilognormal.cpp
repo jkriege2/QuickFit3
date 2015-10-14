@@ -90,12 +90,12 @@ double QFFitFunctionGeneralMultiLogNormal::evaluate(double t, const double* data
     const int comps=data[PARAM_COMPONENTS];
     const double offset=data[PARAM_OFFSET];
     double res= offset;
-    if (comps>0) res=res+data[PARAM_AMPLITUDE1]*exp(-0.5*qfSqr(log(t)-data[PARAM_POSITION1])/qfSqr(data[PARAM_WIDTH1]));
-    if (comps>1) res=res+data[PARAM_AMPLITUDE2]*exp(-0.5*qfSqr(log(t)-data[PARAM_POSITION2])/qfSqr(data[PARAM_WIDTH2]));
-    if (comps>2) res=res+data[PARAM_AMPLITUDE3]*exp(-0.5*qfSqr(log(t)-data[PARAM_POSITION3])/qfSqr(data[PARAM_WIDTH3]));
-    if (comps>3) res=res+data[PARAM_AMPLITUDE4]*exp(-0.5*qfSqr(log(t)-data[PARAM_POSITION4])/qfSqr(data[PARAM_WIDTH4]));
-    if (comps>4) res=res+data[PARAM_AMPLITUDE5]*exp(-0.5*qfSqr(log(t)-data[PARAM_POSITION5])/qfSqr(data[PARAM_WIDTH5]));
-    if (comps>5) res=res+data[PARAM_AMPLITUDE6]*exp(-0.5*qfSqr(log(t)-data[PARAM_POSITION6])/qfSqr(data[PARAM_WIDTH6]));
+    if (comps>0) res=res+data[PARAM_AMPLITUDE1]*exp(-0.5*qfSqr(log10(t)-log10(data[PARAM_POSITION1]))/qfSqr(data[PARAM_WIDTH1]));
+    if (comps>1) res=res+data[PARAM_AMPLITUDE2]*exp(-0.5*qfSqr(log10(t)-log10(data[PARAM_POSITION2]))/qfSqr(data[PARAM_WIDTH2]));
+    if (comps>2) res=res+data[PARAM_AMPLITUDE3]*exp(-0.5*qfSqr(log10(t)-log10(data[PARAM_POSITION3]))/qfSqr(data[PARAM_WIDTH3]));
+    if (comps>3) res=res+data[PARAM_AMPLITUDE4]*exp(-0.5*qfSqr(log10(t)-log10(data[PARAM_POSITION4]))/qfSqr(data[PARAM_WIDTH4]));
+    if (comps>4) res=res+data[PARAM_AMPLITUDE5]*exp(-0.5*qfSqr(log10(t)-log10(data[PARAM_POSITION5]))/qfSqr(data[PARAM_WIDTH5]));
+    if (comps>5) res=res+data[PARAM_AMPLITUDE6]*exp(-0.5*qfSqr(log10(t)-log10(data[PARAM_POSITION6]))/qfSqr(data[PARAM_WIDTH6]));
     return res;
 }
 

@@ -80,12 +80,12 @@ QVariant NIChannelsModel::headerData(int section, Qt::Orientation orientation, i
     return QVariant();
 }
 
-int NIChannelsModel::rowCount(const QModelIndex &parent) const
+int NIChannelsModel::rowCount(const QModelIndex &/*parent*/) const
 {
     return channels.size();
 }
 
-int NIChannelsModel::columnCount(const QModelIndex &parent) const
+int NIChannelsModel::columnCount(const QModelIndex &/*parent*/) const
 {
     return 7;
 }
@@ -248,7 +248,7 @@ NIChannelsDelegate::NIChannelsDelegate(QObject *parent):
 
 }
 
-QWidget *NIChannelsDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget *NIChannelsDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/, const QModelIndex &index) const
 {
     int col=index.column();
     int row=index.row();

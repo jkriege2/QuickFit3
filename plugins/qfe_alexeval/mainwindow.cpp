@@ -209,7 +209,7 @@ void MainWindow::storeSettings()
     settings.endGroup();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent */*event*/)
 {
     QSettings settings(QApplication::applicationDirPath()+"/" FILENAME_SETTINGS,QSettings::IniFormat);
     this->storeSettings();

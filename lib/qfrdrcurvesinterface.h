@@ -8,6 +8,15 @@
 /*! \brief a simple interface for 1D data curves
     \ingroup qf3rdrdp_imaging_fcs
 
+    \note \b IMPLEMENTATION: There is a general possibility to specify curves made up of two vector-results in any RDR by using "compound-rests"
+          (see e.g QFRawDataRecord::evaluationCompoundResult and  QFRawDataRecord::resultsCompoundSet() ). Therefore, any QFRawDataRecord implements this interface.
+          If you want to implement a curves-interface in a user-defined RDR with custom addition(!!!) curves, implement QFRDRUserCurvesInterface.
+          The implementation of QFRDRCurvesInterface will then summarize the curves from QFRDRUserCurvesInterface and the
+          compound results in the RDR!
+
+    \note \b ACCESS: If you want to access the curves in an RDR, use the QFRDRCurvesInterface interface!
+
+
 */
 class QFRDRCurvesInterface {
     public:
@@ -30,39 +39,71 @@ class QFRDRCurvesInterface {
         virtual CurveType curvesGetType(int index) const=0;
         virtual QString curvesGetXLabel(int index) const=0;
         virtual QString curvesGetYLabel(int index) const=0;
-
-
 };
 
 Q_DECLARE_INTERFACE( QFRDRCurvesInterface,
                      "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRCurvesInterface/1.0")
 
 
+/*! \brief a simple interface for user-defined 1D data curves
+    \ingroup qf3rdrdp_imaging_fcs
+
+    \note \b IMPLEMENTATION: There is a general possibility to specify curves made up of two vector-results in any RDR by using "compound-rests"
+          (see e.g QFRawDataRecord::evaluationCompoundResult and  QFRawDataRecord::resultsCompoundSet() ). Therefore, any QFRawDataRecord implements this interface.
+          If you want to implement a curves-interface in a user-defined RDR with custom addition(!!!) curves, implement QFRDRUserCurvesInterface.
+          The implementation of QFRDRCurvesInterface will then summarize the curves from QFRDRUserCurvesInterface and the
+          compound results in the RDR!
+
+    \note \b ACCESS: If you want to access the curves in an RDR, use the QFRDRCurvesInterface interface!
+
+
+*/class QFRDRUserCurvesInterface {
+    public:
+        virtual ~QFRDRUserCurvesInterface() {}
+        virtual int userCurvesGetCount() const=0;
+        virtual QString userCurvesGetName(int index) const=0;
+        virtual QVector<double> userCurvesGetX(int index) const=0;
+        virtual QVector<double> userCurvesGetXError(int index) const=0;
+        virtual QVector<double> userCurvesGetY(int index) const=0;
+        virtual QVector<double> userCurvesGetYError(int index) const=0;
+        virtual bool userCurvesGetLogX(int index) const=0;
+        virtual bool userCurvesGetLogY(int index) const=0;
+        virtual QFRDRCurvesInterface::CurveType userCurvesGetType(int index) const=0;
+        virtual QString userCurvesGetXLabel(int index) const=0;
+        virtual QString userCurvesGetYLabel(int index) const=0;
+
+
+};
+
+Q_DECLARE_INTERFACE( QFRDRUserCurvesInterface,
+                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRUserCurvesInterface/1.0")
+
+
 /*! \brief a simple interface for 1D data curves
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRCurvesPropertiesEditInterface {
+class QFRDRUserCurvesPropertiesEditInterface {
     public:
-        virtual ~QFRDRCurvesPropertiesEditInterface() {}
+        virtual ~QFRDRUserCurvesPropertiesEditInterface() {}
 
 
-        virtual void curvesSetName(int index, const QString& name) =0;
-        virtual void curvesSetLogX(int index, bool l) =0;
-        virtual void curvesSetLogY(int index, bool l) =0;
-        virtual void curvesSetType(int index, QFRDRCurvesInterface::CurveType type) =0;
-        virtual void curvesSetXLabel(int index, const QString& label) =0;
-        virtual void curvesSetYLabel(int index, const QString& label) =0;
+        virtual void userCurvesSetName(int index, const QString& name) =0;
+        virtual void userCurvesSetLogX(int index, bool l) =0;
+        virtual void userCurvesSetLogY(int index, bool l) =0;
+        virtual void userCurvesSetType(int index, QFRDRCurvesInterface::CurveType type) =0;
+        virtual void userCurvesSetXLabel(int index, const QString& label) =0;
+        virtual void userCurvesSetYLabel(int index, const QString& label) =0;
 
-        inline void curvesSetTypeI(int index, int type) {
-            curvesSetType(index, QFRDRCurvesInterface::CurveType(type));
+        inline void userCurvesSetTypeI(int index, int type) {
+            userCurvesSetType(index, QFRDRCurvesInterface::CurveType(type));
         }
 
 
 };
 
-Q_DECLARE_INTERFACE( QFRDRCurvesPropertiesEditInterface,
-                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRCurvesPropertiesEditInterface/1.0")
+Q_DECLARE_INTERFACE( QFRDRUserCurvesPropertiesEditInterface,
+                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRUserCurvesPropertiesEditInterface/1.0")
 
 
 inline QString QFRDRCurvesInterfaceCurveTypeToString(QFRDRCurvesInterface::CurveType t) {

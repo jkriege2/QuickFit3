@@ -59,7 +59,7 @@ private:
 
 private slots:
     void setMethodSingle(int index);
-    void setMethodDual(int index) {setMethod();}
+    void setMethodDual(int /*index*/) {setMethod();}
     void setMethod();
     void setDisabledMethodLowerFrame(bool toggle);
 

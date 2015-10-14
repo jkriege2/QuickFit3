@@ -48,12 +48,22 @@ QFEvaluationItem* QFPEvalCurveFit::createRecord(QFProject* parent) {
 }
 
 
-void QFPEvalCurveFit::registerToMenu(QMenu* menu) {
+void QFPEvalCurveFit::registerToMenu(QMenu* menu_main) {
+    QMenu* menu=menu_main->addMenu(QIcon(":/curve_fit.png"), tr("General Curve Fitting"));
     QAction* actCURVE=new QAction(QIcon(":/curve_fit.png"), tr("Curve Fitting"), parentWidget);
     actCURVE->setStatusTip(tr("Insert a least-squares fit evaluation"));
     connect(actCURVE, SIGNAL(triggered()), this, SLOT(insertCurveFit()));
     menu->addAction(actCURVE);
-}
+    menu->addSeparator();
+    QAction* actHIST=new QAction(QIcon(":/curve_fit/hist.png"), tr("Histogram Fitting"), parentWidget);
+    actHIST->setStatusTip(tr("Insert a least-squares fit evaluation with presets for fitting histograms"));
+    connect(actHIST, SIGNAL(triggered()), this, SLOT(insertHistogramFit()));
+    menu->addAction(actHIST);
+    QAction* actMEXP=new QAction(QIcon(":/curve_fit/mexp.png"), tr("Multi-Exponential Decay Fitting"), parentWidget);
+    actMEXP->setStatusTip(tr("Insert a least-squares fit evaluation with presets for fitting multi-exponential decays"));
+    connect(actMEXP, SIGNAL(triggered()), this, SLOT(insertHistogramFit()));
+    menu->addAction(actMEXP);
+ }
 
 
 
@@ -75,6 +85,42 @@ QFPluginOptionsWidget *QFPEvalCurveFit::createOptionsWidget(QWidget *parent)
 void QFPEvalCurveFit::insertCurveFit() {
     if (project) {
         project->addEvaluation(getID(), "Curve Fit");
+    }
+}
+
+void QFPEvalCurveFit::insertHistogramFit()
+{
+    if (project) {
+        QFEvaluationItem* e=project->addEvaluation(getID(), "Histogram Fit");
+        if (e) {
+            e->setPresetProperty("PRESET_FIT_MODEL", "gen_multigaussian_sqrte", false, false);
+            e->setPresetProperty("PRESET_components", 2, false, false);
+            e->setPresetProperty("PRESET_amplitude_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude1_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude2_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude3_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude4_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude5_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude6_MIN", 0.0, false, false);
+        }
+    }
+}
+
+void QFPEvalCurveFit::insertMultiExpFit()
+{
+    if (project) {
+        QFEvaluationItem* e=project->addEvaluation(getID(), "Multi-Exp Decay Fit");
+        if (e) {
+            e->setPresetProperty("PRESET_FIT_MODEL", "gen_multiexp", false, false);
+            e->setPresetProperty("PRESET_components", 2, false, false);
+            e->setPresetProperty("PRESET_amplitude_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude1_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude2_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude3_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude4_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude5_MIN", 0.0, false, false);
+            e->setPresetProperty("PRESET_amplitude6_MIN", 0.0, false, false);
+        }
     }
 }
 

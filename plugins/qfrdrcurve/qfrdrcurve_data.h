@@ -44,9 +44,9 @@ Copyright (c) 2015
     \ingroup qf3rdrdp_curves
 
 */
-class QFRDRCurveData : public QFRawDataRecord , public QFRDRCurvesInterface, public QFRDRCurvesPropertiesEditInterface {
+class QFRDRCurveData : public QFRawDataRecord , public QFRDRUserCurvesInterface, public QFRDRUserCurvesPropertiesEditInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRCurvesInterface QFRDRCurvesPropertiesEditInterface)
+        Q_INTERFACES(QFRDRUserCurvesInterface QFRDRUserCurvesPropertiesEditInterface)
     public:
         /** Default constructor */
         QFRDRCurveData(QFProject* parent);
@@ -88,25 +88,25 @@ class QFRDRCurveData : public QFRawDataRecord , public QFRDRCurvesInterface, pub
         QString getExportDialogFiletypes() const { return tr(""); }
 
 
-        virtual int curvesGetCount() const;
-        virtual QString curvesGetName(int index) const;
-        virtual QVector<double> curvesGetX(int index) const;
-        virtual QVector<double> curvesGetXError(int index) const;
-        virtual QVector<double> curvesGetY(int index) const;
-        virtual QVector<double> curvesGetYError(int index) const;
-        virtual bool curvesGetLogX(int index) const;
-        virtual bool curvesGetLogY(int index) const;
-        virtual CurveType curvesGetType(int index) const;
-        virtual QString curvesGetXLabel(int index) const;
-        virtual QString curvesGetYLabel(int index) const;
+        virtual int userCurvesGetCount() const;
+        virtual QString userCurvesGetName(int index) const;
+        virtual QVector<double> userCurvesGetX(int index) const;
+        virtual QVector<double> userCurvesGetXError(int index) const;
+        virtual QVector<double> userCurvesGetY(int index) const;
+        virtual QVector<double> userCurvesGetYError(int index) const;
+        virtual bool userCurvesGetLogX(int index) const;
+        virtual bool userCurvesGetLogY(int index) const;
+        virtual QFRDRCurvesInterface::CurveType userCurvesGetType(int index) const;
+        virtual QString userCurvesGetXLabel(int index) const;
+        virtual QString userCurvesGetYLabel(int index) const;
 
 
-        virtual void curvesSetName(int index, const QString& name) ;
-        virtual void curvesSetLogX(int index, bool l) ;
-        virtual void curvesSetLogY(int index, bool l) ;
-        virtual void curvesSetType(int index, QFRDRCurvesInterface::CurveType type) ;
-        virtual void curvesSetXLabel(int index, const QString& label) ;
-        virtual void curvesSetYLabel(int index, const QString& label) ;
+        virtual void userCurvesSetName(int index, const QString& name) ;
+        virtual void userCurvesSetLogX(int index, bool l) ;
+        virtual void userCurvesSetLogY(int index, bool l) ;
+        virtual void userCurvesSetType(int index, QFRDRCurvesInterface::CurveType type) ;
+        virtual void userCurvesSetXLabel(int index, const QString& label) ;
+        virtual void userCurvesSetYLabel(int index, const QString& label) ;
 
     protected:
         /** \brief write the contents of the object to a XML file */

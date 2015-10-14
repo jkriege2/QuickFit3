@@ -47,7 +47,7 @@ double QFFitFunctionGeneralLogNormal::evaluate(double t, const double* data) con
     const double amplitude=data[PARAM_AMPLITUDE];
     const double position=data[PARAM_POSITION];
     const double width=data[PARAM_WIDTH];
-    return offset+amplitude*exp(-0.5*qfSqr(log(t)-position)/qfSqr(width));
+    return offset+amplitude*exp(-0.5*qfSqr(log10(t)-log10(position))/qfSqr(width));
 }
 
 

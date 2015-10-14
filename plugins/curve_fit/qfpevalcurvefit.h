@@ -87,6 +87,8 @@ class QFPEvalCurveFit : public QObject, public QFPluginEvaluationItemBase, publi
         QFPluginOptionsWidget *createOptionsWidget(QWidget *parent);
 protected slots:
         void insertCurveFit();
+        void insertHistogramFit();
+        void insertMultiExpFit();
 
     private:
 };

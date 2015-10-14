@@ -94,6 +94,7 @@
       <li>bugfix: QFFunctionReferenceTool: behaves nicer, when selecting several characters in a parser expression (before, several small help-prepare windows appeared in fast succession)</li>
       <li>added option to settings-dialog (View/General Settings), which allows to choose a nonlinear scaling of the color-coding in VAR-COV-matrices (with a gamma-transform and user-selectable gamma!)</li>
       <li>extended QFitFunction with functions to estimate a specific parameter from an XY-location in a plot (also supported by library fit functions in a DLL/SOLIB...)</li>
+      <li>"compound-result" in any RDR are accessible over the QFRDRCurvesInterface-interface, i.e. by curves-evaluations like the new curve_fit plugin</li>
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>
@@ -101,6 +102,7 @@
         <li>added support for reading PicoQuant exported ASCII FCS correlation curves (*.dat files) [thanks to Martin Seefeld, Uni Heidelberg]</li>
         <li>added support for reading PicoQuant *.cor ASCII files</li>
         <li>improved error reporting while importing data: there will be error messages now, when trying to import a non-existent file.</li>
+        <li>added check-box to correlation editor, which allows to retain the current zoom-level when changing between runs and/or RDRs</li>
     </ul></li>
     <li><b>FCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
@@ -175,6 +177,7 @@
         <li>added overlay plots of the runs in a single RDR</li>
         <li>bugfix: If a fit was once canceled, all following fits were also canceled after the first run/file, until QuickFit was closed and reopened</li>
         <li>bugfix: the overviewplot of ACF+fit now should work</li>
+        <li>MaxEnt distributions are now stored as "compound-result" and are accessible over the QFRDRCurvesInterface-interface, i.e. by curves-evaluations like the new curve_fit plugin</li>
     </ul></li>
     <li><b>FCS MSD evaluation</b><ul>
         <li><font color="red"><b>MAJOR BUGFIX:</b> Before this versions, all 2D-diffusion MSD models returned an MSD, which was a factor of 2/3 too high!</font> This was fixed now. See the documentation for the correct models. [Thanks to T. Wohland for pointing me to that]</li>
@@ -184,6 +187,7 @@
         <li>added an offset G<sub>&infin;</sub> to all models</li>
         <li>bugfix: If a fit was once canceled, all following fits were also canceled after the first run/file, until QuickFit was closed and reopened</li>
         <li>"get N from fit results" tool can now also read imagingFCS fit results (i.e. from results that are stored as vectors which are index by the run/index/pixel)</li>
+        <li>MSD curves are now stored as "compound-result" and are accessible over the QFRDRCurvesInterface-interface, i.e. by curves-evaluations like the new curve_fit plugin</li>
     </ul></li>
     <li><b>Diffusion Coefficient Calculator</b><ul>
         <li>bugfix: D20W was not calculated correctly, when a D at arbitrary conditions with viscosity factor !=1 was given!</li>
@@ -277,6 +281,9 @@
     <li><b>fitfunctions_general</b><ul>
       <li>license is now LGPL 2.1</li>
       <li>added fit function: Peaks: Multi-Component Gaussian function (1/sqrt(e) width)</li>
+      <li>added fit function: Peaks: Multi-Component Log-Normal</li>
+      <li>added fit function: Decays: Multi-Exponential</li>
+      <li><b>function changes:</b> modified all log-normal distributions to have log10(x)-log10(mean) as parameter!</li>
     </ul></li>
     <li><b>fcs_fitfunctions</b><ul>
       <li>added code for single-parameter-estimation (from XY) and initial-parameter guessing</li>

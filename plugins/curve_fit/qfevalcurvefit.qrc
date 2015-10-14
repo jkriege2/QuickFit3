@@ -3,6 +3,8 @@
         <file alias="curve_fit.png">icons/curve_fit.png</file>
         <file alias="curve_fit_logo.png">icons/curve_fit_large.png</file>
         <file alias="curve_fit_large.png">icons/curve_fit_large.png</file>
+        <file alias="curve_fit/hist.png">icons/hist.png</file>
+        <file alias="curve_fit/mexp.png">icons/mexp.png</file>
         <file alias="curve_fit/curve_fit.png">icons/curve_fit.png</file>
         <file alias="curve_fit/curve_fit_logo.png">icons/curve_fit_large.png</file>
         <file alias="curve_fit/curve_fit_large.png">icons/curve_fit_large.png</file>

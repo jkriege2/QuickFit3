@@ -38,13 +38,13 @@ void QFRDRCurveData::exportData(const QString& /*format*/, const QString& /*file
     // THIS IS OPTIONAL
 }
 
-int QFRDRCurveData::curvesGetCount() const
+int QFRDRCurveData::userCurvesGetCount() const
 {
     return curves.size();
 
 }
 
-QString QFRDRCurveData::curvesGetName(int index) const
+QString QFRDRCurveData::userCurvesGetName(int index) const
 {
     if (index>=0 && index<curves.size()) {
         return curves[index].name;
@@ -52,7 +52,7 @@ QString QFRDRCurveData::curvesGetName(int index) const
     return QString();
 }
 
-QVector<double> QFRDRCurveData::curvesGetX(int index) const
+QVector<double> QFRDRCurveData::userCurvesGetX(int index) const
 {
     if (index>=0 && index<curves.size()) {
         int c=curves[index].xcolumn;
@@ -65,7 +65,7 @@ QVector<double> QFRDRCurveData::curvesGetX(int index) const
     return QVector<double>();
 }
 
-QVector<double> QFRDRCurveData::curvesGetXError(int index) const
+QVector<double> QFRDRCurveData::userCurvesGetXError(int index) const
 {
     if (index>=0 && index<curves.size()) {
         int c=curves[index].xerrorcolumn;
@@ -77,7 +77,7 @@ QVector<double> QFRDRCurveData::curvesGetXError(int index) const
     return QVector<double>();
 }
 
-QVector<double> QFRDRCurveData::curvesGetY(int index) const
+QVector<double> QFRDRCurveData::userCurvesGetY(int index) const
 {
     if (index>=0 && index<curves.size()) {
         int c=curves[index].ycolumn;
@@ -89,7 +89,7 @@ QVector<double> QFRDRCurveData::curvesGetY(int index) const
     return QVector<double>();
 }
 
-QVector<double> QFRDRCurveData::curvesGetYError(int index) const
+QVector<double> QFRDRCurveData::userCurvesGetYError(int index) const
 {
     if (index>=0 && index<curves.size()) {
         int c=curves[index].yerrorcolumn;
@@ -101,7 +101,7 @@ QVector<double> QFRDRCurveData::curvesGetYError(int index) const
     return QVector<double>();
 }
 
-bool QFRDRCurveData::curvesGetLogX(int index) const
+bool QFRDRCurveData::userCurvesGetLogX(int index) const
 {
     if (index>=0 && index<curves.size()) {
         return curves[index].logX;
@@ -109,7 +109,7 @@ bool QFRDRCurveData::curvesGetLogX(int index) const
     return false;
 }
 
-bool QFRDRCurveData::curvesGetLogY(int index) const
+bool QFRDRCurveData::userCurvesGetLogY(int index) const
 {
     if (index>=0 && index<curves.size()) {
         return curves[index].logY;
@@ -117,7 +117,7 @@ bool QFRDRCurveData::curvesGetLogY(int index) const
     return false;
 }
 
-QFRDRCurvesInterface::CurveType QFRDRCurveData::curvesGetType(int index) const
+QFRDRCurvesInterface::CurveType QFRDRCurveData::userCurvesGetType(int index) const
 {
     if (index>=0 && index<curves.size()) {
         return curves[index].type;
@@ -125,7 +125,7 @@ QFRDRCurvesInterface::CurveType QFRDRCurveData::curvesGetType(int index) const
     return QFRDRCurvesInterface::ctPoints;
 }
 
-QString QFRDRCurveData::curvesGetXLabel(int index) const
+QString QFRDRCurveData::userCurvesGetXLabel(int index) const
 {
     if (index>=0 && index<curves.size()) {
         return curves[index].xlabel;
@@ -133,7 +133,7 @@ QString QFRDRCurveData::curvesGetXLabel(int index) const
     return QString();
 }
 
-QString QFRDRCurveData::curvesGetYLabel(int index) const
+QString QFRDRCurveData::userCurvesGetYLabel(int index) const
 {
     if (index>=0 && index<curves.size()) {
         return curves[index].ylabel;
@@ -141,7 +141,7 @@ QString QFRDRCurveData::curvesGetYLabel(int index) const
     return QString();
 }
 
-void QFRDRCurveData::curvesSetName(int index, const QString &name)
+void QFRDRCurveData::userCurvesSetName(int index, const QString &name)
 {
     if (index>=0 && index<curves.size() && curves[index].name!=name) {
         curves[index].name=name;
@@ -149,7 +149,7 @@ void QFRDRCurveData::curvesSetName(int index, const QString &name)
     }
 }
 
-void QFRDRCurveData::curvesSetLogX(int index, bool l)
+void QFRDRCurveData::userCurvesSetLogX(int index, bool l)
 {
     if (index>=0 && index<curves.size() && curves[index].logX!=l) {
         curves[index].logX=l;
@@ -158,7 +158,7 @@ void QFRDRCurveData::curvesSetLogX(int index, bool l)
 
 }
 
-void QFRDRCurveData::curvesSetLogY(int index, bool l)
+void QFRDRCurveData::userCurvesSetLogY(int index, bool l)
 {
     if (index>=0 && index<curves.size() && curves[index].logY!=l) {
         curves[index].logY=l;
@@ -167,7 +167,7 @@ void QFRDRCurveData::curvesSetLogY(int index, bool l)
 
 }
 
-void QFRDRCurveData::curvesSetType(int index, QFRDRCurvesInterface::CurveType type)
+void QFRDRCurveData::userCurvesSetType(int index, QFRDRCurvesInterface::CurveType type)
 {
     if (index>=0 && index<curves.size() && curves[index].type!=type) {
         curves[index].type=type;
@@ -176,7 +176,7 @@ void QFRDRCurveData::curvesSetType(int index, QFRDRCurvesInterface::CurveType ty
 
 }
 
-void QFRDRCurveData::curvesSetXLabel(int index, const QString &label)
+void QFRDRCurveData::userCurvesSetXLabel(int index, const QString &label)
 {
     if (index>=0 && index<curves.size() && curves[index].xlabel!=label) {
         curves[index].xlabel=label;
@@ -185,7 +185,7 @@ void QFRDRCurveData::curvesSetXLabel(int index, const QString &label)
 
 }
 
-void QFRDRCurveData::curvesSetYLabel(int index, const QString &label)
+void QFRDRCurveData::userCurvesSetYLabel(int index, const QString &label)
 {
     if (index>=0 && index<curves.size() && curves[index].ylabel!=label) {
         curves[index].ylabel=label;

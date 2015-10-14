@@ -951,7 +951,7 @@ void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumn
     }
 }
 
-int QFRDRTable::curvesGetCount() const
+int QFRDRTable::userCurvesGetCount() const
 {
     int cnt=0;
     for (int i=0; i<plots.size(); i++) {
@@ -964,7 +964,7 @@ int QFRDRTable::curvesGetCount() const
     return cnt;
 }
 
-QString QFRDRTable::curvesGetName(int index) const
+QString QFRDRTable::userCurvesGetName(int index) const
 {
     int cnt=0;
     for (int i=0; i<plots.size(); i++) {
@@ -978,7 +978,7 @@ QString QFRDRTable::curvesGetName(int index) const
     return QString();
 }
 
-QVector<double> QFRDRTable::curvesGetX(int index) const
+QVector<double> QFRDRTable::userCurvesGetX(int index) const
 {
     int cnt=0;
     QVector<double> dat;
@@ -1000,7 +1000,7 @@ QVector<double> QFRDRTable::curvesGetX(int index) const
     return dat;
 }
 
-QVector<double> QFRDRTable::curvesGetXError(int index) const
+QVector<double> QFRDRTable::userCurvesGetXError(int index) const
 {
     int cnt=0;
     QVector<double> dat;
@@ -1022,7 +1022,7 @@ QVector<double> QFRDRTable::curvesGetXError(int index) const
     return dat;
 }
 
-QVector<double> QFRDRTable::curvesGetY(int index) const
+QVector<double> QFRDRTable::userCurvesGetY(int index) const
 {
     int cnt=0;
     QVector<double> dat;
@@ -1044,7 +1044,7 @@ QVector<double> QFRDRTable::curvesGetY(int index) const
     return dat;
 }
 
-QVector<double> QFRDRTable::curvesGetYError(int index) const
+QVector<double> QFRDRTable::userCurvesGetYError(int index) const
 {
     int cnt=0;
     QVector<double> dat;
@@ -1066,7 +1066,7 @@ QVector<double> QFRDRTable::curvesGetYError(int index) const
     return dat;
 }
 
-bool QFRDRTable::curvesGetLogX(int index) const
+bool QFRDRTable::userCurvesGetLogX(int index) const
 {
     int cnt=0;
     for (int i=0; i<plots.size(); i++) {
@@ -1080,7 +1080,7 @@ bool QFRDRTable::curvesGetLogX(int index) const
     return false;
 }
 
-bool QFRDRTable::curvesGetLogY(int index) const
+bool QFRDRTable::userCurvesGetLogY(int index) const
 {
     int cnt=0;
     for (int i=0; i<plots.size(); i++) {
@@ -1094,7 +1094,7 @@ bool QFRDRTable::curvesGetLogY(int index) const
     return false;
 }
 
-QFRDRCurvesInterface::CurveType QFRDRTable::curvesGetType(int index) const
+QFRDRCurvesInterface::CurveType QFRDRTable::userCurvesGetType(int index) const
 {
     int cnt=0;
     for (int i=0; i<plots.size(); i++) {
@@ -1108,7 +1108,7 @@ QFRDRCurvesInterface::CurveType QFRDRTable::curvesGetType(int index) const
     return QFRDRCurvesInterface::ctPoints;
 }
 
-QString QFRDRTable::curvesGetXLabel(int index) const
+QString QFRDRTable::userCurvesGetXLabel(int index) const
 {
     int cnt=0;
     for (int i=0; i<plots.size(); i++) {
@@ -1122,7 +1122,7 @@ QString QFRDRTable::curvesGetXLabel(int index) const
     return QString("x");
 }
 
-QString QFRDRTable::curvesGetYLabel(int index) const
+QString QFRDRTable::userCurvesGetYLabel(int index) const
 {
     int cnt=0;
     for (int i=0; i<plots.size(); i++) {

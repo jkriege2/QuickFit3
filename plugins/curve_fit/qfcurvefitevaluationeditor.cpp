@@ -36,6 +36,7 @@ Copyright (c) 2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), Germ
 #include "qmodernprogresswidget.h"
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
+#include "qffitfunctionplottools.h"
 
 
 
@@ -43,13 +44,17 @@ Copyright (c) 2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), Germ
 
 
 QFCurveFitEvaluationEditor::QFCurveFitEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent):
-    QFFitResultsByIndexEvaluationEditorWithWidgets("curvefitevaleditor/", propEditor, services, parent, true, true, tr("curve"), true)
+    QFFitResultsByIndexEvaluationEditorWithWidgets("curvefitevaleditor/", propEditor, services, parent, true, true, tr("curve"), true, true)
 {
 
     createWidgets();
     btnFirstRun->setText(tr("first curve"));
     if (spinRun) spinRun->setSpecialValueText(QString());
     setGuessingEnabled(true);
+    actXLogScale->setVisible(true);
+    actYLogScale->setVisible(true);
+    chkXLogScale->setText(tr("x-log  "));
+    chkYLogScale->setText(tr("y-log  "));
 
 }
 
@@ -166,11 +171,25 @@ void QFCurveFitEvaluationEditor::fillRunCombo(QFFitResultsByIndexEvaluation *cur
 
 QString QFCurveFitEvaluationEditor::getPlotXLabel() const
 {
+    QFCurveFitEvaluation* eval=qobject_cast<QFCurveFitEvaluation*>(current);
+    if (eval) {
+        QFRawDataRecord* data=current->getHighlightedRecord();
+        if (data) {
+            return data->curvesGetXLabel(eval->getCurrentIndex());
+        }
+    }
     return "X";
 }
 
 QString QFCurveFitEvaluationEditor::getPlotYLabel() const
 {
+    QFCurveFitEvaluation* eval=qobject_cast<QFCurveFitEvaluation*>(current);
+    if (eval) {
+        QFRawDataRecord* data=current->getHighlightedRecord();
+        if (data) {
+            return data->curvesGetYLabel(eval->getCurrentIndex());
+        }
+    }
     return "Y";
 }
 
@@ -181,11 +200,25 @@ QString QFCurveFitEvaluationEditor::getFitName() const
 
 bool QFCurveFitEvaluationEditor::getPlotXLog() const
 {
+    QFCurveFitEvaluation* eval=qobject_cast<QFCurveFitEvaluation*>(current);
+    if (eval) {
+        QFRawDataRecord* data=current->getHighlightedRecord();
+        if (data) {
+            return data->curvesGetLogX(eval->getCurrentIndex());
+        }
+    }
     return false;
 }
 
 bool QFCurveFitEvaluationEditor::getPlotYLog() const
 {
+    QFCurveFitEvaluation* eval=qobject_cast<QFCurveFitEvaluation*>(current);
+    if (eval) {
+        QFRawDataRecord* data=current->getHighlightedRecord();
+        if (data) {
+            return data->curvesGetLogY(eval->getCurrentIndex());
+        }
+    }
     return false;
 }
 
@@ -753,6 +786,7 @@ void QFCurveFitEvaluationEditor::replotData() {
 
     pltResiduals->getXAxis()->set_logAxis(chkXLogScale->isChecked());
     pltData->getXAxis()->set_logAxis(chkXLogScale->isChecked());
+    pltData->getYAxis()->set_logAxis(chkYLogScale->isChecked());
     if (chkXLogScale->isChecked()) {
         pltData->getXAxis()->set_minorTicks(9);
         pltResiduals->getXAxis()->set_minorTicks(9);
@@ -760,15 +794,22 @@ void QFCurveFitEvaluationEditor::replotData() {
         pltData->getXAxis()->set_minorTicks(1);
         pltResiduals->getXAxis()->set_minorTicks(1);
     }
+    if (chkYLogScale->isChecked()) {
+        pltData->getYAxis()->set_minorTicks(9);
+        pltResiduals->getYAxis()->set_minorTicks(9);
+    } else {
+        pltData->getYAxis()->set_minorTicks(1);
+        pltResiduals->getYAxis()->set_minorTicks(1);
+    }
     pltResiduals->getXAxis()->set_drawGrid(chkGrid->isChecked());
     pltResiduals->getYAxis()->set_drawGrid(chkGrid->isChecked());
     pltData->getXAxis()->set_drawGrid(chkGrid->isChecked());
     pltData->getYAxis()->set_drawGrid(chkGrid->isChecked());
     pltData->getYAxis()->set_minTicks(5);
     pltResiduals->getYAxis()->set_minTicks(5);
-    pltData->getXAxis()->set_logAxis(data->curvesGetLogX(eval->getCurrentIndex()));
-    pltResiduals->getXAxis()->set_logAxis(data->curvesGetLogX(eval->getCurrentIndex()));
-    pltData->getYAxis()->set_logAxis(data->curvesGetLogY(eval->getCurrentIndex()));
+    //pltData->getXAxis()->set_logAxis(data->curvesGetLogX(eval->getCurrentIndex()));
+    //pltResiduals->getXAxis()->set_logAxis(data->curvesGetLogX(eval->getCurrentIndex()));
+    //pltData->getYAxis()->set_logAxis(data->curvesGetLogY(eval->getCurrentIndex()));
     pltResiduals->getXAxis()->set_axisLabel(data->curvesGetXLabel(eval->getCurrentIndex()));
     pltData->getYAxis()->set_axisLabel(data->curvesGetYLabel(eval->getCurrentIndex()));
 

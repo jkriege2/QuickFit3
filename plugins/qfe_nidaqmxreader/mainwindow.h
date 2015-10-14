@@ -30,6 +30,7 @@ class MainWindow : public QMainWindow
         int getRefTriggerEdge() const;
         QString getRefTriggerChannel() const;
         double getSampleClock() const;
+        QString getClockSource() const;
         double getPreviewSampleClock() const;
         int getUpdatePlotSamples() const;
         int getUpdatePreviewPlotSamples() const;

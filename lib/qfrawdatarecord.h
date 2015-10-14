@@ -40,6 +40,7 @@
 #include <QWriteLocker>
 #include <QReadWriteLock>
 #include "qfmathtools.h"
+#include "qfrdrcurvesinterface.h"
 
 
 class QDomElement; // forward
@@ -79,8 +80,9 @@ struct qfmpResult; // forward
     as HTML page (or a set of these) and has to be stored as \verbatim plugins/help/<plugin_id>/<plugin_id>.html \endverbatim.
 
  */
-class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
+class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties, public QFRDRCurvesInterface {
         Q_OBJECT
+        Q_INTERFACES(QFRDRCurvesInterface)
     public:
         /** \brief class constructor, reads from QDomElement */
         QFRawDataRecord(QFProject* parent);
@@ -584,6 +586,9 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                   - \c labelX , \c labelY (string) axis labels
                 .
             .
+
+            For compounds of type qfrdrctGraph1D, the evaluationCompoundResult::referencedResults has to contain at least two entries for x- and y-data.
+            In addition, two more entries can be given for x- and y-errors, then in the order \c (x,y,xerror,yerror).
          */
         struct QFLIB_EXPORT evaluationCompoundResult {
                 inline evaluationCompoundResult() {
@@ -1459,6 +1464,18 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         virtual QStringList getPossibleFilesTypes() const;
 
 
+    public:
+        virtual int curvesGetCount() const;
+        virtual QString curvesGetName(int index) const;
+        virtual QVector<double> curvesGetX(int index) const;
+        virtual QVector<double> curvesGetXError(int index) const;
+        virtual QVector<double> curvesGetY(int index) const;
+        virtual QVector<double> curvesGetYError(int index) const;
+        virtual bool curvesGetLogX(int index) const;
+        virtual bool curvesGetLogY(int index) const;
+        virtual CurveType curvesGetType(int index) const;
+        virtual QString curvesGetXLabel(int index) const;
+        virtual QString curvesGetYLabel(int index) const;
 
 };
 

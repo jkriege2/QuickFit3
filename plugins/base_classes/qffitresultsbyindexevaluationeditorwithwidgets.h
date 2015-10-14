@@ -77,7 +77,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 {
         Q_OBJECT
     public:
-        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false, const QString& runName=QString("run"), bool useRunComboBox=false);
+        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false, const QString& runName=QString("run"), bool useRunComboBox=false, bool twoToolbars=false);
 
 
     protected slots:
@@ -151,12 +151,20 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QCheckBox* chkWeightedResiduals;
         /** \brief checkbox for x logscale */
         QCheckBox* chkXLogScale;
+        /** \brief checkbox for y logscale */
+        QCheckBox* chkYLogScale;
+        /** \brief checkbox for x logscale */
+        QAction* actXLogScale;
+        /** \brief checkbox for y logscale */
+        QAction* actYLogScale;
         /** \brief checkbox to display grid */
         QCheckBox* chkGrid;
         /** \brief checkbox to display key */
         QCheckBox* chkKey;
         /** \brief toolbar above the plots */
         QToolBar* toolbar;
+        /** \brief toolbar2 above the plots */
+        QToolBar* toolbar2;
         /** \brief label to display the current position of the mouse cursor */
         QLabel* labMousePosition;
         /** \brief label that displays whether the current fit parameters are global or local */
@@ -415,7 +423,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
     private:
         /** \brief create all widgets on the form */
-        void createWidgets(bool hasMultiThreaded, bool multiThreadPriority, bool useRunCombobox);
+        void createWidgets(bool hasMultiThreaded, bool multiThreadPriority, bool useRunCombobox, bool twoToolbars=false);
 };
 
 #endif // QFFITRESULTSBYINDEXEVALUATIONEDITORWITHWIDGETS_H

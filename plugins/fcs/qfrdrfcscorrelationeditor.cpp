@@ -132,8 +132,10 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     QGridLayout* gl=new QGridLayout();
     w->setLayout(gl);
     cmbAverageErrors=new QComboBox(w);
-    gl->addWidget(new QLabel(tr("display average:")), 0, 0);
-    gl->addWidget(cmbAverageErrors, 0, 1);
+    int row=0;
+    gl->addWidget(new QLabel(tr("display average:")), row, 0);
+    gl->addWidget(cmbAverageErrors, row, 1);
+    row++;
     cmbAverageErrors->addItem(QIcon(":/fcs/fcsplot_enone.png"), tr("no average"));
     cmbAverageErrors->addItem(QIcon(":/fcs/fcsplot_enone.png"), tr("no errors"));
     cmbAverageErrors->addItem(QIcon(":/fcs/fcsplot_elines.png"), tr("with error lines"));
@@ -144,18 +146,19 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     connect(cmbAverageErrors, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData(int)));
 
     cmbRunDisplay=new QComboBox(w);
-    gl->addWidget(new QLabel(tr("display runs:")), 1, 0);
-    gl->addWidget(cmbRunDisplay, 1, 1);
+    gl->addWidget(new QLabel(tr("display runs:")), row, 0);
+    gl->addWidget(cmbRunDisplay, row, 1);
     cmbRunDisplay->addItem(tr("no runs"));
     cmbRunDisplay->addItem(tr("all runs"));
     cmbRunDisplay->addItem(tr("all runs (highlighted)"));
     cmbRunDisplay->addItem(tr("used runs"));
     cmbRunDisplay->addItem(tr("selected run"));
     connect(cmbRunDisplay, SIGNAL(currentIndexChanged(int)), this, SLOT(runsModeChanged(int)));
+    row++;
 
     cmbRunErrors=new QComboBox(w);
-    gl->addWidget(new QLabel(tr("run errors:")), 2, 0);
-    gl->addWidget(cmbRunErrors, 2, 1);
+    gl->addWidget(new QLabel(tr("run errors:")), row, 0);
+    gl->addWidget(cmbRunErrors, row, 1);
     cmbRunErrors->addItem(QIcon(":/fcs/fcsplot_enone.png"), tr("no errors"));
     cmbRunErrors->addItem(QIcon(":/fcs/fcsplot_elines.png"), tr("with error lines"));
     cmbRunErrors->addItem(QIcon(":/fcs/fcsplot_ebars.png"), tr("with error bars"));
@@ -163,28 +166,37 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     cmbRunErrors->addItem(QIcon(":/libqf3widgets/plot_epoly.png"), tr("with error polygons"));
     cmbRunErrors->addItem(QIcon(":/libqf3widgets/plot_epolybars.png"), tr("with polygons and bars"));
     connect(cmbRunErrors, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData(int)));
+    row++;
 
+    chkKeepZoom=new QCheckBox(tr("retain when changing runs/files"), this);
+    gl->addWidget(new QLabel(tr("zoom-level:")), row, 0);
+    gl->addWidget(chkKeepZoom, row, 1);
     lstRunsSelect=new QListView(w);
     lstRunsSelect->setModel(&runs);
     lstRunsSelect->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(lstRunsSelect->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
     connect(lstRunsSelect->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(selectionChanged(const QModelIndex &, const QModelIndex &)));
+    row++;
 
-
-    gl->addWidget(new QLabel(tr("select runs to display:")), 3, 0, 1, 2);
-    gl->addWidget(lstRunsSelect, 4, 0, 3, 2);
-    gl->setRowStretch(4, 2);
+    gl->addWidget(new QLabel(tr("select runs to display:")), row, 0, 1, 2);
+    row++;
+    gl->addWidget(lstRunsSelect, row, 0, 3, 2);
+    gl->setRowStretch(row, 2);
+    row+=3;
     btnDontUse=new QPushButton(tr("exclude selected"), w);
     connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
-    gl->addWidget(btnDontUse, 7, 0, 1, 2);
+    gl->addWidget(btnDontUse, row, 0, 1, 2);
+    row++;
     btnUse=new QPushButton(tr("include selected"), w);
     connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
-    gl->addWidget(btnUse, 8, 0, 1, 2);
+    gl->addWidget(btnUse, row, 0, 1, 2);
+    row++;
 
     chkLogTauAxis=new QCheckBox("", w);
-    gl->addWidget(new QLabel(tr("log-scale on<br>lag time axis:")), 9, 0);
-    gl->addWidget(chkLogTauAxis, 9, 1);
+    gl->addWidget(new QLabel(tr("log-scale on<br>lag time axis:")), row, 0);
+    gl->addWidget(chkLogTauAxis, row, 1);
     connect(chkLogTauAxis, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+    row++;
 
     grpInfo=new QGroupBox(tr("Info"), w);
     QGridLayout* ggl=new QGridLayout();
@@ -195,7 +207,8 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     ggl->addWidget(new QLabel(tr("# Points = ")), 1, 0);
     labCorrelationPoints=new QLabel(grpInfo);
     ggl->addWidget(labCorrelationPoints, 1,1);
-    gl->addWidget(grpInfo, 10,0,1,2);
+    gl->addWidget(grpInfo, row,0,1,2);
+    row++;
 
     QWidget* wp=new QWidget(this);
     QVBoxLayout* lp=new QVBoxLayout();
@@ -517,7 +530,7 @@ void QFRDRFCSCorrelationEditor::replotData(int /*dummy*/) {
         plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
         plotter->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
     //std::cout<<"repainting ... 7\n";
-        plotter->zoomToFit(true, true, false,false);
+        if (!chkKeepZoom->isChecked()) plotter->zoomToFit(true, true, false,false);
     //std::cout<<"repainting ... 8\n";
     }
     plotter->set_doDrawing(true);
@@ -535,6 +548,7 @@ void QFRDRFCSCorrelationEditor::readSettings() {
     plotter->loadSettings(*(settings->getQSettings()), QString("fcsdataeditor/corrplot"));
     //splitter->restoreState(settings->getQSettings()->value(QString("fcsdataeditor/corrsplitterSizes")).toByteArray());
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/log_tau_axis"), true).toBool());
+    chkKeepZoom->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/chkKeepZoom"), false).toBool());
     cmbAverageErrors->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/error_display"), 2).toInt());
     cmbRunErrors->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/run_error_display"), 0).toInt());
     cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/run_display"), 0).toInt());
@@ -548,6 +562,7 @@ void QFRDRFCSCorrelationEditor::writeSettings() {
     //plotter->saveSettings(*(settings->getQSettings()), QString("fcsdataeditor/corrplot"));
     //settings->getQSettings()->setValue(QString("fcsdataeditor/corrsplitterSizes"), splitter->saveState());
     settings->getQSettings()->setValue(QString("fcsdataeditor/log_tau_axis"), chkLogTauAxis->isChecked());
+    settings->getQSettings()->setValue(QString("fcsdataeditor/chkKeepZoom"), chkKeepZoom->isChecked());
     settings->getQSettings()->setValue(QString("fcsdataeditor/error_display"), cmbAverageErrors->currentIndex());
     settings->getQSettings()->setValue(QString("fcsdataeditor/run_error_display"), cmbRunErrors->currentIndex());
     settings->getQSettings()->setValue(QString("fcsdataeditor/run_display"), cmbRunDisplay->currentIndex());

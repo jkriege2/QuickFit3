@@ -133,6 +133,7 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
 
         QAction* actCopyNormalizedACF;
         QAction* actCorrectOffset;
+        QCheckBox* chkKeepZoom;
 
     private:
 };

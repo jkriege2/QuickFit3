@@ -266,18 +266,33 @@ bool QFDistributionFitFunctionBase::estimateInitial(double *params, const double
                 if (id_offset>=0) params[id_offset]=pB;
                 if (id_components>=0) params[id_components]=1;
                 params[id_amplitude]=pH;
-                params[id_position]=pP;
+                if (logX) {
+                    params[id_position]=pow(10.0,pP);
+                } else {
+                    params[id_position]=pP;
+                }
                 params[id_width]=pW*width_factor;
                 if (statisticsFloatIsOK(pP2)) {
                     params[id_amplitude2]=pH2;
-                    params[id_position2]=pP2;
+                    if (logX) {
+                        params[id_position2]=pow(10.0,pP2);
+                    } else {
+                        params[id_position2]=pP2;
+                    }
+                    //params[id_position2]=pP2;
                     params[id_width2]=pW2*width_factor;
                     if (id_components>=0) params[id_components]=2;
                 }
                 if (statisticsFloatIsOK(pP3)) {
-                    params[id_amplitude2]=pH3;
-                    params[id_position2]=pP3;
-                    params[id_width2]=pW3*width_factor;
+                    params[id_amplitude3]=pH3;
+                    //params[id_position2]=pP3;
+                    if (logX) {
+                        params[id_position3]=pow(10.0,pP3);
+                    } else {
+                        params[id_position3]=pP3;
+                    }
+
+                    params[id_width3]=pW3*width_factor;
                     if (id_components>=0) params[id_components]=3;
                 }
                 return true;
@@ -309,12 +324,20 @@ bool QFDistributionFitFunctionBase::estimateInitial(double *params, const double
                 }
                 if (id_offset>=0) params[id_offset]=pB;
                 params[id_amplitude]=pH;
-                params[id_position]=pP;
+                if (logX) {
+                    params[id_position]=pow(10.0,pP);
+                } else {
+                    params[id_position]=pP;
+                }
                 params[id_width]=pW*width_factor;
                 if (id_components>=0) params[id_components]=1;
                 if (statisticsFloatIsOK(pP2)) {
                     params[id_amplitude2]=pH2;
-                    params[id_position2]=pP2;
+                    if (logX) {
+                        params[id_position2]=pow(10.0,pP2);
+                    } else {
+                        params[id_position2]=pP2;
+                    }
                     params[id_width2]=pW2*width_factor;
                     if (id_components>=0) params[id_components]=2;
                 }
@@ -343,7 +366,11 @@ bool QFDistributionFitFunctionBase::estimateInitial(double *params, const double
                 }
                 if (id_offset>=0) params[id_offset]=pB;
                 params[id_amplitude]=pH;
-                params[id_position]=pP;
+                if (logX) {
+                    params[id_position]=pow(10.0,pP);
+                } else {
+                    params[id_position]=pP;
+                }
                 params[id_width]=pW*width_factor;
                 if (id_components>=0) params[id_components]=1;
                 return true;

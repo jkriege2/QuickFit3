@@ -1355,16 +1355,26 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
         }
 
         // now store the results:
-        QString param;
-        setFitResultValueNumberArray(record, index, model, param="msd_tau", distTaus, Ndist, QString("seconds"));
+        QString param, paramtau, parammsd;
+        QFRawDataRecord::evaluationCompoundResult comp;
+        setFitResultValueNumberArray(record, index, model, paramtau=param="msd_tau", distTaus, Ndist, QString("seconds"));
         setFitResultGroup(record, index, model, param, tr("fit results"));
         setFitResultLabel(record, index, model, param, tr("MSD: lag times"), QString("MSD: lag times <i>&tau;</i>"));
         setFitResultSortPriority(record, index, model, param, true);
 
-        setFitResultValueNumberArray(record, index, model, param="msd", dist, Ndist);
+        setFitResultValueNumberArray(record, index, model, parammsd=param="msd", dist, Ndist);
         setFitResultGroup(record, index, model, param, tr("fit results"));
         setFitResultLabel(record, index, model, param, tr("MSD"), QString("MSD: <i>&lang;r<sup>2</sup>(&tau;)&rang;</i>"));
         setFitResultSortPriority(record, index, model, param, true);
+
+        comp.type=QFRawDataRecord::qfrdrctGraph1D;
+        comp.metadata["logX"]=true;
+        comp.metadata["logY"]=true;
+        comp.metadata["labelX"]=tr("lag time \\tau [s]");
+        comp.metadata["labelY"]=tr("MSD \\langle{r^2}\\rangle(\\tau) [\\mu}m^2]");
+        comp.label=tr("MSD-Curve");
+        comp.referencedResults<<paramtau<<parammsd;
+        record->resultsCompoundSet(getEvaluationResultID(index, model), "msd_curve", comp);
 
 
 

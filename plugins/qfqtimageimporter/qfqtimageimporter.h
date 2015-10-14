@@ -46,7 +46,7 @@ class QFQtImageImporter : public QObject, public QFPluginImporters {
     public:
 
         /** Default constructor */
-        QFQtImageImporter(QObject* parent=NULL) {}
+        QFQtImageImporter(QObject* /*parent*/=NULL) {}
         /** Default destructor */
         virtual ~QFQtImageImporter() {}
 

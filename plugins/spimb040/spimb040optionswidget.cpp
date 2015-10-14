@@ -76,7 +76,7 @@ QString SPIMB040OptionsWidget::getStyle()
     return ui->cmbStyle->currentText();
 }
 
-void SPIMB040OptionsWidget::on_cmbStylesheet_currentIndexChanged( int index ) {
+void SPIMB040OptionsWidget::on_cmbStylesheet_currentIndexChanged( int /*index*/ ) {
 //    QString fn=ui->cmbStylesheet->itemData(index).toString();
 //    QFile f(fn);
 //    QString qss="";
@@ -90,7 +90,7 @@ void SPIMB040OptionsWidget::on_cmbStylesheet_currentIndexChanged( int index ) {
 }
 
 
-void SPIMB040OptionsWidget::on_cmbStyle_currentIndexChanged( const QString & text ) {
+void SPIMB040OptionsWidget::on_cmbStyle_currentIndexChanged( const QString & /*text*/ ) {
 //    parentWidget()->setStyle(QStyleFactory::create(text));
 //    parentWidget()->setPalette(parentWidget()->style()->standardPalette());
     emit styleChanged(getStyle(), getStylesheet());

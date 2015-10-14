@@ -1574,6 +1574,421 @@ QStringList QFRawDataRecord::getPossibleFilesTypes() const
     return QStringList();
 }
 
+int QFRawDataRecord::curvesGetCount() const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) cnt=uc->userCurvesGetCount();
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+     QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+     while (j.hasNext()) {
+         j.next();
+         QFRawDataRecordPrivate::CompoundResultsResultsIterator jj(j.value()->compounds);
+         while (jj.hasNext()) {
+             jj.next();
+             if (jj.value().type==qfrdrctGraph1D) {
+                 cnt++;
+             }
+         }
+     }
+
+     return cnt;
+}
+
+QString QFRawDataRecord::curvesGetName(int index) const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) {
+        cnt=uc->userCurvesGetCount();
+        if (index<cnt) return uc->userCurvesGetName(index);
+    }
+    //index=cnt;
+
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+     QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+     while (j.hasNext()) {
+         j.next();
+         QString key="";
+         QFRawDataRecordPrivate::CompoundResultsResultsIterator jj(j.value()->compounds);
+         while (jj.hasNext()) {
+             jj.next();
+             if (jj.value().type==qfrdrctGraph1D) {
+                 if (index==cnt) key=jj.key();
+                 cnt++;
+             }
+         }
+         //qDebug()<<"curvesGetName("<<index<<"): "<<cnt<<key;
+         if (key.size()>0) {
+             return QString("%1 [%2]").arg(j.value()->compounds[key].label).arg(j.key());
+         }
+     }
+
+    return tr("Curve #%1").arg(index+1);
+}
+
+QVector<double> QFRawDataRecord::curvesGetX(int index) const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) {
+        cnt=uc->userCurvesGetCount();
+        if (index<cnt) return uc->userCurvesGetX(index);
+    }
+    //index=cnt;
+
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+     QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+     while (j.hasNext()) {
+         j.next();
+         QString key="";
+         QFRawDataRecordPrivate::CompoundResultsResultsIterator jj(j.value()->compounds);
+         while (jj.hasNext()) {
+             jj.next();
+             if (jj.value().type==qfrdrctGraph1D) {
+                 if (index==cnt) key=jj.key();
+                 cnt++;
+             }
+         }
+         if (key.size()>0) {
+             QString res= j.value()->compounds[key].referencedResults.value(0, "");
+             //qDebug()<<"curvesGetX"<<key<<j.key()<<res;
+             if (!res.isEmpty()) {
+                 QVector<double> v= resultsGetAsDoubleList(j.key(), res);
+                 //qDebug()<<v;
+                 return v;
+             }
+         }
+     }
+
+    return QVector<double>();
+}
+
+QVector<double> QFRawDataRecord::curvesGetXError(int index) const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) {
+        cnt=uc->userCurvesGetCount();
+        if (index<cnt) return uc->userCurvesGetXError(index);
+    }
+    //index=cnt;
+
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+     QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+     while (j.hasNext()) {
+         j.next();
+         QString key="";
+         QFRawDataRecordPrivate::CompoundResultsResultsIterator jj(j.value()->compounds);
+         while (jj.hasNext()) {
+             jj.next();
+             if (jj.value().type==qfrdrctGraph1D) {
+                 if (index==cnt) key=jj.key();
+                 cnt++;
+             }
+         }
+         if (key.size()>0) {
+             QString res= j.value()->compounds[key].referencedResults.value(3, "");
+             if (!res.isEmpty()) {
+                 QVector<double> v= resultsGetAsDoubleList(j.key(), res);
+                 return v;
+             }
+         }
+     }
+
+    return QVector<double>();
+}
+
+QVector<double> QFRawDataRecord::curvesGetY(int index) const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) {
+        cnt=uc->userCurvesGetCount();
+        if (index<cnt) return uc->userCurvesGetY(index);
+    }
+    //index=cnt;
+
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+     QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+     while (j.hasNext()) {
+         j.next();
+         QString key="";
+         QFRawDataRecordPrivate::CompoundResultsResultsIterator jj(j.value()->compounds);
+         while (jj.hasNext()) {
+             jj.next();
+             if (jj.value().type==qfrdrctGraph1D) {
+                 if (index==cnt) key=jj.key();
+                 cnt++;
+             }
+         }
+         if (key.size()>0) {
+             QString res= j.value()->compounds[key].referencedResults.value(1, "");
+             //qDebug()<<"curvesGetY"<<key<<j.key()<<res;
+             if (!res.isEmpty()) {
+                 QVector<double> v=resultsGetAsDoubleList(j.key(), res);
+                 //qDebug()<<v;
+                 return v;
+             }
+         }
+     }
+
+    return QVector<double>();
+}
+
+QVector<double> QFRawDataRecord::curvesGetYError(int index) const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) {
+        cnt=uc->userCurvesGetCount();
+        if (index<cnt) return uc->userCurvesGetYError(index);
+    }
+    //index=cnt;
+
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+     QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+     while (j.hasNext()) {
+         j.next();
+         QString key="";
+         QFRawDataRecordPrivate::CompoundResultsResultsIterator jj(j.value()->compounds);
+         while (jj.hasNext()) {
+             jj.next();
+             if (jj.value().type==qfrdrctGraph1D) {
+                 if (index==cnt) key=jj.key();
+                 cnt++;
+             }
+         }
+         if (key.size()>0) {
+             QString res= j.value()->compounds[key].referencedResults.value(4, "");
+             if (!res.isEmpty()) {
+                 return resultsGetAsDoubleList(j.key(), res);
+             }
+         }
+     }
+
+    return QVector<double>();
+}
+
+bool QFRawDataRecord::curvesGetLogX(int index) const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) {
+        cnt=uc->userCurvesGetCount();
+        if (index<cnt) return uc->userCurvesGetLogX(index);
+    }
+    //index=cnt;
+
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+     QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+     while (j.hasNext()) {
+         j.next();
+         QString key="";
+         QFRawDataRecordPrivate::CompoundResultsResultsIterator jj(j.value()->compounds);
+         while (jj.hasNext()) {
+             jj.next();
+             if (jj.value().type==qfrdrctGraph1D) {
+                 if (index==cnt) key=jj.key();
+                 cnt++;
+             }
+         }
+         if (key.size()>0) {
+             return j.value()->compounds[key].metadata.value("logX", false).toBool();
+         }
+
+     }
+
+    return false;
+}
+
+bool QFRawDataRecord::curvesGetLogY(int index) const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) {
+        cnt=uc->userCurvesGetCount();
+        if (index<cnt) return uc->userCurvesGetLogY(index);
+    }
+    //index=cnt;
+
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+     QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+     while (j.hasNext()) {
+         j.next();
+         QString key="";
+         QFRawDataRecordPrivate::CompoundResultsResultsIterator jj(j.value()->compounds);
+         while (jj.hasNext()) {
+             jj.next();
+             if (jj.value().type==qfrdrctGraph1D) {
+                 if (index==cnt) key=jj.key();
+                 cnt++;
+             }
+         }
+         if (key.size()>0) {
+             return j.value()->compounds[key].metadata.value("logY", false).toBool();
+         }
+
+     }
+
+    return false;
+}
+
+QFRDRCurvesInterface::CurveType QFRawDataRecord::curvesGetType(int index) const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) {
+        cnt=uc->userCurvesGetCount();
+        if (index<cnt) return uc->userCurvesGetType(index);
+    }
+    return QFRDRCurvesInterface::ctPoints;
+
+}
+
+QString QFRawDataRecord::curvesGetXLabel(int index) const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) {
+        cnt=uc->userCurvesGetCount();
+        if (index<cnt) return uc->userCurvesGetXLabel(index);
+    }
+    //index=cnt;
+
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+     QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+     while (j.hasNext()) {
+         j.next();
+         QString key="";
+         QFRawDataRecordPrivate::CompoundResultsResultsIterator jj(j.value()->compounds);
+         while (jj.hasNext()) {
+             jj.next();
+             if (jj.value().type==qfrdrctGraph1D) {
+                 if (index==cnt) key=jj.key();
+                 cnt++;
+             }
+         }
+         if (key.size()>0) {
+             return j.value()->compounds[key].metadata.value("labelX", tr("X")).toString();
+         }
+
+     }
+
+    return tr("X");
+}
+
+QString QFRawDataRecord::curvesGetYLabel(int index) const
+{
+    int cnt=0;
+    const QFRDRUserCurvesInterface* uc=dynamic_cast<const QFRDRUserCurvesInterface*>(this);
+    if (uc) {
+        cnt=uc->userCurvesGetCount();
+        if (index<cnt) return uc->userCurvesGetYLabel(index);
+    }
+    //index=cnt;
+
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+     QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+     while (j.hasNext()) {
+         j.next();
+         QString key="";
+         QFRawDataRecordPrivate::CompoundResultsResultsIterator jj(j.value()->compounds);
+         while (jj.hasNext()) {
+             jj.next();
+             if (jj.value().type==qfrdrctGraph1D) {
+                 if (index==cnt) key=jj.key();
+                 cnt++;
+             }
+         }
+         if (key.size()>0) {
+             return j.value()->compounds[key].metadata.value("labelY", tr("Y")).toString();
+         }
+     }
+
+    return tr("Y");
+}
+
 
 
 void QFRawDataRecord::resultsClearAll() {

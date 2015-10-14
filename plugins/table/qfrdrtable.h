@@ -47,9 +47,9 @@ class QFRDRTableEditor; // forward
     The data is stored in a QFTablePluginModel object which is also externally accessible for data access.
  */
 
-class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QFRDRColumnGraphsInterface, public QFFitAlgorithmParameterStorage, public QFRDRCurvesInterface {
+class QFRDRTable: public QFRawDataRecord, public QFRDRTableInterface, public QFRDRColumnGraphsInterface, public QFFitAlgorithmParameterStorage, public QFRDRUserCurvesInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRTableInterface QFRDRColumnGraphsInterface QFRDRCurvesInterface)
+        Q_INTERFACES(QFRDRTableInterface QFRDRColumnGraphsInterface QFRDRUserCurvesInterface)
     public:
         enum {
             TableExpressionRole = Qt::UserRole+1,
@@ -651,17 +651,17 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         void colgraphToolsSetGraphtype(QFRDRTable::GraphInfo& g, QFRDRColumnGraphsInterface::ColumnGraphTypes type);
 
 
-        virtual int curvesGetCount() const;
-        virtual QString curvesGetName(int index) const;
-        virtual QVector<double> curvesGetX(int index) const;
-        virtual QVector<double> curvesGetXError(int index) const;
-        virtual QVector<double> curvesGetY(int index) const;
-        virtual QVector<double> curvesGetYError(int index) const;
-        virtual bool curvesGetLogX(int index) const;
-        virtual bool curvesGetLogY(int index) const;
-        virtual CurveType curvesGetType(int index) const;
-        virtual QString curvesGetXLabel(int index) const;
-        virtual QString curvesGetYLabel(int index) const;
+        virtual int userCurvesGetCount() const;
+        virtual QString userCurvesGetName(int index) const;
+        virtual QVector<double> userCurvesGetX(int index) const;
+        virtual QVector<double> userCurvesGetXError(int index) const;
+        virtual QVector<double> userCurvesGetY(int index) const;
+        virtual QVector<double> userCurvesGetYError(int index) const;
+        virtual bool userCurvesGetLogX(int index) const;
+        virtual bool userCurvesGetLogY(int index) const;
+        virtual CurveType userCurvesGetType(int index) const;
+        virtual QString userCurvesGetXLabel(int index) const;
+        virtual QString userCurvesGetYLabel(int index) const;
 
 
         int getPlotCount() const;

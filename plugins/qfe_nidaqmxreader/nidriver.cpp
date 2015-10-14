@@ -4,7 +4,7 @@
 MainWindow* NIMainWindow=NULL;
 int NIchannels=0;
 
-int32 CVICALLBACK EveryNCallback(TaskHandle taskHandle, int32 everyNsamplesEventType, uInt32 nSamples, void *callbackData)
+int32 CVICALLBACK EveryNCallback(TaskHandle taskHandle, int32 /*everyNsamplesEventType*/, uInt32 nSamples, void */*callbackData*/)
 {
     bool hasError=false;
     int32       error=0;
@@ -53,7 +53,7 @@ int32 CVICALLBACK EveryNCallback(TaskHandle taskHandle, int32 everyNsamplesEvent
     return 0;
 }
 
-int32 CVICALLBACK DoneCallback(TaskHandle taskHandle, int32 status, void *callbackData)
+int32 CVICALLBACK DoneCallback(TaskHandle taskHandle, int32 status, void */*callbackData*/)
 {
     bool hasError=false;
     int32   error=0;
@@ -122,7 +122,7 @@ TaskHandle setupNI(MainWindow *win)
         NIchannels++;
     }
 
-    DAQmxErrChk (DAQmxCfgSampClkTiming(taskHandle,"",NIMainWindow->getSampleClock(),DAQmx_Val_Rising ,DAQmx_Val_FiniteSamps,win->getSamples()));
+    DAQmxErrChk (DAQmxCfgSampClkTiming(taskHandle,NIMainWindow->getClockSource().toLocal8Bit().data(),NIMainWindow->getSampleClock(),DAQmx_Val_Rising ,DAQmx_Val_FiniteSamps,win->getSamples()));
     if (NIMainWindow->getStartTrigger()) {
         int32 edge=DAQmx_Val_Rising;
         if (NIMainWindow->getStartTriggerEdge()==1) edge=DAQmx_Val_Falling;
@@ -174,6 +174,7 @@ TaskHandle setupNIPreview(MainWindow *win)
     NIchannels=0;
     for (int i=0; i<NIMainWindow->getChannels()->getChannelCount(); i++) {
         int32 term=DAQmx_Val_Cfg_Default;
+        bool addChannel=true;
         switch(NIMainWindow->getChannels()->getChannel(i).type) {
             case NIC_Analog_SingleEnded:
                 term=DAQmx_Val_RSE;
@@ -188,21 +189,23 @@ TaskHandle setupNIPreview(MainWindow *win)
                 term=DAQmx_Val_PseudoDiff;
                 break;
             default:
-                term=DAQmx_Val_Cfg_Default;
+                //term=DAQmx_Val_Cfg_Default;
+                addChannel=false;
                 break;
         }
-
-        DAQmxErrChk (DAQmxCreateAIVoltageChan(taskHandle, NIMainWindow->getChannels()->getChannel(i).physicalChannel.toLatin1().data(),
-                                                          "",//NIMainWindow->getChannels()->getChannel(i).name.toLatin1().data(),
-                                                          term,
-                                                          NIMainWindow->getChannels()->getChannel(i).minVal,
-                                                          NIMainWindow->getChannels()->getChannel(i).maxVal,DAQmx_Val_Volts,NULL));
-        if (hasError) break;
-        NIMainWindow->addLogMessage(QString("    added channel '%1' (physical: '%2')").arg(NIMainWindow->getChannels()->getChannel(i).name).arg(NIMainWindow->getChannels()->getChannel(i).physicalChannel));
-        NIchannels++;
+        if (addChannel) {
+            DAQmxErrChk (DAQmxCreateAIVoltageChan(taskHandle, NIMainWindow->getChannels()->getChannel(i).physicalChannel.toLatin1().data(),
+                                                  "",//NIMainWindow->getChannels()->getChannel(i).name.toLatin1().data(),
+                                                  term,
+                                                  NIMainWindow->getChannels()->getChannel(i).minVal,
+                                                  NIMainWindow->getChannels()->getChannel(i).maxVal,DAQmx_Val_Volts,NULL));
+            if (hasError) break;
+            NIMainWindow->addLogMessage(QString("    added channel '%1' (physical: '%2')").arg(NIMainWindow->getChannels()->getChannel(i).name).arg(NIMainWindow->getChannels()->getChannel(i).physicalChannel));
+            NIchannels++;
+        }
     }
 
-    DAQmxErrChk (DAQmxCfgSampClkTiming(taskHandle,"",NIMainWindow->getPreviewSampleClock(),DAQmx_Val_Rising ,DAQmx_Val_ContSamps , win->getUpdatePreviewPlotSamples()));
+    DAQmxErrChk (DAQmxCfgSampClkTiming(taskHandle,NIMainWindow->getClockSource().toLocal8Bit().data(),NIMainWindow->getPreviewSampleClock(),DAQmx_Val_Rising ,DAQmx_Val_ContSamps , win->getUpdatePreviewPlotSamples()));
 
     DAQmxErrChk (DAQmxRegisterEveryNSamplesEvent(taskHandle,DAQmx_Val_Acquired_Into_Buffer,NIMainWindow->getUpdatePreviewPlotSamples(),0,EveryNCallback,NULL));
     DAQmxErrChk (DAQmxRegisterDoneEvent(taskHandle,0,DoneCallback,NULL));

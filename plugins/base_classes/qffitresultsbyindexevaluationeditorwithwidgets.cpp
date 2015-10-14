@@ -41,7 +41,7 @@
 #include "qfselectrdrdialog.h"
 #include "qfoverlayplotdialog.h"
 
-QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent, bool hasMultiThreaded, bool multiThreadPriority, const QString &runName, bool useRunComboBox) :
+QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent, bool hasMultiThreaded, bool multiThreadPriority, const QString &runName, bool useRunComboBox, bool twoToolbars) :
     QFFitResultsByIndexEvaluationEditorBase(iniPrefix, propEditor, services, parent)
 {
     m_runName=runName;
@@ -54,14 +54,14 @@ QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEdi
     fitStatisticsReport="";
 
 
-    createWidgets(hasMultiThreaded, multiThreadPriority, useRunComboBox);
+    createWidgets(hasMultiThreaded, multiThreadPriority, useRunComboBox,twoToolbars);
 
 
 }
 
 
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMultiThreaded, bool /*multiThreadPriority*/, bool useRunCombobox) {
+void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMultiThreaded, bool /*multiThreadPriority*/, bool useRunCombobox, bool twoToolbars) {
 
 
 
@@ -142,12 +142,17 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     boldfont.setBold(true);
 
     toolbar=new QToolBar("toolbar_fit", this);
+    toolbar->setIconSize(QSize(16,16));
+    toolbar2=new QToolBar("toolbar2_fit", this);
+    toolbar2->setIconSize(QSize(16,16));
     vbl->addWidget(toolbar);
+    vbl->addWidget(toolbar2);
+    toolbar2->setVisible(twoToolbars);
     /*actSaveReport=new QAction(QIcon(":/lib/fit_savereport.png"), tr("Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
     actPrintReport=new QAction(QIcon(":/lib/fit_printreport.png"), tr("Print Report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));*/
-    QLabel* lPS=new QLabel(tr("   &Plots: "), toolbar);
+    QLabel* lPS=new QLabel(tr("   &Curves: "), toolbar);
     lPS->setFont(boldfont);
     cmbPlotStyle=new QComboBox(toolbar);
     cmbPlotStyle->addItem(QIcon(":/lib/plot_points.png"), tr("points"));
@@ -170,13 +175,20 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
     chkWeightedResiduals=new QCheckBox(tr("&weighted  "), toolbar);
 
+    QLabel* lGS=new QLabel(tr("Plots: "), toolbar);
+    lGS->setFont(boldfont);
+
+
+
     QWidget* sp1=new QWidget(this);
     sp1->setMinimumWidth(10);
     sp1->setMaximumWidth(10);
-    chkGrid=new QCheckBox(tr("&Grid   "), toolbar);
-    chkKey=new QCheckBox(tr("&Key   "), toolbar);
+    chkGrid=new QCheckBox(tr("&Grid  "), toolbar);
+    chkKey=new QCheckBox(tr("&Key  "), toolbar);
     chkXLogScale=new QCheckBox(tr("&log. tau   "), toolbar);
-    chkXLogScale->setVisible(false);
+    //chkXLogScale->setVisible(false);
+    chkYLogScale=new QCheckBox(tr("log. y   "), toolbar);
+    //chkYLogScale->setVisible(false);
     labMousePosition=new QLabel(this);
     QWidget* sp2=new QWidget(this);
     sp2->setMinimumWidth(10);
@@ -550,13 +562,32 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     toolbar->addWidget(lRS);
     toolbar->addWidget(chkWeightedResiduals);
     toolbar->addWidget(cmbResidualStyle);
-    toolbar->addWidget(sp1);
-    toolbar->addWidget(chkGrid);
-    toolbar->addWidget(chkKey);
-    toolbar->addWidget(chkXLogScale);
-    toolbar->addSeparator();
+    if (twoToolbars) {
+        toolbar2->addWidget(sp1);
+        toolbar2->addWidget(lGS);
+        actXLogScale= toolbar2->addWidget(chkXLogScale);
+        actYLogScale=toolbar2->addWidget(chkYLogScale);
+        toolbar2->addWidget(chkGrid);
+        toolbar2->addWidget(chkKey);
+        //toolbar2->addSeparator();
+    } else {
+        toolbar->addWidget(sp1);
+        toolbar->addWidget(lGS);
+        actXLogScale= toolbar->addWidget(chkXLogScale);
+        actYLogScale=toolbar->addWidget(chkYLogScale);
+        toolbar->addWidget(chkGrid);
+        toolbar->addWidget(chkKey);
+        //toolbar->addSeparator();
+        cmbErrorStyle->setMaximumWidth(100);
+        cmbPlotStyle->setMaximumWidth(100);
+        cmbResidualStyle->setMaximumWidth(100);
+    }
+
     toolbar->addWidget(sp2);
     toolbar->addWidget(labMousePosition);
+    actYLogScale->setVisible(false);
+    actXLogScale->setVisible(false);
+
 
     connect(actAlgorithmHelp, SIGNAL(triggered()), this, SLOT(displayFitAlgorithmHelp()));
     connect(actConfigAlgorithm, SIGNAL(triggered()), this, SLOT(configFitAlgorithm()));
@@ -700,6 +731,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
         disconnect(chkGrid, SIGNAL(toggled(bool)), this, SLOT(chkGridToggled(bool)));
         disconnect(chkKey, SIGNAL(toggled(bool)), this, SLOT(chkKeyToggled(bool)));
         disconnect(chkXLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
+        disconnect(chkYLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
         disconnect(cmbResidualStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(residualStyleChanged(int)));
         disconnect(chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(chkWeightedResidualsToggled(bool)));
         disconnect(spinResidualHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(residualHistogramBinsChanged(int)));
@@ -716,6 +748,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
 
         dataEventsEnabled=false;
         chkXLogScale->setChecked(current->getProperty("plot_taulog", getPlotXLog()).toBool());
+        chkYLogScale->setChecked(current->getProperty("plot_ylog", getPlotYLog()).toBool());
         chkGrid->setChecked(current->getProperty("plot_grid", true).toBool());
         chkKey->setChecked(current->getProperty("plot_key", true).toBool());
         cmbPlotStyle->setCurrentIndex(current->getProperty("plot_style", 0).toInt());
@@ -760,6 +793,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
     connect(chkGrid, SIGNAL(toggled(bool)), this, SLOT(chkGridToggled(bool)));
     connect(chkKey, SIGNAL(toggled(bool)), this, SLOT(chkKeyToggled(bool)));
     connect(chkXLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
+    connect(chkYLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
     connect(cmbResidualStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(residualStyleChanged(int)));
     connect(chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(chkWeightedResidualsToggled(bool)));
     connect(spinResidualHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(residualHistogramBinsChanged(int)));
@@ -964,7 +998,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::estimateActionClicked()
 
             eval->setFitValue(rdr, eval->getCurrentIndex(), id, np);
             updateParameterValues(rdr);
-            updateFitFunctionsPlot();
+            replotData();
         }
     }
 }
@@ -1420,6 +1454,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::chkXLogScaleToggled(bool /*
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     current->setQFProperty("plot_taulog", chkXLogScale->isChecked(), false, false);
+    current->setQFProperty("plot_ylog", chkYLogScale->isChecked(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
 }

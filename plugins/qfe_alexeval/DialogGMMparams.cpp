@@ -353,7 +353,7 @@ void DialogGMMparams::saveAll()
     if(writeToIni(iniFile.toStdString())==EXIT_SUCCESS) qDebug()<<"all models saved in"<<iniFile;
 }
 
-void DialogGMMparams::dimChanged(int dim)
+void DialogGMMparams::dimChanged(int /*dim*/)
 {
     ui->spinBoxDim->setDisabled(true);
 }

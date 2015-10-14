@@ -79,12 +79,12 @@ void QFRDRCurveDataEditor::currentCurveChanged(int curve)
     if (curve>=0) m->setQFProperty("QFRDRCurveDataEditor/currentCurve", curve, false, false);
 
     // set metadata widgets
-    ui->edtName->setText(m->curvesGetName(curve));
-    ui->edtLabelX->setText(m->curvesGetXLabel(curve));
-    ui->edtLabelY->setText(m->curvesGetYLabel(curve));
-    ui->chkLogX->setChecked(m->curvesGetLogX(curve));
-    ui->chkLogY->setChecked(m->curvesGetLogY(curve));
-    ui->cmbType->setCurrentIndex((int)m->curvesGetType(curve));
+    ui->edtName->setText(m->userCurvesGetName(curve));
+    ui->edtLabelX->setText(m->userCurvesGetXLabel(curve));
+    ui->edtLabelY->setText(m->userCurvesGetYLabel(curve));
+    ui->chkLogX->setChecked(m->userCurvesGetLogX(curve));
+    ui->chkLogY->setChecked(m->userCurvesGetLogY(curve));
+    ui->cmbType->setCurrentIndex((int)m->userCurvesGetType(curve));
 
     // disable plot-updates while we edit the plot data
     ui->plotter->set_doDrawing(false);
@@ -95,15 +95,15 @@ void QFRDRCurveDataEditor::currentCurveChanged(int curve)
     ds->clear();
 
     // set plot properties
-    ui->plotter->getXAxis()->set_axisLabel(m->curvesGetXLabel(curve));
-    ui->plotter->getXAxis()->set_logAxis(m->curvesGetLogX(curve));
-    ui->plotter->getYAxis()->set_axisLabel(m->curvesGetYLabel(curve));
-    ui->plotter->getYAxis()->set_logAxis(m->curvesGetLogY(curve));
+    ui->plotter->getXAxis()->set_axisLabel(m->userCurvesGetXLabel(curve));
+    ui->plotter->getXAxis()->set_logAxis(m->userCurvesGetLogX(curve));
+    ui->plotter->getYAxis()->set_axisLabel(m->userCurvesGetYLabel(curve));
+    ui->plotter->getYAxis()->set_logAxis(m->userCurvesGetLogY(curve));
 
     QList<int> curvesDisplay;
     // check for overlay: If in overlay mode, we display all curves
     if (ui->chkOverlay->isChecked()) {
-        for (int i=0; i<m->curvesGetCount(); i++) curvesDisplay<<i;
+        for (int i=0; i<m->userCurvesGetCount(); i++) curvesDisplay<<i;
     } else {
         // if in single-mode only the currentcurve!
         curvesDisplay<<curve;
@@ -114,36 +114,36 @@ void QFRDRCurveDataEditor::currentCurveChanged(int curve)
         int curve=curvesDisplay[i];
 
         // add new plot:
-        switch(m->curvesGetType(curve)) {
+        switch(m->userCurvesGetType(curve)) {
             case QFRDRCurvesInterface::ctPoints: {
                     JKQTPxyLineErrorGraph* plt=new JKQTPxyLineErrorGraph(ui->plotter);
                     plt->set_drawLine(false);
                     plt->set_symbol(JKQTPfilledCircle);
-                    plt->set_title(m->curvesGetName(curve));
-                    if (m->curvesGetX(curve).size()>0) plt->set_xColumn(ds->addCopiedColumn(m->curvesGetX(curve), QString("x-data (curve %1)").arg(curve)));
-                    if (m->curvesGetY(curve).size()>0) plt->set_yColumn(ds->addCopiedColumn(m->curvesGetY(curve), QString("y-data (curve %1)").arg(curve)));
-                    if (m->curvesGetXError(curve).size()>0) plt->set_xErrorColumn(ds->addCopiedColumn(m->curvesGetX(curve), QString("x-error (curve %1)").arg(curve)));
-                    if (m->curvesGetYError(curve).size()>0) plt->set_yErrorColumn(ds->addCopiedColumn(m->curvesGetX(curve), QString("y-error (curve %1)").arg(curve)));
+                    plt->set_title(m->userCurvesGetName(curve));
+                    if (m->userCurvesGetX(curve).size()>0) plt->set_xColumn(ds->addCopiedColumn(m->userCurvesGetX(curve), QString("x-data (curve %1)").arg(curve)));
+                    if (m->userCurvesGetY(curve).size()>0) plt->set_yColumn(ds->addCopiedColumn(m->userCurvesGetY(curve), QString("y-data (curve %1)").arg(curve)));
+                    if (m->userCurvesGetXError(curve).size()>0) plt->set_xErrorColumn(ds->addCopiedColumn(m->userCurvesGetX(curve), QString("x-error (curve %1)").arg(curve)));
+                    if (m->userCurvesGetYError(curve).size()>0) plt->set_yErrorColumn(ds->addCopiedColumn(m->userCurvesGetX(curve), QString("y-error (curve %1)").arg(curve)));
                     ui->plotter->addGraph(plt);
                 } break;
             case QFRDRCurvesInterface::ctLines: {
                     JKQTPxyLineErrorGraph* plt=new JKQTPxyLineErrorGraph(ui->plotter);
                     plt->set_drawLine(true);
                     plt->set_symbol(JKQTPnoSymbol);
-                    plt->set_title(m->curvesGetName(curve));
-                    if (m->curvesGetX(curve).size()>0) plt->set_xColumn(ds->addCopiedColumn(m->curvesGetX(curve), QString("x-data (curve %1)").arg(curve)));
-                    if (m->curvesGetY(curve).size()>0) plt->set_yColumn(ds->addCopiedColumn(m->curvesGetY(curve), QString("y-data (curve %1)").arg(curve)));
-                    if (m->curvesGetXError(curve).size()>0) plt->set_xErrorColumn(ds->addCopiedColumn(m->curvesGetX(curve), QString("x-error (curve %1)").arg(curve)));
-                    if (m->curvesGetYError(curve).size()>0) plt->set_yErrorColumn(ds->addCopiedColumn(m->curvesGetX(curve), QString("y-error (curve %1)").arg(curve)));
+                    plt->set_title(m->userCurvesGetName(curve));
+                    if (m->userCurvesGetX(curve).size()>0) plt->set_xColumn(ds->addCopiedColumn(m->userCurvesGetX(curve), QString("x-data (curve %1)").arg(curve)));
+                    if (m->userCurvesGetY(curve).size()>0) plt->set_yColumn(ds->addCopiedColumn(m->userCurvesGetY(curve), QString("y-data (curve %1)").arg(curve)));
+                    if (m->userCurvesGetXError(curve).size()>0) plt->set_xErrorColumn(ds->addCopiedColumn(m->userCurvesGetX(curve), QString("x-error (curve %1)").arg(curve)));
+                    if (m->userCurvesGetYError(curve).size()>0) plt->set_yErrorColumn(ds->addCopiedColumn(m->userCurvesGetX(curve), QString("y-error (curve %1)").arg(curve)));
                     ui->plotter->addGraph(plt);
                 } break;
             case QFRDRCurvesInterface::ctBars: {
                     JKQTPbarHorizontalGraph* plt=new JKQTPbarHorizontalGraph(ui->plotter);
-                    plt->set_title(m->curvesGetName(curve));
-                    if (m->curvesGetX(curve).size()>0) plt->set_xColumn(ds->addCopiedColumn(m->curvesGetX(curve), QString("x-data (curve %1)").arg(curve)));
-                    if (m->curvesGetY(curve).size()>0) plt->set_yColumn(ds->addCopiedColumn(m->curvesGetY(curve), QString("y-data (curve %1)").arg(curve)));
-                    if (m->curvesGetXError(curve).size()>0) plt->set_xErrorColumn(ds->addCopiedColumn(m->curvesGetX(curve), QString("x-error (curve %1)").arg(curve)));
-                    if (m->curvesGetYError(curve).size()>0) plt->set_yErrorColumn(ds->addCopiedColumn(m->curvesGetX(curve), QString("y-error (curve %1)").arg(curve)));
+                    plt->set_title(m->userCurvesGetName(curve));
+                    if (m->userCurvesGetX(curve).size()>0) plt->set_xColumn(ds->addCopiedColumn(m->userCurvesGetX(curve), QString("x-data (curve %1)").arg(curve)));
+                    if (m->userCurvesGetY(curve).size()>0) plt->set_yColumn(ds->addCopiedColumn(m->userCurvesGetY(curve), QString("y-data (curve %1)").arg(curve)));
+                    if (m->userCurvesGetXError(curve).size()>0) plt->set_xErrorColumn(ds->addCopiedColumn(m->userCurvesGetX(curve), QString("x-error (curve %1)").arg(curve)));
+                    if (m->userCurvesGetYError(curve).size()>0) plt->set_yErrorColumn(ds->addCopiedColumn(m->userCurvesGetX(curve), QString("y-error (curve %1)").arg(curve)));
                     ui->plotter->addGraph(plt);
                 } break;
          }
@@ -171,13 +171,13 @@ void QFRDRCurveDataEditor::curveMetadataEdited()
     m->setQFProperty("QFRDRCurveDataEditor/overlayCurves", ui->chkOverlay->isChecked(), false, false);
     int curve=ui->cmbCurve->currentIndex();
     if (curve>=0) {
-        m->curvesSetName(curve, ui->edtName->text());
+        m->userCurvesSetName(curve, ui->edtName->text());
         if (curve>=0 && curve<ui->cmbCurve->count()) ui->cmbCurve->setItemText(curve, ui->edtName->text());
-        m->curvesSetXLabel(curve, ui->edtLabelX->text());
-        m->curvesSetYLabel(curve, ui->edtLabelY->text());
-        m->curvesSetLogX(curve, ui->chkLogX->isChecked());
-        m->curvesSetLogY(curve, ui->chkLogY->isChecked());
-        m->curvesSetTypeI(curve, ui->cmbType->currentIndex());
+        m->userCurvesSetXLabel(curve, ui->edtLabelX->text());
+        m->userCurvesSetYLabel(curve, ui->edtLabelY->text());
+        m->userCurvesSetLogX(curve, ui->chkLogX->isChecked());
+        m->userCurvesSetLogY(curve, ui->chkLogY->isChecked());
+        m->userCurvesSetTypeI(curve, ui->cmbType->currentIndex());
     }
     // eat all intermediate events
     QApplication::processEvents();
@@ -199,8 +199,8 @@ void QFRDRCurveDataEditor::rawDataChanged() {
 
     // add new curves to cmbCurve
     ui->cmbCurve->clear();
-    for (int i=0; i<m->curvesGetCount(); i++) {
-        ui->cmbCurve->addItem(tr("%1: %2").arg(i+1).arg(m->curvesGetName(i)));
+    for (int i=0; i<m->userCurvesGetCount(); i++) {
+        ui->cmbCurve->addItem(tr("%1: %2").arg(i+1).arg(m->userCurvesGetName(i)));
     }
     ui->cmbCurve->setCurrentIndex(m->getQFProperty("QFRDRCurveDataEditor/currentCurve", 0).toInt()); // read last curve
     ui->chkOverlay->setChecked(m->getQFProperty("QFRDRCurveDataEditor/overlayCurves", ui->chkOverlay->isChecked()).toBool());

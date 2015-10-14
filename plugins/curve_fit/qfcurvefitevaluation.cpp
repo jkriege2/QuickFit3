@@ -160,7 +160,7 @@ void QFCurveFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
     if (defaultMinDatarange>=0) rangeMinDatarange=defaultMinDatarange;
     if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
 
-    int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 1).toInt(),1000);
+    int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 2).toInt(),1000);
 
     restoreQFFitAlgorithmParameters(falg);
     falg->readErrorEstimateParametersFit(this);
@@ -498,7 +498,7 @@ void QFCurveFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFuncti
     if (defaultMinDatarange>=0) rangeMinDatarange=defaultMinDatarange;
     if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
 
-    int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 1).toInt(),1000);
+    int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 2).toInt(),1000);
 
     //restoreQFFitAlgorithmParameters(falg);
     falg->readErrorEstimateParametersFit(this);

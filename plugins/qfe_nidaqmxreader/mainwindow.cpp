@@ -135,6 +135,7 @@ void MainWindow::loadSettings(const QString &fn, const QString &prefix)
     ui->chkStartTrigger->setChecked(set->value(prefix+"chkStartTrigger", false).toBool());
     ui->cmbStartTriggerEdge->setCurrentIndex(set->value(prefix+"cmbStartTriggerEdge", 0).toInt());
     ui->edtStartTriggerChannel->setText(set->value(prefix+"edtStartTriggerChannel", "/Dev1/PFI0").toString());
+    ui->edtClockSource->setText(set->value(prefix+"edtClockSource", "").toString());
     ui->chkStartTriggerRetrigger->setChecked(set->value(prefix+"chkStartTriggerRetrigger", false).toBool());
     ui->chkRefTrigger->setChecked(set->value(prefix+"chkRefTrigger", true).toBool());
     ui->cmbRefTriggerEdge->setCurrentIndex(set->value(prefix+"cmbRefTriggerEdge", 0).toInt());
@@ -175,6 +176,7 @@ void MainWindow::storeSettings(const QString &fn, const QString&prefix)
     set->setValue(prefix+"chkStartTriggerRetrigger", ui->chkStartTriggerRetrigger->isChecked());
     set->setValue(prefix+"cmbStartTriggerEdge", ui->cmbStartTriggerEdge->currentIndex());
     set->setValue(prefix+"edtStartTriggerChannel", ui->edtStartTriggerChannel->text());
+    set->setValue(prefix+"edtClockSource", ui->edtClockSource->text());
     set->setValue(prefix+"chkRefTrigger", ui->chkRefTrigger->isChecked());
     set->setValue(prefix+"cmbRefTriggerEdge", ui->cmbRefTriggerEdge->currentIndex());
     set->setValue(prefix+"edtRefTriggerChannel", ui->edtRefTriggerChannel->text());
@@ -458,6 +460,11 @@ QString MainWindow::getRefTriggerChannel() const
 double MainWindow::getSampleClock() const
 {
     return ui->spinSampleClock->value();
+}
+
+QString MainWindow::getClockSource() const
+{
+    return ui->edtClockSource->text();
 }
 
 double MainWindow::getPreviewSampleClock() const
