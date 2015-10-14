@@ -2,106 +2,207 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <title>Plugin Tutorial</title>
+  <title>FCS MaxEnt Evaluation Tutorial</title>
   </head>
   <body>
         $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-        <p>This tutorial explains how to use the Maximum Entropy Plugin for QuickFit.
+        
+        $$startbox_note$$
+        Example dataset and projects can be found in the directory <code><a href="opendir:///$$plugin_info:examplesdir:fcs_maxent$$">$$plugin_info:examplesdir:fcs_maxent$$</a>.</code><br><br>
+        
+       This tutorial explains how to use the Maximum Entropy Plugin for QuickFit.
         This is done by providing a step by step instruction for FCS example data.
         It might be helpful to read the help and tutorial of the FCS fit plugin as well to
         get the basic idea of how data evaluation in QuickFit works.
-        </p>
-        
+        $$endbox$$
     <p></p>
     <p></p>
-    <h2>Getting started</h2>    
+    <h2>Preparing the Project</h2>    
     <p>
-    Once the FCS data has been loaded into the workspace we need to add an MaxEnt Evaluation object to the current project. To do so, click on the "Insert a new evaluation" button and choose
-    "FCS: MaxEnt", or alternatively click on <b>Data Items/Insert Evaluations/FCS: MaxEnt</b>
-    </p>
-    
-    <center><img align="middle" vspace="10" src="./pic/open_maxent.png"></center>
-    <p>
-    Next double click on the new item in the "Evaluations Items" list in the project tree, to open the plugin environment
-    and there switch to the "Evaluation" tab to see the MaxEnt user interface.
-    </p>    
-    
-        
-        
-        
-    <center><img align="middle" vspace="10" src="./pic/maxent_gui2.png"></center>
-    <p>
-    You should see the user interface as explained above. 
-    In the file list on the right hand side
-    we see our opened data record which we wish to process.
-    </p>
-        
-    <h2>MaxEnt Fitting</h2>
-    <p>
-    In this tutorial we work with the data file:
-    <ul><li>DNA_2nM_Al488_10ul.ASC</li></ul>
-    which can be found in the driectory <b>output/assets/plugins/fcs_maxent/tutorial</b>.
-    
-    </p>
-    
-    
-    By following the steps in the list below you should be able to carry out a MaxEnt fit.
-        
-        
     <ol>
-    <li>
-    <b>Selecting the desired data.</b>
-    First of all make sure that the correct data set is chosen. Check that the data you wish to evaluate
-    appears highlighted in the file list on the right. Then choose which run you wish to work with
-    by using the corresponding sliders for the "run" -field.
+        <li>Load FCS-datasets into the project. For this tutorial, you should create a new project and then add the following ALV-5000 files from the directory <a href="opendir:///$$plugin_info:examplesdir:fcs_maxent$$">$$plugin_info:examplesdir:fcs_maxent$$</a>:
+        <ul>
+            <li><tt>$$plugin_info:examplesdir:fcs_maxent$$/testdata/al488_20nM_3.ASC</tt> (only ALexa-488)</li>
+            <li><tt>$$plugin_info:examplesdir:fcs_maxent$$/testdata/DNA_2nM_Al488_0ul_1.ASC</tt> (only DNA)</li>
+            <li><tt>$$plugin_info:examplesdir:fcs_maxent$$/testdata/DNA_2nM_Al488_5ul_1.ASC</tt> (DNA-ALexa-488 mixture)</li>
+            <li><tt>$$plugin_info:examplesdir:fcs_maxent$$/testdata/DNA_2nM_Al488_10ul_1.ASC</tt> (DNA-ALexa-488 mixture)</li>
+        </ul> 
+        These files represent measurements of aqueous solutions of Alexa-488, of an Alexa-488-labeled dsDNA and of mixtures of Alexa-488 and the DNA in different proportions.
+        <br><br>
+        You can load these files into the project with the mainwindow menu entry <b>Data Items | Insert Raw Data | FCS/DLS | Open FCS/DLS Data from File</b>:
+        <center><a name="tutorial_maxent_pic000"><img src="./pic/tutorial_maxent_pic000.png" border="1">
+        </center>
+        </li>
+        <li>Now we will have to add the evaluation item to the project. This is done in the mainwindow menu <b>Data Items | Insert Evaluations | FCS: MaxEnt</b>.</li>
+        <li>The project will now look as follows:
+        <center><a name="tutorial_maxent_pic001"><img src="./pic/tutorial_maxent_pic001.png" border="1">
+        </center>
+        </li>
+        <li>In some cases it might be required to clean the data in the input files. How to do this is described in the tutorial of the plugin <a href="$$plugin_info:tutorial:fcs_fit$$">FCS Curve Fitting</a>.</li>
+    </ol>
     
-    </li>
     
-    <li>
-    <b>Set model parameters.</b> To ensure a good performance it is recommended, to use the fit 
-    results from a preliminary FCS fit as input parameters for the MaxEnt fit algorithm.
-    <ul>
-    <li><b>Axial ratio:</b> For the calibration of the axial ratio see the FCS fit help document.
-    If not specified otherwise you might use the default value set by the algorithm.</li>
-    </ul>
-    For the given example data we use the the model "3D diffusion with triplet."
-    In this case a previous FCS fit provided the following values for the triplet decay time 
-    and the triplet fraction
-    <ul>
-    <li>&tau; = 9.39532 &plusmn; 0.75 </li>
-    <li>&theta; = 0.2969 &plusmn; 0.0119 </li>
-    </ul>
-    We adjust the default values for these two model parameters to the newly found fit results
-    for our given data set.
-    </li>
+    <h2>MaxEnt Evaluation</h2>
     
-    <li><b>Select data range.</b> By using the lower & upper cutoff sliders below the plotting boxes
-    we can adjust which data points we wish to neglect. In this example we will cut off the first three data points.</li>
     
-    <li> If all values are set. We can click on the fit current button and will see both
-    the fitted autocorrelation curve in the main plot window on the left, and the computed Maximum
-    Entropy distribution in the plot box to the right.</li>
+    <h3>Basic MaxEnt Fitting</h3>
     
-    </ol>    
-        
-        
-    <center><img align="middle" vspace="10" src="./pic/maxent_result.png"></center>    
-        
+    
+    <p>
+    <ol>
+        <li>Now open the MaxEnt evaluation editor by double-clicking the entry "FCS: MaxEnt" in the project. The window looks as follows:
+        <center><a name="tutorial_maxent_pic002"><img src="./pic/tutorial_maxent_pic002.png" border="1">
+        </center>
+        On the rhs of this dialog you can select one of the files/RDRs in the project. On the lhs you see a plot of the ACF-curve (red) and the model derived from the MaxEnt distribution (green) together with the residuals and in a second plot the actual MaxEnt distribution.  Below these plots you will find several fit statsitics.
+        </li>
+        <li>First cut any non-needed lag-time channels from the data, e.g. to exclude detector afterpulsing in the first few channels, or long ranges with $(g(\tau)\approx0)$ for large lag times.
+<center><a name="tutorial_maxent_pic005"><img src="./pic/tutorial_maxent_pic005.png" border="1">
+</center>
+ This can be done with the <b>lower &amp; uppper cut-off</b> widgets below the ACF-plot:
+<center><a name="tutorial_maxent_pic003"><img src="./pic/tutorial_maxent_pic003.png" border="1">
+</center>
+If these are deactivated, you can click on the button <b>Reset Current</b> to actiavte them. For the first file (<tt>al488_20nM...ASC</tt>), you should cut them so the data looks as follows:
+<center><a name="tutorial_maxent_pic004"><img src="./pic/tutorial_maxent_pic004.png" border="1">
+</center>
+</li>
+      <li>Now we have to select a MaxEnt model at the top of the window (for this tutorial choose <b>FCS: 3D Normal Diffusion with Triplet</b>) and set the model parameters at the (bottom-)right. This model supports a triplet-component, which is removed form the model before the MaxEnt analysis is performed. A simple <a href="$$plugin_info:tutorial:fcs_fit$$">FCS Curve Fit</a> and a focal volume calibration has revealed the following parameters for this measurement: $[ w_{xy}\approx282\mathrm{nm},\ \ \ \ \ \gamma=6,\ \ \ \ \ \tau_{trip}\approx2\mathrm{{\mu}s},\ \ \ \ \ \theta_{trip}\approx0.2 ]$
+Set these parameters in the MaxEnt dialog:
+<center><a name="tutorial_maxent_pic006"><img src="./pic/tutorial_maxent_pic006.png" border="1">
+<br><a name="tutorial_maxent_pic007"><img src="./pic/tutorial_maxent_pic007.png" border="1">
+</center>
+</li>
+      <li>Now we start the MaxEnt evaluation istelf. First set the Maxent-&alpha; parameter to $(\alpha=0.1)$, which is a rather large value and will lead to broad distributions.
+<center><a name="tutorial_maxent_pic009"><img src="./pic/tutorial_maxent_pic009.png" border="1">
+</center>
+ Finally click several times on <img src="./pic/tutorial_maxent_pic008.png" border="1"> until the MaxEnt distribution does not change any more. You should get a distribution like this:
+<center><a name="tutorial_maxent_pic010"><img src="./pic/tutorial_maxent_pic010.png" border="1">
+</center>
+It is plotted as a function of the correlation time $(\tau_D)$. In some cases it might be more convenient to plot it as a function of the diffusion coefficient $(D=w_{xy}^2/(4\tau_D)})$ instead. This can be done by selecting the x-axis aboive the distribution plot:
+<center><a name="tutorial_maxent_pic012"><img src="./pic/tutorial_maxent_pic012.png" border="1">
+</center>
+Both plots contain blue and red ranges that can be defined on the rhs of the window:
+<center><a name="tutorial_maxent_pic013"><img src="./pic/tutorial_maxent_pic013.png" border="1">
+</center>
+The plugin integrates the MaxEnt-distribution over these two ranges and outputs the fraction of particles in these ranges (here 13% and 31%). This feature helps to quickly quantify mixtures, of the components are easily separable.
+</li>
+</ol></p>
+    <h3>Improvement of the fit Results</h3>
+    <p>As seen in the last step, the distributions are still relatively broad, because we chose a large value $(\alpha=0.1)$. This is also seen in a relatively bad fit to the ACF:
+<center><a name="tutorial_maxent_pic014"><img src="./pic/tutorial_maxent_pic014.png" border="1">
+</center>
+Now we will refine this evaluation, by step-wise reducing the value of $(\alpha)$. To do so, set $(\alpha=0.01)$ and click on <b>Fit Curerent</b>. The result should look as follows:
+<center><a name="tutorial_maxent_pic015"><img src="./pic/tutorial_maxent_pic015.png" border="1">
+</center>
+The fit is already significantly better and the peak is narrower. However the position of the major peak is still around 400&mu;m<sup>2</sup>/s, which is expected for this dye ($(D_{20,W}\approx 407\mathrm{{\mu}m^2/s})$. If you set $(\alpha=0.001)$ and repeat the fit, the results will further improve:
+<center><a name="tutorial_maxent_pic016"><img src="./pic/tutorial_maxent_pic016.png" border="1">
+</center>
+This seems to be an ideal $(\alpha)$ for this dataset (the best value for $(\alpha)$ depends on the dataset, as the residuals are not normalized during the fit). If you further decrease the value to e.g. $(\alpha=10^{-5})$ the fit will get unstable and eventually fail. So we stick to $(\alpha=0.001)$. But note that you'll have to find a good $(\alpha)$ for every new dataset or group of datasets.
+    </p>
+    $$note:If the fit fails, you have to click on <b>Reset Current</b> before running a new fit with new parameters, as every click on <b>Fit Current</b> bases its fit on the previously obtained distribution!$$
+    
 
-    <center><img align="middle" vspace="10" src="./pic/gui_tools.png"></center>    
-        
-        
+<h3>Fitting the other files</h3>
+<p>Now repeat the steps above for the other files in the project. The setting of $(\alpha=0.001)$ will give good results for all files, but since the data is different, you should set the cut to:
+<center><a name="tutorial_maxent_pic017"><img src="./pic/tutorial_maxent_pic017.png" border="1">
+</center>
+The expected curves are these:
+
+<ul>
+    <li><b>DNA_2nM_Al488_0ul_1.ASC - ACF0</b>
+    <center><a name="tutorial_maxent_pic018"><img src="./pic/tutorial_maxent_pic018.png" border="1">
+    </center>
+    </li>
+    <li><b>DNA_2nM_Al488_5ul_1.ASC - ACF0</b>
+    <center><a name="tutorial_maxent_pic019"><img src="./pic/tutorial_maxent_pic019.png" border="1">
+    </center>
+    </li>
+    <li><b>DNA_2nM_Al488_10ul_1.ASC - ACF0</b>
+    <center><a name="tutorial_maxent_pic020"><img src="./pic/tutorial_maxent_pic020.png" border="1">
+    </center>
+
+</ul>
+As you can see, all distributions show two peaks, one at a low diffusion coefficient around 10&mu;m<sup>2</sup>/s and one at 400&mu;m<sup>2</sup>/s. These correspond to the diffusion coefficient of the DNA and of Alexa-488, but the distributions show different abundances of the two. From the given ranges, one gets these fractions (see above):<center><table cellspacing="0" cellpadding="1" border="1">
+  <tr>
+    <th bgcolor="#a0a0a4"><b>file</b></th>
+    <th bgcolor="#a0a0a4"><b>slow fraction (DNA)</b></th>
+    <th bgcolor="#a0a0a4"><b>fast fraction (Alexa-488)</b></th>
+  </tr>
+  <tr>
+    <th bgcolor="#a0a0a4">DNA_2nM_Al488_0ul_1.ASC - ACF0</th>
+    <td>94%</td>
+    <td>4%</td>
+  </tr>
+  <tr>
+    <th bgcolor="#a0a0a4">DNA_2nM_Al488_5ul_1.ASC - ACF0</th>
+    <td>23%</td>
+    <td>72%</td>
+  </tr>
+  <tr>
+    <th bgcolor="#a0a0a4">DNA_2nM_Al488_10ul_1.ASC - ACF0</th>
+    <td>16%</td>
+    <td>83%</td>
+  </tr>
+
+</table></center></p>
+
+<h3>Data Interpretation</h3>
 <p>
-A cursor function in the top toolbar above the plot boxes can be used for a rough analysis.
-For a further analysis of the plotted curves one should use the "Save data of the plot as file (CSV,...)" function
-which is highlighted with a red circle on the left. 
-</p>        
+These data also show that the fraction of ALexa-48 increases and the fraction if the DNA decreases. However these fractions are not always easy to interpret: The first file <tt>DNA_2nM_Al488_0ul_1.ASC - ACF0</tt> did not contain any Alexa-488, so the 4% fast fraction cannot be explained by that. What we see here is most probably internal DNA dynamics, which is also visible in the FCS-autocorrelation curves. Therefore they also appear in the MaxEnt evaluation as an additional peak. the second file <tt>DNA_2nM_Al488_5ul_1.ASC - ACF0</tt> shows a small increase at large diffusion coefficients $(D>10^4\mathrm{{\mu}m^2/s})$. This is a remnant of imperfect correction of the triplet contribution. You can improve this by performing a simple FCS-fit and trying to obtain better estimates for $(\theta_{trip}, \tau_{trip})$.
+</p>
+
+
+
 
 <h2>Overlay Plots</h2>
 <p>
-    You can also use the <a href="tutorial_overlayplot.html">overlay tool</a> to plot several MaxEnt-distributions in a single plot and compare them.</li>
+    You can also use the <a href="tutorial_overlayplot.html">overlay tool</a> to plot several MaxEnt-distributions in a single plot and compare them. In brief:
+    
+<ol>
+    <li>click on the menu entry 
+<center><a name="tutorial_maxent_pic022"><img src="./pic/tutorial_maxent_pic022.png" border="1">
+</center></li>
+    <li>select the files/RDRs you want to overlay (keep the CTRL-key pressed while clicking the files in the list with the mouse) and choose the desired plot. FInally click on OK.</li>
+    <li>For a "MaxEnt D-distribution" plot you should get a new window with this plot:
+    <center><a name="tutorial_maxent_pic023"><img src="./pic/tutorial_maxent_pic023.png" border="1">
+    </center>
+    </li>
+    <li>If you want to keep this plot, you can right-click on the plot and choose "Copy Plot Data to Table RDR" from the context-menu. You will then get a dialog which allows to store the plot (and data) into a new <a href="$$plugin_info:help:table$$">table RDR</a> in the project.</li>
+</ol>
+
 
 </p>
+
+
+
+
+<h2>Fitting the MaxEnt distributions</h2>
+<p>You can fit some model functions (e.g. log-normal distributions) to the MaxEnt dristribution. To do so, follow these instructions:
+<ol>
+    <li>Close the MaxEnt editor and add a new <a href="$$plugin_info:help:curve_fit$$">Histogram Curve-Fit</a> by clicking the following menu entry in the main window:
+    <center><a name="tutorial_maxent_pic024"><img src="./pic/tutorial_maxent_pic024.png" border="1">
+    </center>
+    You will get a new Evaluation Item "Histogram Fit" in the project.
+    </li>
+    <li>Open the Fit editor by double-clicking the new entry:
+    <center><a name="tutorial_maxent_pic025"><img src="./pic/tutorial_maxent_pic025.png" border="1">
+    </center>
+    On the rhs you can select one of the RDRs in the project. The dialog then shows the data from the RDR. With the combobox (3) you can select the different distributions (either as a function of $(\tau_D)$ or of $(D)$). For this tutorial slect "MaxEnt(D)" which is the distributiona s a function of $(D)$.
+    </li>
+    <li>Now select an appropriate fitting model (1). For this tutorial, a log-normal distribution <a href="$$fitfunction:help:gen_multilognormal$$">$$fitfunction:name:gen_multilognormal$$</a> is a good choice. Also set the plot to have a logarithmic x-axis by clicking the checkbox (2).</li>
+    <li>Finally set the initial parameters for the fit in (4) and perform the fit with the button "Fit Current" (5). The result should look as folows:
+    <center><a name="tutorial_maxent_pic026"><img src="./pic/tutorial_maxent_pic026.png" border="1">
+    </center>
+    </li>
+    <li>For the other files you'll need two components in the fit model, as there are also two components in the distribution:
+    <center><a name="tutorial_maxent_pic027"><img src="./pic/tutorial_maxent_pic027.png" border="1">
+    </center>
+    If the first fit for one of the two-peak distributions is done, you can use this result as starting values for the next fits by clicking <b>Copy to Initial</b> before selcting the next file and running the fit there with <b>Fit Current</b>.
+    </li>
+    <li></li>
+</ol></p>
+
+
+
 
         
         
