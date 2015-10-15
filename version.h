@@ -28,6 +28,7 @@
 #define QF_SOURCEWEBLINK "https://github.com/jkriege2/QuickFit3"
 
 #define QF_UPDATEXMLURL "http://www.dkfz.de/Macromol/quickfit/update.xml"
+#define QF_ALTUPDATEXMLURL "http://www.jkrieger.de/quickfit_update.xml"
 //#define QF_UPDATEXMLURL "http://raw.githubusercontent.com/jkriege2/QuickFit3/master/update.xml"
 #define QF_UPDATESPECIALXMLURL "http://www.dkfz.de/Macromol/quickfit/update.xml"
 //#define QF_UPDATESPECIALXMLURL "http://www.dkfz.de/Macromol/quickfit/updatespecial.xml"

@@ -130,7 +130,7 @@ void myMessageOutput(QtMsgType type, const char *msg)
 MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     QMainWindow(NULL)
 {
-
+    latestUpdateVersion=0;
     dlgUserFitFunctionEditor=NULL;
     projectModeEnabled=true;
     nonprojectTitle=tr("non-project mode");
@@ -4282,31 +4282,36 @@ void MainWindow::checkUpdates(bool userRequest)
     QNetworkProxy proxy;
     ProgramOptionsSetQNetworkProxy(proxy);
     networkManager.setProxy(proxy);
+    QModernProgressDialog progress(tr("getting update information ..."), tr("Cancel"), this);
+    progress.open();
 
-    QUrl url = qfUpdateXMLURL();
-    QNetworkRequest request(url);
-    //qDebug()<<"request updates from: "<<qfUpdateXMLURL();
-    //qDebug()<<"user request "<<userRequest;
-    QNetworkReply *reply = networkManager.get(request);
-    if (!userRequest) lastUpdateRequest=reply;
-    else {
-        //qDebug()<<"  user request !";
-        lastUpdateRequestUser=reply;
-        QModernProgressDialog progress(tr("getting update information ..."), tr("Cancel"), this);
-        progress.open();
-        QElapsedTimer time;
-        time.start();
-        while (!reply->atEnd() && time.elapsed()<60000) {
-            QApplication::processEvents();
-            if (progress.wasCanceled()) {
-                lastUpdateRequestUser=NULL;
-                reply->abort();
-                //delete reply;
+    for (int i=0; i<2; i++) {
+        QUrl url;
+        if (i==0) url= qfUpdateXMLURL(false);
+        else if (i==1) url= qfUpdateXMLURL(true);
+        QNetworkRequest request(url);
+        //qDebug()<<"request updates from: "<<qfUpdateXMLURL();
+        //qDebug()<<"user request "<<userRequest;
+        QNetworkReply *reply = networkManager.get(request);
+        if (!userRequest) lastUpdateRequest=reply;
+        else {
+            //qDebug()<<"  user request !";
+            lastUpdateRequestUser=reply;
+            QElapsedTimer time;
+            time.start();
+            while (!reply->atEnd() && time.elapsed()<60000) {
+                QApplication::processEvents();
+                if (progress.wasCanceled()) {
+                    lastUpdateRequestUser=NULL;
+                    reply->abort();
+                    return;
+                    //delete reply;
+                }
+                //qDebug()<<"  user request ! "<<time.elapsed();
             }
-            //qDebug()<<"  user request ! "<<time.elapsed();
         }
-        progress.hide();
     }
+    progress.hide();
 }
 
 void MainWindow::checkUpdatesAutomatic()
@@ -4335,58 +4340,62 @@ void MainWindow::showUpdateInfo(QNetworkReply* reply) {
             bool ok=false;
             int svn=qfReadFirstInt(qfInfoGITVersion(), &ok);
 
-            if (info.valid) {
-                log_global_text("update info from "+reply->url().toString()+":\n");
-                log_global_text("   current version: "+QString::number(svn)+"\n");
-                log_global_text("   newest version "+QString::number(info.latestVersion)+":\n");
-                log_global_text("      date:         "+info.date+"\n");
-                log_global_text("      os:           "+info.os+"\n");
-                log_global_text("      description:  "+info.description+"\n");
-                log_global_text("      download:     "+info.download+"\n");
-                log_global_text("      link:         "+info.link+"\n");
-                log_global_text("      releasenotes: "+info.releasenotes+"\n");
-                for (int i=0; i<info.warnings.size(); i++) {
-                    if (svn<=info.warnings[i].warnSince) log_global_text("      warning (cur. version <= "+QString::number(info.warnings[i].warnSince)+"): "+info.warnings[i].message+"\n");
-                }
-            }
-            if (ok && info.valid && svn<info.latestVersion) {
-                if (lastUpdateRequestUser==reply) {
-                    QString warning="";
-                    if (info.warnings.size()>0) {
-                        warning+=tr("\n\nIt is no longer advised to use your current version (SVN%1). Reasons:").arg(svn);
-                    }
-                    for (int i=0; i<info.warnings.size(); i++) {
-                        if (svn<=info.warnings[i].warnSince) {
-                            warning+=tr("\n   warning (older than SVN%1): %2").arg(info.warnings[i].warnSince).arg(info.warnings[i].message);
-                        }
-                    }
+            if (info.valid && latestUpdateVersion<=info.latestVersion) {
+                latestUpdateVersion=info.latestVersion;
+                if (info.valid) {
 
-                    if (QMessageBox::information(this, tr("QuickFit updates"), tr("new QuickFit 3.0 version (SVN version: %3, date: %2) available:\n\n  %4%5\n\n  Link: %1\n Go to Download site?").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description).arg(warning), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
-                        QDesktopServices::openUrl(info.link);
-                    }
-                    lastUpdateRequestUser=NULL;
-                } else if (lastUpdateRequest==reply) {
-                    QString message=tr("<b>new QuickFit 3.0 version (SVN version: %3, date: %2) available: <a href=\"%1\">go to download</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><a href=\"close_labupdate\">close message</a></small><br>&nbsp;&nbsp;&nbsp;&nbsp;description: <i>%4</i>").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description);
-                    if (info.warnings.size()>0) {
-                        message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">It is no longer advised to use your current version (SVN%1). Reasons:</font>").arg(svn);
-                    }
+                    log_global_text("update info from "+reply->url().toString()+":\n");
+                    log_global_text("   current version: "+QString::number(svn)+"\n");
+                    log_global_text("   newest version "+QString::number(info.latestVersion)+":\n");
+                    log_global_text("      date:         "+info.date+"\n");
+                    log_global_text("      os:           "+info.os+"\n");
+                    log_global_text("      description:  "+info.description+"\n");
+                    log_global_text("      download:     "+info.download+"\n");
+                    log_global_text("      link:         "+info.link+"\n");
+                    log_global_text("      releasenotes: "+info.releasenotes+"\n");
                     for (int i=0; i<info.warnings.size(); i++) {
-                        if (svn<=info.warnings[i].warnSince) {
-                            message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">warning (older than %1): <i>%2</i></font>").arg(info.warnings[i].warnSince).arg(info.warnings[i].message);
-                        }
+                        if (svn<=info.warnings[i].warnSince) log_global_text("      warning (cur. version <= "+QString::number(info.warnings[i].warnSince)+"): "+info.warnings[i].message+"\n");
                     }
-                    labUpgrade->setText(message);
-                    labUpgrade->setVisible(true);
-                    lastUpdateRequest=NULL;
                 }
-            } else {
-                labUpgrade->setText("");
-                labUpgrade->setVisible(false);
-                if (lastUpdateRequestUser==reply) {
-                    QMessageBox::information(this, tr("QuickFit updates"), tr("no updates available"));
-                    lastUpdateRequestUser=NULL;
-                } else if (lastUpdateRequest==reply) {
-                    lastUpdateRequest=NULL;
+                if (ok && info.valid && svn<info.latestVersion) {
+                    if (lastUpdateRequestUser==reply) {
+                        QString warning="";
+                        if (info.warnings.size()>0) {
+                            warning+=tr("\n\nIt is no longer advised to use your current version (SVN%1). Reasons:").arg(svn);
+                        }
+                        for (int i=0; i<info.warnings.size(); i++) {
+                            if (svn<=info.warnings[i].warnSince) {
+                                warning+=tr("\n   warning (older than SVN%1): %2").arg(info.warnings[i].warnSince).arg(info.warnings[i].message);
+                            }
+                        }
+
+                        if (QMessageBox::information(this, tr("QuickFit updates"), tr("new QuickFit 3.0 version (SVN version: %3, date: %2) available:\n\n  %4%5\n\n  Link: %1\n Go to Download site?").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description).arg(warning), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                            QDesktopServices::openUrl(info.link);
+                        }
+                        lastUpdateRequestUser=NULL;
+                    } else if (lastUpdateRequest==reply) {
+                        QString message=tr("<b>new QuickFit 3.0 version (SVN version: %3, date: %2) available: <a href=\"%1\">go to download</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><a href=\"close_labupdate\">close message</a></small><br>&nbsp;&nbsp;&nbsp;&nbsp;description: <i>%4</i>").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description);
+                        if (info.warnings.size()>0) {
+                            message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">It is no longer advised to use your current version (SVN%1). Reasons:</font>").arg(svn);
+                        }
+                        for (int i=0; i<info.warnings.size(); i++) {
+                            if (svn<=info.warnings[i].warnSince) {
+                                message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">warning (older than %1): <i>%2</i></font>").arg(info.warnings[i].warnSince).arg(info.warnings[i].message);
+                            }
+                        }
+                        labUpgrade->setText(message);
+                        labUpgrade->setVisible(true);
+                        lastUpdateRequest=NULL;
+                    }
+                } else {
+                    labUpgrade->setText("");
+                    labUpgrade->setVisible(false);
+                    if (lastUpdateRequestUser==reply) {
+                        QMessageBox::information(this, tr("QuickFit updates"), tr("no updates available"));
+                        lastUpdateRequestUser=NULL;
+                    } else if (lastUpdateRequest==reply) {
+                        lastUpdateRequest=NULL;
+                    }
                 }
             }
         } else {

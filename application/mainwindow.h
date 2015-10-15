@@ -672,6 +672,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         };
 
         updateInfo readUpdateInfo(QIODevice* io);
+        int latestUpdateVersion;
 
         QMap<QString, QString> mathParserHelpCache;
 };

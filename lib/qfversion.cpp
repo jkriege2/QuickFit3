@@ -114,7 +114,8 @@ QString qfInfoCompileDate() {
 }
 
 
-QUrl qfUpdateXMLURL() {
+QUrl qfUpdateXMLURL(bool alternative) {
+    if (alternative) return QUrl::fromEncoded(QString(QF_ALTUPDATEXMLURL).toLocal8Bit());
     if (qfIsSpecialVersion())  return QUrl::fromEncoded(QString(QF_UPDATESPECIALXMLURL).toLocal8Bit());
     return QUrl::fromEncoded(QString(QF_UPDATEXMLURL).toLocal8Bit());
 }
