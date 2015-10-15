@@ -4,7 +4,7 @@
 #include "qfrdrimagingfcs.h"
 #include "qmodernprogresswidget.h"
 
-QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
+QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, bool is_calibration, QWidget *parent):
     QFWizard(QSize(600, 440), parent, QString("imaging_fcs/wizard/"))
 {
     QLabel* lab;
@@ -516,6 +516,10 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     wizFinalizePage->setNextID(-1);
     wizFinalizePage->setFinalPage(true);
 
+    if (is_calibration) {
+        wizIntro->setChecked(1);
+        setStartId(FileSelectionPage);
+    }
 }
 
 QFRDRImagingFCSWizard::~QFRDRImagingFCSWizard()

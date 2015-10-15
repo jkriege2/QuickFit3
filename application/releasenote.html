@@ -158,10 +158,11 @@
         <li>added display options for annotations of the imFCS RDR</li>
         <li>added model comparison function to "imagingFCS Tools" menu, entry "Annotate Model Comparison", which can also calculate model probability maps from (non-normalized) Bayesian model probabilities</li>
         <li>implemented blocking method to estimate the standard error of the correlation function for some correlators and segments=1</li>
-        <li>several results of the correlation process (e.g. bleach correction fit results, blocking transform results, ...) are now readable as RDR results and thus displayable as parameter images. Note: If you delete one of these results, it will be regereated/reread when reopening the project!!!</li>
+        <li>several results of the correlation process (e.g. bleach correction fit results, blocking transform results, ...) are now readable as RDR results and thwipus displayable as parameter images. Note: If you delete one of these results, it will be regereated/reread when reopening the project!!!</li>
         <li>bugfix: segment number and length were switched in evalsettings.txt files</li>
         <li>aded a wizard that allows to correlate (several) files and add the results to the project, also may add evaluation objects</li>
         <li>added wizard to add imaging FCS evaluation objects to the project</li>
+        <li>added explicit project-wizard menu entry for "imFCS calibration wizard</li>
     </ul></li>
 
     <li><b>number and brightness</b><ul>
@@ -178,6 +179,7 @@
         <li>bugfix: If a fit was once canceled, all following fits were also canceled after the first run/file, until QuickFit was closed and reopened</li>
         <li>bugfix: the overviewplot of ACF+fit now should work</li>
         <li>MaxEnt distributions are now stored as "compound-result" and are accessible over the QFRDRCurvesInterface-interface, i.e. by curves-evaluations like the new curve_fit plugin</li>
+        <li>added improved and very extensive MaxEnt tutorial</li>
     </ul></li>
     <li><b>FCS MSD evaluation</b><ul>
         <li><font color="red"><b>MAJOR BUGFIX:</b> Before this versions, all 2D-diffusion MSD models returned an MSD, which was a factor of 2/3 too high!</font> This was fixed now. See the documentation for the correct models. [Thanks to T. Wohland for pointing me to that]</li>

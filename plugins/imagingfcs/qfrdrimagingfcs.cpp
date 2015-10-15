@@ -73,6 +73,7 @@ void QFRDRImagingFCSPlugin::init()
 
 
     services->registerWizard("project_wizards", tr("Imaging FCS/FCCS Project Wizard"), QIcon(":/imaging_fcs/projectwizard.png"), this, SLOT(startProjectWizard()));
+    services->registerWizard("project_wizards", tr("Imaging FCS Calibration Wizard"), QIcon(":/imaging_fcs/projectwizard.png"), this, SLOT(startCalibProjectWizard()));
     services->registerWizard("rdr_wizards", tr("Imaging FCS/FCCS Correlation Wizard"), QIcon(":/imaging_fcs/rdrwizard.png"), this, SLOT(startWizard()));
     services->registerWizard("eval_wizards", tr("Imaging FCS/FCCS Correlation Wizard"), QIcon(":/imaging_fcs/evalwizard.png"), this, SLOT(startFitWizard()));
 
@@ -269,9 +270,14 @@ void QFRDRImagingFCSPlugin::startProjectWizard()
     startWizard(true);
 }
 
-void QFRDRImagingFCSPlugin::startWizard(bool isProject)
+void QFRDRImagingFCSPlugin::startCalibProjectWizard()
 {
-    QFRDRImagingFCSWizard* wiz=new QFRDRImagingFCSWizard(isProject, parentWidget);
+    startWizard(true, true);
+}
+
+void QFRDRImagingFCSPlugin::startWizard(bool isProject, bool isCalibration)
+{
+    QFRDRImagingFCSWizard* wiz=new QFRDRImagingFCSWizard(isProject, isCalibration, parentWidget);
     if (isProject) wiz->setWindowIcon(QIcon(":/imaging_fcs/projectwizard.png"));
     else wiz->setWindowIcon(QIcon(":/imaging_fcs/rdrwizard.png"));
     if (wiz->exec()) {

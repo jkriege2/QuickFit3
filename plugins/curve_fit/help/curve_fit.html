@@ -6,25 +6,29 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
-	 <p>The Least-Squares Fit plugin determines the best-fit parameters of a given model function $$math:f(x;\vec{p})$$ from a measured curve $$math:(x_i,\hat{y}_i)_{i\in\mathbb{N}}$$. In order to perform this task, they solve a least-squares optimization problem:
+     <p>The Least-Squares Fit plugin determines the best-fit parameters of a given model function $$math:f(x;\vec{p})$$ from a measured curve $$math:(x_i,\hat{y}_i)_{i\in\mathbb{N}}$$. In order to perform this task, they solve a least-squares optimization problem:
 $$bmath:\vec{p}^\ast=\argmin_{\vec{p}}\ \sum_{i=1}^N\left(\frac{f(x_i;\vec{p})-\hat{y}_i}{\sigma_i}\right)^2\ \ \equiv\ \ \argmin_{\vec{p}}\ \sum_{i=1}^N\ \left[\hat{E}_i^\mathrm{(W)}\right]^2.$$
 Here $$math:\sigma_i$$ are weighting factors (see <a href="$$mainhelpdir$$/fit_weighting.html">Fit Weighting</a>)
            </p><p>
            Further help can be found on one of the following pages:
-	 <ol>
-	   <li><a href="./ui.html">User Interface</a></li>
-	   <li><a href="$$mainhelpdir$$/fit_weighting.html">Fit Weighting</a></li>
-	   <li><a href="$$mainhelpdir$$/fit_statistics.html">Explanation of Fit Statistics</a></li>
-	   <li><a href="./configuration.html">Configuration (global fit parameter presets ...)</a></li>
-	 </ol>
-	 </p>
-	 <p>
-	 This plugin uses any of the available <a href="$$mainhelpdir$$qf3_fitalg.html">Fit Algorithm Plugins</a> to execute the model fit:
-	 $$list:fitalg:$$ 
-	 </p>
-	 <p>
-	 Models have to be implemented as <a href="$$mainhelpdir$$qf3_fitfunc.html">Fit Function Plugins</a>. Models that may be used with this plugin are:
-	 $$list:fitfunc:$$
-	 </p>
+     <ol>
+       <li><a href="./ui.html">User Interface</a></li>
+       <li><a href="$$mainhelpdir$$/fit_weighting.html">Fit Weighting</a></li>
+       <li><a href="$$mainhelpdir$$/fit_statistics.html">Explanation of Fit Statistics</a></li>
+       <li><a href="./tutorial.html">Curve Fit Tutorial</a></li>
+     </ol>
+     </p>
+     <p>
+     <small>
+     This plugin uses any of the available <a href="$$mainhelpdir$$qf3_fitalg.html">Fit Algorithm Plugins</a> to execute the model fit:
+     $$list:fitalg:$$ 
+     </small>
+     </p>
+     <p>
+     <small>
+     Models have to be implemented as <a href="$$mainhelpdir$$qf3_fitfunc.html">Fit Function Plugins</a>. Models that may be used with this plugin are:
+     $$list:fitfunc:$$
+     </small>
+     </p>
   </body>
 </html>

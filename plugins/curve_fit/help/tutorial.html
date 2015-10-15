@@ -1,0 +1,322 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>$$local_plugin_name$$: Tutorial</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$
+<h2>Introduction</h2> 
+<p> This tutorial explains how to use the <a href="$$plugin_info:help:curve_fit$$">Curve-Fit plugin</a>. It is based on example data that is available from the example-directory of this plugin <tt>$$plugin_info:examplesdir:curve_fit$$</tt>. We will use these data-files:
+<ul>
+    <li><tt>hist-double-gauss.csv</tt> which contains data for a histogram with 2 Gaussian peaks.</li>
+    <li><tt>hist-single-gauss.csv</tt> which contains data for a histogram with 1 Gaussian peak.</li>
+</ul>
+and fit some model functions to them. For this purpose we will load the data using the <a href="$$plugin_info:help:curves$$">curves Plugin</a>, which represents simple data-curves from any file. However, this is only one way to use this plugin. In addition it is possible to also fit any xy-graph in a <a href="$$plugin_info:help:table$$">table raw data record (RDR)</a> in the current project (this will be shown in a later part of this tutorial). Above these two options, also other RDRs may expose curves to this plugin. If so they will appear in the files-list of the curve-fit editor window. An example for such plugins are the <a href="$$plugin_info:help:fcs_maxent$$">FCS MaxEnt Evaluation</a> and the <a href="$$plugin_info:help:fcs_msd$$">FCS MSD Evaluation</a>, which both allow to fit models to their resulting (distribution) curves. Finally it is possible to create a table- or curve-RDR from virtually any plot in QUickFit, by right-clicking the plot widget and then selecting <b>Copy Plot Data to Table RDR</b> or <b>Copy Plot Data to Curve RDR</b>. See the help-page <a href="$$qf_ui_jkqtplotter_helpfile$$">$$qf_ui_jkqtplotter_helpfiletitle$$</a> for further details on this option.</p>
+        
+
+
+<h2>Loading Data as a Curve-RDR</h2>
+<p>As mentioned above, we will now load the two test-datasets as <a href="$$plugin_info:help:curves$$">curve RDRs</a> into the project.
+<ol>
+    <li>Start a new project and then click on the mainwindow menu entry <b>Data Items | Insert Raw Data | XY-Curves | Insert single-file curves</b>.</li>
+    <li>Select the two files mentioned above and click on OK.</li>
+    <li>Now the "CSV Import Properties dialog opens, where you have to set the properties of the CSV-import. The files are comma-separated and use a dot as decimal-separator. Comments are started by <tt>#</tt>. Usually this dialog can determine the parameters correctly form the file and you see the expected table at the bottom-right. If this is not the case, alter the data until everything is OK. Also you'll have to select the columns to use as X-, Y- and YError-data at the bottom-left (here we use the first column <tt>"hist_x"</tt> for x-data and the second columne <tt>"hist(N(2_5))" as y-data):
+<center><a name="tutorial_pic000"><img src="./pic/tutorial_pic000.png" border="1">
+</center>
+When everything is set correctly, click on OK. The two files will be loaded into the project, which will look as follows:
+<center><a name="tutorial_pic001"><img src="./pic/tutorial_pic001.png" border="1">
+</center>
+</li>
+    <li>You can look at the data by double-clicking any of the entries in the project. E.g. for the first record <tt>hist-double-gauss.csv</tt> a dialog like this will open up:
+<center><a name="tutorial_pic002"><img src="./pic/tutorial_pic002.png" border="1">
+</center>
+With these dialogs you can alter some basic properties of the data (log-axes, axis-labels etc.) below the plot and check whether the data has been loaded correctly. The second file will open a plot like this:
+<center><a name="tutorial_pic003"><img src="./pic/tutorial_pic003.png" border="1">
+</center>
+</li>
+
+</ol></p>
+
+
+
+<h2>Performing a Curve-Fit</h2>
+<p>Now we will fit a single- or double-Gaussian-fit function $[f(x)=Y_0+\sum\limits_{i=1}^2A_i\cdot\exp\left(-\frac{1}{2}\cdot\frac{(x-X_i)^2}{w_i^2}\right)]$ to these two datasets:
+<ol>
+    <li>First we have to add a curve-fit to the project. To do so click on the mainwindow menu-entry <b>Data Items | Insert Evaluation | General Curve Fitting | Curve Fitting</b>. A new evaluation item will appear in the project:
+<center><a name="tutorial_pic004"><img src="./pic/tutorial_pic004.png" border="1">
+</center>
+</li>
+    <li>Double-click this new evaluation item to open the curve-fit editor window:
+    <center><a name="tutorial_pic005"><img src="./pic/tutorial_pic005.png" border="1">
+    </center>
+    This dialog consists of a list with all accessible RDRs in the project on the rhs. On the lhs you can see a plot of the data with the current fit function and below that the residulas. At the bottom of the window, the fit statistics are displayed together with fit statsitics plots, such as a residual correlation function or the residual histogram. Between these plots and the RDRs/files list, there are widgets to edit the current parameters of the fit model. AT the top of the dialog, you can select the fit algorithm, error estimation method and fit model.<br>
+Each RDR in the project can contain several curves (this is not used by our current example!). Above the fit parameters, you can select the displayed/fitted <b>curve</b> in the current file/RDR from a combobox:
+<center><a name="tutorial_pic007"><img src="./pic/tutorial_pic007.png" border="1">
+</center>
+
+    </li>
+    <li>First we select the fit algorithm <b><a href="$$fitalgorithm:help:fit_lmfit$$">$$fitalgorithm:name:fit_lmfit$$</a></b>, which is a good choice in most cases.</li>
+    <li>Next we select the correct fitting model, which will be <a href="$$fitfunction:help:gen_multigaussian_sqrte$$">$$fitfunction:name:gen_multigaussian_sqrte$$</a> for this tutorial (initially a simple linear model is selected).</li>
+    <li>This plugin provides different methods to calculate the fit-parameter error. The default setting "from algorithm" uses the methods implemented in the fit-algorithm, which is usually based on the Variance-Covariance-matrix of the least-squares problem and gives good estimators, if the model-parameters are mostly independent (non-correlated). You can also select "bootstrapping" here, which will use a bootstrapping approach to error estimatein, i.e. fit different randomly selected sub-sets of the data repeatedly and the calculate the standard-deviation of each fit-parameter over these repeats and use that as error estimate. </li>
+    <li>As can be seen, many data-points are 0. These should be removed from the dataset before the fit. This can be done with the <b>lower &amp; upper cut-off spinboxes below the residuals. Use them now to cut several datapoints at the start and end of the curve:
+<center><a name="tutorial_pic006"><img src="./pic/tutorial_pic006.png" border="1">
+</center>
+If you have several dataset that are equal, you can right-click into these spin-boxes and copy the settings to other curves in the current file, or to other files.
+</li>
+    <li>Next we have to set good initial parameters for our fit. First for the current model we have to select the number of Gaussian components. As the RDR <tt>hist-double-gauss.csv</tt> contains a double-peak, we select 2 components. This can be done in the fit-parameter widget between the plot and the files-list:
+<center><a name="tutorial_pic008"><img src="./pic/tutorial_pic008.png" border="1">
+</center>
+To estimate the remaining parameter, different ways exist:
+    <ol>
+        <li>You can edit the parameters by hand, e.g. set the to these value to get a not-too-bad fit:
+        <center><a name="tutorial_pic009"><img src="./pic/tutorial_pic009.png" border="1">
+        &nbsp;&nbsp;&nbsp;&nbsp;<a name="tutorial_pic011"><img src="./pic/tutorial_pic011.png" border="1">
+        </center>
+        </li>
+        <li>You can semi-automatically guess the values by right-clicking on a point in the plot, e.g. the tip of the right Gaussian:
+        <center><a name="tutorial_pic010"><img src="./pic/tutorial_pic010.png" border="1">
+        </center>
+        Then you can use the sub-menu <b>Estimate Paramters ...</b> in the context-menu to set the value of a parameter, based on the selected point. E.g. selecting "amplitude 2" will set the amplitude $(A_2)$ to the y-position of the mouse-click. This can be repeated for all the other parameters. Those parameters that cannot be set by this value can be set, as described above.
+        </li>
+        <li>Finally there is a completely automatic way to detemine these parameters. Simply select the number of components and then click on the button 
+        <img src="./pic/tutorial_pic012.png" border="1"> and QuickFit will try and guess the model parameters form the dataset. Note however that this is not implemented in every model and sometimes the results are not too good, as no full fit is performed. Here are some example results:
+<center><a name="tutorial_pic014"><img src="./pic/tutorial_pic014.png" border="1">
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="tutorial_pic013"><img src="./pic/tutorial_pic013.png" border="1">
+</center>
+        </li>
+    </ol></li>
+    <li>Now we can perform the fit by clicking on 
+    <center><a name="tutorial_pic015"><img src="./pic/tutorial_pic015.png" border="1">
+    </center>
+    </li>
+    <li>If the fit does not converge properly, you can go back one step and edit the initial parameters and then repeat the fit. ANother possibility is to use the fit algorithm <a href="$$fitalgorithm:help:fit_simanneal$$">$$fitalgorithm:name:fit_simanneal$$</a> instead of lm_fit. This algorithm performs a stochastic search and often produces good starting parameters for a further run with lm_fit. If the fit succeeds, the results will look e.g. like this:
+<center><a name="tutorial_pic016"><img src="./pic/tutorial_pic016.png" border="1">
+</center>
+As you can see, the residuals are nicely scattering randomly around 0 and the green model curve fits nicely to the red dataset (BTW: The blue and magenta curve are the two single Gaussian components, which are automatically plotted by the model!). You can also judge the fit quality by looking at the residual histogram , which shows a distribution that is nicely centered around 0 and the residual correlations that also scatter around 0:
+<center><a name="tutorial_pic017"><img src="./pic/tutorial_pic017.png" border="1">
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="tutorial_pic018"><img src="./pic/tutorial_pic018.png" border="1">
+</center>
+$$startbox_note$$
+In addition to the fit parameters that are marked with red text, the model contains additional parameters (italic labels!). These are calculated from the fit results. As an example, here the single components (magenta, blue) are integrated over and the absolute and relative area under these curve are given:
+<center><a name="tutorial_pic029"><img src="./pic/tutorial_pic029.png" border="1">
+</center>
+In addition this model also supports parameters that can be set, but cannot be a fit parameter. Here these are $(x_{min}, x_{max})$, which are the integration-limits.
+$$endbox$$
+$$startbox_note$$
+When you started editing the parameters, <u>before</u> the first fit, you actually edited the initial parameters. This happens any time, you select a curve for which no fit esits yet. It is indicated by the text "Global Fit Parameters" above the parameters:
+<center><a name="tutorial_pic048"><img src="./pic/tutorial_pic048.png" border="1">
+</center>
+After you performed a fit, this changes to "Local Fit Parameters" and if you edit a parameter, this is stored for the current curve only:
+<center><a name="tutorial_pic049"><img src="./pic/tutorial_pic049.png" border="1">
+</center>
+If you are not satisfied with the current fit, you can always go back to the initial/global parameters by clicking on "Reset Current"!
+$$endbox$$
+</li>
+    <li>For comparison, try to fit the same dataset with one component only:
+    <center><a name="tutorial_pic019"><img src="./pic/tutorial_pic019.png" border="1">
+    </center>
+    Now also the residual histogram and correlation are skewed and show non-random structures:
+    <center><a name="tutorial_pic020"><img src="./pic/tutorial_pic020.png" border="1">
+    &nbsp;&nbsp;&nbsp;&nbsp;<a name="tutorial_pic021"><img src="./pic/tutorial_pic021.png" border="1">
+    </center>
+    </li>
+    <li>So, return to the 2-component fit!</li>
+    <li>Now we can fit the next file. Assuming that we want to reuse the current fit parameters as initial values for the next fit, we can click on 
+    <center><a name="tutorial_pic022"><img src="./pic/tutorial_pic022.png" border="1">
+    </center>
+    to set them as initial values. Now select the second file <tt>hist-single-gauss.csv</tt> in the list on the right. As this file represents a one-component distribution, also the initial parameters that we copied for demo-purposes do not fit too well:
+<center><a name="tutorial_pic023"><img src="./pic/tutorial_pic023.png" border="1">
+</center>
+Nevertheless, you can try a fit, which will typically have one domninant component, e.g.:
+<center><a name="tutorial_pic024"><img src="./pic/tutorial_pic024.png" border="1">
+</center>
+So for this dataset, it might be enough to return to a 1-component fit.
+</li>
+
+</ol></p>
+$$startbox_note$$
+If you have several RDRs/files with comparable contantents you can automatize the fitting:
+<ol>
+    <li>Choose the first file and determine a good fit, as described above</li>
+    <li>When you are satisfied click on "Copy To Initial" to setthe fit result as initial values for the further fits.</li>
+    <li>Now you can use "Fit All Files, this curve" to fit the current curve in all files, or "Fit Everything" to fit all curves in all files.</li>
+    <li>After the fit has finished you can go through the different files and curves therein and check the results.</li>
+</ol>
+$$endbox$$
+
+
+
+
+<h2>Table of Fit results</h2>
+<p>Sometimes you want to get a table of the fit results for the same model form different files. This is availble in the tab <b>Evaluation Results</b> in this window:
+<center><a name="tutorial_pic025"><img src="./pic/tutorial_pic025.png" border="1">
+</center>
+Here you have a table with one row for each curve and one column per fit parameter. See the help-page <a href="$$qf_ui_eval_helpfile$$">$$qf_ui_eval_helpfiletitle$$</a> for further details on how to use this screen.
+</p>
+
+
+
+<h2>Parameter-Ranges and -Fixing</h2>
+<p>Up until now, all fit parameters were free. However, sometimes additional information is known about the data. E.g. the datsets above are histograms, so we can sevaly assume that the offset has to be zero $[Y_0=0]$ and that the amplitudes have to be positive:$[A_i\geq0]$ These conditions can be supplied to the fit algorithm by fixingcertain parameters to predefined values and setting the ranges, in which the fit algorithm may choose their values:
+<ol>
+    <li>First we will fix $(Y_0=0)$. To do so, set $(Y_0)$ to 0 and then check the checkbox on the lhs of the parameter editor widget:
+    <center><a name="tutorial_pic026"><img src="./pic/tutorial_pic026.png" border="1">
+    </center>
+    Now this parameter is no longer fitted, but is fixed to 0.</li>
+    <li>Next we will change the fit parameter ranges. To do so:
+    <ol>
+        <li>Click on the <b>Parameter Ranges</b> tab above the parameter widgets:
+        <center><a name="tutorial_pic027"><img src="./pic/tutorial_pic027.png" border="1">
+        </center>
+        </li>
+        <li>Now edit the parameter ranges, so that the minimum of $(A_1)$ and $(A_2)$ is 0:
+        <center><a name="tutorial_pic028"><img src="./pic/tutorial_pic028.png" border="1">
+        </center>
+        </li>
+    </ol></li>
+    <li>Now you can repeat the fit (see above) with the new parameter ranges and fixings.</li>
+</ol></p>
+
+
+
+
+<h2>Model Selection</h2>
+<p>Often the question occurs, how many components (e.g. Gaussian components in this tutorial, or e.e.g which polynomial-degree) a dataset statistically supports. For this task, you can use advanced fit statistics, such as the Akaike Information criterion (AIC), or the Bayes Informationc criterion (BIC) that are described on the help-page <a href="$$mainhelpdir$$/fit_statistics.html">Explanation of Fit Statistics</a>. These parameters assign a number to each plot that takes into account the quality of fit, as well as the model complexity (i.e. number of parameters). For these two parameters, one should choose the model, for which AIC or BIC have the smallest value (if they are below 0, also the most negative velaue!). To demonstrate this:
+<ol>
+    <li>Return to the 2-peak file <tt>hist-double-gauss.csv</tt>.</li>
+    <li>Fit this dataset, as described above, with different numbers of components. For each fit, note down these values from the fit-statistics at the bottom-center of the plot:<center><table border="0">
+  <tr>
+    <td>
+    <ul>
+        <li>the residual sum of squares $(\chi^2)$</li>
+        <li>the number of fit parameters NP</li>
+        <li>the AICc</li>
+        <li>the BIC</li>
+    </ul></td>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="./pic/tutorial_pic030.png" border="1"></td>
+  </tr>
+</table></center>
+</li>
+    <li>If you fix $(Y_0=0)$ and ensure $(A_i\geq0)$, as well as $(-20\leq X_i\leq10)$ as described above, you should get result like these:<center><table cellspacing="0" cellpadding="1" border="1">
+      <tr>
+        <th bgcolor="#a0a0a4"><b>components</b></th>
+        <th bgcolor="#a0a0a4"><b>NP</b></th>
+        <th bgcolor="#a0a0a4"><b>$(\chi^2)$</b></th>
+        <th bgcolor="#a0a0a4"><b>AICc</b></th>
+        <th bgcolor="#a0a0a4"><b>BIC</b></th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>3</td>
+        <td>$(1.06\cdot10^6)$</td>
+        <td>442</td>
+        <td>446</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>6</td>
+        <td>12393</td>
+        <td>258</td>
+        <td>266</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>9</td>
+        <td>11078</td>
+        <td>266</td>
+        <td>276</td>
+      </tr>
+    </table></center> As you can see, adding more components can improve the $(\chi^2)$ (e.g. from 2 to 3), but the AIC and BIC increase again, as the additional components are not really supported statistically by the dataset.</li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ol></p>
+
+
+
+
+
+<h2>Fits to data in a table-RDR and Fit weighting</h2>
+<p>As mentioned in the introduction, the curve_fit-plugin may also be used to fit models to plot in a <a href="$$plugin_info:help:table$$">table RDR</a>:
+<ol>
+    <li>Add a table-RDR to the project by clicking on the mainwindow menu entry <b>Data Items | Insert raw Data | Table | Editable Table</b>. The double-click on the new table-entry in the project:
+<center><a name="tutorial_pic031"><img src="./pic/tutorial_pic031.png" border="1">
+</center>
+</li>
+    <li>In the table-editor, choose the second tab "Data Table" and start editing the table (see the documentation of the <a href="$$plugin_info:help:table$$">table RDR PLugin</a> for details on this!): 
+    <ol>
+        <li>double-click the first column-header "1: 0". Then enter <tt>X</tt> as new column title and press OK.</li>
+        <li>enter the number 1,2,...20 into the cells of the first column. If you need more rows, press  <img src="./pic/tutorial_pic032.png" border="1">
+        above the table repeatedly.</li>
+        <li>double-click the second column-header "2: 1". Then enter <tt>Y</tt> as new column title. In addition, activate the "Expression" and enter this expression: $$bqcode:5*exp(-column(1)/3)+2*exp(-column(1)/15)+randnormvec(20)*0.3*(1-column(1)/40)$$
+Finally press OK. This will generate a column of values $[f(x)=5\cdot e^{-x/3}+2\cdot e^{x/15}+\mathcal{N}(0,0.3\cdot (1-x/40))]$ this correspconds to a double-exponential function of the values in the first column (returned by <tt>columne(1)</tt>). To these values, a normally-distributed random number is added, which has zero-mean and standard deviation of $(0.3\cdot (1-x/40))$ that varies with the x-value from column 1. We use <a href="$$qf_mathparser_helpfile$$">QuickFit's internal expression parser</a> for this!</li>
+        <li>double-click the second column-header "3: 2". Then enter <tt>Yerror</tt> as new column title. In addition, activate the "Expression" and enter this expression: $$bqcode:0.3*(1-column(1)/40)$$
+Finally press OK. This will calculate the expected error for each value. </li>
+        <li>The data should look as follows (up to the random error):
+        <center><a name="tutorial_pic033"><img src="./pic/tutorial_pic033.png" border="1">
+        </center>
+        </li>
+    </ol></li>
+    <li>Now we generate plot form this data:
+    <ol>
+        <li>Switch to the tab "Plots" and add a new plot by clicking  <img src="./pic/tutorial_pic034.png" border="1"> at the top-left.
+        </li>
+        <li>Then add a new graph, by clicking 
+        <center><a name="tutorial_pic035"><img src="./pic/tutorial_pic035.png" border="1">
+        </center>
+        In the Graphs-tab on the rhs of the dialog.
+        </li>
+        <li>For the new graph, choose these settings:
+        <center><a name="tutorial_pic036"><img src="./pic/tutorial_pic036.png" border="1">
+        </center>
+        </li>
+        <li>You should get a plot like this:
+        <center><a name="tutorial_pic037"><img src="./pic/tutorial_pic037.png" border="1">
+        </center>
+        You can set the axis ranges if you choose the tab "Coordinate System" on the rhs and then "Axes".
+        </li>
+        <li>Now we will try and fit a model to this graph, so you can close the table.</li>
+        <li></li>
+        <li></li>
+    </ol></li>
+    <li>Now add a new Curve fit to the project (as above, click <b>Data Items | Insert Evaluation | General Curve Fitting | Curve Fitting</b>). In the file/RDR list, you should see the new table now:
+    <center><a name="tutorial_pic038"><img src="./pic/tutorial_pic038.png" border="1">
+    </center>
+    So choose this table.
+    </li>
+    <li>Until now, the error bars are not displayed. To show them, you have to select the <b>"Weight Model = per run error"</b>:
+    <center><a name="tutorial_pic039"><img src="./pic/tutorial_pic039.png" border="1">
+    </center>
+    Now the plot displays the error bars, bit the residuals are still unweighted (although a fit would already be weighted!). So choose:
+    <center><a name="tutorial_pic040"><img src="./pic/tutorial_pic040.png" border="1">
+    </center>
+    to also display weighted residuals. $$note:This splitting of the setting for the fit (at the top of the window) and for the plot (i.e. display only) above the plots allows to easily compare weighted and unweighted residuals in the plot.$$</li>
+    <li>Next we have to select a proper model for this fit. Since we want to fit a multi-exponential decay, choose <a href="$$fitfunction:help:gen_multiexp$$">$$fitfunction:name:gen_multiexp$$</a>: $[f(x)=Y_0+\sum_{i=1}^\text{components}A_i\Cdot\exp\left(-\frac{x-X_i}{\tau_i}\right)]$</li>
+    <li>You can use 
+    <center><a name="tutorial_pic041"><img src="./pic/tutorial_pic041.png" border="1">
+    </center>
+    to guess good initial values and then fix $(Y_0=X_i=0)$ (this ensures that the fit is not underdetermined and provides a bit of information that we have about the data. </li>
+    <li>Finally fit the data with 
+    <center><a name="tutorial_pic042"><img src="./pic/tutorial_pic042.png" border="1">
+    </center>
+    If you have chosen one component, the fit might look like this:
+    <center><a name="tutorial_pic044"><img src="./pic/tutorial_pic044.png" border="1">
+    &nbsp;    &nbsp;    &nbsp;<a name="tutorial_pic045"><img src="./pic/tutorial_pic045.png" border="1">
+    </center>
+    For a 2-component fit, you get:
+    <center><a name="tutorial_pic046"><img src="./pic/tutorial_pic046.png" border="1">
+    &nbsp;    &nbsp;    &nbsp;<a name="tutorial_pic047"><img src="./pic/tutorial_pic047.png" border="1">
+    </center>
+    These results are already pretty close to the values that we expect from our dataset!
+    </li>
+    <li></li>
+    <li></li>
+</ol></p>
+$$note:If you table contains several curves or several curves with different plots, you can select the one to fit in the combobox <b>curve</b> above the fit parameters:
+<center><a name="tutorial_pic050"><img src="./pic/tutorial_pic050.png" border="1">
+</center>
+$$
+    </body>
+</html>

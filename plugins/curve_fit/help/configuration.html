@@ -6,16 +6,12 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
-	 <h2>Default Fit Function &amp; Algorithm</h2>
-	 <p>The plugin tries to find a normal diffusion model and Levenberg-Marquardt fit routine.</p>
-	 <p></p>
-	 <p></p>
-	 <h2>Fit Parameter Presets</h2>
-	 <p>
-	   This plugin reads default values for the parameters either from an internal declaration of the fit function, or from a <tt>fitparams_fcs_fit.ini</tt> file which is either situated in the global configuration directory, or in the suer's configuration directory. THe user file superseeds the global file.
-	 </p>
-	 <p>These configuration files have a specific format (<b>note:</b> none of the information in the file and not even their existence is obligatory!):
-	 <blockquote><pre><code>
+     <h2>Fit Parameter Presets</h2>
+     <p>
+       This plugin reads default values for the parameters either from an internal declaration of the fit function, or from a <tt>fitparams_curve_fit.ini</tt> file which is either situated in the global configuration directory, or in the suer's configuration directory. THe user file superseeds the global file.
+     </p>
+     <p>These configuration files have a specific format (<b>note:</b> none of the information in the file and not even their existence is obligatory!):
+     <blockquote><pre><code>
 [FITFUNCTION_ID1]
 PARAMETER_ID1 = <i>(number): default value of this parameter</i>
 PARAMETER_ID1<b>_fix</b> = <i>(true|false): default fix-state of this parameter</i>
@@ -35,9 +31,9 @@ PARAMETER_ID2 = <i>(number): default value of this parameter</i>
 PARAMETER_ID2<b>_fix</b> = <i>(true|false): default fix-state of this parameter</i>
 PARAMETER_ID2<b>_max</b> = <i>(true|false): default lower-bound of this parameter</i>
 PARAMETER_ID2<b>_min</b> = <i>(number): default lower-bound of this parameter</i>
-	 </code></pre></blockquote>
-	 Here <tt>FITFUNCTION_ID2</tt> is the ID of the respective fit-function (see e.g. the list of <i>implemented ids:</i> under Help|About Plugins in the main window, <a href="$$mainhelpdir$$plugin_list.html">here</a>, or the respective fit function's plugin documentation. The <tt>PARAMETER_ID<i>n</i></tt> stand for the different parameters of the fit functions (see the fit function documentation).
-	 </p>
-	 <p></p>
+     </code></pre></blockquote>
+     Here <tt>FITFUNCTION_ID2</tt> is the ID of the respective fit-function (see e.g. the list of <i>implemented ids:</i> under Help|About Plugins in the main window, <a href="$$mainhelpdir$$plugin_list.html">here</a>, or the respective fit function's plugin documentation. The <tt>PARAMETER_ID<i>n</i></tt> stand for the different parameters of the fit functions (see the fit function documentation).
+     </p>
+     <p></p>
   </body>
 </html>

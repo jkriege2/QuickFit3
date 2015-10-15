@@ -37,7 +37,7 @@ class QFFitFunctionGeneralMultiExp: public QFDecayFitFunctionBase {
         QFFitFunctionGeneralMultiExp();
         virtual ~QFFitFunctionGeneralMultiExp() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("Peaks: Multi-Component Exponential Decay"); }
+        virtual QString name() const { return QObject::tr("Decays: Multi-Component Exponential Decay"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
