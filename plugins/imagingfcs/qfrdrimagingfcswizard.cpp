@@ -40,16 +40,32 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, bool is_calibratio
 
     setWindowTitle(tr("Imaging FCS/FCCS Wizard"));
     setPage(InitPage, wizIntro=new QFRadioButtonListWizardPage(tr("Introduction"), this));
-    wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br>"
-                        "<u>Note:</u> It offers a simplified user-interface for processing imaging FCS correlations and calibrations. If you should need more options, please use the full correlator UI under the menu entry <tt>Data Items | Insert Raw Data | imFCS | correlate &amp; insert</tt>.<br><br>"
-                        "<center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"));
+    if (is_calibration) {
+        wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS calbration. After successfull completion, it will also guide you through the process of imagingFCS calbration with a second wizard.<br>"
+                            "<u>Note:</u> It offers a simplified user-interface for processing imaging FCS measurement for calibration."
+                            "If you should need more options, please use the full correlator UI under the menu entry <tt>Data Items | Insert Raw Data | imFCS | correlate &amp; insert</tt>.<br><br>"
+                            "<center><img src=\":/imaging_fcs/imfcscalib.png\"></center>"));
+
+    } else {
+        wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br>"
+                            "<u>Note:</u> It offers a simplified user-interface for processing imaging FCS correlations and calibrations. If you should need more options, please use the full correlator UI under the menu entry <tt>Data Items | Insert Raw Data | imFCS | correlate &amp; insert</tt>.<br><br>"
+                            "<center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"));
+    }
     wizIntro->addItem(tr("imFCS / imFCCS evaluation"), true);
     wizIntro->addItem(tr("imFCS focus volume calibration"), false);
     wizIntro->setEnabled(1, QFPluginServices::getInstance()->getEvaluationItemFactory()->contains("imfcs_fit"));
     wizIntro->setChecked(ProgramOptions::getConfigValue("imaging_fcs/wizard/wizardmethod", 0).toInt());
     connect(wizIntro, SIGNAL(onValidate(QWizardPage*)), this, SLOT(finishedIntro()));
 
-
+    if (is_calibration) {
+        wizIntro->setChecked(1);
+        wizIntro->setEnabled(0, false);
+        wizIntro->setEnabled(1, false);
+    } else {
+        wizIntro->setChecked(0);
+        wizIntro->setEnabled(0, true);
+        wizIntro->setEnabled(1, true);
+    }
 
 
     setPage(FileSelectionPage, wizSelfiles=new QFFormWizardPage(tr("Select image stack files ..."), this));
@@ -516,10 +532,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, bool is_calibratio
     wizFinalizePage->setNextID(-1);
     wizFinalizePage->setFinalPage(true);
 
-    if (is_calibration) {
-        wizIntro->setChecked(1);
-        setStartId(FileSelectionPage);
-    }
+
 }
 
 QFRDRImagingFCSWizard::~QFRDRImagingFCSWizard()

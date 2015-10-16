@@ -678,6 +678,7 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     double l=ui->spinDisplayLength->value()*1e-3;
     double s=qMin(ui->spinDisplayStart->value(), ui->spinDisplayStart->maximum()-l);
+    ui->spinDisplayStart->setSingleStep(qMax(0.001, l*0.75));
     ui->pltTrace->set_doDrawing(false);
     JKQTPdatastore* ds=ui->pltTrace->getDatastore();
     ds->clear();
@@ -801,7 +802,7 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
         for (int i=0; i<bursts.burstdata.size(); i++) {
             double t0=bursts.burstdata[i].start;
             double t1=t0+bursts.burstdata[i].duration;
-            QColor colrange("silver");
+            QColor colrange("black");
             colrange.setAlphaF(0.5);
 
             if ((t0>=tmin && t1<=tmax) || (t1>=tmin && t1<=tmax) || (t0>=tmin && t0<=tmax) || (t1>=tmin && t1<=tmax)) {
@@ -814,7 +815,7 @@ void QFETCSPCImporterFretchen2::updateCTRTrace()
                 plteRanges.last()->set_rangeMax(t1);
                 plteRanges.last()->set_rangeCenter((t0+t1)/2.0);
                 plteRanges.last()->set_plotRange(true);
-                plteRanges.last()->set_plotRangeLines(true);
+                plteRanges.last()->set_plotRangeLines(false);
                 plteRanges.last()->set_invertedRange(false);
                 plteRanges.last()->set_unlimitedSizeMin(true);
                 plteRanges.last()->set_unlimitedSizeMax(true);

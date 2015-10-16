@@ -216,3 +216,5 @@ release
 /releasenotes.html
 /extlibs/cimg/README.md
 /output/snippets.txt
+/output/.qfp
+/output/test.qfp

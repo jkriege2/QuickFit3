@@ -337,6 +337,7 @@ void QFCurveFitEvaluationEditor::updateFitFunctionsPlot() {
             g_fit->set_title("fit function");
             g_fit->set_fitFunction(ffunc->id());
             g_fit->set_copiedParams(fullParams, ffunc->paramCount());
+            g_fit->set_lineWidth(2);
             for (int i=0; i<(int)ffunc->getAdditionalPlotCount(fullParams); i++) {
                 double* params=eval->allocFillParameters();
                 QString name=ffunc->transformParametersForAdditionalPlot(i, params);
@@ -358,6 +359,7 @@ void QFCurveFitEvaluationEditor::updateFitFunctionsPlot() {
                 g_afit->set_title(name);
                 g_afit->set_fitFunction(ffunc->id());
                 g_afit->set_copiedParams(params, ffunc->paramCount());
+                g_afit->set_lineWidth(1);
                 pltData->addGraph(g_afit);
                 qfFree(params);
                 qfFree(afitfunc);

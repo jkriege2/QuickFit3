@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1013</width>
-    <height>651</height>
+    <height>674</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -768,7 +768,7 @@ p, li { white-space: pre-wrap; }
                 <string> s</string>
                </property>
                <property name="decimals">
-                <number>1</number>
+                <number>5</number>
                </property>
                <property name="minimum">
                 <double>0.000000000000000</double>

@@ -970,7 +970,7 @@ QString QFRDRTable::userCurvesGetName(int index) const
     for (int i=0; i<plots.size(); i++) {
         for (int j=0; j<plots[i].graphs.size(); j++) {
             if (plots[i].graphs[j].isCurvesCurve()) {
-                if (cnt==index) return plots[i].graphs[j].title;
+                if (cnt==index) return QString("%1: %2").arg(plots[i].title).arg(plots[i].graphs[j].title);
                 cnt++;
             }
         }
