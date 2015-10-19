@@ -145,6 +145,8 @@ class QFWIDLIB_EXPORT QtLogFile : public QWidget {
         /** \brief read the widget settings from a QSettings object */
         void readSettings(QSettings& s, QString namePrefix=QString(""));
 
+        QString toPlainText() const;
+
 
 		/** \brief get the current log file name */
 		GetMacro(QString, log_filename);

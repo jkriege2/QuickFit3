@@ -684,6 +684,20 @@ bool QFCompleterTextEditWidget::findNext(){
     }
 }
 
+void QFCompleterTextEditWidget::setPlainText(const QString &text)
+{
+    QTextEdit::setPlainText(text);
+    selectAll();
+    QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString());
+    f.setPointSizeF(ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
+    f.setStyleHint(QFont::TypeWriter);
+    f.setFamily(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString());
+    setFont(f);
+    QTextCursor c=textCursor();
+    c.movePosition(QTextCursor::Start);
+    setTextCursor(c);
+}
+
 bool QFCompleterTextEditWidget::replaceFirst(QString phrase, QString replaceBy, bool searchFromStart, bool matchCase, bool wholeWords, bool replaceAll, bool askBeforeReplace){
     this->searchFromStart=searchFromStart;
     this->matchCase=matchCase;
@@ -835,6 +849,7 @@ QFCompleterTextEdit::QFCompleterTextEdit(QWidget* parent):
     f.setStyleHint(QFont::TypeWriter);
     f.setFamily(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString());
     editor->setFontFamily(f.family());
+    editor->setFontPointSize(f.pointSize());
     editor->setTabwidth(2);
 
     numbers = new QFCompleterTextEditNumberBar(editor, this);

@@ -377,6 +377,11 @@ void QtLogFile::readSettings(QSettings& s, QString namePrefix) {
   textColor=QColor(s.value(namePrefix+"logTextColor", textColor.name()).toString());;
 }
 
+QString QtLogFile::toPlainText() const
+{
+    return browser->toPlainText();
+}
+
 
 void QtLogFile::log_text(const QString& message) {
   QMutexLocker locker(mutex);
