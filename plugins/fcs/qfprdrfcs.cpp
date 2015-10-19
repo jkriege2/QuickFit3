@@ -129,6 +129,25 @@ void QFPRDRFCS::init()
 
 }
 
+void QFPRDRFCS::sendPluginCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
+{
+    if (command=="load_alv5000") {
+        QMap<QString, QVariant> p;
+        QString filt=QFRDRFCSData::getFileTypesFilterForID("ALV5000");
+        setFCSFilterProperties(p, file, param1.toString());
+        QStringList paramsReadonly;
+        paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_MODE"<<"CSV_FIRSTLINE"<<"CSV_ENDSWITH"<<"CSV_TIMEFACTOR";
+        loadFCSFilterFiles(QStringList(param1.toString()), filt, p, paramsReadonly);
+    } else if (command=="load_qf3asciicorr") {
+        QMap<QString, QVariant> p;
+        QString filt=QFRDRFCSData::getFileTypesFilterForID("QF3ASCIICORR");
+        setFCSFilterProperties(p, file, param1.toString());
+        QStringList paramsReadonly;
+        paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_MODE"<<"CSV_FIRSTLINE"<<"CSV_ENDSWITH"<<"CSV_TIMEFACTOR";
+        loadFCSFilterFiles(QStringList(param1.toString()), filt, p, paramsReadonly);
+    }
+}
+
 void QFPRDRFCS::setBackgroundInFCS(const QVector<double> &backgrounds, const QVector<double> &background_sds, const QVector<bool> &background_set)
 {
     QFMatchRDRFunctorSelectType* sel=new QFMatchRDRFunctorSelectType("fcs");

@@ -34,9 +34,9 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3rdrdp_fcs
     */
 
-class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
+class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase , public QFPluginCommandsInterface {
         Q_OBJECT
-        Q_INTERFACES(QFPluginRawDataRecord)
+        Q_INTERFACES(QFPluginRawDataRecord QFPluginCommandsInterface)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
         Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFPRDRFCS")
 #endif
@@ -83,6 +83,9 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
 
         /** \brief icon for the plugin */
         virtual QString getIconFilename() const  { return QString(":/fcs_logo.png"); }
+
+        /** \brief send a text command to another plugin */
+        virtual void sendPluginCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant())=0;
 
     public slots:
         /** \brief start a dialog, which allows to set the background intensity for records
