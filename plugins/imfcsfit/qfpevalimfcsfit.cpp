@@ -133,7 +133,7 @@ QFPluginOptionsWidget *QFPEvalIMFCSFit::createOptionsWidget(QWidget *parent)
     return new OptionsWidget(this, parent);
 }
 
-void QFPEvalIMFCSFit::sendPluginCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
+QVariant QFPEvalIMFCSFit::sendPluginCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
 {
     if (command.trimmed().toLower()=="run_calibration") {
         insertFCSCalibrationWizard();
@@ -145,7 +145,9 @@ void QFPEvalIMFCSFit::sendPluginCommand(const QString &command, const QVariant &
         insertFCSFitForCalibration(NULL, param1.toDouble(), param2.toDouble(), param3.toBool(), param4.toString(), vals);
         calibrationWizard->enableStep2();
         calibrationWizard->hideStep01(true);
+        return QVariant(true);
     }
+    return QVariant(false);
 }
 
 

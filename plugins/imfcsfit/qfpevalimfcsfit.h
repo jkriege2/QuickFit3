@@ -107,7 +107,7 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
          *    .
          *  .
          */
-        virtual void sendPluginCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
+        virtual QVariant sendPluginCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
     protected slots:
         /** \brief insert FCS data from file*/
         void insertFCSFit();
