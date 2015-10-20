@@ -86,7 +86,7 @@ double QFFitFunctionGeneralMultiExp::evaluate(double t, const double* data) cons
 }
 
 
-void QFFitFunctionGeneralMultiExp::calcParameter(double* data, double* /*error*/) const {
+void QFFitFunctionGeneralMultiExp::calcParameter(double* /*data*/, double* /*error*/) const {
     
 }
 

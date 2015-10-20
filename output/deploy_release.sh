@@ -338,7 +338,7 @@ else
 	SECTIONNAME_FCSPLUGINS="FCS and FCCS Plugins"
 	SECTIONMODE_FCSPLUGINS="bs"
 	INSECTION_FCSPLUGINS="1 4 5 6"
-	FCSPLUGINS=" fcs qfrdrfcs qfevalfcsfit fccsfit fccs_fit fcsfit qffcsfitfuncs fcs_fitfuctions fcsmsdevaluation fitfunction_2ffcs fitfunction_dls fitfunction_fccs fitfunction_fcsdistribution fitfunction_spimfcs fitfunction_tirfcs fitfunctions_2ffcs fitfunctions_dls fitfunctions_fccs fitfunctions_fcsdistribution fitfunctions_spimfcs fitfunctions_tirfcs importers_simpletcspcimporter photoncounts importers_picoquant picoquantimporters qffcsmaxentevaluation fcs_maxent tcspcimporter  "
+	FCSPLUGINS=" fcs qfrdrfcs qfevalfcsfit fccsfit fccs_fit fcsfit qffcsfitfuncs fcs_fitfuctions fcsmsdevaluation fitfunction_2ffcs fitfunction_dls fitfunction_fccs fitfunction_fcsdistribution fitfunction_spimfcs fitfunction_tirfcs fitfunctions_2ffcs fitfunctions_dls fitfunctions_fccs fitfunctions_fcsdistribution fitfunctions_spimfcs fitfunctions_tirfcs importers_simpletcspcimporter photoncounts importers_picoquant picoquantimporters qffcsmaxentevaluation fcs_maxent tcspcimporter qfe_fcssimulator "
 
 
 	SECTIONNAME_IMFCSPLUGINS="Imaging FCS and FCCS Plugins"

@@ -172,6 +172,10 @@ plg_curve_fit.depends = lib libqf3widgets
     plg_fccsfit.subdir = ./plugins/fccsfit
     plg_fccsfit.depends = lib libqf3widgets
 
+    SUBDIRS += plg_qfe_fcssimulator
+    plg_qfe_fcssimulator.subdir = ./plugins/qfe_fcssimulator
+    plg_qfe_fcssimulator.depends = lib libqf3widgets
+
     SUBDIRS += plg_photoncounts
     plg_photoncounts.subdir = ./plugins/photoncounts
     plg_photoncounts.depends = lib libqf3widgets
