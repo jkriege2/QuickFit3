@@ -411,10 +411,12 @@ QVector<bool> QFLIB_EXPORT resizeBoolVecImage(const QVector<bool>& image, int w,
 
 template<class T>
 inline void qfBinImage(T* img_out,const  T*image, int width, int height, int binning, bool avg=false) {
-    qDebug()<<"qfBinImage"<<img_out<<image<<width<<height<<binning<<avg;
+    //qDebug()<<"qfBinImage"<<img_out<<image<<width<<height<<binning<<avg;
     if (!img_out || !image || width<=0 || height<=0) return;
-    const int nw=width/binning;
-    const int nh=height/binning;
+    const int nw=qMax(1,width/binning);
+    const int nh=qMax(1,height/binning);
+    if (nw*nh<=0) return;
+    //qDebug()<<"qfBinImage"<<nw<<nh;
     for (int i=0; i<nw*nh; i++) {
         img_out[i]=0;
     }
@@ -441,20 +443,24 @@ inline void qfBinImage(T* img_out,const  T*image, int width, int height, int bin
 
 template<class T>
 inline T* qfBinImageCreate(const  T*image, int width, int height, int binning, bool avg=false) {
-    const int nw=width/binning;
-    const int nh=height/binning;
-    T* res=(T*)qfMalloc(nw*nh*sizeof(T));
-    qDebug()<<"qfBinImageCreate "<<nw<<nh<<res;
-    qfBinImage(res, image, width, height, binning, avg);
-    return res;
+    if (width*height>0) {
+//        const int nw=qMax(1,width/binning);
+//        const int nh=qMax(1,height/binning);
+        T* res=(T*)qfMalloc(width*height*sizeof(T));
+        //qDebug()<<"qfBinImageCreate "<<nw<<nh<<res;
+        if (res) qfBinImage(res, image, width, height, binning, avg);
+        return res;
+    } else {
+        return NULL;
+    }
 }
 
 
 
 inline void qfBinMaskImage(bool* img_out,const  bool*image, int width, int height, int binning, bool use_or=true) {
     if (!img_out || !image || width<=0 || height<=0) return;
-    const int nw=width/binning;
-    const int nh=height/binning;
+    const int nw=qMax(1,width/binning);
+    const int nh=qMax(1,height/binning);
     if (use_or) {
         for (int i=0; i<nw*nh; i++) {
             img_out[i]=false;
