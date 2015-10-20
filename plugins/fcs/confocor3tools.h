@@ -93,17 +93,12 @@ class Confocor3Tools
             /** \brief indicates whether this is the reverse FCS */
             bool reverseFCCS;
 
-            FCSDataSet() {
-                reverseFCCS=false;
-                position=-1;
-                kinetic=-1;
-                repetition=-1;
-                channelNo=-1;
-                channelNo2=-1;
-                type=fdtUnkown;
-                recCnt1=-1;
-                recCnt2=-1;
+            inline FCSDataSet() {
+                clear();
             }
+
+            void clear();
+            void clearDataOnly();
         };
 
         struct ConfocorDataset {
@@ -111,6 +106,8 @@ class Confocor3Tools
             QString name;
             QString comment;
             QString sortorder;
+            bool isConfocor2;
+            bool isConfocor3;
             QList<FCSDataSet> fcsdatasets;
             QStringList getGroups() const;
             QStringList getRoles() const;
@@ -145,7 +142,7 @@ class Confocor3Tools
 
         ConfocorDataset data;
         bool loadFile(ConfocorDataset& data, const QString& filename);
-        void readBlock(int level, ConfocorDataset& data, QIODevice &f, bool readNewLine=true, const QString lastLine=QString(), Confocor3Tools::FCSDataSet *fcsds=NULL);
+        void readBlock(int level, ConfocorDataset& data, QIODevice &f, bool readNewLine=true, const QString lastLine=QString(), Confocor3Tools::FCSDataSet *fcsds=NULL, bool isFCSIn=false);
         QString readArray(QIODevice& f, int lines, int cols, bool &readNextLine, QList<QVector<double> >& dataout);
         static QList<ConfocorDataset> oldData;
 

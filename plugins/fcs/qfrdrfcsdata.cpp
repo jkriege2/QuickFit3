@@ -127,7 +127,7 @@ QList<QPair<QString, QString> > QFRDRFCSData::getFileTypesAndFilters()
     ft.append(qMakePair(QString("ALV6000"), tr("ALV-6000 file (*.asc)")));
     ft.append(qMakePair(QString("ALV7000"), tr("ALV-7000 file (*.asc)")));
     ft.append(qMakePair(QString("CORRELATOR.COM_SIN"), tr("correlator.com files (*.sin)")));
-    ft.append(qMakePair(QString("CONFOCOR3"), tr("Zeiss Confocor3 files (*.fcs)")));
+    ft.append(qMakePair(QString("CONFOCOR3"), tr("Zeiss Confocor2/3 files [ASCII] (*.fcs *.fcs.txt)")));
     ft.append(qMakePair(QString("ISS_ALBA"), tr("ISS Alba Files (*.csv)")));
     ft.append(qMakePair(QString("PICOQUANT_ASCII_COR"), tr("PicoQuant FCS Files from v6.0 TTTR correlator (*.cor)")));
     ft.append(qMakePair(QString("PICOQUANT_ASCII_FCS_W"), tr("PicoQuant ASCII FCS Curves Files with weights (*.dat)")));
@@ -3322,7 +3322,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
     reader.loadFile(filename);
     if (reader.wasError()) {
         ok=false;
-        setError(tr("Error while importing ConfoCor3 file '%1':\n    %2\n").arg(filename).arg(reader.getLastErrors().join("\n")));
+        setError(tr("Error while importing ConfoCor2/3 file '%1':\n    %2\n").arg(filename).arg(reader.getLastErrors().join("\n")));
         return ok;
     } else {
         const Confocor3Tools::ConfocorDataset& d=reader.getData();
@@ -3401,7 +3401,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                         for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {if (fabs(correlationT[i]-f.tau.value(i, 0.0))>1e-3*correlationT[i]) {okT=false; break;}}
                         if (!okT) {
                             ok=false;
-                            setError(tr("Error while importing ConfoCor3 file '%1':\n    lag-time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                            setError(tr("Error while importing ConfoCor2/3 file '%1':\n    lag-time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
                             return ok;
                         }
                     }
@@ -3412,7 +3412,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                         }
                     } else {
                         ok=false;
-                        setError(tr("Error while importing ConfoCor3 file '%1':\n    no correlation data found in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                        setError(tr("Error while importing ConfoCor2/3 file '%1':\n    no correlation data found in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
                         return ok;
 
                     }
@@ -3424,7 +3424,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                         for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {if (fabs(rateT[i]-f.time.value(i, 0.0))>1e-3*rateT[i]) {okT=false; break;}}
                         if (!okT) {
                             ok=false;
-                            setError(tr("Error while importing ConfoCor3 file '%1':\n    time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                            setError(tr("Error while importing ConfoCor2/3 file '%1':\n    time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
                             return ok;
                         }
                     }
@@ -3451,12 +3451,12 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                 }
             } else {
                 ok=false;
-                setError(tr("Error while importing ConfoCor3 file '%1':\n    no items selected to import (group=%1, role=%2).\n").arg(filename).arg(group).arg(role));
+                setError(tr("Error while importing ConfoCor2/3 file '%1':\n    no items selected to import (group=%1, role=%2).\n").arg(filename).arg(group).arg(role));
                 return ok;
             }
         } else {
             ok=false;
-            setError(tr("Error while importing ConfoCor3 file '%1':\n    no items selected to import.\n").arg(filename));
+            setError(tr("Error while importing ConfoCor2/3 file '%1':\n    no items selected to import.\n").arg(filename));
             return ok;
         }
     }
