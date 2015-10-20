@@ -220,10 +220,10 @@ void QFImagePlot::new_plots()
         if (binning<=1){
             plteImage->set_imageColumn(ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image")));
         } else {
-            double* tmp=NULL;
-            plteImage->set_imageColumn(ds->addCopiedImageAsColumn(tmp=qfBinImageCreate(image_data, image_width, image_height, binning), image_width/binning, image_height/binning, tr("image, %1x%1 binned").arg(binning)));
-            qfFree(tmp);
             ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image"));
+            double* tmp=qfBinImageCreate(image_data, image_width, image_height, binning);
+            plteImage->set_imageColumn(ds->addCopiedImageAsColumn(tmp, image_width/binning, image_height/binning, tr("image, %1x%1 binned").arg(binning)));
+            qfFree(tmp);
         }
         plteImage->set_x(0);
         plteImage->set_y(0);

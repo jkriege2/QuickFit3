@@ -21,7 +21,7 @@ Copyright (c) 2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), Germ
 
 #include "qfcurvefitevaluation.h"
 #include "qfcurvefitevaluationeditor.h"
-#include "QFRDRCurvesInterface.h"
+#include "qfrdrcurvesinterface.h"
 #include "qffitfunction.h"
 #include "qffcstools.h"
 

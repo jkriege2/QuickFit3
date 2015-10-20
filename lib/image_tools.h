@@ -411,6 +411,7 @@ QVector<bool> QFLIB_EXPORT resizeBoolVecImage(const QVector<bool>& image, int w,
 
 template<class T>
 inline void qfBinImage(T* img_out,const  T*image, int width, int height, int binning, bool avg=false) {
+    qDebug()<<"qfBinImage"<<img_out<<image<<width<<height<<binning<<avg;
     if (!img_out || !image || width<=0 || height<=0) return;
     const int nw=width/binning;
     const int nh=height/binning;
@@ -443,6 +444,7 @@ inline T* qfBinImageCreate(const  T*image, int width, int height, int binning, b
     const int nw=width/binning;
     const int nh=height/binning;
     T* res=(T*)qfMalloc(nw*nh*sizeof(T));
+    qDebug()<<"qfBinImageCreate "<<nw<<nh<<res;
     qfBinImage(res, image, width, height, binning, avg);
     return res;
 }
