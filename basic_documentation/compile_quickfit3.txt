@@ -79,9 +79,11 @@
              git clone --recursive "https://github.com/jkriege2/QuickFit3.git" "./QuickFit3.git"
           Now ensure that all submodules (all in the subfolder './extlibsb040' are
           up to date. To do so, execute in the base directory of the repository:
-             git submodule update --remote
-          If (for any reason) the submodules are not yet initialized, call instead:
-             git submodule update --remote --init
+             git submodule update --remote --init --recursive
+          This can also be done with the bash-script
+             ./checkout_update_submodules.sh
+          this script also switches all modules to their respective master-branch,
+          which simplifies later submitting/pushing.
    
    Afterwards you will have a source repository with this contents:
      * The base directory contains the main QMake project quickfit.pro
