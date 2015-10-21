@@ -297,6 +297,8 @@ void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, c
 
             int calcStart=coloffset+calcStartIn;
             int histStart=coloffset+histStartIn;
+            double gamma=outData.properties.value("fret_gamma", 1).toDouble();
+            double R0=outData.properties.value("foerster_radius", 55).toDouble();
             if ( rdrAT ) {
                 outData.saveToTable(rdrAT, true);
 
@@ -309,10 +311,15 @@ void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, c
                     double emin=outData.properties.value("burstfiltered_histogram_E_min", 0).toDouble();
                     double emax=outData.properties.value("burstfiltered_histogram_E_max", 1).toDouble();
                     int ebins=outData.properties.value("burstfiltered_histogram_E_bins", 31).toInt();
+                    double rmin=outData.properties.value("burstfiltered_histogram_Rda_min", 0).toDouble();
+                    double rmax=outData.properties.value("burstfiltered_histogram_Rda_max", 150).toDouble();
+                    int rbins=outData.properties.value("burstfiltered_histogram_Rda_bins", 51).toInt();
                     QString pre=QString("// normalize histograms:\nhistograms_normalized = %7;\n\n// burst duration histogram:\nbdur_bins=21;\n\n// burst size histogram:\nbsize_bins=21;\n\n// burst countrate histogram:\nbrate_bins=21;\n\n// P-histogram bins:\npmin = %1;\npmax = %2;\npbins = %3;\n\n// E-histogram bins:\nemin = %4;\nemax = %5;\nebins = %6;\n")
                                 .arg(CDoubleToQString(pmin)).arg(CDoubleToQString(pmax)).arg(pbins)
                                 .arg(CDoubleToQString(emin)).arg(CDoubleToQString(emax)).arg(ebins)
                                 .arg(boolToQString(ui->chkNormHistogram->isChecked()));
+                    pre+=QString("\n\n// dynamic FRET properties\ngamma = %1; // gamma-factor\nRFoerster = %2; // Foerster radius in angstrom\nrDAmin = %3;\nrDAmax = %4;\nrDAbins = %5;\n")
+                            .arg(CDoubleToQString(gamma)).arg(CDoubleToQString(R0)).arg(CDoubleToQString(rmin)).arg(CDoubleToQString(rmax)).arg(rbins);
 
                     rdrAT->tableSetPreEvaluationExpression(pre);
 
@@ -322,31 +329,45 @@ void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, c
                     rdrAT->tableSetColumnExpression(calcStart, QString("column(%1)*1e-3").arg(coloffset+6));
                     rdrAT->tableSetColumnTitle(calcStart+1, tr("Burst Size"));
                     rdrAT->tableSetColumnExpression(calcStart+1, QString("column(%1)+column(%2)").arg(coloffset+4).arg(coloffset+5));
+                    rdrAT->tableSetColumnTitle(calcStart+2, tr("dynamic FRET E"));
+                    rdrAT->tableSetColumnExpression(calcStart+2, QString("P=column(%1);1/(1+gamma*(1-P)/P)").arg(coloffset+7));
+                    rdrAT->tableSetColumnTitle(calcStart+3, tr("Distance From dynamic FRET [Angstrom=0.1nm]"));
+                    rdrAT->tableSetColumnExpression(calcStart+3, QString("RFoerster*(1/column(%1)-1)^(1/6)").arg(calcStart+2));
 
 
                     rdrAT->tableSetColumnTitle(histStart, tr("P-Histogram: P"));
                     rdrAT->tableSetColumnExpression(histStart, QString("rangedhistogrambins(pmin, pmax, pbins)"));
                     rdrAT->tableSetColumnTitle(histStart+1, tr("P-Histogram: frequency"));
                     rdrAT->tableSetColumnExpression(histStart+1, QString("rangedhistogram(column(%1), pmin, pmax, pbins, histograms_normalized)").arg(coloffset+7));
-                    rdrAT->tableSetColumnTitle(histStart+2, tr("E-Histogram: E"));
+                    rdrAT->tableSetColumnTitle(histStart+2, tr("original E-Histogram: E (gamma=%1)").arg(gamma));
                     rdrAT->tableSetColumnExpression(histStart+2, QString("rangedhistogrambins(emin, emax, ebins)"));
-                    rdrAT->tableSetColumnTitle(histStart+3, tr("E-Histogram: frequency"));
+                    rdrAT->tableSetColumnTitle(histStart+3, tr("original E-Histogram: frequency (gamma=%1)").arg(gamma));
                     rdrAT->tableSetColumnExpression(histStart+3, QString("rangedhistogram(column(%1), emin, emax, ebins, histograms_normalized)").arg(coloffset+8));
 
-                    rdrAT->tableSetColumnTitle(histStart+4, tr("Burst Duration-Histogram: Delta T[ms]"));
-                    rdrAT->tableSetColumnExpression(histStart+4, QString("histogrambins(column(%1)*1e3, bdur_bins)").arg(coloffset+3));
-                    rdrAT->tableSetColumnTitle(histStart+5, tr("Burst Duration-Histogram: frequency"));
-                    rdrAT->tableSetColumnExpression(histStart+5, QString("histogram(column(%1)*1e3, bdur_bins, histograms_normalized)").arg(coloffset+3));
+                    rdrAT->tableSetColumnTitle(histStart+4, tr("dynamic E-Histogram: E"));
+                    rdrAT->tableSetColumnExpression(histStart+4, QString("rangedhistogrambins(emin, emax, ebins)"));
+                    rdrAT->tableSetColumnTitle(histStart+5, tr("dynamic E-Histogram: frequency"));
+                    rdrAT->tableSetColumnExpression(histStart+5, QString("rangedhistogram(column(%1), emin, emax, ebins, histograms_normalized)").arg(calcStart+2));
 
-                    rdrAT->tableSetColumnTitle(histStart+6, tr("Burst Size-Histogram: photons"));
-                    rdrAT->tableSetColumnExpression(histStart+6, QString("histogrambins(column(%1)+column(%2), bsize_bins)").arg(coloffset+4).arg(coloffset+5));
-                    rdrAT->tableSetColumnTitle(histStart+7, tr("Burst Size-Histogram: frequency"));
-                    rdrAT->tableSetColumnExpression(histStart+7, QString("histogram(column(%1)+column(%2), bsize_bins, histograms_normalized)").arg(coloffset+4).arg(coloffset+5));
+                    rdrAT->tableSetColumnTitle(histStart+6, tr("Burst Duration-Histogram: Delta T[ms]"));
+                    rdrAT->tableSetColumnExpression(histStart+6, QString("histogrambins(column(%1)*1e3, bdur_bins)").arg(coloffset+3));
+                    rdrAT->tableSetColumnTitle(histStart+7, tr("Burst Duration-Histogram: frequency"));
+                    rdrAT->tableSetColumnExpression(histStart+7, QString("histogram(column(%1)*1e3, bdur_bins, histograms_normalized)").arg(coloffset+3));
 
-                    rdrAT->tableSetColumnTitle(histStart+8, tr("Burst Countrate-Histogram: countrate [kcps]"));
-                    rdrAT->tableSetColumnExpression(histStart+8, QString("histogrambins(column(%1)*1e-3, brate_bins)").arg(coloffset+6));
-                    rdrAT->tableSetColumnTitle(histStart+9, tr("Burst Countrate-Histogram: frequency"));
-                    rdrAT->tableSetColumnExpression(histStart+9, QString("histogram(column(%1)*1e-3, brate_bins, histograms_normalized)").arg(coloffset+6));
+                    rdrAT->tableSetColumnTitle(histStart+8, tr("Burst Size-Histogram: photons"));
+                    rdrAT->tableSetColumnExpression(histStart+8, QString("histogrambins(column(%1)+column(%2), bsize_bins)").arg(coloffset+4).arg(coloffset+5));
+                    rdrAT->tableSetColumnTitle(histStart+9, tr("Burst Size-Histogram: frequency"));
+                    rdrAT->tableSetColumnExpression(histStart+9, QString("histogram(column(%1)+column(%2), bsize_bins, histograms_normalized)").arg(coloffset+4).arg(coloffset+5));
+
+                    rdrAT->tableSetColumnTitle(histStart+10, tr("Burst Countrate-Histogram: countrate [kcps]"));
+                    rdrAT->tableSetColumnExpression(histStart+10, QString("histogrambins(column(%1)*1e-3, brate_bins)").arg(coloffset+6));
+                    rdrAT->tableSetColumnTitle(histStart+11, tr("Burst Countrate-Histogram: frequency"));
+                    rdrAT->tableSetColumnExpression(histStart+11, QString("histogram(column(%1)*1e-3, brate_bins, histograms_normalized)").arg(coloffset+6));
+
+                    rdrAT->tableSetColumnTitle(histStart+12, tr("Distance-Histogram: Distance From dynamic FRET [Angstrom=0.1nm]"));
+                    rdrAT->tableSetColumnExpression(histStart+12, QString("rangedhistogrambins(rDAmin, rDAmax, rDAbins)"));
+                    rdrAT->tableSetColumnTitle(histStart+13, tr("Distance-Histogram: frequency"));
+                    rdrAT->tableSetColumnExpression(histStart+13, QString("rangedhistogram(column(%1), rDAmin, rDAmax, rDAbins, histograms_normalized)").arg(calcStart+3));
 
 
 
@@ -362,16 +383,20 @@ void QFETCSPCImporterFretchen2::saveToProject(const QFDataExportTool &outData, c
                 int g;
                 g=cg->colgraphAddPlot(tr("proximity ratio histogram"), tr("proximity ratio P"), tr("frequency"));
                 cg->colgraphAddGraph(g, histStart, histStart+1, QFRDRColumnGraphsInterface::cgtBars, "");
-                g=cg->colgraphAddPlot(tr("FRET ratio histogram"), tr("FRET ratio E"), tr("frequency"));
+                g=cg->colgraphAddPlot(tr("original FRET ratio histogram: E (gamma=%1)").arg(gamma), tr("FRET ratio E"), tr("frequency"));
                 cg->colgraphAddGraph(g, histStart+2, histStart+3, QFRDRColumnGraphsInterface::cgtBars, "");
-                g=cg->colgraphAddPlot(tr("burst duration histogram"), tr("burst duration \\Delta t_{Burst} [ms]"), tr("frequency"));
+                g=cg->colgraphAddPlot(tr("dynamic FRET ratio histogram: E"), tr("FRET ratio E"), tr("frequency"));
                 cg->colgraphAddGraph(g, histStart+4, histStart+5, QFRDRColumnGraphsInterface::cgtBars, "");
-                g=cg->colgraphAddPlot(tr("burst size histogram"), tr("burst size [photons]"), tr("frequency"));
+                g=cg->colgraphAddPlot(tr("burst duration histogram"), tr("burst duration \\Delta t_{Burst} [ms]"), tr("frequency"));
                 cg->colgraphAddGraph(g, histStart+6, histStart+7, QFRDRColumnGraphsInterface::cgtBars, "");
-                g=cg->colgraphAddPlot(tr("burst countrate histogram"), tr("burst countrate [kcps]"), tr("frequency"));
+                g=cg->colgraphAddPlot(tr("burst size histogram"), tr("burst size [photons]"), tr("frequency"));
                 cg->colgraphAddGraph(g, histStart+8, histStart+9, QFRDRColumnGraphsInterface::cgtBars, "");
+                g=cg->colgraphAddPlot(tr("burst countrate histogram"), tr("burst countrate [kcps]"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart+10, histStart+11, QFRDRColumnGraphsInterface::cgtBars, "");
                 g=cg->colgraphAddPlot(tr("burst size vs. duration"), tr("burst size [photons]"), tr("burst duration [ms]"));
                 cg->colgraphAddGraph(g, calcStart+1,calcStart, QFRDRColumnGraphsInterface::cgtPoints, "");
+                g=cg->colgraphAddPlot(tr("Distance-Histogram: Distance From dynamic FRET [Angstrom=0.1nm]"), tr("distance r_{AD} [Angstrom=0.1nm]"), tr("frequency"));
+                cg->colgraphAddGraph(g, histStart+10,histStart+11, QFRDRColumnGraphsInterface::cgtBars, "");
 
             }
 
@@ -855,6 +880,7 @@ void QFETCSPCImporterFretchen2::updateAnalysis()
     p.crosstalk=ui->spinCrosstalk->value()/100.0;
     p.fdirect=ui->spinFDir->value();
     p.gamma=ui->spinGamma->value();
+    p.R0=ui->spinR0->value();
     TTTRCalcBurstProperties(&bursts, p);
 
     outData.properties["burstanalysis_background_green_Hz"]=p.backG;
@@ -898,7 +924,7 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     dsB->clear();
     dsP->clear();
 
-    QVector<double> PVec, EVec, PVecAll, RVecAll, EVecAll, DVec, RVec, SAllVec, DAllVec, RRVec, RGVec, SVec;
+    QVector<double> PVec, EVec, PVecAll, RVecAll, EVecAll, DVec, RVec, SAllVec, DAllVec, RRVec, RGVec, SVec, rDAVec, rDAVecAll;
     const double mir=ui->spinMinRate->value()*1e3;
     const double mar=ui->spinMaxRate->value()*1e3;
 
@@ -906,6 +932,11 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
     outDataFiltered.properties["burstfiltered"]=true;
     outDataFiltered.properties["burstfiltered_minimum_rate_kHz"]=mir;
     outDataFiltered.properties["burstfiltered_minimum_rate_kHz"]=mar;
+    outDataFiltered.properties["fret_gamma"]=ui->spinGamma->value();
+    outDataFiltered.properties["foerster_radius"]=ui->spinR0->value();
+    outDataFiltered.properties["background_green"]=ui->spinBackG->value();
+    outDataFiltered.properties["background_red"]=ui->spinBackR->value();
+    outDataFiltered.properties["direct_excitation"]=ui->spinFDir->value();
 
 
     while (outDataFiltered.data.size()<8) outDataFiltered.data.append(QList<QVariant>());
@@ -917,6 +948,7 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
         DAllVec<<(bursts.burstdata[i].duration*1e3);
         PVecAll<<bursts.burstdata[i].P;
         EVecAll<<bursts.burstdata[i].E;
+        rDAVecAll<<bursts.burstdata[i].rDA;
         RVecAll<<(r*1e-3);
         if (r>=mir && r<=mar) {
             RVec<<(r*1e-3);
@@ -924,6 +956,7 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
             SVec<<(bursts.burstdata[i].photonG+bursts.burstdata[i].photonR);
             PVec<<bursts.burstdata[i].P;
             EVec<<bursts.burstdata[i].E;
+            rDAVec<<bursts.burstdata[i].rDA;
             RGVec<<(double(bursts.burstdata[i].photonG)/bursts.burstdata[i].duration);
             RRVec<<(double(bursts.burstdata[i].photonR)/bursts.burstdata[i].duration);
             outDataFiltered.data[0]<<i;
@@ -987,6 +1020,15 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
         outDataFiltered.properties["burstfiltered_histogram_E_bins"]=nbins;
         outDataFiltered.properties["burstfiltered_histogram_E_binwidth"]=binw;
     }
+    {
+        nbins=1;
+        dmin=dmax=0;
+        calcHistParams(rDAVec, dmin,dmax,nbins,binw);
+        outDataFiltered.properties["burstfiltered_histogram_Rda_min"]=dmin;
+        outDataFiltered.properties["burstfiltered_histogram_Rda_max"]=dmax;
+        outDataFiltered.properties["burstfiltered_histogram_Rda_bins"]=nbins;
+        outDataFiltered.properties["burstfiltered_histogram_Rda_binwidth"]=binw;
+    }
 
     nbins=1;
     dmin=dmax=0;
@@ -1042,6 +1084,15 @@ void QFETCSPCImporterFretchen2::updateAnalysisPlots()
         plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("Burst rate histogram: rate [kcps]")));
         plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("Burst rate histogram: frequency")));
         ui->pltProximity->getXAxis()->set_axisLabel(tr("Burst rate (N_g+N_r)/\\Delta t_{burst} [kcps]"));
+    } else if (ui->cmbAnaHistMode->currentIndex()==5) {
+        nbins=ui->spinHBins->value();
+        QVector<double> HX(nbins,0.0);
+        QVector<double> HY(nbins,0.0);
+        statisticsHistogram(rDAVec.data(), rDAVec.size(),HX.data(), HY.data(), nbins, ui->chkNormHistogram->isChecked());
+
+        plteProximity->set_xColumn(dsP->addCopiedColumn(HX, tr("Donor-Acceptor-distance histogram: r_{DA} [Angstrom]")));
+        plteProximity->set_yColumn(dsP->addCopiedColumn(HY, tr("Donor-Acceptor-distance histogram:: frequency")));
+        ui->pltProximity->getXAxis()->set_axisLabel(tr("donor-acceptor distance r_{DA} [\\Angstrom]"));
     }
 
     ui->labHistParams->setText(tr("%3 bins in [%1..%2]").arg(dmin,0,'f',4).arg(dmax,0,'f',4).arg(nbins));
