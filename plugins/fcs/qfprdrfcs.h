@@ -84,7 +84,13 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase, public QFPlu
         /** \brief icon for the plugin */
         virtual QString getIconFilename() const  { return QString(":/fcs_logo.png"); }
 
-        /** \brief send a text command to another plugin */
+        /** \brief send a text command to another plugin
+         *
+         *  This function supports these commands:
+         *    - \c "load_alv5000" loads the given ALV5000-file (1. argument) into the project
+         *    - \c "load_qf3asciicorr" loads the given QF3ASCIICORR-file (1. argument) into the project
+         *  .
+         */
         virtual QVariant sendPluginCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
 
     public slots:

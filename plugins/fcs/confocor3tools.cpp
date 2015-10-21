@@ -72,7 +72,7 @@ bool Confocor3Tools::loadFile(const QString &filename)
 
 
 #define CONFOCOR2_ADDFCSDS() {\
-    if (data.isConfocor2 && fcs->corr.size()>0 && fcs->rate.size()>0) {\
+    if (fcs && data.isConfocor2 && fcs->corr.size()>0 && fcs->rate.size()>0 && fcs->tau.size()>0 && fcs->time.size()>0) {\
         QString ch=fcs->channel.toLower().trimmed();\
         bool intok=false;\
         int chint=ch.toInt(&intok);\
@@ -82,8 +82,8 @@ bool Confocor3Tools::loadFile(const QString &filename)
             fcs->type=fdtACF;\
         }\
         data.fcsdatasets.append(*fcs);\
+        qDebug()<<"!!! ADDED FCS CONFOCOR2-DATASET   P="<<fcs->position<<" K="<<fcs->kinetic<<" R="<<fcs->repetition<<"   Channel="<<fcs->channel<<"   Channels="<<fcs->channelNo<<"/"<<fcs->channelNo2<<"   corrsize="<<fcs->tau.size()<<fcs->corr[0].size()<<"   ratesize="<<fcs->time.size()<<fcs->rate[0].size();\
         fcs->clearDataOnly();\
-        qDebug()<<"!!! ADDED FCS CONFOCOR2-DATASET   P="<<fcs_local.position<<" K="<<fcs_local.kinetic<<" R="<<fcs_local.repetition<<"   Channel="<<fcs_local.channel;\
     }\
 }
 
@@ -200,6 +200,11 @@ void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data,
     bool done=false;
     bool isFCSDataSet=isFCSIn || (items.value(1,"").toLower().trimmed()=="fcsdataset");
     Confocor3Tools::FCSDataSet fcs_local;
+    if (data.isConfocor2) {
+        fcs_local.position=0;
+        fcs_local.kinetic=0;
+        fcs_local.repetition=0;
+    }
     Confocor3Tools::FCSDataSet* fcs=fcsds;
     //qDebug()<<isFCSDataSet<<isFCSIn<<fcs;
     if (isFCSDataSet) {
@@ -309,6 +314,11 @@ void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data,
                                 }
                                 if (fcs->corr.size()>1) {
                                     fcs->tau=fcs->corr[0];
+                                    if (data.isConfocor2) {
+                                        for (int i=0; i<fcs->tau.size(); i++) {
+                                            fcs->tau[i]=fcs->tau[i]*1e-3;
+                                        }
+                                    }
                                     fcs->corr.removeFirst();
                                 }
 
@@ -346,8 +356,9 @@ void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data,
         }
     }
 
-    qDebug()<<QString(level*2, ' ')<<"END"<<items.value(1, "---")<<items.value(2, "---")<<isFCSDataSet<<fcs_local.kinetic<<fcs_local.position<<fcs_local.repetition<<isFCSIn;
-    if (isFCSDataSet && (fcs_local.kinetic>=0 || fcs_local.position>=0 || fcs_local.repetition>=0) && (data.isConfocor3/* || (data.isConfocor2 && !isFCSIn)*/)) {
+    //qDebug()<<QString(level*2, ' ')<<"END"<<items.value(1, "---")<<items.value(2, "---")<<isFCSDataSet<<fcs_local.kinetic<<fcs_local.position<<fcs_local.repetition<<isFCSIn;
+    if (isFCSDataSet && (fcs_local.kinetic>=0 && fcs_local.position>=0 && fcs_local.repetition>=0) && (data.isConfocor3/* || (data.isConfocor2 && !isFCSIn)*/)
+        && fcs_local.tau.size()>0 ) {
         QString ch=fcs_local.channel.toLower().trimmed();
         bool intok=false;
         int chint=ch.toInt(&intok);
@@ -380,7 +391,7 @@ void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data,
         data.fcsdatasets.append(fcs_local);        
         qDebug()<<"!!! ADDED FCS CONFOCOR3-DATASET   P="<<fcs_local.position<<" K="<<fcs_local.kinetic<<" R="<<fcs_local.repetition<<"   Channel="<<fcs_local.channel;
     }
-    qDebug()<<QString(level*2, ' ')<<"END"<<items.value(1, "---")<<items.value(2, "---")<<" FINISHED!!!";
+    //qDebug()<<QString(level*2, ' ')<<"END"<<items.value(1, "---")<<items.value(2, "---")<<" FINISHED!!!";
 }
 
 QString Confocor3Tools::readArray(QIODevice &f, int lines, int cols, bool &readNextLine, QList<QVector<double> > &dataout)

@@ -3377,82 +3377,84 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                     }
                 }
             }
-            resizeCorrelations(Nc, runs);
-            resizeRates(Nc, runs, channels);
-            setQFProperty("CHANNELS_SWAPPED", chSwap, false, true);
-            if (importData.size()>0) {
-                for (int r=0; r<importData.size(); r++) {
-                    const Confocor3Tools::FCSDataSet& f=d.fcsdatasets[importData[r].index];
-                    setQFProperty("CHANNEL_NAME", f.channel, false, true);
-                    setQFProperty("POSITION", f.position, false, true);
-                    setQFProperty("KINETIC", f.kinetic, false, true);
-                    setQFProperty("ACQUISITION_TIME", f.acqtime, false, true);
-                    setQFProperty("RAWDATA_FILE", f.rawdata, false, true);
-                    QMapIterator<QString, QVariant> it(f.props);
-                    while (it.hasNext()) {
-                        it.next();
-                        setQFProperty(it.key().toUpper(), it.value(), false, true);
-                    }
-
-                    if (r==0) {
-                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) correlationT[i]=f.tau.value(i, 0.0);
-                    } else {
-                        bool okT=true;
-                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {if (fabs(correlationT[i]-f.tau.value(i, 0.0))>1e-3*correlationT[i]) {okT=false; break;}}
-                        if (!okT) {
-                            ok=false;
-                            setError(tr("Error while importing ConfoCor2/3 file '%1':\n    lag-time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
-                            return ok;
+            if (Nc<INT_MAX && runs>0) {
+                resizeCorrelations(Nc, runs);
+                resizeRates(Nc, runs, channels);
+                setQFProperty("CHANNELS_SWAPPED", chSwap, false, true);
+                if (importData.size()>0) {
+                    for (int r=0; r<importData.size(); r++) {
+                        const Confocor3Tools::FCSDataSet& f=d.fcsdatasets[importData[r].index];
+                        setQFProperty("CHANNEL_NAME", f.channel, false, true);
+                        setQFProperty("POSITION", f.position, false, true);
+                        setQFProperty("KINETIC", f.kinetic, false, true);
+                        setQFProperty("ACQUISITION_TIME", f.acqtime, false, true);
+                        setQFProperty("RAWDATA_FILE", f.rawdata, false, true);
+                        QMapIterator<QString, QVariant> it(f.props);
+                        while (it.hasNext()) {
+                            it.next();
+                            setQFProperty(it.key().toUpper(), it.value(), false, true);
                         }
-                    }
-                    double* corr=getCorrelationRun(r);
-                    if (f.corr.size()>0 && f.corr.first().size()>=Nc) {
-                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {
-                            corr[i]=f.corr.first().value(i, 0.0)-1.0;
-                        }
-                    } else {
-                        ok=false;
-                        setError(tr("Error while importing ConfoCor2/3 file '%1':\n    no correlation data found in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
-                        return ok;
 
-                    }
-
-                    if (r==0) {
-                        for (int i=0; i<qMin((int64_t)rateN, Nr); i++) rateT[i]=f.time.value(i, 0.0);
-                    } else {
-                        bool okT=true;
-                        for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {if (fabs(rateT[i]-f.time.value(i, 0.0))>1e-3*rateT[i]) {okT=false; break;}}
-                        if (!okT) {
-                            ok=false;
-                            setError(tr("Error while importing ConfoCor2/3 file '%1':\n    time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
-                            return ok;
-                        }
-                    }
-                    if (importData[r].cntRec1>=0) {
-                        double* rat0=getRateRun(r,0);
-                        const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec1];
-                        if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
-                            for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {
-                                rat0[i]=fr1.rate.first().value(i, 0)/1000.0;
+                        if (r==0) {
+                            for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) correlationT[i]=f.tau.value(i, 0.0);
+                        } else {
+                            bool okT=true;
+                            for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {if (fabs(correlationT[i]-f.tau.value(i, 0.0))>1e-3*correlationT[i]) {okT=false; break;}}
+                            if (!okT) {
+                                ok=false;
+                                setError(tr("Error while importing ConfoCor2/3 file '%1':\n    lag-time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                                return ok;
                             }
                         }
-                    }
-                    if (channels>1 && importData[r].cntRec2>=0) {
-                        double* rat1=getRateRun(r, 1);
-                        const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec2];
-                        if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
-                            for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {
-                                rat1[i]=fr1.rate.first().value(i, 0)/1000.0;
+                        double* corr=getCorrelationRun(r);
+                        if (f.corr.size()>0 && f.corr.first().size()>=Nc) {
+                            for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {
+                                corr[i]=f.corr.first().value(i, 0.0)-1.0;
+                            }
+                        } else {
+                            ok=false;
+                            setError(tr("Error while importing ConfoCor2/3 file '%1':\n    no correlation data found in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                            return ok;
+
+                        }
+
+                        if (r==0) {
+                            for (int i=0; i<qMin((int64_t)rateN, Nr); i++) rateT[i]=f.time.value(i, 0.0);
+                        } else {
+                            bool okT=true;
+                            for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {if (fabs(rateT[i]-f.time.value(i, 0.0))>1e-3*rateT[i]) {okT=false; break;}}
+                            if (!okT) {
+                                ok=false;
+                                setError(tr("Error while importing ConfoCor2/3 file '%1':\n    time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                                return ok;
                             }
                         }
+                        if (importData[r].cntRec1>=0) {
+                            double* rat0=getRateRun(r,0);
+                            const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec1];
+                            if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
+                                for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {
+                                    rat0[i]=fr1.rate.first().value(i, 0)/1000.0;
+                                }
+                            }
+                        }
+                        if (channels>1 && importData[r].cntRec2>=0) {
+                            double* rat1=getRateRun(r, 1);
+                            const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec2];
+                            if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
+                                for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {
+                                    rat1[i]=fr1.rate.first().value(i, 0)/1000.0;
+                                }
+                            }
+                        }
+
+
                     }
-
-
+                } else {
+                    ok=false;
+                    setError(tr("Error while importing ConfoCor2/3 file '%1':\n    no items selected to import (group=%1, role=%2).\n").arg(filename).arg(group).arg(role));
+                    return ok;
                 }
-            } else {
-                ok=false;
-                setError(tr("Error while importing ConfoCor2/3 file '%1':\n    no items selected to import (group=%1, role=%2).\n").arg(filename).arg(group).arg(role));
-                return ok;
             }
         } else {
             ok=false;
