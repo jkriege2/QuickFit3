@@ -173,9 +173,7 @@ void QFEFCSSimScriptTab::startProcess()
         proc->setProgram(mainWin->getSimulator());
         QStringList args;
         args<<"--spectra";
-        QDir spectradir(QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_fcssimulator"));
-        spectradir.cd("spectra");
-        args<<QDir::toNativeSeparators(spectradir.absolutePath());
+        args<<QDir::toNativeSeparators(mainWin->getSpectraDir());
         args<<QDir::toNativeSeparators(filename);
         proc->setArguments(args);
         connect(proc.data(), SIGNAL(readyReadStandardOutput()), this, SLOT(dataAvailable()));
@@ -263,19 +261,38 @@ void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
 
     //qDebug()<<log<<log.size();
 
-    QRegExp rxASC("\\n\\s*writing[^\\n\\r]*([\\\"\\'])([^\\n\\r]+\\.asc)\\1", Qt::CaseInsensitive);
-    int idx=0;
-    while ((idx=rxASC.indexIn(log, idx))>=0) {
-        if (rxASC.cap(2).size()>0) {
-            QString fn=d.absoluteFilePath(rxASC.cap(2));
-            if (!outfiles.contains(fn) && QFile::exists(fn)) {
-                outfiles.append(fn);
-                ui->pteOutput->log_text(tr("   - %1\n").arg(fn));
+    isqf3acorr=true;
+    {
+        QRegExp rxACORR("\\n\\s*writing[^\\n\\r]*([\\\"\\'])([^\\n\\r]+\\.qf3acorr)\\1", Qt::CaseInsensitive);
+        int idx=0;
+        while ((idx=rxACORR.indexIn(log, idx))>=0) {
+            if (rxACORR.cap(2).size()>0) {
+                QString fn=d.absoluteFilePath(rxACORR.cap(2));
+                if (!outfiles.contains(fn) && QFile::exists(fn)) {
+                    outfiles.append(fn);
+                    ui->pteOutput->log_text(tr("   - %1\n").arg(fn));
+                }
+                QApplication::processEvents();
             }
-            QApplication::processEvents();
+            idx=idx+rxACORR.matchedLength();
         }
-        //qDebug()<<idx<<rxASC.cap(2);
-        idx=idx+rxASC.matchedLength();
+    }
+    if (outfiles.size()<=0) {
+        isqf3acorr=false;
+        QRegExp rxASC("\\n\\s*writing[^\\n\\r]*([\\\"\\'])([^\\n\\r]+\\.asc)\\1", Qt::CaseInsensitive);
+        int idx=0;
+        while ((idx=rxASC.indexIn(log, idx))>=0) {
+            if (rxASC.cap(2).size()>0) {
+                QString fn=d.absoluteFilePath(rxASC.cap(2));
+                if (!outfiles.contains(fn) && QFile::exists(fn)) {
+                    outfiles.append(fn);
+                    ui->pteOutput->log_text(tr("   - %1\n").arg(fn));
+                }
+                QApplication::processEvents();
+            }
+            //qDebug()<<idx<<rxASC.cap(2);
+            idx=idx+rxASC.matchedLength();
+        }
     }
     resultfiles=outfiles;
     setRunning(false);
@@ -289,7 +306,8 @@ void QFEFCSSimScriptTab::on_btnImport_clicked()
         QFPluginCommandsInterface* command=dynamic_cast<QFPluginCommandsInterface*>(QFPluginServices::getInstance()->getRawDataRecordFactory()->getPlugin("fcs"));
         if (command) {
             for (int i=0; i<resultfiles.size(); i++) {
-                command->sendPluginCommand("load_alv5000", resultfiles[i]);
+                if (resultfiles[i].trimmed().toLower().endsWith(".qf3qcorr")) command->sendPluginCommand("load_qf3asciicorr", resultfiles[i]);
+                else if (resultfiles[i].trimmed().toLower().endsWith(".asc")) command->sendPluginCommand("load_alv5000", resultfiles[i]);
             }
         } else {
             QMessageBox::critical(this, tr("Import FCS-files"), tr("Imternal Error: FCS-plugin does not support importing!"));

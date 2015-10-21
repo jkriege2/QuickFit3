@@ -59,8 +59,13 @@ win32|win64 {
     fcssim_exe=$$PWD/../../extlibsb040/FCSSimulator/diffusion4.exe
     fcssim_exe_out=$${QFOUTPUT}/diffusion4.exe
 } else {
-    fcssim_exe=$$PWD/../../extlibsb040/FCSSimulator/diffusion4$${EXE_SUFFIX}
-    fcssim_exe_out=$${QFOUTPUT}/diffusion4$${EXE_SUFFIX}
+    macx {
+        fcssim_exe=$$PWD/../../extlibsb040/FCSSimulator/diffusion4$${EXE_SUFFIX}
+        fcssim_exe_out=$${QFOUTPUT}/assets/plugins/$${TARGET}/diffusion4$${EXE_SUFFIX}
+    } else {
+        fcssim_exe=$$PWD/../../extlibsb040/FCSSimulator/diffusion4$${EXE_SUFFIX}
+        fcssim_exe_out=$${QFOUTPUT}/diffusion4$${EXE_SUFFIX}
+    }
 }
 
 fcssim_build.depends =

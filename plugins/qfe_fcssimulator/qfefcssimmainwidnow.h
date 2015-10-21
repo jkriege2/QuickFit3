@@ -21,6 +21,7 @@ class QFEFCSSimMainWidnow : public QWidget
         bool mayStartProcess() const;
         QString getWorkingDir() const;
         QString getSimulator() const;
+        QString getSpectraDir() const;
     protected slots:
         void on_btnOpen_clicked();
         void on_btnNew_clicked();
