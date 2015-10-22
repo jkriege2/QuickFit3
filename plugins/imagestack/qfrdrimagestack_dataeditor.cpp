@@ -536,7 +536,7 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
 //                amax=mv->getImageStackMax(idx, channelA);
 //            }
 //        }
-        if (channelA<edtChannelRange.size()) {
+        if (channelA>=0 && channelA<edtChannelRange.size()) {
             amin=edtChannelRange[channelA]->getMin();
             amax=edtChannelRange[channelA]->getMax();
         }
@@ -595,7 +595,7 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
 //                    cmin=mv->getImageStackMin(idx, channel);
 //                    cmax=mv->getImageStackMax(idx, channel);
 //                }
-                if (channelR<edtChannelRange.size()) {
+                if (channelR>=0 && channelR<edtChannelRange.size()) {
                     cmin=edtChannelRange[channelR]->getMin();
                     cmax=edtChannelRange[channelR]->getMax();
                 }
@@ -627,15 +627,15 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             if (channelG>=0 && channelG<mv->getImageStackChannels(idx)) ig=mv->getImageStack(idx, frame, channelG);
             if (channelB>=0 && channelB<mv->getImageStackChannels(idx)) ib=mv->getImageStack(idx, frame, channelB);
 
-            if (ir && channelR<edtChannelRange.size()) {
+            if (ir && channelR>=0 && channelR<edtChannelRange.size()) {
                 cmin=edtChannelRange[channelR]->getMin();
                 cmax=edtChannelRange[channelR]->getMax();
             }
-            if (ig && channelG<edtChannelRange.size()) {
+            if (ig && channelG>=0 && channelG<edtChannelRange.size()) {
                 gmin=edtChannelRange[channelG]->getMin();
                 gmax=edtChannelRange[channelG]->getMax();
             }
-            if (ib && channelB<edtChannelRange.size()) {
+            if (ib && channelB>=0 && channelB<edtChannelRange.size()) {
                 bmin=edtChannelRange[channelB]->getMin();
                 bmax=edtChannelRange[channelB]->getMax();
             }
@@ -733,9 +733,9 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
                     if (ib) addDataHistogram(ib, mv->maskGet(), width*height, width*height, tr("blue frame histogram"), tr("histogram_blue_x"), tr("histogram_blue_y"), QColor("blue"), 0.66, 0.3);
 
                 } else if (cmbHistogramMode->currentIndex()==1) {
-                    if (ir) addDataHistogram(mv->getImageStack(idx, 0, channelR), mv->maskGet(), width*height*frames, width*height, tr("red full histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("red"), 0, 0.3);
-                    if (ig) addDataHistogram(mv->getImageStack(idx, 0, channelG), mv->maskGet(), width*height*frames, width*height, tr("green full histogram"), tr("histogram_green_x"), tr("histogram_green_y"), QColor("green"),0.33, 0.3);
-                    if (ib) addDataHistogram(mv->getImageStack(idx, 0, channelB), mv->maskGet(), width*height*frames, width*height, tr("blue full histogram"), tr("histogram_blue_x"), tr("histogram_blue_y"), QColor("blue"), 0.66, 0.3);
+                    if (ir && channelR>=0) addDataHistogram(mv->getImageStack(idx, 0, channelR), mv->maskGet(), width*height*frames, width*height, tr("red full histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("red"), 0, 0.3);
+                    if (ig && channelG>=0 ) addDataHistogram(mv->getImageStack(idx, 0, channelG), mv->maskGet(), width*height*frames, width*height, tr("green full histogram"), tr("histogram_green_x"), tr("histogram_green_y"), QColor("green"),0.33, 0.3);
+                    if (ib && channelB>=0) addDataHistogram(mv->getImageStack(idx, 0, channelB), mv->maskGet(), width*height*frames, width*height, tr("blue full histogram"), tr("histogram_blue_x"), tr("histogram_blue_y"), QColor("blue"), 0.66, 0.3);
                 }
             }
 
@@ -746,7 +746,7 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
                 if (ar) addDataHistogram(ar, mv->maskGet(), width*height, width*height, tr("alpha frame histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("gray"), 0, 0.3);
 
             } else if (cmbHistogramMode->currentIndex()==1) {
-                if (ar) addDataHistogram(mv->getImageStack(idx, 0, channelA), mv->maskGet(), width*height*frames, width*height, tr("alpha full histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("gray"), 0, 0.3);
+                if (ar && channelA>=0) addDataHistogram(mv->getImageStack(idx, 0, channelA), mv->maskGet(), width*height*frames, width*height, tr("alpha full histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("gray"), 0, 0.3);
             }
 
          }
