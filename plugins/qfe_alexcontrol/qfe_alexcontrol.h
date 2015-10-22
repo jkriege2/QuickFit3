@@ -61,7 +61,7 @@ class QFE_ALEXControl : public QObject, public QFExtensionBase, public QFPluginO
         /** \copydoc QFExtension::getDescription() */
         virtual QString getDescription() const  { return getName(); }
         /** \copydoc QFExtension::getAuthor() */
-        virtual QString getAuthor() const  { return tr("Sebastian Isbaner"); }
+        virtual QString getAuthor() const  { return tr("Sebastian Isbaner, Jan W. Krieger (QuickFit 3 integration)"); }
         /** \copydoc QFExtension::getCopyright() */
         virtual QString getCopyright() const  { return tr("(c) 2013-2015 by Sebastian Isbaner"); }
         /** \copydoc QFExtension::getWeblink() */

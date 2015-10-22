@@ -827,6 +827,10 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "blocking_success", QRegExp(QString("%1.*blocking.*success.*(file)?").arg(QRegExp::escape(getRole().toLower().simplified().trimmed())), Qt::CaseInsensitive), tr("blocking transform success"));
     addImageAsResult(metadata_eid, metadata_egroup, metadata_elabel, "blocking_level", QRegExp(QString("%1.*blocking.*level.*(file)?").arg(QRegExp::escape(getRole().toLower().simplified().trimmed())), Qt::CaseInsensitive), tr("blocking transform level"));
 
+    addCFAmplitudeAsResult(metadata_eid, metadata_egroup, metadata_elabel, "cf_amplitude_1lag", tr("correlation amplitude, 1 lowest lag"), 1);
+    addCFAmplitudeAsResult(metadata_eid, metadata_egroup, metadata_elabel, "cf_amplitude_3lag", tr("correlation amplitude, 3 lowest lag"), 3);
+    addCFAmplitudeAsResult(metadata_eid, metadata_egroup, metadata_elabel, "cf_amplitude_5lag", tr("correlation amplitude, 5 lowest lag"), 5);
+
     if (emres) enableEmitResultsChanged();
 
 
@@ -858,6 +862,27 @@ void QFRDRImagingFCSData::addImageAsResult(const QString&  metadata_eid, const Q
         }
     }
 
+}
+
+void QFRDRImagingFCSData::addCFAmplitudeAsResult(const QString &metadata_eid, const QString &metadata_egroup, const QString &metadata_elabel, const QString &param, const QString &plabel, int avg)
+{
+    if (!resultsExists(metadata_eid,param)) {
+        int siz=getImageFromRunsWidth()*getImageFromRunsHeight();
+        QVector<double> img;
+        for (int i=0; i<siz; i++) {
+            const double* acf=getCorrelationRun(i);
+            int N=getCorrelationN();
+            double acc=0;
+            for (int j=0;j<qMin(avg, N); j++) {
+                acc+=acf[j]/double(qMin(avg, N));
+            }
+            img<<acc;
+        }
+        resultsSetNumberList(metadata_eid,param, img.data(), siz);
+        resultsSetGroupAndLabels(metadata_eid,param, metadata_egroup, plabel, plabel);
+        resultsSetEvaluationGroup(metadata_eid, metadata_egroup);
+        resultsSetEvaluationGroupLabel(metadata_egroup, metadata_elabel);
+    }
 }
 
 bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, const QString& filename) {

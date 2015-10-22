@@ -146,7 +146,7 @@ inline void qfVideoBinInFrame(T* data, int width, int height, int frames, int bi
             const int64_t ny=y/binning;
             for (int64_t x=0; x<width; x++) {
                 const int64_t nx=x/binning;
-                data[f*nw*nh+ny*nw+nx]=data[f*nw*nh+ny*nw+nx]+temp[f*width*height+y*width+x];
+                if (nx<nw && ny<nh) data[f*nw*nh+ny*nw+nx]=data[f*nw*nh+ny*nw+nx]+temp[f*width*height+y*width+x];
             }
         }
     }
@@ -431,7 +431,7 @@ inline void qfBinImage(T* img_out,const  T*image, int width, int height, int bin
         const int ny=y/binning;
         for (int x=0; x<width; x++) {
             const int nx=x/binning;
-            img_out[ny*nw+nx]=img_out[ny*nw+nx]+image[y*width+x];
+            if (nx<nw && ny<nh) img_out[ny*nw+nx]=img_out[ny*nw+nx]+image[y*width+x];
         }
     }
     if (avg) {
@@ -444,9 +444,9 @@ inline void qfBinImage(T* img_out,const  T*image, int width, int height, int bin
 template<class T>
 inline T* qfBinImageCreate(const  T*image, int width, int height, int binning, bool avg=false) {
     if (width*height>0) {
-//        const int nw=qMax(1,width/binning);
-//        const int nh=qMax(1,height/binning);
-        T* res=(T*)qfMalloc(width*height*sizeof(T));
+        const int nw=qMax(1,width/binning);
+        const int nh=qMax(1,height/binning);
+        T* res=(T*)qfMalloc(nw*nh*sizeof(T));
         //qDebug()<<"qfBinImageCreate "<<nw<<nh<<res;
         if (res) qfBinImage(res, image, width, height, binning, avg);
         return res;

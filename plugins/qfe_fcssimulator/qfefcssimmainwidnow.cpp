@@ -28,11 +28,16 @@ void QFEFCSSimMainWidnow::loadSettings()
 {
 #ifdef Q_OS_WIN
     QString sim=QApplication::applicationDirPath()+"/diffusion4.exe";
+#elif Q_OS_MAC
+    QString sim=QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_fcssimulator")+"/diffusion4";
 #else
     QString sim=QApplication::applicationDirPath()+"/diffusion4";
 #endif
+    QDir spectradir(QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_fcssimulator"));
+    spectradir.cd("spectra");
     ProgramOptions::getConfigWindowGeometry(this, "QFEFCSSimMainWidnow/window");
     ProgramOptions::getConfigQLineEdit(ui->edtExeDir, "QFEFCSSimMainWidnow/edtExeDir", QDir::homePath());
+    ProgramOptions::getConfigQLineEdit(ui->edtExeDir, "QFEFCSSimMainWidnow/edtSimulatorSpectra", spectradir.absolutePath());
     ProgramOptions::getConfigQLineEdit(ui->edtSimulator, "QFEFCSSimMainWidnow/edtSimulator", sim);
     ProgramOptions::getConfigQSpinBox(ui->spinMaxProcesses, "QFEFCSSimMainWidnow/spinMaxProcesses", 1);
 }
@@ -42,6 +47,7 @@ void QFEFCSSimMainWidnow::saveSettings()
     ProgramOptions::setConfigWindowGeometry(this, "QFEFCSSimMainWidnow/window");
     ProgramOptions::setConfigQLineEdit(ui->edtExeDir, "QFEFCSSimMainWidnow/edtExeDir");
     ProgramOptions::setConfigQLineEdit(ui->edtSimulator, "QFEFCSSimMainWidnow/edtSimulator");
+    ProgramOptions::setConfigQLineEdit(ui->edtSimulatorSpectra, "QFEFCSSimMainWidnow/edtSimulatorSpectra");
     ProgramOptions::setConfigQSpinBox(ui->spinMaxProcesses, "QFEFCSSimMainWidnow/spinMaxProcesses");
 }
 
@@ -58,6 +64,10 @@ bool QFEFCSSimMainWidnow::mayStartProcess() const
 QString QFEFCSSimMainWidnow::getWorkingDir() const
 {
     return ui->edtExeDir->text();
+}
+QString QFEFCSSimMainWidnow::getSpectraDir() const
+{
+    return ui->edtSimulatorSpectra->text();
 }
 
 QString QFEFCSSimMainWidnow::getSimulator() const

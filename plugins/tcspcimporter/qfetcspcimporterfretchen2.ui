@@ -29,7 +29,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tabFile">
         <attribute name="title">
@@ -66,7 +66,7 @@
                <string>data range:</string>
               </property>
               <property name="buddy">
-               <cstring>cmbFileformat</cstring>
+               <cstring>spinRangeStart</cstring>
               </property>
              </widget>
             </item>
@@ -212,7 +212,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8.25pt; font-weight:600;&quot;&gt;Green Channel:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="buddy">
-               <cstring>edtTCSPCFile</cstring>
+               <cstring>cmbGreenChannel</cstring>
               </property>
              </widget>
             </item>
@@ -259,7 +259,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8.25pt; font-weight:600;&quot;&gt;Red Channel:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="buddy">
-               <cstring>edtTCSPCFile</cstring>
+               <cstring>cmbRedChannel</cstring>
               </property>
              </widget>
             </item>
@@ -306,7 +306,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8.25pt; font-weight:600;&quot;&gt;&amp;amp;Background TCSPC File:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="buddy">
-               <cstring>edtTCSPCFile</cstring>
+               <cstring>edtTCSPCBackground</cstring>
               </property>
              </widget>
             </item>
@@ -914,12 +914,18 @@ p, li { white-space: pre-wrap; }
               <property name="text">
                <string>min. burst size:</string>
               </property>
+              <property name="buddy">
+               <cstring>spinMinBurstSize</cstring>
+              </property>
              </widget>
             </item>
             <item row="1" column="4">
              <widget class="QLabel" name="label_12">
               <property name="text">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;LEE parameter σ&lt;span style=&quot; vertical-align:sub;&quot;&gt;0&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinLEESigma</cstring>
               </property>
              </widget>
             </item>
@@ -943,6 +949,9 @@ p, li { white-space: pre-wrap; }
              <widget class="QLabel" name="label_8">
               <property name="text">
                <string>max. IPT:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinMaxIPT</cstring>
               </property>
              </widget>
             </item>
@@ -982,6 +991,9 @@ p, li { white-space: pre-wrap; }
              <widget class="QLabel" name="label_11">
               <property name="text">
                <string>window size:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinLEERange</cstring>
               </property>
              </widget>
             </item>
@@ -1109,6 +1121,9 @@ p, li { white-space: pre-wrap; }
              <widget class="QLabel" name="label_10">
               <property name="text">
                <string>max. burst duration:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinMaxBurstDuration</cstring>
               </property>
              </widget>
             </item>
@@ -1367,6 +1382,9 @@ p, li { white-space: pre-wrap; }
                 <property name="text">
                  <string>background rate, green:</string>
                 </property>
+                <property name="buddy">
+                 <cstring>spinBackG</cstring>
+                </property>
                </widget>
               </item>
               <item row="0" column="1">
@@ -1407,6 +1425,9 @@ p, li { white-space: pre-wrap; }
                <widget class="QLabel" name="label_26">
                 <property name="text">
                  <string>background rate, red:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinBackR</cstring>
                 </property>
                </widget>
               </item>
@@ -1449,6 +1470,9 @@ p, li { white-space: pre-wrap; }
                 <property name="text">
                  <string>crosstalk factor</string>
                 </property>
+                <property name="buddy">
+                 <cstring>spinCrosstalk</cstring>
+                </property>
                </widget>
               </item>
               <item row="2" column="1">
@@ -1471,6 +1495,9 @@ p, li { white-space: pre-wrap; }
                <widget class="QLabel" name="label_28">
                 <property name="text">
                  <string>direct excitation of A:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinFDir</cstring>
                 </property>
                </widget>
               </item>
@@ -1501,6 +1528,9 @@ p, li { white-space: pre-wrap; }
                 <property name="textFormat">
                  <enum>Qt::RichText</enum>
                 </property>
+                <property name="buddy">
+                 <cstring>spinGamma</cstring>
+                </property>
                </widget>
               </item>
               <item row="4" column="1">
@@ -1522,7 +1552,7 @@ p, li { white-space: pre-wrap; }
                 </property>
                </widget>
               </item>
-              <item row="5" column="0" colspan="2">
+              <item row="6" column="0" colspan="2">
                <widget class="QPushButton" name="btnApplyBurstAnalysis">
                 <property name="minimumSize">
                  <size>
@@ -1542,6 +1572,38 @@ p, li { white-space: pre-wrap; }
                 <property name="icon">
                  <iconset resource="qfetcspcimporter.qrc">
                   <normaloff>:/tcspcimporter/job_done.png</normaloff>:/tcspcimporter/job_done.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_45">
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Förster &amp;amp;Radius R&lt;span style=&quot; vertical-align:sub;&quot;&gt;0&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::RichText</enum>
+                </property>
+                <property name="buddy">
+                 <cstring>spinR0</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QDoubleSpinBox" name="spinR0">
+                <property name="suffix">
+                 <string> Angstrom</string>
+                </property>
+                <property name="decimals">
+                 <number>3</number>
+                </property>
+                <property name="maximum">
+                 <double>1000000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="value">
+                 <double>55.000000000000000</double>
                 </property>
                </widget>
               </item>
@@ -1570,6 +1632,9 @@ p, li { white-space: pre-wrap; }
                 <property name="text">
                  <string>max. burst rate:</string>
                 </property>
+                <property name="buddy">
+                 <cstring>spinMaxRate</cstring>
+                </property>
                </widget>
               </item>
               <item row="0" column="1">
@@ -1589,6 +1654,9 @@ p, li { white-space: pre-wrap; }
                <widget class="QLabel" name="label_29">
                 <property name="text">
                  <string>min. burst rate:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinMinRate</cstring>
                 </property>
                </widget>
               </item>
@@ -1625,6 +1693,9 @@ p, li { white-space: pre-wrap; }
                <widget class="QLabel" name="labHBinWidth">
                 <property name="text">
                  <string>histogram bin width:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinHBinWidth</cstring>
                 </property>
                </widget>
               </item>
@@ -1702,6 +1773,9 @@ p, li { white-space: pre-wrap; }
                 <property name="text">
                  <string>histogram bins:</string>
                 </property>
+                <property name="buddy">
+                 <cstring>spinHBins</cstring>
+                </property>
                </widget>
               </item>
               <item row="4" column="1">
@@ -1765,6 +1839,11 @@ p, li { white-space: pre-wrap; }
              <item>
               <property name="text">
                <string>Burst rate histogram</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Donor-Acceptor-radius histogram</string>
               </property>
              </item>
             </widget>
@@ -2071,15 +2150,48 @@ In any case, an additional column will contain the file ID</string>
   <tabstop>btnApplyBurstSelection</tabstop>
   <tabstop>btnHelp</tabstop>
   <tabstop>btnClose</tabstop>
+  <tabstop>spinDisplayBin</tabstop>
+  <tabstop>cmbBurstSelPlotMode</tabstop>
+  <tabstop>chkShowBursts</tabstop>
+  <tabstop>spinBackG</tabstop>
+  <tabstop>btnLeftBG</tabstop>
+  <tabstop>spinBackR</tabstop>
+  <tabstop>btnLeftBR</tabstop>
+  <tabstop>spinCrosstalk</tabstop>
+  <tabstop>spinFDir</tabstop>
+  <tabstop>spinGamma</tabstop>
+  <tabstop>spinR0</tabstop>
+  <tabstop>spinMinRate</tabstop>
+  <tabstop>spinMaxRate</tabstop>
+  <tabstop>spinHBinWidth</tabstop>
+  <tabstop>chkNormHistogram</tabstop>
+  <tabstop>spinHBins</tabstop>
+  <tabstop>btnApplyBurstAnalysis</tabstop>
+  <tabstop>btnSaveToProject</tabstop>
+  <tabstop>btnAppendToMulti</tabstop>
+  <tabstop>btnSaveToFile</tabstop>
+  <tabstop>cmbAnaHistMode</tabstop>
+  <tabstop>cmbAnaCorrMode</tabstop>
+  <tabstop>cmbColorCol</tabstop>
+  <tabstop>tabMultiFile</tabstop>
+  <tabstop>btnClear</tabstop>
+  <tabstop>btnDelete</tabstop>
+  <tabstop>btnUp</tabstop>
+  <tabstop>btnDown</tabstop>
+  <tabstop>lstMultiFile</tabstop>
+  <tabstop>chkMSRenumberBursts</tabstop>
+  <tabstop>chkMSAddFileID</tabstop>
+  <tabstop>btnSaveMultiToProject</tabstop>
+  <tabstop>btnSaveToMulti</tabstop>
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfetcspcimporter.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
@@ -2122,12 +2234,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>63</x>
-     <y>43</y>
+     <x>327</x>
+     <y>89</y>
     </hint>
     <hint type="destinationlabel">
-     <x>52</x>
-     <y>43</y>
+     <x>201</x>
+     <y>91</y>
     </hint>
    </hints>
   </connection>
@@ -2138,12 +2250,12 @@ In any case, an additional column will contain the file ID</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>95</x>
-     <y>43</y>
+     <x>542</x>
+     <y>89</y>
     </hint>
     <hint type="destinationlabel">
-     <x>85</x>
-     <y>43</y>
+     <x>450</x>
+     <y>91</y>
     </hint>
    </hints>
   </connection>
@@ -2155,7 +2267,7 @@ In any case, an additional column will contain the file ID</string>
    <hints>
     <hint type="sourcelabel">
      <x>258</x>
-     <y>425</y>
+     <y>448</y>
     </hint>
     <hint type="destinationlabel">
      <x>400</x>
@@ -2171,11 +2283,11 @@ In any case, an additional column will contain the file ID</string>
    <hints>
     <hint type="sourcelabel">
      <x>411</x>
-     <y>423</y>
+     <y>446</y>
     </hint>
     <hint type="destinationlabel">
      <x>518</x>
-     <y>425</y>
+     <y>448</y>
     </hint>
    </hints>
   </connection>
@@ -2187,11 +2299,11 @@ In any case, an additional column will contain the file ID</string>
    <hints>
     <hint type="sourcelabel">
      <x>411</x>
-     <y>423</y>
+     <y>446</y>
     </hint>
     <hint type="destinationlabel">
      <x>645</x>
-     <y>425</y>
+     <y>448</y>
     </hint>
    </hints>
   </connection>
@@ -2203,11 +2315,11 @@ In any case, an additional column will contain the file ID</string>
    <hints>
     <hint type="sourcelabel">
      <x>411</x>
-     <y>423</y>
+     <y>446</y>
     </hint>
     <hint type="destinationlabel">
      <x>518</x>
-     <y>451</y>
+     <y>474</y>
     </hint>
    </hints>
   </connection>
@@ -2219,11 +2331,11 @@ In any case, an additional column will contain the file ID</string>
    <hints>
     <hint type="sourcelabel">
      <x>411</x>
-     <y>423</y>
+     <y>446</y>
     </hint>
     <hint type="destinationlabel">
      <x>645</x>
-     <y>451</y>
+     <y>474</y>
     </hint>
    </hints>
   </connection>
@@ -2250,8 +2362,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>51</x>
-     <y>70</y>
+     <x>533</x>
+     <y>360</y>
     </hint>
     <hint type="destinationlabel">
      <x>376</x>
@@ -2266,8 +2378,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>51</x>
-     <y>72</y>
+     <x>533</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel">
      <x>888</x>
@@ -2282,8 +2394,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>58</x>
-     <y>41</y>
+     <x>71</x>
+     <y>62</y>
     </hint>
     <hint type="destinationlabel">
      <x>95</x>
@@ -2298,8 +2410,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>47</x>
-     <y>76</y>
+     <x>387</x>
+     <y>435</y>
     </hint>
     <hint type="destinationlabel">
      <x>522</x>
@@ -2314,8 +2426,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>51</x>
-     <y>74</y>
+     <x>533</x>
+     <y>412</y>
     </hint>
     <hint type="destinationlabel">
      <x>497</x>
@@ -2330,8 +2442,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>51</x>
-     <y>78</y>
+     <x>533</x>
+     <y>461</y>
     </hint>
     <hint type="destinationlabel">
      <x>121</x>
@@ -2346,8 +2458,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>73</x>
-     <y>42</y>
+     <x>484</x>
+     <y>62</y>
     </hint>
     <hint type="destinationlabel">
      <x>225</x>
@@ -2362,8 +2474,8 @@ In any case, an additional column will contain the file ID</string>
    <slot>updateAnalysisPlots()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>42</y>
+     <x>737</x>
+     <y>62</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>

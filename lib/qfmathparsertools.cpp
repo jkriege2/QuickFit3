@@ -930,8 +930,8 @@ void qfmpResult::sub(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
         case (uint32_t(qfmpDouble)<<16)+qfmpDouble:
             re.setDouble(l.num-r.num);
             break;
-        case (qfmpDoubleVector<<16)-qfmpDouble:
-        case (qfmpDoubleMatrix<<16)-qfmpDouble:
+        case (qfmpDoubleVector<<16)+qfmpDouble:
+        case (qfmpDoubleMatrix<<16)+qfmpDouble:
             {
             re=l;
             for (int i=0; i<l.numVec.size(); i++) {

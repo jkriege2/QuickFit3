@@ -442,6 +442,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual void allocateOverviews(int x, int y);
         void allocateStatistics(statisticsData& stat, uint32_t N);
         void addImageAsResult(const QString &metadata_eid, const QString &metadata_egrou, const QString &metadata_elabel, const QString &param, QRegExp rx, const QString &plabel);
+        void addCFAmplitudeAsResult(const QString &metadata_eid, const QString &metadata_egrou, const QString &metadata_elabel, const QString &param, const QString &plabel, int avg);
     public:
         /** \copydoc QFRDRImageToRunInterface::getImageFromRunsWidth() */
         virtual int getImageFromRunsWidth() const;

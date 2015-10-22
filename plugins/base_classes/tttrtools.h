@@ -480,6 +480,7 @@ struct TCSPCBurstData {
         photonR=0;
         P=0;
         size=0;
+        rDA=0;
     }
 
     double start;
@@ -488,6 +489,7 @@ struct TCSPCBurstData {
     int photonR;
     double P;
     double E;
+    double rDA;
     int size;
 
     inline double getRate() const {
@@ -529,6 +531,7 @@ struct TTTRCalcBurstPropertiesProps {
     double crosstalk;
     double fdirect;
     double gamma;
+    double R0;
 };
 
 void TTTRCalcBurstProperties(TCSPCBurstsData* output, TTTRCalcBurstPropertiesProps props);

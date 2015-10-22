@@ -104,6 +104,7 @@
         <li>added support for reading PicoQuant *.cor ASCII files</li>
         <li>improved error reporting while importing data: there will be error messages now, when trying to import a non-existent file.</li>
         <li>added check-box to correlation editor, which allows to retain the current zoom-level when changing between runs and/or RDRs</li>
+        <li>added Confocor2 import</li>
     </ul></li>
     <li><b>FCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
@@ -164,6 +165,8 @@
         <li>aded a wizard that allows to correlate (several) files and add the results to the project, also may add evaluation objects</li>
         <li>added wizard to add imaging FCS evaluation objects to the project</li>
         <li>added explicit project-wizard menu entry for "imFCS calibration wizard</li>
+        <li>added correlation amplitude as metadata</li>
+        <li>added metadata parameter-image for the correlation amplitude</li>
     </ul></li>
 
     <li><b>number and brightness</b><ul>
@@ -236,6 +239,8 @@
         <li>new: added FRET Burst Analyzer</li>
         <li>improved error reporting when selecting a file that cannot be read</li>
         <li>added example dataset</li>
+        <li>added input widget for Foerster-radius, so the DA-distance is calculated from the E</li>
+        <li>if "Save to Project" is used, the created tables now allow to recalculate E (and rDA from it) dynamically with a user-selectable gamma-factor and Foerster-radius R0</li>
     </ul></li>
     <li><b>Table</b><ul>
         <li>added Tools menu entry to quickly calculate and plot boxplots from columned data</li>
