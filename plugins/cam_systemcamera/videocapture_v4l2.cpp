@@ -715,7 +715,7 @@ int VideoCapture::getConfigDialogCount() const {
     return 0;
 }
 
-std::string VideoCapture::getConfigDialogName(int dlg) const {
+std::string VideoCapture::getConfigDialogName(int /*dlg*/) const {
     return std::string("");
 }
 

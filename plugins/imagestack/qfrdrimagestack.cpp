@@ -972,7 +972,7 @@ void QFRDRImageStackPlugin::wizLSAnalysisImgPreviewOnValidate(QWizardPage *page,
         QFImporter::FileInfo info;
         double* image=NULL;
         int width=0, height=0;
-        plot->setImage(files->files().value(0, ""), files->fileFilterIDs().value(0, ""), -1, image, width, height, &info);
+        plot->setImage(files->files().value(0, ""), files->fileFilterIDs().value(0, ""), -1, &image, width, height, &info);
         if (wizLSAnalysisedtPixelSize) {
             if (info.properties.contains("PIXEL_WIDTH")) {
                 wizLSAnalysisedtPixelSize->setValue(info.properties["PIXEL_WIDTH"].toDouble());

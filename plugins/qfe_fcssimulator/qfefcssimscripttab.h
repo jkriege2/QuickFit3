@@ -42,6 +42,7 @@ class QFEFCSSimScriptTab : public QWidget
         QFEFCSSimMainWidnow* mainWin;
         QPointer<QProcess> proc;
         QStringList resultfiles;
+        bool isqf3acorr;
         bool txtChanged;
         void setFilename(const QString& filename);
     protected slots:

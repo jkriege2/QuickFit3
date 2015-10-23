@@ -160,7 +160,7 @@ void QFImagePlot::update_plot()
         double imin=0, imax=0;
         if (binning>1) {
             double* imgb=qfBinImageCreate(image_data, image_width, image_height, binning);
-            statisticsMinMax(imgb, (image_width/binning)*(image_height/binning), imin, imax);
+            statisticsMinMax(imgb, qMax(1,image_width/binning)*qMax(1,image_height/binning), imin, imax);
             qfFree(imgb);
         } else {
             statisticsMinMax(image_data, image_width*image_height, imin, imax);
@@ -220,10 +220,19 @@ void QFImagePlot::new_plots()
         if (binning<=1){
             plteImage->set_imageColumn(ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image")));
         } else {
-            double* tmp=NULL;
-            plteImage->set_imageColumn(ds->addCopiedImageAsColumn(tmp=qfBinImageCreate(image_data, image_width, image_height, binning), image_width/binning, image_height/binning, tr("image, %1x%1 binned").arg(binning)));
-            qfFree(tmp);
-            ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image"));
+            int imgcol=ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image"));
+            try {
+                double* tmp=qfBinImageCreate(image_data, image_width, image_height,binning);
+                int nw=qMax(1,image_width/binning);
+                int nh=qMax(1,image_height/binning);
+                if (!tmp) { nw=nh=0; }
+                //qDebug()<<tmp<<nw<<nh<<ds;
+                int col=ds->addCopiedImageAsColumn(tmp, nw, nh, tr("image, %1x%1 binned").arg(binning));
+                plteImage->set_imageColumn(col);
+                qfFree(tmp);
+            } catch(std::exception& E) {
+                plteImage->set_imageColumn(imgcol);
+            }
         }
         plteImage->set_x(0);
         plteImage->set_y(0);
@@ -290,8 +299,11 @@ void QFImagePlot::plotMouseMove(double x, double y)
             int xx=floor(x);
             int yy=floor(y);
             double v=0;
-            if (xx>=0 && xx<image_width/binning && yy>=0 && yy<image_height/binning) {
-                v=image_data[yy*(image_width/binning)+xx];
+            int nw=qMax(1,image_width/binning);
+            int nh=qMax(1,image_height/binning);
+            if (!img) { nw=nh=0; }
+            if (xx>=0 && xx<nw && yy>=0 && yy<nh) {
+                v=img[yy*nw+xx];
                 ui->labMouse->setText(tr("image(%1, %2) = %3").arg(xx).arg(yy).arg(v));
             } else {
                 ui->labMouse->setText("");
@@ -431,7 +443,7 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
     }
 }
 
-void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, int frameNum, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo, int* frames)
+void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, int frameNum, double **image, int &width, int &height, QFImporter::FileInfo *fileinfo, int* frames)
 {
     QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
     QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
@@ -464,7 +476,7 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
             double* frame=qfMallocT<double>(r->frameHeight()*r->frameWidth());
             r->readFrameDouble(frame);
             if (fileinfo) *fileinfo=r->getFileInfo();
-            image=duplicateArray(frame, r->frameHeight()*r->frameWidth());
+            if (image) *image=duplicateArray(frame, r->frameHeight()*r->frameWidth());
             height=r->frameHeight();
             width=r->frameWidth();
             r->close();
@@ -479,7 +491,7 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
     }
 }
 
-void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &imageReaderID, int frameStart, int frameCount, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo, int *frames)
+void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &imageReaderID, int frameStart, int frameCount, double **image, int &width, int &height, QFImporter::FileInfo *fileinfo, int *frames)
 {
     QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
     QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
@@ -519,7 +531,7 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
             double* frame=qfMallocT<double>(width*height);
             r->readFrameDouble(frame);
             if (fileinfo) *fileinfo=r->getFileInfo();
-            image=duplicateArray(frame, width*height);
+            if (image) *image=duplicateArray(frame, width*height);
             //qDebug()<<width<<height;
             double fcnt=1;
             for (int i=1; i<frameCount; i++) {
@@ -527,8 +539,8 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
                     if (r->readFrameDouble(frame)) {
                         fcnt++;
                         //qDebug()<<fcnt;
-                        for (int j=0; j<width*height; j++) {
-                            image[j]=image[j]+frame[j];
+                        if (image) for (int j=0; j<width*height; j++) {
+                            (*image)[j]=(*image)[j]+frame[j];
                         }
                     }
                 } else {
@@ -539,11 +551,11 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
                 }
             }
             //qDebug()<<"normalize "<<fcnt;
-            for (int j=0; j<width*height; j++) {
-                image[j]=image[j]/fcnt;
+            if (image) for (int j=0; j<width*height; j++) {
+                (*image)[j]=(*image)[j]/fcnt;
             }
             r->close();
-            plot->setImage(image, width, height);
+            if (image) plot->setImage(*image, width, height);
             qfFree(frame);
             //qfFree(image);
         } else {
@@ -558,9 +570,9 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
 void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &imageReaderID, int frameStart, int frameCount, QFImporter::FileInfo *fileinfo)
 {
     double* image=NULL;
-    int width;
-    int height;
-    setImageAvg(filename, imageReaderID, frameStart, frameCount, image, width, height, fileinfo);
+    int width=0;
+    int height=0;
+    setImageAvg(filename, imageReaderID, frameStart, frameCount, &image, width, height, fileinfo);
     if (image) qfFree(image);
 
 }
@@ -570,7 +582,7 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
     setImage(filename, imageReaderID, 0, fileinfo);
 }
 
-void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo)
+void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, double **image, int &width, int &height, QFImporter::FileInfo *fileinfo)
 {
     setImage(filename, imageReaderID, 0, image, width, height, fileinfo);
 }

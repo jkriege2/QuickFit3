@@ -1,12 +1,23 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Extension qfe_fcssimulator Help</title>
-	</head>
-	<body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$
-		<h2>Introduction</h2>
-		<p> This plugin controls an open-source FCS/FCCS simulator, available in this installation and online on GitHub: <a href="https://github.com/jkriege2/FCSSimulator">https://github.com/jkriege2/FCSSimulator</a></p>
-	</body>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Extension qfe_fcssimulator Help</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$
+        <h2>Introduction</h2>
+        <p> This plugin controls an open-source FCS/FCCS simulator, available in this installation and online on GitHub: <a href="https://github.com/jkriege2/FCSSimulator">https://github.com/jkriege2/FCSSimulator</a></p>
+$$startbox_see$$ A manual for the simulator software is available in this <a href="openfile:///$$plugin_info:helpdir:qfe_fcssimulator$$/manual.pdf"><img src=":/pdf.png"> documentation-file</a>.
+$$endbox$$
+
+
+
+<h2>User-Interface</h2>
+<p>This plugin privides an editor GUI for the configuration scripts of the FCS simulator. You can start the editor with the main window menu entry <b>Tools | FCS SImulator ("diffusion4")</b>. This editor can also run several simulator instances in parallel and import the resultiung FCS-curves.</p>
+<p>The user-interface is simple and split into two parts. In the upper part of the dialog, you can choose the executable and spetra-directory of the simulator, as well as its execution-directory. If the simulator configuration contains relative pathes (e.g. for the basename/output), these will be created inside the working directory. Also you can set the maximum number of parallel simulator tasks. If you try to start more tasks, these will wait until a free slot becomes available.</p>
+<p>Below this general settings part, several buttons allow to create a new script, open an existing script and save the script in the current tab. You can also execute the script in teh current tab, or cancel an ongoing execution. Below that each script is opened in one tab. To close a tab, use the X-symbol in the tab-header. Each tab is again split into two parts: At the top, the script is shown in a simple text-editor widget. Below that a log-widget will contain the output (and progress) of the execution of the current script. After execution, the tab analyzes the output and tries to identify output files, which can finally be imported into the current project by clicking on the button <b>import results ...</b>.</p>
+
+
+    </body>
 </html>

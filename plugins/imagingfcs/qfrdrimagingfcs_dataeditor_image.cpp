@@ -3940,10 +3940,11 @@ void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_
         QList<Qt::CheckState> gfix;
         for (int i=0; i<m->getCorrelationN(); i++) { corr[i]=0; cerr[i]=0; }
         double N=0, Nfit=0;
+        QStringList usedidxs;
         for (int i=0; i<m->getCorrelationRuns(); i++) {
             //qDebug()<<"r"<<i<<"  "<<indexIsDualView2(i);
             if (selected.contains(i) && !m->leaveoutRun(i) && ((avgs==1)||(avgIdx==0 && !indexIsDualView2(i)) || (avgIdx==1 && indexIsDualView2(i)))) {
-                double* tmp=m->getCorrelationRun(i);
+                const double* tmp=m->getCorrelationRun(i);
                 for (int jj=0; jj<m->getCorrelationN(); jj++) {
                     corr[jj]=corr[jj]+tmp[jj];
                     cerr[jj]=cerr[jj]+tmp[jj]*tmp[jj];
@@ -3981,6 +3982,7 @@ void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_
 
 
                 if (evaluateFitFunction(m, m->getCorrelationT(), corr1, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, resultID, i, NULL, true)) {
+                    usedidxs<<QString("f%1").arg(i);
                     if (Nfit==0) {
                         for (int jj=0; jj<fix.size(); jj++) {
                             gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);
@@ -4001,11 +4003,22 @@ void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_
                     }
 
                     Nfit++;
+                } else {
+                    usedidxs<<QString("n%1").arg(i);
                 }
 
                 N++;
+            } else {
+                if (!selected.contains(i)) usedidxs<<QString("ns%1").arg(i);
+                else if (m->leaveoutRun(i)) usedidxs<<QString("nm%1").arg(i);
+                else if (((avgs==1)||(avgIdx==0 && !indexIsDualView2(i)) || (avgIdx==1 && indexIsDualView2(i)))) {
+                    usedidxs<<QString("nn%1[avgs=%2 avgIdx=%3 DV=%4]").arg(i).arg(avgs).arg(avgIdx).arg(indexIsDualView2(i));
+                }
+
             }
         }
+
+        qDebug()<<"collected "<<usedidxs.size()<<" values: "<<usedidxs.join(" ");
 
 
         for (int jj=0; jj<m->getCorrelationN(); jj++) {
@@ -5115,18 +5128,33 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
             switch (current->resultsGetType(evaluation, "fit_model_name")) {
                 case QFRawDataRecord::qfrdreStringVector:
                 case QFRawDataRecord::qfrdreStringMatrix:
-                    fitfunc=current->resultsGetInStringList(evaluation, "fit_model_name", index);
-                    isMatrixResults=true;
-                    if (fitfunc.isEmpty()) {
-                        bool ok=false;
-                        QStringList sl=current->resultsGetAsStringList(evaluation, "fit_model_name", &ok);
-                        if (ok) {
-                            for (int i=0; i<sl.size(); i++) {
-                                if (!sl[i].isEmpty()) {
-                                    fitfunc=sl[i];
-                                    break;
+                    for (int iii=0; iii<=2; iii++){
+                        int idx=index;
+                        if (iii==1) idx=qMin(0, index-1);
+                        else if (iii==2) idx=qMin(0, index+1);
+                        QString fitfuncn=current->resultsGetInStringList(evaluation, "fit_model_name", idx).trimmed().simplified();
+                        isMatrixResults=true;
+                        if (fitfuncn.isEmpty()) {
+                            bool ok=false;
+
+                            QStringList sl=current->resultsGetAsStringList(evaluation, "fit_model_name", &ok);
+                            //qDebug()<<"checking others"<<sl.size()<<ok<<sl<<"\n";
+                            if (ok) {
+                                for (int i=0; i<sl.size(); i++) {
+                                    QString s=sl[i].trimmed().simplified();
+                                    if (!s.isEmpty()) {
+                                        //qDebug()<<"found at "<<i<<": "<<s<<"\n";
+                                        fitfuncn=s;
+                                        break;
+                                    }
                                 }
                             }
+                        }
+                        if (!fitfuncn.isEmpty()) {
+                            fitfunc=fitfuncn;
+                            break;
+                        } else {
+                            //qDebug()<<"didn't find at iii="<<iii;
                         }
                     }
                     break;
@@ -5140,9 +5168,22 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
 
         }
     }
-    //qDebug()<<"evaluateFitFunction()  "<<evaluation<<index<<"  => "<<fitfunc<<isMatrixResults;
+
     QFFitFunction* ff=m_fitFunctions.value(fitfunc, NULL);
+    if (!ff) ff=m_fitFunctions.value(fitfunc.toLatin1(), NULL);
     //qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size()<<ff;
+    if (false && !ff) {
+        QString s;
+        for (int ii=0; ii<fitfunc.size(); ii++) {
+            if (fitfunc[ii]>=' ' && fitfunc[ii]<=127) {
+                s+=fitfunc[ii];
+            } else {
+                s+=QString("[%1]").arg((int)fitfunc[ii].unicode());
+            }
+        }
+        qDebug()<<"evaluateFitFunction()  "<<index<<evaluation<<"  => fitfunc.size='"<<fitfunc.size()<<"  fitfunc='"<<s<<"'  isMatrix="<<isMatrixResults<<"\n";
+
+    }
     if (!ff) return false;
     double* params=(double*)qfCalloc(ff->paramCount(),sizeof(double));
     double* errs=(double*)qfCalloc(ff->paramCount(),sizeof(double));
@@ -5805,12 +5846,13 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                             }
                             double N=0;
                             d.Nfit=0;
+                            QStringList idxs;
                             for (int i=0; i<m->getCorrelationRuns(); i++) {
                                 //qDebug()<<"r"<<i<<"  "<<indexIsDualView2(i);
                                 if ( ( ((cmbSelection->currentIndex()==1) && selected.contains(i))
                                        || (cmbSelection->currentIndex()==0)
                                        || (cmbSelection->currentIndex()==2 && masel.value(i, false)) )
-                                     && !m->leaveoutRun(i)
+                                     && (!m->leaveoutRun(i))
                                      && ((avgs==1)||(avgIdx==0 && !indexIsDualView2(i)) || (avgIdx==1 && indexIsDualView2(i))))
                                 {
 
@@ -5864,6 +5906,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
 
                                     QStringList tmpn, tmpi;
                                     if (evaluateFitFunction(curRec, NULL, NULL, m->getCorrelationN(), tmpn, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i, &tmpi, true)) {
+                                        idxs<<QString("f%1").arg(i);
                                         if (d.Nfit==0) {
                                             for (int jj=0; jj<fix.size(); jj++) {
                                                 d.gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);
@@ -5905,6 +5948,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
 
                                         d.Nfit++;
                                     } else if (evalFound && !hasFitFunction) {
+                                        idxs<<QString("n%1").arg(i);
                                         for (int jj=0; jj<singlenames.size()-channels; jj++) {
                                             if (curRec->resultsExists(resultID, singlenames[jj])) {
                                                 values.append(curRec->resultsGetInNumberList(resultID, singlenames[jj], i));
@@ -5958,6 +6002,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                     N++;
                                 }
                             }
+                            //qDebug()<<"copy "<<idxs.join(" ");
 
 
 

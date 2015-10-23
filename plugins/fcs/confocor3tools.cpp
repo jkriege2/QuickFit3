@@ -69,6 +69,25 @@ bool Confocor3Tools::loadFile(const QString &filename)
     return true;
 }
 
+
+
+#define CONFOCOR2_ADDFCSDS() {\
+    if (fcs && data.isConfocor2 && fcs->corr.size()>0 && fcs->rate.size()>0 && fcs->tau.size()>0 && fcs->time.size()>0) {\
+        QString ch=fcs->channel.toLower().trimmed();\
+        bool intok=false;\
+        int chint=ch.toInt(&intok);\
+        if (intok) {\
+            fcs->channelNo=chint;\
+            fcs->channelNo2=chint;\
+            fcs->type=fdtACF;\
+        }\
+        data.fcsdatasets.append(*fcs);\
+        qDebug()<<"!!! ADDED FCS CONFOCOR2-DATASET   P="<<fcs->position<<" K="<<fcs->kinetic<<" R="<<fcs->repetition<<"   Channel="<<fcs->channel<<"   Channels="<<fcs->channelNo<<"/"<<fcs->channelNo2<<"   corrsize="<<fcs->tau.size()<<fcs->corr[0].size()<<"   ratesize="<<fcs->time.size()<<fcs->rate[0].size();\
+        fcs->clearDataOnly();\
+    }\
+}
+
+
 bool Confocor3Tools::loadFile(Confocor3Tools::ConfocorDataset &data, const QString &filename)
 {
 
@@ -79,13 +98,19 @@ bool Confocor3Tools::loadFile(Confocor3Tools::ConfocorDataset &data, const QStri
         data.filename=filename;
 
         QString line=f.readLine().trimmed().simplified();
-        if (line.toLower().startsWith("carl zeiss confocor3")) {
+        if (line.toLower().startsWith("carl zeiss confocor2")) {
+            data.isConfocor2=true;
+            data.isConfocor3=false;
+            readBlock(0, data, f, true);
+        } else if (line.toLower().startsWith("carl zeiss confocor3")) {
+            data.isConfocor2=false;
+            data.isConfocor3=true;
             readBlock(0, data, f, true);
         } else {
-            setError(QObject::tr("Did not find ConfoCor3 header in file '%1'. Header was: '%2'").arg(filename).arg(line));
+            setError(QObject::tr("Did not find ConfoCor2/3 header in file '%1'. Header was: '%2'").arg(filename).arg(line));
         }
 
-
+        qDebug()<<"CLOSING FILE!";
         f.close();
 
         // try to group FCS records
@@ -159,12 +184,12 @@ bool Confocor3Tools::loadFile(Confocor3Tools::ConfocorDataset &data, const QStri
         oldData.append(data);
         return wasError();
     } else {
-        setError(QObject::tr("could not open ConfoCor3 file '%1'. Reason: %2").arg(filename).arg(f.errorString()));
+        setError(QObject::tr("could not open ConfoCor2/3 file '%1'. Reason: %2").arg(filename).arg(f.errorString()));
     }
     return false;
 }
 
-void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data, QIODevice &f, bool readNewLine, const QString lastLine, Confocor3Tools::FCSDataSet* fcsds)
+void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data, QIODevice &f, bool readNewLine, const QString lastLine, Confocor3Tools::FCSDataSet* fcsds, bool isFCSIn)
 {
     QString ll=lastLine.trimmed().simplified();
     if (readNewLine) ll=f.readLine().trimmed().simplified();
@@ -172,24 +197,56 @@ void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data,
         ll=f.readLine().trimmed().simplified();
     }
     QStringList items=ll.split(' ');
-    //qDebug()<<QString(level*2, ' ')<<"BEGIN"<<items.value(1, "---")<<items.value(2, "---");
     bool done=false;
-    bool isFCSDataSet=(items.value(1,"").toLower().trimmed()=="fcsdataset");
+    bool isFCSDataSet=isFCSIn || (items.value(1,"").toLower().trimmed()=="fcsdataset");
     Confocor3Tools::FCSDataSet fcs_local;
-    Confocor3Tools::FCSDataSet* fcs=fcsds;
-    if (isFCSDataSet) {
-        fcs=&fcs_local;
-        fcs->id=items.value(2,"").toLower().trimmed();
+    if (data.isConfocor2) {
+        fcs_local.position=0;
+        fcs_local.kinetic=0;
+        fcs_local.repetition=0;
     }
+    Confocor3Tools::FCSDataSet* fcs=fcsds;
+    //qDebug()<<isFCSDataSet<<isFCSIn<<fcs;
+    if (isFCSDataSet) {
+        if (data.isConfocor3 || (data.isConfocor2 && !isFCSIn)) fcs=&fcs_local;
+        //qDebug()<<isFCSDataSet<<isFCSIn<<fcs;
+        if (fcs) {
+            fcs->id=items.value(2,"").toLower().trimmed();
+            if (data.isConfocor2) {
+                QString s1=items.value(1,"").toLower().trimmed();
+                if (s1.startsWith("channel")) {
+                    s1=s1.right(s1.size()-QString("channel").size());
+                    fcs->channel=s1;
+                    //qDebug()<<"confocor22 - channel = "<<fcs->channel<<"  items.value(1,"").toLower().trimmed()="<<items.value(1,"").toLower().trimmed()<<"  s1="<<s1<<"\n";
+                }
+                if (s1.startsWith("correlation")) {
+                    s1=s1.right(s1.size()-QString("correlation").size());
+                    fcs->channel=s1;
+                    //qDebug()<<"confocor22 - correlation = "<<fcs->channel<<"  items.value(1,"").toLower().trimmed()="<<items.value(1,"").toLower().trimmed()<<"  s1="<<s1<<"\n";
+                }
+            }
+        }
+
+    }
+    if (!fcs) {
+        if (fcsds) fcs=fcsds;
+        else fcs=&fcs_local;
+    }
+    //qDebug()<<isFCSDataSet<<isFCSIn<<fcs;
     bool readNextLine=true;
     QRegExp rxProp("\\s*([^\\s]+)\\s*\\=\\s*(.*)");
-    while (!done && !f.atEnd()) {
+    int emptycount=0;
+    //qDebug()<<QString(level*2, ' ')<<"BEGIN"<<items.value(1, "---")<<items.value(2, "---")<<" isFCSDataSet="<<isFCSDataSet;
+    while (!done && !f.atEnd() && emptycount<100) {
         if (readNextLine) ll=f.readLine().trimmed().simplified();
         readNextLine=true;
 
+        if (ll.size()>0 && !(ll.size()==1 && ll[0]=='\0')) emptycount=0;
+        else emptycount++;
+        //qDebug()<<emptycount<<done<<f.atEnd()<<ll;
 
         if (ll.startsWith("BEGIN")) {
-            readBlock(level+1, data, f, false, ll, fcs);
+            readBlock(level+1, data, f, false, ll, fcs, isFCSDataSet);
         } else if (ll.startsWith("END")) {
             done=true;
         } else {
@@ -211,22 +268,32 @@ void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data,
                 } else {
                     if (n=="position") {
                         if (vi>=0 && fcs && isFCSDataSet) fcs->position=vi;
+                        //qDebug()<<"!!!position"<<vi<<fcs->position;
                     } else if (n=="kinetics") {
                         if (vi>=0 && fcs && isFCSDataSet) fcs->kinetic=vi;
+                        //qDebug()<<"!!!kinetics"<<vi<<fcs->kinetic;
                     } else if (n=="repetition") {
                         if (vi>=0 && fcs && isFCSDataSet) fcs->repetition=vi;
+                        //qDebug()<<"!!!repetition"<<vi<<fcs->repetition;
                     } else if (n=="channel") {
                         if (fcs && isFCSDataSet) fcs->channel=v;
+                        //qDebug()<<"!!!channel"<<v<<fcs->channel;
                     } else if (n=="rawdata") {
                         if (fcs && isFCSDataSet) fcs->rawdata=v;
                     } else if (n=="acquisitiontime") {
                         if (fcs && isFCSDataSet) fcs->acqtime=v;
                     } else if (n=="countratearray") {
+                        //qDebug()<<"!!!countratearray";
                         if (fcs && isFCSDataSet) {
                             QStringList lst=v.split(' ');
                             int lines=lst.value(0,"0").toInt();
                             int cols=lst.value(1,"0").toInt();
                             if (lines>0 && cols>0) {
+
+                                if (fcs->rate.size()>0) {
+                                    CONFOCOR2_ADDFCSDS();
+                                }
+
                                 ll=readArray(f, lines, cols, readNextLine, fcs->rate);
                                 if (fcs->rate.size()>1) {
                                     fcs->time=fcs->rate[0];
@@ -235,25 +302,40 @@ void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data,
                             }
                         }
                     } else if (n=="correlationarray") {
+                        //qDebug()<<"!!!correlationarray";
                         if (fcs && isFCSDataSet) {
                             QStringList lst=v.split(' ');
                             int lines=lst.value(0,"0").toInt();
                             int cols=lst.value(1,"0").toInt();
                             if (lines>0 && cols>0) {
                                 ll=readArray(f, lines, cols, readNextLine, fcs->corr);
+                                if (fcs->corr.size()>0) {
+                                    CONFOCOR2_ADDFCSDS();
+                                }
                                 if (fcs->corr.size()>1) {
                                     fcs->tau=fcs->corr[0];
+                                    if (data.isConfocor2) {
+                                        for (int i=0; i<fcs->tau.size(); i++) {
+                                            fcs->tau[i]=fcs->tau[i]*1e-3;
+                                        }
+                                    }
                                     fcs->corr.removeFirst();
                                 }
+
                             }
                         }
                     } else if (n=="photoncounthistogramarray") {
+                        //qDebug()<<"!!!photoncounthistogramarray";
                         if (fcs && isFCSDataSet) {
                             QStringList lst=v.split(' ');
                             int lines=lst.value(0,"0").toInt();
                             int cols=lst.value(1,"0").toInt();
                             if (lines>0 && cols>0) {
+
                                 ll=readArray(f, lines, cols, readNextLine, fcs->pch);
+                                if (fcs->pch.size()>0) {
+                                    CONFOCOR2_ADDFCSDS();
+                                }
                                 if (fcs->pch.size()>1) {
                                     fcs->pch_photons=fcs->pch[0];
                                     fcs->pch.removeFirst();
@@ -266,12 +348,20 @@ void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data,
                             fcs->props[norig]=v;
                         }
                     }
+
+                    CONFOCOR2_ADDFCSDS();
+
                 }
             }
         }
     }
-    if (isFCSDataSet && fcs_local.kinetic>=0 && fcs_local.position>=0 && fcs_local.repetition>=0) {
+
+    //qDebug()<<QString(level*2, ' ')<<"END"<<items.value(1, "---")<<items.value(2, "---")<<isFCSDataSet<<fcs_local.kinetic<<fcs_local.position<<fcs_local.repetition<<isFCSIn;
+    if (isFCSDataSet && (fcs_local.kinetic>=0 && fcs_local.position>=0 && fcs_local.repetition>=0) && (data.isConfocor3/* || (data.isConfocor2 && !isFCSIn)*/)
+        && fcs_local.tau.size()>0 ) {
         QString ch=fcs_local.channel.toLower().trimmed();
+        bool intok=false;
+        int chint=ch.toInt(&intok);
         QRegExp rxDet("detector\\s*(meta)*\\s*(\\d+)");
         if (ch.contains("auto-correlation")) {
             fcs_local.type=fdtACF;
@@ -294,10 +384,14 @@ void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data,
                 int ii=rxDet.cap(2).toInt(&ok);
                 if (ok) fcs_local.channelNo2=ii-1;
             }
+        } else if (intok){
+            fcs_local.type=fdtACF;
+            fcs_local.channelNo=chint;
         }
         data.fcsdatasets.append(fcs_local);        
-        //qDebug()<<"!!! ADDED FCS DATASET   P="<<fcs_local.position<<" K="<<fcs_local.kinetic<<" R="<<fcs_local.repetition<<"   Channel="<<fcs_local.channel;
+        qDebug()<<"!!! ADDED FCS CONFOCOR3-DATASET   P="<<fcs_local.position<<" K="<<fcs_local.kinetic<<" R="<<fcs_local.repetition<<"   Channel="<<fcs_local.channel;
     }
+    //qDebug()<<QString(level*2, ' ')<<"END"<<items.value(1, "---")<<items.value(2, "---")<<" FINISHED!!!";
 }
 
 QString Confocor3Tools::readArray(QIODevice &f, int lines, int cols, bool &readNextLine, QList<QVector<double> > &dataout)
@@ -415,9 +509,45 @@ QList<QVector<int> > Confocor3Tools::ConfocorDataset::getRepetitions() const
 
 void Confocor3Tools::ConfocorDataset::clear()
 {
+    isConfocor2=false;
+    isConfocor3=false;
     name.clear();
     comment.clear();
     sortorder.clear();
     filename.clear();
     fcsdatasets.clear();
+}
+
+
+void Confocor3Tools::FCSDataSet::clear()
+{
+    reverseFCCS=false;
+    position=-1;
+    kinetic=-1;
+    repetition=-1;
+    channelNo=-1;
+    channelNo2=-1;
+    type=fdtUnkown;
+    recCnt1=-1;
+    recCnt2=-1;
+
+    clearDataOnly();
+
+    channel.clear();
+    rawdata.clear();
+    acqtime.clear();
+    props.clear();
+    id.clear();
+    group.clear();
+    role.clear();
+}
+
+void Confocor3Tools::FCSDataSet::clearDataOnly()
+{
+    tau.clear();
+    corr.clear();
+    time.clear();
+    rate.clear();
+    pch_photons.clear();
+    pch.clear();
 }

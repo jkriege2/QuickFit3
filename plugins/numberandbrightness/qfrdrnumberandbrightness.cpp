@@ -957,7 +957,7 @@ void QFRDRNumberAndBrightnessPlugin::wizImgPreviewOnValidate(QWizardPage *page, 
         double* image=NULL;
         int width=0, height=0;
         QString filter="imageimporter_libtiff";
-        plot->setImage(files->files().value(0, ""), filter, -1, image, width, height, &info);
+        plot->setImage(files->files().value(0, ""), filter, -1, &image, width, height, &info);
         if (wizPixelSize) {
             if (info.properties.contains("PIXEL_WIDTH")) {
                 wizPixelSize->setValue(info.properties["PIXEL_WIDTH"].toDouble());
@@ -1081,7 +1081,7 @@ void QFRDRNumberAndBrightnessPlugin::wizImageOverviewFromFilesList(QWizardPage *
         double* image=NULL;
         int width=0, height=0, frames=0;
         //qDebug()<<files->files().value(0, "")<<files->fileFilterIDs().value(0, "");
-        plot->setImageAvg(files->files().value(0, ""), files->fileFilterIDs().value(0, ""), -1, 50, image, width, height, &info, &frames);
+        plot->setImageAvg(files->files().value(0, ""), files->fileFilterIDs().value(0, ""), -1, 50, &image, width, height, &info, &frames);
         if (wizPixelSize) {
             if (info.properties.contains("PIXEL_WIDTH")) {
                 wizPixelSize->setValue(info.properties["PIXEL_WIDTH"].toDouble());

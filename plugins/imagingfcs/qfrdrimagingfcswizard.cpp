@@ -1070,8 +1070,8 @@ void QFRDRImagingFCSWizard::cropRegionChanged(int region)
 void QFRDRImagingFCSWizard::cropValuesChanged()
 {
     //qDebug()<<"cropValuesChanged";
-    cropRegionChanged(cmbCropRegion->currentIndex());
     wizCropAndBin->setBinning(spinBinning->value());
+    cropRegionChanged(cmbCropRegion->currentIndex());
 }
 
 void QFRDRImagingFCSWizard::microscopyChoosen()
@@ -1426,6 +1426,7 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
 
         wizard->wizImageProps->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
         wizard->wizCalibration->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
+        wizard->wizCropAndBin->setBinning(1);
         wizard->wizCropAndBin->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
         wizard->calibrationRegionChanged(wizard->cmbCalibCropRegion->currentIndex());
         wizard->cropRegionChanged(wizard->cmbCropRegion->currentIndex());

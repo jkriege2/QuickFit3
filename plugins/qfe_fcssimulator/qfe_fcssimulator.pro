@@ -55,12 +55,19 @@ spectradir=$$PWD/../../extlibsb040/FCSSimulator/spectra
 spectradir_out=$${QFOUTPUT}/assets/plugins/$${TARGET}/
 exampledir=$$PWD/../../extlibsb040/FCSSimulator/example_configs
 exampledir_out=$${QFOUTPUT}/examples/$${TARGET}/
+manualpdf=$$PWD/../../extlibsb040/FCSSimulator/manual/manual.pdf
+manualpdf_out=$${QFOUTPUT}/assets/plugins/help/$${TARGET}/
 win32|win64 {
     fcssim_exe=$$PWD/../../extlibsb040/FCSSimulator/diffusion4.exe
     fcssim_exe_out=$${QFOUTPUT}/diffusion4.exe
 } else {
-    fcssim_exe=$$PWD/../../extlibsb040/FCSSimulator/diffusion4$${EXE_SUFFIX}
-    fcssim_exe_out=$${QFOUTPUT}/diffusion4$${EXE_SUFFIX}
+    macx {
+        fcssim_exe=$$PWD/../../extlibsb040/FCSSimulator/diffusion4$${EXE_SUFFIX}
+        fcssim_exe_out=$${QFOUTPUT}/assets/plugins/$${TARGET}/diffusion4$${EXE_SUFFIX}
+    } else {
+        fcssim_exe=$$PWD/../../extlibsb040/FCSSimulator/diffusion4$${EXE_SUFFIX}
+        fcssim_exe_out=$${QFOUTPUT}/diffusion4$${EXE_SUFFIX}
+    }
 }
 
 fcssim_build.depends =
@@ -71,7 +78,9 @@ fcssim_spectracopy.depends = fcssim_build
 fcssim_spectracopy.commands = $(MKDIR) $${spectradir_out} && $(COPY_DIR) $${spectradir} $${spectradir_out}
 fcssim_examplecopy.depends = fcssim_build
 fcssim_examplecopy.commands = $(MKDIR) $${exampledir_out} && $(COPY_DIR) $${exampledir} $${exampledir_out}
-QMAKE_EXTRA_TARGETS += fcssim_build fcssim_copy fcssim_spectracopy fcssim_examplecopy
-PRE_TARGETDEPS += fcssim_copy fcssim_spectracopy fcssim_examplecopy
+fcssim_manualcopy.depends = fcssim_build
+fcssim_manualcopy.commands = $(MKDIR) $${manualpdf_out} && $(COPY_DIR) $${manualpdf} $${manualpdf_out}
+QMAKE_EXTRA_TARGETS += fcssim_build fcssim_copy fcssim_spectracopy fcssim_examplecopy fcssim_manualcopy
+PRE_TARGETDEPS += fcssim_copy fcssim_spectracopy fcssim_examplecopy fcssim_manualcopy
 
 

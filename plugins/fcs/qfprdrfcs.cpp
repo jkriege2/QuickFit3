@@ -513,8 +513,8 @@ void QFPRDRFCS::insertConfocor3File(const QStringList &filename, const QMap<QStr
     reader.loadFile(filename.value(0, ""));
     if (reader.wasError()) {
         cc=0;
-        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ConfoCor3 file '%1':\n%2").arg(filename.value(0, "")).arg(reader.getLastErrors().join("\n")));
-        services->log_error(tr("Error while importing ConfoCor3 file '%1':\n    %2\n").arg(filename.value(0, "")).arg(reader.getLastErrors().join("\n")));
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ConfoCor2/3 file '%1':\n%2").arg(filename.value(0, "")).arg(reader.getLastErrors().join("\n")));
+        services->log_error(tr("Error while importing ConfoCor2/3 file '%1':\n    %2\n").arg(filename.value(0, "")).arg(reader.getLastErrors().join("\n")));
     } else {
         const Confocor3Tools::ConfocorDataset& d=reader.getData();
         QMap<QString, QVariant> p=paramValues;
@@ -543,10 +543,11 @@ void QFPRDRFCS::insertConfocor3File(const QStringList &filename, const QMap<QStr
                     e->setRole(roles[i]);
                     e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()+"_"+groups.value(r, "")));
                     if (e->error()) {
-                        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ConfoCor3 file '%1' (role: %3, group: %4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(roles[i]).arg(groups.value(r, "")));
-                        services->log_error(tr("Error while importing ConfoCor3 file '%1' (role: %3, group: %4):\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()).arg(roles[i]).arg(groups.value(r, "")));
+                        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ConfoCor2/3 file '%1' (role: %3, group: %4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(roles[i]).arg(groups.value(r, "")));
+                        services->log_error(tr("Error while importing ConfoCor2/3 file '%1' (role: %3, group: %4):\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()).arg(roles[i]).arg(groups.value(r, "")));
                         project->deleteRawData(e->getID());
                     }
+
                 }
             }
         }
