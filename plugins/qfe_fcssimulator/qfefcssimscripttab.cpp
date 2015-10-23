@@ -14,6 +14,9 @@ QFEFCSSimScriptTab::QFEFCSSimScriptTab(QFEFCSSimMainWidnow *parent) :
     QWidget(parent),
     ui(new Ui::QFEFCSSimScriptTab)
 {
+    updTimer.setSingleShot(true);
+    updTimer.setInterval(100);
+    connect(&updTimer, SIGNAL(timeout()), this, SLOT(dataAvailable()));
     this->mainWin=parent;
     ui->setupUi(this);
     txtChanged=false;
@@ -66,12 +69,12 @@ bool QFEFCSSimScriptTab::loadTemplate(const QString &filename)
 {
     QString fn=filename;
     if (fn.isEmpty()) {
-        fn=qfGetOpenFileNameSet("QFEFCSSimScriptTab/filedlg", this, tr("Open Simulator Template ..."), QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_fcssimulator")+"/template_configs", tr("Simulator Scripts (*.ini);;All Files (*.*"));
+        fn=qfGetOpenFileNameSet("QFEFCSSimScriptTab/templatedlg", this, tr("Open Simulator Template ..."), QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_fcssimulator")+"/template_configs", tr("Simulator Scripts (*.ini);;All Files (*.*"));
         if (fn.isEmpty()) return false;
     }
     setFilename("");
-    if (!this->filename.isEmpty()) {
-        ui->edtScript->getEditor()->setPlainText(QString::fromLatin1(readFile(this->filename)));
+    if (!fn.isEmpty()) {
+        ui->edtScript->getEditor()->setPlainText(QString::fromLatin1(readFile(fn)));
         txtChanged=false;
         emit textChanged(false);
         return true;
@@ -193,8 +196,8 @@ void QFEFCSSimScriptTab::startProcess()
         args<<QDir::toNativeSeparators(mainWin->getSpectraDir());
         args<<QDir::toNativeSeparators(filename);
         proc->setArguments(args);
-        connect(proc.data(), SIGNAL(readyReadStandardOutput()), this, SLOT(dataAvailable()));
-        connect(proc.data(), SIGNAL(readyReadStandardError()), this, SLOT(dataAvailable()));
+        connect(proc.data(), SIGNAL(readyReadStandardOutput()), this, SLOT(dataAvailableTimed()));
+        connect(proc.data(), SIGNAL(readyReadStandardError()), this, SLOT(dataAvailableTimed()));
         connect(proc.data(), SIGNAL(error(QProcess::ProcessError)), this, SLOT(error(QProcess::ProcessError)));
         connect(proc.data(), SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
         ui->pteOutput->clearLog();
@@ -216,16 +219,27 @@ void QFEFCSSimScriptTab::editorChanged()
     emit textChanged(true);
 }
 
+void QFEFCSSimScriptTab::dataAvailableTimed() {
+    //updTimer.start();
+    dataAvailable();
+}
+
 void QFEFCSSimScriptTab::dataAvailable()
 {
     if (proc) {
-        QString dat=proc->readAllStandardOutput();
-        ui->pteOutput->log_text(dat);
-        QRegExp rx("\\n\\s*(\\d+\\.?\\d*)%[^\\n\\r]+ETA:\\s*(\\d+\\:\\d+\\:\\d+)", Qt::CaseInsensitive);
-        if (rx.lastIndexIn(dat.right(200))>=0) {
-            ui->progressBar->setValue(QStringToDouble(rx.cap(1)));
-            ui->labETA->setText(tr("ETA: %1").arg(rx.cap(2)));
-        }
+        QString dati=proc->readAllStandardOutput();
+        QString dat=dati;
+        /*QStringList sl=dati.split('\n');
+        for (int i=0; i<sl.size(); i++) {
+            QString dat=sl[i];
+            if (i+1<sl.size()) dat+="\n";*/
+            ui->pteOutput->log_text(dat);
+            QRegExp rx("\\n\\s*(\\d+\\.?\\d*)%[^\\n\\r]+ETA:\\s*(\\d+\\:\\d+\\:\\d+)", Qt::CaseInsensitive);
+            if (rx.lastIndexIn(dat.right(200))>=0) {
+                ui->progressBar->setValue(QStringToDouble(rx.cap(1)));
+                ui->labETA->setText(tr("ETA: %1").arg(rx.cap(2)));
+            }
+        //}
     }
 }
 
@@ -259,6 +273,8 @@ void QFEFCSSimScriptTab::error(QProcess::ProcessError error)
 
 void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    updTimer.stop();
+    dataAvailable();
      ui->pteOutput->log_text("\n\n\n");
     if (exitStatus==QProcess::CrashExit) {
         ui->pteOutput->log_error(tr("The simulator ended with a crash! Results may not be usable!\nexitCode = %1").arg(exitCode));
@@ -276,7 +292,7 @@ void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
     ui->pteOutput->log_text(tr("\n\n\nSEARCHING FOR FCS RESULTS THAT CAN BE IMPORTED:\n(use the button import results):\n\n"));
     ui->progressBar->setValue(ui->progressBar->maximum());
 
-    log=log.right(log.size()/2);
+    //log=log.right(log.size()/2);
 
     //qDebug()<<log<<log.size();
 
@@ -285,8 +301,10 @@ void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
         QRegExp rxACORR("\\n\\s*writing[^\\n\\r]*([\\\"\\'])([^\\n\\r]+\\.qf3acorr)\\1", Qt::CaseInsensitive);
         int idx=0;
         while ((idx=rxACORR.indexIn(log, idx))>=0) {
-            if (rxACORR.cap(2).size()>0) {
-                QString fn=d.absoluteFilePath(rxACORR.cap(2));
+            QString f=rxACORR.cap(2);
+            f=f.replace('\\', '/');
+            if (f.size()>0) {
+                QString fn=d.absoluteFilePath(f);
                 if (!outfiles.contains(fn) && QFile::exists(fn)) {
                     outfiles.append(fn);
                     ui->pteOutput->log_text(tr("   - %1\n").arg(fn));
@@ -301,8 +319,10 @@ void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
         QRegExp rxASC("\\n\\s*writing[^\\n\\r]*([\\\"\\'])([^\\n\\r]+\\.asc)\\1", Qt::CaseInsensitive);
         int idx=0;
         while ((idx=rxASC.indexIn(log, idx))>=0) {
-            if (rxASC.cap(2).size()>0) {
-                QString fn=d.absoluteFilePath(rxASC.cap(2));
+            QString f=rxASC.cap(2);
+            f=f.replace('\\', '/');
+            if (f.size()>0) {
+                QString fn=d.absoluteFilePath(f);
                 if (!outfiles.contains(fn) && QFile::exists(fn)) {
                     outfiles.append(fn);
                     ui->pteOutput->log_text(tr("   - %1\n").arg(fn));
@@ -326,7 +346,8 @@ void QFEFCSSimScriptTab::on_btnImport_clicked()
         QFPluginCommandsInterface* command=dynamic_cast<QFPluginCommandsInterface*>(QFPluginServices::getInstance()->getRawDataRecordFactory()->getPlugin("fcs"));
         if (command) {
             for (int i=0; i<resultfiles.size(); i++) {
-                if (resultfiles[i].trimmed().toLower().endsWith(".qf3qcorr")) {
+                resultfiles[i]=resultfiles[i].replace('\\', '/');
+                if (resultfiles[i].trimmed().toLower().endsWith(".qf3acorr")) {
                     QVariant res=command->sendPluginCommand("load_qf3asciicorr", resultfiles[i]);
                     qDebug()<<"imported QF3ASCIICorr "<<resultfiles[i]<<res<<"\n";
                 } else if (resultfiles[i].trimmed().toLower().endsWith(".asc")) {

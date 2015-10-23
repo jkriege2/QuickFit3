@@ -43,6 +43,7 @@ class QFEFCSSimScriptTab : public QWidget
         QFEFCSSimMainWidnow* mainWin;
         QPointer<QProcess> proc;
         QStringList resultfiles;
+        QTimer updTimer;
         bool isqf3acorr;
         bool txtChanged;
         void setFilename(const QString& filename);
@@ -50,6 +51,7 @@ class QFEFCSSimScriptTab : public QWidget
         void startProcess();
         void editorChanged();
         void dataAvailable();
+        void dataAvailableTimed();
         void error(QProcess::ProcessError error);
         void finished(int exitCode, QProcess::ExitStatus exitStatus);
         void on_btnImport_clicked();
