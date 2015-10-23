@@ -22,6 +22,7 @@ class QFEFCSSimMainWidnow : public QWidget
         QString getWorkingDir() const;
         QString getSimulator() const;
         QString getSpectraDir() const;
+        bool getSaveLog() const;
     protected slots:
         void on_btnOpen_clicked();
         void on_btnNew_clicked();
@@ -32,6 +33,8 @@ class QFEFCSSimMainWidnow : public QWidget
         void on_btnExecute_clicked();
         void on_btnStop_clicked();
         bool closeTab(int i);
+        void on_btnHelp_clicked();
+        void on_btnTutorial_clicked();
 
         void textChanged(bool changed);
 

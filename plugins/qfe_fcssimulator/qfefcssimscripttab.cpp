@@ -114,7 +114,7 @@ void QFEFCSSimScriptTab::execute()
     if (mainWin->mayStartProcess()) {
         startProcess();
     } else {
-        ui->pteOutput->clearLog();
+        ui->pteOutput->clearLog();        
         ui->pteOutput->log_dline();
         ui->pteOutput->log_text(tr("waiting for a free slot to start simulator ..."));
         ui->pteOutput->log_dline();
@@ -181,6 +181,8 @@ void QFEFCSSimScriptTab::startProcess()
         connect(proc.data(), SIGNAL(error(QProcess::ProcessError)), this, SLOT(error(QProcess::ProcessError)));
         connect(proc.data(), SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
         ui->pteOutput->clearLog();
+        ui->pteOutput->set_log_file_append(false);
+        ui->pteOutput->open_logfile(QDir(mainWin->getWorkingDir()).absoluteFilePath(QFileInfo(filename).fileName()+".log"), false);
         ui->pteOutput->log_dline();
         ui->pteOutput->log_text(tr("running FCS simulator: %1\nin working directory: %2\nwith input file: %3\n\n").arg(proc->program()).arg(proc->workingDirectory()).arg(filename));
         ui->pteOutput->log_dline();
@@ -297,6 +299,7 @@ void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
     resultfiles=outfiles;
     setRunning(false);
     ui->pteOutput->log_text(tr("\n\nFINISHED SIMULATION AND POST-PROCESSING!\n"));
+    ui->pteOutput->close_logfile();
 }
 
 void QFEFCSSimScriptTab::on_btnImport_clicked()

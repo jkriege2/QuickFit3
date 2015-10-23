@@ -83,6 +83,13 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QCheckBox" name="chkSaveLog">
+          <property name="text">
+           <string>save log-file in exe-directory</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -212,6 +219,34 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnHelp">
+        <property name="text">
+         <string>&amp;Help</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/lib/help/help.png</normaloff>:/lib/help/help.png</iconset>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnManual">
+        <property name="text">
+         <string>simulator manual</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/pdf.png</normaloff>:/pdf.png</iconset>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
