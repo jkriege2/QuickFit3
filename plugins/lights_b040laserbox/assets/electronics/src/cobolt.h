@@ -210,10 +210,10 @@ const char* errormessages[6] = {
    "                "
    "BAD INSTR. ERR  ",
    "LASER TIMEOUT   ",
-   " TEMP. ERROR    ",
+   "TEMP. ERROR     ",
    "INTERLOCK OPEN  ",
    "CONST POW.FAULT ",
-   "LASER DOSCONNEC "
+   "LASER DISCONN.  "
 };
 
 inline char* laser_errordescription(uint8_t ERROR) {
@@ -232,4 +232,5 @@ char* laser_getadditionalinfo(void) {
         las_addinfo[i]=0;
     }
     sprintf_P(las_addinfo, PSTR("I=%5.3f  "), CUR_MEAS);
+    return las_addinfo;
 }
