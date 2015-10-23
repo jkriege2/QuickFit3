@@ -4296,7 +4296,11 @@ void MainWindow::checkUpdates(bool userRequest)
     ProgramOptionsSetQNetworkProxy(proxy);
     networkManager.setProxy(proxy);
     QModernProgressDialog progress(tr("getting update information ..."), tr("Cancel"), this);
-    progress.open();
+    if (userRequest) progress.open();
+    else {
+        progress.hide();
+        progress.close();
+    }
 
     for (int i=0; i<2; i++) {
         QUrl url;
