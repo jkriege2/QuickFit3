@@ -27,9 +27,9 @@ QFEFCSSimMainWidnow::~QFEFCSSimMainWidnow()
 
 void QFEFCSSimMainWidnow::loadSettings()
 {
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     QString sim=QApplication::applicationDirPath()+"/diffusion4.exe";
-#elifdef Q_OS_MAC
+#elif defined(Q_OS_MAC)
     QString sim=QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_fcssimulator")+"/diffusion4";
 #else
     QString sim=QApplication::applicationDirPath()+"/diffusion4";
@@ -184,9 +184,10 @@ void QFEFCSSimMainWidnow::on_btnHelp_clicked()
     QFPluginServices::getInstance()->displayPluginHelpWindow("qfe_fcssimulator");
 }
 
-void QFEFCSSimMainWidnow::on_btnTutorial_clicked()
+void QFEFCSSimMainWidnow::on_btnManual_clicked()
 {
     QUrl url(QString("file:///")+QFPluginServices::getInstance()->getPluginHelpDirectory("qfe_fcssimulator")+"/manual.pdf", QUrl::TolerantMode);
+    qDebug()<<"opening "<<url;
     QDesktopServices::openUrl(url);
 }
 

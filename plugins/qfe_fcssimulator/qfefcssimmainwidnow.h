@@ -34,7 +34,7 @@ class QFEFCSSimMainWidnow : public QWidget
         void on_btnStop_clicked();
         bool closeTab(int i);
         void on_btnHelp_clicked();
-        void on_btnTutorial_clicked();
+        void on_btnManual_clicked();
 
         void textChanged(bool changed);
 
