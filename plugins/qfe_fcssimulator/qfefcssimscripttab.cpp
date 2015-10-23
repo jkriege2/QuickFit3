@@ -136,7 +136,7 @@ void QFEFCSSimScriptTab::execute()
     } else {
         ui->pteOutput->clearLog();        
         ui->pteOutput->log_dline();
-        ui->pteOutput->log_text(tr("waiting for a free slot to start simulator ..."));
+        ui->pteOutput->log_text(tr("waiting for a free slot to start simulator ..."), false);
         ui->pteOutput->log_dline();
         QTimer::singleShot(500, this, SLOT(startProcess()));
     }
@@ -204,10 +204,10 @@ void QFEFCSSimScriptTab::startProcess()
         ui->pteOutput->set_log_file_append(false);
         ui->pteOutput->open_logfile(QDir(mainWin->getWorkingDir()).absoluteFilePath(QFileInfo(filename).fileName()+".log"), false);
         ui->pteOutput->log_dline();
-        ui->pteOutput->log_text(tr("running FCS simulator: %1\nin working directory: %2\nwith input file: %3\n\n").arg(proc->program()).arg(proc->workingDirectory()).arg(filename));
+        ui->pteOutput->log_text(tr("running FCS simulator: %1\nin working directory: %2\nwith input file: %3\n\n").arg(proc->program()).arg(proc->workingDirectory()).arg(filename), false);
         ui->pteOutput->log_dline();
         proc->start(QProcess::ReadOnly);
-        ui->pteOutput->log_text("\nstarted simulator process ...\n\n");
+        ui->pteOutput->log_text("\nstarted simulator process ...\n\n", false);
     } else {
         QTimer::singleShot(500, this, SLOT(startProcess()));
     }
@@ -233,9 +233,10 @@ void QFEFCSSimScriptTab::dataAvailable()
         for (int i=0; i<sl.size(); i++) {
             QString dat=sl[i];
             if (i+1<sl.size()) dat+="\n";*/
-            ui->pteOutput->log_text(dat);
+            ui->pteOutput->log_text(dat, false);
+            dat=ui->pteOutput->toPlainText().right(200);
             QRegExp rx("\\n\\s*(\\d+\\.?\\d*)%[^\\n\\r]+ETA:\\s*(\\d+\\:\\d+\\:\\d+)", Qt::CaseInsensitive);
-            if (rx.lastIndexIn(dat.right(200))>=0) {
+            if (rx.lastIndexIn(dat)>=0) {
                 ui->progressBar->setValue(QStringToDouble(rx.cap(1)));
                 ui->labETA->setText(tr("ETA: %1").arg(rx.cap(2)));
             }
@@ -245,26 +246,26 @@ void QFEFCSSimScriptTab::dataAvailable()
 
 void QFEFCSSimScriptTab::error(QProcess::ProcessError error)
 {
-    ui->pteOutput->log_text("\n\n\n");
+    ui->pteOutput->log_text("\n\n\n", false);
     switch (error) {
         case QProcess::FailedToStart:
-            ui->pteOutput->log_error(tr("The process failed to start. Either the invoked program is missing, or you may have insufficient permissions to invoke the program."));
+            ui->pteOutput->log_error(tr("The process failed to start. Either the invoked program is missing, or you may have insufficient permissions to invoke the program."), false);
             break;
         case QProcess::Crashed:
-            ui->pteOutput->log_error(tr("The process crashed some time after starting successfully."));
+            ui->pteOutput->log_error(tr("The process crashed some time after starting successfully."), false);
             break;
         case QProcess::Timedout:
-            ui->pteOutput->log_error(tr("The last waitFor...() function timed out. The state of QProcess is unchanged, and you can try calling waitFor...() again."));
+            ui->pteOutput->log_error(tr("The last waitFor...() function timed out. The state of QProcess is unchanged, and you can try calling waitFor...() again."), false);
             break;
         case QProcess::WriteError:
-            ui->pteOutput->log_error(tr("An error occurred when attempting to write to the process. For example, the process may not be running, or it may have closed its input channel."));
+            ui->pteOutput->log_error(tr("An error occurred when attempting to write to the process. For example, the process may not be running, or it may have closed its input channel."), false);
             break;
         case QProcess::ReadError:
-            ui->pteOutput->log_error(tr("An error occurred when attempting to read from the process. For example, the process may not be running."));
+            ui->pteOutput->log_error(tr("An error occurred when attempting to read from the process. For example, the process may not be running."), false);
             break;
         case QProcess::UnknownError:
         default:
-            ui->pteOutput->log_error(tr("unknown error"));
+            ui->pteOutput->log_error(tr("unknown error"), false);
             break;
     }
 
@@ -275,11 +276,11 @@ void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     updTimer.stop();
     dataAvailable();
-     ui->pteOutput->log_text("\n\n\n");
+     ui->pteOutput->log_text("\n\n\n", false);
     if (exitStatus==QProcess::CrashExit) {
-        ui->pteOutput->log_error(tr("The simulator ended with a crash! Results may not be usable!\nexitCode = %1").arg(exitCode));
+        ui->pteOutput->log_error(tr("The simulator ended with a crash! Results may not be usable!\nexitCode = %1").arg(exitCode), false);
     } else {
-        ui->pteOutput->log_text(tr("The simulator ended normally! Results are ready for further evaluation!\nexitCode = %1").arg(exitCode));
+        ui->pteOutput->log_text(tr("The simulator ended normally! Results are ready for further evaluation!\nexitCode = %1").arg(exitCode), false);
     }
     setRunning(false);
 
@@ -289,7 +290,7 @@ void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
     QDir d(mainWin->getWorkingDir());
     if (proc) d=QDir(proc->workingDirectory());
 
-    ui->pteOutput->log_text(tr("\n\n\nSEARCHING FOR FCS RESULTS THAT CAN BE IMPORTED:\n(use the button import results):\n\n"));
+    ui->pteOutput->log_text(tr("\n\n\nSEARCHING FOR FCS RESULTS THAT CAN BE IMPORTED:\n(use the button import results):\n\n"), false);
     ui->progressBar->setValue(ui->progressBar->maximum());
 
     //log=log.right(log.size()/2);
@@ -307,7 +308,7 @@ void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
                 QString fn=d.absoluteFilePath(f);
                 if (!outfiles.contains(fn) && QFile::exists(fn)) {
                     outfiles.append(fn);
-                    ui->pteOutput->log_text(tr("   - %1\n").arg(fn));
+                    ui->pteOutput->log_text(tr("   - %1\n").arg(fn), false);
                 }
                 QApplication::processEvents();
             }
@@ -325,7 +326,7 @@ void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
                 QString fn=d.absoluteFilePath(f);
                 if (!outfiles.contains(fn) && QFile::exists(fn)) {
                     outfiles.append(fn);
-                    ui->pteOutput->log_text(tr("   - %1\n").arg(fn));
+                    ui->pteOutput->log_text(tr("   - %1\n").arg(fn), false);
                 }
                 QApplication::processEvents();
             }
@@ -335,7 +336,7 @@ void QFEFCSSimScriptTab::finished(int exitCode, QProcess::ExitStatus exitStatus)
     }
     resultfiles=outfiles;
     setRunning(false);
-    ui->pteOutput->log_text(tr("\n\nFINISHED SIMULATION AND POST-PROCESSING!\n"));
+    ui->pteOutput->log_text(tr("\n\nFINISHED SIMULATION AND POST-PROCESSING!\n"), false);
     ui->pteOutput->close_logfile();
 }
 
