@@ -221,6 +221,19 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     logFileMainWidget->log_text(tr("- productVersion: %1\n").arg(QSysInfo::productVersion()));
     logFileMainWidget->dec_indent();
 #endif
+    logFileMainWidget->log_header(tr("C/C++ System info:"));
+    logFileMainWidget->inc_indent();
+    logFileMainWidget->log_text(tr("- sizeof(void*): %1 bits\n").arg(sizeof(void*)*8));
+    logFileMainWidget->log_text(tr("- sizeof(char): %1 bits\n").arg(sizeof(char)*8));
+    logFileMainWidget->log_text(tr("- sizeof(int): %1 bits\n").arg(sizeof(int)*8));
+    logFileMainWidget->log_text(tr("- sizeof(long int): %1 bits\n").arg(sizeof(long int)*8));
+    logFileMainWidget->log_text(tr("- sizeof(long long int): %1 bits\n").arg(sizeof(long long int)*8));
+    logFileMainWidget->log_text(tr("- sizeof(float): %1 bits\n").arg(sizeof(float)*8));
+    logFileMainWidget->log_text(tr("- sizeof(double): %1 bits\n").arg(sizeof(double)*8));
+    logFileMainWidget->log_text(tr("- sizeof(bool): %1 bits\n").arg(sizeof(bool)*8));
+    logFileMainWidget->dec_indent();
+
+
     logFileMainWidget->log_header(tr("System directories:"));
     logFileMainWidget->inc_indent();
     logFileMainWidget->log_text(tr("- example temporary file: %1\n").arg(qfGetTempFilename()));

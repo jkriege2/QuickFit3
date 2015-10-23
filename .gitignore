@@ -244,3 +244,5 @@ output/quickfit3lib.framework/Versions/Current
 output/quickfit3widgets.framework/quickfit3widgets
 
 output/*.framework
+
+output/diffusion4
