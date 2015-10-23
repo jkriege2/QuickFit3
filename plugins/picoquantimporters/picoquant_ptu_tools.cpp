@@ -3,8 +3,8 @@
 #include <wchar.h>
 #include "qftools.h"
 #include <stdint.h>
-const int EpochDiff = 25569; // days between 30/12/1899 and 01/01/1970
-const int SecsInDay = 86400; // number of seconds in a day
+const int32_t EpochDiff = 25569; // days between 30/12/1899 and 01/01/1970
+const int32_t SecsInDay = 86400; // number of seconds in a day
 
 union TgPTUTagHeadValue {
     int64_t integ;
@@ -13,8 +13,8 @@ union TgPTUTagHeadValue {
 
 // A Tag entry
 struct TgPTUTagHead{
-  char Ident[32];     // Identifier of the tag
-  int Idx;            // Index for multiple tags or -1
+  int8_t Ident[32];     // Identifier of the tag
+  int32_t Idx;            // Index for multiple tags or -1
   uint32_t Typ;  // Type of tag ty..... see const section
   TgPTUTagHeadValue TagValue; // Value of tag.
 } PTUTagHead;
@@ -35,10 +35,10 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
     info.channels=4;
     info.duration=0;
     error="";
-    char Magic[8];
-    char Version[8];
+    int8_t Magic[8];
+    int8_t Version[8];
     //char Buffer[40];
-    char* AnsiBuffer;
+    int8_t* AnsiBuffer;
     WCHAR* WideBuffer;
     int Result;
 
@@ -60,13 +60,13 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
       error=QObject::tr("error reading header, aborted.");
       return false;
     }
-    if (strncmp(Magic, "PQTTTR", 6))
+    if (strncmp((char*)Magic, "PQTTTR", 6))
     {
       error=QObject::tr("Wrong Magic, this is not a PTU file.");
       return false;
     }
 
-    info.version=Version;
+    info.version=(char*)Version;
     //fprintf(fpout, "Tag Version: %s \n", Version);
 
     // read tagged header
@@ -84,7 +84,7 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
           return false;
       }
 
-      QString tagID=PTUTagHead.Ident;
+      QString tagID=(char*)PTUTagHead.Ident;
       QVariant tagData;
 
       //strcpy(Buffer, PTUTagHead.Ident);
@@ -103,9 +103,9 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
           case tyInt8:
               tagData=int(PTUTagHead.TagValue.integ);
               // get some Values we need to analyse records
-              if (strcmp(PTUTagHead.Ident, TTTRTagNumRecords)==0) // Number of records
+              if (strcmp((char*)PTUTagHead.Ident, TTTRTagNumRecords)==0) // Number of records
                           NumRecords = PTUTagHead.TagValue.integ;
-              if (strcmp(PTUTagHead.Ident, TTTRTagTTTRRecType)==0) // TTTR RecordType
+              if (strcmp((char*)PTUTagHead.Ident, TTTRTagTTTRRecType)==0) // TTTR RecordType
                           RecordType = PTUTagHead.TagValue.integ;
               break;
           case tyBitSet64:
@@ -116,9 +116,9 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
               break;
           case tyFloat8:
               tagData=PTUTagHead.TagValue.dbl;
-              if (strcmp(PTUTagHead.Ident, TTTRTagRes)==0) // Resolution for TCSPC-Decay
+              if (strcmp((char*)PTUTagHead.Ident, TTTRTagRes)==0) // Resolution for TCSPC-Decay
                       Resolution = PTUTagHead.TagValue.dbl;
-              if (strcmp(PTUTagHead.Ident, TTTRTagGlobRes)==0) // Global resolution for timetag
+              if (strcmp((char*)PTUTagHead.Ident, TTTRTagGlobRes)==0) // Global resolution for timetag
                       GlobRes = PTUTagHead.TagValue.dbl; // in ns
               break;
           case tyFloat8Array: {
@@ -140,14 +140,14 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
               //fprintf(fpout, "%s", asctime(gmtime(&CreateTime)), "\0");
               break;
           case tyAnsiString:
-              AnsiBuffer = (char*)qfCalloc((size_t)PTUTagHead.TagValue.integ,1);
+              AnsiBuffer = (int8_t*)qfCalloc((size_t)PTUTagHead.TagValue.integ,1);
               Result = fread(AnsiBuffer, 1, (size_t)PTUTagHead.TagValue.integ, fpin);
               if (Result!= PTUTagHead.TagValue.integ) {
                   error=QObject::tr("Incomplete File.");
                   qfFree(AnsiBuffer);
                   return false;
               }
-              tagData=QString(AnsiBuffer);
+              tagData=QString((char*)AnsiBuffer);
               qfFree(AnsiBuffer);
               break;
           case tyWideString:
@@ -180,7 +180,7 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
       else if (tagID=="File_Comment" ) info.comment=tagData.toString();
       info.header_data.append(qMakePair(tagID, tagData));
     }
-    while((strncmp(PTUTagHead.Ident, FileTagEnd, sizeof(FileTagEnd))));
+    while((strncmp((char*)PTUTagHead.Ident, FileTagEnd, sizeof(FileTagEnd))));
 
     info.NumRecords=NumRecords;
     info.RecordType=RecordType;

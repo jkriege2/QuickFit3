@@ -19,13 +19,13 @@ bool PT3ReadConfiguration(FILE* fpin, PT3TxtHdr* txtHeader, PT3BinHdr* binHeader
     //qDebug()<<"creating software: "<<txtHeader->CreatorName;
     //qDebug()<<"creating software version: "<<txtHeader->CreatorVersion;
 
-    if(strncmp(txtHeader->Ident,"PicoHarp 300",3)) {
+    if(strncmp((char*)txtHeader->Ident,"PicoHarp 300",3)) {
         error=QObject::tr("Input file is not a PicoHarp 300 file ");
         return false;
     }
 
-    if(strncmp(txtHeader->FormatVersion,"2.0",3)) {
-        error=QObject::tr("Input file version is %1. This program is for v2.0 only").arg(txtHeader->FormatVersion);
+    if(strncmp((char*)txtHeader->FormatVersion,"2.0",3)) {
+        error=QObject::tr("Input file version is %1. This program is for v2.0 only").arg((char*)txtHeader->FormatVersion);
         return false;
     }
 
