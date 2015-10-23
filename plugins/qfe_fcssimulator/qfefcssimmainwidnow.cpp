@@ -98,7 +98,20 @@ void QFEFCSSimMainWidnow::on_btnOpen_clicked()
 void QFEFCSSimMainWidnow::on_btnNew_clicked()
 {
     tabs.append(new QFEFCSSimScriptTab(this));
-     ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(lastTab(), tabs.last()->getFilename()));
+    connect(tabs.last(), SIGNAL(textChanged(bool)), this, SLOT(textChanged(bool)));
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(lastTab(), tabs.last()->getFilename()));
+}
+
+void QFEFCSSimMainWidnow::on_btnNewFromTemplate_clicked()
+{
+    tabs.append(new QFEFCSSimScriptTab(this));
+    if (!tabs.last()->loadTemplate()) {
+        delete tabs.last();
+        tabs.removeLast();
+        return;
+    }
+    connect(tabs.last(), SIGNAL(textChanged(bool)), this, SLOT(textChanged(bool)));
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(lastTab(), tabs.last()->getFilename()));
 }
 
 void QFEFCSSimMainWidnow::on_btnSave_clicked()

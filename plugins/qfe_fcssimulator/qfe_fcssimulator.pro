@@ -84,3 +84,7 @@ QMAKE_EXTRA_TARGETS += fcssim_build fcssim_copy fcssim_spectracopy fcssim_exampl
 PRE_TARGETDEPS += fcssim_copy fcssim_spectracopy fcssim_examplecopy fcssim_manualcopy
 
 
+ASSETSTEMPLATESDIFF4_FILES.files = ./assets/template_configs/*.*
+ASSETSTEMPLATESDIFF4_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/template_configs/
+
+INSTALLS +=  ASSETSTEMPLATESDIFF4_FILES

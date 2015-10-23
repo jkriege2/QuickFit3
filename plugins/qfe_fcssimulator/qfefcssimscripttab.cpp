@@ -62,6 +62,23 @@ bool QFEFCSSimScriptTab::loadFile(const QString &filename)
     return false;
 }
 
+bool QFEFCSSimScriptTab::loadTemplate(const QString &filename)
+{
+    QString fn=filename;
+    if (fn.isEmpty()) {
+        fn=qfGetOpenFileNameSet("QFEFCSSimScriptTab/filedlg", this, tr("Open Simulator Template ..."), QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_fcssimulator")+"/template_configs", tr("Simulator Scripts (*.ini);;All Files (*.*"));
+        if (fn.isEmpty()) return false;
+    }
+    setFilename("");
+    if (!this->filename.isEmpty()) {
+        ui->edtScript->getEditor()->setPlainText(QString::fromLatin1(readFile(this->filename)));
+        txtChanged=false;
+        emit textChanged(false);
+        return true;
+    }
+    return false;
+}
+
 void QFEFCSSimScriptTab::save()
 {
     if (filename.isEmpty()) {
@@ -309,8 +326,15 @@ void QFEFCSSimScriptTab::on_btnImport_clicked()
         QFPluginCommandsInterface* command=dynamic_cast<QFPluginCommandsInterface*>(QFPluginServices::getInstance()->getRawDataRecordFactory()->getPlugin("fcs"));
         if (command) {
             for (int i=0; i<resultfiles.size(); i++) {
-                if (resultfiles[i].trimmed().toLower().endsWith(".qf3qcorr")) command->sendPluginCommand("load_qf3asciicorr", resultfiles[i]);
-                else if (resultfiles[i].trimmed().toLower().endsWith(".asc")) command->sendPluginCommand("load_alv5000", resultfiles[i]);
+                if (resultfiles[i].trimmed().toLower().endsWith(".qf3qcorr")) {
+                    QVariant res=command->sendPluginCommand("load_qf3asciicorr", resultfiles[i]);
+                    qDebug()<<"imported QF3ASCIICorr "<<resultfiles[i]<<res<<"\n";
+                } else if (resultfiles[i].trimmed().toLower().endsWith(".asc")) {
+                    QVariant res=command->sendPluginCommand("load_alv5000", resultfiles[i]);
+                    qDebug()<<"imported ALV5000 "<<resultfiles[i]<<res<<"\n";
+                } else {
+                    qDebug()<<"could not import "<<resultfiles[i]<<"\n";
+                }
             }
         } else {
             QMessageBox::critical(this, tr("Import FCS-files"), tr("Imternal Error: FCS-plugin does not support importing!"));

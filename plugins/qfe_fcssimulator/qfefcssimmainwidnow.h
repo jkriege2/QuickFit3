@@ -26,6 +26,7 @@ class QFEFCSSimMainWidnow : public QWidget
     protected slots:
         void on_btnOpen_clicked();
         void on_btnNew_clicked();
+        void on_btnNewFromTemplate_clicked();
         void on_btnSave_clicked();
         void on_btnSaveAs_clicked();
         void on_btnClose_clicked();

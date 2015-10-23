@@ -25,6 +25,7 @@ class QFEFCSSimScriptTab : public QWidget
         void setRunning(bool running=true);
 
         bool loadFile(const QString& filename=QString());
+        bool loadTemplate(const QString& filename=QString());
         void save();
         bool saveAs(const QString& filename=QString());
         void execute();
