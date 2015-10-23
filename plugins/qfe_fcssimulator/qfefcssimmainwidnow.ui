@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>FCS SImulator (&quot;diffusion4&quot;)</string>
+   <string>FCS Simulator (&quot;diffusion4&quot;)</string>
   </property>
   <property name="windowIcon">
    <iconset resource="qfe_fcssimulator.qrc">
