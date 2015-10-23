@@ -29,7 +29,7 @@ void QFEFCSSimMainWidnow::loadSettings()
 {
 #ifdef Q_OS_WIN
     QString sim=QApplication::applicationDirPath()+"/diffusion4.exe";
-#elif Q_OS_MAC
+#elifdef Q_OS_MAC
     QString sim=QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_fcssimulator")+"/diffusion4";
 #else
     QString sim=QApplication::applicationDirPath()+"/diffusion4";
