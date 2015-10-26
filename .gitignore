@@ -246,3 +246,4 @@ output/quickfit3widgets.framework/quickfit3widgets
 output/*.framework
 
 output/diffusion4
+/extlibs/gsl/gsl.7z
