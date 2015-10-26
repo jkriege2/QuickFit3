@@ -23,7 +23,7 @@ function help {
 }
 
 function module_prepare_cleandeploy {
-	rm -rf  &>/dev/null$1 &>/dev/null
+	rm -rf  deploy_$1 &>/dev/null
 	cp "quickfit3_win${BITDEPTH}_${SVNVER}_${1}.zip" "quickfit3_win${BITDEPTH}_${SVNVER}_${1}.zip.backup" &>/dev/null
 	rm -f "quickfit3_win${BITDEPTH}_${SVNVER}_${1}.zip" &>/dev/null
 }
