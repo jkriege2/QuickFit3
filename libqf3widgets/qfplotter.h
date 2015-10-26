@@ -41,6 +41,7 @@ class QFWIDLIB_EXPORT QFPlotter : public JKQtPlotter
         virtual void populateToolbar(QToolBar* toolbar) const;
 
         QAction* get_actCopyToTable() const;
+        QAction* get_actCopyToCurve() const;
         QAction* get_actHelp() const;
     signals:
         

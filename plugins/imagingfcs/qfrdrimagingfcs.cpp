@@ -28,6 +28,7 @@
 #include "qfrdrimagingfcssimulator.h"
 #include "qfrdrimagingfcs_parserfunctions.h"
 #include "qfmathparser.h"
+#include "qfrdrcolumngraphsinterface.h"
 
 QFRDRImagingFCSPlugin* QFRDRImagingFCSPlugin::instance=NULL;
 
@@ -72,6 +73,7 @@ void QFRDRImagingFCSPlugin::init()
 
 
     services->registerWizard("project_wizards", tr("Imaging FCS/FCCS Project Wizard"), QIcon(":/imaging_fcs/projectwizard.png"), this, SLOT(startProjectWizard()));
+    services->registerWizard("project_wizards", tr("Imaging FCS Calibration Wizard"), QIcon(":/imaging_fcs/projectwizard.png"), this, SLOT(startCalibProjectWizard()));
     services->registerWizard("rdr_wizards", tr("Imaging FCS/FCCS Correlation Wizard"), QIcon(":/imaging_fcs/rdrwizard.png"), this, SLOT(startWizard()));
     services->registerWizard("eval_wizards", tr("Imaging FCS/FCCS Correlation Wizard"), QIcon(":/imaging_fcs/evalwizard.png"), this, SLOT(startFitWizard()));
 
@@ -268,9 +270,14 @@ void QFRDRImagingFCSPlugin::startProjectWizard()
     startWizard(true);
 }
 
-void QFRDRImagingFCSPlugin::startWizard(bool isProject)
+void QFRDRImagingFCSPlugin::startCalibProjectWizard()
 {
-    QFRDRImagingFCSWizard* wiz=new QFRDRImagingFCSWizard(isProject, parentWidget);
+    startWizard(true, true);
+}
+
+void QFRDRImagingFCSPlugin::startWizard(bool isProject, bool isCalibration)
+{
+    QFRDRImagingFCSWizard* wiz=new QFRDRImagingFCSWizard(isProject, isCalibration, parentWidget);
     if (isProject) wiz->setWindowIcon(QIcon(":/imaging_fcs/projectwizard.png"));
     else wiz->setWindowIcon(QIcon(":/imaging_fcs/rdrwizard.png"));
     if (wiz->exec()) {
@@ -741,7 +748,127 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     QStringList roParams;
                     roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
                     insertProjectRecord("table", fi.fileName(), files[i], "", group, description, folder, p, roParams);
-                }
+                } else if (QFile::exists(files[i]) && (files_types[i].toLower().trimmed()=="csv_msd" ||files_types[i].toLower().trimmed()=="simulation_msds")  ) {
+                    QFileInfo fi(files[i]);
+                    QMap<QString, QVariant> p;
+                    p["column_separator"]=",";
+                    p["decimal_separator"]=".";
+                    p["comment_start"]="#";
+                    p["header_start"]="#!";
+
+                    QStringList roParams;
+                    roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
+                    QFRawDataRecord* rdr=insertProjectRecord("table", fi.fileName()+tr(" - MSD"), files[i], "", group, description, folder, p, roParams);
+                    QFRDRColumnGraphsInterface* cg=dynamic_cast<QFRDRColumnGraphsInterface*>(rdr);
+                    QString fd=files_descriptions.value(i, "");
+                    if (cg && fd.size()>0 && fd.contains(':')) {
+                        fd=fd.right(fd.size()-fd.indexOf(':')-1);
+                        QStringList w=fd.split(';');
+                        int gall=cg->colgraphAddPlot(tr("MSD, no errors"));
+                        cg->colgraphSetPlotXAxisProps(gall, tr("lag time \\tau [s]"), true );
+                        cg->colgraphSetPlotYAxisProps(gall, tr("MSD {\\langle}r^2\\rangle(\\tau) [{\\mu}m^2]"), true );
+                        int gallerr=cg->colgraphAddPlot(tr("MSD, with errors"));
+                        cg->colgraphSetPlotXAxisProps(gallerr, tr("lag time \\tau [s]"), true );
+                        cg->colgraphSetPlotYAxisProps(gallerr, tr("MSD {\\langle}r^2\\rangle(\\tau) [{\\mu}m^2]"), true );
+                        for (int i=0; i<w.size(); i++) {
+                            cg->colgraphAddGraph(gall, 0, 1+i*2, QFRDRColumnGraphsInterface::cgtLines, w[i]);
+                            cg->colgraphAddErrorGraph(gallerr, 0, -1, 1+i*2, 1+i*2+1, QFRDRColumnGraphsInterface::cgtLines, w[i], QFRDRColumnGraphsInterface::egtPolygons);
+                        }
+                    }
+                    rdr->setQFProperty("AUTOSCALEXY_PLOTS_ON_SHOWUP", true, false, false);
+                } else if (QFile::exists(files[i]) && (files_types[i].toLower().trimmed()=="csv_trajectories" ||files_types[i].toLower().trimmed()=="simulation_trajectories")  ) {
+                    QFileInfo fi(files[i]);
+                    QMap<QString, QVariant> p;
+                    p["column_separator"]=",";
+                    p["decimal_separator"]=".";
+                    p["comment_start"]="#";
+                    p["header_start"]="#!";
+
+                    QStringList roParams;
+                    roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
+                    QFRawDataRecord* rdr=insertProjectRecord("table", fi.fileName()+tr(" - Trajectories"), files[i], "", group, description, folder, p, roParams);
+                    QFRDRColumnGraphsInterface* cg=dynamic_cast<QFRDRColumnGraphsInterface*>(rdr);
+                    QString fd=files_descriptions.value(i, "");
+                    if (cg && fd.size()>0 && fd.contains('-')) {
+                        fd=fd.right(fd.size()-fd.indexOf('-')-1).trimmed();
+                        QStringList w=fd.split(';');
+                        int k=1;
+                        for (int ii=0; ii<w.size(); ii++) {
+                            QStringList ww=w[ii].split(':');
+                            bool ok=false;
+                            int wcnt=ww.value(1, "0").toInt(&ok);
+                            if (ok && wcnt>0) {
+                                int gall=cg->colgraphAddPlot(tr("Trajectories: %1").arg(ww.value(0, "").trimmed()), tr("position X [{\\mu}m]"), tr("position Y [{\\mu}m]"));
+                                int gcol=cg->colgraphAddPlot(tr("Trajectories: %1, color-coded time").arg(ww.value(0, "").trimmed()), tr("position X [{\\mu}m]"), tr("position Y [{\\mu}m]"));
+                                for (int kk=0; kk<wcnt; kk++) {
+                                    cg->colgraphAddGraph(gall, k, k+1, QFRDRColumnGraphsInterface::cgtLines, tr("walker #%1").arg(kk+1));
+                                    cg->colgraphAddParametrizedScatterGraph(gcol, k, k+1,0,tr("walker #%1").arg(kk+1),  QFRDRColumnGraphsInterface::cgptColorLines, kk==0, tr("time t [s]"));
+                                    k+=2;
+                                }
+
+                            }
+                        }
+                    }
+                    rdr->setQFProperty("AUTOSCALEXY_PLOTS_ON_SHOWUP", true, false, false);
+                } else if (QFile::exists(files[i]) && (files_types[i].toLower().trimmed()=="csv_jumphistograms" ||files_types[i].toLower().trimmed()=="simulation_jumphistograms")  ) {
+                    QFileInfo fi(files[i]);
+                    QMap<QString, QVariant> p;
+                    p["column_separator"]=",";
+                    p["decimal_separator"]=".";
+                    p["comment_start"]="#";
+                    p["header_start"]="#!";
+
+                    QStringList roParams;
+                    roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
+                    QFRawDataRecord* rdr=insertProjectRecord("table", fi.fileName()+tr(" - Jump Histograms"), files[i], "", group, description, folder, p, roParams);
+                    QFRDRColumnGraphsInterface* cg=dynamic_cast<QFRDRColumnGraphsInterface*>(rdr);
+                    QString fd=files_descriptions.value(i, "");
+                    if (cg && fd.size()>0 && fd.contains('-')) {
+                        fd=fd.right(fd.size()-fd.indexOf('-')-1).trimmed();
+                        QStringList w=fd.split(';');
+                        int k=0;
+                        int gallx=cg->colgraphAddPlot(tr("X-Jump Histograms"), tr("x-jump \\Delta_x [{\\mu}m]"), tr("frequency"));
+                        int gally=cg->colgraphAddPlot(tr("Y-Jump Histograms"), tr("y-jump \\Delta_y [{\\mu}m]"), tr("frequency"));
+                        int gall=cg->colgraphAddPlot(tr("Absolute Jump Length Histograms"), tr("jump length |\\Delta| [{\\mu}m]"), tr("frequency"));
+                        for (int ii=0; ii<w.size(); ii++) {
+                            //int gcol=cg->colgraphAddPlot(tr("Jump Histogram: %1").arg(w.value(ii, "").trimmed()), tr("jump length |\\Delta| [{\\mu}m]"), tr("frequency"));
+                            cg->colgraphAddGraph(gall, k, k+1, QFRDRColumnGraphsInterface::cgtBars, w.value(ii, "").trimmed());
+                            cg->colgraphAddGraph(gallx, k+2, k+3, QFRDRColumnGraphsInterface::cgtBars, w.value(ii, "").trimmed());
+                            cg->colgraphAddGraph(gally, k+4, k+5, QFRDRColumnGraphsInterface::cgtBars, w.value(ii, "").trimmed());
+                            //cg->colgraphAddGraph(gcol, k, k+1, QFRDRColumnGraphsInterface::cgtBars, w.value(ii, "").trimmed());
+                            k+=6;
+                        }
+                    }
+                    rdr->setQFProperty("AUTOSCALEXY_PLOTS_ON_SHOWUP", true, false, false);
+                } else if (QFile::exists(files[i]) && (files_types[i].toLower().trimmed()=="csv_psf" ||files_types[i].toLower().trimmed()=="simulation_psf")  ) {
+                    QFileInfo fi(files[i]);
+                    QMap<QString, QVariant> p;
+                    p["column_separator"]=",";
+                    p["decimal_separator"]=".";
+                    p["comment_start"]="#";
+                    p["header_start"]="#!";
+
+                    QStringList roParams;
+                    roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
+                    QFRawDataRecord* rdr=insertProjectRecord("table", fi.fileName()+tr(" - PSFs"), files[i], "", group, description, folder, p, roParams);
+                    QFRDRColumnGraphsInterface* cg=dynamic_cast<QFRDRColumnGraphsInterface*>(rdr);
+                    QString fd=files_descriptions.value(i, "");
+                    QStringList names=fd.split('-').value(1, "").trimmed().split(';');
+                    if (cg) {
+                        int gall=cg->colgraphAddPlot(tr("PSF: all"), tr("position x [{\\mu}m]"), tr("normalized intensity [A.U.]"));
+                        for (int i=0; i<names.size(); i++) {
+                            cg->colgraphAddGraph(gall, 0,i+1, QFRDRColumnGraphsInterface::cgtLines, names.value(i, "").trimmed());
+
+                            if (names.contains("green"))cg->colgraphSetGraphColor(gall, i, QColor("darkgreen"));
+                            else if (names.contains("red")) cg->colgraphSetGraphColor(gall, i, QColor("darkred"));
+                            else  cg->colgraphSetGraphColor(gall, i, QColor("darkblue"));
+
+                            //cg->colgraphAddGraph(gall, 0,2, QFRDRColumnGraphsInterface::cgtLines, tr("red"));
+                            //cg->colgraphSetGraphColor(gall, 1, QColor("darkred"));
+                        }
+                    }
+                    rdr->setQFProperty("AUTOSCALEXY_PLOTS_ON_SHOWUP", true, false, false);
+                 }
             }
 
 

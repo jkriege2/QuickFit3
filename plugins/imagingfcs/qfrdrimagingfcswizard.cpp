@@ -2,14 +2,17 @@
 #include "qfpluginservices.h"
 #include "programoptions.h"
 #include "qfrdrimagingfcs.h"
+#include "qmodernprogresswidget.h"
 
-QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
+QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, bool is_calibration, QWidget *parent):
     QFWizard(QSize(600, 440), parent, QString("imaging_fcs/wizard/"))
 {
     QLabel* lab;
     frame_data_io=NULL;
-
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     setOption(QWizard::NoCancelButtonOnLastPage);
+#endif
+
     setOption(QWizard::NoBackButtonOnLastPage);
     setOption(QWizard::NoBackButtonOnStartPage);
 
@@ -37,16 +40,32 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
     setWindowTitle(tr("Imaging FCS/FCCS Wizard"));
     setPage(InitPage, wizIntro=new QFRadioButtonListWizardPage(tr("Introduction"), this));
-    wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br>"
-                        "<u>Note:</u> It offers a simplified user-interface for processing imaging FCS correlations and calibrations. If you should need more options, please use the full correlator UI under the menu entry <tt>Data Items | Insert Raw Data | imFCS | correlate &amp; insert</tt>.<br><br>"
-                        "<center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"));
+    if (is_calibration) {
+        wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS calbration. After successfull completion, it will also guide you through the process of imagingFCS calbration with a second wizard.<br>"
+                            "<u>Note:</u> It offers a simplified user-interface for processing imaging FCS measurement for calibration."
+                            "If you should need more options, please use the full correlator UI under the menu entry <tt>Data Items | Insert Raw Data | imFCS | correlate &amp; insert</tt>.<br><br>"
+                            "<center><img src=\":/imaging_fcs/imfcscalib.png\"></center>"));
+
+    } else {
+        wizIntro->addRow(tr("This wizard will help you to correlate an image series in order to perform an imaging FCS or FCCS evaluation<br>"
+                            "<u>Note:</u> It offers a simplified user-interface for processing imaging FCS correlations and calibrations. If you should need more options, please use the full correlator UI under the menu entry <tt>Data Items | Insert Raw Data | imFCS | correlate &amp; insert</tt>.<br><br>"
+                            "<center><img src=\":/imaging_fcs/imfcs_flow.png\"></center>"));
+    }
     wizIntro->addItem(tr("imFCS / imFCCS evaluation"), true);
     wizIntro->addItem(tr("imFCS focus volume calibration"), false);
     wizIntro->setEnabled(1, QFPluginServices::getInstance()->getEvaluationItemFactory()->contains("imfcs_fit"));
     wizIntro->setChecked(ProgramOptions::getConfigValue("imaging_fcs/wizard/wizardmethod", 0).toInt());
     connect(wizIntro, SIGNAL(onValidate(QWizardPage*)), this, SLOT(finishedIntro()));
 
-
+    if (is_calibration) {
+        wizIntro->setChecked(1);
+        wizIntro->setEnabled(0, false);
+        wizIntro->setEnabled(1, false);
+    } else {
+        wizIntro->setChecked(0);
+        wizIntro->setEnabled(0, true);
+        wizIntro->setEnabled(1, true);
+    }
 
 
     setPage(FileSelectionPage, wizSelfiles=new QFFormWizardPage(tr("Select image stack files ..."), this));
@@ -378,7 +397,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
     chk2ColorFCCS=new QCheckBox(wizCorrelation);
     chk2ColorFCCS->setChecked(false);
     wizCorrelation->addRow(tr("calculate 2-color FCCS:"), chk2ColorFCCS);
-    cmb2PixelFCCS=new QComboBox(wizCorrelation);
+    cmb2PixelFCCS=new QFEnhancedComboBox(wizCorrelation);
     cmb2PixelFCCS->addItem(tr("none"),0);
     cmb2PixelFCCS->addItem(tr("4 direct neighbors"), 4); // user data is number of CCFs
     cmb2PixelFCCS->addItem(tr("8 direct neighbors"), 8);
@@ -512,6 +531,7 @@ QFRDRImagingFCSWizard::QFRDRImagingFCSWizard(bool is_project, QWidget *parent):
 
     wizFinalizePage->setNextID(-1);
     wizFinalizePage->setFinalPage(true);
+
 
 }
 
@@ -722,13 +742,13 @@ void QFRDRImagingFCSWizard::finalizeAndModifyProject(bool projectwizard, QFRDRIm
 
 
                     if (!acfmodel.isEmpty()) {
-                        e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListFromItems(acfmodel, constructQStringListWithMultipleItems(ccfmodel, Nccf)).join(';'), false, false);
-                        e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListFromItems("acf", constructQStringListWithMultipleItems("dccf", Nccf)).join(';'), false, false);
+                        e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListFromItems(acfmodel, constructQStringListWithMultipleItems(ccfmodel, Nccf)).join(";"), false, false);
+                        e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListFromItems(QString("acf"), constructQStringListWithMultipleItems(QString("dccf"), Nccf)).join(";"), false, false);
                     } else {
-                        e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListWithMultipleItems(ccfmodel, Nccf).join(';'), false, false);
-                        e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListWithMultipleItems("dccf", Nccf).join(';'), false, false);
+                        e->setQFProperty("PRESET_FIT_MODELS_LIST", constructQStringListWithMultipleItems(ccfmodel, Nccf).join(";"), false, false);
+                        e->setQFProperty("PRESET_FIT_MODELS_ROLES_LIST", constructQStringListWithMultipleItems("dccf", Nccf).join(";"), false, false);
                     }
-                    e->setQFProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST", globalparams.join(';'), false, false);
+                    e->setQFProperty("PRESET_FIT_MODELS_GLOBALPARAMS_LIST", globalparams.join(";"), false, false);
 
                 }
             }
@@ -1050,8 +1070,8 @@ void QFRDRImagingFCSWizard::cropRegionChanged(int region)
 void QFRDRImagingFCSWizard::cropValuesChanged()
 {
     //qDebug()<<"cropValuesChanged";
-    cropRegionChanged(cmbCropRegion->currentIndex());
     wizCropAndBin->setBinning(spinBinning->value());
+    cropRegionChanged(cmbCropRegion->currentIndex());
 }
 
 void QFRDRImagingFCSWizard::microscopyChoosen()
@@ -1396,10 +1416,17 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
 {
     //qDebug()<<"QFRDRImagingFCSWizard_ImagestackIsValid::isValid";
     if (wizard) {
+        QModernProgressDialog progress(wizard);
+        progress.setHasCancel(false);
+        progress.setLabelText(QObject::tr("reading image file ..."));
+        progress.setMode(true, false);
+        progress.show();
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         QString readerid=wizard->imageFormatIDs.value(wizard->cmbFileformat->currentIndex(), wizard->imageFormatIDs.value(0, ""));
 
         wizard->wizImageProps->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
         wizard->wizCalibration->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
+        wizard->wizCropAndBin->setBinning(1);
         wizard->wizCropAndBin->setImageAvg(wizard->edtFilename->text(), readerid, 0, 20);
         wizard->calibrationRegionChanged(wizard->cmbCalibCropRegion->currentIndex());
         wizard->cropRegionChanged(wizard->cmbCropRegion->currentIndex());
@@ -1452,6 +1479,7 @@ bool QFRDRImagingFCSWizard_ImagestackIsValid::isValid(QFWizardPage */*page*/)
         if (wizard->cmbDualView->currentIndex()==2) {
             wizard->cmbCalibCropRegion->setCurrentIndex(3);
         }
+        QApplication::restoreOverrideCursor();
 
         if (wizard->frame_count_io<=0) {
             wizard->labFileError->setText(QObject::tr("<font color=\"red\"><b><u>ERROR:</u> Image stack file does not contain frames or could not be read!</b></font>"));

@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = fitfunctions_lightsheet
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input

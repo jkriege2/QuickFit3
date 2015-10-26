@@ -45,6 +45,8 @@
 #include "qfrdrimagemaskedittools.h"
 #include "qfhistogramview.h"
 #include "qfrdrimagestack3dviewer.h"
+#include "qfdoubleedit.h"
+#include "qfdoublerangeedit.h"
 
 /*! \brief editor for QFRawDataRecord
     \ingroup qf3rdrdp_image_stack
@@ -71,6 +73,8 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         void channelModeChanged();
 
         void show3DViewer();
+
+        void colorModeOrRangesChanged();
 
     signals:
         void displayedFrame(double time);
@@ -101,7 +105,9 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         QMenu* menuTools;
         QLabel* labSelectiondata;
         QCheckBox* chkHistogramLog;
-        QComboBox* cmbHitogramMode;
+        QComboBox* cmbHistogramMode;
+        QComboBox* cmbHistogramStyle;
+        QGroupBox* grpRanges;
 
         QAction* act3DViewer;
 
@@ -125,6 +131,16 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         QFPLayerControls* player;
         QComboBox* cmbColorScaleMode;
 
+        QList<QFDoubleRangeEdit*> edtChannelRange;
+        QList<QLabel*> edtChannelRangeLabels;
+        QComboBox* cmbChannelGrouping;
+
+        QCheckBox* chkChannelRangeMindMask;
+        void connectDisconnectChannelRanges(bool connect);
+        void updateChannelRanges();
+        double* getImageStackAndSizeForColorRanging(uint64_t &size, int stack, int channel, bool currentFrame=false);
+        bool edtChannelRangesConnected;
+
         JKQTPMathImage* image;
         JKQTPRGBMathImage* imageRGB;
         /** \brief plot for the excluded runs in pltOverview, plot plteOverviewSelectedData */
@@ -146,7 +162,10 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         /** \brief write the settings */
         virtual void writeSettings();
 
-        void addDataHistogram(double* data, bool *mask, int size, int maskSize, const QString& title, const QString& colX, const QString& colY, QColor col=QColor("darkblue"), double shift=0, double width=0.9);
+        void addDataHistogram(double* data, bool *mask, int size, int maskSize, double dmin, double dmax, const QString& title, const QString& colX, const QString& colY, QColor col=QColor("darkblue"), double shift=0, double width=0.9);
+        inline void addDataHistogram(double* data, bool *mask, int size, int maskSize,const QString& title, const QString& colX, const QString& colY, QColor col=QColor("darkblue"), double shift=0, double width=0.9) {
+            addDataHistogram(data, mask, size, maskSize, 0,0,title, colX, colY, col, shift, width);
+        }
 
         void connectWidgets();
         void disconnectWidgets();

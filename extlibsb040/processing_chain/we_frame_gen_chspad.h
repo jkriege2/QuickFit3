@@ -23,10 +23,10 @@
 
 #include "worker_thread.h"
 #include "we_sink_source.h"
-#include "../../../../LIB/trunk/qt/qqueue.h"
-#include "../../../../LIB/trunk/frame.h"
-#include "../../../../LIB/trunk/helper.h"
-#include "../../../../LIB/trunk/textcolor.h"
+#include "qqueue.h"
+#include "frame.h"
+#include "helper.h"
+#include "textcolor.h"
 
 const unsigned int xres=4; //frames to attach in x dir
 const unsigned int yres=128; //frames to attach in y dir

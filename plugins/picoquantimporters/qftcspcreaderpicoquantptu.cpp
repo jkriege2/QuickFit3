@@ -88,6 +88,7 @@ bool QFTCSPCReaderPicoquantPTU::open(const QString &filename, const QString &par
             return false;
         }
 
+
         fgetpos(tttrfile, &fileResetPos);
         currentTTTRRecordNum=0;
         current.microtime_offset=0;
@@ -225,5 +226,15 @@ QFTCSPCRecord QFTCSPCReaderPicoquantPTU::getCurrentRecord() const {
 
 double QFTCSPCReaderPicoquantPTU::percentCompleted() const {
     return double(currentTTTRRecordNum)/double(ptuinfo.NumRecords)*100.0;
+}
+
+uint32_t QFTCSPCReaderPicoquantPTU::microtimeChannels() const
+{
+    return 65536;
+}
+
+double QFTCSPCReaderPicoquantPTU::microtimeChannelsResolutionPicoSeconds() const
+{
+    return ptuinfo.Resolution*1e12;
 }
 

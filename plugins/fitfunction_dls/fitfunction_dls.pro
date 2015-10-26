@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = fitfunctions_dls
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/gsl.pri)
 
 
@@ -62,4 +62,4 @@ include(../../quickfit3_configqt.pri)
 #                        $$TRANSLATIONS \
 #                        $$GPL3LICENSE
 
-message("!!!!!! fitfunction_dls LIB=$$LIB  QFOUTPUT=$$QFOUTPUT")
+#message("!!!!!! fitfunction_dls LIB=$$LIB  QFOUTPUT=$$QFOUTPUT")

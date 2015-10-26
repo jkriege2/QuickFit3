@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = fitfunctions_2ffcs
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input

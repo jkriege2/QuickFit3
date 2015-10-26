@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = fitfunction_general
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input
@@ -59,7 +59,10 @@ HEADERS += qfgeneralfitfunctionsplugin.h \
     qffitfunctiongeneralcdfcauchy.h \
     qffitfunctiongeneralpdfcauchy.h \
     qffitfunctiongeneralcdfloggaussian.h \
-    qffitfunctiongeneralpdfloggaussian.h
+    qffitfunctiongeneralpdfloggaussian.h \
+    qffitfunctiongeneralmultigaussianvar.h \
+    qffitfunctiongeneralmultiexp.h \
+    qffitfunctiongeneralmultilognormal.h
 
 SOURCES += qfgeneralfitfunctionsplugin.cpp\
            qffitfunctiongeneralsigmoid.cpp \
@@ -91,7 +94,10 @@ SOURCES += qfgeneralfitfunctionsplugin.cpp\
     qffitfunctiongeneralcdfcauchy.cpp \
     qffitfunctiongeneralpdfcauchy.cpp \
     qffitfunctiongeneralcdfloggaussian.cpp \
-    qffitfunctiongeneralpdfloggaussian.cpp
+    qffitfunctiongeneralpdfloggaussian.cpp \
+    qffitfunctiongeneralmultigaussianvar.cpp \
+    qffitfunctiongeneralmultiexp.cpp \
+    qffitfunctiongeneralmultilognormal.cpp
 
 FORMS =
 

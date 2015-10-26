@@ -6,13 +6,14 @@
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		<p>This function implements a 1-component diffusion+flow model for data acquired with a camera in SPIM illumination mode. It assumes that the time series of two distant pixels were cross-correlated. The model was taken from:
+		<p>This function implements a 1-component diffusion+flow model for data acquired with a camera in SPIM illumination mode. In addition it contains a global ACF-like term that does not depend on the focus deisplacement $(\vec{d})$ or the flow velocity $(\vec{v})$.
+		It assumes that the time series of two distant pixels were cross-correlated. The model was taken from:
 		<blockquote>
 		  Wohland T, Shi X, Sankaran J, Stelzer EH (2010): <b>Single plane illumination fluorescence correlation spectroscopy (SPIM-FCS) probes inhomogeneous three-dimensional environments</b>, <i>Optics Express</i> <b>18</b>(10): 10627-10641, doi: 10.1364/OE.18.010627.<br>
 		  $$jankrieger_phdthesis$$
 		</blockquote>
 		The fit function is defined as:
-		$$bmath:g(\tau)=G_\infty + \frac{(I-B)^2}{I^2}\cdot\frac{1}{N/V_{\text{eff}}}\cdot\left[ \rho_1\cdot g_{xy}(\tau; d_x, v_x,D_1)\cdot g_{xy}(\tau; d_y, v_y,D_1)\cdot g_{z}(\tau; d_z, 0,D_1)+ \rho_2\cdot g_{xy}(\tau; d_x, 0,D_2)\cdot g_{xy}(\tau; d_y, 0,D_2)\cdot g_{z}(\tau; d_z, 0,D_2)\right]$$
+		$$bmath:g(\tau)=G_\infty + \frac{(I-B)^2}{I^2}\cdot\frac{1}{N/V_{\text{eff}}}\cdot\left[ \overset{\text{CCF-term $d$-dependent}}{\rho_1\cdot g_{xy}(\tau; d_x, v_x,D_1)\cdot g_{xy}(\tau; d_y, v_y,D_1)\cdot g_{z}(\tau; d_z, 0,D_1)}+ \overset{\text{global ACF-like term, independent of $d$}}{\rho_2\cdot g_{xy}(\tau; 0, 0, D_2)\cdot g_{xy}(\tau; 0, 0, D_2)\cdot g_{z}(\tau; 0, 0, D_2)}\right]$$
 		$$bmath:\mathrm{with:} g_{xy}(\tau;d,v,D)=\frac{1}{2a^2}\cdot\left[(a-d+v\tau)\cdot\mbox{erf}\left(\frac{a-d+v\tau}{\sqrt{4D\tau+w_{xy}^2}}\right)+ -2(d-v\tau)\cdot\mbox{erf}\left(\frac{d-v\tau}{\sqrt{4D\tau+w_{xy}^2}}\right)+ (a+d-v\tau)\cdot\mbox{erf}\left(\frac{a+d-v\tau}{\sqrt{4D\tau+w_{xy}^2}}\right)+ \frac{\sqrt{4D\tau+w_{xy}^2}}{2\sqrt{\pi}\cdot\left[\exp\left(-\frac{(a+d-v\tau)^2}{4D\tau+w_{xy}^2}\right)+\exp\left(-\frac{(a-d+v\tau)^2}{4D\tau+w_{xy}^2}\right)-2\exp\left(-\frac{(d-v\tau)^2}{4D\tau+w_{xy}^2}\right)\right]\right]^2$$
 		$$bmath:\mathrm{with:} g_{z}(\tau;v,d)=\frac{1}{\sqrt{\pi}\cdot w_z}\cdot\left(1+\frac{4D\tau}{w_{z}^2}\right)^{-1/2}\cdot\exp\left(-\frac{v^2\tau^2}{4D\tau+w_z^2}\right)$$
 		$$bmath:\rho_1+\rho_2=1$$

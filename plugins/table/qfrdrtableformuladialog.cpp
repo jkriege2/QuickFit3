@@ -83,6 +83,8 @@ QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QFRDRTable *table, QFTablePlugi
 
     ui->edtFormula->setText(ProgramOptions::getConfigValue("QFRDRTableFormulaDialog/expression", "sin(row/10*2*pi)").toString());
     ui->lstFunctions->setModel(functionRef->getHelpModel());
+    QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString(), ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
+    ui->edtFormula->setFont(f);
 
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
 

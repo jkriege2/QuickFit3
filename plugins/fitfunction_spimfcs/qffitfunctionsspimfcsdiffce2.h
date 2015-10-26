@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFitFunctionsSPIMFCSDiffCE2E2_H
 #define QFFitFunctionsSPIMFCSDiffCE2E2_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -37,7 +37,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 //\f[ C=\frac{N}{V_{\text{eff}}}=\frac{N}{\pi^{3/2}\cdot a^2\cdot \sigma_z} \f]
 //\f[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}a^2\cdot\sigma_z}\right)^2+\left(\frac{\Delta\sigma_z\cdot N}{\pi^{3/2}a^2\sigma_z^2}\right)^2+\left(\frac{\Delta a\cdot 2\cdot N}{\pi^{3/2}a^3\cdot\sigma_z}\right)^2} \f]
 
-class QFFitFunctionsSPIMFCSDiffCE2: public QFFitFunction {
+class QFFitFunctionsSPIMFCSDiffCE2: public QFFCSLargeFocusFitFunctionBase {
     public:
         QFFitFunctionsSPIMFCSDiffCE2();
         virtual ~QFFitFunctionsSPIMFCSDiffCE2() {}

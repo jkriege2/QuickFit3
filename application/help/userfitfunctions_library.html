@@ -278,6 +278,7 @@ See <a href="openfile://$$maindir$$/sdk/sdk_fitfunctions/example_with_derivative
 $$endbox$$
 
 
+
 $$startbox_info$$
 <b>estimate inital values for $$math:\vec{p}$$</b> <i>[OPTIONAL]</i>:$$example:<code>int8_t estimateInitial(double* params, const double* dataX, const double* dataY, int64_t Nxy, const int8_t* fix)</code>$$
 Some fits in QuickFit can guess the initial values for $$math:\vec{p}$$, used by a fit algorithm. This guessing is implemented in this function, which returns the guessed parameters in <code>params</code> for a given dataset in <code>dataX, dataY</code> with <code>Nxy</code> entries.
@@ -294,6 +295,26 @@ Returns:
     <li><code>QF3SFF_TRUE</code> on success and <code>QF3SFF_FALSE</code> else (in the latter case, no parameters ought to be returned).</li>
 </ul>
 For example, if you want to fit a line, you could perform a <a href="https://en.wikipedia.org/wiki/Simple_linear_regression">simple linear regression</a> here and return the output of the regression as parameters for the line.
+$$endbox$$
+
+
+
+$$startbox_info$$
+<b>estimate a value for a given fit parameter from a location $((x,y))$ in the same coordinate system, as the fit function ($(y=f(x))$). This function can be used by QuickFit to allow to the suer to click a location in a plot and then use this location to estimate certain fit parameters (e.g. by selecting an entry in a context-menu, as in the curve_fit plugin!)</b> <i>[OPTIONAL]</i>:$$example:<code>int8_t estimateParameterFromXY(double* newparam, int paramID, double x, double y, const double* params)</code>$$
+This function has to return <code>QF3SFF_TRUE</code>, if the given parameter is <u>in principle estimateable</u>, but <tt>x=y=NAN</tt> and <tt>params=NULL</tt>, as these conditions are used to check for estimateability of a parameter. 
+<br>Parameters:
+<ul>
+    <li><i><code>newparam</code></i>: the estimated value for the given fit parameter </li>
+    <li><i><code>paramID</code></i>: the parameter number of the parameter to estimate </li>
+    <li><i><code>x</code></i>: x-value on which to base the estimate. This is <tt>NAN</tt>, of we only want to check for the in principle estimateablility of the parameter.</li>
+    <li><i><code>y</code></i>: y-value on which to base the estimate. This is <tt>NAN</tt>, of we only want to check for the in principle estimateablility of the parameter.</li>
+    <li><i><code>params</code></i>: current parameter value. This parameter is strictly optional, so don't expect to get a non-<tt>NULL</tt> pointer, but if it is present, you can base your estimation on these values. This is <tt>NULL</tt>, of we only want to check for the in principle estimateablility of the parameter.</li>
+</ul>
+Returns:
+<ul>
+    <li><code>QF3SFF_TRUE</code> for a successfull estiamation and <code>QF3SFF_FALSE</code> else (in the latter case, <code>newparam</code> must not be altered!). $$note:This function has to return <code>QF3SFF_TRUE</code>, if the given parameter is <u>in principle estimateable</u>, but <tt>x=y=NAN</tt> and <tt>params=NULL</tt>, as these conditions are used to check for in principle estimateability of a parameter.$$ </li>
+</ul>
+
 $$endbox$$
 
 

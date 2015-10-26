@@ -29,6 +29,7 @@ QFTCSPCReaderPicoquant::QFTCSPCReaderPicoquant() {
 //fileResetPos=0;
     ofltime=0;
     overflows=0;
+    isV6=false;
 }
 
 QFTCSPCReaderPicoquant::~QFTCSPCReaderPicoquant() {
@@ -50,58 +51,79 @@ bool QFTCSPCReaderPicoquant::open(const QString &filename, const QString &parame
     tttrfile=fopen(filename.toLatin1().data(), "rb");
     if (tttrfile) {
         QString error="";
-        bool ok=TTTRReadConfiguration(tttrfile, &txtHeader, &binHeader, &boardHeader, &TTTRHeader, error);
-        /*fprintf(fpout,"# Identifier       : %.*s\n",sizeof(txtHeader.Ident),txtHeader.Ident);
-        fprintf(fpout,"# Software Version : %.*s\n",sizeof(txtHeader.SoftwareVersion),txtHeader.SoftwareVersion);
-        fprintf(fpout,"# Hardware Version : %.*s\n",sizeof(txtHeader.HardwareVersion),txtHeader.HardwareVersion);
-        fprintf(fpout,"# Time of Creation : %.*s\n",sizeof(txtHeader.FileTime),txtHeader.FileTime);
-        fprintf(fpout,"# File Comment     : %.*s\n",sizeof(txtHeader.CommentField),txtHeader.CommentField);
-
-        fprintf(fpout,"# No of Channels   : %ld\n",binHeader.Channels);
-        fprintf(fpout,"# No of Curves     : %ld\n",binHeader.Curves);
-        fprintf(fpout,"# Bits per Channel : %ld\n",binHeader.BitsPerChannel);
-        fprintf(fpout,"# Routing Channels : %ld\n",binHeader.RoutingChannels);
-        fprintf(fpout,"# No of Boards     : %ld\n",binHeader.NumberOfBoards);
-        fprintf(fpout,"# Active Curve     : %ld\n",binHeader.ActiveCurve);
-        fprintf(fpout,"# Measurement Mode : %ld\n",binHeader.MeasMode);
-        fprintf(fpout,"# Measurem.SubMode : %ld\n",binHeader.SubMode);
-        fprintf(fpout,"# Range No         : %ld\n",binHeader.RangeNo);
-        fprintf(fpout,"# Offset           : %ld\n",binHeader.Offset);
-        fprintf(fpout,"# AcquisitionTime  : %ld\n",binHeader.Tacq);
-        fprintf(fpout,"# Stop at          : %ld\n",binHeader.StopAt);
-        fprintf(fpout,"# Stop on Ovfl.    : %ld\n",binHeader.StopOnOvfl);
-        fprintf(fpout,"# Restart          : %ld\n",binHeader.Restart);
-        fprintf(fpout,"# DispLinLog       : %ld\n",binHeader.DispLinLog);
-        fprintf(fpout,"# DispTimeAxisFrom : %ld\n",binHeader.DispTimeFrom);
-        fprintf(fpout,"# DispTimeAxisTo   : %ld\n",binHeader.DispTimeTo);
-        fprintf(fpout,"# DispCountAxisFrom: %ld\n",binHeader.DispCountsFrom);
-        fprintf(fpout,"# DispCountAxisTo  : %ld\n",binHeader.DispCountsTo);
-
-        fprintf(fpout,"# Board serial     : %ld\n",boardHeader.BoardSerial);
-        fprintf(fpout,"# CFDZeroCross     : %ld\n",boardHeader.CFDZeroCross);
-        fprintf(fpout,"# CFDDiscriminMin  : %ld\n",boardHeader.CFDDiscrMin);
-        fprintf(fpout,"# SYNCLevel        : %ld\n",boardHeader.SyncLevel);
-        fprintf(fpout,"# Curve Offset     : %ld\n",boardHeader.CurveOffset);
-        fprintf(fpout,"# Resolution       : %f\n", boardHeader.Resolution);
-
-        fprintf(fpout,"# Glob Clock       : %ld\n",TTTRHeader.Globclock);
-        fprintf(fpout,"# Sync Rate        : %ld\n",TTTRHeader.SyncRate);
-        fprintf(fpout,"# Average CFD Rate : %ld\n",TTTRHeader.TTTRCFDRate);
-        fprintf(fpout,"# Stop After       : %ld\n",TTTRHeader.TTTRStopAfter);
-        fprintf(fpout,"# Stop Reason      : %ld\n",TTTRHeader.TTTRStopReason);
-        fprintf(fpout,"# No of Records    : %ld\n",TTTRHeader.NoOfRecords);
-        fprintf(fpout,"# Special Hdr Size : %ld\n\n",TTTRHeader.SpecialHeaderSize);
-        printf("\nNo. of Records	 : %ld\n\n",TTTRHeader.NoOfRecords);*/
+        isV6=false;
+        bool ok=TTTRReadConfiguration(tttrfile, &txtHeader, &binHeader, &boardHeader, &TTTRHeader, error, isV6);
+        if (!ok && isV6) {
+            fseek(tttrfile,0,SEEK_SET);
+            ok=TTTRReadConfiguration6(tttrfile, &txtHeader6, &binHeader6, &boardHeader6, &TTTRHeader6, error);
+        }
 
         if (!ok) {
             setLastError(error);
             return false;
         }
 
+        if (isV6) {
+            fileinfo.properties["CommentField"]=(char*)txtHeader6.CommentField;
+            fileinfo.properties["FileTime"]=(char*)txtHeader6.FileTime;
+            fileinfo.properties["CreatorName"]=(char*)txtHeader6.CreatorName;
+            fileinfo.properties["CreatorVersion"]=(char*)txtHeader6.CreatorVersion;
+
+            fileinfo.properties["NumberOfChannels"]=(qlonglong)binHeader6.Channels;
+            fileinfo.properties["NumberOfBoards"]=(qlonglong)binHeader6.NumberOfBoards;
+            fileinfo.properties["RoutingChannels"]=(qlonglong)binHeader6.RoutingChannels;
+            fileinfo.properties["MeasMode"]=(qlonglong)binHeader6.MeasMode;
+            fileinfo.properties["SubMode"]=(qlonglong)binHeader6.SubMode;
+            fileinfo.properties["AcquisitionTime"]=(qlonglong)binHeader6.Tacq;
+            fileinfo.properties["StopAt"]=(qlonglong)binHeader6.StopAt;
+            fileinfo.properties["StopOnOvfl"]=(qlonglong)binHeader6.StopOnOvfl;
+
+            fileinfo.properties["BoardSerial"]=(qlonglong)boardHeader6.BoardSerial;
+            fileinfo.properties["CFDZeroCross"]=(qlonglong)boardHeader6.CFDZeroCross;
+            fileinfo.properties["CFDDiscrMin"]=(qlonglong)boardHeader6.CFDDiscrMin;
+            fileinfo.properties["SyncLevel"]=(qlonglong)boardHeader6.SyncLevel;
+            fileinfo.properties["CFDDiscrMin"]=(qlonglong)boardHeader6.CFDDiscrMin;
+
+            fileinfo.properties["Globclock"]=(qlonglong)TTTRHeader6.Globclock;
+            fileinfo.properties["SyncRate"]=(qlonglong)TTTRHeader6.SyncRate;
+            fileinfo.properties["TTTRCFDRate"]=(qlonglong)TTTRHeader6.TTTRCFDRate;
+            fileinfo.properties["TTTRStopAfter"]=(qlonglong)TTTRHeader6.TTTRStopAfter;
+            fileinfo.properties["TTTRStopReason"]=(qlonglong)TTTRHeader6.TTTRStopReason;
+            fileinfo.properties["NoOfRecords"]=(qlonglong)TTTRHeader6.NoOfRecords;
+        } else {
+            fileinfo.properties["CommentField"]=(char*)txtHeader.CommentField;
+            fileinfo.properties["FileTime"]=(char*)txtHeader.FileTime;
+            fileinfo.properties["HardwareVersion"]=(char*)txtHeader.HardwareVersion;
+            fileinfo.properties["SoftwareVersion"]=(char*)txtHeader.SoftwareVersion;
+
+            fileinfo.properties["NumberOfChannels"]=(qlonglong)binHeader.Channels;
+            fileinfo.properties["NumberOfBoards"]=(qlonglong)binHeader.NumberOfBoards;
+            fileinfo.properties["RoutingChannels"]=(qlonglong)binHeader.RoutingChannels;
+            fileinfo.properties["MeasMode"]=(qlonglong)binHeader.MeasMode;
+            fileinfo.properties["SubMode"]=(qlonglong)binHeader.SubMode;
+            fileinfo.properties["AcquisitionTime"]=(qlonglong)binHeader.Tacq;
+            fileinfo.properties["StopAt"]=(qlonglong)binHeader.StopAt;
+            fileinfo.properties["StopOnOvfl"]=(qlonglong)binHeader.StopOnOvfl;
+
+            fileinfo.properties["BoardSerial"]=(qlonglong)boardHeader.BoardSerial;
+            fileinfo.properties["CFDZeroCross"]=(qlonglong)boardHeader.CFDZeroCross;
+            fileinfo.properties["CFDDiscrMin"]=(qlonglong)boardHeader.CFDDiscrMin;
+            fileinfo.properties["SyncLevel"]=(qlonglong)boardHeader.SyncLevel;
+            fileinfo.properties["CFDDiscrMin"]=(qlonglong)boardHeader.CFDDiscrMin;
+
+            fileinfo.properties["Globclock"]=(qlonglong)TTTRHeader.Globclock;
+            fileinfo.properties["SyncRate"]=(qlonglong)TTTRHeader.SyncRate;
+            fileinfo.properties["TTTRCFDRate"]=(qlonglong)TTTRHeader.TTTRCFDRate;
+            fileinfo.properties["TTTRStopAfter"]=(qlonglong)TTTRHeader.TTTRStopAfter;
+            fileinfo.properties["TTTRStopReason"]=(qlonglong)TTTRHeader.TTTRStopReason;
+            fileinfo.properties["NoOfRecords"]=(qlonglong)TTTRHeader.NoOfRecords;
+        }
+
         fgetpos(tttrfile, &fileResetPos);
         currentTTTRRecordNum=0;
         current.microtime_offset=0;
-        current.microtime_deltaT=boardHeader.Resolution;
+        if (isV6) current.microtime_deltaT=boardHeader6.Resolution;
+        else current.microtime_deltaT=boardHeader.Resolution;
         nextRecord();
 
         // read some photons to estimate a countrate
@@ -121,7 +143,8 @@ bool QFTCSPCReaderPicoquant::open(const QString &filename, const QString &parame
         fsetpos(tttrfile, &fileResetPos);
         currentTTTRRecordNum=0;
         current.microtime_offset=0;
-        current.microtime_deltaT=boardHeader.Resolution;
+        if (isV6) current.microtime_deltaT=boardHeader6.Resolution;
+        else current.microtime_deltaT=boardHeader.Resolution;
 
         return true;
     }
@@ -168,7 +191,10 @@ bool QFTCSPCReaderPicoquant::nextRecord() {
         currentTTTRRecordNum++;
 
         // calculate the true time of the photon
-        double truetime = double(ofltime + TTTRrecord.TimeTag) * TTTRHeader.Globclock/1000000000.0 ; /* convert to seconds */
+
+        double truetime;
+        if (isV6) truetime = double(ofltime + TTTRrecord.TimeTag) * TTTRHeader6.Globclock/1000000000.0 ; /* convert to seconds */
+        else truetime = double(ofltime + TTTRrecord.TimeTag) * TTTRHeader.Globclock/1000000000.0 ; /* convert to seconds */
 
         current.isPhoton=false;
         current.marker_type=0;
@@ -195,16 +221,33 @@ bool QFTCSPCReaderPicoquant::nextRecord() {
         }
     } while (!ok);
 
-    return (int64_t(currentTTTRRecordNum)<TTTRHeader.NoOfRecords && !feof(tttrfile));
+    if (isV6) return (int64_t(currentTTTRRecordNum)<TTTRHeader6.NoOfRecords && !feof(tttrfile));
+    else return (int64_t(currentTTTRRecordNum)<TTTRHeader.NoOfRecords && !feof(tttrfile));
 }
 
 double QFTCSPCReaderPicoquant::measurementDuration() const {
-    return double(binHeader.Tacq)/1000.0;
+    if (isV6) return double(binHeader6.Tacq)/1000.0;
+    else return double(binHeader.Tacq)/1000.0;
 }
 
 uint16_t QFTCSPCReaderPicoquant::inputChannels() const {
 
-    return binHeader.RoutingChannels;
+    if (isV6) return binHeader6.RoutingChannels;
+    else return binHeader.RoutingChannels;
+}
+
+uint32_t QFTCSPCReaderPicoquant::microtimeChannels() const
+{
+    if (isV6) return binHeader6.Channels;
+    else return binHeader.Channels;
+
+}
+
+double QFTCSPCReaderPicoquant::microtimeChannelsResolutionPicoSeconds() const
+{
+    if (isV6) return boardHeader6.Resolution*1e3;
+    else return boardHeader.Resolution*1e3;
+
 }
 
 double QFTCSPCReaderPicoquant::avgCountRate(uint16_t channel) const {
@@ -216,6 +259,8 @@ QFTCSPCRecord QFTCSPCReaderPicoquant::getCurrentRecord() const {
 }
 
 double QFTCSPCReaderPicoquant::percentCompleted() const {
-    return double(currentTTTRRecordNum)/double(TTTRHeader.NoOfRecords)*100.0;
+    if (isV6) return double(currentTTTRRecordNum)/double(TTTRHeader6.NoOfRecords)*100.0;
+    else return double(currentTTTRRecordNum)/double(TTTRHeader.NoOfRecords)*100.0;
+
 }
 

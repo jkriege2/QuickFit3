@@ -39,7 +39,7 @@
 #include "we_sink_source.h"
 #include "worker_thread.h"
 
-#include "../../../../LIB/trunk/frame.h"
+#include "frame.h"
 
 //TODO: count and size of frames
 

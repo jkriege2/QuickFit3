@@ -28,6 +28,7 @@
 #include "qfextension.h"
 
 class QFETCSPCImporterDialog; // forward
+class QFETCSPCImporterFretchen2;
 
 /*!
     \defgroup qf3ext_tcspcimporter QFExtension implementation
@@ -59,11 +60,11 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return tr("TCSPC importer"); }
         /** \copydoc QFExtension::getDescription() */
-        virtual QString getDescription() const  { return tr("TCSPC importer (FCS, count rates, ...)"); }
+        virtual QString getDescription() const  { return tr("TCSPC importer (FCS, count rates, spFRET burst analysis, ...)"); }
         /** \copydoc QFExtension::getAuthor() */
         virtual QString getAuthor() const  { return tr("Jan W. Krieger, Sebastian Isbaner"); }
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2012-2015 by Jan W. Krieger (TTTR correlator code by Sebastian Isbaner)"); }
+        virtual QString getCopyright() const  { return tr("(c) 2012-2015 by Jan W. Krieger (TTTR correlator code in part by Sebastian Isbaner)"); }
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
         /** \copydoc QFExtension::getIconFilename() */
@@ -71,12 +72,13 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=2;
+            minor=3;
         }
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
     protected slots:
         void startPlugin();
+        void startBurstAnalyzer();
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);
@@ -105,9 +107,12 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
         QFRawDataRecord* insertFCSCSVFile(const QString &filenameFCS, const QString& filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""), const QString& role=QString(""));
         QFRawDataRecord* insertFCCSCSVFile(const QString& filenameFCS, const QString &filenameCR1, const QString &filenameCR2, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""), const QString& role=QString(""));
         QFRawDataRecord* insertCountRate(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""), const QString& role=QString(""));
+        QFRawDataRecord* insertTable(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""), const QString& role=QString(""));
         QList<QPointer<QFRawDataRecord> > insertQF3ASCIICORRFile(const QString& filenameFCS, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group=QString(""));
 
-        QFETCSPCImporterDialog* dlgCorrelate;
+        QList<QPointer<QFETCSPCImporterFretchen2> > FRETDialogs;
+
+        QPointer<QFETCSPCImporterDialog> dlgCorrelate;
 	protected:
         QFPluginLogService* logService;
 		

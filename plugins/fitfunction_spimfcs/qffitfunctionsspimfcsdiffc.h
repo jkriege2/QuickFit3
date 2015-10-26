@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFitFunctionsSPIMFCSDiffC_H
 #include "qfpluginfitfunction.h"
 
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief QFFitFunction class for a SPIM-FCS fit model with pure diffusion and 1/sqrt(e) lateral width, with the conecntration as fit parameter, not the particle number N
@@ -34,7 +34,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \f[ V_{\text{eff}}=2\cdot a^2\cdot \sigma_z \f]
     \f[ \Delta V_{\text{eff}}=\sqrt{\left(\Delta\sigma_z\cdot 2a^2\right)^2+\left(\Delta a\cdot 4a\sigma_z\right)^2} \f]
 */
-class QFFitFunctionsSPIMFCSDiffC: public QFFitFunction {
+class QFFitFunctionsSPIMFCSDiffC: public QFFCSLargeFocusFitFunctionBase {
     public:
         QFFitFunctionsSPIMFCSDiffC();
         virtual ~QFFitFunctionsSPIMFCSDiffC() {}

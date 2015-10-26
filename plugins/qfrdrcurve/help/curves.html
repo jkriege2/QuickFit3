@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Curves Plugin Online-Help</title>
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+    
+    <h2>Description</h2>
+    <p>This plugin represents one (or more) curves, i.e. datasets $((x_i,y_i)_{i=0..N-1})$. In addition, an error $(\sigma_{x,i})$ / $(\sigma_{y,i})$ may be assigned to each datapoint. The data may be read from different sources:<ul>
+        <li><a name="insert_recs"><b>From Comma-separated values (CSV) or ASCI-files:</b> Such RDRs can be imported into the project from the main window of QuickFit in the sub-menu <b>Data Items | Insert Raw Data | <img src=":/curves/qfrdrcurve_small.png"> XY-Curves</b>. There are two possibilities available:<ol>
+          <li><b>single-file records</b>: This record only reads data from a single file (and if you select several files, each file is included as one RDR). </li>
+          <li><b>multi-file records</b>: This record reads data from several files, where from each file one curve is read.</li>
+        </ol></li>
+        <li><b>Directly from the project:</b> This is used by other plugins to automatically insert curve records, e.g. with results for further evaluation or documentation.</li>
+    </ul></p>
+    
+    
+    <h2>User Interface</h2>
+    <h3>Inserting new records</h3>
+    <p>Adding a curve-RDR is done, as described <a href="#insert_recs">above</a>, in the mainwindow's menu <b>Data Items | Insert Raw Data | <img src=":/curves/qfrdrcurve_small.png"> XY-Curves</b>. </p>
+    
+    <h3>Displaying the curves</h3>
+    <p>If you double-click any curve record (with this icon: <img src=":/curves/qfrdrcurve_small.png">) in the project tree, an RDR editor window will open, in which you can view the different curves on the second <b>tab "XY-Curves editor"</b>:
+<center><a name="curves_pic000"><img src="./pic/curves_pic000.png" border="1">
+</center>
+
+    
+    Here you can:<ul>
+      <li>(1): select the curve to display at the top (combobox "Curve:"), or <br>(2) choose to show an overlay plot of all curves in this record.</li>
+      <li>(3): view the curves in the <a href="$$qf_ui_jkqtplotter_helpfile$$">central plotter widget</a>.</li>
+      <li>(4): edit the curve metadata at the bottom. The available metadata are:<ul>
+        <li>name of the curve</li>
+        <li>x/y-axis labels</li>
+        <li>whether the x/y-axis are log-scaled</li>
+        <li>plot type:<ul>
+          <li>points:
+          <center><a name="curves_pic001"><img src="./pic/curves_pic001.png" border="1">
+          </center>
+          </li>
+          <li>lines:
+          <center><a name="curves_pic002"><img src="./pic/curves_pic002.png" border="1">
+          </center>
+          </li>
+          <li>histogram/bars:
+          <center><a name="curves_pic003"><img src="./pic/curves_pic003.png" border="1">
+          </center>
+          </li>
+        </ul></li>
+      </ul></li>
+    </ul></p>
+  </body>
+</html>

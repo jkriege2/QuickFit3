@@ -30,9 +30,10 @@
 #include <cmath>
 #include "cpptools.h"
 #include "qfrdrtable.h"
-#include "QToolTip"
+#include <QToolTip>
 #include "qfmathparser.h"
 #include "qffunctionreferencetool.h"
+#include <QTimer>
 
 namespace Ui {
     class QFRDRTablePlotWidget;
@@ -56,13 +57,21 @@ class QFRDRTablePlotWidget : public QWidget
 
 
         double getMagnification() const;
+    public slots:
+        void doAutoscaleX();
+        void doAutoscaleY();
+        void doAutoscaleXY();
+
     signals:
         void plotTitleChanged(int plot, QString title);
-    signals:
         void performFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString function, QFRDRTable::GraphDataSelection sel,bool xlog,bool ylog);
         void performRegression(int xCol, int yCol, int sigmaCol, int plot,int graph, QFRDRTable::GraphDataSelection sel,bool xlog,bool ylog);
         void performRefit(int plot, int graph);
     protected slots:
+        inline void emitPlotTitleChanged(int plot, QString title) {
+            emit plotTitleChanged(plot, title);
+        }
+
         void doFit(int xCol, int yCol, int sigmaCol, int plot, QString function, QFRDRTable::GraphDataSelection sel);
         void doRegression(int xCol, int yCol, int sigmaCol, int plot, QFRDRTable::GraphDataSelection sel);
         void doRefit(int plot);
@@ -70,19 +79,24 @@ class QFRDRTablePlotWidget : public QWidget
         void on_btnDeleteGraph_clicked();
         void on_btnCloneGraph_clicked();
         void on_btnAddGraph_clicked();
-        void doAutoscaleX();
-        void doAutoscaleY();
         void on_plotter_plotMouseMove(double x, double y);
         void on_btnMoveUp_clicked();
         void on_btnMoveDown_clicked();
         void on_btnResetColoring_clicked();
         void on_btnColorByPalette_clicked();
         void reloadGraphData();
+        void delayedReloadGraphData();
 
         void graphDataChanged();
+        void delayedGraphDataChanged();
         void plotDataChanged();
+        void delayedPlotDataChanged();
+
+
         void updateGraph();
+        void delayedUpdateGraph();
         void updateData();
+        void delayedUpdateData();
         void updatePlotWidgetVisibility();
 
         void connectWidgets();
@@ -96,6 +110,11 @@ class QFRDRTablePlotWidget : public QWidget
 
         void setAxisProps(JKQTPcoordinateAxis *axis, const QFRDRTable::AxisInfo &axisData, const QFRDRTable::PlotInfo &p, bool minorGrid=true, bool majorGrid=true);
     private:
+        QTimer timUpdateGraph;
+        QTimer timUpdateData;
+        QTimer timReloadGraphData;
+        QTimer timGraphDataChanged;
+        QTimer timPlotDataChanged;
         Ui::QFRDRTablePlotWidget *ui;
         QToolBar* toolbarPlot;
         QLabel* labPlotPosition;

@@ -111,7 +111,7 @@ class QFPluginCommandsInterface {
         virtual ~QFPluginCommandsInterface() {}
 
         /** \brief send a text command to another plugin */
-        virtual void sendPluginCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant())=0;
+        virtual QVariant sendPluginCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant())=0;
 
 };
 

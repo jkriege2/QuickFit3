@@ -87,36 +87,16 @@ bool QFFitFunctionGeneralModHill5P::get_implementsDerivatives() const
 }
 
 
-bool QFFitFunctionGeneralModHill5P::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool */*fix*/) const
+bool QFFitFunctionGeneralModHill5P::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix) const
 {
-    //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
-    if (params && dataX && dataY) {
+    bool ok=QFCDFFitFunctionBase::estimateInitial(params, dataX, dataY, N, fix);
+    if (ok&&params) {
 
-        StatisticsScopedPointer<double> dX(statisticsDuplicateArray(dataX, N));
-        StatisticsScopedPointer<double> dY(statisticsDuplicateArray(dataY, N));
-
-        statisticsSort2(dX.data(), dY.data(), N);
-
-        double mi=0, ma=0;
-
-        statisticsMinMax(dY.data(), N, mi, ma);
-
-        double p=statisticsXatY50Sorted(dX.data(), dY.data(), N);
-
-        double rate=(ma-mi)/(dX[N-1]-dX[0]);
-        rate=rate/log(10)*4.0/(ma-mi);
-        if (dY[N-1]-dY[0]<0) {
-            rate=rate*(-1.0);
-        }
-        params[PARAM_BASE]=mi;
-        params[PARAM_MAX]=ma;
-        params[PARAM_POSITION]=p;
-        params[PARAM_RATE]=rate;
         params[PARAM_ASYMMETRY]=1;
 
 
     }
 
-    return true;
+    return ok;
 
 }

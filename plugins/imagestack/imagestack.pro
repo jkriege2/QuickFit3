@@ -27,7 +27,7 @@ TARGET = image_stack
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 

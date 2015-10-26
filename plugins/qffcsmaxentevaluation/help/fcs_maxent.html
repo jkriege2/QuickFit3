@@ -6,233 +6,241 @@
   </head>
   <body>
   
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-	    
-		<h2>Introduction</h2>
-		This plugin implements the maximum entropy (MaxEnt) data fit method for fluorescence correlation spectroscopy (FCS) or dynamic lightscattering (DLS) data.
-		The maximum entropy approach is a method from Bayesian statistics, that is suitable to treat ill-conditioned data. For a specific problem such as fitting FCS data, we assume to
-		know the physical model behind the measured data, and want to find the model parameters.
-		In this case we can compute a "probability" distribution for the desired parameters,
-		that allows us to compute an entropy function. The basic idea is to maximise the entropy, constrained by the data.
-		This is done by introducing a new regularisation parameter, that controls the ratio of both the influence of the data and the entropy on the fit result.
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        
+        <h2>Introduction</h2>
+        
+<p>
+    This plugin implements the maximum entropy (MaxEnt) data fit method for fluorescence correlation spectroscopy (FCS) or dynamic lightscattering (DLS) data.
+        The maximum entropy approach is a method from Bayesian statistics, that is suitable to treat ill-conditioned data. For a specific problem such as fitting FCS data, we assume to
+        know the physical model behind the measured data, and want to find the model parameters.
+        In this case we can compute a "probability" distribution for the desired parameters,
+        that allows us to compute an entropy function. The basic idea is to maximise the entropy, constrained by the data.
+        This is done by introducing a new regularisation parameter, that controls the ratio of both the influence of the data and the entropy on the fit result.
+</p>
 
-		
-		
-		<h2>Supported Models</h2>
-		This plugin supports several models that incorporate a MaxEnt distribution <img src="./pic/01_dist.png"> <!-- $$math:(\tau_i, p(\tau_i)=p_i)_{i=1...N}$$:-->
-		where <img src="./pic/nmem.png"> is the number of discretization steps to sample the maximum entropy distribution.
-		<ol>
-		
-		  <li><p><b>FCS: 3D diffusion with Triplet</b>: 
-		   This plugin may be used for FCS data from a confocal microscope with assumed 3D diffusion. The model is:
-		        <center><img vspace="20" src="./pic/02_model1.png"></center>
-		  
-		      <!-- $$bmath:g(\tau)=\left(\frac{1-\Theta_T+\Theta_T\cdot\exp(-tau/\tau_T)}
-		      {1-\Theta_T}\right)\cdot\sum_{i=1}^Np_i\cdot\left(1+\frac{\tau}{\tau_i}\right)^{-1}
-		      \cdot\left(1+\frac{\tau}{\gamma^2\cdot\tau_i}\right)^{-1/2}$$ -->
-			   Here <!--$$math:\Theta_T$$--> <img src="./pic/03_theta_t.png">  is the triplet fraction and <img src="./pic/04_tau_t.png"> 
-			   <!--$$math:\tau_T$$--> is the triplet lifetime. The parameter <!--$$math:\gamma$$--> <img src="./pic/gamma.png"> describes the axial ratio of the gaussian laser focus (a common value for confocal microscopes is <!--$$math:\gamma\approx 6$$--><img src="./pic/06_gammaisapprox.png">).
-		 </p>
-		 </li>
-		  
-		  <li><p><b>FCS: 3D diffusion with two blinking components</b>: This model is similar to the first one but has now two blinking components. It may as well be used for FCS data from a confocal microscope with assumed 3D diffusion. The model is:
-		        <center><img vspace="20" src="./pic/07_model2.png"></center>
-		  where  <img src="./pic/08_thetataus.png"> are the corresponding triplet fractions and triplet lifetimes, respectively.
-		  <img src="./pic/09_Ginf.png"> is a offset constant, and <img src="./pic/gamma.png"> is the axial ratio of the laser focus as explained above.
 
-		    </p>	  
-		  </li>
-		  
-		    <li><p><b>FCS: 2D diffusion with two blinking components</b>: Applicable to FCS data from a confocal microscope with assumed 2D diffusion and 2 blinking components. The model is:
-		        <center><img vspace="20" src="./pic/10_model3.png"></center>
-		  The relevant parameters are basically the same as for the 3D Diffusion with two blinking components, except that the focus ratio is not needed here.
+        
+        
+        <h2>Supported Models</h2>
+        
+        <p>
+            This plugin supports several models that incorporate a MaxEnt distribution <img src="./pic/01_dist.png"> <!-- $$math:(\tau_i, p(\tau_i)=p_i)_{i=1...N}$$:-->
+        where <img src="./pic/nmem.png"> is the number of discretization steps to sample the maximum entropy distribution.
+        <ol>
+        
+          <li><p><b>FCS: 3D diffusion with Triplet</b>: 
+           This plugin may be used for FCS data from a confocal microscope with assumed 3D diffusion. The model is:
+                <center><img vspace="20" src="./pic/02_model1.png"></center>
+          
+              <!-- $$bmath:g(\tau)=\left(\frac{1-\Theta_T+\Theta_T\cdot\exp(-tau/\tau_T)}
+              {1-\Theta_T}\right)\cdot\sum_{i=1}^Np_i\cdot\left(1+\frac{\tau}{\tau_i}\right)^{-1}
+              \cdot\left(1+\frac{\tau}{\gamma^2\cdot\tau_i}\right)^{-1/2}$$ -->
+               Here <!--$$math:\Theta_T$$--> <img src="./pic/03_theta_t.png">  is the triplet fraction and <img src="./pic/04_tau_t.png"> 
+               <!--$$math:\tau_T$$--> is the triplet lifetime. The parameter <!--$$math:\gamma$$--> <img src="./pic/gamma.png"> describes the axial ratio of the gaussian laser focus (a common value for confocal microscopes is <!--$$math:\gamma\approx 6$$--><img src="./pic/06_gammaisapprox.png">).
+         </p>
+         </li>
+          
+          <li><p><b>FCS: 3D diffusion with two blinking components</b>: This model is similar to the first one but has now two blinking components. It may as well be used for FCS data from a confocal microscope with assumed 3D diffusion. The model is:
+                <center><img vspace="20" src="./pic/07_model2.png"></center>
+          where  <img src="./pic/08_thetataus.png"> are the corresponding triplet fractions and triplet lifetimes, respectively.
+          <img src="./pic/09_Ginf.png"> is a offset constant, and <img src="./pic/gamma.png"> is the axial ratio of the laser focus as explained above.
 
-		    </p>	  
-		  </li>
-		  
-		  <li>
-		  <p>
-		  <b>DLS: Dynamic Light Scattering</b>: The model is:
-		        <center><img vspace="20" src="./pic/11_model4.png"></center>
-		  with the parameter A, that describes a unknown baseline count.
+            </p>      
+          </li>
+          
+            <li><p><b>FCS: 2D diffusion with two blinking components</b>: Applicable to FCS data from a confocal microscope with assumed 2D diffusion and 2 blinking components. The model is:
+                <center><img vspace="20" src="./pic/10_model3.png"></center>
+          The relevant parameters are basically the same as for the 3D Diffusion with two blinking components, except that the focus ratio is not needed here.
 
-		  </p>	  
-		  </li>  
-		  
-		  
-		  <li>
-		  <p>
-		  <b>FCS: Blinking with 3D Diffusion</b>: The model is given by:
-		        <center><img vspace="20" src="./pic/13_model5.png"></center>
-		  As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
+            </p>      
+          </li>
+          
+          <li>
+          <p>
+          <b>DLS: Dynamic Light Scattering</b>: The model is:
+                <center><img vspace="20" src="./pic/11_model4.png"></center>
+          with the parameter A, that describes a unknown baseline count.
+
+          </p>      
+          </li>  
+          
+          
+          <li>
+          <p>
+          <b>FCS: Blinking with 3D Diffusion</b>: The model is given by:
+                <center><img vspace="20" src="./pic/13_model5.png"></center>
+          As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
             <img src="./pic/td1td2.png"> are the two lifetimes, N is the particle number, <img src="./pic/gamma.png">
             the axial ratio of the laser focus, and  <img src="./pic/rho.png"> is the fraction of the D1 component.
-		  </p>	  
-		  </li>  
-		  
-	  
-		  <li>
-		  <p>
-		  <b>camera SPIM-FCS: 3D Diffusion</b>: The model is given by:
-		        $$bmath:g(\tau)=G_\infty+\frac{1}{\sqrt{\pi}\cdot w_z\cdot a^2\cdot N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\sum_{i}\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{4D_i\tau}{w_z^2}\right]^{-1/2}$$
-		$$bmath:V_{\text{eff}}=\frac{\sqrt{\pi}\cdot a^2w_z}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
-		  As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
+          </p>      
+          </li>  
+          
+      
+          <li>
+          <p>
+          <b>camera SPIM-FCS: 3D Diffusion</b>: The model is given by:
+                $$bmath:g(\tau)=G_\infty+\frac{1}{\sqrt{\pi}\cdot w_z\cdot a^2\cdot N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\sum_{i}\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{4D_i\tau}{w_z^2}\right]^{-1/2}$$
+        $$bmath:V_{\text{eff}}=\frac{\sqrt{\pi}\cdot a^2w_z}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
+          As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
             $$math:w_{xy}$$ and $$math:w_z$$ are the 1/e<sup>2</sup> focus width and height , $$math:a$$ is the pixel size and $$math:N$$ is the particle number
-		  </p>	  
-		  </li>  
-		  
-		  
+          </p>      
+          </li>  
+          
+          
   
-		  <li>
-		  <p>
-		  <b>camera TIR-FCS: 2D Diffusion</b>: The model is given by:
-		        $$bmath:g(\tau)=G_\infty+\frac{1}{\cdot a^2\cdot N/A_{\text{eff}}}\cdot\frac{1}{a^2}\cdot\sum_{i}\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2$$
-		$$bmath:A_{\text{eff}}=\frac{a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
-		  As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
+          <li>
+          <p>
+          <b>camera TIR-FCS: 2D Diffusion</b>: The model is given by:
+                $$bmath:g(\tau)=G_\infty+\frac{1}{\cdot a^2\cdot N/A_{\text{eff}}}\cdot\frac{1}{a^2}\cdot\sum_{i}\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2$$
+        $$bmath:A_{\text{eff}}=\frac{a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
+          As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
             $$math:w_{xy}$$ is the 1/e<sup>2</sup> focus width, $$math:a$$ is the pixel size and $$math:N$$ is the particle number
-		  </p>	  
-		  </li>  
-		  
-		  
-		  
-		</ol>
-		$$note: The x-axis of the distribution can be set up in different modes. By default, it is the same, as the tau-axis of the correlation function. Alternatively it can be set up as a linear or lagarithmic range between two times or diffusion coeffcicients (recalculated to lag times with the current wxy).$$
-	
-		
+          </p>      
+          </li>  
+          
+          
+          
+        </ol>
+        </p>
+        
+        $$note: The x-axis of the distribution can be set up in different modes. By default, it is the same, as the tau-axis of the correlation function. Alternatively it can be set up as a linear or lagarithmic range between two times or diffusion coeffcicients (recalculated to lag times with the current wxy).$$
+    
+        
 
-		
-		
-		
-		
-		<h2>Algorithm</h2>
-		<p>
-		In this section we explain the basic concept of this algorithm.
-		One assumes that in our experiment we have measured <img src="./pic/Nd.png"> datapoints, that we store in a vector  <img src="./pic/D.png">.
-		In the language of maximum entropy analysis we wish to find a "map" <img src="./pic/f.png"> that gives rise
-		to the measured data, through a linear transform T. This map is what we call the maximum entropy distribution. So we start off with an <img src="./pic/Nd.png">
-		dimensional data vector <img src="./pic/Din.png">, an <img src="./pic/Nd.png"> dimensional fit-result vector <img src="./pic/bigFin.png"> and a <img src="./pic/N.png"> dimensional map-vector
-		<img src="./pic/fin.png"> along with a linear transform <img src="./pic/tin.png"> between F and f, such that <img src="./pic/fittinggoal.png"> 
-		(D contains the experimentally measured data whilst F contains our fit results). Here <img src="./pic/nnmem.png"> 
-		is the number of discretization steps that are used to sample the
-		maximum entropy distribution that is contained in the vector   <img src="./pic/ftranspose.png">. In the relation
-	     <img src="./pic/FTf.png">
-		one sometimes refers to the fit result <img src="./pic/bigF.png"> as the restored image. T is for a given model 
-		a constant linear mapping making it clear,
-		that the task of this algorithm is to find such a maximum entropy map/distribution that creates an <img src="./pic/bigF.png"> 
-		that possibly best matches our measured result in <img src="./pic/D.png">. 
-		Normal fitting routines try to minimize the summed squared deviation between the experimental datapoints and a theoretical model,
-		by arguing, that the best fit to a given data set must be the one, which minimizes
-		
-		<center><img align="middle" vspace="15" src="./pic/least.png"></center>
-		
-		where <img src="./pic/sigmai.png"> is the standard deviation of the i-th datapoint. If the distribution vector <img src="./pic/f.png">
-		is properly chosen, namely that <img src="./pic/f.png"> is a positive, additive and normalizable distribution function,
-		one can set up an entropy function for <img src="./pic/f.png">, according to the information theoretical interpretation of entropy, by
-		assigning:
-		
-		<center><img align="middle" vspace="15" src="./pic/entropyf.png"></center>
-		
-		The key idea behind maximum entropy is now to consider a new optimisation problem, namely to maximise a new functional Q, depending 
-		on L and S, which corresponds to a minimisation in the least square sense while at the same time maximising the entropy.
-		
-		<center><img align="middle" vspace="15" src="./pic/Qfunctional.png"></center>
-		
-		<img src="./pic/alpha.png"> is a new so called regularization parameter, that balances the relative weight of either the entropy term
-		or the data term L.
-		</p>
-		
-		
-		
-		<h3>Application to FCS</h3>
-		<p>
-		In the case of FCS data, we measure an autocorrelation function
-		
-		<center><img align="middle" vspace="10" src="./pic/autocorr.png"></center>
-		
-		where <img src="./pic/tauD.png"> is an effective diffusion time. For multi-species probes we expect several different diffusion coefficients
-		to be present and hence expand the model to
-		
-		<center><img vspace="10" align="middle" src="./pic/multispecies.png">  , with <img vspace="10" align="middle" src="./pic/smallgi.png"> </center>
-		
-		Our approach here is to reinterprete the discrete <img  src="./pic/rhoi.png"> in the sum as a "continuous" distribution <img  src="./pic/rhotauD.png"> of diffusion times,
-		that will be peaked at distinct times that correspond to the actual diffusion times of the species, respectively.
-		This is the map, that we wish to compute via the maximum entropy algorithm.
-		We conclude, that the i-th component of our data vector <img  src="./pic/D.png"> can be written as
-		<img  src="./pic/Dicomp.png"> and the j-th component of the map-vector <img  src="./pic/f.png"> as <img  src="./pic/fjcomp.png">.
-		Due to the given linearity of the problem we can cast the equation above into the matrix form by identifying:
-		
-		<center><img align="middle" vspace="10" src="./pic/Tij.png"></center>
-		
-		With these assignments we have constructed <img src="./pic/FTf.png"> as required. It should be emphasized, that the concrete form of T and choice of f is
-		problem specific and has here been shown for the application to FCS data fitting.
-		</p>
-		
-		
-	
-		
-		
-		
-		<h2>Implementation Details</h2>
-		<h3>The MaxEnt algorithm</h3>
-		<p>
-		As known from basics maximisation tasks, maximizing   <img src="./pic/Qfunctional.png"> can be done by satisfying the condition <img src="./pic/maxcond.png"> 
-		One key aspect of the implementation is the reduction of the higher dimensional problem to the singular space of the given matrix T, by computing the Singular Value Decomposition
-		of T and exploiting the fact the all important information are preserved when restricting to the smaller dimensional singular space of T compared to ist full size. We remember that 
-		<img src="./pic/tin.png">.
-		The singular value decomposition of a given matrix T, decomposes T  in the form <img src="./pic/svd.png"> where V is <img src="./pic/ndtimesnd.png"> orthogonal matrix and
-		U is a <img src="./pic/ntimesn.png"> orthogonal matrix and <img src="./pic/sigmain.png"> contains all the singular values on its diagonal in decreasing order, such that
-		<img src="./pic/sigmadiag.png"> where s is the dimension of the spanned singular space.
-	    This simplifies the problem in such a way as one can now reduce the problem to and s dimensional space by cutting off the additional dimensions.
-	    </p>
-	    
-	    <p>
-	    Furthmore one transforms the Maximum Entropy distribution vector <img src="./pic/f.png"> into <img src="./pic/uvec.png"> by
-	    
-	    <center><img align="middle" vspace="10" src="./pic/ftransform.png"></center>
-	    
-	    where the <img src="./pic/mi.png"> are the initial values for the maximum entropy distribution and <img src="./pic/uvec.png">
-	    is the new s dimensional vector that from now on is used in the algorithm. Once the algorithm terminates we use the final <img src="./pic/uvec.png">
-	    and plug it into the equation above to get back the final result for <img src="./pic/f.png">
-	    </p>
-	    
-	    <p>
-		One can rewrite the maximisation condition <img src="./pic/maxcond.png"> in the following way
-		<center><img align="middle" vspace="10" src="./pic/newton1.png"></center>
-		which is the equation we need to solve for <img src="./pic/uvec.png">.
-		This is done by a so called Newton-Iteration method, which computes an increment <img src="./pic/deltau.png">
-		in each iteration by solving the following equation
-		<center><img align="middle" vspace="10" src="./pic/newton2.png"></center>
-		where <img src="./pic/mu.png"> is another algorithm parameter that is modified during the runtime to ensure convergence and
-		<img src="./pic/Es.png"> is simply the s-dimensional unity matrix. 
-		By some further matrix algebra and eigenvalue analysis the algorithm simplifies the above equation. The details for the remaining steps can be seen
-		in the paper by Richard K. Bryan.
-		</p>
-		
-	    <h3>Diffusion coefficient distributions</h3>
-		<p>
-		THis plugin calculates distributions of (diffusion) correlation times $$math:\tau_i$$. For FCS and DLS, these can be recalibrated to diffusion coefficients $$math:D_i$$. This is done, using additional parameters, such as the focus size $$math:w_{xy}$$ for FCS, or the scattering angle $$math:\Theta$$, the refactive index $$math:n$$ and the wavelength $$math:\lambda$$ for DLS in the following fashion:
-		<ul>
-		  <li><b>FCS:</b> $$bmath:D_i=\frac{w_{xy}^2}{4\tau_i}$$</li>
-		  <li><b>DLS:</b> $$bmath:D_i=\frac{1}{q^2\cdot \tau_i}$$ with the squared scattering vector $$bmath:q=\frac{4\pi n}{\lambda}\cdot\sin(\Theta/2)$$</li>
-		</ul>
-		</p>
-	    
-		
-		
-		
-				
-		<h2>References</h2>
-		The implementation follows the algorithm form R.K. Bryan. For more details and other application ideas we refer to the following references:
-		<ul>
-		  <li>R.K. Bryan (1990): <strong>"Maximum entropy analysis of oversampled data problems"</strong>, <i>European Biophysics Journal</i> <b>18</b>(3), 65-174, DOI: 10.1007/BF02427376</li>
-		  <li>Károly Módos, Rita Galántai, Irén Bárdos-Nagy, Malte Wachsmuth, Katalin Tóth, Judit Fidy und Jörg Langowski (2004): <small><strong><a href="http://www.dkfz.de/Macromol/publications/files/ModosFCS.pdf">"Maximum-entropy decomposition of fluorescence correlation spectroscopy data: application to liposome–human serum albumin association"</a></strong></small>, <i>European Biophysics Journal</i> <b>33</b>(1), 59-67, DOI: 10.1007/s00249-003-0343-6</li>
-		</ul>
-		
-		
-		<p>
-		The algorithm uses matrix tools and numerical solvers from the Eigen C++ Template Library for Linear Algebra. For further information on Eigen see:		
-		<small><strong><a href="<strong><a href="http://eigen.tuxfamily.org/index.php?title=Main_Page">"http://eigen.tuxfamily.org/index.php?title=Main_Page"</a></strong></small>
-		</p>
-		
+        
+        
+        
+        
+        <h2>Algorithm</h2>
+        <p>
+        In this section we explain the basic concept of this algorithm.
+        One assumes that in our experiment we have measured <img src="./pic/Nd.png"> datapoints, that we store in a vector  <img src="./pic/D.png">.
+        In the language of maximum entropy analysis we wish to find a "map" <img src="./pic/f.png"> that gives rise
+        to the measured data, through a linear transform T. This map is what we call the maximum entropy distribution. So we start off with an <img src="./pic/Nd.png">
+        dimensional data vector <img src="./pic/Din.png">, an <img src="./pic/Nd.png"> dimensional fit-result vector <img src="./pic/bigFin.png"> and a <img src="./pic/N.png"> dimensional map-vector
+        <img src="./pic/fin.png"> along with a linear transform <img src="./pic/tin.png"> between F and f, such that <img src="./pic/fittinggoal.png"> 
+        (D contains the experimentally measured data whilst F contains our fit results). Here <img src="./pic/nnmem.png"> 
+        is the number of discretization steps that are used to sample the
+        maximum entropy distribution that is contained in the vector   <img src="./pic/ftranspose.png">. In the relation
+         <img src="./pic/FTf.png">
+        one sometimes refers to the fit result <img src="./pic/bigF.png"> as the restored image. T is for a given model 
+        a constant linear mapping making it clear,
+        that the task of this algorithm is to find such a maximum entropy map/distribution that creates an <img src="./pic/bigF.png"> 
+        that possibly best matches our measured result in <img src="./pic/D.png">. 
+        Normal fitting routines try to minimize the summed squared deviation between the experimental datapoints and a theoretical model,
+        by arguing, that the best fit to a given data set must be the one, which minimizes
+        
+        <center><img align="middle" vspace="15" src="./pic/least.png"></center>
+        
+        where <img src="./pic/sigmai.png"> is the standard deviation of the i-th datapoint. If the distribution vector <img src="./pic/f.png">
+        is properly chosen, namely that <img src="./pic/f.png"> is a positive, additive and normalizable distribution function,
+        one can set up an entropy function for <img src="./pic/f.png">, according to the information theoretical interpretation of entropy, by
+        assigning:
+        
+        <center><img align="middle" vspace="15" src="./pic/entropyf.png"></center>
+        
+        The key idea behind maximum entropy is now to consider a new optimisation problem, namely to maximise a new functional Q, depending 
+        on L and S, which corresponds to a minimisation in the least square sense while at the same time maximising the entropy.
+        
+        <center><img align="middle" vspace="15" src="./pic/Qfunctional.png"></center>
+        
+        <img src="./pic/alpha.png"> is a new so called regularization parameter, that balances the relative weight of either the entropy term
+        or the data term L.
+        </p>
+        
+        
+        
+        <h3>Application to FCS</h3>
+        <p>
+        In the case of FCS data, we measure an autocorrelation function
+        
+        <center><img align="middle" vspace="10" src="./pic/autocorr.png"></center>
+        
+        where <img src="./pic/tauD.png"> is an effective diffusion time. For multi-species probes we expect several different diffusion coefficients
+        to be present and hence expand the model to
+        
+        <center><img vspace="10" align="middle" src="./pic/multispecies.png">  , with <img vspace="10" align="middle" src="./pic/smallgi.png"> </center>
+        
+        Our approach here is to reinterprete the discrete <img  src="./pic/rhoi.png"> in the sum as a "continuous" distribution <img  src="./pic/rhotauD.png"> of diffusion times,
+        that will be peaked at distinct times that correspond to the actual diffusion times of the species, respectively.
+        This is the map, that we wish to compute via the maximum entropy algorithm.
+        We conclude, that the i-th component of our data vector <img  src="./pic/D.png"> can be written as
+        <img  src="./pic/Dicomp.png"> and the j-th component of the map-vector <img  src="./pic/f.png"> as <img  src="./pic/fjcomp.png">.
+        Due to the given linearity of the problem we can cast the equation above into the matrix form by identifying:
+        
+        <center><img align="middle" vspace="10" src="./pic/Tij.png"></center>
+        
+        With these assignments we have constructed <img src="./pic/FTf.png"> as required. It should be emphasized, that the concrete form of T and choice of f is
+        problem specific and has here been shown for the application to FCS data fitting.
+        </p>
+        
+        
+    
+        
+        
+        
+        <h2>Implementation Details</h2>
+        <h3>The MaxEnt algorithm</h3>
+        <p>
+        As known from basics maximisation tasks, maximizing   <img src="./pic/Qfunctional.png"> can be done by satisfying the condition <img src="./pic/maxcond.png"> 
+        One key aspect of the implementation is the reduction of the higher dimensional problem to the singular space of the given matrix T, by computing the Singular Value Decomposition
+        of T and exploiting the fact the all important information are preserved when restricting to the smaller dimensional singular space of T compared to ist full size. We remember that 
+        <img src="./pic/tin.png">.
+        The singular value decomposition of a given matrix T, decomposes T  in the form <img src="./pic/svd.png"> where V is <img src="./pic/ndtimesnd.png"> orthogonal matrix and
+        U is a <img src="./pic/ntimesn.png"> orthogonal matrix and <img src="./pic/sigmain.png"> contains all the singular values on its diagonal in decreasing order, such that
+        <img src="./pic/sigmadiag.png"> where s is the dimension of the spanned singular space.
+        This simplifies the problem in such a way as one can now reduce the problem to and s dimensional space by cutting off the additional dimensions.
+        </p>
+        
+        <p>
+        Furthmore one transforms the Maximum Entropy distribution vector <img src="./pic/f.png"> into <img src="./pic/uvec.png"> by
+        
+        <center><img align="middle" vspace="10" src="./pic/ftransform.png"></center>
+        
+        where the <img src="./pic/mi.png"> are the initial values for the maximum entropy distribution and <img src="./pic/uvec.png">
+        is the new s dimensional vector that from now on is used in the algorithm. Once the algorithm terminates we use the final <img src="./pic/uvec.png">
+        and plug it into the equation above to get back the final result for <img src="./pic/f.png">
+        </p>
+        
+        <p>
+        One can rewrite the maximisation condition <img src="./pic/maxcond.png"> in the following way
+        <center><img align="middle" vspace="10" src="./pic/newton1.png"></center>
+        which is the equation we need to solve for <img src="./pic/uvec.png">.
+        This is done by a so called Newton-Iteration method, which computes an increment <img src="./pic/deltau.png">
+        in each iteration by solving the following equation
+        <center><img align="middle" vspace="10" src="./pic/newton2.png"></center>
+        where <img src="./pic/mu.png"> is another algorithm parameter that is modified during the runtime to ensure convergence and
+        <img src="./pic/Es.png"> is simply the s-dimensional unity matrix. 
+        By some further matrix algebra and eigenvalue analysis the algorithm simplifies the above equation. The details for the remaining steps can be seen
+        in the paper by Richard K. Bryan.
+        </p>
+        
+        <h3>Diffusion coefficient distributions</h3>
+        <p>
+        THis plugin calculates distributions of (diffusion) correlation times $$math:\tau_i$$. For FCS and DLS, these can be recalibrated to diffusion coefficients $$math:D_i$$. This is done, using additional parameters, such as the focus size $$math:w_{xy}$$ for FCS, or the scattering angle $$math:\Theta$$, the refactive index $$math:n$$ and the wavelength $$math:\lambda$$ for DLS in the following fashion:
+        <ul>
+          <li><b>FCS:</b> $$bmath:D_i=\frac{w_{xy}^2}{4\tau_i}$$</li>
+          <li><b>DLS:</b> $$bmath:D_i=\frac{1}{q^2\cdot \tau_i}$$ with the squared scattering vector $$bmath:q=\frac{4\pi n}{\lambda}\cdot\sin(\Theta/2)$$</li>
+        </ul>
+        </p>
+        
+        
+        
+        
+                
+        <h2>References</h2>
+        The implementation follows the algorithm form R.K. Bryan. For more details and other application ideas we refer to the following references:
+        <ul>
+          <li>R.K. Bryan (1990): <strong>"Maximum entropy analysis of oversampled data problems"</strong>, <i>European Biophysics Journal</i> <b>18</b>(3), 65-174, DOI: 10.1007/BF02427376</li>
+          <li>K.y Modos, R. Galantai, I. Bordos-Nagy, M. Wachsmuth, K. Toth, J. Fidy und J. Langowski (2004): <small><strong><a href="http://www.dkfz.de/Macromol/publications/files/ModosFCS.pdf">"Maximum-entropy decomposition of fluorescence correlation spectroscopy data: application to liposome-human serum albumin association"</a></strong></small>, <i>European Biophysics Journal</i> <b>33</b>(1), 59-67, DOI: 10.1007/s00249-003-0343-6</li>
+        </ul>
+        
+        
+        <p>
+        The algorithm uses matrix tools and numerical solvers from the Eigen C++ Template Library for Linear Algebra. For further information on Eigen see:        
+        <small><strong><a href="<strong><a href="http://eigen.tuxfamily.org/index.php?title=Main_Page">"http://eigen.tuxfamily.org/index.php?title=Main_Page"</a></strong></small>
+        </p>
+        
   </body>
 </html>

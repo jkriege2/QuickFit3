@@ -37,11 +37,11 @@
 #include "qffitalgorithmmanager.h"
 #include "dlgqfprogressdialog.h"
 #include "qffitresultsbyindexevaluationfittools.h"
-#include "qffcsfitchi2landscapedialog.h"
+#include "qffitchi2landscapedialog.h"
 #include "qfselectrdrdialog.h"
 #include "qfoverlayplotdialog.h"
 
-QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent, bool hasMultiThreaded, bool multiThreadPriority, const QString &runName) :
+QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent, bool hasMultiThreaded, bool multiThreadPriority, const QString &runName, bool useRunComboBox, bool twoToolbars) :
     QFFitResultsByIndexEvaluationEditorBase(iniPrefix, propEditor, services, parent)
 {
     m_runName=runName;
@@ -54,14 +54,14 @@ QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEdi
     fitStatisticsReport="";
 
 
-    createWidgets(hasMultiThreaded, multiThreadPriority);
+    createWidgets(hasMultiThreaded, multiThreadPriority, useRunComboBox,twoToolbars);
 
 
 }
 
 
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMultiThreaded, bool /*multiThreadPriority*/) {
+void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMultiThreaded, bool /*multiThreadPriority*/, bool useRunCombobox, bool twoToolbars) {
 
 
 
@@ -90,10 +90,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     layAlgorithm->addWidget(l);
     cmbAlgorithm->setEditable(false);
     layAlgorithm->addWidget(cmbAlgorithm);
-    btnConfigAlgorithm=createButtonAndActionShowText(actConfigAlgorithm, QIcon(":/fcsfit/fit_config.png"), tr("&Configure Algorithm"), this);
+    btnConfigAlgorithm=createButtonAndActionShowText(actConfigAlgorithm, QIcon(":/lib/fit_config.png"), tr("&Configure Algorithm"), this);
     btnConfigAlgorithm->setMaximumWidth(250);
     layAlgorithm->addWidget(btnConfigAlgorithm);
-    btnAlgorithmHelp=createButtonAndActionShowText(actAlgorithmHelp, QIcon(":/fcsfit/fit_help.png"), tr("Algorithm &Help"), this);
+    btnAlgorithmHelp=createButtonAndActionShowText(actAlgorithmHelp, QIcon(":/lib/fit_help.png"), tr("Algorithm &Help"), this);
     btnAlgorithmHelp->setMaximumWidth(250);
     layAlgorithm->addWidget(btnAlgorithmHelp);
     layAlgorithm->addStretch();
@@ -120,7 +120,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     btnModelSelector->setMaximumWidth(250);
     layModel->addWidget(btnModelSelector);
     btnModelHelp=createButtonForActionShowText(actModelHelp=cmbModel->getHelpAction(), this);
-    //btnModelHelp=createButtonAndActionShowText(actModelHelp, QIcon(":/fcsfit/fit_help.png"), tr("Model H&elp"), this);
+    //btnModelHelp=createButtonAndActionShowText(actModelHelp, QIcon(":/lib/fit_help.png"), tr("Model H&elp"), this);
     btnModelHelp->setMaximumWidth(250);
     layModel->addWidget(btnModelHelp);
     layModel->addStretch();
@@ -141,18 +141,23 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     QFont boldfont=font();
     boldfont.setBold(true);
 
-    toolbar=new QToolBar("toolbar_fcs_fit", this);
+    toolbar=new QToolBar("toolbar_fit", this);
+    toolbar->setIconSize(QSize(16,16));
+    toolbar2=new QToolBar("toolbar2_fit", this);
+    toolbar2->setIconSize(QSize(16,16));
     vbl->addWidget(toolbar);
-    /*actSaveReport=new QAction(QIcon(":/fcsfit/fit_savereport.png"), tr("Save Report"), this);
+    vbl->addWidget(toolbar2);
+    toolbar2->setVisible(twoToolbars);
+    /*actSaveReport=new QAction(QIcon(":/lib/fit_savereport.png"), tr("Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
-    actPrintReport=new QAction(QIcon(":/fcsfit/fit_printreport.png"), tr("Print Report"), this);
+    actPrintReport=new QAction(QIcon(":/lib/fit_printreport.png"), tr("Print Report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));*/
-    QLabel* lPS=new QLabel(tr("   &Plots: "), toolbar);
+    QLabel* lPS=new QLabel(tr("   &Curves: "), toolbar);
     lPS->setFont(boldfont);
     cmbPlotStyle=new QComboBox(toolbar);
-    cmbPlotStyle->addItem(QIcon(":/fcsfit/plot_points.png"), tr("points"));
-    cmbPlotStyle->addItem(QIcon(":/fcsfit/plot_lines.png"), tr("lines"));
-    cmbPlotStyle->addItem(QIcon(":/fcsfit/plot_pointslines.png"), tr("lines + points"));
+    cmbPlotStyle->addItem(QIcon(":/lib/plot_points.png"), tr("points"));
+    cmbPlotStyle->addItem(QIcon(":/lib/plot_lines.png"), tr("lines"));
+    cmbPlotStyle->addItem(QIcon(":/lib/plot_pointslines.png"), tr("lines + points"));
     lPS->setBuddy(cmbPlotStyle);
     QLabel* lES=new QLabel(tr("   &Errors: "), toolbar);
     lES->setFont(boldfont);
@@ -163,20 +168,27 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     QLabel* lRS=new QLabel(tr("   &Residuals: "), toolbar);
     lRS->setFont(boldfont);
     cmbResidualStyle=new QComboBox(toolbar);
-    cmbResidualStyle->addItem(QIcon(":/fcsfit/plot_points.png"), tr("points"));
-    cmbResidualStyle->addItem(QIcon(":/fcsfit/plot_lines.png"), tr("lines"));
-    cmbResidualStyle->addItem(QIcon(":/fcsfit/plot_pointslines.png"), tr("lines + points"));
+    cmbResidualStyle->addItem(QIcon(":/lib/plot_points.png"), tr("points"));
+    cmbResidualStyle->addItem(QIcon(":/lib/plot_lines.png"), tr("lines"));
+    cmbResidualStyle->addItem(QIcon(":/lib/plot_pointslines.png"), tr("lines + points"));
     lRS->setBuddy(cmbResidualStyle);
 
     chkWeightedResiduals=new QCheckBox(tr("&weighted  "), toolbar);
 
+    QLabel* lGS=new QLabel(tr("Plots: "), toolbar);
+    lGS->setFont(boldfont);
+
+
+
     QWidget* sp1=new QWidget(this);
     sp1->setMinimumWidth(10);
     sp1->setMaximumWidth(10);
-    chkGrid=new QCheckBox(tr("&Grid   "), toolbar);
-    chkKey=new QCheckBox(tr("&Key   "), toolbar);
+    chkGrid=new QCheckBox(tr("&Grid  "), toolbar);
+    chkKey=new QCheckBox(tr("&Key  "), toolbar);
     chkXLogScale=new QCheckBox(tr("&log. tau   "), toolbar);
-    chkXLogScale->setVisible(false);
+    //chkXLogScale->setVisible(false);
+    chkYLogScale=new QCheckBox(tr("log. y   "), toolbar);
+    //chkYLogScale->setVisible(false);
     labMousePosition=new QLabel(this);
     QWidget* sp2=new QWidget(this);
     sp2->setMinimumWidth(10);
@@ -213,14 +225,14 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     pltData->get_plotter()->addGridPrintingPlotter(0,1,pltResiduals->get_plotter());
     pltData->set_displayToolbar(false);
     pltResiduals->set_displayToolbar(false);
-    pltResiduals->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
+    pltResiduals->getXAxis()->set_axisLabel(getPlotXLabel());
     pltResiduals->getXAxis()->set_labelFontSize(11);
     pltResiduals->getXAxis()->set_tickLabelFontSize(10);
     pltResiduals->getYAxis()->set_axisLabel(tr("residuals"));
     pltResiduals->getYAxis()->set_labelFontSize(11);
     pltResiduals->getYAxis()->set_tickLabelFontSize(10);
     pltData->getXAxis()->set_axisLabel("");
-    pltData->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
+    pltData->getYAxis()->set_axisLabel(getPlotYLabel());
     pltData->getYAxis()->set_labelFontSize(11);
     pltData->getYAxis()->set_tickLabelFontSize(10);
     pltData->getXAxis()->set_drawMode1(JKQTPCADMticks);
@@ -337,23 +349,39 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     fl=new QFormLayout();
     fl->setContentsMargins(9,0,0,0);
     fl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-    spinRun=new QSpinBox(this);
-    spinRun->setMinimum(-1);
-    spinRun->setMaximum(-1);
-    spinRun->setSpecialValueText(tr("average"));
-    spinRun->setMinimumWidth(100);
+    cmbRun=NULL;
+    spinRun=NULL;
+    if (useRunCombobox) {
+        cmbRun=new QFEnhancedComboBox(this);
+        cmbRun->setMinimumWidth(100);
+        cmbRun->setMaximumWidth(300);
+    } else {
+        spinRun=new QSpinBox(this);
+        spinRun->setMinimum(-1);
+        spinRun->setMaximum(-1);
+        spinRun->setSpecialValueText(tr("average"));
+        spinRun->setMinimumWidth(100);
+    }
     labRun=new QLabel(this);
     QHBoxLayout* hblRun=new QHBoxLayout();
     hblRun->setContentsMargins(0,0,0,0);
-    hblRun->addWidget(spinRun, 1);
     btnFirstRun=new QToolButton(this);
     btnFirstRun->setText(tr("first"));
     btnFirstRun->setToolTip(tr("switch to first %1").arg(m_runName));
     connect(btnFirstRun, SIGNAL(clicked()), this, SLOT(gotoFirstRun()));
-    hblRun->addWidget(btnFirstRun, 0);
 
-    hblRun->addWidget(labRun, 2);
-    fl->addRow(tr("%1: ").arg(m_runName), hblRun);
+    if (useRunCombobox) {
+        hblRun->addWidget(cmbRun, 1);
+        //hblRun->addWidget(btnFirstRun, 0);
+        //hblRun->addWidget(labRun, 2);
+        btnFirstRun->setVisible(false);
+        labRun->setVisible(false);
+    } else {
+        hblRun->addWidget(spinRun, 1);
+        hblRun->addWidget(btnFirstRun, 0);
+        hblRun->addWidget(labRun, 2);
+    }
+    fl->addRow(labRunLabel=new QLabel(tr("%1: ").arg(m_runName)), hblRun);
     layModel->addLayout(fl, 0);
 
     labFitParameters=new QLabel(this);
@@ -394,52 +422,90 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
     layButtons=new QGridLayout();
     layButtons->setContentsMargins(0,0,0,0);
-    btnFitCurrent=createButtonAndActionShowText(actFitCurrent, QIcon(":/fcsfit/fit_fitcurrent.png"), tr("&Fit Current"), this);
+    int row=0;
+
+    row++;
+    btnFitCurrent=createButtonAndActionShowText(actFitCurrent, QIcon(":/lib/fit_fitcurrent.png"), tr("&Fit Current"), this);
     actFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and %1").arg(m_runName));
-    layButtons->addWidget(btnFitCurrent, 0, 0);
-    btnFitRunsCurrent=createButtonAndActionShowText(actFitRunsCurrent, QIcon(":/fcsfit/fit_fitallruns.png"), tr("Fit All &%1s").arg(m_runName), this);
+    layButtons->addWidget(btnFitCurrent, row, 0);
+    btnFitRunsCurrent=createButtonAndActionShowText(actFitRunsCurrent, QIcon(":/lib/fit_fitallruns.png"), tr("Fit All &%1s").arg(m_runName), this);
     actFitRunsCurrent->setToolTip(tr("perform a fit for all %1s in the currently selected file ").arg(m_runName));
-    layButtons->addWidget(btnFitRunsCurrent, 0, 1);
-    btnFitAll=createButtonAndActionShowText(actFitAll, QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (Current %1)").arg(m_runName), this);
+    layButtons->addWidget(btnFitRunsCurrent, row, 1);
+
+    row++;
+    btnFitAll=createButtonAndActionShowText(actFitAll, QIcon(":/lib/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (Current %1)").arg(m_runName), this);    
     actFitAll->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
-    layButtons->addWidget(btnFitAll, 1, 0);
-    btnFitRunsAll=createButtonAndActionShowText(actFitRunsAll, QIcon(":/fcsfit/fit_fitall.png"), tr("Fit &Everything"), this);
+    layButtons->addWidget(btnFitAll, row, 0);
+    btnFitRunsAll=createButtonAndActionShowText(actFitRunsAll, QIcon(":/lib/fit_fitall.png"), tr("Fit &Everything"), this);
     actFitRunsAll->setToolTip(tr("perform a fit for all %1s in all files").arg(m_runName));
-    layButtons->addWidget(btnFitRunsAll, 1, 1);
+    layButtons->addWidget(btnFitRunsAll, row, 1);
+
+    row++;
     btnResetCurrent=createButtonAndActionShowText(actResetCurrent, tr("&Reset Current"), this);
     actResetCurrent->setToolTip(tr("reset the currently displayed file (and %1) to the initial parameters\nThis deletes all fit results stored for the current file.").arg(m_runName));
-    layButtons->addWidget(btnResetCurrent, 2, 0);
-    btnResetAll=createButtonAndActionShowText(actResetAll, tr("&Reset All"), this);
-    actResetAll->setToolTip(tr("reset all loaded files to the initial parameters.\nThis deletes all fit results stored for all files file."));
-    layButtons->addWidget(btnResetAll, 3, 1);
+    layButtons->addWidget(btnResetCurrent, row, 0);
 
     btnResetAllRuns=createButtonAndActionShowText(actResetAllRuns, tr("&Reset All %1s").arg(m_runName), this);
     actResetAllRuns->setToolTip(tr("reset all %1s to the initial parameters in the current file.\nThis deletes all fit results stored for all %1s in the current file.").arg(m_runName));
-    layButtons->addWidget(btnResetAllRuns, 2, 1);
+    layButtons->addWidget(btnResetAllRuns, row, 1);
 
+    row++;
+    btnResetAll=createButtonAndActionShowText(actResetAll, tr("&Reset All"), this);
+    actResetAll->setToolTip(tr("reset all loaded files to the initial parameters.\nThis deletes all fit results stored for all files file."));
+    layButtons->addWidget(btnResetAll, row, 1);
+
+    row++;
     btnCopyToInitial=createButtonAndActionShowText(actCopyToInitial, tr("Copy to &Initial"), this);
     actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/%1s that were not fit yet.").arg(m_runName));
-    layButtons->addWidget(btnCopyToInitial, 4, 0);
+    layButtons->addWidget(btnCopyToInitial, row, 0);
     btnCopyToAllRuns=createButtonAndActionShowText(actCopyToAllRuns, tr("&Copy to All %1s").arg(m_runName), this);
     actCopyToAllRuns->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters\n and also to all %1s in the current file.").arg(m_runName));
-    layButtons->addWidget(btnCopyToAllRuns, 4, 1);
+    layButtons->addWidget(btnCopyToAllRuns, row, 1);
+
+    row++;
     btnCopyToAll=createButtonAndActionShowText(actCopyToAll, tr("&Copy to All"), this);
     actCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set\n of initial parameters and also to all files."));
-    layButtons->addWidget(btnCopyToAll, 5, 1);
+    layButtons->addWidget(btnCopyToAll, row, 1);
     btnCopyToAllCurrentRun=createButtonAndActionShowText(actCopyToAllCurrentRun, tr("&Copy to All (Current %1)").arg(m_runName), this);
     actCopyToAllCurrentRun->setToolTip(tr("copy the currently displayed fit parameters to the set of\n initial parameters and also to all files, but only to the current %1 therein.").arg(m_runName));
-    layButtons->addWidget(btnCopyToAllCurrentRun, 5, 0);
+    layButtons->addWidget(btnCopyToAllCurrentRun, row, 0);
 
+    guessrow=row;
+    btnGuessCurrent=createButtonAndActionShowText(actGuessCurrent, QIcon(":/lib/fit_guesscurrent.png"), tr("&Guess Current"), this);
+    actGuessCurrent->setToolTip(tr("perform a parameter-guessing for the currently displayed file and %1").arg(m_runName));
+    btnGuessCurrent->setVisible(false);
+    actGuessCurrent->setVisible(false);
+    layButtons->addWidget(btnGuessCurrent, row, 0);
+    btnGuessRunsCurrent=createButtonAndActionShowText(actGuessRunsCurrent, QIcon(":/lib/fit_guessallruns.png"), tr("Guess All &%1s").arg(m_runName), this);
+    actGuessRunsCurrent->setToolTip(tr("perform a parameter-guessing for all %1s in the currently selected file ").arg(m_runName));
+    btnGuessRunsCurrent->setVisible(false);
+    actGuessRunsCurrent->setVisible(false);
+    layButtons->addWidget(btnGuessRunsCurrent, row, 1);
+
+    row++;
+    btnGuessAll=createButtonAndActionShowText(actGuessAll, QIcon(":/lib/fit_guessallfiles.png"), tr("Guess All &Files (Current %1)").arg(m_runName), this);
+    actGuessAll->setToolTip(tr("perform a parameter-guessing for all files, but Guess in each file only the currently displayed %1").arg(m_runName));
+    btnGuessAll->setVisible(false);
+    actGuessAll->setVisible(false);
+    layButtons->addWidget(btnGuessAll, row, 0);
+    btnGuessRunsAll=createButtonAndActionShowText(actGuessRunsAll, QIcon(":/lib/fit_guessall.png"), tr("Guess &Everything"), this);
+    actGuessRunsAll->setToolTip(tr("perform a parameter-guessing for all %1s in all files").arg(m_runName));
+    btnGuessRunsAll->setVisible(false);
+    actGuessRunsAll->setVisible(false);
+    layButtons->addWidget(btnGuessRunsAll, row, 1);
+
+    row++;
     actChi2Landscape=new QAction(tr("&Plot &Chi2 Landscape"), this);
     connect(actChi2Landscape, SIGNAL(triggered()), this, SLOT(plotChi2Landscape()));
 
 
-    btnLoadParameters=createButtonAndActionShowText(actLoadParameters, QIcon(":/fcsfit/param_load.png"), tr("&Load Parameters"), this);
-    actLoadParameters->setToolTip(tr("load a FCS fit parameter set from a file.\nThe parameter set files can be created using \"Save Parameters\""));
-    layButtons->addWidget(btnLoadParameters, 7, 0);
-    btnSaveParameters=createButtonAndActionShowText(actSaveParameters, QIcon(":/fcsfit/param_save.png"), tr("&Save Parameters"), this);
-    actSaveParameters->setToolTip(tr("save the current FCS fit parameter as a set to a file\nfor later reuse with \"Load Parameters\""));
-    layButtons->addWidget(btnSaveParameters, 7, 1);
+    row++;
+    btnLoadParameters=createButtonAndActionShowText(actLoadParameters, QIcon(":/lib/param_load.png"), tr("&Load Parameters"), this);
+    actLoadParameters->setToolTip(tr("load a fit parameter set from a file.\nThe parameter set files can be created using \"Save Parameters\""));
+    layButtons->addWidget(btnLoadParameters, row, 0);
+    btnSaveParameters=createButtonAndActionShowText(actSaveParameters, QIcon(":/lib/param_save.png"), tr("&Save Parameters"), this);
+    actSaveParameters->setToolTip(tr("save the current fit parameter as a set to a file\nfor later reuse with \"Load Parameters\""));
+    layButtons->addWidget(btnSaveParameters, row, 1);
 
     layModel->addLayout(layButtons);
 
@@ -478,15 +544,15 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     toolbar->addAction(actSaveReport);
     toolbar->addAction(actPrintReport);
     toolbar->addSeparator();
-    toolbar->addAction(pltData->get_plotter()->get_actSavePlot()); pltData->get_plotter()->get_actSavePlot()->setIcon(QIcon(":/fcsfit/plot_saveplot.png"));
-    toolbar->addAction(pltData->get_plotter()->get_actSaveData()); pltData->get_plotter()->get_actSaveData()->setIcon(QIcon(":/fcsfit/plot_savedata.png"));
-    toolbar->addAction(pltData->get_plotter()->get_actPrint()); pltData->get_plotter()->get_actPrint()->setIcon(QIcon(":/fcsfit/plot_print.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actSavePlot()); pltData->get_plotter()->get_actSavePlot()->setIcon(QIcon(":/lib/plot_saveplot.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actSaveData()); pltData->get_plotter()->get_actSaveData()->setIcon(QIcon(":/lib/plot_savedata.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actPrint()); pltData->get_plotter()->get_actPrint()->setIcon(QIcon(":/lib/plot_print.png"));
     toolbar->addSeparator();
     toolbar->addAction(pltData->get_plotter()->get_actCopyPixelImage());
     toolbar->addAction(pltData->get_plotter()->get_actCopyData());
     toolbar->addAction(pltData->get_plotter()->get_actCopyMatlab());
     toolbar->addSeparator();
-    toolbar->addAction(pltData->get_plotter()->get_actZoomAll()); pltData->get_plotter()->get_actZoomAll()->setIcon(QIcon(":/fcsfit/plot_zoomall.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actZoomAll()); pltData->get_plotter()->get_actZoomAll()->setIcon(QIcon(":/lib/plot_zoomall.png"));
     connect(pltData->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), pltResiduals, SLOT(zoomToFit()));
     toolbar->addSeparator();
     toolbar->addWidget(lPS);
@@ -496,13 +562,32 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     toolbar->addWidget(lRS);
     toolbar->addWidget(chkWeightedResiduals);
     toolbar->addWidget(cmbResidualStyle);
-    toolbar->addWidget(sp1);
-    toolbar->addWidget(chkGrid);
-    toolbar->addWidget(chkKey);
-    toolbar->addWidget(chkXLogScale);
-    toolbar->addSeparator();
+    if (twoToolbars) {
+        toolbar2->addWidget(sp1);
+        toolbar2->addWidget(lGS);
+        actXLogScale= toolbar2->addWidget(chkXLogScale);
+        actYLogScale=toolbar2->addWidget(chkYLogScale);
+        toolbar2->addWidget(chkGrid);
+        toolbar2->addWidget(chkKey);
+        //toolbar2->addSeparator();
+    } else {
+        toolbar->addWidget(sp1);
+        toolbar->addWidget(lGS);
+        actXLogScale= toolbar->addWidget(chkXLogScale);
+        actYLogScale=toolbar->addWidget(chkYLogScale);
+        toolbar->addWidget(chkGrid);
+        toolbar->addWidget(chkKey);
+        //toolbar->addSeparator();
+        cmbErrorStyle->setMaximumWidth(100);
+        cmbPlotStyle->setMaximumWidth(100);
+        cmbResidualStyle->setMaximumWidth(100);
+    }
+
     toolbar->addWidget(sp2);
     toolbar->addWidget(labMousePosition);
+    actYLogScale->setVisible(false);
+    actXLogScale->setVisible(false);
+
 
     connect(actAlgorithmHelp, SIGNAL(triggered()), this, SLOT(displayFitAlgorithmHelp()));
     connect(actConfigAlgorithm, SIGNAL(triggered()), this, SLOT(configFitAlgorithm()));
@@ -517,6 +602,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     connect(actFitAll, SIGNAL(triggered()), this, SLOT(fitAll()));
     connect(actFitRunsAll, SIGNAL(triggered()), this, SLOT(fitRunsAll()));
     connect(actFitRunsCurrent, SIGNAL(triggered()), this, SLOT(fitRunsCurrent()));
+    connect(actGuessCurrent, SIGNAL(triggered()), this, SLOT(guessCurrent()));
+    connect(actGuessAll, SIGNAL(triggered()), this, SLOT(guessAll()));
+    connect(actGuessRunsAll, SIGNAL(triggered()), this, SLOT(guessRunsAll()));
+    connect(actGuessRunsCurrent, SIGNAL(triggered()), this, SLOT(guessRunsCurrent()));
     connect(actResetCurrent, SIGNAL(triggered()), this, SLOT(resetCurrent()));
     connect(actResetAll, SIGNAL(triggered()), this, SLOT(resetAll()));
     connect(actCopyToAll, SIGNAL(triggered()), this, SLOT(copyToAll()));
@@ -551,6 +640,11 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
 
     menuFit=propertyEditor->addMenu("&Fit", 0);
+    menuFit->addAction(actGuessCurrent);
+    menuFit->addAction(actGuessRunsCurrent);
+    menuFit->addAction(actGuessRunsAll);
+    menuFit->addAction(actGuessAll);
+    actFitSeparator=menuFit->addSeparator();
     menuFit->addAction(actFitCurrent);
     menuFit->addAction(actFitRunsCurrent);
     menuFit->addAction(actFitRunsAll);
@@ -587,15 +681,15 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
 
 
-    actFitAllFilesThreaded=new QAction(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files, this %1 (MT)").arg(m_runName), this);
+    actFitAllFilesThreaded=new QAction(QIcon(":/lib/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files, this %1 (MT)").arg(m_runName), this);
     actFitAllFilesThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
     connect (actFitAllFilesThreaded, SIGNAL(triggered()), this, SLOT(fitAllFilesThreaded()));
 
-    actFitAllThreaded=new QAction(QIcon(":/imfcsfit/fit_fitall.png"), tr("Fit Everything (MT)"), this);
+    actFitAllThreaded=new QAction(QIcon(":/lib/fit_fitall.png"), tr("Fit Everything (MT)"), this);
     actFitAllThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, and all %1s therein (everything)").arg(m_runName));
     connect (actFitAllThreaded, SIGNAL(triggered()), this, SLOT(fitEverythingThreaded()));
 
-    actFitAllRunsThreaded=new QAction(QIcon(":/imfcsfit/fit_fitallruns.png"), tr("Fit All %1s, this file (MT)").arg(m_runName), this);
+    actFitAllRunsThreaded=new QAction(QIcon(":/lib/fit_fitallruns.png"), tr("Fit All %1s, this file (MT)").arg(m_runName), this);
     actFitAllRunsThreaded->setToolTip(tr("multi-threaded: perform a fit for all %1s, in the current file").arg(m_runName));
     connect (actFitAllRunsThreaded, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
 
@@ -608,17 +702,28 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
         menuFit->insertAction(actFitRunsCurrent, actFitAllThreaded);
         menuFit->insertSeparator(actFitRunsCurrent);
     }
+
+    menuEstimate=new QMenu(tr("Estimate Parameters ..."), this);
+    menuEstimate->setIcon(QIcon(":/lib/fit_guesscurrent.png"));
+    menuEstimateDblClk=new QMenu(tr("Estimate Parameters ..."), this);
+    menuEstimateDblClk->setIcon(QIcon(":/lib/fit_guesscurrent.png"));
+    pltData->addAction(menuEstimate->menuAction());
+    connect(pltData, SIGNAL(contextMenuOpened(double,double,QMenu*)), this, SLOT(dataplotContextMenuOpened(double,double,QMenu*)));
+    pltData->set_leftDoubleClickAction(QFPlotter::LeftDoubleClickSpecialContextMenu);
+    pltData->set_menuSpecialContextMenu(menuEstimateDblClk);
+
 }
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEvaluationItem *current, QFEvaluationItem *old, bool updatePlots) {
     QFFitResultsByIndexEvaluationEditorBase::connectDefaultWidgets(current, old, updatePlots);
 
-    QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
 
     if (old!=NULL) {
         disconnect(old, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
         disconnect(datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
-        disconnect(spinRun, SIGNAL(valueChanged(int)), this, SLOT(runChanged(int)));
+        if (spinRun) disconnect(spinRun, SIGNAL(valueChanged(int)), this, SLOT(runChanged(int)));
+        if (cmbRun) disconnect(cmbRun, SIGNAL(currentIndexChanged(int)), this, SLOT(runCmbChanged(int)));
         disconnect(cmbAlgorithm, SIGNAL(currentIndexChanged(int)), this, SLOT(algorithmChanged(int)));
         disconnect(cmbModel, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged(int)));
         disconnect(cmbPlotStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotStyleChanged(int)));
@@ -626,21 +731,24 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
         disconnect(chkGrid, SIGNAL(toggled(bool)), this, SLOT(chkGridToggled(bool)));
         disconnect(chkKey, SIGNAL(toggled(bool)), this, SLOT(chkKeyToggled(bool)));
         disconnect(chkXLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
+        disconnect(chkYLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
         disconnect(cmbResidualStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(residualStyleChanged(int)));
         disconnect(chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(chkWeightedResidualsToggled(bool)));
         disconnect(spinResidualHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(residualHistogramBinsChanged(int)));
 
         cmbModel->clear();
         cmbAlgorithm->clear();
-        spinRun->setMaximum(-1);
+        if (spinRun) spinRun->setMaximum(-1);
+        cmbRun->clear();
     }
 
 
 
-    if (fcs) {
+    if (eval) {
 
         dataEventsEnabled=false;
-        chkXLogScale->setChecked(current->getProperty("plot_taulog", true).toBool());
+        chkXLogScale->setChecked(current->getProperty("plot_taulog", getPlotXLog()).toBool());
+        chkYLogScale->setChecked(current->getProperty("plot_ylog", getPlotYLog()).toBool());
         chkGrid->setChecked(current->getProperty("plot_grid", true).toBool());
         chkKey->setChecked(current->getProperty("plot_key", true).toBool());
         cmbPlotStyle->setCurrentIndex(current->getProperty("plot_style", 0).toInt());
@@ -649,28 +757,24 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
         chkWeightedResiduals->setChecked(current->getProperty("weighted_residuals", false).toBool());
         spinResidualHistogramBins->setValue(current->getProperty("plot_residualshistogrambins", 25).toInt());
 
-        /*QStringList ff=fcs->getAvailableFitFunctions();
+
+
+        cmbModel->updateFitFunctions(eval->getAvailableFitFunctions());
+        QStringList ff=eval->getAvailableFitAlgorithms();
         for (int i=0; i<ff.size(); i++) {
             QString id=ff[i];
-            if (fcs->getFitFunction(id)) cmbModel->addItem(QIcon(":/lib/fitfunc_icon.png"), fcs->getFitFunction(id)->name(), id);
-            else  cmbModel->addItem(QIcon(":/lib/fitfunc_icon.png"), tr("unknown fit function"), id);
-        }*/
-        cmbModel->updateFitFunctions(fcs->getAvailableFitFunctions());
-        QStringList ff=fcs->getAvailableFitAlgorithms();
-        for (int i=0; i<ff.size(); i++) {
-            QString id=ff[i];
-            if (fcs->getFitAlgorithm(id)->isThreadSafe()) cmbAlgorithm->addItem(QIcon(":/lib/fitalg_icon_mt.png"), fcs->getFitAlgorithm(id)->name(), id);
-            else cmbAlgorithm->addItem(QIcon(":/lib/fitalg_icon.png"), fcs->getFitAlgorithm(id)->name(), id);
+            if (eval->getFitAlgorithm(id)->isThreadSafe()) cmbAlgorithm->addItem(QIcon(":/lib/fitalg_icon_mt.png"), eval->getFitAlgorithm(id)->name(), id);
+            else cmbAlgorithm->addItem(QIcon(":/lib/fitalg_icon.png"), eval->getFitAlgorithm(id)->name(), id);
         }
 
 
-        if (fcs->getFitFunction()!=NULL) {
-            cmbModel->setCurrentFitFunction(fcs->getFitFunction()->id());
+        if (eval->getFitFunction()!=NULL) {
+            cmbModel->setCurrentFitFunction(eval->getFitFunction()->id());
         } else {
             cmbModel->setCurrentFitFunction("");
         }
-        if (fcs->getFitAlgorithm()!=NULL) {
-            cmbAlgorithm->setCurrentIndex(cmbAlgorithm->findData(fcs->getFitAlgorithm()->id()));
+        if (eval->getFitAlgorithm()!=NULL) {
+            cmbAlgorithm->setCurrentIndex(cmbAlgorithm->findData(eval->getFitAlgorithm()->id()));
         } else {
             cmbAlgorithm->setCurrentIndex(-1);
         }
@@ -681,20 +785,22 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
     connect(cmbAlgorithm, SIGNAL(currentIndexChanged(int)), this, SLOT(algorithmChanged(int)));
     connect(current, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
     connect(datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
-    connect(spinRun, SIGNAL(valueChanged(int)), this, SLOT(runChanged(int)));
+    if (spinRun) connect(spinRun, SIGNAL(valueChanged(int)), this, SLOT(runChanged(int)));
+    if (cmbRun) connect(cmbRun, SIGNAL(currentIndexChanged(int)), this, SLOT(runCmbChanged(int)));
     connect(cmbModel, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged(int)));
     connect(cmbPlotStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotStyleChanged(int)));
     connect(cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(errorStyleChanged(int)));
     connect(chkGrid, SIGNAL(toggled(bool)), this, SLOT(chkGridToggled(bool)));
     connect(chkKey, SIGNAL(toggled(bool)), this, SLOT(chkKeyToggled(bool)));
     connect(chkXLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
+    connect(chkYLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
     connect(cmbResidualStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(residualStyleChanged(int)));
     connect(chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(chkWeightedResidualsToggled(bool)));
     connect(spinResidualHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(residualHistogramBinsChanged(int)));
 
     if (updatePlots) {
-        displayModel(true);
         replotData();
+        displayModel(true);
     }
 }
 
@@ -745,8 +851,6 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues(QFRaw
     QTime t;
     t.start();
 
-    //qDebug()<<"QFFCSFitEvaluationEditor::updateParameterValues()";
-    //QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction(rec);
 
@@ -772,6 +876,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues(QFRaw
         }
     }
 
+    QMapIterator<QAction*,QString> it(actsEstimate);
+    while (it.hasNext()) {
+        it.next();
+        it.key()->setVisible(ffunc->isParameterVisible(it.value(), fullParams));
+    }
+
     qfFree(fullParams);
     qfFree(errors);
 
@@ -781,6 +891,133 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues(QFRaw
 
     widParameters->setUpdatesEnabled(true);
 
+}
+
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::dataplotContextMenuOpened(double x, double y, QMenu */*contextMenu*/)
+{
+    if (!current) return;
+    if (!cmbModel) return;
+
+
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction(current->getHighlightedRecord());
+
+    if (!ffunc) return;
+
+    QVector<double> fullParams=eval->allocVecFillParameters(ffunc);
+    QVector<double> errors=eval->allocVecFillParameterErrors(ffunc);
+    ffunc->calcParameter(fullParams, errors);
+
+
+    QMapIterator<QAction*,QString> it(actsEstimate);
+    while (it.hasNext()) {
+        it.next();
+        if (it.key()->isVisible()) {
+            QString id=it.value();
+            double np=eval->getFitValue(eval->getHighlightedRecord(), eval->getCurrentIndex(), id);
+            if (ffunc->estimateParameterFromXY(np, id, x, y, fullParams)) {
+                QFFitFunction::ParameterDescription d=ffunc->getDescription(id);
+                it.key()->setText(tr("estimate '%1' = %2 %3").arg(d.name).arg(np).arg(d.unit));
+            }
+        }
+
+    }
+}
+
+QString QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotXLabel() const
+{
+    return tr("lag time $\\tau$ [seconds]");
+}
+
+QString QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotYLabel() const
+{
+    return tr("correlation function $g(\\tau)$");
+}
+
+QString QFFitResultsByIndexEvaluationEditorWithWidgets::getFitName() const
+{
+    return tr("FCS Fit");
+}
+
+bool QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotXLog() const
+{
+    return true;
+}
+
+bool QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotYLog() const
+{
+    return false;
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::setGuessingEnabled(bool enabled, bool currentOnly)
+{
+    actGuessCurrent->setVisible(enabled);
+    btnGuessCurrent->setVisible(enabled);
+
+    btnGuessAll->setVisible(enabled);
+    actGuessAll->setVisible(enabled);
+
+    bool enmulti=enabled;
+    if (currentOnly) enmulti=false;
+
+    btnGuessRunsCurrent->setVisible(enmulti);
+    actGuessRunsCurrent->setVisible(enmulti);
+
+    btnGuessRunsAll->setVisible(enmulti);
+    actGuessRunsAll->setVisible(enmulti);
+    if (currentOnly) {
+        layButtons->removeWidget(btnGuessRunsCurrent);
+        layButtons->removeWidget(btnGuessAll);
+        layButtons->addWidget(btnGuessAll, guessrow, 1);
+        layButtons->addWidget(btnGuessRunsCurrent, guessrow+1,0);
+    } else {
+        layButtons->removeWidget(btnGuessRunsCurrent);
+        layButtons->removeWidget(btnGuessAll);
+        layButtons->addWidget(btnGuessAll, guessrow+1,0);
+        layButtons->addWidget(btnGuessRunsCurrent, guessrow,1);
+    }
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::estimateActionClicked()
+{
+    if (!current) return;
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction(current->getHighlightedRecord());
+    if (!ffunc || !eval) return;
+    if (!eval->getHighlightedRecord()) return;
+    QFRawDataRecord* rdr=eval->getHighlightedRecord();
+
+    QAction* act=qobject_cast<QAction*>(sender());
+    if (act && actsEstimate.contains(act)) {
+        QString id=actsEstimate[act];
+        double np=eval->getFitValue(rdr, eval->getCurrentIndex(), id);
+        if (ffunc->estimateParameterFromXY(np, id, pltData->get_mouseContextX(), pltData->get_mouseContextY(), eval->allocVecFillParameters(ffunc))) {
+
+            eval->setFitValue(rdr, eval->getCurrentIndex(), id, np);
+            updateParameterValues(rdr);
+            replotData();
+        }
+    }
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::clearEstimateActions()
+{
+    if (menuEstimate) {
+        for(int i=0; i<menuEstimate->actions().size(); i++) {
+            if (!menuEstimate->actions().at(i)->isSeparator()) disconnect(menuEstimate->actions().at(i), SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
+        }
+        menuEstimate->clear();
+    }
+    if (menuEstimateDblClk) {
+        for(int i=0; i<menuEstimateDblClk->actions().size(); i++) {
+            if (!menuEstimateDblClk->actions().at(i)->isSeparator()) disconnect(menuEstimateDblClk->actions().at(i), SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
+        }
+        menuEstimateDblClk->clear();
+    }
+    actsEstimate.clear();
 }
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::populateFitButtons(bool mulThreadEnabledInModel)
@@ -820,6 +1057,24 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::populateFitButtons(bool mul
 
 }
 
+void QFFitResultsByIndexEvaluationEditorWithWidgets::fillRunCombo(QFFitResultsByIndexEvaluation *eval, QFRawDataRecord* rdr)
+{
+    if (!cmbRun) return;
+    int imin=eval->getIndexMin(rdr);
+    int imax=eval->getIndexMax(rdr);
+    cmbRun->clear();
+    for (int i=imin; i<=imax; i++) {
+        cmbRun->addItem(QString("%2 #%1").arg(i).arg(m_runName));
+    }
+}
+
+int QFFitResultsByIndexEvaluationEditorWithWidgets::getCurrentRunFromWidget() const
+{
+    if (spinRun) return spinRun->value();
+    if (cmbRun) return cmbRun->currentData().toInt();
+    return 0;
+}
+
 void QFFitResultsByIndexEvaluationEditorWithWidgets::plotMouseMove(double x, double y) {
     labMousePosition->setTextFormat(Qt::RichText);
     labMousePosition->setText(tr("cursor: (%1, %2)").arg(floattohtmlstr(x).c_str()).arg(floattohtmlstr(y).c_str()));
@@ -828,9 +1083,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::plotMouseMove(double x, dou
 void QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(QFRawDataRecord *formerRecord, QFRawDataRecord *currentRecord)
 {
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
+    if (formerRecord) disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
     bool modelChanged=false;
     if (currentRecord) {
+        if (!formerRecord) eval->setCurrentIndex(eval->getIndexMax(currentRecord));
         connect(currentRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
 
         datacut->disableSliderSignals();
@@ -842,12 +1098,21 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(QFRawDa
         datacut->set_userMax(getUserMax(getUserRangeMax(currentRecord, eval->getCurrentIndex())));
         datacut->enableSliderSignals();
         dataEventsEnabled=false;
-        spinRun->setMaximum(eval->getIndexMax(currentRecord));
-        spinRun->setMinimum(eval->getIndexMin(currentRecord));
-        //if (data->getCorrelationRuns()==1) spinRun->setMaximum(-1);
-        spinRun->setValue(eval->getCurrentIndex());//currentRecord->getProperty(resultID+"_selected_run", -1).toInt());
-        //if (data->getCorrelationRuns()>1)
-        spinRun->setSuffix(QString(" / %2..%1").arg(eval->getIndexMax(currentRecord)).arg(eval->getIndexMin(currentRecord)));
+        if (spinRun) {
+            spinRun->setMaximum(eval->getIndexMax(currentRecord));
+            spinRun->setMinimum(eval->getIndexMin(currentRecord));
+            //if (data->getCorrelationRuns()==1) spinRun->setMaximum(-1);
+            spinRun->setValue(eval->getCurrentIndex());//currentRecord->getProperty(resultID+"_selected_run", -1).toInt());
+            if (eval->getCurrentIndex()!=spinRun->value()) eval->setCurrentIndex(spinRun->value());
+            //if (data->getCorrelationRuns()>1)
+            spinRun->setSuffix(QString(" / %2..%1").arg(eval->getIndexMax(currentRecord)).arg(eval->getIndexMin(currentRecord)));
+        }
+        if (cmbRun) {
+            fillRunCombo(eval, currentRecord);
+            cmbRun->setCurrentData(eval->getCurrentIndex());
+            if (cmbRun->currentIndex()<0) cmbRun->setCurrentIndex(0);
+        }
+        if (eval->getCurrentIndex()!=getCurrentRunFromWidget()) eval->setCurrentIndex(getCurrentRunFromWidget());
         QString oldID=cmbModel->currentFitFunctionID();
         cmbModel->setCurrentFitFunction(eval->getFitFunction()->id());
         if (cmbModel->currentFitFunctionID()!=oldID) modelChanged=true;
@@ -868,11 +1133,11 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(QFRawDa
 void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget) {
     if (!current) return;
     if (!cmbModel) return;
-    //QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    QFFitFunction* ffunc=eval->getFitFunction();
+    QFRawDataRecord* rdr=eval->getHighlightedRecord();
+    QFFitFunction* ffunc=eval->getFitFunction(rdr);
 
-    //qDebug()<<" **** displayModel()";
+    //qDebug()<<" **** displayModel() rdr="<<rdr<<"  idx="<<eval->getCurrentIndex()<<"  idxM="<<eval->getCurrentIndexM();
 
     if (!ffunc) {
         /////////////////////////////////////////////////////////////////////////////////////////////
@@ -895,6 +1160,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         }
         m_fitParameters.clear();
         widParameters->setUpdatesEnabled(true);
+        clearEstimateActions();
         //setUpdatesEnabled(updEn);
         return;
     }
@@ -908,6 +1174,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         // first delete all fit parameter widgets
         /////////////////////////////////////////////////////////////////////////////////////////////
         widParameters->setUpdatesEnabled(false);
+        clearEstimateActions();
         for (int i=0; i<m_fitParameters.size(); i++) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
@@ -988,9 +1255,39 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         // add stretcher item in bottom row
         layParameters->addItem(new QSpacerItem(5,5, QSizePolicy::Minimum, QSizePolicy::Expanding), layParameters->rowCount(), 0);
         widParameters->setUpdatesEnabled(true);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // create new parameter actions
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        QAction* act=menuEstimateDblClk->addSection( tr("Estimate ..."));
+        if (act) act->setIcon(QIcon(":/lib/fit_guesscurrent.png"));
+        //menuEstimateDblClk->addSeparator();
+
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            QString id=ffunc->getParameterID(i);
+
+            QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+            if (ffunc->isParameterXYEstimateable(i)
+                    && (d.widgetType==QFFitFunction::LogFloatNumber || d.widgetType==QFFitFunction::FloatNumber)
+                    && (d.fit || d.userEditable)) {
+                QAction* act=new QAction(tr("... parameter '%1'").arg(d.name), this);
+                connect(act, SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
+                actsEstimate.insert(act, id);
+                menuEstimate->addAction(act);
+                menuEstimateDblClk->addAction(act);
+            }
+        }
+        bool enGuess=ffunc->isEstimateInitialAvailable();
+        actGuessAll->setEnabled(enGuess);
+        actGuessCurrent->setEnabled(enGuess);
+        actGuessRunsAll->setEnabled(enGuess);
+        actGuessRunsCurrent->setEnabled(enGuess);
+
     }
 
-    if (eval->getCurrentIndex()!=spinRun->value()) eval->setCurrentIndex(eval->getCurrentIndex());
+    /*int crun=getCurrentRunFromWidget();
+    if (eval->getCurrentIndex()!=crun) eval->setCurrentIndex(crun);*/
+    int crun=eval->getCurrentIndex();
 
     if (eval->hasFit()) {
         labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
@@ -1000,7 +1297,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         labFitResult->setText("");
     }
 
-    updateParameterValues(eval->getHighlightedRecord());
+    updateParameterValues(rdr);
     //setUpdatesEnabled(updEn);
 }
 
@@ -1044,7 +1341,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayFitAlgorithmHelp()
         //hlpAlgorithm->updateHelp(help);
         //hlpAlgorithm->show();
     } else {
-        QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit algorithm available."));
+        QMessageBox::information(this, getFitName(), tr("No Online-Help for this fit algorithm available."));
     }
 }
 
@@ -1109,6 +1406,19 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::runChanged(int run)
     //qDebug()<<"QFFitResultsByIndexEvaluationEditorWithWidgets::runChanged("<<run<<") ... done";
 }
 
+void QFFitResultsByIndexEvaluationEditorWithWidgets::runCmbChanged(int run)
+{
+    if (cmbRun) {
+        QVariant v=cmbRun->itemData(run).toInt();
+        bool ok=false;
+        int idx=v.toInt(&ok);
+        if (ok && v.isValid()) runChanged(idx);
+        runChanged(cmbRun->currentIndex());
+    } else {
+        runChanged(run);
+    }
+}
+
 void QFFitResultsByIndexEvaluationEditorWithWidgets::modelChanged(int /*model*/)
 {
     if (!dataEventsEnabled) return;
@@ -1144,6 +1454,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::chkXLogScaleToggled(bool /*
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     current->setQFProperty("plot_taulog", chkXLogScale->isChecked(), false, false);
+    current->setQFProperty("plot_ylog", chkYLogScale->isChecked(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
 }
@@ -1275,6 +1586,59 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitCurrent() {
 
     //qDebug()<<"++++++ updating fit interface";
     dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    //qDebug()<<"++++++ before displayModel "<<tim.elapsed();
+    displayModel(false);
+    //qDebug()<<"++++++ before replotData "<<tim.elapsed();
+    replotData();
+    QApplication::restoreOverrideCursor();
+    //qDebug()<<"++++++ before dlgFitProgress->done() "<<tim.elapsed();
+    dlgFitProgress->done();
+    falg->setReporter(NULL);
+    //qDebug()<<"++++++ before processing events "<<tim.elapsed();
+    QApplication::processEvents();
+    //qDebug()<<"++++++ before emitting results changed "<<tim.elapsed();
+    current->emitResultsChanged();
+    //qDebug()<<"++++++ done "<<tim.elapsed();
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::guessCurrent()
+{
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!falg)) return;
+
+    falg->setReporter(dlgFitProgressReporter);
+    QString runname=tr("average");
+    if (eval->getCurrentIndex()>=0) runname=QString::number(eval->getCurrentIndex());
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess '%1', run %3<br>using model '%2' \n").arg(record->getName()).arg(ffunc->name()).arg(runname));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    dlgFitProgress->setAllowCancel(true);
+    dlgFitProgress->display();
+    QApplication::processEvents();
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+
+    feval->doFit(record, eval->getCurrentIndex(), getUserMin(record, eval->getCurrentIndex(), datacut->get_userMin()), getUserMax(record, eval->getCurrentIndex(), datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool(), true);
+    record->enableEmitResultsChanged(true);
+
+    QTime tim;
+    tim.start();
+
+    //qDebug()<<"++++++ updating fit interface";
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess done ... updating user interface\n"));
     dlgFitProgress->reportStatus("");
     dlgFitProgress->setProgressMax(100);
     dlgFitProgress->setSuperProgressMax(100);
@@ -1529,8 +1893,239 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
 }
 
 
+void QFFitResultsByIndexEvaluationEditorWithWidgets::guessRunsCurrent() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!eval)||(!falg)) return;
 
 
+    int runmax=eval->getIndexMax(record);
+    int runmin=eval->getIndexMin(record);
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess all runs<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(runmax-runmin);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->setAllowCancel(true);
+    dlgFitProgress->display();
+    QApplication::processEvents();
+    QTime time;
+    time.start();
+    for (int run=runmin; run<=runmax; run++) {
+        bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+        if (doall || (!doall && rsel && !rsel->leaveoutRun(run))) {
+            falg->setReporter(dlgFitProgressReporter);
+            QString runname=tr("average");
+            if (run>=0) runname=QString::number(run);
+            double runtime=double(time.elapsed())/1.0e3;
+            double timeperfit=runtime/double(run-runmin);
+            double estimatedRuntime=double(runmax-runmin)*timeperfit;
+            double remaining=estimatedRuntime-runtime;
+            dlgFitProgress->reportSuperStatus(tr("parameter-guess '%1', run %3<br>using model '%2'<br>\nruntime: %4:%5       remaining: %6:%7 [min:secs]       %8 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+
+            //doFit(record, run);
+            feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool(), true);
+
+            dlgFitProgress->incSuperProgress();
+            QApplication::processEvents();
+            falg->setReporter(NULL);
+            if (dlgFitProgress->isCanceled()) break;
+        }
+    }
+    record->enableEmitResultsChanged(true);
+
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    QApplication::processEvents();
+
+    current->emitResultsChanged();
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::guessAll() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(current);
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!falg)) return;
+
+    int run=eval->getCurrentIndex();
+    QString runname=tr("average");
+    if (run>=0) runname=QString::number(run);
+
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess all files and current run (%2) therein<br>using model '%1'\n").arg(ffunc->name()).arg(runname));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(10);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->setAllowCancel(true);
+    dlgFitProgress->display();
+    QApplication::processEvents();
+
+
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+
+    // count the records and runs to work on (for proper superProgress
+    int items=recs.size();
+    dlgFitProgress->setSuperProgressMax(items);
+
+    // iterate through all records and all runs therein and do the fits
+    int jobsDone=0;
+    QTime time;
+    time.start();
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
+        //std::cout<<"i="<<i<<"   run="<<run<<"   record="<<record<<"   data="<<data<<"\n";
+        int runmax=eval->getIndexMax(record);
+        int runmin=eval->getIndexMin(record);
+
+        if (record) {
+            //std::cout<<"   corrN="<<data->getCorrelationN()<<"   corrRuns="<<data->getCorrelationRuns()<<"\n";
+            bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+            if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                falg->setReporter(dlgFitProgressReporter);
+                double runtime=double(time.elapsed())/1.0e3;
+                double timeperfit=runtime/double(jobsDone);
+                double estimatedRuntime=double(items)*timeperfit;
+                double remaining=estimatedRuntime-runtime;
+                dlgFitProgress->reportSuperStatus(QString(tr("parameter-guess '%1', ")+m_runName+tr(" %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec")).arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(uint(int(runtime)%60)),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+
+                //doFit(record, run);
+                feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool(), true);
+
+                falg->setReporter(NULL);
+                QApplication::processEvents();
+                if (dlgFitProgress->isCanceled()) break;
+                jobsDone++;
+            }
+            dlgFitProgress->incSuperProgress();
+            record->enableEmitResultsChanged(true);
+        }
+    }
+
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    QApplication::processEvents();
+
+    current->emitResultsChanged();
+
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::guessRunsAll() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!falg)) return;
+
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess all files and all %2s therein<br>using model '%1'\n").arg(ffunc->name()).arg(m_runName));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(10);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    dlgFitProgress->setAllowCancel(true);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->display();
+    QApplication::processEvents();
+
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+
+    // count the records and runs to work on (for proper superProgress
+    int items=0;
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+
+        if (record ) {
+            int runmax=eval->getIndexMax(record);
+            int runmin=eval->getIndexMin(record);
+            items=items+runmax-runmin+1;
+        }
+    }
+    dlgFitProgress->setSuperProgressMax(items);
+
+    // iterate through all records and all runs therein and do the fits
+    QTime time;
+    time.start();
+    int jobsDone=0;
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
+
+        if (record ) {
+            record->setResultsInitSize(qMax(1000, items));
+            record->setEvaluationIDMetadataInitSize(1000);
+            int runmax=eval->getIndexMax(record);
+            int runmin=eval->getIndexMin(record);
+            for (int run=runmin; run<=runmax; run++) {
+                bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+                if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                    falg->setReporter(dlgFitProgressReporter);
+                    QString runname=tr("average");
+                    if (run>=0) runname=QString::number(run);
+                    double runtime=double(time.elapsed())/1.0e3;
+                    double timeperfit=runtime/double(jobsDone);
+                    double estimatedRuntime=double(items)*timeperfit;
+                    double remaining=estimatedRuntime-runtime;
+                    dlgFitProgress->reportSuperStatus(QString("parameter-guess '%1', "+m_runName+" %3<br>using model '%2'<br>\nruntime: %4:%5       remaining: %6:%7 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+
+                    //doFit(record, run);
+                    feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool(), true);
+
+                    dlgFitProgress->incSuperProgress();
+                    QApplication::processEvents();
+                    falg->setReporter(NULL);
+                    if (dlgFitProgress->isCanceled()) break;
+                    jobsDone++;
+                }
+            }
+            record->enableEmitResultsChanged(true);
+        }
+    }
+
+    dlgFitProgress->reportSuperStatus(tr("parameter-guess done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    QApplication::processEvents();
+
+    current->emitResultsChanged();
+
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+}
 
 
 
@@ -1936,7 +2531,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::plotChi2Landscape()
 {
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!data) return;
-    QFFCSFitChi2LandscapeDialog* dlgChi2=new QFFCSFitChi2LandscapeDialog(data, data->getHighlightedRecord(), data->getCurrentIndex(), data->getFitFunction(), this);
+    QFFitChi2LandscapeDialog* dlgChi2=new QFFitChi2LandscapeDialog(data, data->getHighlightedRecord(), data->getCurrentIndex(), data->getFitFunction(), this);
     dlgChi2->exec();
 
     delete dlgChi2;
@@ -1944,6 +2539,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::plotChi2Landscape()
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::gotoFirstRun()
 {
-    spinRun->setValue(spinRun->minimum());
+    if (spinRun) spinRun->setValue(spinRun->minimum());
+    if (cmbRun) cmbRun->setCurrentIndex(0);
 }
 

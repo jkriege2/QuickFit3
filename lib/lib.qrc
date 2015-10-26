@@ -36,6 +36,24 @@
         <file alias="lib/file_openfile.png">icons/fileselect.png</file>
         <file alias="lib/file_open.png">icons/fileselect.png</file>
         <file alias="tetris.png">icons/tetris.png</file>
+        <file alias="lib/fit_config.png">icons/fcsfit_configure.png</file>
+        <file alias="lib/fit_help.png">icons/fcsfit_help.png</file>
+        <file alias="lib/fit_savereport.png">icons/fcs_savereport_22.png</file>
+        <file alias="lib/fit_printreport.png">icons/fcs_printreport_22.png</file>
+        <file alias="lib/plot_saveplot.png">icons/fcsplot_saveplot.png</file>
+        <file alias="lib/plot_savedata.png">icons/fcsplot_savedata.png</file>
+        <file alias="lib/plot_print.png">icons/fcsplot_print.png</file>
+        <file alias="lib/plot_zoomall.png">icons/fcsplot_zoomall.png</file>
+        <file alias="lib/plot_points.png">icons/fcsplot_points.png</file>
+        <file alias="lib/plot_pointslines.png">icons/fcsplot_pointslines.png</file>
+        <file alias="lib/plot_lines.png">icons/fcsplot_lines.png</file>
+        <file alias="lib/plot_elines.png">icons/fcsplot_elines.png</file>
+        <file alias="lib/plot_elinesbars.png">icons/fcsplot_elinesbars.png</file>
+        <file alias="lib/plot_ebars.png">icons/fcsplot_ebars.png</file>
+        <file alias="lib/plot_enone.png">icons/fcsplot_enone.png</file>
+        <file alias="lib/fit_fit.png">icons/wizard.png</file>
+        <file alias="lib/param_load.png">icons/fileopen.png</file>
+        <file alias="lib/param_save.png">icons/filesave.png</file>
     </qresource>
     <qresource prefix="/lib/help">
         <file alias="tooltip.png">icons/tooltip.png</file>
@@ -264,8 +282,80 @@
         <file alias="fit_fitall.png">icons/fit_fitall.png</file>
         <file alias="fit_fitallfiles.png">icons/fit_fitallfiles.png</file>
         <file alias="fit_fitallruns.png">icons/fit_fitallruns.png</file>
-        <file alias="fit_fitcurrent.png">icons/fit_fitcurrent.png</file>
         <file alias="fit_fitcurrentrunallfiles.png">icons/fit_fitcurrentrunallfiles.png</file>
+        <file alias="fit_fitcurrent.png">icons/fit_fitcurrent.png</file>
+        <file alias="fit_guesscurrent.png">icons/fit_guesscurrent.png</file>
+        <file alias="fit_guessall.png">icons/fit_guessall.png</file>
+        <file alias="fit_guessallfiles.png">icons/fit_guessallfiles.png</file>
+        <file alias="fit_guessallruns.png">icons/fit_guessallruns.png</file>
+        <file alias="image_importer_icon.png">icons/image_importer_icon.png</file>
+        <file alias="image_importer_icon_large.png">icons/image_importer_icon_large.png</file>
+        <file alias="image_exporter_icon.png">icons/image_exporter_icon.png</file>
+        <file alias="image_exporter_icon_large.png">icons/image_exporter_icon_large.png</file>
+        <file>icons/1downarrow.png</file>
+        <file>icons/1downarrow1.png</file>
+        <file>icons/1leftarrow.png</file>
+        <file>icons/1rightarrow.png</file>
+        <file>icons/1uparrow.png</file>
+        <file>icons/2dowarrow.png</file>
+        <file>icons/2downarrow.png</file>
+        <file>icons/2downarrow1.png</file>
+        <file>icons/2leftarrow.png</file>
+        <file>icons/2rightarrow.png</file>
+        <file>icons/2uparrow.png</file>
+        <file>icons/3dowarrow.png</file>
+        <file>icons/3downarrow.png</file>
+        <file>icons/3uparrow.png</file>
+        <file>icons/db.png</file>
+        <file>icons/db_add.png</file>
+        <file>icons/db_comit.png</file>
+        <file>icons/db_remove.png</file>
+        <file>icons/db_status.png</file>
+        <file>icons/db_update.png</file>
+        <file>icons/fileprint.png</file>
+        <file>icons/filesaveas.png</file>
+        <file>icons/filter.png</file>
+        <file>icons/findf.png</file>
+        <file>icons/finish.png</file>
+        <file>icons/flag.png</file>
+        <file>icons/folder.png</file>
+        <file>icons/folder_new.png</file>
+        <file>icons/move_task_down.png</file>
+        <file>icons/move_task_up.png</file>
+        <file>icons/next.png</file>
+        <file>icons/previous.png</file>
+        <file>icons/rebuild.png</file>
+        <file>icons/recur.png</file>
+        <file>icons/up.png</file>
+        <file>icons/application_exit.png</file>
+        <file>icons/archive_extract.png</file>
+        <file>icons/archive_insert.png</file>
+        <file>icons/archive_insert_directory.png</file>
+        <file>icons/archive_remove.png</file>
+        <file>icons/book.png</file>
+        <file>icons/book2.png</file>
+        <file>icons/bookmark.png</file>
+        <file>icons/document_export.png</file>
+        <file>icons/document_import.png</file>
+        <file>icons/document_new.png</file>
+        <file>icons/document_open.png</file>
+        <file>icons/document_open_folder.png</file>
+        <file>icons/document_open_recent.png</file>
+        <file>icons/document_open_remote.png</file>
+        <file>icons/document_preview.png</file>
+        <file>icons/document_preview_archive.png</file>
+        <file>icons/document_print.png</file>
+        <file>icons/document_print_frame.png</file>
+        <file>icons/document_print_preview.png</file>
+        <file>icons/document_properties.png</file>
+        <file>icons/document_revert.png</file>
+        <file>icons/document_save.png</file>
+        <file>icons/document_save_all.png</file>
+        <file>icons/document_save_as.png</file>
+        <file>icons/document_sign.png</file>
+        <file>icons/document_start_presentation.png</file>
+        <file>icons/documentinfo_koffice.png</file>
+        <file>icons/filequickprint.png</file>
     </qresource>
     <qresource prefix="/lib/qfstyledbutton">
         <file alias="network.png">icons/network.png</file>

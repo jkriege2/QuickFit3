@@ -24,6 +24,7 @@
 #ifndef QFFitFunctionGeneralModHill5P_H
 #define QFFitFunctionGeneralModHill5P_H
 #include "qfpluginfitfunction.h"
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +33,7 @@
     \ingroup qf3fitfunp_fitfunction_general
 
 */
-class QFFitFunctionGeneralModHill5P: public QFFitFunction {
+class QFFitFunctionGeneralModHill5P: public QFCDFFitFunctionBase {
     public:
         QFFitFunctionGeneralModHill5P();
         virtual ~QFFitFunctionGeneralModHill5P() {}

@@ -38,7 +38,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qmodernprogresswidget.h"
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
-
+#include "qffitfunctionplottools.h"
 
 
 
@@ -50,6 +50,7 @@ QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, Q
 
     createWidgets();
     btnFirstRun->setText(tr("avg."));
+    setGuessingEnabled(true, true);
 
 }
 
@@ -200,7 +201,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
 
 
 
-void QFFCSFitEvaluationEditor::updateFitFunctions() {
+void QFFCSFitEvaluationEditor::updateFitFunctionsPlot() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -339,13 +340,18 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot fit model and additional function graphs
                 /////////////////////////////////////////////////////////////////////////////////
-                JKQTPxyLineGraph* g_fit=new JKQTPxyLineGraph(pltData->get_plotter());
+//                JKQTPxyLineGraph* g_fit=new JKQTPxyLineGraph(pltData->get_plotter());
+//                g_fit->set_drawLine(true);
+//                g_fit->set_title("fit function");
+//                g_fit->set_xColumn(c_tau);
+//                g_fit->set_yColumn(c_fit);
+//                g_fit->set_datarange_start(datacut->get_userMin());
+//                g_fit->set_datarange_end(datacut->get_userMax());
+                JKQTPxQFFitFunctionLineGraph* g_fit=new JKQTPxQFFitFunctionLineGraph(pltData);
                 g_fit->set_drawLine(true);
                 g_fit->set_title("fit function");
-                g_fit->set_xColumn(c_tau);
-                g_fit->set_yColumn(c_fit);
-                g_fit->set_datarange_start(datacut->get_userMin());
-                g_fit->set_datarange_end(datacut->get_userMax());
+                g_fit->set_fitFunction(ffunc->id());
+                g_fit->set_copiedParams(fullParams, ffunc->paramCount());
                 for (int i=0; i<(int)ffunc->getAdditionalPlotCount(fullParams); i++) {
                     double* params=eval->allocFillParameters();
                     QString name=ffunc->transformParametersForAdditionalPlot(i, params);
@@ -355,13 +361,18 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                         afitfunc[j]=ffunc->evaluate(tauvals[j], params);
                     }
                     size_t c_afit=ds->addCopiedColumn(afitfunc, N, QString("add_fit_model_%1").arg(i));
-                    JKQTPxyLineGraph* g_afit=new JKQTPxyLineGraph(pltData->get_plotter());
+//                    JKQTPxyLineGraph* g_afit=new JKQTPxyLineGraph(pltData->get_plotter());
+//                    g_afit->set_drawLine(true);
+//                    g_afit->set_title(name);
+//                    g_afit->set_xColumn(c_tau);
+//                    g_afit->set_yColumn(c_afit);
+//                    g_afit->set_datarange_start(datacut->get_userMin());
+//                    g_afit->set_datarange_end(datacut->get_userMax());
+                    JKQTPxQFFitFunctionLineGraph* g_afit=new JKQTPxQFFitFunctionLineGraph(pltData);
                     g_afit->set_drawLine(true);
-                    g_afit->set_title(name);
-                    g_afit->set_xColumn(c_tau);
-                    g_afit->set_yColumn(c_afit);
-                    g_afit->set_datarange_start(datacut->get_userMin());
-                    g_afit->set_datarange_end(datacut->get_userMax());
+                    g_afit->set_title("fit function");
+                    g_afit->set_fitFunction(ffunc->id());
+                    g_afit->set_copiedParams(params, ffunc->paramCount());
                     pltData->addGraph(g_afit);
                     qfFree(params);
                     qfFree(afitfunc);
@@ -957,7 +968,7 @@ void QFFCSFitEvaluationEditor::replotData() {
         //qDebug()<<"   d "<<t.elapsed()<<" ms";
         t.start();
 
-        updateFitFunctions();
+        updateFitFunctionsPlot();
         //qDebug()<<"   e "<<t.elapsed()<<" ms";
         t.start();
 

@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFitFunctionFCSDiffDcAfterPulseAfterPulse_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 /*! \brief plugin class for FCS Normal Diffusion Fit Functions
     \ingroup qf3fitfunp_fcs
@@ -63,7 +63,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
       \f[ \Delta \mbox{cpm}=\sqrt{\left(\Delta\mbox{cps}\cdot\frac{1}{N}\right)^2+\left(\Delta b\cdot\frac{1}{N}\right)^2+\left(\Delta N\cdot\frac{\mbox{cps}-b}{N^2}\right)^2} \f]
 
 */
-class QFFitFunctionFCSDiffDcAfterPulse: public QFFitFunction {
+class QFFitFunctionFCSDiffDcAfterPulse: public QFFCSFitFunctionBase {
     public:
     QFFitFunctionFCSDiffDcAfterPulse(bool hasGamma=true);
     virtual ~QFFitFunctionFCSDiffDcAfterPulse() {}

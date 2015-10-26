@@ -24,7 +24,7 @@
 #ifndef QFFitFunctionGeneralLorentzian_H
 #define QFFitFunctionGeneralLorentzian_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +32,7 @@
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralLorentzian: public QFFitFunction {
+class QFFitFunctionGeneralLorentzian: public QFDistributionFitFunctionBase {
     public:
         QFFitFunctionGeneralLorentzian();
         virtual ~QFFitFunctionGeneralLorentzian() {}
@@ -60,7 +60,6 @@ class QFFitFunctionGeneralLorentzian: public QFFitFunction {
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() const;
 
-        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionGeneralLorentzian_H

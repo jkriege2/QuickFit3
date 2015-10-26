@@ -31,7 +31,7 @@ class QFRDRImagingFCSWizard_ProcessNextId;
 class QFRDRImagingFCSWizard : public QFWizard {
         Q_OBJECT
     public:
-        explicit QFRDRImagingFCSWizard(bool is_project=false, QWidget* parent=NULL);
+        explicit QFRDRImagingFCSWizard(bool is_project=false, bool is_calibration=false, QWidget* parent=NULL);
         ~QFRDRImagingFCSWizard();
         enum Pages {
             InitPage=0,
@@ -159,7 +159,7 @@ class QFRDRImagingFCSWizard : public QFWizard {
         QFFormWizardPage* wizCorrelation;
         QCheckBox* chkACF;
         QCheckBox* chk2ColorFCCS;
-        QComboBox* cmb2PixelFCCS;
+        QFEnhancedComboBox* cmb2PixelFCCS;
         QDoubleSpinBox* spinTauMax;
         QSpinBox* spinSegments;
         QLabel* labSegments;

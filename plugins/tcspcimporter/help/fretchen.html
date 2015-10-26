@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>$$local_plugin_name$$: TCSPC Burst Analyzer</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        $$invisibleref:GANSEN08:Gansen A  (2008) Chromatin at the Nanolevel. Dissertational Thesis. Available at: <a href="http://archiv.ub.uni-heidelberg.de/volltextserver/8342/1/Dissertation_Gansen.pdf">http://archiv.ub.uni-heidelberg.de/volltextserver/8342/1/Dissertation_Gansen.pdf</a> $$
+        <h2>Introduction</h2>
+<a name="burstanalysis"><h3>Burst Analysis</h3>
+<p>This tool allows to read data from single-photon counting (or time-correlated single-photon counting, TCSPC) experiments. Then it tries to detect fluorescence bursts from single molecules passing the focus of the microscope, used for detection. This analysis assumes that two detection channels ("green"/"red") are used. The intensities in these two channels can then be used to calculate FRET-properties of the observed molecules. For each such burst, several properties are measured:
+<ul>
+    <li>when did the burst occur $(t_\text{burst})$</li>
+    <li>burst duration $(\Delta t_\text{burst})$</li>
+    <li>accumulated photon count $(N_g, N_r)$ during the burst in two detection channels (green/red)</li>
+    <li>the photon countrate during a burst: $(\mbox{CR}=(N_g+N_r)/\Delta t_\text{burst})$</li>
+</ul>
+These are used to calculate additional burst properties together with additional data:
+<ul>
+    <li>background count-rates $(B_g,B_r)$ in the two channels</li>
+    <li>crosstalk-coefficient $(\kappa_{gr})$ from the green into the red channel</li>
+    <li>direct excitation rate $(f_{direct})$ of the donor fluorophore with the excitation wavelength</li>
+    <li>FRET detection factor $[ \gamma=\frac{\eta_A\phi_A}{\eta_D\phi_D}, ]$where $(\eta_A,\eta_D)$ are detection efficiencies in the two channels and $(\phi_A,\phi_D)$ are the quantum yields of the acceptor and donor fluorophore.</li>
+</ul>
+The major burst-property is the FRET proximity ratio:
+$[ P=\frac{N_A}{N_A+N_D} ]$
+with the background-, crosstalk- and direct-excitation-corrected number of photons in the acceptor- and donor-channels:
+$[N_D=N_g-B_g\cdot\Delta t_\text{burst}]$
+$[N_A=N_r-(B_r+f_\text{direct})\cdot\Delta t_\text{burst}-\kappa_{gr}\cdot N_D]$
+If in addition, the detection factor $(\gamma)$ is known, also the actual FRET-efficiency can be calculated
+$[ E=\frac{N_A}{N_A+\gamma\cdot N_B}=\frac{1}{1+\gamma\cdot\frac{1-P}{P}}, ]$
+which can be recalculated into a distance $(r_{DA})$ between donor and acceptor, if the F&ouml;rster-radius $(R_0)$ of the fluorophore pair is known:
+$[E(r_{DA})=\frac{1}{1+\left(\frac{r_{DA}}{R_0}\right)^6}\ \ \ \ \ \Rightarrow\ \ \ \ \ r_{DA}(E)=R_0\cdot\left(\frac{1}{E}-1\right)^{1/6}]$
+</p>
+
+
+<a name="burstsearch"><h3>Burst Search</h3>
+<p>In order to perform a burst analysis, the bursts have to be identified first. This is done by a search algorithm, which relies on the interphoton-time (IPT) $(\delta t_i)$ between two consecutive photons $(i)$ and $(i+1)$. Inside bursts, the photons are spaced more closely, than during section with background only. This can be seen in the following interphoton time trace:
+<center><a name="fretchen_pic001"><img src="./pic/fretchen_pic001.png" border="1">
+</center>
+In this image, you can see three bursts, at approximately 1.04s, 1.23s and 1.46s. The burst search algorithm identifies bursts with the following properties:
+<ol>
+    <li>a bursts consists of at least $(N_{burst-min})$ photons</li>
+    <li>the interphoton times inside a burst habe to be shorter than a maximum value of $(\mbox{IPT}_{burst-max})$.</li>
+    <li>A burst has a maximum length of $(\Delta t_\text{burst-max})$</li>
+</ol>
+</p>
+<a name="leefilter"><h3>LEE-Filtering</h3>
+<p>
+The algorithm performance can be optimized, if the IPTs are filtered with a LEE-filter before applying the burst search. The LEE-filter smoothes out outlierst from the data. The IPT-trace above will look as follows if LEE-filtered:
+<center><a name="fretchen_pic002"><img src="./pic/fretchen_pic002.png" border="1">
+</center>
+The LEE-filter works as follows:<br>
+Each IPT is transformed:
+$[ \delta t_i'=\overline{\delta t}_i+(\delta t_i-\overline{\delta t}_i)\cdot\frac{\sigma_i^2}{\sigma_i^2+\sigma_0^2} ]$
+with:
+$[\overline{\delta t}_i=\frac{1}{2m+1}\cdot\sum_{j=-m}^m\delta t_{i+j}]$
+$[\sigma_i^2=\frac{1}{2m+1}\cdot\sum_{j=-m}^m(\delta t_{i+j} - \overline{\delta t}_{i+j})^2.]$
+The LEE filter is then characterized by its two parameters:
+<ul>
+    <li>the window size $(M_{LEE}=2m+1)$. The following image shows the influence of this parameter on the result of the filter:<center><a name="fretchen_pic011"><img src="./pic/fretchen_pic011.png" border="1">
+</center></li>
+    <li>the parameter $(\sigma_0)$, which is usually set to $(\sigma_0=5\;\mathrm{ms})$. This parameter has only a minor influence of the result of the filter:
+<center><a name="fretchen_pic012"><img src="./pic/fretchen_pic012.png" border="1">
+</center>
+</li>
+</ul>
+
+</p>
+
+
+<a name="#usage"><a name="#tutorial"><h2>Usage/Tutorial</h2>
+$$startbox_see$$
+There is a <a href="tutorial_spfret.html">full tutorial available for this tool</a>. It gives a detailed walk-through of a complete spFRET evaluation in QuickFit $$version$$.
+$$endbox$$
+
+<h3>Basic Workflow</h3>
+<p>You can start the TCSPC Burst Analyzer with the mainwindow menu entry <b>Data Items | Insert Raw Data | TCSPC Burst Analyzer</b>, or the RDR-button on the mainwindow:
+<center><a name="fretchen_pic033"><img src="./pic/fretchen_pic033.png" border="1">
+</center>
+</p>
+<p>The Burst Analyzer dialog is split into three tabs that have to be filled in step-wise.</p>
+<h4>Tab: 1. File Selection</h4>
+<p>
+<center><a name="fretchen_pic034"><img src="./pic/fretchen_pic034.png" border="1">
+</center>
+ Here you can select an input TCSPC file, as well as an optional TCSPC-measurement of the buffer that is used to characterize the background. You can also choose which channel in the file to use for the green and red evaluation channel. Finally click on 
+    <center><a name="fretchen_pic005"><img src="./pic/fretchen_pic005.png" border="1">
+    </center>
+    to read in the sepcified datasets. $$note: If you change any of the settings above lateron, you will have to click this button again!$$</li>
+<h4>Tab: 2. Burst Search</h4>
+<p>
+<center><a name="fretchen_pic035"><img src="./pic/fretchen_pic035.png" border="1">
+</center>
+In this tab, you can configure the burst-search algorithm and are presented with the first results from the burst search (e.g. the number of bursts and a timetrace-view of the measurement in which the bursts are marked. You can also choose to use a LEE-filter (see above) before performing the actual burst search. After changing any of the burst-search parameters, you will have to click on <center><a name="fretchen_pic014"><img src="./pic/fretchen_pic014.png" border="1">
+</center>
+Now the filter and burst search will be applied, the graph will be updated and below the editing widgets, the number of found bursts will be displayed:
+<center><a name="fretchen_pic015"><img src="./pic/fretchen_pic015.png" border="1">
+</center>
+Also you can now move on to the third tab, which is deaktivated until a burst search is performed.
+</p>
+
+<h4>Tab: 3. Burst Analysis</h4>
+<p>
+<center><a name="fretchen_pic036"><img src="./pic/fretchen_pic036.png" border="1">
+</center>
+This tab analyzes the data that was extracted from the single bursts (mainly the number of photons, countrate and proximity ration, see above). The data is presented as histograms and correlation plots. In addition you can specify the parameters of the histograms (i.e. the bin width) and filter the bursts according to their average countrate. A click on "Apply" recalculates the histograms after changing any parameter (except the countrate filters!). $$note:The buttons <img src="./pic/fretchen_pic024.png" border="1"> next to the background edit widgets allow to set the background intensity to the given value, which was extracted from the buffer measurement, if one was applied!$$
+On the rhs of the window, a list of basic statistical figures about the sample is given (and updated after a click on "Apply"):
+<center><a name="fretchen_pic025"><img src="./pic/fretchen_pic025.png" border="1">
+</center>
+</p>
+<p>Finally you can store the results, as <a href="$$plugin_info:help:table$$">table RDRs</a> in the project or as data-files (CSV, Excel, Matlab, ...), where each row is one burst and the columns contain the different burst parameters:
+<center><a name="fretchen_pic020"><img src="./pic/fretchen_pic020.png" border="1">
+</center>
+This is done with the buttons
+<center><a name="fretchen_pic021"><img src="./pic/fretchen_pic021.png" border="1">&nbsp;&nbsp;<a name="fretchen_pic022"><img src="./pic/fretchen_pic022.png" border="1">
+</center>
+These store the tables either to a <a href="$$plugin_info:help:table$$">table RDR</a> in the current project (including updatable histograms!), or to a data-file (e.g. CSV, Matlab or Excel).
+$$note:If you want to compare different settings of the analysis parameters, you can set the initial parameters and then store the results. Then set new parameters and store again. This way you get several tables in the project, or several files on the harddisk that you can compare. The previoulsy stored results will NOT be overwritten updates (autonatically).$$</p>
+
+
+
+
+<h3>Multi-file Workflow</h3>
+<p>The burst analyzer also allows to combine several files into one evaluation. To do so:
+<ol>
+    <li>Follow the standard workflow (see above) for the first file. When saving the results in the final step, use the button
+<center><a name="fretchen_pic026"><img src="./pic/fretchen_pic026.png" border="1">
+</center>
+Then a new list <b>Multi-File Store</b> will open on the rhs of the dialog:
+<center><a name="fretchen_pic027"><img src="./pic/fretchen_pic027.png" border="1">
+</center>
+This list is initialized with an entry for the current file and can be edited with the buttons above the list:
+<center><a name="fretchen_pic028"><img src="./pic/fretchen_pic028.png" border="1">
+</center>
+These allow to clear the list, delete the selected entry, or move the selected entry up or down.</li>
+<li>Return to the first tab <b>"1. File Selection"</b>, select a new "Input TCSPC file", set all other settings and load it with <center><a name="fretchen_pic005"><img src="./pic/fretchen_pic005.png" border="1">
+    </center> Then follow the rest of the evaluation steps, as for the first file until you can save the results. </li>
+    <li>Click on the button
+<center><a name="fretchen_pic026"><img src="./pic/fretchen_pic026.png" border="1">
+</center>
+again and a second entry will be added to the <b>Multi-File Store</b>:
+<center><a name="fretchen_pic029"><img src="./pic/fretchen_pic029.png" border="1">
+</center>
+Repeat these steps for all files that make up your measurement.
+</li>
+<li>Finally you can store a table with the properties of all bursts (and a numeric file-id in one column), by clicking on the buttons below the Multi-File Store list:
+<center><a name="fretchen_pic030"><img src="./pic/fretchen_pic030.png" border="1">
+</center>
+these will again create either a file with the table as CSV/Excel/Matlab/..., or a <a href="$$plugin_info:help:table$$">table RDR</a> in the current project (including updatable histograms!). The two check-boxes above the buttons allow to set whether:
+<ul>
+    <li>the bursts should be renumbered. If checked, each bursts receives a continuous numebr that is unique over all files, otherwise the burst enumeration restarts at 0 for each file.</li>
+    <li>a columne with a file-ID (as an integer number) should be added to the table (as alast column).</li>
+</ul></li>
+</ol>
+$$note:The histograms in the Burst-Analysis tab always only show the results of the current file, not the histograms over all files. To view these:
+<ol>
+    <li>Click on <img src="./pic/fretchen_pic031.png" border="1"> after evaluating all files</li>
+    <li>Double-click the new entry in the project:
+    <center><a name="fretchen_pic032"><img src="./pic/fretchen_pic032.png" border="1">
+    </center>
+    </li>
+    <li>In the table RDR-editor window, choose "Plots" and then the histogram you are interested in.</li>
+</ol>$$
+</p>
+
+
+<h3>Fitting Distributions to the spFRET histograms</h3>
+<p>You can use the <a href="$$plugin_info:help:curve_fit$$">General Least Squares Curve-Fit plugin</a> of QuickFit to fit a model function to the spFRET histograms obtained from this tool. To do so:<ol>
+  <li>Add a new fit to the project (<b>Data Items | Insert Evaluation | General Curve Fitting | Histogram Fitting</b>):
+  <center><a name="fretchen_pic038"><img src="./pic/fretchen_pic038.png" border="1">
+</center> 
+open the curve-fit editor with a double-click on the project entry and choose an appropriate model (e.g. <a href="$$fitfunction:help:gen_multigaussian_sqrte$$">$$fitfunction:name:gen_multigaussian_sqrte$$</a>):
+<center><a name="fretchen_pic039"><img src="./pic/fretchen_pic039.png" border="1">
+</center>
+
+
+</li>
+  <li>Now select one of the tables (1) that the Burst Analyzer created and select the histogram (2) that you want to fit: 
+  <center><a name="fretchen_pic037"><img src="./pic/fretchen_pic037.png" border="1">
+  </center>
+  </li>
+  <li>Now you can edit the parameters of the fit function so you have good starting values. To estimate initial values, right-click into the plot to set a parameter based on the mouse-position (chose the submenu <b>Estimate Parameters ...</b> from the context-menu, or use the button <b>Guess Current</b> to automatically guess initial parameters (if it is provided by the chosen fit model). FInally use <b>Fit Current</b> to fit the model to the dataset. You can evaluate the quality of fit with the residuals and the fit statistics numbers and plots at the bottom of the dialog.</li>
+</ol>
+$$startbox_see$$
+The documentation of the <a href="$$plugin_info:help:curve_fit$$">General Least Squares Curve-Fit plugin</a> also contains  <a href="$$plugin_info:tutorial:curve_fit$$">detailed tutorials</a> on how to use this plugin!
+$$endbox$$
+</p>
+
+
+<h2>References</h2>
+<p>$$references$$</p>
+    </body>
+</html>

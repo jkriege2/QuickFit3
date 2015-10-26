@@ -8,9 +8,10 @@
 <body>
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 
-
+<h2>Using udev for hardware enumeration/configuration</h2>
+<h3>Using <a href="https://en.wikipedia.org/wiki/Udev">udev</a> to link specific devices to named device-files</h3>
 <p>Many hardware devices can be controlled via simple serial ports, USB-to-serial converters, or other USB devices. It is convenient to map the file in <code>/dev/</code> used to access them to an arbitrary name, identifying a special device (e.g. <code>/dev/ttyUSB_PISTAGE</code>).
-On Linux this can be done using the udev system for USB device enumeration. Take these steps:
+On Linux this can be done using the <a href="https://en.wikipedia.org/wiki/Udev">udev system</a> for USB device enumeration. Take these steps:
 <ol>
   <li>create a udev rules file with a name like e.g.: <code>/etc/udev/rules.d/99-spim.rules</code></li>
   <li>add a line like this:<blockquote><code>#B040SERVO<br>
@@ -19,15 +20,67 @@ KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{product}=="B040SERVO", SYMLINK+="tty
 Instead of the product name you can also use any other USB device property, as reported by <blockquote><code>lsusb -v -s <i>bus</i>:<i>devnum</i></code></blockquote>Possible filters are e.g.: <blockquote><code>ATTRS{serial}=="A800dOBl", ATTRS{idVendor}=="1a72", ATTRS{idProduct}=="1007", ATTR{vendor}=="0x149a", ATTR{device}=="0x0005"</code></blockquote></li>
   <li>After saving the rules file you will have to tell udev that there are new/changed rules by executing <blockquote><code>/etc/init.d/udev restart</code></blockquote>The rules will be executed when the new device is connected to the computer. So if it's already connected: pull and reconnect the plug.</li>
 </ol>
+</p>
+
+
+<h3>Executing programs/scripts using udev</h3>
+<p>
 It is also possible to execute programs and scripts when a device is connected. To do so, add <code>RUN+="..."</code> to the rule. Here's an example:
 <blockquote><code>#B040SERVO#andor card<br>
 SUBSYSTEM=="pci", ATTR{vendor}=="0x149a", ATTR{device}=="0x0005", RUN+="/usr/sbin/andordrvlx_load"
 </code></blockquote>
 </p>
 
-<p>Links with further information:<ul>
+
+
+<h3>Full example of a udev-rules file</h3>
+<p>Here is a full example for our SPIM-setup, i.e. the contents of the file <tt>/etc/udev/rules.d/99-spim.rules</tt>!$$startbox_example$$
+<code>#for the PI stage chain<br>
+SUBSYSTEMS=="usb", ATTRS{idProduct}=="1007", ATTRS{idVendor}=="1a72", RUN+="/root/bin/pi_mercury.sh"<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{idVendor}=="1a72", ATTRS{idProduct}=="1007", ATTRS{product}=="PI C-863 Mercury", SYMLINK+="ttyUSB_PI"<br>
+<br>
+#B040SERVO<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{product}=="B040SERVO", SYMLINK+="ttyUSB_B040SERVO"<br>
+<br>
+#LED controller<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{serial}=="A800dOBl", SYMLINK+="ttyUSB_LED"<br>
+<br>
+#LASER 491nm controller<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{serial}=="A6VFYA6O", SYMLINK+="ttyUSB_LASER491"<br>
+<br>
+#LASER 561nm controller<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{serial}=="A1VFYBNS", SYMLINK+="ttyUSB_LASER561"<br>
+<br>
+#TMCL filter wheelFILTWHEEL<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{product}=="USB-RS485 Cable", SYMLINK+="ttyUSB_FWTMCL"<br>
+<br>
+#POLOLU Maestro Servo controller<br>
+KERNEL=="ttyACM*", SUBSYSTEMS=="usb", ENV{ID_SERIAL_SHORT}=="00057479", ENV{ID_USB_INTERFACE_NUM}=="00", SYMLINK+="ttyUSB_POLOLUMaestro"<br>
+<br>
+#Cobolt MLD Laser<br>
+KERNEL=="ttyACM*", SUBSYSTEMS=="usb", ENV{ID_SERIAL_SHORT}=="000013245678", ENV{ID_USB_INTERFACE_NUM}=="00", SYMLINK+="ttyUSB_CoboltMLD"<br>
+<br>
+#Temperature controller<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{serial}=="A600cMkh", SYMLINK+="ttyUSB_TEMPERATURE"<br>
+<br>
+#B040SERVO<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{product}=="B040SPADSurveilance", SYMLINK+="ttyUSB_B040SPADSURVEILANCE"</code>
+$$endbox$$</p>
+
+
+
+<h2>Problems accessinf USB/TTY devices on Linux</h2>
+<p>On some Linux distributions, the default user accounts are not allowed to access TTY/USB devices, as the system thinks these are modems and normal user should not be able to dial-out from the computer. This is e.g. the case on Scientific Linux (tested with version 7.1), where the user has to be added to the group <tt>dialout</tt> using$$codeexample:usermod -a -G dialout kriegerj$$  This instruction adds the user <tt>kriegerj</tt> to the group <tt>dialout</tt>, which is owner of the device-files <tt>/dev/ttyUSB<i>x</i></tt> on our machine. After this change, connecting to the TTY-devices works correctly! $$note: This has to be execute in superuser mode!$$ 
+</p>
+
+
+
+
+
+<h2>Further Reading</h2>
+$$see:Links with further information:<ul>
 <li><a href="http://www.reactivated.net/writing_udev_rules.html">Writing udev rules</a></li>
-</ul></p>
+</ul>$$
 
 $$qf_commondoc_footer.start$$ $$qf_commondoc_footer.end$$
 </body>

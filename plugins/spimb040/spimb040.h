@@ -99,7 +99,7 @@ class QFESPIMB040 : public QObject, public QFExtensionBase, public QFPluginOptio
         QAction* actStartPlugin;
         //QAction* actStartPluginNew;
         QAction* actStartPluginOld;
-        QMenu* menuOptSetups;
+        QPointer<QMenu> menuOptSetups;
         QList<QAction*> actsOptSetups;
 
         QPointer<QFESPIMB040MainWindow2> main;

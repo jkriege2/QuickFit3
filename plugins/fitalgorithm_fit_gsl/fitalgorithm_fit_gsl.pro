@@ -26,7 +26,7 @@ TARGET = fit_gsl
 DEFINES += TARGETNAME=$$TARGET
 
 DEPENDPATH += ./
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/gsl.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/

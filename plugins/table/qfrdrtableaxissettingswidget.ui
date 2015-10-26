@@ -741,6 +741,31 @@
   <tabstop>edtXMin</tabstop>
   <tabstop>edtXMax</tabstop>
   <tabstop>btnAutoscaleX</tabstop>
+  <tabstop>chkLinTicksLogAxis</tabstop>
+  <tabstop>cmbXMode1</tabstop>
+  <tabstop>cmbXMode2</tabstop>
+  <tabstop>spinAxis1Width</tabstop>
+  <tabstop>cmbXLabel</tabstop>
+  <tabstop>spinXAxisDigits</tabstop>
+  <tabstop>chkXAutoTicks</tabstop>
+  <tabstop>spinXAxisMinTicks</tabstop>
+  <tabstop>spinXAxisMinorTicks</tabstop>
+  <tabstop>edtXTickSpacing</tabstop>
+  <tabstop>edtXTickSpacingLog</tabstop>
+  <tabstop>chkMinorTickLabels</tabstop>
+  <tabstop>chkMinorTickOnlyDigits</tabstop>
+  <tabstop>spinLabelAngel</tabstop>
+  <tabstop>cmbNamedTicksValues</tabstop>
+  <tabstop>cmbNamedTicksNames</tabstop>
+  <tabstop>spinXTickWidth</tabstop>
+  <tabstop>spinXTickMinWidth</tabstop>
+  <tabstop>spinXILength</tabstop>
+  <tabstop>spinXMinILength</tabstop>
+  <tabstop>spinXOLength</tabstop>
+  <tabstop>spinXMinOLength</tabstop>
+  <tabstop>chkX0Axis</tabstop>
+  <tabstop>spin0AxisWidth</tabstop>
+  <tabstop>chkXInverted</tabstop>
  </tabstops>
  <resources>
   <include location="qfrdrtable.qrc"/>

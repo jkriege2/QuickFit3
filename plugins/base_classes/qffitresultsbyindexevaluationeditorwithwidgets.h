@@ -77,7 +77,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 {
         Q_OBJECT
     public:
-        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false, const QString& runName=QString("run"));
+        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false, const QString& runName=QString("run"), bool useRunComboBox=false, bool twoToolbars=false);
 
 
     protected slots:
@@ -97,6 +97,19 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
 
     protected:
+        virtual QString getPlotXLabel() const;
+        virtual QString getPlotYLabel() const;
+        virtual QString getFitName() const;
+        virtual bool getPlotXLog() const;
+        virtual bool getPlotYLog() const;
+
+        void setGuessingEnabled(bool enabled=true, bool currentOnly=false);
+
+        void clearEstimateActions();
+        QMenu* menuEstimate;
+        QMenu* menuEstimateDblClk;
+        QMap<QAction*,QString> actsEstimate;
+
         QString m_runName;
         /** \brief label displaying the current record */
         QLabel* labRecord;
@@ -123,12 +136,11 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
         /** \brief QSpinBox that allows to select a special run */
         QSpinBox* spinRun;
+        QFEnhancedComboBox* cmbRun;
         /** \brief label for the run name */
         QLabel* labRun;
-        /** \brief help window for help on the current fit algorithm */
-        //QFHTMLHelpWindow* hlpAlgorithm;
-        /** \brief help window for help on the current fit model function */
-        //QFHTMLHelpWindow* hlpFunction;
+        QLabel* labRunLabel;
+
         /** \brief combobox to select a plotting style */
         QComboBox* cmbPlotStyle;
         /** \brief combobox to select a plotting style for the data errors */
@@ -139,19 +151,27 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QCheckBox* chkWeightedResiduals;
         /** \brief checkbox for x logscale */
         QCheckBox* chkXLogScale;
+        /** \brief checkbox for y logscale */
+        QCheckBox* chkYLogScale;
+        /** \brief checkbox for x logscale */
+        QAction* actXLogScale;
+        /** \brief checkbox for y logscale */
+        QAction* actYLogScale;
         /** \brief checkbox to display grid */
         QCheckBox* chkGrid;
         /** \brief checkbox to display key */
         QCheckBox* chkKey;
         /** \brief toolbar above the plots */
         QToolBar* toolbar;
+        /** \brief toolbar2 above the plots */
+        QToolBar* toolbar2;
         /** \brief label to display the current position of the mouse cursor */
         QLabel* labMousePosition;
         /** \brief label that displays whether the current fit parameters are global or local */
         QLabel* labFitParameters;
         /** \brief widget to switch between editing fit parameter values and ranges  */
         QTabBar* tbEditRanges;
-        //QToolButton* btnEditRanges;
+
         /** \brief plotter for residual distribution histogram */
         QFPlotter* pltResidualHistogram;
         /** \brief plotter for residual autocorrelation */
@@ -170,14 +190,22 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QTabWidget* tabResidulas;
         /** \brief to fit current file */
         QAction* actFitCurrent;
+        /** \brief to guess current file&run */
+        QAction* actGuessCurrent;
+        /** \brief to guess all runs in current file */
+        QAction* actGuessRunsCurrent;
         /** \brief to fit all runs in current file */
         QAction* actFitRunsCurrent;
         /** \brief to fit current run in all file */
         QAction* actFitAll;
+        /** \brief to guess current run in all file */
+        QAction* actGuessAll;
         /** \brief the separator that follows the fits in menuFit */
         QAction* actFitSeparator;
         /** \brief to fit all runs in all file */
         QAction* actFitRunsAll;
+        /** \brief to fit all runs in all file */
+        QAction* actGuessRunsAll;
         /** \brief reset current parameter set to default */
         QAction* actResetCurrent;
         /** \brief reset all parameter sets to default */
@@ -251,15 +279,25 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
     protected:
         virtual void populateFitButtons(bool mulThreadEnabledInModel=true);
+        virtual void fillRunCombo(QFFitResultsByIndexEvaluation *eval, QFRawDataRecord *rdr);
+        int getCurrentRunFromWidget() const;
 
         /** \brief to fit current file */
         QToolButton* btnFitCurrent;
+        /** \brief to guess current file */
+        QToolButton* btnGuessCurrent;
         /** \brief to fit all runs in current file */
         QToolButton* btnFitRunsCurrent;
         /** \brief to fit current run in all file */
         QToolButton* btnFitAll;
         /** \brief to fit all runs in all file */
         QToolButton* btnFitRunsAll;
+        /** \brief to Guess all runs in current file */
+        QToolButton* btnGuessRunsCurrent;
+        /** \brief to Guess current run in all file */
+        QToolButton* btnGuessAll;
+        /** \brief to Guess all runs in all file */
+        QToolButton* btnGuessRunsAll;
         /** \brief reset current parameter set to default */
         QToolButton* btnResetCurrent;
         /** \brief reset all parameter sets to default */
@@ -289,6 +327,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
         QToolButton* btnFirstRun;
 
+        int guessrow;
+
     protected slots:
         /** \brief executed when the mouse position over the plot changes */
         void plotMouseMove(double x, double y);
@@ -306,7 +346,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
             This function only adds the fit function plot objects and does NOT cause a replot of the graphs. It is called by
             replotData().
         */
-        virtual void updateFitFunctions()=0;
+        virtual void updateFitFunctionsPlot()=0;
 
         /** \brief executed when the sliders values change */
         void slidersChanged(int userMin, int userMax, int min, int max);
@@ -319,6 +359,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         void configFitAlgorithm();
         /** \brief called when the current run changes */
         void runChanged(int run);
+        void runCmbChanged(int run);
         /** \brief called when the fit model changes */
         void modelChanged(int model);
         /** \brief called when the fit algorithm changes */
@@ -347,19 +388,19 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief executed when a parameter range is changed by the user */
         void parameterRangeChanged();
 
-        virtual void plotChi2Landscape();
-
         virtual void gotoFirstRun();
 
+        void estimateActionClicked();
 
 
 
         void chkKeyToggled(bool checked);
+        void dataplotContextMenuOpened(double x, double y, QMenu *);
     public slots:
         /*! \brief fit model to current data
          */
         virtual void fitCurrent();
-        /** \brief fit all files (current run) */
+         /** \brief fit all files (current run) */
         virtual void fitAll();
         /** \brief fit all files, all runs */
         virtual void fitRunsAll();
@@ -370,9 +411,19 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         virtual void fitAllRunsThreaded();
         virtual void fitAllFilesThreaded();
 
+        virtual void plotChi2Landscape();
+
+        /*! \brief guess model-parameters to current data
+         */
+        virtual void guessCurrent();
+        virtual void guessRunsAll();
+        virtual void guessAll();
+        /** \brief fit all runs in current file */
+        virtual void guessRunsCurrent();
+
     private:
         /** \brief create all widgets on the form */
-        void createWidgets(bool hasMultiThreaded, bool multiThreadPriority);
+        void createWidgets(bool hasMultiThreaded, bool multiThreadPriority, bool useRunCombobox, bool twoToolbars=false);
 };
 
 #endif // QFFITRESULTSBYINDEXEVALUATIONEDITORWITHWIDGETS_H

@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = qfrdrfcs
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 DEFINES += TARGETNAME=$$TARGET
 
@@ -82,7 +82,7 @@ SOURCES += dlgcsvparameters.cpp \
 
 FORMS = dlg_csvparameters.ui \
     qfrdrfcsfitfunctionsimulator.ui \
-    ../base_classes/qffcsfitchi2landscapedialog.ui \
+    ../base_classes/qffitchi2landscapedialog.ui \
     ../base_classes/qffinderroneouscorrelationdlg.ui
 
 RESOURCES += qfrdrfcs.qrc

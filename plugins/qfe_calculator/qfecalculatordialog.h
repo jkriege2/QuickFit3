@@ -48,12 +48,17 @@ class QFECalculatorDialog : public QDialog {
     protected slots:
         void showHelp();
         void showCache();
+
+        void on_btnLoad_clicked();
+        void on_btnSave_clicked();
+
         void on_btnEvaluate_clicked();
+        void on_btnEvaluateScript_clicked();
         void on_btnClearHistory_clicked();
         void on_btnClearCache_clicked();
         void delayedStartSearch();
         void on_edtExpression_textChanged(QString text);
-        void on_chkMultiline_toggled(bool enabled);        
+        //void on_chkMultiline_toggled(bool enabled);
     private:
         Ui::QFECalculatorDialog *ui;
         QFMathParser* parser;

@@ -187,7 +187,7 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
                 QHash<quint64, QVariant> dataCheckedMap;
                 /** \brief this map is used to store additional data for roles >=Qt::UserRole */
                 QHash<quint64, QHash<int, QVariant> > moreDataMap;
-
+                /** \brief this map is used to store additional data for roles >=Qt::UserRole for the horizontal header (columns-header) */
                 QHash<quint64, QHash<int, QVariant> > headerDataMap;
 
                 /** \brief string list that contains the column names */
@@ -336,6 +336,12 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         bool hasColumnHeaderData(quint32 column, int role) const;
         QList<quint64> getColumnHeaderDataRoles() const;
 
+        /** \brief reorder/permute the rows in the given map and in these rows, either all columns or the columns specified by the second list
+         *
+         *  \note \a  row_permutation maps from old_idx[key] -> new_idx[value]
+         */
+        void reorderRows(const QMap<int, int>& row_permutation, const QList<int>& cols=QList<int>());
+
 
         enum copyColumnHeaderMode {
             dontCopyHeader=0,
@@ -372,6 +378,10 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         QStringList getColumnTitles() const;
         /** \brief return a list of all row titles */
         QStringList getRowTitles() const;
+        /** \brief return a column title */
+        QString getColumnTitle(int i) const;
+        /** \brief return arow title */
+        QString getRowTitle(int i) const;
 
 
         /** \brief save the contents in a <a href="http://en.wikipedia.org/wiki/SYmbolic_LinK_(SYLK)">SYLK file (SYmbolic LinK)</a>
@@ -494,6 +504,14 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void deleteRow(quint32 r);
         /** \brief remove the given column */
         void deleteColumn(quint32 c);
+        /** \brief remove the given rows */
+        void deleteRows(const QList<quint32>& r);
+        /** \brief remove the given columns */
+        void deleteColumns(const QList<quint32>& c);
+        /** \brief remove the given rows */
+        void deleteRows(const QVector<quint32>& r);
+        /** \brief remove the given columns */
+        void deleteColumns(const QVector<quint32>& c);
         /** \brief remove all data from given column, but do not remove the column (also does not delete it's header) */
         void emptyColumn(quint32 c);
         /** \brief delete all contents from the given cell */

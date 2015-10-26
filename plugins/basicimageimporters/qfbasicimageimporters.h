@@ -54,7 +54,7 @@ class QFBasicImageImporters : public QObject, public QFPluginImporters, public Q
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr("basic image series importers");
+            return tr("Basic image series importers");
         }
 
         /** \brief short description for the plugin */

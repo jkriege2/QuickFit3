@@ -54,6 +54,10 @@ void QFPRDRTable::registerToMenu(QMenu* menu) {
     insertRDTableFileAct->setStatusTip(tr("Insert a new table raw data item from a specified file"));
     connect(insertRDTableFileAct, SIGNAL(triggered()), this, SLOT(insertTableFile()));
 
+    QAction* insertRDTableFileEditableAct = new QAction(QIcon(":/table/table_open.png"), tr("Import Table from File [editable]"), parentWidget);
+    insertRDTableFileEditableAct->setStatusTip(tr("Insert a new table raw data item from a specified file"));
+    connect(insertRDTableFileEditableAct, SIGNAL(triggered()), this, SLOT(insertTableFileEdit()));
+
     QAction* insertRDTableAct = new QAction(QIcon(":/table/table_insert.png"), tr("Editable Table"), parentWidget);
     insertRDTableAct->setStatusTip(tr("Insert a new table raw data item, which may be edited in QuickFit 3.0 and is not connected to a file."));
     connect(insertRDTableAct, SIGNAL(triggered()), this, SLOT(insertTable()));
@@ -62,6 +66,7 @@ void QFPRDRTable::registerToMenu(QMenu* menu) {
     m->setIcon(QIcon(":/table/projecttree_tablefile.png"));
     m->addAction(insertRDTableAct);
     m->addAction(insertRDTableFileAct);
+    m->addAction(insertRDTableFileEditableAct);
     menu->addMenu(m);
 }
 
@@ -77,37 +82,59 @@ void QFPRDRTable::insertTable() {
 }
 
 
-void QFPRDRTable::insertTableFile() {
+void QFPRDRTable::insertTableFile(bool editable) {
     if (project) {
-        QStringList files = qfGetOpenFileNames(parentWidget, tr("Select Table File(s) to Import ..."), settings->getCurrentRawDataDir(), tr("Comma Separated Value Files (*.txt *.dat *.csv);;All Files (*.*)"));
+        QString selFilter="";
+        QStringList filters;
+        filters<<tr("Comma Separated Value Files (*.txt *.dat *.csv)");
+        filters<<tr("Table XML file (*.qftxml)");
+        filters<<tr("All Files (*.*)");
+        QStringList files = qfGetOpenFileNames(parentWidget, tr("Select Table File(s) to Import ..."), settings->getCurrentRawDataDir(), filters.join(";;"), &selFilter);
         QStringList list = files;
         if (list.size()>0) {
 
-            QFDlgCSVParameters* csvDlg=new QFDlgCSVParameters(parentWidget, settings->getQSettings()->value("table/column_separator", ",").toString(),
-                                                                  settings->getQSettings()->value("table/decimal_separator", ".").toString(),
-                                                          settings->getQSettings()->value("table/comment_start", "#").toString(),
-                                                          settings->getQSettings()->value("table/header_start", "#!").toString());
-            csvDlg->setFileContents(list[0]);
-            if (csvDlg->exec()==QDialog::Accepted) {
-                QMap<QString, QVariant> p;
-                p["column_separator"]=QString(csvDlg->get_column_separator());
-                p["decimal_separator"]=QString(csvDlg->get_decimal_separator());
-                p["comment_start"]=QString(csvDlg->get_comment_start());
-                p["header_start"]=QString(csvDlg->get_header_start());
-                settings->getQSettings()->setValue("table/column_separator", QString(csvDlg->get_column_separator()));
-                settings->getQSettings()->setValue("table/decimal_separator", QString(csvDlg->get_decimal_separator()));
-                settings->getQSettings()->setValue("table/comment_start", QString(csvDlg->get_comment_start()));
-                settings->getQSettings()->setValue("table/header_start", QString(csvDlg->get_header_start()));
 
-                QStringList roParams;
-                roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
 
+            QStringList roParams;
+            QMap<QString, QVariant> p;
+            bool ok=false;
+            if (editable) {
+                p["CONVERT_READWRITE"]=true;
+                roParams<<"CONVERT_READWRITE";
+            }
+            if (filters.indexOf(selFilter)==1) {
+                p["READFILE_FILEFORMAT"]="QFTABLEXML";
+                roParams<<"READFILE_FILEFORMAT";
+                ok=true;
+            } else {
+                QFDlgCSVParameters* csvDlg=new QFDlgCSVParameters(parentWidget, settings->getQSettings()->value("table/column_separator", ",").toString(),
+                                                                      settings->getQSettings()->value("table/decimal_separator", ".").toString(),
+                                                              settings->getQSettings()->value("table/comment_start", "#").toString(),
+                                                              settings->getQSettings()->value("table/header_start", "#!").toString());
+                csvDlg->setFileContents(list[0]);
+                if (csvDlg->exec()==QDialog::Accepted) {
+                    p["column_separator"]=QString(csvDlg->get_column_separator());
+                    p["decimal_separator"]=QString(csvDlg->get_decimal_separator());
+                    p["comment_start"]=QString(csvDlg->get_comment_start());
+                    p["header_start"]=QString(csvDlg->get_header_start());
+                    p["READFILE_FILEFORMAT"]="CSV";
+                    settings->getQSettings()->setValue("table/column_separator", QString(csvDlg->get_column_separator()));
+                    settings->getQSettings()->setValue("table/decimal_separator", QString(csvDlg->get_decimal_separator()));
+                    settings->getQSettings()->setValue("table/comment_start", QString(csvDlg->get_comment_start()));
+                    settings->getQSettings()->setValue("table/header_start", QString(csvDlg->get_header_start()));
+                    roParams<<"READFILE_FILEFORMAT"<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
+                    ok=true;
+
+                }
+                delete csvDlg;
+            }
+            if (ok) {
                 QStringList::Iterator it = list.begin();
                 services->setProgressRange(0, list.size());
                 int i=0;
                 while(it != list.end()) {
                     i++;
-                    services->log_text(tr("importing CSV file '%1' using (column_separator='%2', decimal_separator='%3', comment_start='%4', header_start='%5')\n").arg(*it).arg(QString(csvDlg->get_column_separator())).arg(QString(csvDlg->get_decimal_separator())).arg(QString(csvDlg->get_comment_start())).arg(QString(csvDlg->get_header_start())));
+                    services->log_text(tr("importing %2 file '%1' ...\n").arg(*it).arg(p.value("READFILE_FILEFORMAT", "UNKNOWN").toString())); /*.arg(QString(csvDlg->get_column_separator())).arg(QString(csvDlg->get_decimal_separator())).arg(QString(csvDlg->get_comment_start())).arg(QString(csvDlg->get_header_start()))*/
                     QFRawDataRecord* e=project->addRawData("table", QFileInfo(*it).fileName(), QStringList(*it), p, roParams);
                     if (e->error()) {
                         project->deleteRawData(e->getID());
@@ -119,11 +146,17 @@ void QFPRDRTable::insertTableFile() {
                     services->setProgress(i);
                     QApplication::processEvents();
                 }
-                services->setProgress(0);
             }
-            delete csvDlg;
+            services->setProgress(0);
+
+
         }
     }
+}
+
+void QFPRDRTable::insertTableFileEdit()
+{
+    insertTableFile(true);
 }
 
 Q_EXPORT_PLUGIN2(qfrdrtable, QFPRDRTable)

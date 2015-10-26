@@ -22,10 +22,32 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFRDRIMAGINGFCSSIMULATIONTHREAD_H
 #define QFRDRIMAGINGFCSSIMULATIONTHREAD_H
 
+#include <QApplication>
+#include <QElapsedTimer>
+#include <QFile>
+#include <QSettings>
+#include <QString>
+#include <QVector>
+#include <QFileInfo>
+#include <QDebug>
 #include <QThread>
+#include <QStringList>
 #include "cpptools.h"
 #include "tinytiffwriter.h"
-#include "../../extlibs/MersenneTwister.h"
+#include "MersenneTwister.h"
+#include "qftools.h"
+#include "datatools.h"
+
+
+#define SIMENV_NORMAL 0
+#define SIMENV_GRIDBOUNDARIES 1
+#define SIMENV_TRAPS 2
+
+#define BOUNDARY_PERIODIC 0
+#define BOUNDARY_REINTRODUCE 1
+
+#define PSF_GAUSS 0
+#define PSF_PIXELGAUSS 1
 
 class QFRDRImagingFCSSimulationThread : public QThread
 {
@@ -34,6 +56,7 @@ class QFRDRImagingFCSSimulationThread : public QThread
         explicit QFRDRImagingFCSSimulationThread(QObject *parent = 0);
         int getCurrentFrame() const;
 
+        GET_SET_MACRO(float, DG3)
         GET_SET_MACRO(float, DG)
         GET_SET_MACRO(float, DR)
         GET_SET_MACRO(float, DRG)
@@ -49,6 +72,7 @@ class QFRDRImagingFCSSimulationThread : public QThread
         GET_SET_MACRO(float, deltay)
         GET_SET_MACRO(float, pixel_size)
         GET_SET_MACRO(float, frametime)
+        GET_SET_MACRO(float, sim_timestep)
         GET_SET_MACRO(long, frames)
         GET_SET_MACRO(long, warmup)
         GET_SET_MACRO(bool, dualView)
@@ -56,6 +80,7 @@ class QFRDRImagingFCSSimulationThread : public QThread
         GET_SET_MACRO(int, width)
         GET_SET_MACRO(int, height)
         GET_SET_MACRO(float, brightnessG)
+        GET_SET_MACRO(float, brightnessG3)
         GET_SET_MACRO(float, brightnessR)
         GET_SET_MACRO(float, brightnessG2)
         GET_SET_MACRO(float, brightnessR2)
@@ -65,17 +90,43 @@ class QFRDRImagingFCSSimulationThread : public QThread
         GET_SET_MACRO(int, walkersR)
         GET_SET_MACRO(int, walkersRG)
         GET_SET_MACRO(int, walkersG2)
+        GET_SET_MACRO(int, walkersG3)
         GET_SET_MACRO(int, walkersR2)
         GET_SET_MACRO(int, walkersRG2)
 
         GET_SET_MACRO(bool, FlowEeverywhere)
         GET_SET_MACRO(bool, onlyHalf_DG)
+        GET_SET_MACRO(bool, onlyHalf_DG3)
         GET_SET_MACRO(bool, onlyHalf_DR)
         GET_SET_MACRO(bool, onlyHalf_DRG)
         GET_SET_MACRO(bool, onlyHalf_DG2)
         GET_SET_MACRO(bool, onlyHalf_DR2)
         GET_SET_MACRO(bool, onlyHalf_DRG2)
+        GET_SET_MACRO(int, boundaryConditions)
 
+        GET_SET_MACRO(float, boundaryGridSpacing)
+        GET_SET_MACRO(float, boundaryGridJumpProbability)
+        GET_SET_MACRO(bool, boundaryGridOnlyRight)
+        GET_SET_MACRO(int, environmentMode)
+        GET_SET_MACRO(float, simspace_sizeinc)
+
+        GET_SET_MACRO(bool, saveTrajectores)
+        GET_SET_MACRO(int, maxTrajectores)
+        GET_SET_MACRO(int, trajectoresMaxSteps)
+        GET_SET_MACRO(bool, saveMSD)
+        GET_SET_MACRO(int, msdMaxSteps)
+        GET_MACRO(QStringList, msdNames)
+        GET_MACRO(QStringList, trajNames)
+
+        GET_SET_MACRO(float, trapGridSpacing)
+        GET_SET_MACRO(float, trapDiameter)
+        GET_SET_MACRO(float, trapSlowdown)
+        GET_SET_MACRO(float, trapJumpIn)
+        GET_SET_MACRO(float, trapJumpOut)
+        GET_SET_MACRO(bool, trapOnlyRight)
+        GET_SET_MACRO(int, psf_type)
+
+        GET_SET_MACRO(float, psf_cutoff_factor)
     public slots:
         void cancel();
         void waitForFinish();
@@ -85,22 +136,48 @@ class QFRDRImagingFCSSimulationThread : public QThread
     protected:
         virtual void run();
 
+        inline float psf_gauss(float x, float y, float wxy) {
+            if (qfSqr(x)+qfSqr(y)>psf_cutoff_factor*qMax(qfSqr(wxy),qfSqr(pixel_size))) return 0;
+            return exp(-2.0*(qfSqr(x)+qfSqr(y))/qfSqr(wxy));
+        }
+        inline float psf_pixelgauss(float x, float y, float wxy) {
+            if (qfSqr(x)+qfSqr(y)>psf_cutoff_factor*qMax(qfSqr(wxy),qfSqr(pixel_size))) return 0;
+            return (erf((pixel_size-2.0*x)/wxy/M_SQRT2)+erf((pixel_size+2.0*x)/wxy/M_SQRT2))*(erf((pixel_size-2.0*y)/wxy/M_SQRT2)+erf((pixel_size+2.0*y)/wxy/M_SQRT2))/qfSqr(2.0*erf(pixel_size/wxy/M_SQRT2));
+        }
+
+        inline bool isInTrap(float gx, float gy, float dx, float dy) {
+            return  (qfSqr(gx-dx)+qfSqr(gy-dy)<qfSqr(trapDiameter/2.0))
+                    ||(qfSqr(gx+trapGridSpacing-dx)+qfSqr(gy-dy)<qfSqr(trapDiameter/2.0))
+                    ||(qfSqr(gx-trapGridSpacing-dx)+qfSqr(gy-dy)<qfSqr(trapDiameter/2.0))
+                    ||(qfSqr(gx-dx)+qfSqr(gy+trapGridSpacing-dy)<qfSqr(trapDiameter/2.0))
+                    ||(qfSqr(gx-dx)+qfSqr(gy-trapGridSpacing-dy)<qfSqr(trapDiameter/2.0))
+                    ||(qfSqr(gx+trapGridSpacing-dx)+qfSqr(gy+trapGridSpacing-dy)<qfSqr(trapDiameter/2.0))
+                    ||(qfSqr(gx-trapGridSpacing-dx)+qfSqr(gy+trapGridSpacing-dy)<qfSqr(trapDiameter/2.0))
+                    ||(qfSqr(gx-trapGridSpacing-dx)+qfSqr(gy+trapGridSpacing-dy)<qfSqr(trapDiameter/2.0))
+                    ||(qfSqr(gx-trapGridSpacing-dx)+qfSqr(gy-trapGridSpacing-dy)<qfSqr(trapDiameter/2.0));
+        }
+
+
         struct WalkerData {
             float x;
             float y;
         };
         QVector<WalkerData> createWalkers(int count, bool onlyHalfImage);
-        void propagateWalkers(QVector<WalkerData>& walkers, float D, bool onlyHalfImage);
+        void propagateWalkers(QVector<WalkerData>& walkers, float D, bool onlyHalfImage, QList<QVector<QPair<float,float> > >* msds=NULL, QList<QVector<QPair<float, float> > > *traj=NULL);
+        void calcMSD(QList<QVector<double> > &msdout, const QList<QVector<QPair<float, float> > > &wg_msd, const QVector<uint64_t> &tau);
+        void saveTraj(QList<QVector<double> > &msdout, const QList<QVector<QPair<float, float> > > &wg_msd, int& tmax, QStringList& columnNames, const QString &wname, QVector<double>* jumpDistX=NULL, QVector<double>* jumpDistN=NULL, QVector<double> *jumpXDistX=NULL, QVector<double> *jumpXDistN=NULL, QVector<double> *jumpYDistX=NULL, QVector<double> *jumpYDistN=NULL, int jumpDistBins=0, double jumpDistMin=0, double jumpDistMax=0);
 
         bool canceled;
         float DG;
         float DR;
         float DRG;
         float DG2;
+        float DG3;
         float DR2;
         float DRG2;
 
         bool onlyHalf_DG;
+        bool onlyHalf_DG3;
         bool onlyHalf_DR;
         bool onlyHalf_DRG;
         bool onlyHalf_DG2;
@@ -116,31 +193,64 @@ class QFRDRImagingFCSSimulationThread : public QThread
         float VY;
         bool FlowEeverywhere;
         float pixel_size;
+        float simspace_sizeinc;
         float frametime;
-        long frames;
-        long warmup;
+        float sim_timestep;
+        uint64_t frames;
+        uint64_t warmup;
+        int boundaryConditions;
 
         bool dualView;
         QString filename;
 
+        bool saveMSD;
+        int msdMaxSteps;
+
+        bool saveTrajectores;
+        int maxTrajectores;
+        int trajectoresMaxSteps;
+
         int width;
         int height;
-        int currentFrame;
+        uint64_t currentFrame;
         float brightnessG;
         float brightnessR;
         float brightnessG2;
+        float brightnessG3;
         float brightnessR2;
         int walkersG;
         int walkersR;
         int walkersRG;
         int walkersG2;
+        int walkersG3;
         int walkersR2;
         int walkersRG2;
         float background;
         float backgroundNoise;
 
+        float psf_cutoff_factor;
 
+        float boundaryGridSpacing;
+        float boundaryGridJumpProbability;
+        bool boundaryGridOnlyRight;
+        int environmentMode;
+
+        float trapGridSpacing;
+        float trapDiameter;
+        float trapSlowdown;
+        float trapJumpIn;
+        float trapJumpOut;
+        bool trapOnlyRight;
+
+        int psf_type;
+
+        QStringList msdNames;
+        QStringList trajNames;
         MTRand rng;
+
+        static QMutex* mutexFilename;
+
+        //QVector<bool> trapGrid;
         
 };
 

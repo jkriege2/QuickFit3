@@ -95,6 +95,10 @@ class QFLIB_EXPORT QFTCSPCReader: public QFImporter {
         virtual double measurementDuration() const=0;
         /** \brief returns the number of input channels */
         virtual uint16_t inputChannels() const=0;
+        /** \brief returns the number of microtime channels */
+        virtual uint32_t microtimeChannels() const=0;
+        /** \brief returns the time-bin width of microtime channels in picoseconds!!! */
+        virtual double microtimeChannelsResolutionPicoSeconds() const=0;
 
         /** \brief returns the average count rate in kHz for a given channel */
         virtual double avgCountRate(uint16_t channel) const=0;
@@ -104,6 +108,12 @@ class QFLIB_EXPORT QFTCSPCReader: public QFImporter {
 
         /** \brief returns the position inside the input file in % */
         virtual double percentCompleted()const =0;
+
+        static QStringList getImporterFilterList();
+        static QStringList getImporterFormatNameList();
+        static QFTCSPCReader* getImporter(int idx);
+        static int getImporterCount();
+
     protected:
 
 };

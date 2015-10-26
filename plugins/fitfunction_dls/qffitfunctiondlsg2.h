@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFITFUNCTIONDLSG2_H
 #define QFFITFUNCTIONDLSG2_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -30,7 +30,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3fitfunp_fitfunctions_dls
 
 */
-class QFFitFunctionDLSG2: public QFFitFunction {
+class QFFitFunctionDLSG2: public QFDLSFitFunctionBase {
     public:
         QFFitFunctionDLSG2();
         virtual ~QFFitFunctionDLSG2() {}

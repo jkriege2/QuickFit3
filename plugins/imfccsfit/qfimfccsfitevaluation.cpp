@@ -87,7 +87,7 @@ void QFImFCCSFitEvaluation::registerToMenu(QMenu* menu) {
 
 void QFImFCCSFitEvaluation::init()
 {
-    QMenu* menu=new QMenu(tr("imFCCS"));
+    QMenu* menu=new QMenu(tr("imFCCS"), parentWidget);
     menu->setIcon(QIcon(getIconFilename()));
     QAction* actI=new QAction(tr("calculate &relative intensity"), menu);
     connect(actI, SIGNAL(triggered()), this, SLOT(calcRelativeIntensity()));

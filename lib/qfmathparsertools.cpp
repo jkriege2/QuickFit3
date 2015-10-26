@@ -26,18 +26,10 @@
 
 
 
-qfmpResult::qfmpResult()
+qfmpResult::qfmpResult():
+    m_custom(NULL)
 {
-    isValid=true;
-    type=qfmpDouble;
-    str="";
-    num=0;
-    boolean=false;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    m_custom=NULL;    
+    setInvalid();
 }
 
 qfmpResult::~qfmpResult()
@@ -46,117 +38,58 @@ qfmpResult::~qfmpResult()
     m_custom=NULL;
 }
 
-qfmpResult::qfmpResult(double value)
+qfmpResult::qfmpResult(double value):
+    m_custom(NULL)
 {
-    isValid=true;
-    type=qfmpDouble;
-    str="";
-    num=value;
-    boolean=false;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    m_custom=NULL;
+    setDouble(value);
 }
 
-qfmpResult::qfmpResult(int value)
+qfmpResult::qfmpResult(unsigned int value):
+    m_custom(NULL)
 {
-    isValid=true;
-    type=qfmpDouble;
-    str="";
-    num=value;
-    boolean=false;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    m_custom=NULL;
+    setDouble(value);
 }
 
-qfmpResult::qfmpResult(QString value)
+qfmpResult::qfmpResult(int value):
+    m_custom(NULL)
 {
-    isValid=true;
-    type=qfmpString;
-    str=value;
-    num=0;
-    boolean=false;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    m_custom=NULL;
+    setDouble(value);
 }
 
-qfmpResult::qfmpResult(bool value)
+qfmpResult::qfmpResult(QString value):
+    m_custom(NULL)
 {
-    isValid=true;
-    type=qfmpBool;
-    str="";
-    num=0;
-    boolean=value;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    m_custom=NULL;
+    setString(value);
+}
+
+qfmpResult::qfmpResult(bool value):
+    m_custom(NULL)
+{
+    setBoolean(value);
 }
 
 qfmpResult::qfmpResult(const QVector<double>& value)
 {
-    isValid=true;
-    type=qfmpDoubleVector;
-    str="";
-    num=0;
-    boolean=false;
-    numVec=value;
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    m_custom=NULL;
+    setDoubleVec(value);
 }
 
-qfmpResult::qfmpResult(const QVector<bool> &value)
+qfmpResult::qfmpResult(const QVector<bool> &value):
+    m_custom(NULL)
 {
-    isValid=true;
-    type=qfmpBoolVector;
-    str="";
-    num=0;
-    boolean=false;
-    numVec.clear();
-    boolVec=value;
-    structData.clear();
-    strVec.clear();
-    m_custom=NULL;
+    setBoolVec(value);
 }
 
-qfmpResult::qfmpResult(const QStringList &value)
+qfmpResult::qfmpResult(const QStringList &value):
+    m_custom(NULL)
 {
-    isValid=true;
-    type=qfmpStringVector;
-    str="";
-    num=0;
-    boolean=false;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec=value;
-    m_custom=NULL;
+    setStringVec(value);
 }
 
 qfmpResult::qfmpResult(const qfmpResult &value):
-    isValid(value.isValid),
-    type(value.type),
-    num(value.num),
-    boolean(value.boolean),
     m_custom(NULL)
 {
-    if (type==qfmpString) this->str=value.str;
-    else if (type==qfmpDoubleVector) this->numVec=value.numVec;
-    else if (type==qfmpStringVector) this->strVec=value.strVec;
-    else if (type==qfmpBoolVector) this->boolVec=value.boolVec;
-    else if (type==qfmpStruct) this->structData=value.structData;
-    else if (type==qfmpCustom) this->setCustomCopy(value.custom());
+    set(value);
+
 }
 
 
@@ -169,24 +102,31 @@ qfmpResult &qfmpResult::operator=(const qfmpResult &value)
 
 void qfmpResult::set(const qfmpResult &value)
 {
+    setInvalid();
     isValid=value.isValid;
     type=value.type;
     num=value.num;
     boolean=value.boolean;
+    matrix_columns=value.matrix_columns;
     if (type==qfmpString) this->str=value.str;
     else if (type==qfmpDoubleVector) this->numVec=value.numVec;
+    else if (type==qfmpDoubleMatrix) this->numVec=value.numVec;
     else if (type==qfmpStringVector) this->strVec=value.strVec;
     else if (type==qfmpBoolVector) this->boolVec=value.boolVec;
+    else if (type==qfmpBoolMatrix) this->boolVec=value.boolVec;
     else if (type==qfmpStruct) this->structData=value.structData;
+    else if (type==qfmpList) this->listData=value.listData;
     else if (type==qfmpCustom) this->setCustomCopy(value.custom());
 }
 
 void qfmpResult::setInvalid()
 {
+    matrix_columns=1;
     isValid=false;
     numVec.clear();
     boolVec.clear();
     structData.clear();
+    listData.clear();
     strVec.clear();
     str.clear();
     clearCustom();
@@ -195,13 +135,8 @@ void qfmpResult::setInvalid()
 
 void qfmpResult::setVoid()
 {
+    setInvalid();
     isValid=true;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    str.clear();
-    clearCustom();
     type=qfmpVoid;
 }
 
@@ -209,9 +144,11 @@ QString qfmpResult::toString(int precision) const
 {
     switch(type) {
         case qfmpDouble: return doubleToQString(num, precision);
-        case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec, precision)+QString(" ]");
+        case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec, precision, 'g', '.', ", ")+QString(" ]");
+        case qfmpDoubleMatrix: return QString("[ ")+doubleMatrixToQString(numVec, matrix_columns, precision,'g', '.', ", ", ";\n")+QString(" ]");
         case qfmpStringVector: return QString("[ ")+strVec.join(", ")+QString(" ]");
-        case qfmpBoolVector: return QString("[ ")+boolvectorToQString(boolVec)+QString(" ]");
+        case qfmpBoolVector: return QString("[ ")+boolvectorToQString(boolVec, ", ", " true", "false")+QString(" ]");
+        case qfmpBoolMatrix: return QString("[ ")+boolMatrixToQString(boolVec, matrix_columns, ", ", ";\n", " true", "false")+QString(" ]");
         case qfmpString: return str;
         case qfmpBool: return boolToQString(boolean);
         case qfmpCustom: if (m_custom) return m_custom->toString(precision);
@@ -221,6 +158,14 @@ QString qfmpResult::toString(int precision) const
                 while (it.hasNext()) {
                     it.next();
                     sl<<QString("%1: %2").arg(it.key()).arg(it.value().toString(precision));
+                }
+                return QObject::tr("{ %1 }").arg(sl.join(", "));
+            }
+        case qfmpList: {
+                QStringList sl;
+                QListIterator<qfmpResult> it(listData);
+                while (it.hasNext()) {
+                    sl<<it.next().toString(precision);
                 }
                 return QObject::tr("{ %1 }").arg(sl.join(", "));
             }
@@ -235,9 +180,11 @@ QString qfmpResult::toTypeString(int precision) const
     if (!isValid) return QObject::tr("[INVALID]");
     switch(type) {
         case qfmpDouble: return doubleToQString(num, precision)+QObject::tr(" [number]");
-        case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec, precision)+QObject::tr(" ] [number vector]");
-        case qfmpStringVector: return QString("[ ")+strVec.join(", ")+QObject::tr(" ] [string vector]");
-        case qfmpBoolVector: return QString("[ ")+boolvectorToQString(boolVec)+QObject::tr(" ] [boolean vector]");
+        case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec, precision, 'g', '.', ", ")+QString(" ] [number vector]");
+        case qfmpDoubleMatrix: return QString("[ ")+doubleMatrixToQString(numVec, matrix_columns, precision,'g', '.', ", ", ";\n")+QString(" ] [number matrix]");
+        case qfmpStringVector: return QString("[ ")+strVec.join(", ")+QString(" ] [string vector]");
+        case qfmpBoolVector: return QString("[ ")+boolvectorToQString(boolVec, ", ", "true", "false")+QString(" ] [boolean vector]");
+        case qfmpBoolMatrix: return QString("[ ")+boolMatrixToQString(boolVec, matrix_columns, ", ", ";\n", "true", "false")+QString(" ] [boolean matrix]");
         case qfmpString: return str+QObject::tr(" [string]");
         case qfmpBool: return boolToQString(boolean)+QObject::tr(" [bool]");
         case qfmpVoid: return QObject::tr(" [void]");
@@ -250,6 +197,15 @@ QString qfmpResult::toTypeString(int precision) const
                 }
                 return QObject::tr("{ %1 } [struct]").arg(sl.join(", "));
             }
+        case qfmpList: {
+                QStringList sl;
+                QListIterator<qfmpResult> it(listData);
+                while (it.hasNext()) {
+                    sl<<it.next().toTypeString(precision);
+                }
+                return QObject::tr("{ %1 } [list]").arg(sl.join(", "));
+            }
+
         case qfmpCustom: if (m_custom) return m_custom->toTypeString(precision);
     }
     return QFMathParser::resultTypeToString(type);
@@ -265,20 +221,34 @@ int32_t qfmpResult::toInteger() const
 
 uint32_t qfmpResult::toUInt() const
 {
-    if (type==qfmpDouble) return num;
+    if (type==qfmpDouble && num>=0) return num;
     if (type==qfmpBool) return (boolean)?1:0;
     return 0;
 }
 
-bool qfmpResult::isInteger() const
+QVector<uint32_t> qfmpResult::toUIntVector() const
 {
-    return (type==qfmpDouble)&&(fabs(num)<4294967296.0);
+    QVector<uint32_t> l;
+    if (type==qfmpDoubleVector) {
+        for (int i=0; i<numVec.size(); i++) {
+            l<<uint32_t(numVec[i]);
+        }
+    }
+    return l;
 }
 
-bool qfmpResult::isUInt() const
+QVector<int32_t> qfmpResult::toIntVector() const
 {
-    return type==qfmpDouble&&(fabs(num)<2147483648.0);
+    QVector<int32_t> l;
+    if (type==qfmpDoubleVector) {
+        for (int i=0; i<numVec.size(); i++) {
+            l<<int32_t(numVec[i]);
+        }
+    }
+    return l;
 }
+
+
 
 int qfmpResult::length() const
 {
@@ -286,199 +256,251 @@ int qfmpResult::length() const
     switch(type) {
         case qfmpDouble: return 1;
         case qfmpDoubleVector: return numVec.size();
+        case qfmpDoubleMatrix: return numVec.size();
         case qfmpBoolVector: return boolVec.size();
+        case qfmpBoolMatrix: return boolVec.size();
         case qfmpStringVector: return strVec.size();
         case qfmpString: return str.size();
         case qfmpBool: return 1;
         case qfmpVoid: return 0;
         case qfmpStruct: return structData.size();
+        case qfmpList: return listData.size();
         case qfmpCustom: if (m_custom) return m_custom->length();
     }
     return 0;
 }
 
-bool qfmpResult::isCustom() const
+
+int qfmpResult::sizeX() const
 {
-    return type==qfmpCustom;
+    //if (type==qfmp) return ;
+    if (isMatrix()) return matrix_columns;
+    return length();
 }
 
+
+int qfmpResult::sizeY() const
+{
+    //if (type==qfmp) return ;
+    if (isMatrix()) return length()/matrix_columns;
+    return (length()>0)?1:0;
+}
+
+
+int qfmpResult::dimensions() const
+{
+    if (!isValid) return 0;
+    switch(type) {
+        case qfmpDouble: return 1;
+        case qfmpDoubleVector: return 1;
+        case qfmpDoubleMatrix: return 2;
+        case qfmpBoolVector: return 1;
+        case qfmpBoolMatrix: return 2;
+        case qfmpStringVector: return 1;
+        case qfmpString: return 1;
+        case qfmpBool: return 1;
+        case qfmpVoid: return 0;
+        case qfmpStruct: return 1;
+        case qfmpList: return 1;
+        case qfmpCustom: if (m_custom) return m_custom->dimensions();
+    }
+    return 0;
+}
+
+bool qfmpResult::isMatrix() const
+{
+    if (!isValid) return false;
+    switch(type) {
+        case qfmpDoubleMatrix:
+        case qfmpBoolMatrix: return true;
+        default: return false;
+    }
+    return false;
+}
+
+bool qfmpResult::isUIntVector() const
+{
+    if (type==qfmpDoubleVector) {
+        for (int i=0; i<numVec.size(); i++) {
+            double num=numVec[i];
+            if (!(fabs(num)<2147483648.0)&&(num>=0)&&(num==round(num))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+bool qfmpResult::isIntVector() const
+{
+    if (type==qfmpDoubleVector) {
+        for (int i=0; i<numVec.size(); i++) {
+            double num=numVec[i];
+            if (!(fabs(num)<2147483648.0)&&(num==round(num))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
 void qfmpResult::setCustomCopy(const qfmpCustomResult *val)
 {
+    setInvalid();
     type=qfmpCustom;
-    num=0;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    str.clear();
-    isValid=true;
-    clearCustom();
     m_custom=val->copy();
+    isValid=true;
 }
 
 void qfmpResult::setCustom(qfmpCustomResult *val)
 {
+    setInvalid();
     type=qfmpCustom;
-    num=0;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    str.clear();
-    isValid=true;
-    clearCustom();
     m_custom=val;
+    isValid=true;
 }
 
 void qfmpResult::setDouble(double val)
 {
+    setInvalid();
     type=qfmpDouble;
     num=val;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    str.clear();
     isValid=true;
-    clearCustom();
 }
 
 void qfmpResult::setBoolean(bool val)
 {
+    setInvalid();
     type=qfmpBool;
     boolean=val;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    str.clear();
-    clearCustom();;
     isValid=true;
 }
 
 void qfmpResult::setString(const QString &val)
 {
+    setInvalid();
     type=qfmpString;
     str=val;
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    numVec.clear();
-    clearCustom();;
     isValid=true;
 }
 
 void qfmpResult::setString(int size, QChar defaultChar)
 {
+    setInvalid();
     type=qfmpString;
     str=QString(size, defaultChar);
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    numVec.clear();
-    clearCustom();;
     isValid=true;
 }
 
 void qfmpResult::setDoubleVec(const QVector<double> &val)
 {
+    setInvalid();
     isValid=true;
     type=qfmpDoubleVector;
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
     numVec=val;
-    clearCustom();;
-    str.clear();
 }
 
 void qfmpResult::setDoubleVec(int size, double defaultVal)
 {
+    setInvalid();
     isValid=true;
     type=qfmpDoubleVector;
-    boolVec.clear();
-    structData.clear();
-    strVec.clear();
-    clearCustom();;
     if (size>0) {
         numVec.resize(size);
         for (int i=0; i<size; i++) numVec[i]=defaultVal;
-    } else {
-        numVec.clear();
     }
-    str.clear();
+}
+
+void qfmpResult::setDoubleMatrix(int size, int cols, double defaultVal)
+{
+    setInvalid();
+    isValid=true;
+    type=qfmpDoubleMatrix;
+    matrix_columns=cols;
+    if (size>0) {
+        numVec.resize(size);
+        for (int i=0; i<size; i++) numVec[i]=defaultVal;
+    }
+    //qDebug()<<"double matrix "<<rows()<<columns()<<"  size="<<size<<length()<<" cols="<<cols;
 }
 
 void qfmpResult::setStruct(const QStringList &items)
 {
+    setInvalid();
     isValid=true;
     type=qfmpStruct;
-    boolVec.clear();
-    strVec.clear();
-    clearCustom();;
-    numVec.clear();
-    str.clear();
-    structData.clear();
     for (int i=0; i<items.size(); i++) {
         structData.insert(items[i], qfmpResult::invalidResult());
     }
 }
 
+void qfmpResult::setList(int items)
+{
+    setInvalid();
+    isValid=true;
+    type=qfmpList;
+    for (int i=0; i<items; i++) {
+        listData.append(qfmpResult::invalidResult());
+    }
+}
+
+void qfmpResult::setList(const QList<qfmpResult> &dat)
+{
+    setInvalid();
+    isValid=true;
+    type=qfmpList;
+    listData=dat;
+}
+
 void qfmpResult::setBoolVec(const QVector<bool> &val)
 {
+    setInvalid();
     isValid=true;
     type=qfmpBoolVector;
-    numVec.clear();
-    strVec.clear();
     boolVec=val;
-    str.clear();
-    structData.clear();
-    clearCustom();;
 }
 
 void qfmpResult::setBoolVec(int size, bool defaultVal)
 {
+    setInvalid();
     isValid=true;
     type=qfmpBoolVector;
-    numVec.clear();
-    strVec.clear();
-    structData.clear();
-    clearCustom();;
     if (size>0) {
         boolVec.resize(size);
         for (int i=0; i<size; i++) boolVec[i]=defaultVal;
-    } else {
-        boolVec.clear();
     }
-    str.clear();
+}
+
+void qfmpResult::setBoolMatrix(int size, int cols, bool defaultVal)
+{
+    setInvalid();
+    isValid=true;
+    type=qfmpBoolMatrix;
+    matrix_columns=cols;
+    if (size>0) {
+        boolVec.resize(size);
+        for (int i=0; i<size; i++) boolVec[i]=defaultVal;
+    }
 }
 
 void qfmpResult::setStringVec(const QStringList &val)
 {
+    setInvalid();
     isValid=true;
     type=qfmpStringVector;
-    numVec.clear();
     strVec=val;
-    boolVec.clear();
-    structData.clear();
-    clearCustom();;
-    str.clear();
 }
 
 void qfmpResult::setStringVec(int size, const QString &defaultVal)
 {
+    setInvalid();
     isValid=true;
     type=qfmpStringVector;
-    numVec.clear();
-    boolVec.clear();
-    structData.clear();
     if (size>0) {
         strVec.clear();
         for (int i=0; i<size; i++) strVec<<defaultVal;
-    } else {
-        strVec.clear();
     }
-    str.clear();
 }
 
 QVector<double> qfmpResult::asVector() const
@@ -492,6 +514,19 @@ QVector<double> qfmpResult::asVector() const
             custom()->convertTo(res,qfmpDoubleVector);
             if (res.isValid && res.type==qfmpDoubleVector) return res.numVec;
         }
+    }
+    else if (type==qfmpList) {
+        bool ok=true;
+        QVector<double> v;
+        for (QList<qfmpResult>::const_iterator it=listData.begin(); it!=listData.end(); it++) {
+            if (it->convertsToDouble()) {
+                v<<it->asNumber();
+            } else {
+                ok=false;
+                break;
+            }
+        }
+        if (ok) return v;
     }
     return QVector<double>();
 }
@@ -516,6 +551,10 @@ QVariantList qfmpResult::asVariantList() const
     } else if (type==qfmpBoolVector) {
         for (int i=0; i<boolVec.size(); i++) {
             vl<<boolVec[i];
+        }
+    } else if (type==qfmpList) {
+        for (QList<qfmpResult>::const_iterator it=listData.begin(); it!=listData.end(); it++) {
+            vl<<it->asVariant();
         }
     } else if (type==qfmpCustom && m_custom) {
         return m_custom->asVariantList();
@@ -548,6 +587,16 @@ bool qfmpResult::setVariant(const QVariant& data, bool convertLists) {
         case QVariant::Rect: setDoubleVec(constructQVectorFromItems<double>(data.toRect().x(), data.toRect().y(), data.toRect().width(), data.toRect().height())); break;
         case QVariant::RectF: setDoubleVec(constructQVectorFromItems<double>(data.toRectF().x(), data.toRectF().y(), data.toRectF().width(), data.toRectF().height())); break;
         case QVariant::Invalid: setInvalid(); break;
+        case QVariant::Map: {
+                QVariantMap m=data.toMap();
+                QMapIterator<QString,QVariant> it(m);
+                setStruct(m.keys());
+                while (it.hasNext()) {
+                    it.next();
+                    structData[it.key()]=qfmpResult::invalidResult();
+                    structData[it.key()].setVariant(it.value());
+                }
+            }
         case QVariant::List: {
                 QVariantList vl=data.toList();
                 if (vl.size()>0 && convertLists) {
@@ -563,7 +612,7 @@ bool qfmpResult::setVariant(const QVariant& data, bool convertLists) {
                         case QVariant::String:
                         case QVariant::ByteArray:
                         case QVariant::Url:
-                        default: {isValid=true; type=qfmpStringVector; strVec.clear(); for (int i=0; i<vl.size(); i++) strVec<<vl[i].toString();} break;
+                        default: {setList(vl.size()); for (int i=0; i<listData.size(); i++) listData[i].setVariant(vl[i]);} break;
                     }
                 } else {
                 }
@@ -590,6 +639,16 @@ QVariant qfmpResult::asVariant() const
         vl=asVariantList();
     } else if (type==qfmpBoolVector) {
         vl=asVariantList();
+    } else if (type==qfmpList) {
+        vl=asVariantList();
+    } else if (type==qfmpStruct) {
+        QVariantMap m;
+        QMapIterator<QString,qfmpResult> it(structData);
+        while (it.hasNext()) {
+            it.next();
+            m[it.key()]=it.value().asVariant();
+        }
+        vl=m;
     } else if (type==qfmpCustom && m_custom) {
         QVariantList l=m_custom->asVariantList();
         if (l.size()==1) vl=l[0];
@@ -645,61 +704,12 @@ bool qfmpResult::convertsToStringVector() const
     return false;
 }
 
-bool qfmpResult::convertsToIntVector() const
-{
-    return convertsToVector();
-}
 
-bool qfmpResult::isUsableResult() const
-{
-    return isValid && (type!=qfmpVoid);
-}
 
-double qfmpResult::asNumber() const
-{
-    if (type==qfmpDouble) return num;
-    if (type==qfmpBool) return boolean?1:0;
-    return NAN;
-}
 
-double qfmpResult::asNumberAlsoVector() const
-{
-    if (type==qfmpDouble) return num;
-    if (type==qfmpDoubleVector && numVec.size()>0) return numVec[0];
-    return NAN;
-}
 
-QString qfmpResult::asStringAlsoVector() const
-{
-    if (type==qfmpString) return str;
-    if (type==qfmpStringVector && strVec.size()>0) return strVec[0];
-    return QString();
-}
 
-bool qfmpResult::asBooleanAlsoVector() const
-{
-    if (type==qfmpBool) return boolean;
-    if (type==qfmpBoolVector && boolVec.size()>0) return boolVec[0];
-    return false;
-}
 
-QString qfmpResult::asString() const
-{
-    if (type==qfmpString) return str;
-    return QString();
-}
-
-bool qfmpResult::asBool() const
-{
-    if (type==qfmpBool) return boolean;
-    if (type==qfmpDouble) return num!=0;
-    return false;
-}
-
-qfmpResultType qfmpResult::getType() const
-{
-    return type;
-}
 
 qfmpResult qfmpResult::invalidResult()
 {
@@ -740,6 +750,41 @@ void qfmpResult::setStruct(const QMap<QString, qfmpResult> &data)
 }
 
 
+qfmpResult qfmpResult::getListItem(int item) const
+{
+    if (type==qfmpList) {
+        if (item>=0 && item<listData.size() ) return listData[item];
+    }
+    return qfmpResult::invalidResult();
+}
+
+qfmpResult qfmpResult::getListItem(int item, const qfmpResult &defaultResult) const
+{
+    if (type==qfmpList) {
+        if (item>=0 && item<listData.size() ) return listData[item];
+    }
+    return defaultResult;
+}
+
+void qfmpResult::removeListItem(int item) {
+    if (type==qfmpList) {
+        if (item>=0 && item<listData.size() ) listData.removeAt(item);
+    }
+}
+
+void qfmpResult::appendListItem(const qfmpResult& item) {
+    if (type==qfmpList) {
+        listData.append(item);
+    }
+}
+
+void qfmpResult::insertListItem(int i, const qfmpResult& item) {
+    if (type==qfmpList) {
+        if (i>=0 && i<listData.size() ) listData.insert(i, item);
+        else if (i<0) listData.prepend(item);
+        else if (i>=listData.size()) listData.append(item);
+    }
+}
 
 
 bool qfmpResult::operator!=(const qfmpResult &other) const
@@ -759,7 +804,10 @@ bool qfmpResult::operator==(const qfmpResult &r) const
             return(num==r.num);
             break;
         case (qfmpDoubleVector<<16)+qfmpDoubleVector:
-            return(numVec==r.numVec);
+            return(numVec.size()==r.numVec.size() && numVec==r.numVec);
+            break;
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            return(matrix_columns==r.matrix_columns && numVec.size()==r.numVec.size() && numVec==r.numVec);
             break;
         case (qfmpString<<16)+qfmpString:
             return(str==r.str);
@@ -768,13 +816,19 @@ bool qfmpResult::operator==(const qfmpResult &r) const
             return(boolean==r.boolean);
             break;
         case (qfmpBoolVector<<16)+qfmpBoolVector:
-            return(boolVec==r.boolVec);
+            return(boolVec.size()==r.boolVec.size() && boolVec==r.boolVec);
+            break;
+        case (qfmpBoolMatrix<<16)+qfmpBoolMatrix:
+            return(matrix_columns==r.matrix_columns && boolVec.size()==r.boolVec.size() && boolVec==r.boolVec);
             break;
         case (qfmpStringVector<<16)+qfmpStringVector:
             return(strVec==r.strVec);
             break;
         case (qfmpStruct<<16)+qfmpStruct:
             return(structData==r.structData);
+            break;
+        case (qfmpList<<16)+qfmpList:
+            return(listData==r.listData);
             break;
         case (qfmpCustom<<16)+qfmpCustom: {
                 if (custom() && r.custom()) {
@@ -809,32 +863,46 @@ void qfmpResult::add(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
         case (uint32_t(qfmpDouble)<<16)+qfmpDouble:
             re.setDouble(l.num+r.num);
             break;
-        case (qfmpDoubleVector<<16)+qfmpDouble: {
-            re.setDoubleVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDouble:
+        case (qfmpDoubleMatrix<<16)+qfmpDouble:
+            {
+            re=l;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=l.numVec[i]+r.num;
             }
             break;
         }
-        case (uint32_t(qfmpDouble)<<16)+qfmpDoubleVector: {
-            re.setDoubleVec(r.numVec.size());
+        case (uint32_t(qfmpDouble)<<16)+qfmpDoubleVector:
+        case (uint32_t(qfmpDouble)<<16)+qfmpDoubleMatrix:
+            {
+            re=r;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.num+r.numVec[i];
             }
             break;
         }
-        case (uint32_t(qfmpDoubleVector<<16))+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
+        case (uint32_t(qfmpDoubleVector<<16))+qfmpDoubleVector:
+        case (uint32_t(qfmpDoubleMatrix<<16))+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+                re=r;
+                for (int i=0; i<r.numVec.size(); i++) {
+                    re.numVec[i]=l.numVec[i]+r.numVec[i];
+                }
+                break;
             }
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]+r.numVec[i];
-            }
-            break;
-        }
         case (uint32_t(qfmpString)<<16)+qfmpString:
             re.setString(l.str+r.str);
             break;
@@ -859,35 +927,49 @@ void qfmpResult::sub(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
     uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpDouble<<16)+qfmpDouble:
+        case (uint32_t(qfmpDouble)<<16)+qfmpDouble:
             re.setDouble(l.num-r.num);
             break;
-        case (qfmpDoubleVector<<16)+qfmpDouble: {
-            re.setDoubleVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDouble:
+        case (qfmpDoubleMatrix<<16)+qfmpDouble:
+            {
+            re=l;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=l.numVec[i]-r.num;
             }
             break;
         }
-        case (qfmpDouble<<16)+qfmpDoubleVector: {
-            re.setDoubleVec(r.numVec.size());
+        case (uint32_t(qfmpDouble)<<16)+qfmpDoubleVector:
+        case (uint32_t(qfmpDouble)<<16)+qfmpDoubleMatrix:
+            {
+            re=r;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.num-r.numVec[i];
             }
             break;
         }
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
+        case (uint32_t(qfmpDoubleVector<<16))+qfmpDoubleVector:
+        case (uint32_t(qfmpDoubleMatrix<<16))+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+                re=r;
+                for (int i=0; i<r.numVec.size(); i++) {
+                    re.numVec[i]=l.numVec[i]-r.numVec[i];
+                }
+                break;
             }
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]-r.numVec[i];
-            }
-            break;
-        }
         default:
             if (l.type==qfmpCustom && l.custom()) l.custom()->sub(re, l, r, p);
             else if (r.type==qfmpCustom && r.custom()) r.custom()->sub(re, l, r, p);
@@ -906,35 +988,49 @@ void qfmpResult::mul(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
     uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpDouble<<16)+qfmpDouble:
+        case (uint32_t(qfmpDouble)<<16)+qfmpDouble:
             re.setDouble(l.num*r.num);
             break;
-        case (qfmpDoubleVector<<16)+qfmpDouble: {
-            re.setDoubleVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDouble:
+        case (qfmpDoubleMatrix<<16)+qfmpDouble:
+            {
+            re=l;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=l.numVec[i]*r.num;
             }
             break;
         }
-        case (qfmpDouble<<16)+qfmpDoubleVector: {
-            re.setDoubleVec(r.numVec.size());
+        case (uint32_t(qfmpDouble)<<16)+qfmpDoubleVector:
+        case (uint32_t(qfmpDouble)<<16)+qfmpDoubleMatrix:
+            {
+            re=r;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.num*r.numVec[i];
             }
             break;
         }
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
+        case (uint32_t(qfmpDoubleVector<<16))+qfmpDoubleVector:
+        case (uint32_t(qfmpDoubleMatrix<<16))+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+                re=r;
+                for (int i=0; i<r.numVec.size(); i++) {
+                    re.numVec[i]=l.numVec[i]*r.numVec[i];
+                }
+                break;
             }
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]*r.numVec[i];
-            }
-            break;
-        }
         default:
             if (l.type==qfmpCustom && l.custom()) l.custom()->mul(re, l, r, p);
             else if (l.type==qfmpCustom && r.custom()) r.custom()->mul(re, l, r, p);
@@ -953,35 +1049,49 @@ void qfmpResult::div(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
     uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpDouble<<16)+qfmpDouble:
+        case (uint32_t(qfmpDouble)<<16)+qfmpDouble:
             re.setDouble(l.num/r.num);
             break;
-        case (qfmpDoubleVector<<16)+qfmpDouble: {
-            re.setDoubleVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDouble:
+        case (qfmpDoubleMatrix<<16)+qfmpDouble:
+            {
+            re=l;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=l.numVec[i]/r.num;
             }
             break;
         }
-        case (qfmpDouble<<16)+qfmpDoubleVector: {
-            re.setDoubleVec(r.numVec.size());
+        case (uint32_t(qfmpDouble)<<16)+qfmpDoubleVector:
+        case (uint32_t(qfmpDouble)<<16)+qfmpDoubleMatrix:
+            {
+            re=r;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.num/r.numVec[i];
             }
             break;
         }
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
+        case (uint32_t(qfmpDoubleVector<<16))+qfmpDoubleVector:
+        case (uint32_t(qfmpDoubleMatrix<<16))+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+                re=r;
+                for (int i=0; i<r.numVec.size(); i++) {
+                    re.numVec[i]=l.numVec[i]/r.numVec[i];
+                }
+                break;
             }
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]/r.numVec[i];
-            }
-            break;
-        }
         default:
             if (l.type==qfmpCustom && l.custom()) l.custom()->div(re, l, r, p);
             else if (l.type==qfmpCustom && r.custom()) r.custom()->div(re, l, r, p);
@@ -1003,27 +1113,41 @@ void qfmpResult::mod(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
         case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(double(l.toInteger()%r.toInteger()));
             break;
-        case (qfmpDoubleVector<<16)+qfmpDouble: {
-            re.setDoubleVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDouble:
+        case (qfmpDoubleMatrix<<16)+qfmpDouble:
+            {
+            re=l;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=int32_t(l.numVec[i])%r.toInteger();
             }
             break;
         }
-        case (qfmpDouble<<16)+qfmpDoubleVector: {
-            re.setDoubleVec(r.numVec.size());
+        case (qfmpDouble<<16)+qfmpDoubleVector:
+        case (qfmpDouble<<16)+qfmpDoubleMatrix:
+            {
+            re=r;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.toInteger()%int32_t(r.numVec[i]);
             }
             break;
         }
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            {
+            if (l.isMatrix()) {
+                if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                    if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                    re.setInvalid();
+                    return;
+                }
+            } else {
+                if (l.length()!=r.length()) {
+                    if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                    re.setInvalid();
+                    return;
+                }
             }
-            re.setDoubleVec(l.numVec.size());
+            re=l;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=int32_t(l.numVec[i])%int32_t(r.numVec[i]);
             }
@@ -1050,27 +1174,42 @@ void qfmpResult::power(qfmpResult& re, const qfmpResult &l, const qfmpResult &r,
         case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(pow(l.num,r.num));
             break;
-        case (qfmpDoubleVector<<16)+qfmpDouble: {
-            re.setDoubleVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDouble:
+        case (qfmpDoubleMatrix<<16)+qfmpDouble:
+            {
+            re=l;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=pow(l.numVec[i],r.num);
             }
             break;
         }
-        case (qfmpDouble<<16)+qfmpDoubleVector: {
-            re.setDoubleVec(r.numVec.size());
+        case (qfmpDouble<<16)+qfmpDoubleVector:
+        case (qfmpDouble<<16)+qfmpDoubleMatrix:
+            {
+            re=r;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=pow(l.num,r.numVec[i]);
             }
             break;
         }
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
-            }
-            re.setDoubleVec(r.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+
+            re=r;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=pow(l.numVec[i],r.numVec[i]);
             }
@@ -1097,27 +1236,41 @@ void qfmpResult::bitwiseand(qfmpResult& re, const qfmpResult &l, const qfmpResul
         case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(double(l.toInteger()&r.toInteger()));
             break;
-        case (qfmpDoubleVector<<16)+qfmpDouble: {
-            re.setDoubleVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDouble:
+        case (qfmpDoubleMatrix<<16)+qfmpDouble:
+            {
+            re=l;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=int32_t(l.numVec[i])&r.toInteger();
             }
             break;
         }
-        case (qfmpDouble<<16)+qfmpDoubleVector: {
-            re.setDoubleVec(r.numVec.size());
+        case (qfmpDouble<<16)+qfmpDoubleVector:
+        case (qfmpDouble<<16)+qfmpDoubleMatrix:
+            {
+            re=r;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.toInteger()&int32_t(r.numVec[i]);
             }
             break;
         }
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
-            }
-            re.setDoubleVec(r.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+            re=r;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=int32_t(l.numVec[i])&int32_t(r.numVec[i]);
             }
@@ -1144,27 +1297,42 @@ void qfmpResult::bitwiseor(qfmpResult& re, const qfmpResult &l, const qfmpResult
         case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(double(l.toInteger()|r.toInteger()));
             break;
-        case (qfmpDoubleVector<<16)+qfmpDouble: {
-            re.setDoubleVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDouble:
+        case (qfmpDoubleMatrix<<16)+qfmpDouble:
+            {
+            re=r;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=int32_t(l.numVec[i])|r.toInteger();
             }
             break;
         }
-        case (qfmpDouble<<16)+qfmpDoubleVector: {
-            re.setDoubleVec(r.numVec.size());
+        case (qfmpDouble<<16)+qfmpDoubleVector:
+        case (qfmpDouble<<16)+qfmpDoubleMatrix:
+            {
+            re=l;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.toInteger()|int32_t(r.numVec[i]);
             }
             break;
         }
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            {
+            if (l.isMatrix()) {
+                if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                    if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                    re.setInvalid();
+                    return;
+                }
+            } else {
+                if (l.length()!=r.length()) {
+                    if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                    re.setInvalid();
+                    return;
+                }
             }
-            re.setDoubleVec(r.numVec.size());
+
+            re=r;
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=int32_t(l.numVec[i])|int32_t(r.numVec[i]);
             }
@@ -1191,20 +1359,32 @@ void qfmpResult::logicand(qfmpResult& re, const qfmpResult &l, const qfmpResult 
         case (qfmpBool<<16)+qfmpBool:
             re.setBoolean(l.boolean&&r.boolean);
             break;
-        case (qfmpBoolVector<<16)+qfmpBoolVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
-            }
-            re.setBoolVec(r.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBoolVector:
+        case (qfmpBoolMatrix<<16)+qfmpBoolMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+            re=r;
             for (int i=0; i<r.boolVec.size(); i++) {
                 re.boolVec[i]=l.boolVec[i]&&r.boolVec[i];
             }
             break;
         }
-        case (qfmpBoolVector<<16)+qfmpBool: {
-            re.setBoolVec(l.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBool:
+        case (qfmpBoolMatrix<<16)+qfmpBool:
+            {
+            re=l;
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=l.boolVec[i]&&r.boolean;
             }
@@ -1232,20 +1412,32 @@ void qfmpResult::logicor(qfmpResult& re, const qfmpResult &l, const qfmpResult &
         case (qfmpBool<<16)+qfmpBool:
             re.setBoolean(l.boolean||r.boolean);
             break;
-        case (qfmpBoolVector<<16)+qfmpBoolVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
-            }
-            re.setBoolVec(r.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBoolVector:
+        case (qfmpBoolMatrix<<16)+qfmpBoolMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+            re=r;
             for (int i=0; i<r.boolVec.size(); i++) {
                 re.boolVec[i]=l.boolVec[i]||r.boolVec[i];
             }
             break;
         }
-        case (qfmpBoolVector<<16)+qfmpBool: {
-            re.setBoolVec(l.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBool:
+        case (qfmpBoolMatrix<<16)+qfmpBool:
+            {
+            re=l;
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=l.boolVec[i]||r.boolean;
             }
@@ -1266,8 +1458,10 @@ void qfmpResult::logicnot(qfmpResult& re, const qfmpResult &l, QFMathParser *p)
 {
     switch(l.type) {
         case qfmpBool: re.setBoolean(!l.boolean); break;
-        case qfmpBoolVector: {
-            re.setBoolVec(l.boolVec.size());
+        case qfmpBoolVector:
+        case qfmpBoolMatrix:
+            {
+            re=l;
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=!l.boolVec[i];
             }
@@ -1295,20 +1489,32 @@ void qfmpResult::logicnand(qfmpResult &re, const qfmpResult &l, const qfmpResult
         case (qfmpBool<<16)+qfmpBool:
             re.setBoolean(!(l.boolean&&r.boolean));
             break;
-        case (qfmpBoolVector<<16)+qfmpBoolVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
-            }
-            re.setBoolVec(r.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBoolVector:
+        case (qfmpBoolMatrix<<16)+qfmpBoolMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+            re=r;
             for (int i=0; i<r.boolVec.size(); i++) {
                 re.boolVec[i]=!(l.boolVec[i]&&r.boolVec[i]);
             }
             break;
         }
-        case (qfmpBoolVector<<16)+qfmpBool: {
-            re.setBoolVec(l.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBool:
+        case (qfmpBoolMatrix<<16)+qfmpBool:
+            {
+            re=l;
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=!(l.boolVec[i]&&r.boolean);
             }
@@ -1335,20 +1541,31 @@ void qfmpResult::logicnor(qfmpResult &re, const qfmpResult &l, const qfmpResult 
         case (qfmpBool<<16)+qfmpBool:
             re.setBoolean(!(l.boolean||r.boolean));
             break;
-        case (qfmpBoolVector<<16)+qfmpBoolVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
-            }
-            re.setBoolVec(r.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBoolVector:
+        case (qfmpBoolMatrix<<16)+qfmpBoolMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+            re=r;
             for (int i=0; i<r.boolVec.size(); i++) {
                 re.boolVec[i]=!(l.boolVec[i]||r.boolVec[i]);
             }
             break;
         }
-        case (qfmpBoolVector<<16)+qfmpBool: {
-            re.setBoolVec(l.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBool:
+        case (qfmpBoolMatrix<<16)+qfmpBool: {
+            re=l;
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=!(l.boolVec[i]||r.boolean);
             }
@@ -1375,20 +1592,32 @@ void qfmpResult::logicxor(qfmpResult &re, const qfmpResult &l, const qfmpResult 
         case (qfmpBool<<16)+qfmpBool:
             re.setBoolean((l.boolean&&!r.boolean)||(!l.boolean&&r.boolean));
             break;
-        case (qfmpBoolVector<<16)+qfmpBoolVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                re.setInvalid();
-                return;
-            }
-            re.setBoolVec(r.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBoolVector:
+        case (qfmpBoolMatrix<<16)+qfmpBoolVector:
+            {
+                if (l.isMatrix()) {
+                    if (l.length()!=r.length() || r.matrix_columns!=l.matrix_columns) {
+                        if (p) p->qfmpError(QObject::tr("matrix arguments have to have the same size, but sizes were left=%1x%2, right=%3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        re.setInvalid();
+                        return;
+                    }
+                } else {
+                    if (l.length()!=r.length()) {
+                        if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
+                        re.setInvalid();
+                        return;
+                    }
+                }
+            re=r;
             for (int i=0; i<r.boolVec.size(); i++) {
                 re.boolVec[i]=(!l.boolVec[i]&&r.boolVec[i])||(l.boolVec[i]&&!r.boolVec[i]);
             }
             break;
         }
-        case (qfmpBoolVector<<16)+qfmpBool: {
-            re.setBoolVec(l.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBool:
+        case (qfmpBoolMatrix<<16)+qfmpBool:
+            {
+            re=l;
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=(!l.boolVec[i]&&r.boolean)||(l.boolVec[i]&&!r.boolean);
             }
@@ -1409,8 +1638,10 @@ void qfmpResult::neg(qfmpResult& re, const qfmpResult &l, QFMathParser *p)
 {
     switch(l.type) {
         case qfmpDouble: re.setDouble(-l.num); break;
-        case qfmpDoubleVector: {
-            re.setDoubleVec(l.numVec);
+        case qfmpDoubleVector:
+        case qfmpDoubleMatrix:
+            {
+            re=l;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=l.numVec[i];
             }
@@ -1431,8 +1662,10 @@ void qfmpResult::bitwisenot(qfmpResult& re, const qfmpResult &l, QFMathParser *p
 {
     switch(l.type) {
         case qfmpDouble: re.setDouble(double(~l.toInteger())); break;
-        case qfmpDoubleVector: {
-            re.setDoubleVec(l.numVec);
+        case qfmpDoubleVector:
+        case qfmpDoubleMatrix:
+            {
+            re=l;
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=~int32_t(l.numVec[i]);
             }
@@ -1456,13 +1689,25 @@ void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpRe
         case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num==r.num);
             break;
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.numVec.size()!=r.numVec.size()) {
-                res.setInvalid();
-                if (p) p->qfmpError(QObject::tr("vectors in comparison '==' have different length"));
-                return;
-            }
-            res.setBoolVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.numVec.size()!=r.numVec.size() || l.matrix_columns!=r.matrix_columns) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("matrix in comparison '==' have different sizes (%1x%2 and %3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        return;
+                    }
+                    res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+                } else {
+                    if (l.numVec.size()!=r.numVec.size()) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("vectors in comparison '==' have different length (%1 and %2)").arg(l.length()).arg(r.length()));
+                        return;
+                    }
+                    res.setBoolVec(l.numVec.size());
+                }
+
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]==r.numVec[i]);
             }
@@ -1479,7 +1724,25 @@ void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpRe
                 res.boolVec[i]=(r.numVec[i]==l.num);
             }
             } break;
+        case (qfmpDoubleMatrix<<16)+qfmpDouble: {
+            res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]==r.num);
+            }
+            } break;
+        case (qfmpDouble<<16)+qfmpDoubleMatrix: {
+            res.setBoolMatrix(r.numVec.size(), r.matrix_columns);
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(r.numVec[i]==l.num);
+            }
+            } break;
 
+        case (qfmpList<<16)+qfmpList:
+            res.setBoolean(l.listData==r.listData);
+            break;
+        case (qfmpStruct<<16)+qfmpStruct:
+            res.setBoolean(l.structData==r.structData);
+            break;
         case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str==r.str);
             break;
@@ -1511,13 +1774,24 @@ void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpRe
         case (qfmpBool<<16)+qfmpBool:
             res.setBoolean(l.boolean==r.boolean);
             break;
-        case (qfmpBoolVector<<16)+qfmpBoolVector: {
-            if (l.boolVec.size()!=r.boolVec.size()) {
-                res.setInvalid();
-                if (p) p->qfmpError(QObject::tr("vectors in comparison '==' have different length"));
-                return;
-            }
-            res.setBoolVec(l.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBoolVector:
+        case (qfmpBoolMatrix<<16)+qfmpBoolMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.boolVec.size()!=r.boolVec.size() || l.matrix_columns!=r.matrix_columns) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("matrix in comparison '==' have different sizes (%1x%2 and %3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        return;
+                    }
+                    res.setBoolMatrix(l.boolVec.size(), l.matrix_columns);
+                } else {
+                    if (l.boolVec.size()!=r.boolVec.size()) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("vectors in comparison '==' have different length (%1 and %2)").arg(l.length()).arg(r.length()));
+                        return;
+                    }
+                    res.setBoolVec(l.boolVec.size());
+                }
             for (int i=0; i<l.boolVec.size(); i++) {
                 res.boolVec[i]=(l.boolVec[i]==r.boolVec[i]);
             }
@@ -1530,6 +1804,18 @@ void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpRe
             } break;
         case (qfmpBool<<16)+qfmpBoolVector: {
             res.setBoolVec(r.boolVec.size());
+            for (int i=0; i<r.boolVec.size(); i++) {
+                res.boolVec[i]=(r.boolVec[i]==l.boolean);
+            }
+            } break;
+        case (qfmpBoolMatrix<<16)+qfmpBool: {
+            res.setBoolMatrix(l.boolVec.size(), l.matrix_columns);
+            for (int i=0; i<l.boolVec.size(); i++) {
+                res.boolVec[i]=(l.boolVec[i]==r.boolean);
+            }
+            } break;
+        case (qfmpBool<<16)+qfmpBoolMatrix: {
+            res.setBoolMatrix(r.boolVec.size(), r.matrix_columns);
             for (int i=0; i<r.boolVec.size(); i++) {
                 res.boolVec[i]=(r.boolVec[i]==l.boolean);
             }
@@ -1551,13 +1837,25 @@ void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfm
         case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num!=r.num);
             break;
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.numVec.size()!=r.numVec.size()) {
-                res.setInvalid();
-                if (p) p->qfmpError(QObject::tr("vectors in comparison '!=' have different length"));
-                return;
-            }
-            res.setBoolVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.numVec.size()!=r.numVec.size() || l.matrix_columns!=r.matrix_columns) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("matrix in comparison '!=' have different sizes (%1x%2 and %3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        return;
+                    }
+                    res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+                } else {
+                    if (l.numVec.size()!=r.numVec.size()) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("vectors in comparison '!=' have different length (%1 and %2)").arg(l.length()).arg(r.length()));
+                        return;
+                    }
+                    res.setBoolVec(l.numVec.size());
+                }
+
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]!=r.numVec[i]);
             }
@@ -1574,7 +1872,25 @@ void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfm
                 res.boolVec[i]=(r.numVec[i]!=l.num);
             }
             } break;
+        case (qfmpDoubleMatrix<<16)+qfmpDouble: {
+            res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]!=r.num);
+            }
+            } break;
+        case (qfmpDouble<<16)+qfmpDoubleMatrix: {
+            res.setBoolMatrix(r.numVec.size(), r.matrix_columns);
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(r.numVec[i]!=l.num);
+            }
+            } break;
 
+        case (qfmpList<<16)+qfmpList:
+            res.setBoolean(l.listData!=r.listData);
+            break;
+        case (qfmpStruct<<16)+qfmpStruct:
+            res.setBoolean(l.structData!=r.structData);
+            break;
         case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str!=r.str);
             break;
@@ -1606,13 +1922,24 @@ void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfm
         case (qfmpBool<<16)+qfmpBool:
             res.setBoolean(l.boolean!=r.boolean);
             break;
-        case (qfmpBoolVector<<16)+qfmpBoolVector: {
-            if (l.boolVec.size()!=r.boolVec.size()) {
-                res.setInvalid();
-                if (p) p->qfmpError(QObject::tr("vectors in comparison '!=' have different length"));
-                return;
-            }
-            res.setBoolVec(l.boolVec.size());
+        case (qfmpBoolVector<<16)+qfmpBoolVector:
+        case (qfmpBoolMatrix<<16)+qfmpBoolMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.boolVec.size()!=r.boolVec.size() || l.matrix_columns!=r.matrix_columns) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("matrix in comparison '!=' have different sizes (%1x%2 and %3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        return;
+                    }
+                    res.setBoolMatrix(l.boolVec.size(), l.matrix_columns);
+                } else {
+                    if (l.boolVec.size()!=r.boolVec.size()) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("vectors in comparison '!=' have different length (%1 and %2)").arg(l.length()).arg(r.length()));
+                        return;
+                    }
+                    res.setBoolVec(l.boolVec.size());
+                }
             for (int i=0; i<l.boolVec.size(); i++) {
                 res.boolVec[i]=(l.boolVec[i]!=r.boolVec[i]);
             }
@@ -1625,6 +1952,18 @@ void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfm
             } break;
         case (qfmpBool<<16)+qfmpBoolVector: {
             res.setBoolVec(r.boolVec.size());
+            for (int i=0; i<r.boolVec.size(); i++) {
+                res.boolVec[i]=(r.boolVec[i]!=l.boolean);
+            }
+            } break;
+        case (qfmpBoolMatrix<<16)+qfmpBool: {
+            res.setBoolMatrix(l.boolVec.size(), l.matrix_columns);
+            for (int i=0; i<l.boolVec.size(); i++) {
+                res.boolVec[i]=(l.boolVec[i]!=r.boolean);
+            }
+            } break;
+        case (qfmpBool<<16)+qfmpBoolMatrix: {
+            res.setBoolMatrix(r.boolVec.size(), r.matrix_columns);
             for (int i=0; i<r.boolVec.size(); i++) {
                 res.boolVec[i]=(r.boolVec[i]!=l.boolean);
             }
@@ -1647,13 +1986,25 @@ void qfmpResult::comparegreater(qfmpResult& res, const qfmpResult &l, const qfmp
         case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num>r.num);
             break;
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.numVec.size()!=r.numVec.size()) {
-                res.setInvalid();
-                if (p) p->qfmpError(QObject::tr("vectors in comparison '>' have different length"));
-                return;
-            }
-            res.setBoolVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.numVec.size()!=r.numVec.size() || l.matrix_columns!=r.matrix_columns) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("matrix in comparison '>' have different sizes (%1x%2 and %3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        return;
+                    }
+                    res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+                } else {
+                    if (l.numVec.size()!=r.numVec.size()) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("vectors in comparison '>' have different length (%1 and %2)").arg(l.length()).arg(r.length()));
+                        return;
+                    }
+                    res.setBoolVec(l.numVec.size());
+                }
+
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]>r.numVec[i]);
             }
@@ -1667,9 +2018,22 @@ void qfmpResult::comparegreater(qfmpResult& res, const qfmpResult &l, const qfmp
         case (qfmpDouble<<16)+qfmpDoubleVector: {
             res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
-                res.boolVec[i]=(l.num>r.numVec[i]);
+                res.boolVec[i]=(r.numVec[i]>l.num);
             }
             } break;
+        case (qfmpDoubleMatrix<<16)+qfmpDouble: {
+            res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]>r.num);
+            }
+            } break;
+        case (qfmpDouble<<16)+qfmpDoubleMatrix: {
+            res.setBoolMatrix(r.numVec.size(), r.matrix_columns);
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(r.numVec[i]>l.num);
+            }
+            } break;
+
 
         case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str>r.str);
@@ -1694,9 +2058,12 @@ void qfmpResult::comparegreater(qfmpResult& res, const qfmpResult &l, const qfmp
         case (qfmpString<<16)+qfmpStringVector: {
             res.setBoolVec(r.strVec.size());
             for (int i=0; i<r.strVec.size(); i++) {
-                res.boolVec[i]=(l.str>r.strVec[i]);
+                res.boolVec[i]=(r.strVec[i]>l.str);
             }
             } break;
+
+
+
 
 
         default:
@@ -1718,13 +2085,25 @@ void qfmpResult::comparegreaterequal(qfmpResult& res, const qfmpResult &l, const
         case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num>=r.num);
             break;
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.numVec.size()!=r.numVec.size()) {
-                res.setInvalid();
-                if (p) p->qfmpError(QObject::tr("vectors in comparison '>=' have different length"));
-                return;
-            }
-            res.setBoolVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.numVec.size()!=r.numVec.size() || l.matrix_columns!=r.matrix_columns) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("matrix in comparison '>=' have different sizes (%1x%2 and %3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        return;
+                    }
+                    res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+                } else {
+                    if (l.numVec.size()!=r.numVec.size()) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("vectors in comparison '>=' have different length (%1 and %2)").arg(l.length()).arg(r.length()));
+                        return;
+                    }
+                    res.setBoolVec(l.numVec.size());
+                }
+
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]>=r.numVec[i]);
             }
@@ -1738,9 +2117,22 @@ void qfmpResult::comparegreaterequal(qfmpResult& res, const qfmpResult &l, const
         case (qfmpDouble<<16)+qfmpDoubleVector: {
             res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
-                res.boolVec[i]=(l.num>=r.numVec[i]);
+                res.boolVec[i]=(r.numVec[i]>=l.num);
             }
             } break;
+        case (qfmpDoubleMatrix<<16)+qfmpDouble: {
+            res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]>=r.num);
+            }
+            } break;
+        case (qfmpDouble<<16)+qfmpDoubleMatrix: {
+            res.setBoolMatrix(r.numVec.size(), r.matrix_columns);
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(r.numVec[i]>=l.num);
+            }
+            } break;
+
 
         case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str>=r.str);
@@ -1765,7 +2157,7 @@ void qfmpResult::comparegreaterequal(qfmpResult& res, const qfmpResult &l, const
         case (qfmpString<<16)+qfmpStringVector: {
             res.setBoolVec(r.strVec.size());
             for (int i=0; i<r.strVec.size(); i++) {
-                res.boolVec[i]=(l.str>=r.strVec[i]);
+                res.boolVec[i]=(r.strVec[i]>=l.str);
             }
             } break;
 
@@ -1791,13 +2183,25 @@ void qfmpResult::comparesmaller(qfmpResult& res, const qfmpResult &l, const qfmp
         case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num<r.num);
             break;
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.numVec.size()!=r.numVec.size()) {
-                res.setInvalid();
-                if (p) p->qfmpError(QObject::tr("vectors in comparison '<' have different length"));
-                return;
-            }
-            res.setBoolVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.numVec.size()!=r.numVec.size() || l.matrix_columns!=r.matrix_columns) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("matrix in comparison '<' have different sizes (%1x%2 and %3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        return;
+                    }
+                    res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+                } else {
+                    if (l.numVec.size()!=r.numVec.size()) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("vectors in comparison '<' have different length (%1 and %2)").arg(l.length()).arg(r.length()));
+                        return;
+                    }
+                    res.setBoolVec(l.numVec.size());
+                }
+
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]<r.numVec[i]);
             }
@@ -1811,9 +2215,22 @@ void qfmpResult::comparesmaller(qfmpResult& res, const qfmpResult &l, const qfmp
         case (qfmpDouble<<16)+qfmpDoubleVector: {
             res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
-                res.boolVec[i]=(l.num<r.numVec[i]);
+                res.boolVec[i]=(r.numVec[i]<l.num);
             }
             } break;
+        case (qfmpDoubleMatrix<<16)+qfmpDouble: {
+            res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]<r.num);
+            }
+            } break;
+        case (qfmpDouble<<16)+qfmpDoubleMatrix: {
+            res.setBoolMatrix(r.numVec.size(), r.matrix_columns);
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(r.numVec[i]<l.num);
+            }
+            } break;
+
 
         case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str<r.str);
@@ -1838,7 +2255,7 @@ void qfmpResult::comparesmaller(qfmpResult& res, const qfmpResult &l, const qfmp
         case (qfmpString<<16)+qfmpStringVector: {
             res.setBoolVec(r.strVec.size());
             for (int i=0; i<r.strVec.size(); i++) {
-                res.boolVec[i]=(l.str<r.strVec[i]);
+                res.boolVec[i]=(r.strVec[i]<l.str);
             }
             } break;
 
@@ -1861,13 +2278,25 @@ void qfmpResult::comparesmallerequal(qfmpResult& res, const qfmpResult &l, const
         case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num<=r.num);
             break;
-        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
-            if (l.numVec.size()!=r.numVec.size()) {
-                res.setInvalid();
-                if (p) p->qfmpError(QObject::tr("vectors in comparison '<=' have different length"));
-                return;
-            }
-            res.setBoolVec(l.numVec.size());
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
+        case (qfmpDoubleMatrix<<16)+qfmpDoubleMatrix:
+            {
+                if (l.isMatrix()) {
+                    if (l.numVec.size()!=r.numVec.size() || l.matrix_columns!=r.matrix_columns) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("matrix in comparison '<=' have different sizes (%1x%2 and %3x%4").arg(l.rows()).arg(l.columns()).arg(r.rows()).arg(r.columns()));
+                        return;
+                    }
+                    res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+                } else {
+                    if (l.numVec.size()!=r.numVec.size()) {
+                        res.setInvalid();
+                        if (p) p->qfmpError(QObject::tr("vectors in comparison '<=' have different length (%1 and %2)").arg(l.length()).arg(r.length()));
+                        return;
+                    }
+                    res.setBoolVec(l.numVec.size());
+                }
+
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]<=r.numVec[i]);
             }
@@ -1881,9 +2310,22 @@ void qfmpResult::comparesmallerequal(qfmpResult& res, const qfmpResult &l, const
         case (qfmpDouble<<16)+qfmpDoubleVector: {
             res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
-                res.boolVec[i]=(l.num<=r.numVec[i]);
+                res.boolVec[i]=(r.numVec[i]<=l.num);
             }
             } break;
+        case (qfmpDoubleMatrix<<16)+qfmpDouble: {
+            res.setBoolMatrix(l.numVec.size(), l.matrix_columns);
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]<=r.num);
+            }
+            } break;
+        case (qfmpDouble<<16)+qfmpDoubleMatrix: {
+            res.setBoolMatrix(r.numVec.size(), r.matrix_columns);
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(r.numVec[i]<=l.num);
+            }
+            } break;
+
 
         case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str<=r.str);
@@ -1908,7 +2350,7 @@ void qfmpResult::comparesmallerequal(qfmpResult& res, const qfmpResult &l, const
         case (qfmpString<<16)+qfmpStringVector: {
             res.setBoolVec(r.strVec.size());
             for (int i=0; i<r.strVec.size(); i++) {
-                res.boolVec[i]=(l.str<=r.strVec[i]);
+                res.boolVec[i]=(r.strVec[i]<=l.str);
             }
             } break;
 
@@ -1929,6 +2371,7 @@ void qfmpResult::clearCustom()
     if (m_custom) delete m_custom;
     m_custom=NULL;
 }
+
 
 
 
@@ -2013,6 +2456,12 @@ int qfmpCustomResult::length() const
 {
     return 1;
 }
+
+int qfmpCustomResult::dimensions() const
+{
+    return 1;
+}
+
 
 void qfmpCustomResult::clear()
 {
@@ -2198,10 +2647,13 @@ QString qfmpResultTypeToString(qfmpResultType type)
         case qfmpString: return QObject::tr("string");
         case qfmpBool: return QObject::tr("bool");
         case qfmpDoubleVector: return QObject::tr("number vector");
+        case qfmpDoubleMatrix: return QObject::tr("number matrix");
         case qfmpStringVector: return QObject::tr("string vector");
         case qfmpBoolVector: return QObject::tr("bool vector");
+        case qfmpBoolMatrix: return QObject::tr("bool matrix");
         case qfmpVoid: return QObject::tr("void");
         case qfmpStruct: return QObject::tr("struct");
+        case qfmpList: return QObject::tr("list");
         case qfmpCustom: return QObject::tr("custom");
     }
     return QObject::tr("invalid");

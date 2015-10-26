@@ -33,7 +33,15 @@
           <li>moved QuickFit 3.0 to GitHub: <a href="https://github.com/jkriege2/QuickFit3.git">https://github.com/jkriege2/QuickFit3.git</a>.</li>
     </ul></li>
     <li><b>new plugins:</b><ul>
-          <li><b>fit_nlopt</b>:  makes the global optimizaton algorithms from the NLopt library available in QuickFit as (least-squares) fit algorithms</li>
+        <li><b>fit_nlopt</b>:  makes the global optimizaton algorithms from the NLopt library available in QuickFit as (least-squares) fit algorithms</li>
+        <li><b>curve</b>:  simple x/y (+errors) curves in the project. The source code of this plugin is also described online under <a href="https://github.com/jkriege2/QuickFit3/wiki/Write-an-RDR-plugin">https://github.com/jkriege2/QuickFit3/wiki/Write-an-RDR-plugin</a>.</li>
+        <li><b>curve_fit</b>:  simple least-squares fit for graphs/curves in curve- and table-RDRs.</li>
+        <li><b>qfe_alexeval</b>: added old evaluation code for ALEX-spFRET measurements from Sebastian Isbaner as plugin (registered in the extensions.menu of the main window!).</li>
+        <li><b>qfe_alexcontrol</b>: added old hardwrae control code for ALEX-spFRET measurements from Sebastian Isbaner as plugin (registered in the extensions.menu of the main window!).</li>
+        <li><b>qfqtimageimporter</b>: provides image series readers for BMP-, GIF-, PNG-, JPEG-, PPM-, PNM-, PGM-files. All are absed on the image-reading framework of Qt</li>
+        <li><b>qfe_dataexportbasics_xlsx</b>: export data-tables to Microsoft Excel (r) XLSX-files</li>
+        <li><b>qfe_nidaqmxreader</b>: allows to sample analog input channels of a National Instrument DAQ-card using the NI-DAQmx driver package (if available on your computer).</li>
+        <li><b>qfe_fcssimulator</b>: plugin, which controls an open-source FCS/FCCS simulator, available in this installation and under <a href="https://github.com/jkriege2/FCSSimulator">https://github.com/jkriege2/FCSSimulator</a>.</li>
     </ul></li>
     <li><b>QuickFit</b><ul>
       <li>plotter widgets:<ul>
@@ -41,18 +49,31 @@
         <li>improved autoscaling/zoom behaviour if data contains NANs</li>
         <li>bugfix: copy images didn't work in some cases</li>
         <li>you can now also copy the color palettes of an image plot to the clipboard</li>
+        <li>bugfix: barcharts (bar widths) now also work for unsorted category data</li>
+        <li>bugfix: copy to clipboard as image now works better on Windows (before it was not that easy to paste into PowerPoint!)</li>
+        <li>added context-menu entry that allows to add plot curves to a curve RDR (e.g. for later data-fitting)</li>
       </ul></li>
       <li>expression parser:<ul>
         <li>added vector creation functions ones(), zeros(), linspace(), logspace(), vector() meshgrid2d_x(), meshgrid2d_y()</li>
         <li>added function for real-values Faddeeva function used in TIR-FCS fit models: faddeeva_real()</li>
         <li>added function comment(), which does nothing and ignores any number of parameters</li>
+        <li>added functions repeat() and repeatstring()</li>
         <li>added comments (single line with <tt>//</tt>, or multi-line <tt>/* ... */</tt>.</li>
         <li>bugfix: functions randvec(N,v1,v2) and randintvec(N,v1,v2) now work properly if more than 1 parameters are given</li>
+        <li>bugfix: savefor() didn't work correctly for <tt>savefor(i,0:3,if(i%2==0,i,"bla"))</tt></li>
+        <li>improved function <tt>fitfunction_init(), fitfunction_fix()</tt>, so parameters can be altered by parameter name</li>
+        <li>added functions: <tt>fitfunction_setparam(), fitfunction_setparammin(), fitfunction_setparammax(), fitfunction_parammins(), fitfunction_parammaxs(), fitfunction_paramabsmins(), fitfunction_paramabsmaxs(), fitfunction_fitranged(), fitranged()</tt></li>
+        <li>added functions: <tt>binomial(), factorial(), poissonpdf(), binomialpdf()</tt></li>
+        <li>added a new datatype "list", which is a list of (possibly different) values </li>
+        <li>added a new datatypes "boolmatrix" and "doublematrix"</li>
+        <li>added functions: <tt>list(), listappend(), listinsert(), listremove(), size(), sizecolumns(), sizerows(), dimensions(), doublematrix(), boolmatrix()</tt></li>
+        <li>added functions: <tt>reshape(), mat2vec(), vec2mat()</tt></li>
       </ul></li>
       <li>online-help:<ul>
           <li>bugfix: the DOI's in the help texts should be linked now again!</li>
           <li>bugfix: in some cases the equations in a tooltip were displayed wrong (mixed up with old renderings!)</li>
           <li>bugfix: fixed an endless loop of the preparation of online-help pages in some cases</li>
+          <li>added help-page on how to write a QFRawDataRecord plugin</li>
       </ul></li>
       <li>QF 3 now compiles with Qt 5.4 on MacOS X!</li>
       <li>added Faddeeva Package to support real-valued Faddeeva-Function, which is required by some TIR-FCS fit modelss</li>
@@ -67,12 +88,23 @@
       <li>improved error reporting for the save-project and zip-project functions</li>
       <li>zipped-projects now also contain a <tt>.readme.txt</tt>-file, which explains the contents of the ZIP-archive</li>
       <li>added link to GitHub repository to several places in QuickFit</li>
+      <li>improved function "Copy selected cells as table RDR with result access parser functions" in evaluation editor results table context-menu</li>
+      <li>added the <font face="Hack">"Hack"</font> font for nicer/more readable code and expression editing</li>
+      <li>added option to choose font for code-editing</li>
+      <li>improved style-preview in settings dialog</li>
+      <li>bugfix: QFFunctionReferenceTool: behaves nicer, when selecting several characters in a parser expression (before, several small help-prepare windows appeared in fast succession)</li>
+      <li>added option to settings-dialog (View/General Settings), which allows to choose a nonlinear scaling of the color-coding in VAR-COV-matrices (with a gamma-transform and user-selectable gamma!)</li>
+      <li>extended QFitFunction with functions to estimate a specific parameter from an XY-location in a plot (also supported by library fit functions in a DLL/SOLIB...)</li>
+      <li>"compound-result" in any RDR are accessible over the QFRDRCurvesInterface-interface, i.e. by curves-evaluations like the new curve_fit plugin</li>
     </li>
     <li><b>FCS/DLS</b><ul>
         <li>bugfix: corrected ALV-700X parser, which now can also properly read files, which only contain two FCCS-curves.</li>
         <li>bugfix: CSV import did not work, when tgegege is selected, but the file only contains 2 columns</li>
         <li>added support for reading PicoQuant exported ASCII FCS correlation curves (*.dat files) [thanks to Martin Seefeld, Uni Heidelberg]</li>
+        <li>added support for reading PicoQuant *.cor ASCII files</li>
         <li>improved error reporting while importing data: there will be error messages now, when trying to import a non-existent file.</li>
+        <li>added check-box to correlation editor, which allows to retain the current zoom-level when changing between runs and/or RDRs</li>
+        <li>added Confocor2 import</li>
     </ul></li>
     <li><b>FCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
@@ -82,6 +114,8 @@
         <li>added overlay plots of the runs in a single RDR</li>
         <li>the fit statistics now display the var-cov-matrix of the fit with color-coded entries</li>
         <li>LMFit is now the default/proposed fit algorithm. It is comparable to levmar, but significantly fatser! Also it now calculates parameter errors from the Var-Cov-Matrix and so no reason exists to use the slower levmar.</li>
+        <li>added option to general settings-dialog (View/General Settings), which allows to choose a nonlinear scaling of the color-coding in VAR-COV-matrices (with a gamma-transform and user-selectable gamma!)</li>
+        <li>added context-menu that allows to estimate fit parameters from the mouse-position in the main plot (if the model supports it)</li>
     </ul></li>
     <li><b>imaging FCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
@@ -90,6 +124,8 @@
         <li>added overlay plots of the runs in a single RDR</li>
         <li>the fit statistics now display the var-cov-matrix of the fit with color-coded entries</li>
         <li>The imFCS Calibration Wizard now shows an additional plot with the final wxy(a)/wxy(delta) curves and indicates the final result for wxy in the plot.</li>
+        <li>added option to general settings-dialog (View/General Settings), which allows to choose a nonlinear scaling of the color-coding in VAR-COV-matrices (with a gamma-transform and user-selectable gamma!)</li>
+        <li>added context-menu that allows to estimate fit parameters from the mouse-position in the main plot (if the model supports it)</li>
     </ul></li>
     <li><b>FCCS fit</b><ul>
         <li>added additional fit statistics parameters: AICc (also weighted), BIC (also weighted), max. rel. parameter error, bayesian model probability</li>
@@ -113,16 +149,24 @@
             <li>more automatic string-replaces in the output filename</li>
             <li>Now should use tinytiff-reader automatically for correlation</li>
             <li>added runtime and ETA displays to simulator progress</li>
-            <li></li>
+            <li>added 3rd green component</li>
+            <li>added options for boundary conditions</li>
+            <li>added possibility to store PSFs, MSDs, trajectories and jump length distributions from the simulation</li>
+            <li>improved options to set the output filename</li>
+            <li>added grids of barriers or traps as environment, which model different conditions in cellular membranes</li>
+            <li>added two different PSFs (either 2D gaussian or 2D square pixel with gaussian PSF</li>
         </ul></li>
         <li>bugfix: correlator didn't recognize background image series from imFCS simulator.</li>
         <li>added display options for annotations of the imFCS RDR</li>
         <li>added model comparison function to "imagingFCS Tools" menu, entry "Annotate Model Comparison", which can also calculate model probability maps from (non-normalized) Bayesian model probabilities</li>
         <li>implemented blocking method to estimate the standard error of the correlation function for some correlators and segments=1</li>
-        <li>several results of the correlation process (e.g. bleach correction fit results, blocking transform results, ...) are now readable as RDR results and thus displayable as parameter images. Note: If you delete one of these results, it will be regereated/reread when reopening the project!!!</li>
+        <li>several results of the correlation process (e.g. bleach correction fit results, blocking transform results, ...) are now readable as RDR results and thwipus displayable as parameter images. Note: If you delete one of these results, it will be regereated/reread when reopening the project!!!</li>
         <li>bugfix: segment number and length were switched in evalsettings.txt files</li>
         <li>aded a wizard that allows to correlate (several) files and add the results to the project, also may add evaluation objects</li>
         <li>added wizard to add imaging FCS evaluation objects to the project</li>
+        <li>added explicit project-wizard menu entry for "imFCS calibration wizard</li>
+        <li>added correlation amplitude as metadata</li>
+        <li>added metadata parameter-image for the correlation amplitude</li>
     </ul></li>
 
     <li><b>number and brightness</b><ul>
@@ -138,6 +182,8 @@
         <li>added overlay plots of the runs in a single RDR</li>
         <li>bugfix: If a fit was once canceled, all following fits were also canceled after the first run/file, until QuickFit was closed and reopened</li>
         <li>bugfix: the overviewplot of ACF+fit now should work</li>
+        <li>MaxEnt distributions are now stored as "compound-result" and are accessible over the QFRDRCurvesInterface-interface, i.e. by curves-evaluations like the new curve_fit plugin</li>
+        <li>added improved and very extensive MaxEnt tutorial</li>
     </ul></li>
     <li><b>FCS MSD evaluation</b><ul>
         <li><font color="red"><b>MAJOR BUGFIX:</b> Before this versions, all 2D-diffusion MSD models returned an MSD, which was a factor of 2/3 too high!</font> This was fixed now. See the documentation for the correct models. [Thanks to T. Wohland for pointing me to that]</li>
@@ -147,6 +193,7 @@
         <li>added an offset G<sub>&infin;</sub> to all models</li>
         <li>bugfix: If a fit was once canceled, all following fits were also canceled after the first run/file, until QuickFit was closed and reopened</li>
         <li>"get N from fit results" tool can now also read imagingFCS fit results (i.e. from results that are stored as vectors which are index by the run/index/pixel)</li>
+        <li>MSD curves are now stored as "compound-result" and are accessible over the QFRDRCurvesInterface-interface, i.e. by curves-evaluations like the new curve_fit plugin</li>
     </ul></li>
     <li><b>Diffusion Coefficient Calculator</b><ul>
         <li>bugfix: D20W was not calculated correctly, when a D at arbitrary conditions with viscosity factor !=1 was given!</li>
@@ -154,12 +201,13 @@
         <li>added an option for user-defined partial specific volumes for globular particles (+ presets for proteins, DNA, ...)</li>
     </ul></li>
     <li><b>SPIM-FCS fit models</b><ul>
+        <li><font color="red"><b>MAJOR BUGFIX:</b> some of the 2-pixel FCCS models has an additional factor of 1/a^2, which was wrong. Therefore the particle number estimate from these models was wrong! [Thanks to F. Taheri]</font></li>
         <li>added model for SPIM-FCS autocorrelation with diffusion and flow</li>
         <li>added 2-color FCCS model for 3D anomalous diffusion</li>
         <li>added 2-pixel FCCS 3D anomalous diffusion model</li>
     </ul></li>
     <li><b>TIR-FCS fit models</b><ul>
-    <li><font color="red"><b>MAJOR BUGFIX:</b> The TIR-FCS fit models with square-pixels had an additional factor 1/a<sup>2</sup>, which was wrong in the code (NOT IN THE DOCUMENTATION!). This is fixed now!</li>
+        <li><font color="red"><b>MAJOR BUGFIX:</b> The TIR-FCS fit models with square-pixels had an additional factor 1/a<sup>2</sup>, which was wrong in the code (NOT IN THE DOCUMENTATION!). This is fixed now!</font></li>
         <li>added model for TIR-FCS autocorrelation with diffusion and flow (pixel-detector)</li>
         <li>added 3D/2D anomalous diffusion model for confocal TIR-FCS</li>
         <li>added 3D/2D normal diffusion model for confocal TIR-FCS</li>
@@ -170,16 +218,43 @@
     <li><b>2-focus Confocal FCCS fit models</b><ul>
         <li>added 2-focus FCCS 3D anomalous diffusion models</li>
     </ul></li>
+    <li><b>confocal FCS fit models with parameter distributions</b><ul>
+        <li>added model with normal distribution of D and numerical integration</li>
+    </ul></li>
+    <li><b>simple TCSPC reader</b><ul>
+        <li>added reader for Text files generated by Picoquant</li>
+    </ul></li>
     <li><b>TCSPC importer</b><ul>
         <li>added fluorescence liftetime (TCSPC microtime) histogram preview</li>
         <li>added an option for time-gate/lifetime-filtered FCS/FCCS to the correlator [thanks to Martin Seefeld, Uni Heidelberg for providing test-datasets]</li>
         <li>bugfix: countrate is now saved in the correct units (kHz instead of Hz) in the correlator output file (before it was a factor 1000 too high!)</li>
         <li>bugfix: fixed a small bug in the normalization of the TTTR correlator that could have an influence at low count rates</li>
+        <li>FCS countrate binning is no longer set automatically from measurement length in file</li>
+        <li>more metadata on the processing is written to the results files (and subsequently loaded into the FCS RDR)</li>
+        <li>bugfix: it is now possible to set the number of segments to &gt;100</li>
+        <li>bugfix: there were some counter overflows when calculating the binned countrate for FCS files.</li>
+        <li>bugfix: countrate RDRs were imported into the project without setting the proper group.</li>
+        <li>new: sgements can either be defined by their number (during the meausrement duration), or alternatively by a fixed segment duration</li>
+        <li>new: may create lifetime-histograms now</li>
+        <li>new: added FRET Burst Analyzer</li>
+        <li>improved error reporting when selecting a file that cannot be read</li>
+        <li>added example dataset</li>
+        <li>added input widget for Foerster-radius, so the DA-distance is calculated from the E</li>
+        <li>if "Save to Project" is used, the created tables now allow to recalculate E (and rDA from it) dynamically with a user-selectable gamma-factor and Foerster-radius R0</li>
     </ul></li>
     <li><b>Table</b><ul>
         <li>added Tools menu entry to quickly calculate and plot boxplots from columned data</li>
         <li>added Tools menu entry to quickly calculate and plot indexed statistics from columned data</li>
         <li>improved import from clipboard/file: data may be pivoted/rotated now in the import dialog (by a button above the table)</li>
+        <li>fixed tab-order of plot/graph-settings widgets</li>
+        <li>bugfix: sometimes, old column properties were strangely reappearing when removing columns</li>
+        <li>bugfix: barcharts (bar widths) now also work for unsorted category data</li>
+        <li>bugfix: sort function didn't work under some conditions and scrambled the undo/redo stack</li>
+        <li>can read properties from CSV files</li>
+        <li>the fit and regression tools show residuals only for the selected datapoints now</li>
+        <li>improved import in case of whitepsace-separated ASCII-files, before empty columns were inserted when multiple whitespaces occured in a file</li>
+        <li>improved parameter-widgets for hor/ver range graphs and added option to draw line-only or line+/-error</li>
+        <li>implemented QFRDRCurvesInterface for compatible plots in a table RDR</li>
     </ul></li>
 
     <li><b>cairo graph exporter plugin</b><ul>
@@ -205,14 +280,29 @@
     <li><b>basicimageexporter</b><ul>
       <li>added exporter for Matlab MAT-files (using TinyMAT)</li>
     </ul></li>
+    <li><b>picoquantimporters</b><ul>
+      <li>importers read more metadata from TCSPC files now.</li>
+      <li>can now read v6.0 T3R files</li>
+    </ul></li>
+    <li><b>image_stack</b><ul>
+        <li>improved user-control over color-channel value-ranging</li>
+    </ul></li>
+    <li><b>fitfunctions_general</b><ul>
+      <li><font color="red"><b>function changes:</b> modified all log-normal distributions to have log10(x)-log10(mean) as parameter!</font></li>
+      <li>license is now LGPL 2.1</li>
+      <li>added fit function: Peaks: Multi-Component Gaussian function (1/sqrt(e) width)</li>
+      <li>added fit function: Peaks: Multi-Component Log-Normal</li>
+      <li>added fit function: Decays: Multi-Exponential</li>
+      <li>improved estimation of multiple peaks (corrected wrongly estimated baseline for 2 or more peaks!)</li>
+    </ul></li>
+    <li><b>fcs_fitfunctions</b><ul>
+      <li>added code for single-parameter-estimation (from XY) and initial-parameter guessing</li>
+    </ul></li>
 
     <li><b>qfe_dataexportbasics</b><ul>
       <li>license is now LGPL 2.1</li>
     </ul></li>
     <li><b>rdrsettings</b><ul>
-      <li>license is now LGPL 2.1</li>
-    </ul></li>
-    <li><b>fitfunctions_general</b><ul>
       <li>license is now LGPL 2.1</li>
     </ul></li>
     <li><b>fitalgorithm_simanneal</b><ul>
@@ -222,10 +312,21 @@
       <li>license is now LGPL 2.1</li>
     </ul></li>
     <li><b>qfe_calculator</b><ul>
+      <li>improved user-interface with resizable (and always visible) editor for longer scripts</li>
+      <li>bugfix: behaves nicer, when selecting several characters in a parser expression (before, several small help-prepare windows appeared in fast succession)</li>
       <li>license is now LGPL 2.1</li>
     </ul></li>
     <li><b>qfe_helpeditor</b><ul>
       <li>license is now LGPL 2.1</li>
+    </ul></li>
+    <li><b>lights_b040laserbox</b><ul>
+      <li>added electronics description of B040 LaserBox (to control Cobolt lasers)</li>
+    </ul></li>
+   <li><b>shutter_servo_arduino</b><ul>
+      <li>added hardware description, PCBs, firmware, ...</li>
+    </ul></li>
+  <li><b>meas_b040resheater</b><ul>
+      <li>added hardware description, PCBs, firmware, ...</li>
     </ul></li>
     </li>
 

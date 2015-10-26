@@ -3,7 +3,7 @@
 
 #include <QTimer>
 #include <QMainWindow>
-#include "../../jkserialconnection.h"
+#include "../../qfserialconnection.h"
 
 namespace Ui {
     class MainWindow;
@@ -25,7 +25,7 @@ protected slots:
     void readBytesFromSerial();
 private:
     Ui::MainWindow *ui;
-    JKSerialConnection* serial;
+    QFSerialConnection* serial;
     QTimer* tim;
 };
 

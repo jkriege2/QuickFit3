@@ -684,6 +684,11 @@ void QFRDRTableCurveFitDialog::replotGraph()
     size_t c_ResY=ds->addCopiedColumn(residualsY.data(), residualsY.size(), tr("residuals"));
     size_t c_ResYW=ds->addCopiedColumn(resW.data(), resW.size(), tr("weighted residuals"));
 
+    size_t c_Xlim=ds->addCopiedColumn(dataX.data()+getRangeMin(), qMin(dataX.size()-getRangeMin(), getRangeMax()-getRangeMin()), tr("x-data, limited"));
+    size_t c_Ylim=ds->addCopiedColumn(dataY.data(), qMin(dataY.size()-getRangeMin(), getRangeMax()-getRangeMin()), tr("y-data, limitd"));
+    size_t c_Wlim=ds->addCopiedColumn(datW.data()+getRangeMin(), qMin(datW.size()-getRangeMin(), getRangeMax()-getRangeMin()), tr("weight, limited"));
+    size_t c_ResYlim=ds->addCopiedColumn(residualsY.data()+getRangeMin(), qMin(residualsY.size()-getRangeMin(), getRangeMax()-getRangeMin()), tr("residuals, limited"));
+    size_t c_ResYWlim=ds->addCopiedColumn(resW.data()+getRangeMin(), qMin(resW.size()-getRangeMin(), getRangeMax()-getRangeMin()), tr("weighted residuals, limited"));
 
     JKQTPxyLineErrorGraph* g_data=new JKQTPxyLineErrorGraph(ui->pltDistribution->get_plotter());
     g_data->set_drawLine(true);
@@ -727,16 +732,16 @@ void QFRDRTableCurveFitDialog::replotGraph()
 
     JKQTPxyLineGraph* g_res=new JKQTPxyLineGraph(ui->pltResiduals->get_plotter());
     g_res->set_drawLine(true);
-    g_res->set_xColumn(c_X);
+    g_res->set_xColumn(c_Xlim);
     g_res->set_sortData(JKQTPxyGraph::SortedX);
     if (ui->chkWeightedResiduals->isChecked()) {
         //qDebug()<<"weighted";
         g_res->set_title(tr("weighted residuals"));
-        g_res->set_yColumn(c_ResYW);
+        g_res->set_yColumn(c_ResYWlim);
     } else {
         //qDebug()<<"non-weighted";
         g_res->set_title(tr("residuals"));
-        g_res->set_yColumn(c_ResY);
+        g_res->set_yColumn(c_ResYlim);
     }
     g_res->set_color(g_data->get_color());
     g_res->set_symbol(JKQTPcross);
@@ -839,6 +844,7 @@ void QFRDRTableCurveFitDialog::updateFitStatistics()
                 residualsYW<<(dataY[i]-v)/getWeight(i);
             }
         }
+
 
         int items=residualsY.size();
 

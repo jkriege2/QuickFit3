@@ -24,7 +24,7 @@
 #ifndef QFFitFunctionGeneralCDFLogGaussian_H
 #define QFFitFunctionGeneralCDFLogGaussian_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +32,7 @@
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralCDFLogGaussian: public QFFitFunction {
+class QFFitFunctionGeneralCDFLogGaussian: public QFCDFFitFunctionBase {
     public:
         QFFitFunctionGeneralCDFLogGaussian();
         virtual ~QFFitFunctionGeneralCDFLogGaussian() {}
@@ -62,8 +62,6 @@ class QFFitFunctionGeneralCDFLogGaussian: public QFFitFunction {
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() const;
 
-        /*! \copydoc QFFitFunction::evaluateDerivatives()   */
-        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionGeneralCDFLogGaussian_H

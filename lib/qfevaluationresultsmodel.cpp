@@ -48,7 +48,7 @@ QFEvaluationResultsModel::~QFEvaluationResultsModel()
 }
 
 void QFEvaluationResultsModel::init(QFEvaluationItem* evaluation, QString evalFilter) {
-    disconnect(this->evaluation, SIGNAL(resultsChanged(QFRawDataRecord* , const QString& , const QString& )), this, SLOT(resultsChanged(QFRawDataRecord* , const QString& , const QString& )));
+    if (this->evaluation) disconnect(this->evaluation, SIGNAL(resultsChanged(QFRawDataRecord* , const QString& , const QString& )), this, SLOT(resultsChanged(QFRawDataRecord* , const QString& , const QString& )));
     setParent(evaluation);
     this->evaluation=evaluation;
     this->evalFilter=evalFilter;
@@ -424,7 +424,7 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                     QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
-                        QString common=tr("<small><font color=\"darkgrey\"><i><br><br>result name: %2<br>evaluation name: %1<br>group: %3</i></font></small>").arg(en).arg(rname).arg(r.group);
+                        QString common=tr("<small><font color=\"darkgrey\"><i><br><br>result name: %2<br>evaluation name: %1<br>group: %3<br>RDR ID: %4</i></font></small>").arg(en).arg(rname).arg(r.group).arg(record->getID());
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                             || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
                             double var=0;

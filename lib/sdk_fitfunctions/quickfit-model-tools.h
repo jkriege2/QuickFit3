@@ -297,6 +297,19 @@ typedef void (*QF3SimpleFFEvaluateDerivatives)(double* ,double, const double*);
   */
 typedef int8_t (*QF3SimpleFFEstimateInitial)(double*,const double*,const double*,int64_t, const int8_t* );
 
+/** \brief type of the estimateParameterFromXY() function of a model (in the DLL), which can be used to estimateestimate a value for the given parameter from a point \f$(x,y)\f$ in the same coordinate system as the function \f$y=f(x)\f$
+  * \ingroup quickfit3_models
+  *
+ *
+ * \param[out] newParam the estimated value for the given fit parameter
+ * \param[in] paramID id/index of the parameter to estimate
+ * \param[in] x x-value to base the estimate on
+ * \param[in] y y-value to base the estimate on
+ * \param[in] oldParams optional array with the current fit parameters
+ * \return QF3SFF_TRUE on success
+  */
+typedef int8_t (*QF3SimpleFFEstimateParameterFromXY)(double*,int,double, double,const double*);
+
 
 
 

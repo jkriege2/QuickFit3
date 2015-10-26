@@ -61,6 +61,10 @@ class QFTCSPCReaderPicoquant: public QFTCSPCReader {
         virtual double measurementDuration() const;
         /** \copydoc QFTCSPCReader::inputChannels() */
         virtual uint16_t inputChannels() const;
+        /** \copydoc QFTCSPCReader::microtimeChannels() */
+        virtual uint32_t microtimeChannels() const;
+        /** \copydoc QFTCSPCReader::microtimeChannelsResolutionPicoSeconds() */
+        virtual double microtimeChannelsResolutionPicoSeconds() const;
 
         /** \copydoc QFTCSPCReader::avgCountRate() */
         virtual double avgCountRate(uint16_t channel) const;
@@ -75,6 +79,13 @@ class QFTCSPCReaderPicoquant: public QFTCSPCReader {
         TTTRBinHdr binHeader;
         TTTRBoardHdr boardHeader;
         TTTRHdr TTTRHeader;
+
+        TTTRTxtHdr6 txtHeader6;
+        TTTRBinHdr6 binHeader6;
+        TTTRBoardHdr6 boardHeader6;
+        TTTRHdr6 TTTRHeader6;
+        bool isV6;
+
 
         fpos_t fileResetPos;
 

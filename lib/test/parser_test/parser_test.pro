@@ -29,7 +29,12 @@ TARGET = parser_test
 CONFIG   += console
 CONFIG   -= app_bundle
 
-INCLUDEPATH += ../../../../../../LIB/trunk/
+INCLUDEPATH += ../../ \
+               ../../../extlibsb040/StatisticsTools/
+
+include(../../../extlibs/eigen.pri)
+include(../../../extlibs/faddeeva.pri)
+include(../../../extlibsb040/tinymat.pri)
 
 TEMPLATE = app
 
@@ -40,7 +45,7 @@ SOURCES += main.cpp \
     ../../qfmathparser.cpp \
     ../../qfmathparserdefaultlib.cpp \
     ../../qfmathparsertools.cpp \
-    ../../../../../../LIB/trunk/statistics_tools.cpp
+    ../../../extlibsb040/StatisticsTools/statistics_tools.cpp
 
 HEADERS += \
     ../../qftools.h \
@@ -49,7 +54,7 @@ HEADERS += \
     ../../lib_imexport.h \
     ../../qfmathparserdefaultlib.h \
     ../../qfmathparsertools.h \
-    ../../../../../../LIB/trunk/statistics_tools.h
+    ../../../extlibsb040/StatisticsTools/statistics_tools.h
 
 
 
@@ -59,3 +64,4 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     message("Qt Major Version >5, using special Qt5.x include syntax for widgets")
 }
 CONFIG += exceptions rtti stl
+

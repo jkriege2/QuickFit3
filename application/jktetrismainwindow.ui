@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>681</width>
-    <height>415</height>
+    <width>911</width>
+    <height>625</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Hack</family>
+    <pointsize>12</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>QuickFit 3.0 Entertain Me!</string>
@@ -86,7 +92,7 @@
      <item>
       <widget class="QLabel" name="labHighscore">
        <property name="text">
-        <string>SCORE:</string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -199,17 +205,23 @@
      </item>
      <item>
       <widget class="QLabel" name="label_5">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
        <property name="frameShape">
         <enum>QFrame::Box</enum>
        </property>
        <property name="text">
         <string>&lt;u&gt;&lt;b&gt;Help:&lt;/b&gt;&lt;/u&gt;&lt;br&gt;&lt;br&gt;
-&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;font size=&quot;+5&quot;&gt;&lt;tt&gt;&amp;larr;&lt;/tt&gt;&lt;/font&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; move piece left&lt;br&gt;
-&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;font size=&quot;+5&quot;&gt;&lt;tt&gt;&amp;rarr;&lt;/tt&gt;&lt;/font&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; move piece right&lt;br&gt;
-&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;font size=&quot;+5&quot;&gt;&lt;tt&gt;&amp;uarr;&lt;/tt&gt;&lt;/font&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; rotate piece&lt;br&gt;
-&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;font size=&quot;+5&quot;&gt;&lt;tt&gt;&amp;darr;&lt;/tt&gt;&lt;/font&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; move piece down fast&lt;br&gt;
-&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;tt&gt;SPACE&lt;/tt&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; drop piece&lt;br&gt;
-&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;tt&gt;PAUSE/ESC&lt;/tt&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; pause/reactivate game&lt;br&gt;</string>
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;font size=&quot;+3&quot;&gt;&lt;tt&gt;&amp;larr;&lt;/tt&gt;&lt;/font&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; move piece left&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;font size=&quot;+3&quot;&gt;&lt;tt&gt;&amp;rarr;&lt;/tt&gt;&lt;/font&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; move piece right&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;font size=&quot;+3&quot;&gt;&lt;tt&gt;&amp;uarr;&lt;/tt&gt;&lt;/font&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; rotate piece&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;font size=&quot;+3&quot;&gt;&lt;tt&gt;&amp;darr;&lt;/tt&gt;&lt;/font&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; move piece down fast&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;tt&gt;SPACE&lt;/tt&gt;&amp;nbsp; drop piece&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;tt&gt;PAUSE&lt;/tt&gt;&amp;nbsp; pause/reactivate game&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;tt&gt;ESC&lt;/tt&gt;&lt;br&gt;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

@@ -195,6 +195,12 @@ class QFLIB_EXPORT QFFitFunctionBase
         inline  bool isParameterVisible(int parameter, const QVector<double>& parameterValues) const {
             return isParameterVisible(parameter, parameterValues.data());
         }
+        inline virtual bool isParameterVisible(const QString& parameter, const double* parameterValues) const {
+            return isParameterVisible(getParameterNum(parameter), parameterValues);
+        }
+        inline  bool isParameterVisible(const QString& parameter, const QVector<double>& parameterValues) const {
+            return isParameterVisible(getParameterNum(parameter), parameterValues.constData());
+        }
 
 
         /*! \brief return the number of graphs that should be plotted additional to the function grph itself

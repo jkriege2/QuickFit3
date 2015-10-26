@@ -85,7 +85,7 @@ class QFRDRTableColumnEditor : public QDialog
         QString getColumnTitle() const;
 
    protected slots:
-        void on_edtFormula_textChanged(QString text);
+//        void on_edtFormula_textChanged(QString text);
         void on_edtFormula_textChanged();
         void on_btnHelp_clicked();
         void on_btnOK2_clicked();

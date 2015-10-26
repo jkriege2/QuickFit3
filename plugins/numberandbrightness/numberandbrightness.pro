@@ -27,7 +27,7 @@ TARGET = number_and_brightness
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)

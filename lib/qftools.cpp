@@ -287,7 +287,7 @@ void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
 }
 
 void loadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosition, QSize defaultSize, QString prefix) {
-    QSize size = settings.value(prefix+"size", defaultSize).toSize();
+    //QSize size = settings.value(prefix+"size", defaultSize).toSize();
 
     if (settings.contains(prefix+"pos")){
         QPoint pos = settings.value(prefix+"pos", defaultPosition).toPoint();
@@ -534,6 +534,46 @@ QString doubleVecToQString(const QVector<double>& value, int prec, char f, QChar
     return out;
 }
 
+QString doubleMatrixToQString(const QVector<double>& value, int columns, int prec , char f , QChar decimalSeparator, const QString& itemSeparator, const QString& columnSeparator) {
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    QString out="";
+    bool first=true;
+    for (int i=0; i<value.size(); i++) {
+        if (!first) out+=itemSeparator;
+        first=false;
+        QString res=loc.toString(value[i], f, prec);
+        if (loc.decimalPoint()!=decimalSeparator) {
+            res=res.replace(loc.decimalPoint(), decimalSeparator);
+        }
+        out+= qfLeftPaddedString(res, 2*prec, ' ');
+        if (i<value.size()-1 && (i%columns)==(columns-1)) {
+            out+=columnSeparator;
+            first=true;
+        }
+    }
+    return out;
+}
+
+QString boolMatrixToQString(const QVector<bool>& value, int columns, const QString& itemSeparator, const QString& columnSeparator, const QString& trueName, const QString& falseName) {
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    QString out="";
+    bool first=true;
+    for (int i=0; i<value.size(); i++) {
+        if (!first) out+=itemSeparator;
+        first=false;
+        if (value[i]) out+=trueName;
+        else out+=falseName;
+
+        if (i<value.size()-1 && (i%columns)==(columns-1)) {
+            out+=columnSeparator;
+            first=true;
+        }
+    }
+    return out;
+}
+
 QString bitarrayToQString(const QBitArray& value, const QString itemSeparator, const QString& trueName, const QString& falseName ) {
     QString out="";
     for (int i=0; i<value.size(); i++) {
@@ -588,16 +628,17 @@ QString CDoubleListToQString(const QList<double> values, const QString& separato
 }
 
 
-double CQStringToDouble(QString value) {
+double CQStringToDouble(const QString& value) {
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
     return loc.toDouble(value) ;
 }
 
-double QStringToDouble(QString value) {
+double QStringToDouble(const QString& value) {
     QString v=value;
     if (value.contains(',')) {
-        v=value.replace(',', '.');
+        v=value;
+        v=v.replace(',', '.');
     }
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
@@ -648,14 +689,14 @@ QString replaceFileExt(const QString& filename, const QString& extension) {
     return f;
 }
 
-QString readFile(const QString& filename) {
-    if (!QFile::exists(filename)) return QString();
+QByteArray readFile(const QString& filename) {
+    if (!QFile::exists(filename)) return QByteArray();
     QFile f(filename);
     if (f.open(QIODevice::ReadOnly)) {
         return f.readAll();
         f.close();
     }
-    return QString();
+    return QByteArray();
 }
 
 
@@ -808,7 +849,11 @@ QStringList deescapifyList(const QString& text) {
 QString	qfGetExistingDirectory ( QWidget * parent, const QString & caption, const QString & dir, QFileDialog::Options options ) {
     QFileDialog::Options opt=options;
 
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#else
+    if (false) {
+#endif
         opt=options;
     } else {
         opt=options|QFileDialog::DontUseNativeDialog;
@@ -891,7 +936,11 @@ QString qfGetSaveFileNameSet (const QString& setPrefix,  QWidget * parent , cons
 QString	qfGetOpenFileName ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options ) {
     QFileDialog::Options opt=options;
 
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#else
+    if (false) {
+#endif
         opt=options;
     } else {
         opt=options|QFileDialog::DontUseNativeDialog;
@@ -904,7 +953,11 @@ QString	qfGetOpenFileName ( QWidget * parent, const QString & caption, const QSt
 QStringList	qfGetOpenFileNames ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options ) {
     QFileDialog::Options opt=options;
 
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#else
+    if (false) {
+#endif
         opt=options;
     } else {
         opt=options|QFileDialog::DontUseNativeDialog;
@@ -920,7 +973,11 @@ QString	qfGetSaveFileName ( QWidget * parent, const QString & caption, const QSt
 
     QFileDialog::Options opt=options;
 
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#else
+    if (false) {
+#endif
         opt=options;
     } else {
         opt=options|QFileDialog::DontUseNativeDialog;
@@ -928,7 +985,11 @@ QString	qfGetSaveFileName ( QWidget * parent, const QString & caption, const QSt
 
     s= QFileDialog::getSaveFileName(parent, caption, dir, filter, &selF, opt);
 
-    if (!ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#ifndef QFMATHPARSER_MATHPARSERTEST
+    if (ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
+#else
+    if (false) {
+#endif
         // this regexp recognizes the first file extension in filters like "Name File (*.cpw *.abc);; Filename 2 (*.txt)" then the first
         // extension is appended to the filename, if it does not already contain a suffix
         QRegExp rx(".*\\(\\*\\.(\\S+).*\\)\\w*[;;.]*", Qt::CaseInsensitive);
@@ -1293,12 +1354,12 @@ QString intToOctQString(int64_t value)
 
 QString doubleToLatexQStringAlwaysSign(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent, const QString& signSeparator){
     QString sign="+"+signSeparator;
-    double d=data;
+    //double d=data;
     if (data<0) {
-        d=-data;
+        //d=-data;
         sign="-"+signSeparator;
     }
-    return sign+doubleToLatexQString(data, precision, remove_trail0, belowIsZero, minNoExponent, maxNoExponent);
+    return sign+doubleToLatexQString(fabs(data), precision, remove_trail0, belowIsZero, minNoExponent, maxNoExponent);
 }
 
 QString doubleToLatexQString(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent){
@@ -1324,12 +1385,12 @@ QString doubleToLatexQString(double data, int precision, bool remove_trail0, dou
 
 QString doubleToHTMLQStringAlwaysSign(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent, const QString& signSeparator){
     QString sign="+"+signSeparator;
-    double d=data;
+    //double d=data;
     if (data<0) {
-        d=-data;
+        //d=-data;
         sign="-"+signSeparator;
     }
-    return sign+doubleToHTMLQString(data, precision, remove_trail0, belowIsZero, minNoExponent, maxNoExponent);
+    return sign+doubleToHTMLQString(fabs(data), precision, remove_trail0, belowIsZero, minNoExponent, maxNoExponent);
 
 }
 
@@ -1404,7 +1465,7 @@ QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& filters) {
 }
 
 
-QList<int> stringToIntList(const QString& data) {
+QList<int> stringToIntList(const QString& data, const QList<int>& defaultList) {
     QList<int> res;
     QStringList sl=data.trimmed().split(',');
     for (int i=0; i<sl.size(); i++) {
@@ -1412,9 +1473,26 @@ QList<int> stringToIntList(const QString& data) {
         int val=sl[i].toInt(&ok);
         if (ok) res<<val;
     }
-    return res;
+    if (res.isEmpty()) return defaultList;
+    else return res;
 }
 
+QList<bool> stringToBoolList(const QString& data, const QList<bool>& defaultList) {
+    QList<bool> res;
+    QStringList sl=data.trimmed().split(',');
+    for (int i=0; i<sl.size(); i++) {
+        bool val=false;
+        QString s=sl[i].toLower().trimmed().simplified();
+        if (s=="1") val=true;
+        else if (s=="true") val=true;
+        else if (s=="ja") val=true;
+        else if (s=="yes") val=true;
+        else if (s=="oui") val=true;
+        res<<val;
+    }
+    if (res.isEmpty()) return defaultList;
+    else return res;
+}
 
 bool qfQStringCompareLengthDecreasing(const QString &s1, const QString &s2) {
     return s1.size() > s2.size();
@@ -1450,11 +1528,12 @@ QString qfCEscaped(const QString& data) {
 QString qfGetTempFilename(const QString& templateName, bool usesSystemAlways) {
     QString tempPath;
     bool useDefaultTemp=true;
-
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (!usesSystemAlways){
         tempPath=ProgramOptions::getConfigValue("quickfit/temp_folder", QFileInfo(qfGetTempFilename(templateName, true)).absolutePath()).toString();
         useDefaultTemp=ProgramOptions::getConfigValue("quickfit/temp_folder_default", true).toBool();
     }
+#endif
 
     QString fn="";
     if (useDefaultTemp || usesSystemAlways || tempPath.isEmpty()) {
@@ -1935,4 +2014,69 @@ QByteArray qfGetCrytographicHashForFile(const QString& file, QCryptographicHash:
         return QCryptographicHash::hash(f.readAll(), method);
     }
     return QByteArray();
+}
+
+QVariant qfStringToVariantAutoRecognizeType(const QString& value) {
+    QRegExp rxInt("[+|-]?\\d+");
+    QRegExp rxDouble("[+|-]?\\d+[\\.]?\\d*[eE]?\\d*");
+    QRegExp rxDate1("(\\d+)\\/(\\d+)\\/(\\d+)\\s+(\\d+)\\:(\\d+)\\:(\\d+)");
+    QRegExp rxDate2("(\\d+)\\/(\\d+)\\/(\\d+)");
+    if (rxInt.exactMatch(value)) {
+        return value.toInt();
+    } else if (rxDouble.exactMatch(value)) {
+        return QStringToDouble(value);
+    } else if (rxDate1.exactMatch(value)) {
+        return QDateTime(QDate(rxDate1.cap(3).toInt(), rxDate1.cap(2).toInt(), rxDate1.cap(1).toInt()), QTime(rxDate1.cap(4).toInt(),rxDate1.cap(5).toInt(),rxDate1.cap(6).toInt()));
+    } else if (rxDate2.exactMatch(value)) {
+        return QDate(rxDate2.cap(3).toInt(), rxDate2.cap(2).toInt(), rxDate2.cap(1).toInt());
+    } else {
+        if (value.trimmed().toLower()=="true") return QVariant(true);
+        else if (value.trimmed().toLower()=="false") return QVariant(false);
+        else return value;
+    }
+    return value;
+}
+
+QString qfLeftPaddedString(const QString& input, int fieldWidth, QChar padchar) {
+    if (fieldWidth<=0 || input.size()>=fieldWidth) return input;
+    QString pad(fieldWidth-input.size(), padchar);
+    return pad+input;
+}
+
+QString qfRightPaddedString(const QString& input, int fieldWidth, QChar padchar) {
+    if (fieldWidth<=0 || input.size()>=fieldWidth) return input;
+    QString pad(fieldWidth-input.size(), padchar);
+    return input+pad;
+}
+
+QString qfRemoveMultipleWhitespaces(const QString& line) {
+    bool isQuot=false;
+    bool isApo=false;
+    QString l=line.trimmed();
+    QString ll;
+    for (int i=0; i<l.size(); i++) {
+        if (isQuot) {
+            ll.append(l[i]);
+            if (l[i]=='"') isQuot=false;
+        } else if (isApo) {
+            ll.append(l[i]);
+            if (l[i]=='\'') isApo=false;
+        } else {
+            if (l[i]=='\'') {
+                isApo=true;
+                ll.append(l[i]);
+            } else if (l[i]=='\"') {
+                isQuot=true;
+                ll.append(l[i]);
+            } else {
+                if (l[i]==' ' &&(/*ll.size()<=0 ||*/ (ll.size()>0 && ll[ll.size()-1]!=' '))) {
+                    ll.append(l[i]);
+                } else if (l[i]!=' ') {
+                    ll.append(l[i]);
+                }
+            }
+        }
+    }
+    //qDebug()<<"\n\n"<<"qfRemoveMultipleWhitespaces('"<<line<<"'):\n  -> '"<<l<<"'\n  -> '"<<ll<<"'\n\n";
+    return ll;
 }

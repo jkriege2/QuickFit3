@@ -38,6 +38,7 @@
 #include <QMultiMap>
 #include "datatools.h"
 #include "qffitalgorithmparameterstorage.h"
+#include "qfrdrcurvesinterface.h"
 class QFRDRTableEditor; // forward
 
 /*! \brief this class is used to manage a table of values (strings/numbers)
@@ -46,9 +47,9 @@ class QFRDRTableEditor; // forward
     The data is stored in a QFTablePluginModel object which is also externally accessible for data access.
  */
 
-class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QFRDRColumnGraphsInterface, public QFFitAlgorithmParameterStorage {
+class QFRDRTable: public QFRawDataRecord, public QFRDRTableInterface, public QFRDRColumnGraphsInterface, public QFFitAlgorithmParameterStorage, public QFRDRUserCurvesInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRTableInterface QFRDRColumnGraphsInterface)
+        Q_INTERFACES(QFRDRTableInterface QFRDRColumnGraphsInterface QFRDRUserCurvesInterface)
     public:
         enum {
             TableExpressionRole = Qt::UserRole+1,
@@ -252,7 +253,28 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         }
 
 
+        enum RangeGraphMode {
+            rgmRange=0,
+            rgmLineError=1,
+            rgmLineOnly=2
+        };
 
+
+        static QString RangeGraphMode2String(RangeGraphMode type) {
+            switch(type) {
+                case rgmLineError: return QString("LINEERR");
+                case rgmLineOnly: return QString("LINE");
+                default:
+                case rgmRange: return QString("RANGE");
+            }
+
+        }
+        static RangeGraphMode String2RangeGraphMode(const QString& type) {
+            if(type.toUpper()=="LINEERR") return rgmLineError;
+            if(type.toUpper()=="LINE") return rgmLineOnly;
+            if(type.toUpper()=="RANGE") return rgmRange;
+            return rgmRange;
+        }
 
         struct GraphInfo {
             GraphInfo();
@@ -369,12 +391,17 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             Qt::PenStyle rangeCenterStyle;
             double rangeCenterWidth;
             bool rangeDrawCenter;
+            RangeGraphMode rangeMode;
 
             bool errorColorAuto;
             bool fillColorAuto;
             bool centerColorAuto;
 
             QMap<QString, QVariant> moreProperties;
+
+            QFRDRCurvesInterface::CurveType getCurvesCurveType() const;
+            bool isCurvesCurve() const;
+
 
         };
 
@@ -607,7 +634,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphSetPlotYRange(int plotid, double xmin, double xmax);
 
         virtual void colgraphSetGraphTitle(int plotid,  int graphid,  const QString& title);
-        virtual void colgraphSetGrphType(int plotid,  int graphid,  ColumnGraphTypes type);
+        virtual void colgraphSetGraphType(int plotid,  int graphid,  ColumnGraphTypes type);
         virtual void colgraphSetGraphErrorStyle(int plotid,  int graphid,  ErrorGraphTypes errorStyle);
         virtual void colgraphSetGraphErrorColor(int plotid,  int graphid, QColor errorColor);
         virtual void colgraphSetGraphFillColor(int plotid,  int graphid, QColor fillColor);
@@ -615,8 +642,26 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphSetGraphFillTransparency(int plotid,  int graphid, double fillT);
         virtual void colgraphSetGraphTransparency(int plotid,  int graphid, double trans);
         virtual void colgraphSetGraphSymbol(int graph,  int plot,  ColumnGraphSymbols symbol, double symbolSize=10.0);
-
+        virtual int colgraphAddParametrizedScatterGraph(int plot, int columnX, int columnY, int columnP, const QString&  title, ParametrizationType type=cgptColorLines, bool colorbarVisible=false, const QString& colorbarLabel=QString());
+        virtual QString colgraphGetPlotXAxisLabel(int plot);
+        virtual QString colgraphGetPlotYAxisLabel(int plot);
+        virtual bool colgraphGetPlotXAxisLog(int plot);
+        virtual bool colgraphGetPlotYAxisLog(int plot);
+        virtual void colgraphSetColorPalette(int plotid, int graphid, ImageColorPalette palette);
         void colgraphToolsSetGraphtype(QFRDRTable::GraphInfo& g, QFRDRColumnGraphsInterface::ColumnGraphTypes type);
+
+
+        virtual int userCurvesGetCount() const;
+        virtual QString userCurvesGetName(int index) const;
+        virtual QVector<double> userCurvesGetX(int index) const;
+        virtual QVector<double> userCurvesGetXError(int index) const;
+        virtual QVector<double> userCurvesGetY(int index) const;
+        virtual QVector<double> userCurvesGetYError(int index) const;
+        virtual bool userCurvesGetLogX(int index) const;
+        virtual bool userCurvesGetLogY(int index) const;
+        virtual CurveType userCurvesGetType(int index) const;
+        virtual QString userCurvesGetXLabel(int index) const;
+        virtual QString userCurvesGetYLabel(int index) const;
 
 
         int getPlotCount() const;

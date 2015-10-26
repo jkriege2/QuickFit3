@@ -354,8 +354,9 @@ void QFESPIMB040ScriptedAcquisition::on_btnSave_clicked()
 {
     if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
     if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
-    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ScriptedAcquisition/lastScriptDir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/").toString();
+    QString tdir=ProgramOptions::getInstance()->getConfigValue("spimb040/script_directory", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acquisitionScripts/").toString();
+    QDir().mkpath(tdir);
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ScriptedAcquisition/lastScriptDir", tdir).toString();
     QDir d(dir);
     QString filename=qfGetSaveFileName(this, tr("save acquisition script ..."), d.absoluteFilePath(currentScript), tr("acquisition script (*.js)"));
     if (!filename.isEmpty()) {
@@ -631,8 +632,9 @@ QStringListModel *QFESPIMB040ScriptedAcquisition::modelFromFile(const QString &f
 void QFESPIMB040ScriptedAcquisition::openScript(QString dir, bool saveDir) {
     if (maybeSave()) {
         if (dir=="last") {
-            QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/");
-            dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ScriptedAcquisition/lastScriptDir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/").toString();
+            QString tdir=ProgramOptions::getInstance()->getConfigValue("spimb040/script_directory", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acquisitionScripts/").toString();
+            QDir().mkpath(tdir);
+            dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ScriptedAcquisition/lastScriptDir", tdir).toString();
         }
         QString filename=qfGetOpenFileName(this, tr("open script ..."), dir, tr("acquisition script (*.js)"))    ;
         if (QFile::exists(filename)) {

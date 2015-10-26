@@ -36,17 +36,6 @@ QFOUTPUT = $$PWD/$${OUTPUTDIR_NAME}
 
 
 
-
-#release {
-#    QFOUTPUT = ../output_release
-#} else {
-#    #MOC_DIR = ./.mocsd/
-#    #UI_DIR = ./.uisd/
-#    #RCC_DIR = ./.rccsd/
-#    #OBJECTS_DIR = ./.objsd/
-#    QFOUTPUT = ../output
-#}
-
 HELP_FILES.files = ./help/*.*
 HELP_FILES.path = $${QFOUTPUT}/assets/help/
 
@@ -69,7 +58,3 @@ OTHER_FILES +=
 include(quickfit3_configqtwidgets.pri)
 
 
-#QF3CONFIG += ffmdrivers
-
-# if you don't want to use the EIgen library, uncomment the following line:
-#QF3CONFIG+=noeigen3lib

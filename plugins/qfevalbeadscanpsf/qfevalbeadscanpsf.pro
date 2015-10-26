@@ -26,7 +26,7 @@ TARGET = eval_beadscanpsf
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibs/cimg.pri)
 include(../../libquickfitwidgets.pri)

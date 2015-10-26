@@ -79,11 +79,11 @@ QList<QVector<double> > readCSV(QTextStream& f, QChar separator_char, QChar /*de
     return dataRotate(res);
 }
 
-QVector<double> csvReadline(QString f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars) {
+QVector<double> csvReadline(QString f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars, QString* lineOut) {
     QTextStream ff(&f);
-    return csvReadline(ff, separator_char, comment_char,  non_value,  eolChars,  ignoreChars);
+    return csvReadline(ff, separator_char, comment_char,  non_value,  eolChars,  ignoreChars, lineOut);
 }
-QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars) {
+QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars, QString* lineOut) {
     //const QString line=f.readLine();
     QString line="";
     QString ch=f.read(1);
@@ -101,6 +101,7 @@ QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_
     bool isComment=false;
     bool ok=false;
     double d=0;
+    if (lineOut) *lineOut=line;
     //for (int i=0; i<line.size(); i++) {
     for (QString::const_iterator i=line.begin(); i!=line.end(); ++i) {
         const QChar ch=*i;//line[i];
@@ -479,7 +480,7 @@ QList<QList<QVariant> > csvDataRotate(const QList<QList<QVariant> >& data) {
     return result;
 }
 
-QString toCSV(const QList<QVector<double> >& data, const QStringList& columnNames, const QStringList& rowNames, QChar decimalSep, const QString colSep, bool withHeaders, QChar stringDelimiter, const QString& headerSep, int precision) {
+QString toCSV(const QList<QVector<double> >& data, const QStringList& columnNames, const QStringList& rowNames, QChar decimalSep, const QString colSep, bool withHeaders, QChar stringDelimiter, const QString& headerSep, int precision, int fieldWidth) {
     QString res;
     int cols=data.size();
     int rows=0;
@@ -492,7 +493,7 @@ QString toCSV(const QList<QVector<double> >& data, const QStringList& columnName
             if (i>0 || rowNames.size()>0) res+=colSep;
             QString h=columnNames.value(i, "");
             h=h.replace(colSep, "_").replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
-            res+=stringDelimiter+h+stringDelimiter;
+            res+=qfLeftPaddedString(stringDelimiter+h+stringDelimiter, fieldWidth);
         }
         res+="\n";
     }
@@ -501,11 +502,11 @@ QString toCSV(const QList<QVector<double> >& data, const QStringList& columnName
         if (rowNames.size()>0 && withHeaders) {
             QString h=rowNames.value(r, "");
             h=h.replace(colSep, "_").replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
-            res+=stringDelimiter+h+stringDelimiter+colSep;
+            res+=qfLeftPaddedString(stringDelimiter+h+stringDelimiter+colSep, fieldWidth);
         }
         for (int c=0; c<cols; c++) {
             if (c>0 || rowNames.size()>0) res+=colSep;
-            if (r<data[c].size()) res+=doubleToQString(data[c].value(r, 0), precision, 'g', decimalSep);
+            if (r<data[c].size()) res+=qfLeftPaddedString(doubleToQString(data[c].value(r, 0), precision, 'g', decimalSep), fieldWidth);
         }
         res+="\n";
     }
@@ -513,7 +514,7 @@ QString toCSV(const QList<QVector<double> >& data, const QStringList& columnName
 }
 
 
-QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnNames, const QStringList& rowNames, QChar decimalSep, const QString colSep, bool withHeaders, QChar stringDelimiter, const QString& headerSep, int precision) {
+QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnNames, const QStringList& rowNames, QChar decimalSep, const QString colSep, bool withHeaders, QChar stringDelimiter, const QString& headerSep, int precision, int fieldWidth) {
     QString res;
     int cols=data.size();
     int rows=0;
@@ -526,7 +527,7 @@ QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnName
             if (i>0 || rowNames.size()>0) res+=colSep;
             QString h=columnNames.value(i, "");
             h=h.replace(colSep, "_").replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
-            res+=stringDelimiter+h+stringDelimiter;
+            res+=qfLeftPaddedString(stringDelimiter+h+stringDelimiter, fieldWidth);
         }
         res+="\n";
     }
@@ -535,7 +536,7 @@ QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnName
         if (rowNames.size()>0 && withHeaders) {
             QString h=rowNames.value(r, "");
             h=h.replace(colSep, "_").replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
-            res+=stringDelimiter+h+stringDelimiter+colSep;
+            res+=qfLeftPaddedString(stringDelimiter+h+stringDelimiter+colSep, fieldWidth);
         }
         for (int c=0; c<cols; c++) {
             if (c>0 || rowNames.size()>0) res+=colSep;
@@ -547,13 +548,13 @@ QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnName
                     case QVariant::LongLong:
                     case QVariant::ULongLong:
                     case QVariant::Double:
-                        res+=doubleToQString(v.toDouble(), precision, 'g', decimalSep);
+                        res+=qfLeftPaddedString(doubleToQString(v.toDouble(), precision, 'g', decimalSep), fieldWidth);
                         break;
                     default:
                         if (v.isValid()) {
                             QString h=v.toString();
                             h=h.replace(colSep, "_").replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
-                            res+=stringDelimiter+h+stringDelimiter;
+                            res+=qfLeftPaddedString(stringDelimiter+h+stringDelimiter, fieldWidth);
                         }
                         break;
                 }
@@ -654,6 +655,7 @@ bool guessCSVParameters(QString data, char* out_sep, char* out_dec, char* out_co
         int cntSem=d.count(';');
         int cntCom=d.count(',');
         int cntTab=d.count('\t');
+        int cntSPACE=d.trimmed().count(' ');
         //qDebug()<<"icntDot="<<icntDot<<"  icntCom="<<icntCom<<"  cnt="<<cnt<<"  cntSem="<<cntSem<<"  cntCom="<<cntCom<<"  cntTab="<<cntTab;
         if (cntSem>=cnt && ';'!=dec) sep=';';
         if (cntCom>=cnt && ','!=dec) sep=',';
@@ -666,6 +668,7 @@ bool guessCSVParameters(QString data, char* out_sep, char* out_dec, char* out_co
         if (icntDot>0 && icntCom>0) { dec='.'; sep=',';}
         if (sep==';' && comment==';') { comment='#'; headercomment=""; }
         if (headercomment.size()<=0) { headercomment=comment; headercomment+="!"; }
+        if (sep=='\t' && cntTab<=0 && cntSPACE>0) sep=' ';
         //qDebug()<<"out_comment="<<QChar(comment);
         //qDebug()<<"out_dec="<<QChar(dec);
         //qDebug()<<"out_sep="<<QChar(sep);

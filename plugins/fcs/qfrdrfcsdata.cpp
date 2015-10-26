@@ -127,8 +127,9 @@ QList<QPair<QString, QString> > QFRDRFCSData::getFileTypesAndFilters()
     ft.append(qMakePair(QString("ALV6000"), tr("ALV-6000 file (*.asc)")));
     ft.append(qMakePair(QString("ALV7000"), tr("ALV-7000 file (*.asc)")));
     ft.append(qMakePair(QString("CORRELATOR.COM_SIN"), tr("correlator.com files (*.sin)")));
-    ft.append(qMakePair(QString("CONFOCOR3"), tr("Zeiss Confocor3 files (*.fcs)")));
+    ft.append(qMakePair(QString("CONFOCOR3"), tr("Zeiss Confocor2/3 files [ASCII] (*.fcs *.fcs.txt)")));
     ft.append(qMakePair(QString("ISS_ALBA"), tr("ISS Alba Files (*.csv)")));
+    ft.append(qMakePair(QString("PICOQUANT_ASCII_COR"), tr("PicoQuant FCS Files from v6.0 TTTR correlator (*.cor)")));
     ft.append(qMakePair(QString("PICOQUANT_ASCII_FCS_W"), tr("PicoQuant ASCII FCS Curves Files with weights (*.dat)")));
     ft.append(qMakePair(QString("PICOQUANT_ASCII_FCS"), tr("PicoQuant ASCII FCS Curves Files (*.dat)")));
     ft.append(qMakePair(QString("QF3ASCIICORR"), tr("QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)")));
@@ -223,6 +224,8 @@ void QFRDRFCSData::fileFiltersSetFCSFilterProperties(QMap<QString, QVariant> &p,
         p["FILETYPE"]="PICOQUANT_ASCII_FCS";
     } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("PICOQUANT_ASCII_FCS_W")) {
         p["FILETYPE"]="PICOQUANT_ASCII_FCS_W";
+    } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("PICOQUANT_ASCII_COR")) {
+        p["FILETYPE"]="PICOQUANT_ASCII_COR";
     } else if (currentFCSFileFormatFilter==getFileTypesFilterForID("DIFFUSION4_SIMRESULTS")) {
         p["FILETYPE"]="DIFFUSION4_SIMRESULTS";
         p["CSV_SEPARATOR"]=",";
@@ -309,7 +312,7 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
     correlation=(double*)qfCalloc(correlationN*correlationRuns, sizeof(double));
     correlationErrors=(double*)qfCalloc(correlationN*correlationRuns, sizeof(double));
     if (!correlationT || !correlation || !correlationMean || !correlationStdDev || !correlationErrors)
-        setError(tr("Error while allocating memory for correlation function data!"));
+        setError(tr("Error while allocating memory for correlation function data (N=%1, runs=%2!").arg(correlationN).arg(correlationRuns));
     emitRawDataChanged();
 }
 
@@ -351,7 +354,7 @@ void QFRDRFCSData::resizeBinnedRates(long long N) {
         binnedRateT=(double*)qfCalloc(binnedRateN, sizeof(double));
         binnedRate=(double*)qfCalloc(rateChannels*binnedRateN*rateRuns, sizeof(double));
         if (!binnedRateT || !binnedRate)
-            setError(tr("Error while allocating memory for binned count rate data!"));
+            setError(tr("Error while allocating memory forbinned count rate data (N=%1, runs=%2, channels=%3)!").arg(N).arg(binnedRateN).arg(rateChannels));
         setIntProperty("BINNED_RATE_N", binnedRateN, false, false);
     }
     emitRawDataChanged();
@@ -902,6 +905,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
     double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
     int firstline=getProperty("CSV_FIRSTLINE", 1).toInt();
     int mode=getProperty("CSV_MODE", 0).toInt();
+    int column=getProperty("CSV_COLUMN", 1).toInt();
     if (d.size()>0) separatorchar=d[0];
     d=getProperty("CSV_COMMENT", "#").toString().toStdString();
     if (d.size()>0) commentchar=d[0];
@@ -931,6 +935,8 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
                 rruns=rruns+columns-1;
             } else if (mode==1) { // tau, corr, error, corr, error, ...
                 rruns=rruns+(columns-1)/2;
+            } else if (mode==2) { // tau, corr, corr, ... -> select only one column
+                rruns=1;
             }
             ccorrN=qMax(lines, ccorrN);
         } catch(datatable2_exception& e) {   // error handling with exceptions
@@ -974,6 +980,9 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
                             }
                         }
                         runincrement=(columns-1)/2;
+                    } else if (mode==2) { // tau, corr, corr, ... -> select only one column
+                        if (column<(long long)data[ii].tab->get_column_count()) correlation[(run0)*correlationN+l]=data[ii].tab->get(column, l);
+                        runincrement=1;
                     }
                 }
                 run0=run0+runincrement;
@@ -1030,7 +1039,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromALBA(QStringList filenames) {
             // search for [Data] in file
             do {
                 line=stream.readLine().toLower();
-            } while ((!line.isNull()) && (!line.contains("[data]")));
+            } while (!stream.atEnd() && !line.isNull() && !line.contains("[data]"));
             if (line.contains("[data]")) {
                 QList<double> tdata, cdata;
                 do {
@@ -2583,6 +2592,18 @@ bool QFRDRFCSData::reloadFromFiles() {
             return false;
         }
         return loadCorrelationCurvesFromALBA(files);
+    } else if (filetype.toUpper()=="PICOQUANT_ASCII_COR") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return false;
+        }
+        bool res=false;
+        if (files.size()==1) {
+            res=loadCorrelationCurvesFromPicoQuantCOR(files[0]);
+        } else if (files.size()>1) {
+            loadSeveral(res, files, loadCorrelationCurvesFromPicoQuantCOR);
+        }
+        return res;
     } else if (filetype.toUpper()=="PICOQUANT_ASCII_FCS_W") {
         if (files.size()<=0) {
             setError(tr("there are no files in the FCS record!"));
@@ -2967,6 +2988,111 @@ bool QFRDRFCSData::loadOlegData(QString filename)
     return ok;
 }
 
+bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantCOR(QString filename)
+{
+    if (!QFile::exists(filename)) {
+        QString msg;
+        setError(msg=tr("data file '%1' does not exist!\n").arg(filename));
+        QFPluginServices::getInstance()->log_warning(msg);
+        return false;
+    }
+
+    QFile f(filename);
+    if (f.open(QFile::ReadOnly|QFile::Text)) {
+        QTextStream txt(&f);
+        QList<QVector<double> > corr;
+        while (!txt.atEnd()) {
+            QString line;
+            QVector<double> data=csvReadline(txt, ' ', '#', 0, "\n", "\r", &line);
+            bool added=false;
+            if (data.size()>=3 && QFFloatIsOK(data[0]) && data[0]>0 && QFFloatIsOK(data[1])) {
+                //data.removeFirst();
+                corr<<data;
+                added=true;
+                //qDebug()<<1<<data;
+            } else {
+                QRegExp rxc("#?([^\\:]+)\\s*\\:\\s*(.+)");
+                //qDebug()<<2<<line;
+                if (rxc.exactMatch(line) && rxc.cap(1).trimmed().size()>0 && rxc.cap(2).trimmed().size()>0) {
+                    QString name=rxc.cap(1).trimmed();
+                    QString value=rxc.cap(2).trimmed();
+                    setQFProperty(name, qfStringToVariantAutoRecognizeType(value), false, true);
+                    //qDebug()<<2<<name<<value<<qfStringToVariantAutoRecognizeType(value);
+                }
+            }
+        }
+        f.close();
+        if (corr.size()>0) {
+            //double taumin=corr[0].at(0)*1e-3;
+            resizeCorrelations(corr.size(), 1);
+            //qDebug()<<"correlationN="<<correlationN;
+            bool cok=false;
+            int col=getQFProperty("COLUMNS", "2").toInt(&cok);
+            if (!cok) col=2;
+            int taucol=1;
+            for (int i=0; i<correlationN; i++) {
+                if (taucol<corr[i].size()) {
+                    correlationT[i]=corr[i].at(taucol);
+                }
+                if (col<corr[i].size()) {
+                    correlation[i]=corr[i].at(col);
+                    //if (weights && corr[i].size()>=3) correlationErrors[i]=1/corr[i].at(2);
+                } else {
+                    correlation[i]=0;
+                }
+            }
+            recalculateCorrelations();
+            emitRawDataChanged();
+            return true;
+        } else {
+            setError(tr("Error while reading correlation functions from PicoQuant ASCII file '%1': %2").arg(filename).arg(tr("No valid data found in file")));
+            return false;
+        }
+    } else {
+        setError(tr("Error while reading correlation functions from PicoQuant ASCII file '%1': %2").arg(filename).arg(f.errorString()));
+        return false;
+    }
+
+    return false;
+}
+
+bool QFRDRFCSData::analyzeCorrelationCurvesFromPicoQuantCOR(QString filename, int *channels)
+{
+    if (!QFile::exists(filename)) {
+        //qDebug()<<"file does not exist";
+        return false;
+    }
+
+
+    QFile f(filename);
+    if (f.open(QFile::ReadOnly|QFile::Text)) {
+        QTextStream txt(&f);
+        while (!txt.atEnd()) {
+            QString line;
+            QVector<double> data=csvReadline(txt, ' ', '#', 0, "\n", "\r", &line);
+            //qDebug()<<line;
+            if (data.size()>=3 && QFFloatIsOK(data[0]) && data[0]>0 && QFFloatIsOK(data[1])) {
+                //qDebug()<< "  -> "<<data<< "  -> chanels ="<<data.size()-2;
+                if (channels) *channels=data.size()-2;
+                f.close();
+                return true;
+            } else {
+//                QRegExp rxc("#?(.+)[\\=|\\:](.+)");
+//                qDebug()<<2<<line;
+//                if (rxc.exactMatch(line) && rxc.cap(1).trimmed().size()>0 && rxc.cap(2).trimmed().size()>0) {
+//                    QString name=rxc.cap(1).trimmed();
+//                    QString value=rxc.cap(2).trimmed();
+//                    setQFProperty(name, qfStringToVariantAutoRecognizeType(value), false, true);
+//                    qDebug()<<2<<name<<value<<qfStringToVariantAutoRecognizeType(value);
+//                }
+            }
+            //qDebug()<<txt.atEnd()<<f.atEnd();
+        }
+        f.close();
+    }
+    return false;
+}
+
 bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantASCIIFCS(QString filename, bool weights)
 {
     if (!QFile::exists(filename)) {
@@ -2980,7 +3106,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromPicoQuantASCIIFCS(QString filename, 
     if (f.open(QFile::ReadOnly|QFile::Text)) {
         QTextStream txt(&f);
         QList<QVector<double> > corr;
-        while (!f.atEnd()) {
+        while (!txt.atEnd()) {
             QVector<double> data=csvReadline(txt, ' ', '#', 0, "\n", "\r");
             bool added=false;
             if (data.size()>=2 && QFFloatIsOK(data[0]) && data[0]>0 && QFFloatIsOK(data[1])) {
@@ -3196,7 +3322,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
     reader.loadFile(filename);
     if (reader.wasError()) {
         ok=false;
-        setError(tr("Error while importing ConfoCor3 file '%1':\n    %2\n").arg(filename).arg(reader.getLastErrors().join("\n")));
+        setError(tr("Error while importing ConfoCor2/3 file '%1':\n    %2\n").arg(filename).arg(reader.getLastErrors().join("\n")));
         return ok;
     } else {
         const Confocor3Tools::ConfocorDataset& d=reader.getData();
@@ -3251,86 +3377,88 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                     }
                 }
             }
-            resizeCorrelations(Nc, runs);
-            resizeRates(Nc, runs, channels);
-            setQFProperty("CHANNELS_SWAPPED", chSwap, false, true);
-            if (importData.size()>0) {
-                for (int r=0; r<importData.size(); r++) {
-                    const Confocor3Tools::FCSDataSet& f=d.fcsdatasets[importData[r].index];
-                    setQFProperty("CHANNEL_NAME", f.channel, false, true);
-                    setQFProperty("POSITION", f.position, false, true);
-                    setQFProperty("KINETIC", f.kinetic, false, true);
-                    setQFProperty("ACQUISITION_TIME", f.acqtime, false, true);
-                    setQFProperty("RAWDATA_FILE", f.rawdata, false, true);
-                    QMapIterator<QString, QVariant> it(f.props);
-                    while (it.hasNext()) {
-                        it.next();
-                        setQFProperty(it.key().toUpper(), it.value(), false, true);
-                    }
-
-                    if (r==0) {
-                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) correlationT[i]=f.tau.value(i, 0.0);
-                    } else {
-                        bool okT=true;
-                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {if (fabs(correlationT[i]-f.tau.value(i, 0.0))>1e-3*correlationT[i]) {okT=false; break;}}
-                        if (!okT) {
-                            ok=false;
-                            setError(tr("Error while importing ConfoCor3 file '%1':\n    lag-time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
-                            return ok;
+            if (Nc<INT_MAX && runs>0) {
+                resizeCorrelations(Nc, runs);
+                resizeRates(Nc, runs, channels);
+                setQFProperty("CHANNELS_SWAPPED", chSwap, false, true);
+                if (importData.size()>0) {
+                    for (int r=0; r<importData.size(); r++) {
+                        const Confocor3Tools::FCSDataSet& f=d.fcsdatasets[importData[r].index];
+                        setQFProperty("CHANNEL_NAME", f.channel, false, true);
+                        setQFProperty("POSITION", f.position, false, true);
+                        setQFProperty("KINETIC", f.kinetic, false, true);
+                        setQFProperty("ACQUISITION_TIME", f.acqtime, false, true);
+                        setQFProperty("RAWDATA_FILE", f.rawdata, false, true);
+                        QMapIterator<QString, QVariant> it(f.props);
+                        while (it.hasNext()) {
+                            it.next();
+                            setQFProperty(it.key().toUpper(), it.value(), false, true);
                         }
-                    }
-                    double* corr=getCorrelationRun(r);
-                    if (f.corr.size()>0 && f.corr.first().size()>=Nc) {
-                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {
-                            corr[i]=f.corr.first().value(i, 0.0)-1.0;
-                        }
-                    } else {
-                        ok=false;
-                        setError(tr("Error while importing ConfoCor3 file '%1':\n    no correlation data found in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
-                        return ok;
 
-                    }
-
-                    if (r==0) {
-                        for (int i=0; i<qMin((int64_t)rateN, Nr); i++) rateT[i]=f.time.value(i, 0.0);
-                    } else {
-                        bool okT=true;
-                        for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {if (fabs(rateT[i]-f.time.value(i, 0.0))>1e-3*rateT[i]) {okT=false; break;}}
-                        if (!okT) {
-                            ok=false;
-                            setError(tr("Error while importing ConfoCor3 file '%1':\n    time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
-                            return ok;
-                        }
-                    }
-                    if (importData[r].cntRec1>=0) {
-                        double* rat0=getRateRun(r,0);
-                        const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec1];
-                        if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
-                            for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {
-                                rat0[i]=fr1.rate.first().value(i, 0)/1000.0;
+                        if (r==0) {
+                            for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) correlationT[i]=f.tau.value(i, 0.0);
+                        } else {
+                            bool okT=true;
+                            for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {if (fabs(correlationT[i]-f.tau.value(i, 0.0))>1e-3*correlationT[i]) {okT=false; break;}}
+                            if (!okT) {
+                                ok=false;
+                                setError(tr("Error while importing ConfoCor2/3 file '%1':\n    lag-time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                                return ok;
                             }
                         }
-                    }
-                    if (channels>1 && importData[r].cntRec2>=0) {
-                        double* rat1=getRateRun(r, 1);
-                        const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec2];
-                        if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
-                            for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {
-                                rat1[i]=fr1.rate.first().value(i, 0)/1000.0;
+                        double* corr=getCorrelationRun(r);
+                        if (f.corr.size()>0 && f.corr.first().size()>=Nc) {
+                            for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {
+                                corr[i]=f.corr.first().value(i, 0.0)-1.0;
+                            }
+                        } else {
+                            ok=false;
+                            setError(tr("Error while importing ConfoCor2/3 file '%1':\n    no correlation data found in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                            return ok;
+
+                        }
+
+                        if (r==0) {
+                            for (int i=0; i<qMin((int64_t)rateN, Nr); i++) rateT[i]=f.time.value(i, 0.0);
+                        } else {
+                            bool okT=true;
+                            for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {if (fabs(rateT[i]-f.time.value(i, 0.0))>1e-3*rateT[i]) {okT=false; break;}}
+                            if (!okT) {
+                                ok=false;
+                                setError(tr("Error while importing ConfoCor2/3 file '%1':\n    time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                                return ok;
                             }
                         }
+                        if (importData[r].cntRec1>=0) {
+                            double* rat0=getRateRun(r,0);
+                            const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec1];
+                            if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
+                                for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {
+                                    rat0[i]=fr1.rate.first().value(i, 0)/1000.0;
+                                }
+                            }
+                        }
+                        if (channels>1 && importData[r].cntRec2>=0) {
+                            double* rat1=getRateRun(r, 1);
+                            const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec2];
+                            if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
+                                for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {
+                                    rat1[i]=fr1.rate.first().value(i, 0)/1000.0;
+                                }
+                            }
+                        }
+
+
                     }
-
-
+                } else {
+                    ok=false;
+                    setError(tr("Error while importing ConfoCor2/3 file '%1':\n    no items selected to import (group=%1, role=%2).\n").arg(filename).arg(group).arg(role));
+                    return ok;
                 }
-            } else {
-                ok=false;
-                setError(tr("Error while importing ConfoCor3 file '%1':\n    no items selected to import (group=%1, role=%2).\n").arg(filename).arg(group).arg(role));
-                return ok;
             }
         } else {
             ok=false;
-            setError(tr("Error while importing ConfoCor3 file '%1':\n    no items selected to import.\n").arg(filename));
+            setError(tr("Error while importing ConfoCor2/3 file '%1':\n    no items selected to import.\n").arg(filename));
             return ok;
         }
     }

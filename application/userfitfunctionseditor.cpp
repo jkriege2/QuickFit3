@@ -62,6 +62,10 @@ UserFitFunctionsEditor::UserFitFunctionsEditor(QWidget *parent) :
     init();
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
+    QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString(), ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
+
+    ui->edtExpression->setFont(f);
+
 }
 
 UserFitFunctionsEditor::~UserFitFunctionsEditor()

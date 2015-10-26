@@ -246,6 +246,16 @@ uint16_t QFSimpleTCSPCImporter::inputChannels() const {
     return 3;
 }
 
+uint32_t QFSimpleTCSPCImporter::microtimeChannels() const
+{
+    return 0;
+}
+
+double QFSimpleTCSPCImporter::microtimeChannelsResolutionPicoSeconds() const
+{
+    return 0;
+}
+
 double QFSimpleTCSPCImporter::avgCountRate(uint16_t channel) const {
     return cr.value(channel, 0);
 }

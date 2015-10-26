@@ -24,8 +24,16 @@
 #define QFRDRFCSPARSERFUNCTIONS_H
 
 #include "qfmathparser.h"
+#include "qfproject.h"
+#include "qfrawdatarecord.h"
+#include "statistics_tools.h"
+#include "qfrdrsimplecountrateinterface.h"
+#include "qfrdrfcsdatainterface.h"
+#include "qfrdrcountratesinterface.h"
+#include <stdint.h>
 
-void fRDR_isfcs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+QFMATHPARSER_DEFINE_RDRIS_FUNC(fRDR_isfcs, rdr_isfcs, QFRDRFCSDataInterface)
+
 void fFCS_correlation(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 void fFCS_correlationerror(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 void fFCS_meancorrelation(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);

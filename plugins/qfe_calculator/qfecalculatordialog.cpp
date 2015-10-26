@@ -59,11 +59,21 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
     functionRef->addDefaultWords(defaultWords);
 
     ui->spinDigits->setValue(ProgramOptions::getConfigValue("QFECalculatorDialog/digits", 10).toDouble());
+    ProgramOptions::getConfigQSplitter(ui->splitter, "QFECalculatorDialog/splitter");
+    ProgramOptions::getConfigWindowGeometry(this, "QFECalculatorDialog/window");
 
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
-    on_chkMultiline_toggled(ui->chkMultiline->isChecked());
-    ui->edtExpression->setFocus();
+    //on_chkMultiline_toggled(ui->chkMultiline->isChecked());
+    ui->btnLoad->clearFocus();
+    ui->btnSave->clearFocus();
+    ui->btnEvaluate->clearFocus();
+    ui->btnEvaluateScript->clearFocus();
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
+    ui->edtExpression->setFocus(Qt::MouseFocusReason);
+
+    QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString(), ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
+    ui->edtExpression->setFont(f)    ;
+    ui->pteExpression->setFont(f);
 }
 
 void QFECalculatorDialog::setupParser(QFMathParser *parser) const
@@ -75,6 +85,8 @@ void QFECalculatorDialog::setupParser(QFMathParser *parser) const
 
 QFECalculatorDialog::~QFECalculatorDialog()
 {
+    ProgramOptions::setConfigQSplitter(ui->splitter, "QFECalculatorDialog/splitter");
+    ProgramOptions::setConfigWindowGeometry(this, "QFECalculatorDialog/window");
     QMapIterator<int, QPointer<QFECalculatorPlotDialog> > i(plots);
     while (i.hasNext()) {
         i.next();
@@ -146,12 +158,41 @@ void QFECalculatorDialog::showCache()
     ui->lstFunctions->setUpdatesEnabled(true);
 }
 
+void QFECalculatorDialog::on_btnLoad_clicked()
+{
+    QString filename=qfGetOpenFileNameSet("QFECalculatorDialog/", this, tr("load script ..."), QString(), tr("expression parser script (*.esc);;text file (*.txt);;all files (*.*)"));
+    if (QFile::exists(filename)) {
+        QFile f(filename);
+        if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+            ui->pteExpression->setPlainText(QString::fromUtf8(f.readAll()));
+            f.close();
+        }
+    }
+}
+
+void QFECalculatorDialog::on_btnSave_clicked()
+{
+    QString filename=qfGetSaveFileNameSet("QFECalculatorDialog/", this, tr("save script ..."), QString(), tr("expression parser script (*.esc);;text file (*.txt);;all files (*.*)"));
+    if (!filename.isEmpty()) {
+        QFile f(filename);
+        if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+            {
+                QTextStream s(&f);
+                s<<ui->pteExpression->toPlainText().toUtf8();
+            }
+            f.close();
+        }
+    }
+}
+
 
 void QFECalculatorDialog::on_btnEvaluate_clicked()
 {
     ProgramOptions::setConfigValue("QFECalculatorDialog/digits", ui->spinDigits->value());
+    ProgramOptions::setConfigQSplitter(ui->splitter, "QFECalculatorDialog/splitter");
+    ProgramOptions::setConfigWindowGeometry(this, "QFECalculatorDialog/window");
     QString expression=ui->edtExpression->text();
-    if (ui->chkMultiline->isChecked()) expression=ui->pteExpression->toPlainText();
+    //if (ui->chkMultiline->isChecked()) expression=ui->pteExpression->toPlainText();
     QTextCursor cur1(ui->edtHistory->document());
     cur1.movePosition(QTextCursor::End);
     cur1.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(qfHTMLEscape(expression))));
@@ -190,6 +231,11 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
         parser->addVariable("ans", r);
         parser->addVariable("answer", r);
         ui->edtExpression->setText("");
+        ui->btnLoad->clearFocus();
+        ui->btnSave->clearFocus();
+        ui->btnEvaluate->clearFocus();
+        ui->btnEvaluateScript->clearFocus();
+        ui->pteExpression->clearFocus();
         ui->edtExpression->setFocus();
         history.append(expression);
     } else {
@@ -206,9 +252,78 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
     ui->edtHistory->moveCursor(QTextCursor::End);
     showCache();
 
-    on_chkMultiline_toggled(ui->chkMultiline->isChecked());
-    if (ui->chkMultiline->isChecked()) ui->pteExpression->setFocus();
-    else ui->edtExpression->setFocus();
+    //on_chkMultiline_toggled(ui->chkMultiline->isChecked());
+    //if (ui->chkMultiline->isChecked()) ui->pteExpression->setFocus();
+    //else ui->edtExpression->setFocus();
+    ui->edtExpression->setFocus();
+}
+
+void QFECalculatorDialog::on_btnEvaluateScript_clicked()
+{
+    ProgramOptions::setConfigValue("QFECalculatorDialog/digits", ui->spinDigits->value());
+    ProgramOptions::setConfigQSplitter(ui->splitter, "QFECalculatorDialog/splitter");
+    ProgramOptions::setConfigWindowGeometry(this, "QFECalculatorDialog/window");
+    QString expression=ui->pteExpression->toPlainText();
+    QTextCursor cur1(ui->edtHistory->document());
+    cur1.movePosition(QTextCursor::End);
+    QStringList ex=expression.split('\n');
+    for (int i=0; i<ex.size(); i++) {
+        if (i==0) cur1.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(qfHTMLEscape(ex[i]))));
+        else cur1.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;<i>%1</i></tt><br>").arg(qfHTMLEscape(ex[i]))));
+    }
+    parser->resetErrors();
+    qfmpResult r=parser->evaluate(expression);
+
+    QString result;
+    if (r.isValid) {
+        if (r.type==qfmpBool) {
+            result=tr("<font color=\"blue\">[boolean] %1</font>").arg(qfHTMLEscape(boolToQString(r.boolean)));
+        } else if (r.type==qfmpDouble) {
+            result=tr("<font color=\"blue\">[float] %1</font>").arg(qfHTMLEscape(doubleToQString(r.num, ui->spinDigits->value())));
+        } else if (r.type==qfmpDoubleVector) {
+            result=tr("<font color=\"blue\">[float vector] [ %1 ]</font>").arg(qfHTMLEscape(doubleVecToQString(r.numVec, ui->spinDigits->value())));
+        } else if (r.type==qfmpStringVector) {
+            result=tr("<font color=\"blue\">[string vector] %1</font>").arg(qfHTMLEscape(listToString(r.strVec)));
+        } else if (r.type==qfmpBoolVector) {
+            result=tr("<font color=\"blue\">[boolean vector] %1</font>").arg(qfHTMLEscape(listToString(r.boolVec)));
+        } else if (r.type==qfmpString) {
+            result=tr("<font color=\"blue\">[string] %1</font>").arg(qfHTMLEscape(r.str));
+        } else if (r.type==qfmpVoid) {
+            result=tr("<font color=\"blue\">[void]</font>");
+        } else if (r.type==qfmpStruct) {
+            result=tr("<font color=\"blue\">[struct] %1</font>").arg(r.toString());
+        } else {
+            result=tr("<font color=\"red\">[unknown] ? ? ?</font>");
+        }
+        qfmpResult r1=parser->getVariableOrInvalid("ans");
+        qfmpResult r2=parser->getVariableOrInvalid("ans1");
+        if (r1.isUsableResult()) {
+            parser->addVariable("ans1", r1);
+        }
+        if (r2.isUsableResult()) {
+            parser->addVariable("ans2", r2);
+        }
+        parser->addVariable("ans", r);
+        parser->addVariable("answer", r);
+        history.append(expression);
+    } else {
+        result=tr("<font color=\"red\">invalid result</font>");
+    }
+
+    QTextCursor cur(ui->edtHistory->document());
+    cur.movePosition(QTextCursor::End);
+    cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; = <tt>%1</tt></tt><br>").arg(result)));
+    if (parser->hasErrorOccured()) {
+        cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; <font color=\"red\">ERROR: %1</font></tt><br>").arg(parser->getLastErrors().join("<br>ERROR: "))));
+    }
+    calc->setHistory(ui->edtHistory->document()->toHtml("UTF-8"));
+    ui->edtHistory->moveCursor(QTextCursor::End);
+    showCache();
+
+    //on_chkMultiline_toggled(ui->chkMultiline->isChecked());
+    //if (ui->chkMultiline->isChecked()) ui->pteExpression->setFocus();
+    //else ui->edtExpression->setFocus();
+
 }
 
 void QFECalculatorDialog::on_edtExpression_textChanged(QString text) {
@@ -227,11 +342,11 @@ void QFECalculatorDialog::on_edtExpression_textChanged(QString text) {
 
 }
 
-void QFECalculatorDialog::on_chkMultiline_toggled(bool enabled)
-{
-    ui->edtExpression->setVisible(!enabled);
-    ui->pteExpression->setVisible(enabled);
-}
+//void QFECalculatorDialog::on_chkMultiline_toggled(bool enabled)
+//{
+//    ui->edtExpression->setVisible(!enabled);
+//    ui->pteExpression->setVisible(enabled);
+//}
 
 
 void QFECalculatorDialog::on_btnClearHistory_clicked()

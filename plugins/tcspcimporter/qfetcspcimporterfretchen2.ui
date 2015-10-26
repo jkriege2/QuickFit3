@@ -1,0 +1,2540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFETCSPCImporterFretchen2</class>
+ <widget class="QDialog" name="QFETCSPCImporterFretchen2">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1013</width>
+    <height>674</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Photon Burst Analyzer</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="qfetcspcimporter.qrc">
+    <normaloff>:/tcspcimporter/burstanalyzer.png</normaloff>:/tcspcimporter/burstanalyzer.png</iconset>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
+    <layout class="QHBoxLayout" name="layTabs">
+     <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>2</number>
+       </property>
+       <widget class="QWidget" name="tabFile">
+        <attribute name="title">
+         <string>1. File Selection</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_6">
+         <item row="1" column="0" colspan="2">
+          <widget class="QWidget" name="widMoreOptions" native="true">
+           <layout class="QFormLayout" name="formLayout">
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_24">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>data range:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinRangeStart</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
+               <widget class="QDoubleSpinBox" name="spinRangeStart">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="suffix">
+                 <string> s</string>
+                </property>
+                <property name="maximum">
+                 <double>1000000000.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="chkFromStart">
+                <property name="text">
+                 <string>from start</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string> ... </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="spinRangeEnd">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="suffix">
+                 <string> s</string>
+                </property>
+                <property name="maximum">
+                 <double>1000000000.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="chkTillEnd">
+                <property name="text">
+                 <string>till end</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_7">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_23">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>file &amp;format:</string>
+              </property>
+              <property name="buddy">
+               <cstring>cmbFileformat</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_11">
+              <item>
+               <widget class="QComboBox" name="cmbFileformat">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>250</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>500</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>none</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>TIFF</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8.25pt; font-weight:600;&quot;&gt;Green Channel:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buddy">
+               <cstring>cmbGreenChannel</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QComboBox" name="cmbGreenChannel">
+                <property name="minimumSize">
+                 <size>
+                  <width>250</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>500</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8.25pt; font-weight:600;&quot;&gt;Red Channel:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buddy">
+               <cstring>cmbRedChannel</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <widget class="QComboBox" name="cmbRedChannel">
+                <property name="minimumSize">
+                 <size>
+                  <width>250</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>500</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8.25pt; font-weight:600;&quot;&gt;&amp;amp;Background TCSPC File:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buddy">
+               <cstring>edtTCSPCBackground</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QLineEdit" name="edtTCSPCBackground">
+                <property name="placeholderText">
+                 <string>enter filename here</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="btnSelectBackground">
+                <property name="toolTip">
+                 <string>select an image series file to correlate</string>
+                </property>
+                <property name="text">
+                 <string>...</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="qfetcspcimporter.qrc">
+                  <normaloff>:/tcspcimporter/fileopen.png</normaloff>:/tcspcimporter/fileopen.png</iconset>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="6" column="0">
+             <spacer name="verticalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="7" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnLoadFiles">
+                <property name="minimumSize">
+                 <size>
+                  <width>250</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Load Data ...</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="qfetcspcimporter.qrc">
+                  <normaloff>:/tcspcimporter/job_done.png</normaloff>:/tcspcimporter/job_done.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLineEdit" name="edtTCSPCFile">
+             <property name="placeholderText">
+              <string>enter filename here</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSelectFile">
+             <property name="toolTip">
+              <string>select an image series file to correlate</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="qfetcspcimporter.qrc">
+               <normaloff>:/tcspcimporter/fileopen.png</normaloff>:/tcspcimporter/fileopen.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnLoad">
+             <property name="toolTip">
+              <string>read metadata from the given image series file</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="qfetcspcimporter.qrc">
+               <normaloff>:/tcspcimporter/use_file.png</normaloff>:/tcspcimporter/use_file.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;amp;Input TCSPC File:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="buddy">
+            <cstring>edtTCSPCFile</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QLabel" name="label_38">
+           <property name="text">
+            <string>&lt;b&gt;&lt;u&gt;Quick Help:&lt;/u&gt;&lt;/b&gt;&lt;br&gt;&lt;i&gt;1. Select a TCSPC file with your measurement data and click on &lt;img src=&quot;:/tcspcimporter/fileopen.png&quot;&gt; or &lt;img src=&quot;:/tcspcimporter/use_file.png&quot;&gt; to read it.&lt;br&gt;
+2. choose the file options and optionally select a background file.&lt;br&gt;
+3. Click on &lt;b&gt;&lt;img src=&quot;:/tcspcimporter/job_done.png&quot;&gt; Load Data ...&lt;/b&gt; to read the data. The Burst Selection tab will be activated on success.&lt;/i&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabBurstSelection">
+        <attribute name="title">
+         <string>2. Burst Selection</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0">
+           <item>
+            <widget class="QFPlotter" name="pltTrace" native="true"/>
+           </item>
+           <item>
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="7" column="0" colspan="2">
+              <widget class="QGroupBox" name="groupBox_2">
+               <property name="minimumSize">
+                <size>
+                 <width>275</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="title">
+                <string>Info</string>
+               </property>
+               <layout class="QFormLayout" name="formLayout_3">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_13">
+                  <property name="text">
+                   <string>duration:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLabel" name="labDuration">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::RichText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_19">
+                  <property name="text">
+                   <string>all photons:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLabel" name="labP">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::RichText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_14">
+                  <property name="text">
+                   <string>photons green:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QLabel" name="labPGreen">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::RichText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="label_20">
+                  <property name="text">
+                   <string>countrate (background) green:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QLabel" name="labCGreen">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::RichText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QLabel" name="label_15">
+                  <property name="text">
+                   <string>photons red:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QLabel" name="labPRed">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::RichText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="label_21">
+                  <property name="text">
+                   <string>countrate (background) red:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QLabel" name="labCRed">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::RichText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="0">
+                 <widget class="QLabel" name="label_18">
+                  <property name="text">
+                   <string>avg. IPT:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="1">
+                 <widget class="QLabel" name="labAvgIPT">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::RichText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="0">
+                 <widget class="QLabel" name="label_16">
+                  <property name="text">
+                   <string>LEE window:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="1">
+                 <widget class="QLabel" name="labLEEWindow">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::RichText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="0">
+                 <widget class="QLabel" name="label_17">
+                  <property name="text">
+                   <string>LEE &amp;sigma;&lt;sub&gt;0&lt;/sub&gt;:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="1">
+                 <widget class="QLabel" name="labLEESigma0">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::RichText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QCheckBox" name="chkSHowFilteredIPT">
+               <property name="text">
+                <string>filtered IPT</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_43">
+               <property name="text">
+                <string>mode:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QDoubleSpinBox" name="spinDisplayBin">
+               <property name="suffix">
+                <string> ms</string>
+               </property>
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="minimum">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100000000000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_44">
+               <property name="text">
+                <string>countrate binning:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="spinDisplayStart">
+               <property name="suffix">
+                <string> s</string>
+               </property>
+               <property name="decimals">
+                <number>5</number>
+               </property>
+               <property name="minimum">
+                <double>0.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1000000000.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>display duration:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>display position:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="spinDisplayLength">
+               <property name="suffix">
+                <string> ms</string>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="minimum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100000000000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>500.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <spacer name="verticalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="cmbBurstSelPlotMode">
+               <item>
+                <property name="text">
+                 <string>interphoton time IPT</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>countrate</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QCheckBox" name="chkShowBursts">
+               <property name="text">
+                <string>highlight bursts</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>Burst Selection Settings </string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_22">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>identified bursts:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <spacer name="verticalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="4" column="1" colspan="7">
+             <widget class="QLabel" name="labBursts">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_9">
+              <property name="text">
+               <string>min. burst size:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinMinBurstSize</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="4">
+             <widget class="QLabel" name="label_12">
+              <property name="text">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;LEE parameter σ&lt;span style=&quot; vertical-align:sub;&quot;&gt;0&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinLEESigma</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QDoubleSpinBox" name="spinMaxBurstDuration">
+              <property name="suffix">
+               <string> ms</string>
+              </property>
+              <property name="minimum">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>100000000.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>6.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>max. IPT:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinMaxIPT</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="6">
+             <spacer name="horizontalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="5">
+             <widget class="QDoubleSpinBox" name="spinLEESigma">
+              <property name="suffix">
+               <string> ms</string>
+              </property>
+              <property name="minimum">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>100000000.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>5.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>window size:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinLEERange</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="spinMaxIPT">
+              <property name="suffix">
+               <string> µs</string>
+              </property>
+              <property name="minimum">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>100000000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>10.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>70.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="7" rowspan="3">
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <widget class="QPushButton" name="btnApplyBurstSelection">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>&amp;Apply</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="qfetcspcimporter.qrc">
+                  <normaloff>:/tcspcimporter/job_done.png</normaloff>:/tcspcimporter/job_done.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="spinMinBurstSize">
+              <property name="suffix">
+               <string> photons</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>100000000</number>
+              </property>
+              <property name="singleStep">
+               <number>10</number>
+              </property>
+              <property name="value">
+               <number>60</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QCheckBox" name="chkLEE">
+              <property name="text">
+               <string>LEE-filter:</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="5">
+             <widget class="QSpinBox" name="spinLEERange">
+              <property name="suffix">
+               <string> photons</string>
+              </property>
+              <property name="minimum">
+               <number>2</number>
+              </property>
+              <property name="maximum">
+               <number>100000000</number>
+              </property>
+              <property name="value">
+               <number>9</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>max. burst duration:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinMaxBurstDuration</cstring>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_39">
+           <property name="text">
+            <string>&lt;b&gt;&lt;u&gt;Quick Help:&lt;/u&gt;&lt;/b&gt;&lt;br&gt;&lt;i&gt;1. choose selection and filter settings.&lt;br&gt;
+2. Click on &lt;b&gt;&lt;img src=&quot;:/tcspcimporter/job_done.png&quot;&gt; Apply.&lt;/b&gt; to apply the settings and perform the filtering/burst search.&lt;br&gt;
+3. When satisfied, switch to the Tab &lt;b&gt;Burst Analysis&lt;/b&gt;.&lt;/i&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabBurstAnalysis">
+        <attribute name="title">
+         <string>3. Burst Analysis</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_3" rowstretch="1,0,0" columnstretch="2,1">
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="groupBox_4">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="title">
+            <string>Burst Analysis Results</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_31">
+              <property name="text">
+               <string>avg. Proximity ratio:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="labAvgP">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_37">
+              <property name="text">
+               <string>avg. FRET ratio:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="labAvgE">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_32">
+              <property name="text">
+               <string>avg. Burst duration:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="labAvgBDuration">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_34">
+              <property name="text">
+               <string>avg. Burst rate:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="labAvgRate">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_41">
+              <property name="font">
+               <font>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>green:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="label_42">
+              <property name="font">
+               <font>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>red:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QLabel" name="label_33">
+              <property name="text">
+               <string>number of bursts:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <widget class="QLabel" name="labNBursts">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <spacer name="verticalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>1</width>
+                <height>5</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLabel" name="labAvgRateG">
+              <property name="font">
+               <font>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QLabel" name="labAvgRateR">
+              <property name="font">
+               <font>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBox_3">
+           <property name="title">
+            <string>Burst Analysis Settings</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="1,0,1">
+            <item>
+             <layout class="QFormLayout" name="formLayout_4">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_25">
+                <property name="text">
+                 <string>background rate, green:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinBackG</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_10">
+                <item>
+                 <widget class="QDoubleSpinBox" name="spinBackG">
+                  <property name="suffix">
+                   <string> Hz</string>
+                  </property>
+                  <property name="decimals">
+                   <number>4</number>
+                  </property>
+                  <property name="maximum">
+                   <double>10000000.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>10.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="btnLeftBG">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../../lib/lib.qrc">
+                    <normaloff>:/lib/icons/previous.png</normaloff>:/lib/icons/previous.png</iconset>
+                  </property>
+                  <property name="toolButtonStyle">
+                   <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_26">
+                <property name="text">
+                 <string>background rate, red:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinBackR</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_12">
+                <item>
+                 <widget class="QDoubleSpinBox" name="spinBackR">
+                  <property name="suffix">
+                   <string> Hz</string>
+                  </property>
+                  <property name="decimals">
+                   <number>4</number>
+                  </property>
+                  <property name="maximum">
+                   <double>10000000.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>10.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="btnLeftBR">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../../lib/lib.qrc">
+                    <normaloff>:/lib/icons/previous.png</normaloff>:/lib/icons/previous.png</iconset>
+                  </property>
+                  <property name="toolButtonStyle">
+                   <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_27">
+                <property name="text">
+                 <string>crosstalk factor</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinCrosstalk</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="spinCrosstalk">
+                <property name="suffix">
+                 <string> %</string>
+                </property>
+                <property name="decimals">
+                 <number>3</number>
+                </property>
+                <property name="maximum">
+                 <double>100.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>4.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_28">
+                <property name="text">
+                 <string>direct excitation of A:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinFDir</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QDoubleSpinBox" name="spinFDir">
+                <property name="suffix">
+                 <string> Hz</string>
+                </property>
+                <property name="decimals">
+                 <number>3</number>
+                </property>
+                <property name="maximum">
+                 <double>1000000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>10.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>0.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_36">
+                <property name="text">
+                 <string>detection factor &amp;gamma;:</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::RichText</enum>
+                </property>
+                <property name="buddy">
+                 <cstring>spinGamma</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QDoubleSpinBox" name="spinGamma">
+                <property name="suffix">
+                 <string/>
+                </property>
+                <property name="decimals">
+                 <number>5</number>
+                </property>
+                <property name="maximum">
+                 <double>1000000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0" colspan="2">
+               <widget class="QPushButton" name="btnApplyBurstAnalysis">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>24</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>&amp;Apply</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="qfetcspcimporter.qrc">
+                  <normaloff>:/tcspcimporter/job_done.png</normaloff>:/tcspcimporter/job_done.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_45">
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Förster &amp;amp;Radius R&lt;span style=&quot; vertical-align:sub;&quot;&gt;0&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::RichText</enum>
+                </property>
+                <property name="buddy">
+                 <cstring>spinR0</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QDoubleSpinBox" name="spinR0">
+                <property name="suffix">
+                 <string> Angstrom</string>
+                </property>
+                <property name="decimals">
+                 <number>3</number>
+                </property>
+                <property name="maximum">
+                 <double>1000000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="value">
+                 <double>55.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>10</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_30">
+                <property name="text">
+                 <string>max. burst rate:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinMaxRate</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="spinMinRate">
+                <property name="suffix">
+                 <string> kHz</string>
+                </property>
+                <property name="decimals">
+                 <number>4</number>
+                </property>
+                <property name="maximum">
+                 <double>10000000.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_29">
+                <property name="text">
+                 <string>min. burst rate:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinMinRate</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <spacer name="verticalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>10</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDoubleSpinBox" name="spinMaxRate">
+                <property name="suffix">
+                 <string> kHz</string>
+                </property>
+                <property name="decimals">
+                 <number>4</number>
+                </property>
+                <property name="maximum">
+                 <double>10000000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>10.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="labHBinWidth">
+                <property name="text">
+                 <string>histogram bin width:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinHBinWidth</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="9" column="0" colspan="2">
+               <layout class="QHBoxLayout" name="horizontalLayout_14">
+                <item>
+                 <widget class="QPushButton" name="btnSaveToFile">
+                  <property name="text">
+                   <string>Save to File</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../../lib/lib.qrc">
+                    <normaloff>:/lib/save16.png</normaloff>:/lib/save16.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnAppendToMulti">
+                  <property name="text">
+                   <string>Append to Multi-File</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../../lib/lib.qrc">
+                    <normaloff>:/lib/save_all.png</normaloff>:/lib/save_all.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="8" column="0" colspan="2">
+               <widget class="QPushButton" name="btnSaveToProject">
+                <property name="text">
+                 <string>Save to Project</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="../../lib/lib.qrc">
+                  <normaloff>:/lib/projecttree_folderopen.png</normaloff>:/lib/projecttree_folderopen.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="labHistParams">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="spinHBinWidth">
+                <property name="suffix">
+                 <string/>
+                </property>
+                <property name="decimals">
+                 <number>4</number>
+                </property>
+                <property name="minimum">
+                 <double>0.000100000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>10000000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.010000000000000</double>
+                </property>
+                <property name="value">
+                 <double>0.050000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="labHBins">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>histogram bins:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinHBins</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QSpinBox" name="spinHBins">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="minimum">
+                 <number>2</number>
+                </property>
+                <property name="maximum">
+                 <number>1000</number>
+                </property>
+                <property name="value">
+                 <number>31</number>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QCheckBox" name="chkNormHistogram">
+                <property name="text">
+                 <string>norm. histogram</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="2">
+          <layout class="QGridLayout" name="gridLayout_5" columnstretch="1,1">
+           <item row="1" column="1">
+            <widget class="QFPlotter" name="pltBurstRate" native="true"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QFPlotter" name="pltProximity" native="true"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QComboBox" name="cmbAnaHistMode">
+             <item>
+              <property name="text">
+               <string>proximity ratio histogram</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>FRET histogram</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Burst length histogram</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Burst size histogram</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Burst rate histogram</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Donor-Acceptor-radius histogram</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="1,0,1">
+             <item>
+              <widget class="QComboBox" name="cmbAnaCorrMode">
+               <item>
+                <property name="text">
+                 <string>burst size vs. rate</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst size vs. proximity ratio</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst duration vs. proximity ratio</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst rate vs. proximity ratio</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_35">
+               <property name="text">
+                <string>color: </string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="cmbColorCol">
+               <item>
+                <property name="text">
+                 <string>--- none ---</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>proximity ratio</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst size</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst duration</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>burst rate</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_40">
+           <property name="text">
+            <string>&lt;b&gt;&lt;u&gt;Quick Help:&lt;/u&gt;&lt;/b&gt;&lt;br&gt;&lt;i&gt;1. choose analysis settings and provide instrument parameters.&lt;br&gt;
+2. Click on &lt;b&gt;&lt;img src=&quot;:/tcspcimporter/job_done.png&quot;&gt; Apply.&lt;/b&gt; to apply the settings and to update the analysis.&lt;br&gt;
+3. When satisfied, store the results to a file with &lt;b&gt;&lt;img src=&quot;:/lib/save16.png&quot;&gt;Save to File&lt;/b&gt;, or to the current QuickFit project with &lt;b&gt;&lt;img src=&quot;:/lib/projecttree_folderopen.png&quot;&gt; Save to Project&lt;/b&gt;.&lt;/i&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTabWidget" name="tabMultiFile">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tabMultiFileTab">
+        <attribute name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/lib/save_all.png</normaloff>:/lib/save_all.png</iconset>
+        </attribute>
+        <attribute name="title">
+         <string>Multi-File Store</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <property name="topMargin">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QToolButton" name="btnClear">
+             <property name="text">
+              <string>clear list</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../lib/lib.qrc">
+               <normaloff>:/lib/clear.png</normaloff>:/lib/clear.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_11">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnDelete">
+             <property name="text">
+              <string>remove</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../lib/lib.qrc">
+               <normaloff>:/lib/file_delete.png</normaloff>:/lib/file_delete.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnUp">
+             <property name="text">
+              <string>move up</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../lib/lib.qrc">
+               <normaloff>:/lib/icons/move_task_up.png</normaloff>:/lib/icons/move_task_up.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnDown">
+             <property name="text">
+              <string>move down</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../lib/lib.qrc">
+               <normaloff>:/lib/icons/move_task_down.png</normaloff>:/lib/icons/move_task_down.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QListView" name="lstMultiFile">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkMSRenumberBursts">
+           <property name="toolTip">
+            <string>If this is checked, the bursts in the multi-file output are renumbered (continuous, unique numbers) before saving.
+If unchecked, the bursts keep their number, which might not be unique in the file.
+In any case, an additional column will contain the file ID</string>
+           </property>
+           <property name="text">
+            <string>renumber bursts</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkMSAddFileID">
+           <property name="toolTip">
+            <string>If checked (default), the output file/table will contain an additional colum with an integer number identifying the file.</string>
+           </property>
+           <property name="text">
+            <string>add file-ID column</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnSaveToMulti">
+           <property name="text">
+            <string>Save selected to File</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../lib/lib.qrc">
+             <normaloff>:/lib/save_all.png</normaloff>:/lib/save_all.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnSaveMultiToProject">
+           <property name="text">
+            <string>Save selected to Project</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../lib/lib.qrc">
+             <normaloff>:/lib/projecttree_folderopen.png</normaloff>:/lib/projecttree_folderopen.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnHelp">
+       <property name="text">
+        <string>&amp;Help</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help/help.png</normaloff>:/lib/help/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="text">
+        <string>&amp;Close</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/exit.png</normaloff>:/lib/exit.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>edtTCSPCFile</tabstop>
+  <tabstop>btnSelectFile</tabstop>
+  <tabstop>btnLoad</tabstop>
+  <tabstop>spinRangeStart</tabstop>
+  <tabstop>chkFromStart</tabstop>
+  <tabstop>spinRangeEnd</tabstop>
+  <tabstop>chkTillEnd</tabstop>
+  <tabstop>cmbFileformat</tabstop>
+  <tabstop>cmbGreenChannel</tabstop>
+  <tabstop>cmbRedChannel</tabstop>
+  <tabstop>edtTCSPCBackground</tabstop>
+  <tabstop>btnSelectBackground</tabstop>
+  <tabstop>btnLoadFiles</tabstop>
+  <tabstop>spinDisplayLength</tabstop>
+  <tabstop>spinDisplayStart</tabstop>
+  <tabstop>chkSHowFilteredIPT</tabstop>
+  <tabstop>spinMaxIPT</tabstop>
+  <tabstop>spinMinBurstSize</tabstop>
+  <tabstop>spinMaxBurstDuration</tabstop>
+  <tabstop>chkLEE</tabstop>
+  <tabstop>spinLEERange</tabstop>
+  <tabstop>spinLEESigma</tabstop>
+  <tabstop>btnApplyBurstSelection</tabstop>
+  <tabstop>btnHelp</tabstop>
+  <tabstop>btnClose</tabstop>
+  <tabstop>spinDisplayBin</tabstop>
+  <tabstop>cmbBurstSelPlotMode</tabstop>
+  <tabstop>chkShowBursts</tabstop>
+  <tabstop>spinBackG</tabstop>
+  <tabstop>btnLeftBG</tabstop>
+  <tabstop>spinBackR</tabstop>
+  <tabstop>btnLeftBR</tabstop>
+  <tabstop>spinCrosstalk</tabstop>
+  <tabstop>spinFDir</tabstop>
+  <tabstop>spinGamma</tabstop>
+  <tabstop>spinR0</tabstop>
+  <tabstop>spinMinRate</tabstop>
+  <tabstop>spinMaxRate</tabstop>
+  <tabstop>spinHBinWidth</tabstop>
+  <tabstop>chkNormHistogram</tabstop>
+  <tabstop>spinHBins</tabstop>
+  <tabstop>btnApplyBurstAnalysis</tabstop>
+  <tabstop>btnSaveToProject</tabstop>
+  <tabstop>btnAppendToMulti</tabstop>
+  <tabstop>btnSaveToFile</tabstop>
+  <tabstop>cmbAnaHistMode</tabstop>
+  <tabstop>cmbAnaCorrMode</tabstop>
+  <tabstop>cmbColorCol</tabstop>
+  <tabstop>tabMultiFile</tabstop>
+  <tabstop>btnClear</tabstop>
+  <tabstop>btnDelete</tabstop>
+  <tabstop>btnUp</tabstop>
+  <tabstop>btnDown</tabstop>
+  <tabstop>lstMultiFile</tabstop>
+  <tabstop>chkMSRenumberBursts</tabstop>
+  <tabstop>chkMSAddFileID</tabstop>
+  <tabstop>btnSaveMultiToProject</tabstop>
+  <tabstop>btnSaveToMulti</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="qfetcspcimporter.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>spinDisplayLength</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateCTRTrace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>807</x>
+     <y>88</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>338</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinDisplayStart</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateCTRTrace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>807</x>
+     <y>114</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>526</x>
+     <y>2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkFromStart</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinRangeStart</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>327</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>201</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkTillEnd</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinRangeEnd</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>542</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>450</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinMaxIPT</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateCTRTrace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>400</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLEE</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_11</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>411</x>
+     <y>446</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>518</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLEE</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinLEERange</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>411</x>
+     <y>446</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>645</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLEE</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_12</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>411</x>
+     <y>446</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>518</x>
+     <y>474</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLEE</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinLEESigma</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>411</x>
+     <y>446</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>645</x>
+     <y>474</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkSHowFilteredIPT</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateCTRTrace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>807</x>
+     <y>137</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>558</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinMinRate</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>533</x>
+     <y>360</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>376</x>
+     <y>4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinMaxRate</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>533</x>
+     <y>386</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>888</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbAnaHistMode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>95</x>
+     <y>2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkNormHistogram</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>387</x>
+     <y>435</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>522</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinHBinWidth</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>533</x>
+     <y>412</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>497</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinHBins</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>533</x>
+     <y>461</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>121</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbAnaCorrMode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>484</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>225</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbColorCol</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateAnalysisPlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>737</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>22</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinDisplayBin</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateCTRTrace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>807</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>60</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbBurstSelPlotMode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateCTRTrace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>727</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>95</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkShowBursts</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFETCSPCImporterFretchen2</receiver>
+   <slot>updateCTRTrace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>682</x>
+     <y>152</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateCTRTrace()</slot>
+  <slot>updateLEE()</slot>
+  <slot>updateAnalysisPlots()</slot>
+ </slots>
+</ui>

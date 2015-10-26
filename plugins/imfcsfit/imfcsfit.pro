@@ -26,7 +26,7 @@ CONFIG += plugin
 TARGET = imfcsfit
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibs/cimg.pri)
@@ -57,7 +57,7 @@ HEADERS += qfpevalimfcsfit.h \
     qfimfcssetparamfromfiledialog.h \
     imfcscalibrationwizard.h \
     ../interfaces/qfrdrimfcscorrelatorremote.h \
-    ../base_classes/qffcsfitchi2landscapedialog.h\
+    ../base_classes/qffitchi2landscapedialog.h\
     ../base_classes/qfimagetransform.h
 
 
@@ -78,7 +78,7 @@ SOURCES += qfpevalimfcsfit.cpp \
     ../base_classes/qffcstools.cpp \
     qfimfcssetparamfromfiledialog.cpp \
     imfcscalibrationwizard.cpp \
-    ../base_classes/qffcsfitchi2landscapedialog.cpp\
+    ../base_classes/qffitchi2landscapedialog.cpp\
     ../base_classes/qfimagetransform.cpp
 
 
@@ -88,7 +88,7 @@ FORMS += \
     optionswidget.ui \
     qfimfcssetparamfromfiledialog.ui \
     imfcscalibrationwizard.ui \
-    ../base_classes/qffcsfitchi2landscapedialog.ui
+    ../base_classes/qffitchi2landscapedialog.ui
 
 RESOURCES += qfevalimfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc

@@ -78,7 +78,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     ui->widMD1->init(m_log, m_pluginServices);
     ui->widMD2->init(m_log, m_pluginServices);
     ui->filtcDetection->init(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini", m_log, m_pluginServices);
-    ui->cmbLightpathConfig->init(m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/", "lpc");
+    ui->cmbLightpathConfig->init(ProgramOptions::getConfigValue("spimb040/optsetup_config_directory", m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/").toString(), ProgramOptions::getConfigValue("spimb040/optsetup_config_directory_readonly", ProgramOptions::getInstance()->getGlobalConfigFileDirectory()).toString(), "lpc");
     ui->cmbLightpathConfig->setIcon(QIcon(":/spimb040/lightpath.png"));
     ui->btnLockFiltersEtc->setChecked(true);
     connect(ui->cmbLightpathConfig, SIGNAL(configsChanged(QFESPIMB040OpticsSetupItems)), this, SLOT(configsChanged(QFESPIMB040OpticsSetupItems)));
@@ -1269,7 +1269,7 @@ void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
         if (dlg->exec()==QDialog::Accepted) {
             name=dlg->getName();
             if (!name.isEmpty()) {
-                QString filename=m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/"+cleanStringForFilename(name)+".lpc";
+                QString filename=ProgramOptions::getConfigValue("spimb040/optsetup_config_directory", m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/").toString()+cleanStringForFilename(name)+".lpc";
                 if (QFile::exists(filename)) {
                     QMessageBox::StandardButton res=QMessageBox::question(this, tr("B040 SPIM"),
                                                                           tr("A lightpath config with the name '%1' already exists.\n  filename: '%2'\nOverwrite?").arg(name).arg(filename),

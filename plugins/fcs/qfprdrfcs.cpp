@@ -129,6 +129,28 @@ void QFPRDRFCS::init()
 
 }
 
+QVariant QFPRDRFCS::sendPluginCommand(const QString &command, const QVariant &param1, const QVariant &/*param2*/, const QVariant &/*param3*/, const QVariant &/*param4*/, const QVariant &/*param5*/)
+{
+    if (command=="load_alv5000") {
+        QMap<QString, QVariant> p;
+        QString filt=QFRDRFCSData::getFileTypesFilterForID("ALV5000");
+        setFCSFilterProperties(p, filt, param1.toString());
+        QStringList paramsReadonly;
+        paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_MODE"<<"CSV_FIRSTLINE"<<"CSV_ENDSWITH"<<"CSV_TIMEFACTOR";
+        loadFCSFilterFiles(QStringList(param1.toString()), filt, p, paramsReadonly);
+        return QVariant(true);
+    } else if (command=="load_qf3asciicorr") {
+        QMap<QString, QVariant> p;
+        QString filt=QFRDRFCSData::getFileTypesFilterForID("QF3ASCIICORR");
+        setFCSFilterProperties(p, filt, param1.toString());
+        QStringList paramsReadonly;
+        paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_MODE"<<"CSV_FIRSTLINE"<<"CSV_ENDSWITH"<<"CSV_TIMEFACTOR";
+        loadFCSFilterFiles(QStringList(param1.toString()), filt, p, paramsReadonly);
+        return QVariant(true);
+    }
+    return QVariant(false);
+}
+
 void QFPRDRFCS::setBackgroundInFCS(const QVector<double> &backgrounds, const QVector<double> &background_sds, const QVector<bool> &background_set)
 {
     QFMatchRDRFunctorSelectType* sel=new QFMatchRDRFunctorSelectType("fcs");
@@ -432,6 +454,38 @@ void QFPRDRFCS::insertPicoQuantASCIIFile(const QStringList& filename, const QMap
     }
 }
 
+void QFPRDRFCS::insertPicoQuantCORFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
+{
+    int ch=1;
+    if (QFRDRFCSData::analyzeCorrelationCurvesFromPicoQuantCOR(filename.value(0, ""), &ch)) {
+        for (int i=0; i<ch; i++) {
+            QMap<QString, QVariant> p=paramValues;
+            QStringList r=paramReadonly;
+            r<<"COLUMNS";
+            p["COLUMNS"]=2+i;
+            QString ro="ACF1";
+            if (i==0) ro="ACF1";
+            if (i==1) ro="ACF2";
+            if (i==2) ro="FCCS";
+            if (i>2) ro=QString("ACF%1").arg(i+1);
+            QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename,ro), filename, p, r);
+            if (e->error()) {
+                QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename.value(0, "")).arg(e->errorDescription()));
+                services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
+                project->deleteRawData(e->getID());
+            } else {
+                e->setRole(ro);
+            }
+
+        }
+    } else {
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename.value(0, "")).arg("Did not find data in file!"));
+        services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename.value(0, "")).arg("Did not find data in file!"));
+    }
+
+//ft.append(qMakePair(QString("PICOQUANT_ASCII_COR"), tr("PicoQuant FCS Files from v6.0 TTTR correlator (*.cor)")));
+}
+
 void QFPRDRFCS::insertDiffusion4File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
     QFRawDataRecord* e=project->addRawData(getID(), getRDRName(filename), filename, paramValues, paramReadonly);
     if (e->error()) {
@@ -459,8 +513,8 @@ void QFPRDRFCS::insertConfocor3File(const QStringList &filename, const QMap<QStr
     reader.loadFile(filename.value(0, ""));
     if (reader.wasError()) {
         cc=0;
-        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ConfoCor3 file '%1':\n%2").arg(filename.value(0, "")).arg(reader.getLastErrors().join("\n")));
-        services->log_error(tr("Error while importing ConfoCor3 file '%1':\n    %2\n").arg(filename.value(0, "")).arg(reader.getLastErrors().join("\n")));
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ConfoCor2/3 file '%1':\n%2").arg(filename.value(0, "")).arg(reader.getLastErrors().join("\n")));
+        services->log_error(tr("Error while importing ConfoCor2/3 file '%1':\n    %2\n").arg(filename.value(0, "")).arg(reader.getLastErrors().join("\n")));
     } else {
         const Confocor3Tools::ConfocorDataset& d=reader.getData();
         QMap<QString, QVariant> p=paramValues;
@@ -489,10 +543,11 @@ void QFPRDRFCS::insertConfocor3File(const QStringList &filename, const QMap<QStr
                     e->setRole(roles[i]);
                     e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()+"_"+groups.value(r, "")));
                     if (e->error()) {
-                        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ConfoCor3 file '%1' (role: %3, group: %4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(roles[i]).arg(groups.value(r, "")));
-                        services->log_error(tr("Error while importing ConfoCor3 file '%1' (role: %3, group: %4):\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()).arg(roles[i]).arg(groups.value(r, "")));
+                        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ConfoCor2/3 file '%1' (role: %3, group: %4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(roles[i]).arg(groups.value(r, "")));
+                        services->log_error(tr("Error while importing ConfoCor2/3 file '%1' (role: %3, group: %4):\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()).arg(roles[i]).arg(groups.value(r, "")));
                         project->deleteRawData(e->getID());
                     }
+
                 }
             }
         }
@@ -610,6 +665,8 @@ void QFPRDRFCS::loadFCSFilterFiles(const QStringList &files, const QString &curr
         insertALBAFile(files, p, paramsReadonly);
     } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("PICOQUANT_ASCII_FCS")) {
         insertPicoQuantASCIIFile(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("PICOQUANT_ASCII_COR")) {
+        insertPicoQuantCORFile(files, p, paramsReadonly);
     } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("PICOQUANT_ASCII_FCS_W")) {
         insertPicoQuantASCIIFile(files, p, paramsReadonly);
     } else if (currentFCSFileFormatFilter==QFRDRFCSData::getFileTypesFilterForID("DIFFUSION4_SIMRESULTS")) {

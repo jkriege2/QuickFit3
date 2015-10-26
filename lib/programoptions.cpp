@@ -88,7 +88,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     //examplesDir=appDir+"/quickfit3.app/Contents/SharedSupport/examples/";
     pluginsDir=appDir+"/../PlugIns/";
     QString altPluginDir=aapppDir.absolutePath()+"/plugins/";
-    if (!QDir::exists(pluginsDir) && QDir::exists(altPluginDir)) pluginsDir=altPluginDir;
+    if (!QDir(pluginsDir).exists() && QDir(altPluginDir).exists()) pluginsDir=altPluginDir;
     #endif
 
     #if defined(__LINUX__) || defined(Q_OS_MAC)

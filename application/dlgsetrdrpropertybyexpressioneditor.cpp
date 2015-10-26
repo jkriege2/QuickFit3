@@ -44,6 +44,8 @@ DlgSetRDRPropertyByExpressionEditor::DlgSetRDRPropertyByExpressionEditor(DlgSetR
     ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrfile(id)", "rdrfile(id)");
     ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrfiles(id)", "rdrfiles(id)");
     ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrfiletype(id)", "rdrfiletype(id)");
+    QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString(), ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
+    ui->edtExpression->setFont(f)    ;
 }
 
 DlgSetRDRPropertyByExpressionEditor::~DlgSetRDRPropertyByExpressionEditor()

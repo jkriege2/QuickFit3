@@ -111,7 +111,7 @@
    <item>
     <widget class="QFEnhancedTabWidget" name="tabWidget_2">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1307,10 +1307,55 @@
  <tabstops>
   <tabstop>btnLoadSystem</tabstop>
   <tabstop>btnSaveSystem</tabstop>
+  <tabstop>btnCopySystem</tabstop>
+  <tabstop>btnPasteSystem</tabstop>
+  <tabstop>tabWidget_2</tabstop>
+  <tabstop>edtTitle</tabstop>
+  <tabstop>chkShowTitle</tabstop>
+  <tabstop>spinTitleFontSize</tabstop>
+  <tabstop>cmbBackgroundColor</tabstop>
+  <tabstop>chkKeepDataAspect</tabstop>
+  <tabstop>edtDataAspect</tabstop>
+  <tabstop>chkKeepAxisAspect</tabstop>
+  <tabstop>edtAxisAspect</tabstop>
+  <tabstop>cmbFontname</tabstop>
+  <tabstop>chkPlotAutosize</tabstop>
+  <tabstop>spinWidth</tabstop>
+  <tabstop>spinHeight</tabstop>
+  <tabstop>btnAutoscaleXY</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>spinAxisFontSize</tabstop>
+  <tabstop>spinMinorAxisFontSize</tabstop>
+  <tabstop>spinAxisLabelFontSize</tabstop>
+  <tabstop>grpMajor</tabstop>
+  <tabstop>spinGridWidth</tabstop>
+  <tabstop>cmbGridColor</tabstop>
+  <tabstop>cmbGridLinestyle</tabstop>
+  <tabstop>chkGridMajorX</tabstop>
+  <tabstop>chkGridMajorY</tabstop>
+  <tabstop>grpMinor</tabstop>
+  <tabstop>spinGridWidthMinor</tabstop>
+  <tabstop>cmbGridColorMinor</tabstop>
+  <tabstop>cmbGridLinestyleMinor</tabstop>
+  <tabstop>chkGridMinorX</tabstop>
+  <tabstop>chkGridMinorY</tabstop>
   <tabstop>chkShowKey</tabstop>
+  <tabstop>cmbKeyBackground</tabstop>
   <tabstop>sliderKeyTransparency</tabstop>
   <tabstop>spinBox_4</tabstop>
+  <tabstop>chkKeyBox</tabstop>
+  <tabstop>cmbKeyBoxColor</tabstop>
+  <tabstop>spinKeyBoxWidth</tabstop>
   <tabstop>cmbKeyLayout</tabstop>
+  <tabstop>spinKeyFontSize</tabstop>
+  <tabstop>spinKeyXMargin</tabstop>
+  <tabstop>spinKeyYMargin</tabstop>
+  <tabstop>spinKeyXSeparation</tabstop>
+  <tabstop>spinKeyYSeparation</tabstop>
+  <tabstop>cmbKeyPosition</tabstop>
+  <tabstop>spinKeyXOffset</tabstop>
+  <tabstop>spinKeyYOffset</tabstop>
+  <tabstop>spinKeyLineLength</tabstop>
  </tabstops>
  <resources>
   <include location="qfrdrtable.qrc"/>

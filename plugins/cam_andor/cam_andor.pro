@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = cam_andor
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/andor.pri)
 
 DESTDIR = $$QFOUTPUT/plugins

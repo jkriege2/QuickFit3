@@ -27,7 +27,7 @@ TARGET = spimb040
 DEPENDPATH += ./
 
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/lmfit.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibsb040/tinytiff.pri)

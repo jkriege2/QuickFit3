@@ -29,7 +29,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 /*! \brief QFFitFunction class for a SPIM-FCCS fit model with pure diffusion for 2-color crosscorrelation and 1/sqrt(e) lateral width
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 */
-class QFFitFunctionsFCCSFWADiff2ColorACFG: public QFFitFunction {
+class QFFitFunctionsFCCSFWADiff2ColorACFG: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionsFCCSFWADiff2ColorACFG();
         virtual ~QFFitFunctionsFCCSFWADiff2ColorACFG() {}

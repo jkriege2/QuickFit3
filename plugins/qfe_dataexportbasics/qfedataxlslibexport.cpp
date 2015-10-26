@@ -42,8 +42,8 @@ QFEDataXlsLibExport::QFEDataXlsLibExport(bool flipped)
 
 QString QFEDataXlsLibExport::getFilter() const
 {
-    if (flipped) return QObject::tr("Excel 97 Worksheet, flipped (*.xls)");
-    else return QObject::tr("Excel 97 Worksheet (*.xls)");
+    if (flipped) return QObject::tr("Microsoft Excel(r) 97 Worksheet, flipped (*.xls)");
+    else return QObject::tr("Microsoft Excel(r) 97 Worksheet (*.xls)");
 }
 
 void QFEDataXlsLibExport::save(const QList<QList<QVariant> > &data_in, const QString &filename, const QStringList &columnHeaders_in, const QStringList &rowHeaders_in)

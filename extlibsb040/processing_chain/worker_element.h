@@ -34,8 +34,8 @@
 
 
 #include "qqueue.h"
-#include "../../../../LIB/trunk/frame.h"
-#include "../../../../LIB/trunk/helper.h"
+#include "frame.h"
+#include "helper.h"
 
 #include "worker_thread.h"
 #include "worker_interface.h"

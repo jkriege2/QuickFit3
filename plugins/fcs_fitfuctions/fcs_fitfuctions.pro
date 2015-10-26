@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = qffcsfitfuncs
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 #DLLDESTDIR = $$DESTDIR
@@ -82,6 +82,8 @@ SOURCES += fcs_fitfuctions.cpp\
     qffitfunctionfcsadiff2d_relbright.cpp \
     qffitfunctionfcsdiff2d.cpp \
     qffitfunctionfcsdiff2dstretchpp.cpp
+
+
 
 FORMS +=
 

@@ -23,10 +23,10 @@
 
 #include "worker_thread.h"
 #include "we_sink_source.h"
-#include "../../../../LIB/trunk/qt/qqueue.h"
-#include "../../../../LIB/trunk/frame.h"
-#include "../../../../LIB/trunk/helper.h"
-#include "../../../../LIB/trunk/textcolor.h"
+#include "qqueue.h"
+#include "frame.h"
+#include "helper.h"
+#include "textcolor.h"
 
 class we_frame_gen_thread : public worker_thread
 {  

@@ -63,9 +63,3 @@ QString QFFitFunctionPSFGaussianBeamZIntensity::transformParametersForAdditional
 }
 
 
-bool QFFitFunctionPSFGaussianBeamZIntensity::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool* /*fix*/) const
-{
-
-
-    return false;
-}

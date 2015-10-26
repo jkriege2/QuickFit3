@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFITFUNCTIONSSPIMFCSADIFFE2_H
 #include "qfpluginfitfunction.h"
 
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief QFFitFunction class for a SPIM-FCS fit model with anomalous diffusion and e^2-radii, new Veff
@@ -33,7 +33,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \f[ V_{\text{eff}}=\frac{\sqrt{\pi}\cdot a^2w_z}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2} \f]
 
 */
-class QFFitFunctionsSPIMFCSADiffE2: public QFFitFunction {
+class QFFitFunctionsSPIMFCSADiffE2: public QFFCSLargeFocusFitFunctionBase {
     public:
         QFFitFunctionsSPIMFCSADiffE2();
         virtual ~QFFitFunctionsSPIMFCSADiffE2() {}

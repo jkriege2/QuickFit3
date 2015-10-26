@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>NI-DAQmx Channel-Reader Plugin Help</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+
+
+
+<h2>Introduction</h2>
+<p>This plugin provides a simple reader for the inputs of DAQ-cards from <a href="http://www.ni.com/data-acquisition/">National Instruments</a>, or that are controllable over the <b>National Instruments NI-DAQmx</b> driver. It can sample several <u>analog channels</u> from one card and display the results as a graph. The data can be stored into files (e.g. CSV, Matlab MAT, ...), asgraphics (PNG, JPEG, PDF, SVG, ...) or as a <a href="$$plugin_info:help:table$$">table RDR</a> in the current project for further processing.</p>
+<p>$$note:You will have to install the NI-DAQmx driver on your computer, before this plugin may function. If the driver is not found, the plugin will not be loaded when QuickFit starts up.$$
+</p>
+<p>This tool can acquire in two modes:
+<ul>
+    <li><b>PREVIEW</b> simply samples the current data and displays it, but does not use any triggering. This is meant to quickly display and check the input signals. This mode acquires a certain number of samples and displays them. When this buffer is full, further samples are acquired and older samples are discarded, so you get a continuous acquistion.</li>
+    <li><b>ACQUISITION</b> uses the full triggering and acqusition capabilities of the card. This mode simply acquires a pre-defined number of samples and stops when this number is reached.</li>
+</ul></p>
+
+<h2>Usage</h2>
+<h3>Starting the Tool</h3>
+<p>You can start this tool from the menu entry <b>Extensions | <img width="16" src=":qfe_nidaqmxreader/qfe_nidaqmxreader.png"> Start NI-DAQmx Channel-Reader</b> in the main window.</p>
+
+
+<h3>Setup of the Measurement</h3>
+$$see:You will find detailed instructions about your DAQ card and its capabilities in the documentation, provided with the card! This documentation should also define the terminology used by NI, whcih is also used for the remainder of this page.$$
+
+<p>The tool's main window is split into two tabs. The first Tab <b><img width="16"  src=":qfe_nidaqmxreader/images/settings.png"> Settings</b> allows to setup the acqusition:
+<center><a name="qfe_nidaqmxreader_pic000"><img src="./pic/qfe_nidaqmxreader_pic000.png" border="1">
+</center>
+<ul>
+    <li>At the top of the tab, you can add the <b>input channels</b> that you want to read to the list (1). For each channel you can give a unique name, specify the channel itself (in the National Instruments notation <tt>/<i>DEVICE</i>/<i>CHANNEL</i></tt>, select the input type (single-ended, differential, ...), the volatge range and give parameters for a linear transform for the values: $[x' = \mbox{slope}\cdot x + \mbox{offset}]$YOu can add new channels or delete channels from the table with the buttons designated by (2).</li>
+    <li>Below the channels list, you can configure the acquisition task (3), i.e. the <b>sample-clock</b>, the number of <b>samples to acquire</b> and the number of <b>pre-trigger samples</b> (this is only used, if a reference trigger is used!). Finally you can specify the update frequency of the graph during the measurement as "<b>update plot every N samples</b>". $$warning:If this number is too small, the program will try to update the plot too often, which results in slow reaction of the whole program and possible crashes! So if you don't need a fast online-display of the data, set this number to 1-2 updates per second! Also note that the tool will wait at least a minimum delay time between updates, so it may be that the graph is updated less often than expected (see Acquisition-tag).$$</li>
+    <li>The settings (4) allow to specify a digital start-trigger for your measurement.</li>
+    <li>The settings (5) allow to specify a digital reference-trigger for your measurement.</li>
+    <li>The final three widgets, labeled (6) allow to set the sample-clock, plot update and max. number of samples for the coninuous Preview-mode.</li>
+</ul>
+</p>
+$$note:You can store/reload these settings with the menu <b>File</b> to/from an INI-file.$$
+
+
+
+<h3>Acquisition</h3>
+<p>After setting everything up, you can start the measurement itself, either in <b>preview-mode</b> or in <b>acquisution-mode</b> by clicking one of these two toolbar-buttons (or the entries in the menu Acquisition):
+<center><a name="qfe_nidaqmxreader_pic001"><img src="./pic/qfe_nidaqmxreader_pic001.png" border="1">
+</center>
+</p>
+<p>
+Depending on which mode you chose, the triggerable acquisition, or a continuous preview is used. In both cases, the tool's window switches to the second tab <b><img src=":qfe_nidaqmxreader/images/graphs.png"> Acquisition</b>:
+<center><a name="qfe_nidaqmxreader_pic002"><img src="./pic/qfe_nidaqmxreader_pic002.png" border="1">
+</center>
+The major part of this tab contains the (preview) plot (2) and a widget for logging output (3). If error's occur, these are reported here and the acqusition will not start!
+</p>
+<p>With the widgets labeled (1), you can change the appearance of the plot (2):
+<ul>
+    <li>You can chose an automatic scaling of the y-axis, or specify a y-range.</li>
+    <li>Data will be averaged for the display, to improve the plot performance (plotting many datapoints can take quite a while). However this averaging is done for display only and if you save the data, the non-averaged and the averaged data will be present in the output file.</li>
+    <li>You can do calculations/operations with the specified channels:
+    <ul>
+        <li>you can <b>divide</b> one channel by another (simply specify the channel numbers (0-based) that you want to divide.</li>
+    </ul></li>
+    <li>Finally you can spoecify a minimum delay between two subsequent replots. This potentially lowers the plot update-rate, but ensures that the user interface stays repsonsive.</li>
+    <li></li>
+</ul></p>
+<p>You can use all tools of any <a href="$$qf_ui_jkqtplotter_helpfile$$">plot widget in QuickFit</a> by right-clicking into the plot and using its context-menu. IN addition, the most important options for saving/copying/printing the data have their own toolbar-buttons at the top of the window (4).</p>
+<p></p>
+
+
+        
+    </body>
+</html>

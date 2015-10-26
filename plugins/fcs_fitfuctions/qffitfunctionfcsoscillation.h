@@ -24,7 +24,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qffitfunction.h"
 #include <QObject>
-
+#include "qfgeneralfitfunctionbase.h"
 /*! \brief plugin class for oscillatory FCS correlation functions
     \ingroup qf3fitfunp_fcs
 
@@ -38,7 +38,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
                                                                                                                                                                                                                                                                                                           derivatives[FCSSDiff_diff_tau1]=fT/N*(t/sqr(tauD)/fDG12/sqr(fD) + t/2.0/fD/cube(fDG12)/gamma2/sqr(tauD));
 
 */
-class QFFitFunctionFCSOscillation : public QFFitFunction
+class QFFitFunctionFCSOscillation : public QFFCSFitFunctionBase
 {
     public:
         QFFitFunctionFCSOscillation();

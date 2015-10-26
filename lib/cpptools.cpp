@@ -32,7 +32,8 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-
+#include <locale>
+#include <ctype.h>
 
 std::string inttostr(long data){
   return format("%ld", data);
@@ -281,24 +282,26 @@ bool strtobool(std::string data){
 std::string tolower(std::string s){
   std::string d;
   d="";
+  std::locale loc;
   if (s.length()>0) {
     for (unsigned long i=0; i<s.length(); i++) {
-        d+=tolower(s[i]);
+        d+=std::tolower(s[i],loc);
     }
   }
   return d;
-};
+}
 
 std::string toupper(std::string s){
   std::string d;
   d="";
+  std::locale loc;
   if (s.length()>0) {
     for (unsigned long i=0; i<s.length(); i++) {
-        d+=toupper(s[i]);
+        d+=std::toupper(s[i], loc);
     }
   }
   return d;
-};
+}
 
 std::string doublearraytostr(double* data, long width, long height, bool linenumber) {
     char line[1024];

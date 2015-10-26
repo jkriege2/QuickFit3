@@ -125,7 +125,7 @@ void QFExtensionLinearStagePI::initExtension() {
         }
     }
 
-    menuStage=new QMenu(tr("PI stage"));
+    menuStage=new QMenu(tr("PI stage"), parentWidget);
     menuStage->setIcon(QIcon(":/stage_pi_logo.png"));
     actCalibrateJoysticks=new QAction(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks"), this);
     connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));

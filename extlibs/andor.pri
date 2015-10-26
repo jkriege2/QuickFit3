@@ -20,15 +20,19 @@
 #
 
 include("../bitdepth.pri")
+
 exists(andor.inc):include(andor.inc)
 
 win32 {
-    contains( ANDOR_WIN64, true )|contains( QF3CONFIG, bits64 )|contains(BIT_DEPTH, 64) {
+    message("Andor-driver for Windows, $${BIT_DEPTH}-bits")
+    contains( ANDOR_WIN64, true )|contains(BIT_DEPTH, 64) {
       LIBS+= -L$$PWD/andor_win64
       INCLUDEPATH += $$PWD/andor_win64
+      message("  --> $${PWD}/andor_win64")
     } else {
       LIBS+= -L$$PWD/andor_win32
       INCLUDEPATH += $$PWD/andor_win32
+      message("  --> $${PWD}/andor_win32")
     }
 }
 

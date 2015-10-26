@@ -27,7 +27,7 @@ TARGET = cam_testcamera
 
 DEFINES += TARGETNAME=$$TARGET
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/tiff.pri)
 
 DESTDIR = $$QFOUTPUT/plugins

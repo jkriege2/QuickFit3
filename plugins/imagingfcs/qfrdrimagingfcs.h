@@ -24,7 +24,6 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qftools.h"
 #include "qfpluginrawdata.h"
 #include "qfrdrimagingfcscorrelationdialog.h"
-#include "qfrdrimagingfcssimulator.h"
 #include "qfrdrimfcscorrelatorremote.h"
 #include "qfrdrimagingfcsfitwizard.h"
 #include "qfrdrimagingfcswizard.h"
@@ -34,10 +33,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3rawdataplugins
 */
 
-/*! \brief raw data record plugin class
-    \ingroup qf3rdrdp_imaging_fcs
-    */
 
+class QFRDRImagingFCSSimulator; //f orward
+
+/*! \brief raw data record plugin class
+
+    \ingroup qf3rdrdp_imaging_fcs
+*/
 class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, public QFRDRIMFCSCorrelatorRemote {
         Q_OBJECT
         Q_INTERFACES(QFPluginRawDataRecord QFRDRIMFCSCorrelatorRemote)
@@ -116,8 +118,9 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, 
         void correctOffset();
         void startFitWizard();
 
-        void startWizard(bool isProject=false);
+        void startWizard(bool isProject=false, bool isCalibration=false);
         void startProjectWizard();
+        void startCalibProjectWizard();
     protected:
         /*! \brief add correlations from a video_correlator file to the current project
 

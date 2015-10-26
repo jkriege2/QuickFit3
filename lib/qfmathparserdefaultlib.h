@@ -52,6 +52,10 @@ namespace QFMathParser_DefaultLib {
     QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fToSystemPathSeparator,tosystempathseparator, ptosystempathseparator )
 
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fFaddeevaRealW, faddeeva_real, qfFaddeevaRealW)
+    QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fFactorial, factorial, qfFactorial)
+    QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC(fBinom, binom, qfBinomialCoefficient)
+    QFMATHPARSER_DEFINE_2PARAM1VEC_NUMERIC_FUNC(fPoissonPDF, poissonpdf, qfPoissonDist)
+    QFMATHPARSER_DEFINE_3PARAM1VEC_NUMERIC_FUNC(fBinomialPDF, binomialpdf, qfBinomialDist)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fSinc, sinc, qfSinc)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fTanc, tanc, qfTanc)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(fSin, sin)
@@ -151,8 +155,26 @@ namespace QFMathParser_DefaultLib {
     void fStructGet(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fStructGetSave(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
-    void fShuffle(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fList(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fListAppend(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fListRemove(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fListGet(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fListGetSave(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fListInsert(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fVec2List(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsList(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsStruct(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsDoubleMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsBoolMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fMat2Vec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fVec2Mat(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fReshape(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
+    void fDoubleMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fBoolMatrix(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
+    void fShuffle(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     void fComment(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fAllTrue(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
@@ -173,6 +195,8 @@ namespace QFMathParser_DefaultLib {
     void fSplit(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fJoin(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fRemoveEmpty(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRepeat(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRepeatString(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fMean, mean, qfstatisticsAverage)
 
@@ -350,6 +374,10 @@ namespace QFMathParser_DefaultLib {
 
 
     void fLength(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fSize(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDimensions(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRows(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fColumns(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fRemove(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fReverse(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fDot(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
@@ -570,6 +598,14 @@ namespace QFMathParser_DefaultLib {
     void fFitFunctionParameters(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionIsFit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionInit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionParamMins(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionParamMaxs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionParamAbsMins(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionParamAbsMaxs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionSetParam(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionSetParamMin(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionSetParamMax(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionSetFix(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionInitFix(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionEval(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
@@ -578,7 +614,9 @@ namespace QFMathParser_DefaultLib {
     void fFitFunctionParamCount(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 
     void fFitFunctionFit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionFitRanged(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFit(qfmpResult& res, QFMathParser::qfmpNode **nodes, unsigned int n, QFMathParser* p);
+    void fFitRanged(qfmpResult& res, QFMathParser::qfmpNode **nodes, unsigned int n, QFMathParser* p);
 
 
     void fFitAlgorithmsIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);

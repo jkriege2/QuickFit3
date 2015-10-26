@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = qfevalfcsfit
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
@@ -50,8 +50,8 @@ HEADERS +=  qfpevalfcsfit.h \
     ../base_classes/qffcsweightingtools.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
     ../base_classes/qffcstools.h \
-    ../base_classes/qffcsfitchi2landscapedialog.h \
-    ../base_classes/qffitresultsbyindexevaluationfittools.h
+    ../base_classes/qffitresultsbyindexevaluationfittools.h \
+    ../base_classes/qffitchi2landscapedialog.h
 
 
 SOURCES +=  qfpevalfcsfit.cpp \
@@ -67,13 +67,13 @@ SOURCES +=  qfpevalfcsfit.cpp \
     optionswidget.cpp \
     ../base_classes/qffcsweightingtools.cpp \
     ../base_classes/qffcstools.cpp \
-    ../base_classes/qffcsfitchi2landscapedialog.cpp \
-    ../base_classes/qffitresultsbyindexevaluationfittools.cpp
+    ../base_classes/qffitresultsbyindexevaluationfittools.cpp \
+    ../base_classes/qffitchi2landscapedialog.cpp
 
 
 FORMS =    estimatefocalvolumedlg.ui \
     optionswidget.ui \
-    ../base_classes/qffcsfitchi2landscapedialog.ui
+    ../base_classes/qffitchi2landscapedialog.ui
 
 RESOURCES += qfevalfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc

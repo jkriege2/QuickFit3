@@ -20,6 +20,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "statistics_tools.h"
 #include "qfetcspcimporter.h"
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtGlobal>
@@ -37,6 +38,8 @@
 #include "qfrawdatarecord.h"
 #include"qfetcspcimporterjobthread.h"
 #include "qf3correlationdataformattool.h"
+#include "qfrdrcolumngraphsinterface.h"
+#include "qfetcspcimporterfretchen2.h"
 
 #define LOG_PREFIX QString("tcspcimporter >>> ").toUpper()
 
@@ -54,6 +57,17 @@ QFETCSPCImporter::~QFETCSPCImporter() {
 
 void QFETCSPCImporter::deinit() {
 	/* add code for cleanup here */
+    for (int i=0; i<FRETDialogs.size(); i++) {
+        if (FRETDialogs[i]) {
+            FRETDialogs[i]->close();
+        }
+    }
+    FRETDialogs.clear();
+    if (dlgCorrelate) {
+        dlgCorrelate->close();
+        delete dlgCorrelate;
+        dlgCorrelate=NULL;
+    }
 }
 
 void QFETCSPCImporter::projectChanged(QFProject* oldProject, QFProject* project) {
@@ -73,12 +87,16 @@ void QFETCSPCImporter::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
 
 
-    QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("import/process TCSPC ..."), this);
+    QAction* actStartPlugin=new QAction(QIcon(":/tcspcimporter/correlator.png"), tr("import/process TCSPC ..."), this);
     actStartPlugin->setToolTip(tr("Import TCSPC Files as FCS, CountRates, ..."));
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
+    QAction* actStartBurstAnalyzer=new QAction(QIcon(":/tcspcimporter/burstanalyzer.png"), tr("TCSPC Burst Analyzer..."), this);
+    actStartBurstAnalyzer->setToolTip(tr("Import TCSPC Files for Burst Analysis ..."));
+    connect(actStartBurstAnalyzer, SIGNAL(triggered()), this, SLOT(startBurstAnalyzer()));
     QMenu* extm=services->getMenu("data/rdr");
     if (extm) {
         extm->addAction(actStartPlugin);
+        extm->addAction(actStartBurstAnalyzer);
     }
 
 }
@@ -94,6 +112,13 @@ void QFETCSPCImporter::startPlugin() {
         dlgCorrelate->show();
         connect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(correlationDialogClosed()));
     }
+}
+
+void QFETCSPCImporter::startBurstAnalyzer()
+{
+    QFETCSPCImporterFretchen2* dlg=new QFETCSPCImporterFretchen2(parentWidget);
+    dlg->show();
+    FRETDialogs.append(dlg);
 }
 
 QFRawDataRecord *QFETCSPCImporter::insertFCSCSVFile(const QString& filenameFCS, const QString &filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group, const QString& role) {
@@ -150,6 +175,22 @@ QFRawDataRecord *QFETCSPCImporter::insertCountRate(const QString& filename, cons
     QString r="";
     if (!role.isEmpty()) r=QString(" - ")+role;
     QFRawDataRecord* e=project->addRawData("photoncounts", QFileInfo(filename).fileName()+r, QStringList(filename), paramValues, paramReadonly);
+    e->setRole(role);
+    if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
+    if (e->error()) {
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
+        services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+        project->deleteRawData(e->getID());
+        return NULL;
+    }
+    return e;
+}
+
+QFRawDataRecord *QFETCSPCImporter::insertTable(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString &group, const QString &role)
+{
+    QString r="";
+    if (!role.isEmpty()) r=QString(" - ")+role;
+    QFRawDataRecord* e=project->addRawData("table", QFileInfo(filename).fileName()+r, QStringList(filename), paramValues, paramReadonly);
     e->setRole(role);
     if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
     if (e->error()) {
@@ -236,11 +277,11 @@ void QFETCSPCImporter::correlationDialogClosed() {
         if (type=="photoncounts") {
             initParams["FILETYPE"]="CSV";
             paramsReadonly<<"FILETYPE";
-            rdr=insertCountRate(filename, initParams, paramsReadonly);
+            if (QFile::exists(filename) && QFileInfo(filename).size()>0) rdr=insertCountRate(filename, initParams, paramsReadonly);
         } else if (type=="photoncounts_binary") {
             initParams["FILETYPE"]="BINARY";
             paramsReadonly<<"FILETYPE";
-            rdr=insertCountRate(filename, initParams, paramsReadonly);
+            if (QFile::exists(filename) && QFileInfo(filename).size()>0) rdr=insertCountRate(filename, initParams, paramsReadonly);
         } else if (type=="fcs_csv") {
             initParams["FILETYPE"]="CSV_CORR";
             if (it->files.value(1,"")!="") initParams["FILETYPE"]="CSV_CORR_RATE";
@@ -263,13 +304,43 @@ void QFETCSPCImporter::correlationDialogClosed() {
             paramsReadonly<<"FILETYPE";
             rdr=NULL;
             rdrs=insertQF3ASCIICORRFile(filename, initParams, paramsReadonly, it->group);
+        } else if (type=="lifetime_csv") {
+            initParams["READFILE_FILEFORMAT"]="CSV";
+            initParams["FILETYPE"]="CSV";
+            paramsReadonly<<"READFILE_FILEFORMAT"<<"FILETYPE";
+            rdr=NULL;
+            rdr=insertTable(filename, initParams, paramsReadonly, it->group);
+            QFRDRColumnGraphsInterface* cg=dynamic_cast<QFRDRColumnGraphsInterface*>(rdr);
+            if (cg && it->dataForInsert.value(0).isValid() && it->dataForInsert.value(1).isValid()) {
+                int segs=it->dataForInsert.value(0).toInt();
+                int chs=it->dataForInsert.value(1).toInt();
+                if (segs==1) {
+                    int g=cg->colgraphAddPlot(tr("Lifetime Histograms"), tr("arrival time delaty t [ns]"), tr("photon frequency"));
+                    cg->colgraphSetPlotXRange(g, 0, it->dataForInsert.value(2).toDouble());
+                    cg->colgraphSetPlotYRange(g, -1, it->dataForInsert.value(3).toDouble());
+                    for (int i=0; i<chs; i++) {
+                        cg->colgraphAddGraph(g, 0, i+1, QFRDRColumnGraphsInterface::cgtLines, tr("channel %1").arg(i));
+                    }
+                } else {
+                    for (int i=0; i<chs; i++) {
+                        int g=cg->colgraphAddPlot(tr("Lifetime Histograms, channel %1").arg(i), tr("arrival time delaty t [ns]"), tr("photon frequency"));
+                        cg->colgraphSetPlotXRange(g, 0, it->dataForInsert.value(2).toDouble());
+                        cg->colgraphSetPlotYRange(g, -1, it->dataForInsert.value(3).toDouble());
+                        for (int s=0; s<segs; s++) {
+                            cg->colgraphAddGraph(g, 0, 1+s*chs+i, QFRDRColumnGraphsInterface::cgtLines, tr("segment %1").arg(s));
+                        }
+                    }
+                }
+            }
         }
         if (rdr) {
             rdr->setDescription(rdr->getDescription()+QString("\n\n")+it->comment);
-        }
-        for (int ii=0; ii<rdrs.size(); ii++) {
-            if (rdrs[ii]) {
-                rdrs[ii]->setDescription(rdrs[ii]->getDescription()+QString("\n\n")+it->comment);
+            rdr->setGroup(rdr->getProject()->addOrFindRDRGroup(it->group));
+            for (int ii=0; ii<rdrs.size(); ii++) {
+                if (rdrs[ii]) {
+                    rdrs[ii]->setDescription(rdrs[ii]->getDescription()+QString("\n\n")+it->comment);
+                    rdrs[ii]->setGroup(rdrs[ii]->getProject()->addOrFindRDRGroup(it->group));
+                }
             }
         }
         //insertVideoCorrelatorFile(filename, overview, filename.toLower().endsWith(".bin"));

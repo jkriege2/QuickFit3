@@ -78,11 +78,11 @@ class QFWIDLIB_EXPORT QFImagePlotWizardPage : public QFWizardPage
 
         void setImage(double* image, int32_t width, int32_t height);
         void setImage(const QString& filename, const QString& imageReaderID, int frameNum=0, QFImporter::FileInfo *fileinfo=NULL);
-        void setImage(const QString& filename, const QString& imageReaderID, int frameNum, double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL, int *frames=NULL);
-        void setImageAvg(const QString& filename, const QString& imageReaderID, int frameStart, int frameCount, double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL, int *frames=NULL);
+        void setImage(const QString& filename, const QString& imageReaderID, int frameNum, double** image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL, int *frames=NULL);
+        void setImageAvg(const QString& filename, const QString& imageReaderID, int frameStart, int frameCount, double** image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL, int *frames=NULL);
         void setImageAvg(const QString& filename, const QString& imageReaderID, int frameStart, int frameCount, QFImporter::FileInfo *fileinfo=NULL);
         void setImage(const QString& filename, const QString& imageReaderID,  QFImporter::FileInfo *fileinfo=NULL);
-        void setImage(const QString& filename, const QString& imageReaderID,  double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL);
+        void setImage(const QString& filename, const QString& imageReaderID,  double** image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL);
 
     public slots:
         void clear();

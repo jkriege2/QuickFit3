@@ -26,7 +26,7 @@ TARGET = cam_systemcam
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/cimg.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/

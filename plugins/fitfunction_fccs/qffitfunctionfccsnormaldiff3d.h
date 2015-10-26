@@ -30,7 +30,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3fitfunp_fitfunctions_fccs
 
 */
-class QFFitFunctionFCCSNormalDiff3D: public QFFitFunction {
+class QFFitFunctionFCCSNormalDiff3D: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCCSNormalDiff3D();
         virtual ~QFFitFunctionFCCSNormalDiff3D() {}

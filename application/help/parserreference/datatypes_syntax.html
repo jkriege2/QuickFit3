@@ -94,7 +94,9 @@
 	</table></blockquote>
 		</p>
 
-	<a name="vectors"><h3>Vectors</h3>
+	<a name="vectors"><h3>Vectors and Matrices</h3>
+	$$note:All vector indices are 0-based, so the 5 elements of a 5-element vector are accessed with indizes 0,1,2,3,4. It is also possible to give floating-point numbers as vector indices. In that case the index is <u>truncated</u> to an integer! $$
+	<h4>Vectors</h4>
 	<p>
 	As already described, you may also work with vectors of numbers. Most of the operators and functions can be applied element-by-element. In addition there is a special <tt>[...]</tt> operator  that allows to access elements out of a vector. The argument between brackets may either be a number of a vector. Here are some examples:
 	<ul>
@@ -105,12 +107,36 @@
 	  <li><tt>x[[2,5,8]]=y[1,2,3]</tt>: assigns the elements 1, 2, and 3 of vector y to the elements 2, 5 and 8 of vector x </li>
 	  <li><tt>x[[2,5,8]]=0</tt>: assigns 0 to elements 2, 5 and 8 of vector x </li>
 	</ul>
-	$$note:All vector indices are 0-based, so the 5 elements of a 5-element vector are accessed with indizes 0,1,2,3,4. It is also possible to give floating-point numbers as vector indices. In that case the index is <u>truncated</u> to an integer! $$
-		</p>
+	$$see: A set of <a href="vector.html">vector-functions</a> are defined, that ease working with vectors.$$
+	</p>
+	
+	<a name="matrix"><h4>Matrices</h4>
+	<p>In addition to vectors, also 2-dimensional matrices are available as datatypes. Their elements can either be numbers or booleans. Strings are not possible!</p>
+	<p>	A matrix can be constructed using the <tt>[r11,r12;r21,r22;...]</tt> notation, i.e. values are given in row-major (first row, then the second row, ... so r<i>ij</i> is the value in row <i>i</i> and column <i>j</i>) with <tt>','</tt> separating values and <tt>';'</tt> separating rows.
+	$$see: A set of <a href="matrix.html">matrix-functions</a> are defined, that ease working with matrices.$$
+	</p>
+
+	<a name="lists"><h3>Lists</h3>
+	<p>Lists assemble an index-adressable set of results (each element can have a different type). You can create lists, using curly braces <tt>{...}</tt>, e.g.:
+	<ul>
+	  <li><tt>{1,2,3}</tt></li>
+	  <li><tt>{1,[2,3,4],"Hello"}</tt></li>
+	</ul>
+	Item access is possible with the standard <tt>lst[index]</tt> operator, all the same as for vectors:
+	<ul>
+	  <li><tt>lst={1,[2,3,4],"Hello"}</tt></li>
+	  <li><tt>lst[2] --> "Hello"</tt></li>
+	  <li><tt>lst[ [0,1] ] --> {1,[2,3,4]}</tt></li>
+	</ul>
+	
+	$$see: A set of <a href="lists.html">list-functions</a> are defined, that ease working with lists.$$
+	</p>
+
 
 	<a name="structs"><h3>Structures/structs</h3>
 	<p>You can also create structs, which are a composite of several (named) items of possibly different type. Structs can be created using the function <tt>struct(nam1, value1, name2, value2, ...)</tt> and you can access a single entry using the dot '.' operator, e.g. <tt>st=struct("a", 1, "b", true)</tt> for the creation and <tt>st.a</tt> for the access to element 'a'.</p>
 	<p>In order to set an element in a struct, use <tt>struct(st, 'a', 'newvalue')</tt>.
+	$$see: A set of <a href="struct.html">struct-functions</a> are defined, that ease working with structs.$$
 	</p>
 
 	<a name="functions"><h3>Functions</h3>
@@ -191,11 +217,13 @@ logical_expression ->  logical_term
                  | NAME<b>(</b> parameter_list <b>)</b>
                  | NAME(parametername_list) <b>=</b> logical_expression
                  | <b>(</b> logical_expression <b>)</b>
-					  | <b>[</b> vector_list <b>]</b></pre>
+				 | <b>[</b> vector_list | matrix_list <b>]</b></pre>
+				 | <b>{</b> vector_list <b>}</b></pre>
 <pre>string_constant -> <b>&quot;</b> STRING <b>&quot;</b> | <b>&apos;</b> STRING <b>&apos;</b></pre>
 <pre>parameter_list  ->  &lambda; | logical_expression | logical_expression <b>,</b> parameter_list</pre>
 <pre>parametername_list ->  &lambda; | NAME | NAME <b>,</b> parametername_list</pre>
 <pre>vector_list     ->  logical_expression | logical_expression <b>,</b> vector_list</pre>
+<pre>matrix_list     ->  logical_expression | logical_expression <b>,</b> matrix_list | logical_expression <b>;</b> matrix_list</pre>
 <pre>vectorops_name  ->  <b>sum</b> | <b>prod</b> | <b>for</b> 
 </pre>
 </blockquote>	

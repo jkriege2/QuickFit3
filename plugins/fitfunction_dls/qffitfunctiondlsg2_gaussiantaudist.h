@@ -24,14 +24,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfpluginfitfunction.h"
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_errno.h>
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief QFFitFunction class for a tri-exponential G2 autocorrelation function in DLS
     \ingroup qf3fitfunp_fitfunctions_dls
 
 */
-class QFFitFunctionDLSG2NormTauDist: public QFFitFunction {
+class QFFitFunctionDLSG2NormTauDist: public QFDLSFitFunctionBase {
     public:
         QFFitFunctionDLSG2NormTauDist();
         virtual ~QFFitFunctionDLSG2NormTauDist();

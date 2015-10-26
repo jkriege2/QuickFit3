@@ -22,8 +22,11 @@ QF3CONFIG+=nospecialdrivers
 QF3CONFIG+=noandor
 # switch off some special plugins (e.g. pre-publication versions of imfccsfit)
 QF3CONFIG+=nospecials
-# on Windows: set this if you use a 64-bit build, as it will deactivate plugins that do not work on 64-bit!
-QF3CONFIG+=bits64
+
+
+# comment out, to compile plugins that depend on the NI-DAQmx driver
+QF3CONFIG+=nonidaqmx
+
 
 # activate special hardware drivers for the FFM!
 #QF3CONFIG+=ffmdrivers

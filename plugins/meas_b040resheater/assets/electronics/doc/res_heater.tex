@@ -1,0 +1,353 @@
+%% Artikelvorlage unter Verwendung der Artikelklasse des KOMA-Script %%
+%% Basierend auf einer TeXNicCenter-Vorlage von Mark Müller          %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wählen Sie die Optionen aus, indem Sie % vor der Option entfernen  
+% Dokumentation des KOMA-Script-Packets: scrguide
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Optionen zum Layout des Artikels                                  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[%
+%a5paper,							% alle weiteren Papierformat einstellbar
+%landscape,						% Querformat
+10pt,								% Schriftgröße (12pt, 11pt (Standard))
+%BCOR1cm,							% Bindekorrektur, bspw. 1 cm
+%DIVcalc,							% führt die Satzspiegelberechnung neu aus
+%											  s. scrguide 2.4
+%twoside,							% Doppelseiten
+%twocolumn,						% zweispaltiger Satz
+%halfparskip*,				% Absatzformatierung s. scrguide 3.1
+%headsepline,					% Trennline zum Seitenkopf	
+%footsepline,					% Trennline zum Seitenfuß
+%titlepage,						% Titelei auf eigener Seite
+%normalheadings,			% Überschriften etwas kleiner (smallheadings)
+%idxtotoc,						% Index im Inhaltsverzeichnis
+%liststotoc,					% Abb.- und Tab.verzeichnis im Inhalt
+%bibtotoc,						% Literaturverzeichnis im Inhalt
+%abstracton,					% Überschrift über der Zusammenfassung an	
+%leqno,   						% Nummerierung von Gleichungen links
+%fleqn,								% Ausgabe von Gleichungen linksbündig
+%draft								% überlangen Zeilen in Ausgabe gekennzeichnet
+]
+{article}
+
+
+% Seiten-Größe einstellen ist mit dem Geometry-Package viel einfacher
+%  a4paper                DIN A4-Papier
+%  text={width,height}    gibt Höhe und Breite des Text-Bereiches an
+%  centering              zentriert den Textbereich auf der Seite
+%  landscape|portrait     Quer-/Hochformat
+\usepackage[a4paper,text={160mm,255mm},centering,headsep=5mm,footskip=10mm]{geometry}
+
+%\pagestyle{empty}		% keine Kopf und Fußzeile (k. Seitenzahl)
+%\pagestyle{headings}	% lebender Kolumnentitel  
+
+
+%% Fonts für pdfLaTeX, falls keine cm-super-Fonts installiert %%%%%%%%
+%\ifpdf
+	%\usepackage{ae}        % Benutzen Sie nur
+	%\usepackage{zefonts}  	% eines dieser Pakete
+%\else
+	%%Normales LaTeX - keine speziellen Fontpackages notwendig
+%\fi
+
+%% optischer Randausgleich, falls pdflatex verwandt %%%%%%%%%%%%%%%%%%%
+\usepackage[activate]{pdfcprot}				
+
+%% Packages für Grafiken & Abbildungen %%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx} %%Grafiken in pdfLaTeX
+%\usepackage[hang]{subfigure} %%Mehrere Teilabbildungen in einer Abbildung
+%\usepackage{pst-all} %%PSTricks - nicht verwendbar mit pdfLaTeX
+
+%% deutsche Anpassung %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[english]{babel}		
+\usepackage[T1]{fontenc}							
+\usepackage[latin1]{inputenc}		
+
+\usepackage{color}
+\usepackage{hyperref}
+\definecolor{darkblue}{rgb}{0,0,0.3}
+\definecolor{darkgreen}{rgb}{0,.3,0}
+\definecolor{darkred}{rgb}{.3,0,0}
+\hypersetup{pdftex=true,citecolor=black,colorlinks=true,breaklinks=true,linkcolor=black,menucolor=black,pagecolor=black,urlcolor=black}
+
+\usepackage{amsmath}
+\usepackage{longtable}
+\usepackage{ifsym}
+\usepackage{float}
+
+
+\begin{document}
+%% Dateiendungen für Grafiken %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ==> Sie können hiermit die Dateiendung einer Grafik weglassen.
+%% ==> Aus "\includegraphics{titel.eps}" wird "\includegraphics{titel}".
+%% ==> Wenn Sie nunmehr 2 inhaltsgleiche Grafiken "titel.eps" und
+%% ==> "titel.pdf" erstellen, wird jeweils nur die Grafik eingebunden,
+%% ==> die von ihrem Compiler verarbeitet werden kann.
+%% ==> pdfLaTeX benutzt "titel.pdf". LaTeX benutzt "titel.eps".
+\ifpdf
+	\DeclareGraphicsExtensions{.pdf,.jpg,.png}
+\else
+	\DeclareGraphicsExtensions{.eps}
+\fi
+
+\pagestyle{empty} %%Keine Kopf-/Fusszeilen auf den ersten Seiten.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Ihr Artikel                                                       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% eigene Titelseitengestaltung %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+%\begin{titlepage}
+%Einsetzen der TXC Vorlage "Deckblatt" möglich
+%\end{titlepage}
+
+%% Angaben zur Standardformatierung des Titels %%%%%%%%%%%%%%%%%%%%%%%%
+%\titlehead{Titelkopf }
+%\subject{Typisierung}
+\title{Resistor Heater (PID loop)}
+\author{Jan Krieger <j.krieger@dkfz.de> / <jan@jkrieger.de>\footnote{German Cancer Research Center (DKFZ), Department: Biophysics of Macromolecules (Prof. J. Langowski), Im Neuenheimer Feld 580, D-69120 Heidelberg, Germany, tel: +49-6221/42-3395}}
+%\and{Der Name des Co-Autoren}
+%\thanks{Elisabeth Brama, now @ University of Sussex, Brighton}			% entspr. \footnote im Fließtext
+%\date{}							% falls anderes, als das aktuelle gewünscht
+%\publishers{Herausgeber}
+
+%% Widmungsseite %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\dedication{Widmung}
+
+\maketitle 						% Titelei wird erzeugt
+
+%% Zusammenfassung nach Titel, vor Inhaltsverzeichnis %%%%%%%%%%%%%%%%%
+%\begin{abstract}
+% Für eine kurze Zusammenfassung des folgenden Artikels.
+% Für die Überschrift s. \documentclass[abstracton].
+%\end{abstract}
+
+%% Erzeugung von Verzeichnissen %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents			% Inhaltsverzeichnis
+%\listoftables				% Tabellenverzeichnis
+%\listoffigures				% Abbildungsverzeichnis
+
+
+%% Der Text %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Introduction}
+\label{sec:Introduction}
+
+\section{Circuit for the Main Controller}
+\label{sec:Circuit}
+\begin{figure}[H]
+	\centering
+		\includegraphics{schematic.pdf}
+	\caption{Schematic}
+	\label{fig:schematic}
+\end{figure}
+
+\subsection{PCB}
+\label{sec:PCB}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics{pcb.pdf}
+	\caption{PCB}
+	\label{fig:pcb}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics{pcb_with_parts.pdf}
+	\caption{PCB with parts}
+	\label{fig:pcb_with_parts}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+		\includegraphics{pcb_3d.pdf}
+	\caption{3D view of the PCB}
+	\label{fig:pcb_3d}
+\end{figure}
+
+
+\section{Circuit for dual PT100 Amplifier}
+\label{sec:CircuitForDualPT100Amplifier}
+\begin{figure}[H]
+	\centering
+		\includegraphics{schematic_PT100.pdf}
+		\caption{schematic of dual PT100 amplifier}
+	\label{fig:schematic_PT100}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics{pcb_pt100.pdf}
+		\caption{PCB of dual PT100 amplifier}
+	\label{fig:pcb_pt100}
+\end{figure}
+
+
+\section{USB Interface \& Command reference}
+\label{sec:USBInterfaceCommandReference}
+\subsection{USB Interface}
+\label{sec:USBInterface}
+As mentioned before the control box contains a USB to serial converter. Thus the communication with a PC may be done by simply sending text commands over a terminal (e.g. \url{http://sites.google.com/site/braypp/terminal} for windows). Several commands are defined that allow to control the laser and the remote control box. Each command starts with a single character identifying it and the additional characters that give parameters. Commands with additional parameters require a closing line feed character (\texttt{0x0A}, or \texttt{$\backslash$n} in C/C++). Any characters which are not recognized as commands will be ignored, so the interface usually does not stall. If a command features a return value two line feed characters (\texttt{0x0A}, or \texttt{$\backslash$n} in C/C++) end the return value.
+
+The interface has a configurable baud rate (default is 115200), uses 8 data bits, no parity and one stop bit. The interface is implemented, using a serial to USB converter chip from FTDI. These chips register to the operating system as a virtual serial port, if an appropriate driver is installed. There are drivers for many Windows variants, Linus and MacOS 8,9 and X. Usually a Linux kernel will recognize the interface out of the box. The drivers may be downloaded and installed from \url{http://www.ftdichip.com/Drivers/VCP.htm}.
+
+
+
+\subsection{Command Reference}
+\label{sec:CommandReference}
+This section will give an overview over the available commands together with examples (identifiers in brackets \texttt{<...>} have to be replaced by the described data, a value in brackets like \texttt{<0xD4>} stands for the binary representation of the value, <LF> stands for a line feed character, <CR> for carriage return). Note that commands are generally case-sensitive!
+\begin{center}
+	\begin{longtable}{|p{60mm}|p{90mm}|}\hline
+	\textit{command} & \textit{description}\\\hline
+	\endhead
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+
+	\multicolumn{2}{l}{\textbf{Status Report \& Configuration}}\\\hline
+	\texttt{?} & identifies the remote control box and sends back copyright and version information (multi-line output ended by two consecutive \texttt{<LF>} characters. Example output: \begin{verbatim}---=== Resitance Heater Temperature Control  v1.0 ===---<LF>
+  (c) 07.2010 by Jan Krieger (DKFZ)<LF>
+  j.krieger@dkfz.de --  jan@jkrieger.de<LF><LF>\end{verbatim}\\\hline
+	\texttt{V} & return version information. Example output: \begin{verbatim}1.3.319.1735 (05.2010)<LF>\end{verbatim}\\\hline
+	\texttt{P<param\_name>=<param\_value><LF>} & set one of the internal parameters of the remote control box to a specified value. These parameter names are defined:
+\begin{itemize}
+	\item \texttt{T\_INPUT} (0,1,2) sets the input to use for the PID loop (0: sensor 1 $T_1$, 1: sensor 2 $T_2$, 2: average of sensors 1 and 2 $(T_1+T_2)/2$)
+	\item \texttt{PT100\_OFFSET0} (-1000..1000) sets the offset for the first PT100 in units of $0.1\;\mathrm{{}^{\circ}C}$
+	\item \texttt{PT100\_OFFSET1} (-1000..1000) sets the offset for the second PT100 in units of $0.1\;\mathrm{{}^{\circ}C}$
+	\item \texttt{SHUTDOWN} (0..100) sets the shutdown temperature
+	\item \texttt{BAUDRATE} (2400,...,9600,...,115200,... <=1000000) sets baud rate of the USB to serial converter (default is 115200)
+	\item \texttt{FAN\_MIN} (0..100) start temperature in $\mathrm{{}^{\circ}C}$ for the internal fan
+	\item \texttt{FAN\_INCREASE} (0..100) increase of fan speed in PWM setps per $\mathrm{{}^{\circ}C}$
+	\item \texttt{PID\_I} (0..1000) integral term prefactor for PID loop
+	\item \texttt{PID\_IMAX} (0..1000000) maximum for error integration
+	\item \texttt{PID\_D} (0..1000) differential term prefactor in PID loop
+	\item \texttt{PID\_P} (0..1000) proportional term prefactor in PID loop
+\end{itemize}
+\\\hline
+	\texttt{P<param\_name><LF>} & get the current value of one of the internal parameters of the remote control box. The parameter names are the same as above.
+\\\hline
+
+	\multicolumn{2}{l}{\textbf{Temperature Control \& Status}}\\\hline
+	\texttt{T<set\_temp>} & set the current set temperature in units of $1/10\mathrm{{}^{\circ}C}$ \\\hline
+
+	\texttt{t} & return the current set temperature in units of $1/10\mathrm{{}^{\circ}C}$\\\hline
+	\texttt{O0}/\texttt{O1} & switch heater on or off\\\hline
+	\texttt{o} & returns whether the heater is currently turned on\\\hline
+	\texttt{s} & return all state variables' current values
+\begin{center}
+	<TEMP0>, <TEMP1>, <SET\_TEMP>, <SET\_VALUE>, <HEATING\_ONOFF\_STATE>, <ERROR>, <INTERNAL\_TEMPERATURE>
+\end{center}
+	\\\hline
+	\texttt{1} & returns the temperature of the first PT100 in units of $1/10\mathrm{{}^{\circ}C}$\\\hline
+	\texttt{2} & returns the temperature of the second PT100 in units of $1/10\mathrm{{}^{\circ}C}$\\\hline
+	\texttt{i} & returns the internal temperature in units of $\mathrm{{}^{\circ}C}$\\\hline
+	\texttt{v} & returns the current set value\\\hline
+	\texttt{e} & returns the current error state\\\hline
+
+	\end{longtable}
+\end{center}
+
+
+\section{Technical Realization}
+\label{sec:Realization}
+\subsection{Hardware Overview (Electronics)}
+\label{sec:HardwareOverview}
+
+
+\subsection{Implementation Details and Hints}
+\label{sec:ImplementationDetailsAndHints}
+\begin{itemize}
+  \item The FTDI USB to serial converter has areprogrammed device name 
+		\begin{center}
+			\textit{***}
+		\end{center}
+		Still you can use the standard FTDI virtual COM port driver for this device: 
+		\begin{center}
+			\url{http://www.ftdichip.com/FTDrivers.htm}
+		\end{center}
+
+	\item The FTDI USB to serial converter has to be programmed to be self-powered. Otherwise the serial connection does not work on Linux (on Windows system the problem does not seem to exist).
+	\item You can bind a box to a spoecific serial port. On \textbf{Windows} this can be done in the driver settings. On \textbf{Linux} this may be achieved using the \texttt{udev} hardware enumeration system:
+	
+\begin{enumerate}
+	\item create a udev rules file with a name like e.g.: \texttt{/etc/udev/rules.d/99-usbboxes.rules} 
+	\item add a line like this:
+
+{\footnotesize\begin{verbatim}
+  #LASERBox
+  KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{product}=="B040SERVO", SYMLINK+="ttyUSB_B040SERVO" 
+\end{verbatim}}
+
+    which will map the ttyUSB device with the product name B040SERVO to the device file \texttt{/dev/ttyUSB\_B040SERVO} in addition to its default file \texttt{/dev/ttyUSB}\textit{x}. Instead of the product name you can also use any other USB device property, as reported by
+
+{\footnotesize\begin{verbatim}
+  lsusb -v -s <bus>:<devnum>
+\end{verbatim}}
+
+    Possible filters are e.g.:
+
+{\footnotesize\begin{verbatim}
+   ATTRS{serial}=="A800dOBl", 
+   ATTRS{idVendor}=="1a72", 
+   ATTRS{idProduct}=="1007", 
+   ATTR{vendor}=="0x149a", 
+   ATTR{device}=="0x0005"
+\end{verbatim}}
+
+    \item After saving the rules file you will have to tell udev that there are new/changed rules by executing
+
+{\footnotesize\begin{verbatim}
+  /etc/init.d/udev restart
+\end{verbatim}}
+
+    The rules will be executed when the new device is connected to the computer. So if it's already connected: pull and reconnect the plug.
+
+\end{enumerate}
+\end{itemize}
+
+
+
+
+\subsection{Programming the Microcontroller}
+\label{sec:ProgrammingTheLaserboxController}
+The main microcontroller of the control box is an Atmel ATmega. It's flash memory may be programmed either by a standard AVR programmer, like usbasp (see \url{http://www.fischl.de/usbasp/} and Fig.~\ref{fig:usbasp}) or by a bootloader already installed on the controller. In the first case you should remove the ``TargetSupply'' jumper of the usbasp and connect the power supply of the control box. Then you can use a programmer software like avrdude to program the controller. The programmer and the controller are connected by a standard $2\times3$ ribbon cable connectors (see Fig.~\ref{fig:pcb}).
+
+If the controller is already equipped with the bootloader \texttt{avrprog\_boot v0.85} (by Martin Thomas, \url{http://www.siwawi.arubi.uni-kl.de/avr_projects#avrprog_boot}), you simply have to reset the controller (switch power off/on or use reset switch) while holding the ON/OFF button pressed down. Afterwards a new program can be loaded using a AVR109/AVR910 programmer software (e.g. avrdude, AVR Prog or AVR Studio) via the serial host port of the control box. Note that the bootloader is started only if the ON/OFF button is held down during a reset, otherwise the standard software starts and the control may be used to control a laser.
+
+Here are some more hints on programming the controller:
+\begin{itemize}
+	\item The fuse bits for the ATmega32 controller without bootloader are: 
+		\begin{center}
+			%\texttt{LFUSE = 0xFD;  HFUSE = 0xDF; EFUSE = 0xFF}.
+		\end{center}
+	\item The fuse bits for the ATmega32 controller with bootloader (2047 bytes) are: 
+		\begin{center}
+			%\texttt{LFUSE = 0xFD;  HFUSE = 0xD8; EFUSE = 0xFF}.
+		\end{center}
+\end{itemize}
+
+
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=100mm]{usbasp.png}
+	\caption{USBasp -- AVR programmer for USB}
+	\label{fig:usbasp}
+\end{figure}
+
+
+
+
+\newpage
+\section{Literature \& Datasheets}
+\label{sec:literature_datasheets}
+\begin{itemize}
+  \item FT232RL: \url{http://www.ftdichip.com/Documents/DataSheets/DS_FT232R.pdf}
+\end{itemize}
+\end{document}
+

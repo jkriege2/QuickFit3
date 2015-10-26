@@ -79,9 +79,7 @@
              git clone --recursive "https://github.com/jkriege2/QuickFit3.git" "./QuickFit3.git"
           Now ensure that all submodules (all in the subfolder './extlibsb040' are
           up to date. To do so, execute in the base directory of the repository:
-             git submodule update --remote --init --recursive
-          This can also be done with the bash-script
-             ./checkout_update_submodules.sh
+              ./checkout_update_submodules.sh
           this script also switches all modules to their respective master-branch,
           which simplifies later submitting/pushing.
    
@@ -219,8 +217,6 @@ cairo         | y                   | y                                  | n (cu
                 QF3CONFIG+=nospecials
              This will switch off all hardware drivers. If you want to build the
              microscope hardware drivers, comment out the appropriate lines.
-                #QF3CONFIG+=bits64
-             If you want to build a 64-bit build, uncomment the last line!
              Changes these options ONLY IF YOU KNOW WHAT YOU ARE DING!!!
              See quickfit.inc.template for an example and an explanation of the
              additional options!

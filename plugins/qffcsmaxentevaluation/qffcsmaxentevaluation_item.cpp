@@ -834,18 +834,18 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         }
 
         // now store the results:
-        QString param;
-        setFitResultValueNumberArray(record, index, model, param="maxent_tau", distTaus, Ndist, QString("seconds"));
+        QString param,paramtau,paramD,parammem;
+        setFitResultValueNumberArray(record, index, model, paramtau=param="maxent_tau", distTaus, Ndist, QString("seconds"));
         setFitResultGroup(record, index, model, param, tr("fit results"));
         setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: lag times"), QString("MaxEnt distribution: lag times <i>&tau;</i>"));
         setFitResultSortPriority(record, index, model, param, true);
 
-        setFitResultValueNumberArray(record, index, model, param="maxent_D", distDs, Ndist, QString("seconds"));
+        setFitResultValueNumberArray(record, index, model, paramD=param="maxent_D", distDs, Ndist, QString("seconds"));
         setFitResultGroup(record, index, model, param, tr("fit results"));
         setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: diffusion coefficients"), QString("MaxEnt distribution: diffusion coefficients <i>D</i>"));
         setFitResultSortPriority(record, index, model, param, true);
 
-        setFitResultValueNumberArray(record, index, model, param="maxent_distribution", dist, Ndist);
+        setFitResultValueNumberArray(record, index, model, parammem=param="maxent_distribution", dist, Ndist);
         setFitResultGroup(record, index, model, param, tr("fit results"));
         setFitResultLabel(record, index, model, param, tr("MaxEnt distribution"), QString("MaxEnt distribution: <i>p(&tau;)</i>"));
         setFitResultSortPriority(record, index, model, param, true);
@@ -854,6 +854,22 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         setFitResultGroup(record, index, model, param, tr("fit results"));
         setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: tau mode"), tr("MaxEnt distribution: tau mode"));
         setFitResultSortPriority(record, index, model, param, true);
+
+        QFRawDataRecord::evaluationCompoundResult comp;
+        comp.type=QFRawDataRecord::qfrdrctGraph1D;
+        comp.metadata["logX"]=true;
+        comp.metadata["logY"]=false;
+        comp.metadata["labelX"]=tr("correlation time \\tau_D [s]");
+        comp.metadata["labelY"]=tr("MaxEnt distribution");
+        comp.label=tr("MaxEnt(tauD)");
+        comp.referencedResults<<paramtau<<parammem;
+        record->resultsCompoundSet(getEvaluationResultID(index, model), "maxent_tau_curve", comp);
+
+        comp.metadata["labelX"]=tr("diffusion coefficient D [{\\mu}m^2/s]");
+        comp.label=tr("MaxEnt(D)");
+        comp.referencedResults.clear();
+        comp.referencedResults<<paramD<<parammem;
+        record->resultsCompoundSet(getEvaluationResultID(index, model), "maxent_d_curve", comp);
 
         if (tau_mode>2) {
 

@@ -25,14 +25,14 @@
 #define QFFitFunctionGeneral2GaussianVar_H
 #include "qfpluginfitfunction.h"
 
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief QFFitFunction class for fit function
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneral2GaussianVar: public QFFitFunction {
+class QFFitFunctionGeneral2GaussianVar: public QFDistributionFitFunctionBase {
     public:
         QFFitFunctionGeneral2GaussianVar();
         virtual ~QFFitFunctionGeneral2GaussianVar() {}
@@ -60,7 +60,6 @@ class QFFitFunctionGeneral2GaussianVar: public QFFitFunction {
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() const;
 
-        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionGeneral2GaussianVar_H

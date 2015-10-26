@@ -330,15 +330,29 @@
    <header>jkqtmathtext.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cmbFitType</tabstop>
+  <tabstop>tabParams</tabstop>
+  <tabstop>btnFit</tabstop>
+  <tabstop>cmbAddGraph</tabstop>
+  <tabstop>cmbSaveColumn</tabstop>
+  <tabstop>chkLogX</tabstop>
+  <tabstop>chkLogY</tabstop>
+  <tabstop>chkPlotErrors</tabstop>
+  <tabstop>chkWeightedResiduals</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton_3</tabstop>
+ </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../fcsmsdevaluation/fcsmsdevaluation.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

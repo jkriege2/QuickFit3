@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFITFUNCTIONFCSFLOW_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -72,7 +72,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     .
 
 */
-class QFFitFunctionFCSFlow: public QFFitFunction {
+class QFFitFunctionFCSFlow: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSFlow();
         virtual ~QFFitFunctionFCSFlow() {}

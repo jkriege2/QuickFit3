@@ -25,25 +25,28 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QVector>
 #include <QPair>
 #include <stdint.h>
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 /*! \brief QFFitFunction class for FCS fit with an assumed gaussian distribution of diffusion coefficients
     \ingroup qf3fitfunp_fitfunctions_fcsdistribution
 
 */
-class QFFitFunctionFCSDistributionGaussianD: public QFFitFunction {
+class QFFitFunctionFCSDistributionGaussianD: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSDistributionGaussianD();
         virtual ~QFFitFunctionFCSDistributionGaussianD() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS SD: Normal Diffuion 3D with gaussian D-distribution"); }
+        virtual QString name() const { return QString("FCS Dist: Normal Diffuion 3D with gaussian D-distribution"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("FCS SD: gaussian D"); }
+        virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_dist_norm_d"); }
         /*! \copydoc QFFitFunction::category()   */
         virtual QString category() const { return QObject::tr("Confocal FCS"); }
+
+        /** \copydoc QFFitFunction::isDeprecated() */
+        virtual bool isDeprecated() const { return true; }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

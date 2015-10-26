@@ -83,7 +83,7 @@ QFLIB_EXPORT void matlabCopyScript(const QList<QVector<QVariant> >& data);
 
     \note this function uses the library TinyMAT from https://github.com/jkriege2/TinyMAT
 */
-QFLIB_EXPORT void saveToMatlabMATfile(const QString&filename, const QList<QList<QVariant> >& data, const QString& varname=QString("M"),  QStringList columnsNames=QStringList(),  QStringList rowNames=QStringList(), bool convertToNumberMatrix=false);
+QFLIB_EXPORT void saveToMatlabMATfile(const QString&filename, const QList<QList<QVariant> >& data, const QString& varname=QString("M"),  QStringList columnsNames=QStringList(),  QStringList rowNames=QStringList(), bool convertToNumberMatrix=false, const QString& comment=QString(), const QMap<QString, QVariant> properties=QMap<QString, QVariant>());
 
 /*! \brief save the given \a data as a Matlab MAT file
     \ingroup qf3lib_tools
@@ -95,6 +95,6 @@ QFLIB_EXPORT void saveToMatlabMATfile(const QString&filename, const QList<QList<
 
     \note this function uses the library TinyMAT from https://github.com/jkriege2/TinyMAT
 */
-QFLIB_EXPORT void saveToMatlabMATfile(const QString&filename, const QList<QVector<double> >& datad, const QString& varname=QString("M"),  QStringList columnsNames=QStringList(),  QStringList rowNames=QStringList());
+QFLIB_EXPORT void saveToMatlabMATfile(const QString&filename, const QList<QVector<double> >& datad, const QString& varname=QString("M"),  QStringList columnsNames=QStringList(),  QStringList rowNames=QStringList(), const QString& comment=QString(), const QMap<QString, QVariant> properties=QMap<QString, QVariant>());
 
 #endif // MATLABTOOLS_H

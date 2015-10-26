@@ -123,7 +123,8 @@ FORMS =    optionsdialog.ui \
     jktetrismainwindow.ui
 
 RESOURCES += quickfit3.qrc \
-             ../extlibs/xits.qrc
+             ../extlibs/xits.qrc \
+    ../extlibs/hack.qrc
 
 
 TRANSLATIONS= ./translations/de.ts

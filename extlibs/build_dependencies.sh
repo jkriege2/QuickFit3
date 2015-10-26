@@ -52,7 +52,7 @@ if [ $MAKE_COMPILEFORLOCAL == "y" ] ; then
 	MORECFLAGS=" -mtune=native -msse -msse2 -mmmx -mfpmath=sse"
 fi
 if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
-	MORECFLAGS=" $MORECFLAGS -ftree-vectorize -ftree-vectorizer-verbose=1 -funroll-loops "
+	MORECFLAGS=" $MORECFLAGS -ftree-vectorize -funroll-loops "
 	MORELDFLAGS=" $MORELDFLAGS "
 fi
 
@@ -79,10 +79,21 @@ echo -e "\n\nbuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INF
 
 PICFLAGS="-fPIC"
 
-ISMSYS=`uname -o`
+
+echo "detecting compile system ... "
+ISMSYS=`uname -a`
 echo $ISMSYS
-if [ "$ISMSYS" != "${string/Msys/}" ] ; then
-read -p "Do you need the -fPIC flags? (y/n)? " -n 1  MAKE_PICFLAGS
+if echo $ISMSYS | grep -iq msys ; then
+	echo "   => this is MSys on Windows"
+	ISMSYS="1"
+else
+	echo "   => this is a default non-MSys system"
+	ISMSYS="0"
+fi
+
+
+if [ $ISMSYS == "0" ] ; then
+	read -p "Do you need the -fPIC flags? (y/n)? " -n 1  MAKE_PICFLAGS
     echo -e  "\n"
 
     PICFLAGS="-fPIC"
@@ -90,12 +101,12 @@ read -p "Do you need the -fPIC flags? (y/n)? " -n 1  MAKE_PICFLAGS
             PICFLAGS=""
     fi
 else
-    echo -e "building in MSys environment on Windows!\n\n"
-    PICFLAGS=
+    echo -e "building in MSys environment on Windows! -fPIC required\n\n"
+    PICFLAGS="-fPIC"
 fi
 
 qtOK=-5
-if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+if [ $ISMSYS == "1" ] ; then
 	qtOK=-1
 	read -p "Do you want to copy 'Qt DLLs' (y/n)? " -n 1 INSTALL_ANSWER
 	echo -e  "\n"
@@ -104,29 +115,29 @@ if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 		"-- COPYING: Qt DLLs                                                   --\n"\
 		"------------------------------------------------------------------------\n\n"
 		
-		cp /mingw/bin/mingwm10.dll ../output/
-		cp /mingw/bin/libstdc++*.dll ../output/
-		cp /mingw/bin/libgcc*.dll ../output/
-		cp /mingw/bin/pthread*.dll ../output/
-		cp /mingw/bin/libpthread*.dll ../output/
+		cp /mingw/bin/mingwm10.dll ../output/ &> /dev/null
+		cp /mingw/bin/libstdc++*.dll ../output/ &> /dev/null
+		cp /mingw/bin/libgcc*.dll ../output/ &> /dev/null
+		cp /mingw/bin/pthread*.dll ../output/ &> /dev/null
+		cp /mingw/bin/libpthread*.dll ../output/ &> / &> /dev/nullev/null
 		cp /mingw/bin/libwinpthread*.dll ../output/
 		
 		USEDQTMODULES="QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4 QtNetwork4"
 		USEDQTMODULES5="Qt5Core Qt5Gui Qt5Network Qt5OpenGL Qt5Script Qt5ScriptTools Qt5PrintSupport Qt5Svg Qt5Xml Qt5Widgets Qt5WinExtras"
 		USEDQTPLUGINS= "${QT_INFO_PLUGINS}/*"
 		mkdir ../output/qtplugins
-		for f in $USEDQTMODULES
+		for f in $USEDQTMODULES $USEDQTMODULES5
 		do
-			cp "${QT_INFO_BIN}/${f}d.dll"  "../output/"
-			cp "${QT_INFO_BIN}/${f}.dll"  "../output/"
+			cp "${QT_INFO_BIN}/${f}d.dll"  "../output/" &> /dev/null
+			cp "${QT_INFO_BIN}/${f}.dll"  "../output/" &> /dev/null
 		done
 		
 		cp -rf "${QT_INFO_BIN}/icu*.dll"  "../output/"
 		
 		for f in $USEDQTPLUGINS
 		do
-			cp -rf "${f}"  "../output/qtplugins/"
-			cp -rf "${f}"  "../output/qtplugins/"
+			cp -rf "${f}"  "../output/qtplugins/" &> /dev/null
+			cp -rf "${f}"  "../output/qtplugins/" &> /dev/null
 		done
 		qtOK=0
 	fi
@@ -146,9 +157,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf zlib-1.2.8.tar.gz -C ./build/
 	cd build/zlib-1.2.8
-	ISMSYS=`uname -o`
-	echo $ISMSYS
- 	if [[ $ISMSYS == *"Msys"* ]] ; then
+ 	if [ $ISMSYS == "1" ] ; then
 		BINARY_PATH='../../bin'
 		INCLUDE_PATH='../../include'
 		LIBRARY_PATH='../../lib'
@@ -157,9 +166,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		
 		MAKEFILE="Makefile.gcc"
 	else
-                export LDFLAGS="${MORELDFLAGS} ${PICFLAGS}"
-                export CFLAGS="${MORECFLAGS} ${PICFLAGS}"
-                export CPPFLAGS="${MORECFLAGS} ${PICFLAGS}"
+		export LDFLAGS="${MORELDFLAGS} ${PICFLAGS}"
+		export CFLAGS="${MORECFLAGS} ${PICFLAGS}"
+		export CPPFLAGS="${MORECFLAGS} ${PICFLAGS}"
 
 
 		./configure --static --prefix=${CURRENTDIR}/zlib
@@ -283,8 +292,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	tar xvf lmfit-3.2.tar -C ./build/
 	cd build/lmfit-3.2
 	export LDFLAGS="${LDFLAGS} ${PICFLAGS} -lm"
-        export CFLAGS="${CFLAGS} ${PICFLAGS} "
-        export CPPFLAGS="${CPPFLAGS} ${PICFLAGS}"
+	export CFLAGS="${CFLAGS} ${PICFLAGS} "
+	export CPPFLAGS="${CPPFLAGS} ${PICFLAGS}"
 	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -lm" 
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
@@ -332,10 +341,10 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf lmfit-5.1.tar -C ./build/
 	cd build/lmfit-5.1
-        export LDFLAGS="${LDFLAGS} ${PICFLAGS} "
-        export CFLAGS="${CFLAGS} ${PICFLAGS} "
-        export CPPFLAGS="${CPPFLAGS} ${PICFLAGS}"
-        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
+        export LDFLAGS="${LDFLAGS}  "
+        export CFLAGS="${CFLAGS}  "
+        export CPPFLAGS="${CPPFLAGS} "
+        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS=" ${MORECFLAGS}" CPPFLAGS=" ${MORECFLAGS}"	LDFLAGS=" ${MORELDFLAGS}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -386,8 +395,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	
 	
 	SKIP="0"
-	read -p "Do you have 'lapack' on your system (y/n)? " -n 1 HAVE_LAPACK
-	echo -e  "\n"
+	HAVE_LAPACK="n"
+	#read -p "Do you have 'lapack' on your system (y/n)? " -n 1 HAVE_LAPACK
+	#echo -e  "\n"
 	if [ $HAVE_LAPACK == "y" ] ; then
 	
 		echo -e  "Possibilities to link agains LAPACK/BLAS:\n"\
@@ -472,11 +482,15 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd libpng
 	mkdir build
-	tar xvf libpng-1.5.4.tar.gz -C ./build/
-	cd build/libpng-1.5.4
+	tar xvf libpng-1.6.18.tar.gz -C ./build/
+	cd build/libpng-1.6.18
+	ZLIBINC=../../../zlib/lib/include/
+	ZLIBLIB=../../../zlib/lib/
 	if [ -e ../../../zlib/lib/libz.a ] ; then
 		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -L${CURRENTDIR}/zlib/lib" CFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include" CXXFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include/ "
 	else
+		ZLIBINC=.
+		ZLIBLIB=.
 		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	fi
 	libOK=$?
@@ -494,7 +508,25 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 			libOK=-3
 		fi
 	else
-	    libOK=-2
+		echo "CONFIGURE-script failes. We will try it with a simple Makefile now!"
+		
+
+		echo -e 'ZLIBINC='$ZLIBINC'\nZLIBLIB='$ZLIBLIB | cat - ../../makefile.gcc > ./makefile.gcc
+		
+		make -j${MAKE_PARALLEL_BUILDS} -f makefile.gcc
+		
+		libOK=$?
+		if [ $libOK -ne 0 ] ; then		
+			libOK=-4
+		else
+			mkdir ../../include
+			mkdir ../../include/libpng16
+			mkdir ../../lib
+			
+			cp -f *.a ../../lib &> /dev/null
+			cp -f png*.h ../../include &> /dev/null
+			cp -f png*.h ../../include/libpng16 &> /dev/null
+		fi
 	fi
 	
 
@@ -659,116 +691,72 @@ if [ -e ${CURRENTDIR}/gsl/lib/libgsl.a ] ; then
 	gsl_LDDIRS="-L${CURRENTDIR}/gsl/lib"
 fi
 
-libusbOK=-5
-if [ "$ISMSYS" != "${string/Msys/}" ] ; then
-	libusbOK=-1
-	read -p "Do you want to build 'libusb' (y/n)? " -n 1 INSTALL_ANSWER
-	echo -e  "\n"
-	if [ $INSTALL_ANSWER == "y" ] ; then
-		read -p "Do you want to use prebuilt win32 'libusb' (y/n)? " -n 1 INSTALL_ANSWER
-		echo -e  "\n"
-		if [ $INSTALL_ANSWER == "y" ] ; then
-			echo -e  "------------------------------------------------------------------------\n"\
-			"-- INSTALLING: precompiled libusb (win32)                             --\n"\
-			"------------------------------------------------------------------------\n\n"\
+libusbOK=-1
+read -p "Do you want to build 'libusb' (y/n)? " -n 1 INSTALL_ANSWER
+echo -e  "\n"
+if [ $INSTALL_ANSWER == "y" ] ; then
 
-			cd libusb
-			mkdir build
-			mkdir lib
-			mkdir bin
-			mkdir include
-			tar xvf ./win32_binary/libusb-win32-bin-1.2.5.0.tar.gz -C ./build/
-			cd build/libusb-win32-bin-1.2.5.0/
-			cp ./include/* ../../include
-			cp ./include/lusb0_usb.h ../../include/usb.h
+	echo -e  "------------------------------------------------------------------------\n"\
+	"-- BUILDING: libusb                                                   --\n"\
+	"------------------------------------------------------------------------\n\n"\
+
+	cd libusb
+	mkdir build
+	mkdir lib
+	mkdir bin
+	mkdir include
+	tar xvf ./libusbx-1.0.16.tar.gz -C ./build/
+	cd build/libusbx-1.0.16/
+	./configure --prefix=${CURRENTDIR}/libusb  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}"
+	libOK=$?
+	if [ $libOK -eq 0 ] ; then
+		make -j${MAKE_PARALLEL_BUILDS}
+		
+		libOK=$?
+		if [ $libOK -eq 0 ] ; then		
+			make -j${MAKE_PARALLEL_BUILDS} install
 			libOK=$?
 			if [ $libOK -ne 0 ] ; then		
 				libOK=-4
-			else 
-				cp ./lib/gcc/* ../../lib
-				libOK=$?
-				if [ $libOK -ne 0 ] ; then		
-					libOK=-4
-				else
-					cp -r ./bin/* ../../bin
-					libOK=$?
-					if [ $libOK -ne 0 ] ; then		
-						libOK=-4
-					fi
-				fi
 			fi
-
-			cd ../../
-			if [ $KEEP_BUILD_DIR == "n" ] ; then
-				rm -rf build
-			fi
-			cd ${CURRENTDIR}
-			
-			libusbOK=$libOK
-		else	
-			echo -e  "------------------------------------------------------------------------\n"\
-			"-- BUILDING: libusb                                                   --\n"\
-			"------------------------------------------------------------------------\n\n"\
-
-			cd libusb
-			mkdir build
-			mkdir lib
-			mkdir bin
-			mkdir include
-			tar xvf ./libusbx-1.0.16.tar.gz -C ./build/
-			cd build/libusbx-1.0.16/
-			./configure --prefix=${CURRENTDIR}/libusb  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}"
-			libOK=$?
-			if [ $libOK -eq 0 ] ; then
-				make -j${MAKE_PARALLEL_BUILDS}
-				
-				libOK=$?
-				if [ $libOK -eq 0 ] ; then		
-					make -j${MAKE_PARALLEL_BUILDS} install
-					libOK=$?
-					if [ $libOK -ne 0 ] ; then		
-						libOK=-4
-					fi
-				else
-					libOK=-3
-				fi
-			else
-				libOK=-2
-			fi
-			cd ../../
-			tar xvf ./libusb-compat-0.1.5.tar.gz -C ./build/
-			cp fix/libusb-compat-0.1.5/* build/libusb-compat-0.1.5/libusb/
-			cd build/libusb-compat-0.1.5/
-			./configure --prefix=${CURRENTDIR}/libusb  CFLAGS=" ${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}"  LIBUSB_1_0_CFLAGS="-I${CURRENTDIR}/libusb/include/libusb-1.0" LIBUSB_1_0_LIBS="-L${CURRENTDIR}/libusb/lib -lusb-1.0"
-			libOK=$?
-			if [ $libOK -eq 0 ] ; then
-				make -j${MAKE_PARALLEL_BUILDS}
-				
-				libOK=$?
-				if [ $libOK -eq 0 ] ; then		
-					make -j${MAKE_PARALLEL_BUILDS} install
-					libOK=$?
-					if [ $libOK -ne 0 ] ; then		
-						libOK=-4
-					fi
-				else
-					libOK=-3
-				fi
-			else
-				libOK=-2
-			fi
-			cd ../../
-			
-			
-			if [ $KEEP_BUILD_DIR == "n" ] ; then
-				rm -rf build
-			fi
-			cd ${CURRENTDIR}
-			cp libusb/bin/* ../output
-			
-			libusbOK=$libOK
+		else
+			libOK=-3
 		fi
+	else
+		libOK=-2
 	fi
+	cd ../../
+	tar xvf ./libusb-compat-0.1.5.tar.gz -C ./build/
+	cp fix/libusb-compat-0.1.5/* build/libusb-compat-0.1.5/libusb/
+	cd build/libusb-compat-0.1.5/
+	./configure --prefix=${CURRENTDIR}/libusb  CFLAGS=" ${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}"  LIBUSB_1_0_CFLAGS="-I${CURRENTDIR}/libusb/include/libusb-1.0" LIBUSB_1_0_LIBS="-L${CURRENTDIR}/libusb/lib -lusb-1.0"
+	libOK=$?
+	if [ $libOK -eq 0 ] ; then
+		make -j${MAKE_PARALLEL_BUILDS}
+		
+		libOK=$?
+		if [ $libOK -eq 0 ] ; then		
+			make -j${MAKE_PARALLEL_BUILDS} install
+			libOK=$?
+			if [ $libOK -ne 0 ] ; then		
+				libOK=-4
+			fi
+		else
+			libOK=-3
+		fi
+	else
+		libOK=-2
+	fi
+	cd ../../
+	
+	
+	if [ $KEEP_BUILD_DIR == "n" ] ; then
+		rm -rf build
+	fi
+	cd ${CURRENTDIR}
+	cp libusb/bin/* ../output
+	
+	libusbOK=$libOK
 fi
 
 
@@ -777,10 +765,9 @@ fi
 
 
 
+
 libnidaqmxOK=-5
-ISMSYS=`uname -o`
-echo $ISMSYS
-if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+if [ $ISMSYS == "1" ] ; then
 	libnidaqmxOK=-1
 	read -p "Do you want to build 'libNIDAQmx' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
 	echo -e  "\n"
@@ -809,9 +796,7 @@ fi
 
 
 libandorOK=-5
-ISMSYS=`uname -o`
-echo $ISMSYS
-if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+if [ $ISMSYS == "1" ] ; then
 	libandorOK=-1
 	read -p "Do you want to build 'libAndor' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
 	echo -e  "\n"
@@ -1028,8 +1013,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd cimg
 	mkdir build
-	tar xvf ./CImg-1.6.2.tar.bz2 -C ./build/
-	cd build/CImg-1.6.2/
+	tar xvf ./CImg-1.6.5.tar.gz -C ./build/
+	cd build/CImg-1.6.5/
 	cp -r * ../../
 	libOK=$?
 	if [ $libOK -ne 0 ] ; then		
@@ -1063,9 +1048,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd pixman
 	mkdir build
-	tar xvf pixman-0.32.6.tar.gz -C ./build/
-	cd build/pixman-0.32.6
-	./configure --enable-static --disable-shared --enable-libpng --disable-gtk  --disable-dependency-tracking --prefix=${CURRENTDIR}/pixman   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" LDFLAGS=" ${zlib_LDFLAGS} ${MORELDFLAGS}" PNG_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib" PNG_CFLAGS=" -I${CURRENTDIR}/libpng -I${CURRENTDIR}/libpng/include"
+	tar xvf pixman-0.32.8.tar.gz -C ./build/
+	cd build/pixman-0.32.8
+	./configure --enable-static --disable-shared --enable-libpng --disable-gtk  --disable-dependency-tracking --prefix=${CURRENTDIR}/pixman   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS}" LDFLAGS=" ${zlib_LDFLAGS} ${MORELDFLAGS}" PNG_LIBS="-L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib -lpng ${zlib_LDFLAGS}" PNG_CFLAGS=" -I${CURRENTDIR}/libpng -I${CURRENTDIR}/libpng/include"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -1118,7 +1103,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	
 	tar xvf cairo-1.14.2.tar.gz -C ./build/
 	cd build/cairo-1.14.2
-	if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+	if [ "$ISMSYS" == "1" ] ; then
 	    cp ../../Makefile.in_hack ./Makefile.in
 		./configure --verbose --enable-static --disable-shared  --disable-ft --disable-dependency-tracking --enable-gobject=no --enable-trace=no --enable-xcb-shm=no --enable-xlib=no --enable-xlib-xrender=no --enable-xcb=no --enable-egl=no --enable-glx=no --enable-wgl=no --enable-ft=no  --enable-fc=no --disable-xlib --without-x --disable-quartz-font --disable-quartz --disable-valgrind --prefix=${CURRENTDIR}/cairo   CFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}/pixman/include/pixman-1 " CPPFLAGS="${PICFLAGS} ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}pixman/include/pixman-1 " LDFLAGS=" ${zlib_LDFLAGS} -L${CURRENTDIR}/pixman/lib -lpixman-1 " png_REQUIRES=libpng png_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib " png_CFLAGS=" -I${CURRENTDIR}/libpng/include " pixman_CFLAGS=" -I${CURRENTDIR}pixman/include/pixman-1" pixman_LIBS=" -L${CURRENTDIR}/pixman/lib -lpixman-1" PKG_CONFIG="${CURRENTDIR}/cairo/build/pkgconfigfake" ax_cv_c_float_words_bigendian=no
 	else 

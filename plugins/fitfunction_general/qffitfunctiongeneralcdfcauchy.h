@@ -24,7 +24,7 @@
 #ifndef QFFitFunctionGeneralCDFCauchy_H
 #define QFFitFunctionGeneralCDFCauchy_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +32,7 @@
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralCDFCauchy: public QFFitFunction {
+class QFFitFunctionGeneralCDFCauchy: public QFCDFFitFunctionBase {
     public:
         QFFitFunctionGeneralCDFCauchy();
         virtual ~QFFitFunctionGeneralCDFCauchy() {}
@@ -62,8 +62,6 @@ class QFFitFunctionGeneralCDFCauchy: public QFFitFunction {
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() const;
 
-        /*! \copydoc QFFitFunction::evaluateDerivatives()   */
-        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionGeneralCDFCauchy_H

@@ -29,7 +29,7 @@
 #include <QObject>
 #include "qffitfunction.h"
 #include "qfplugin.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 class QFLIB_EXPORT QFFitFunctionFactory {
     public:

@@ -71,7 +71,10 @@ class QFTCSPCReaderPicoquantPTU: public QFTCSPCReader {
         virtual QFTCSPCRecord getCurrentRecord() const;
 
         virtual double percentCompleted()const;
-
+        /** \copydoc QFTCSPCReader::microtimeChannels() */
+        virtual uint32_t microtimeChannels() const;
+        /** \copydoc QFTCSPCReader::microtimeChannelsResolutionPicoSeconds() */
+        virtual double microtimeChannelsResolutionPicoSeconds() const;
     protected:
         FILE* tttrfile;
         PTUInfo ptuinfo;

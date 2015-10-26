@@ -26,7 +26,7 @@ TARGET = eval_colocalization
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../libquickfitwidgets.pri)
 DESTDIR = $$QFOUTPUT/plugins
 

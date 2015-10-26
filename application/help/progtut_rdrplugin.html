@@ -1,0 +1,843 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Programming Tutorial: How to Write an RDR plugin for QuickFit $$version$$</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        <p>This tutorial describes how to write qn RDR plugin for QuickFit. The plugin will simply load a set of curves (X-Y-YError data) from one or more CSV files.</p>
+
+<p>The result of this tutorial is the plugin in <code>plugins/qfrdrcurve/</code></p>
+
+<h1>
+<a id="user-content-create-plugin-backbone" class="anchor" href="#create-plugin-backbone" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create plugin backbone</h1>
+
+<ol>
+<li>run the bash script <code>doc/plugin_template_projects/QFRawDataRecord_withUI/instance.sh</code>
+
+<ol>
+<li>class name <code>QFRDRCurve</code>
+</li>
+<li>plugin id: <code>curves</code> </li>
+<li>Now the script generates a subfolder <code>qfrdrcurve</code> with the plugin project files Initially three classes are created <code>QFRDRCurvePlugin</code> in 'qfrdrcurve.h/cpp' which represents the plugin and serves as a factory-class for the actual RDR-objects. The class <code>QFRDRCurveData</code> in <code>qfrdrcurve_data.h/cpp</code> represents an RDR object class. Finally <code>QFRDRCurveDataEditor</code> in <code>qfrdrcurve_dataeditor.h/cpp/ui</code>  represents an editor widget, which displays the data in the RDR-editor. The file <code>qfrdrcurve.pro</code> is the qmake-project for this plugin and <code>qfrdrcurve.qrc</code> contains the resources (e.g. icons from the sub-folder <code>images</code>). The sub-folder <code>help</code> finally contains the online-help for this plugin, with the main help in <code>help/curves.html</code> and a tutorial in <code>help/tutorial.html</code>, which is registered in <code>help/tutorial..ini</code>.</li>
+</ol>
+</li>
+<li><p>copy the folder <code>qfrdrcurve</code> into the plugins folder of the Git-repository and add the following lines to <code>quickfit3.pro</code> (if you are a QuickFit main-developer):</p>
+
+<pre><code>SUBDIRS += plg_qfrdrcurve
+plg_qfrdrcurve.subdir=./plugins/qfrdrcurve
+plg_qfrdrcurve.depends = lib libqf3widgets
+</code></pre>
+
+<p>If you are not a main developer, you can alternatively add these lines to the file <code>userplugins.inc</code> (create it if it does not exist yet and it will be evaluated automatically by <code>quickfit3.pro</code>!)</p></li>
+
+
+</ol>
+
+<h1>
+<a id="user-content-editing-the-plugin-source-code-in-qfrdrcurvehpp" class="anchor" href="#editing-the-plugin-source-code-in-qfrdrcurvehpp" aria-hidden="true"><span class="octicon octicon-link"></span></a>Editing the plugin source-code in <code>qfrdrcurve.h/pp</code>
+</h1>
+
+<p>Now edit the file <code>qfrdrcurve.h</code>, which contains the main plugin and add the plugin metadata:</p>
+
+<blockquote>
+<pre><code>......
+virtual QString getID() const  { return tr("curves"); };
+virtual QString getName() const  { return tr("XY-Curves-RDR"); };
+virtual QString getDescription() const  { return tr("This RDR representy XY-curve data"); };
+virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
+virtual QString getCopyright() const  { return tr("(c) 2015 by Jan W. Krieger"); };
+virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol"); };
+......
+</code></pre>
+</blockquote>
+
+<p>The file <code>qfrdrcurve.cpp</code> is already preset to perform its basic function (in addition to providing the plugin metadata):</p>
+
+<h2>
+<a id="user-content-rdr-object-factory-method" class="anchor" href="#rdr-object-factory-method" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDR Object Factory Method</h2>
+
+<p>The following method is a factory method that generates a new RDR object of tzype <code>QFRDRCurveData</code> for a specified project. It is called internally by QuickFit!</p>
+
+<blockquote>
+<pre><code>QFRawDataRecord* QFRDRCurvePlugin::createRecord(QFProject* parent) {
+    // factory method: create a QFRawDataRecord objectof the type of this plugin (QFRDRCurveData)
+    return new QFRDRCurveData(parent);
+}
+</code></pre>
+</blockquote>
+
+<h2>
+<a id="user-content-rdr-menu-entry" class="anchor" href="#rdr-menu-entry" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDR Menu Entry:</h2>
+
+<p>The following function registers an action into the 'Insert Raw Data Record' submenu that inserts one of our curve RDRs:</p>
+
+<blockquote>
+<pre><code>void QFRDRCurvePlugin::registerToMenu(QMenu* menu) {
+    // create a sub-menu
+    QMenu* m=menu-&gt;addMenu(tr("XY-Curves"));
+    // create menu entries to insert data with this type
+    QAction* action=new QAction(QIcon(getIconFilename()), tr("Insert single-file curves"), parentWidget);
+    action-&gt;setStatusTip(tr("Insert a new record, which represents one curve from one file"));
+    connect(action, SIGNAL(triggered()), this, SLOT(insertRecord()));
+    m-&gt;addAction(action);
+    action=new QAction(QIcon(getIconFilename()), tr("Insert multi-file curves"), parentWidget);
+    action-&gt;setStatusTip(tr("Insert a new record, which represents several curves form several files in one RDR"));
+    connect(action, SIGNAL(triggered()), this, SLOT(insertMultiFileRecord()));
+    m-&gt;addAction(action);
+}
+</code></pre>
+</blockquote>
+
+<p>The actual insertionof the curve RDRs is done in <code>QFRDRCurvePlugin::insertRecord()</code>:</p>
+
+<blockquote>
+<pre><code> void QFRDRCurvePlugin::insertRecord(bool multi_file) {
+       if (project) {
+           // file formats to import
+           QStringList fileformats;
+           fileformats&lt;&lt;tr("CSV Files (*.dat *.txt *.csv)");
+           QString current_format_name=fileformats[0] ;
+           // let the user select some files to import
+           QStringList files = qfGetOpenFileNamesSet("curves/", parentWidget,
+                                 tr("Select Data File(s) to Import ..."),
+                                 settings-&gt;getCurrentRawDataDir(),
+                                 fileformats.join(";;"), &amp;current_format_name);
+           if (files.size()&gt;0) { // if the user selected files
+               // here we store some initial parameters
+               QMap&lt;QString, QVariant&gt; initParams;
+               // add all properties in initParams that will be readonly
+               QStringList paramsReadonly;
+               paramsReadonly&lt;&lt;"FILETYPE";
+               int fomratID=fileformats.indexOf(current_format_name);
+               // For CSV-files we ask the user to specify the file parameters:
+               if (fomratID==0) {
+                   QFDlgCSVParameters* csvDlg=new QFDlgCSVParameters(NULL, ProgramOptions::getConfigValue("curves/column_separator_save", ",").toString(),
+                                                                     ProgramOptions::getConfigValue("curves/decimal_separator_save", ".").toString(),
+                                                                     ProgramOptions::getConfigValue("curves/comment_start_save", "#").toString(),
+                                                                     ProgramOptions::getConfigValue("curves/header_start_save", "#!").toString());
+                   csvDlg-&gt;addColSelComboBox(tr("x-data column:"));
+                   csvDlg-&gt;addColSelComboBox(tr("y-data column:"));
+                   csvDlg-&gt;addColSelComboBox(tr("y-error column:"));
+                   csvDlg-&gt;setFileContents(files.value(0));
+                   if (csvDlg-&gt;exec()==QDialog::Accepted) {
+                       // set whatever you want (FILETYPE is just an example)!
+                       initParams["FILETYPE"]="CSV";
+                       ProgramOptions::setConfigValue("curves/column_separator_save", QString(csvDlg-&gt;get_column_separator()));
+                       ProgramOptions::setConfigValue("curves/decimal_separator_save", QString(csvDlg-&gt;get_decimal_separator()));
+                       ProgramOptions::setConfigValue("curves/comment_start_save", QString(csvDlg-&gt;get_comment_start()));
+                       ProgramOptions::setConfigValue("curves/header_start_save", QString(csvDlg-&gt;get_header_start()));
+                       // here we save the configuration as parameters in the new RDR, which we can sue later to interpret the CSV-file
+                       initParams["csv_column_separator"]=QString(csvDlg-&gt;get_column_separator());
+                       initParams["decimal_separator"]=QString(csvDlg-&gt;get_decimal_separator());
+                       initParams["comment_start"]=QString(csvDlg-&gt;get_comment_start());
+                       initParams["header_start"]=QString(csvDlg-&gt;get_header_start());
+                       initParams["column_x"]=csvDlg-&gt;getColSelComboBoxCurrentIndex(0);
+                       initParams["column_y"]=csvDlg-&gt;getColSelComboBoxCurrentIndex(1);
+                       initParams["column_yerr"]=csvDlg-&gt;getColSelComboBoxCurrentIndex(2);
+                       paramsReadonly&lt;&lt;"csv_column_separator"&lt;&lt;"decimal_separator"&lt;&lt;"comment_start"&lt;&lt;"header_start"&lt;&lt;"column_x"&lt;&lt;"column_y"&lt;&lt;"column_yerr";
+                   } else {
+                       // aborted by user!
+                       delete csvDlg;
+                       return;
+                   }
+                   delete csvDlg;
+               }
+               if (multi_file) {
+                   QString filename=files.value(0, "");
+                   QStringList fileNames;
+                   for (int i=0; i&lt;files.size(); i++) {
+                       fileNames&lt;&lt;QFileInfo(files[i]).fileName();
+                   }
+                   services-&gt;log_text(tr("loading [%2] '%1' ...\n").arg(filename).arg(current_format_name));
+                   // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
+                   QFRawDataRecord* e=project-&gt;addRawData(getID(), tr("Multifile-XY-Curves: %1").arg(fileNames.join(", ")), files, initParams, paramsReadonly);
+                   if (e-&gt;error()) { // when an error occured: remove record and output an error message
+                       project-&gt;deleteRawData(e-&gt;getID());
+                       QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e-&gt;errorDescription()));
+                       services-&gt;log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e-&gt;errorDescription()));
+                   }
+                   settings-&gt;setCurrentRawDataDir(QFileInfo(files.value(0, "")).dir().absolutePath());
+               } else {
+                   // now we iterate over all files and use QuickFit's progress bar interface (see plugin services)
+                   QStringList list = files;
+                   QStringList::Iterator it = list.begin();
+                   services-&gt;setProgressRange(0, list.size());
+                   services-&gt;setProgress(0);
+                   int i=0;
+                   while(it != list.end()) {
+                       i++;
+                       QString filename=*it;
+                       if (QFile::exists(filename)) {
+                           services-&gt;log_text(tr("loading [%2] '%1' ...\n").arg(filename).arg(current_format_name));
+                           // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
+                           QFRawDataRecord* e=project-&gt;addRawData(getID(), QFileInfo(filename).fileName(), QStringList(filename), initParams, paramsReadonly);
+                           if (e-&gt;error()) { // when an error occured: remove record and output an error message
+                               project-&gt;deleteRawData(e-&gt;getID());
+                               QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e-&gt;errorDescription()));
+                               services-&gt;log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e-&gt;errorDescription()));
+                           }
+                           settings-&gt;setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
+                           ++it;
+                       }
+                       services-&gt;setProgress(i);
+                       QApplication::processEvents();
+                   }
+                   services-&gt;setProgress(0);
+               }
+           }
+       }
+   }
+</code></pre>
+</blockquote>
+
+<p>In this function, first the user is asked for a set of files that he wants to insert. Currently only CSV-files are supported and for these the program opens a dialog in which the suer can select the CSV-parameters (column separator, decimal separator, ...) and choose the columns that he wants to read for the x-data, y-data and y-errors. Finally the function inserts new RDR objects into the project. Depending on the parameter <code>multi_file</code> all files are either summarized by a single RDR, or one RDR is generated per file. In both cases, the same CSV-parameters are used for all files. The multi-file RDR reads one curve from each file and represents it as a single curve. The single-file RDR reads one curve from the file, i.e. only contains a single curve.</p>
+
+<p>The list of files is directly given to the function <code>project-&gt;addRawData()</code>. It also receives a set of properties in <code>initParams</code>, which are used to tell the object about the CSV-parameters.</p>
+
+<h1>
+<a id="user-content-the-rdr-data-representation-in-qfrdrcurvedata-in-the-files-qfrdrcurve_datahcpp" class="anchor" href="#the-rdr-data-representation-in-qfrdrcurvedata-in-the-files-qfrdrcurve_datahcpp" aria-hidden="true"><span class="octicon octicon-link"></span></a>The RDR data representation in <code>QFRDRCurveData</code> in the files <code>qfrdrcurve_data.h/cpp</code>
+</h1>
+
+<p>The class that is used to make curve RDR-objects has to be derived from <code>QFRawDataRecord</code> and is called <code>QFRDRCurveData</code> for this plugin. In addition it implements the interface <code>QFRDRCurvesInterface</code> to access a set of curves consisting of (x,y)-datapoints with optional errors in both directions. In addition the interface <code>QFRDRCurvesPropertiesEditInterface</code> is implemented, which allows to edit the curve metadata (names, axis-labels, ...). Both interfaces are defined in <code>lib/qfrdrcurvesinterface.h</code>. </p>
+
+<h2>
+<a id="user-content-rdr-object-meta-data" class="anchor" href="#rdr-object-meta-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDR object meta-data</h2>
+
+<p>First of all, the class <code>QFRDRCurveData</code> need to define/implement some basic house-keeping functions. FIrst for the RDR meta-data (which is mostly the same as the plugin-metadata):</p>
+
+<blockquote>
+<pre><code>   /** \brief return type (short type string) */
+   virtual QString getType() const { return "curves"; }
+   /** \brief return type (longer type string, user readable) */
+   virtual QString getTypeName() const { return tr("XY-Curves"); }
+   /** \brief return a small icon (16x16) */
+   virtual QIcon getSmallIcon() const { return QIcon(":/curves/qfrdrcurve_small.png"); }
+   /** \brief return type description */
+   virtual QString getTypeDescription() const { return getTypeName(); }
+   /** \brief return a large icon (32x32) */
+   virtual QIcon getLargeIcon() const { return QIcon(":/curves/qfrdrcurve.png"); }
+</code></pre>
+</blockquote>
+
+<h2>
+<a id="user-content-editor-factory-methods" class="anchor" href="#editor-factory-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Editor Factory Methods</h2>
+
+<p>Second we have to provide factory methods to create editor widgets for this data:</p>
+
+<blockquote>
+<pre><code>   /** \brief returns the number of additional editor panes for this record */
+   virtual int getEditorCount() { return 1; }
+   /** \brief returns the name for the i-th editor pane */
+   virtual QString getEditorName(int i) {
+       if (i==0) return tr("XY-Curves editor");
+       return QString("");
+   }
+   /** \brief create an object for the i-th editor pane */
+   virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL) {
+       if (i==0) return new QFRDRCurveDataEditor(services, propEditor, parent);
+       return NULL;
+   }
+</code></pre>
+</blockquote>
+
+<p>The RDR editor widget is implemented in <code>QFRDRCurveDataEditor</code>, which is explained in the next chapter.</p>
+
+<p>As you can see it is in principle possible to provide more than one editor widget. If several widgets are available, they are displayed in multiple tabs inside the RDR editor (see e.g. the fcs-plugin, where the first editor display the ACFs and the second the countrate-traces, while a third editor provides an FCCS overlay plot).</p>
+
+<h2>
+<a id="user-content-internal-data-representation" class="anchor" href="#internal-data-representation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Internal Data representation</h2>
+
+<p>Internally, <code>QFRDRCurveData</code> uses a list of simple structs to represent the curves and it uses the class QFTableModel from <code>lib/qftablemodel.h/cpp</code> to read data from CSV files. the latter represents a table of values (numbers, string, ...) and offers a lot of features. The struct is defined as follows:</p>
+
+<blockquote>
+<pre><code>    struct CurveData {
+       CurveData();
+       QPointer&lt;QFTableModel&gt; table;
+       bool logX;
+       bool logY;
+       QString name;
+       QString xlabel;
+       QString ylabel;
+       QFRDRCurvesInterface::CurveType type;
+       int xcolumn;
+       int xerrorcolumn;
+       int ycolumn;
+       int yerrorcolumn;
+   };
+</code></pre>
+</blockquote>
+
+<p>The interface <code>QFRDRCurvesInterface</code> offers these methods to access the data (note the correspondence between struct members and functions!):</p>
+
+<blockquote>
+<pre><code>   virtual int curvesGetCount() const;
+   virtual QString curvesGetName(int index) const;
+   virtual QVector&lt;double&gt; curvesGetX(int index) const;
+   virtual QVector&lt;double&gt; curvesGetXError(int index) const;
+   virtual QVector&lt;double&gt; curvesGetY(int index) const;
+   virtual QVector&lt;double&gt; curvesGetYError(int index) const;
+   virtual bool curvesGetLogX(int index) const;
+   virtual bool curvesGetLogY(int index) const;
+   virtual CurveType curvesGetType(int index) const;
+   virtual QString curvesGetXLabel(int index) const;
+   virtual QString curvesGetYLabel(int index) const;
+</code></pre>
+</blockquote>
+
+<p>Here are two example implementations of these access functions:</p>
+
+<blockquote>
+<pre><code>   QString QFRDRCurveData::curvesGetName(int index) const
+   {
+       if (index&gt;=0 &amp;&amp; index&lt;curves.size()) {
+           return curves[index].name;
+       }
+       return QString();
+   }
+
+   QVector&lt;double&gt; QFRDRCurveData::curvesGetX(int index) const
+   {
+       if (index&gt;=0 &amp;&amp; index&lt;curves.size()) {
+           int c=curves[index].xcolumn;
+           const QFTableModel* m=curves[index].table;
+           if (m &amp;&amp; c&gt;=0 &amp;&amp; c&lt;m-&gt;columnCount()) {
+               return m-&gt;getColumnDataAsNumbers(c);
+           }
+       }
+       return QVector&lt;double&gt;();
+   }
+</code></pre>
+</blockquote>
+
+<h2>
+<a id="user-content-data-readingwriting-fromto-projectfiles" class="anchor" href="#data-readingwriting-fromto-projectfiles" aria-hidden="true"><span class="octicon octicon-link"></span></a>Data Reading/Writing From/To Project&amp;Files</h2>
+
+<p>Finally we only have to provide two functions to read the curves from the files (when initializing the object) and to write back the curve properties to the project (when the user clicks save). This functionality is implemented in two methods:</p>
+
+<blockquote>
+<pre><code>  /** \brief write the contents of the object to a XML file */
+  virtual void intWriteData(QXmlStreamWriter&amp; w);
+  /** \brief read in external data files &lt;b&gt;and&lt;/b&gt; data stored in the project file &lt;b&gt;IMPLEMENT IN CHILD CLASSES!&lt;/b&gt;
+   *
+   * If \a e is \c NULL then this method should only read the datafiles already saved in the files property.
+   */
+  virtual void intReadData(QDomElement* e=NULL);
+</code></pre>
+</blockquote>
+
+<p>The function <code>intReadData(e)</code> reads the data from a <code>QDomElement e</code> in the project XML-DOM. In addition it uses the QFProperties to store additional meta-data (remember how these were set when add a new RDR, as described above!). NOte that most of these properties are stored with an invisible-flag, so they are neither editable by, nor visible to the user, when he runs QuickFit. Visible properties are displayed towards the bottom of the first tab in an RDR editor window!</p>
+
+<blockquote>
+<pre><code>void QFRDRCurveData::intReadData(QDomElement* e) {
+   // free any old memory
+   clearCurves();
+   // read the datatype
+   QString datatype=getQFProperty("FILETYPE", "CSV_INTERNAL").toString().toUpper().trimmed();
+   // read curves parameters
+   char colsep=qfGetFirstChar(getQFProperty("csv_column_separator", ",").toString(), ',').toLatin1();
+   char decsep=qfGetFirstChar(getQFProperty("decimal_separator", ".").toString(), '.').toLatin1();
+   char commentstart=qfGetFirstChar(getQFProperty("comment_start", "#").toString(), '#').toLatin1();
+   QString headstart=getQFProperty("header_start", ",").toString();
+   QList&lt;int&gt; colXL=stringToIntList(getQFProperty("column_x", "0").toString(), 0);
+   QList&lt;int&gt; colYL=stringToIntList(getQFProperty("column_y", "1").toString(), 1);
+   QList&lt;int&gt; colXErrL=stringToIntList(getQFProperty("column_xerr", "-1").toString(), -1);
+   QList&lt;int&gt; colYErrL=stringToIntList(getQFProperty("column_yerr", "-1").toString(), -1);
+   QList&lt;bool&gt; logXL=stringToBoolList(getQFProperty("logx", "false").toString(), false);
+   QList&lt;bool&gt; logYL=stringToBoolList(getQFProperty("logy", "false").toString(), false);
+   QStringList curveTypeL=getQFProperty("curvetype", QStringList("points")).toStringList();
+   QStringList nameL=getQFProperty("curvename").toStringList();
+   QStringList xlabelL=getQFProperty("xlabel", QStringList()).toStringList();
+   QStringList ylabelL=getQFProperty("ylabel", QStringList()).toStringList();
+</code></pre>
+</blockquote>
+
+<p>Each QFProperty is a QVariant, so it may be converted directly to e.g. a string or QStringList. For some properties, QLIst or QList are required, so we use special conversion methods from the libquickfit to do the conversion from a QString to the desired final type (e.g. <code>stringToIntList()</code>  splits a string like <code>1,2,3,4</code> into a QList with the entries 1, 2, 3, 4).</p>
+
+<p>Then the function has to read the actual data for the curves from different sources (depending on the property "FILETYPE", stored in the variable <code>datatype</code>. In the simplest case, the data comes from external (an) CSV-file(s). Then <code>datatype=="CSV"</code> and the function executes this code:</p>
+
+<blockquote>
+<pre><code>if (datatype=="CSV") {
+   QStringList files=getFiles();
+   if (files.size()==1 &amp;&amp; (colXL.size()&gt;1 || colYL.size()&gt;1)) {
+       QFTableModel* table=new QFTableModel();
+       table-&gt;setReadonly(false);
+       if (table-&gt;readCSV(files[0], colsep, decsep, headstart, commentstart)) {
+           table-&gt;setReadonly(true);
+           for (int i=0; i&lt;colXL.size(); i++) {
+               CurveData cd;
+               cd.table=table;
+               cd.xcolumn=colXL.value(i,-1);
+               cd.ycolumn=colYL.value(i,-1);
+               cd.xerrorcolumn=colXErrL.value(i,-1);
+               cd.yerrorcolumn=colYErrL.value(i,-1);
+               cd.logX=logXL.value(i, false);
+               cd.logY=logYL.value(i, false);
+               cd.xlabel=xlabelL.value(i, xlabelL.value(0, cd.table-&gt;getColumnTitle(cd.xcolumn)));
+               cd.ylabel=xlabelL.value(i, ylabelL.value(0, cd.table-&gt;getColumnTitle(cd.ycolumn)));
+               cd.name=nameL.value(i, tr("%1 - columns %2/%4 vs. %3/%5").arg(QFileInfo(files[0]).fileName()).arg(cd.xcolumn).arg(cd.ycolumn).arg(cd.xerrorcolumn).arg(cd.yerrorcolumn));
+               cd.type=QFRDRCurvesInterfaceStringToCurveType(curveTypeL.value(i, curveTypeL.value(0,"points")));
+               curves.append(cd);
+           }
+       } else {
+           delete table;
+           setError(tr("Error while reading data from CSV file '%1':\n   ERROR PARSING FILE!").arg(files[0]));
+           return ;
+       }
+   } else if (files.size()&gt;=1){
+       for (int i=0; i&lt;files.size(); i++) {
+           CurveData cd;
+           cd.table=new QFTableModel();
+           cd.table-&gt;setReadonly(false);
+           if (cd.table-&gt;readCSV(files[i], colsep, decsep, headstart, commentstart)) {
+               cd.table-&gt;setReadonly(true);
+               cd.xcolumn=colXL.value(i,colXL.value(0,-1));
+               cd.ycolumn=colYL.value(i,colYL.value(0,-1));
+               cd.xerrorcolumn=colXErrL.value(i,colXErrL.value(0,-1));
+               cd.yerrorcolumn=colYErrL.value(i,colYErrL.value(0,-1));
+               cd.logX=logXL.value(i, logXL.value(0, false));
+               cd.logY=logYL.value(i, logYL.value(0, false));
+               cd.name=nameL.value(i, nameL.value(0, tr("%1 - columns %2/%4 vs. %3/%5").arg(QFileInfo(files[i]).fileName()).arg(cd.xcolumn).arg(cd.ycolumn).arg(cd.xerrorcolumn).arg(cd.yerrorcolumn)));
+               cd.xlabel=xlabelL.value(i, xlabelL.value(0, cd.table-&gt;getColumnTitle(cd.xcolumn)));
+               cd.ylabel=xlabelL.value(i, ylabelL.value(0, cd.table-&gt;getColumnTitle(cd.ycolumn)));
+               cd.type=QFRDRCurvesInterfaceStringToCurveType(curveTypeL.value(i, curveTypeL.value(0, "points")));
+               curves.append(cd);
+           } else {
+               delete cd.table;
+               clearCurves();
+               setError(tr("Error while reading data from CSV file '%1':\n   ERROR PARSING FILE!").arg(files[i]));
+               return ;
+           }
+       }
+   } else {
+       setError(tr("Error while reading data for RDR '%1':\n   NO FILES ARE ASSOCIATEDC TO THIS RDR!").arg(getName()));
+       return ;
+   }
+</code></pre>
+</blockquote>
+
+<p>Now we have to distinguish two cases:
+1. There is one file, but <code>column_x</code> or <code>column_y</code> (and possibly the other properties) contains a list of integer numbers. This means that for each pair of entries in these lists represents one curve, which is based on the same file. E.g. if the lists are <code>X: 0,3,5</code> and <code>Y: 1,4,6</code>, then we have three curves, one of columns 0vs.1, one of column 3vs.4 and one of 5vs.6. This is covered by the branch <code>if (files.size()==1 &amp;&amp; (colXL.size()&gt;1 || colYL.size()&gt;1)) { ... }</code>. 
+2. The other case are multiple files with either single-numbers for <code>column_x</code> and <code>column_y</code>, or lists for each. In the first case, the same columns are read from different files and each file corresponds to its own curve. In the second case, columns are specified specifically for each file.</p>
+
+<p>Note: In both cases, if a value is missing in any of the properties lists, the first entry in these lists is used as a default. If this is missing also (or the list is totally empty), a pre-defined default value is used!</p>
+
+<p>ALso Note: Errors are reported by calling <code>setError()</code> which sets the error-state of the QFRawDataRecord and stores an error message, which is automatically written to the project LOG and displayed to the user!</p>
+
+<p>The second source of data is <code>datatype=="CSV_INTERNAL"</code>. This case is equivalent to one file with multiple curves, but the data is not read from a file, but from the project-XML, or (if empty) from the QFProperty "CSV":</p>
+
+<blockquote>
+<pre><code>   QString csv;
+   if (e) {
+       QDomElement te=e-&gt;firstChildElement("internal_csv");
+       csv=te.text();
+   }
+   if (csv.isEmpty()) {
+       csv=getQFProperty("CSV", "").toString();
+   }
+</code></pre>
+</blockquote>
+
+<p>Such a string, containing data can be read using <code>QFTableModel::fromCSV()</code>. The full source-code of this Branch is:</p>
+
+<blockquote>
+<pre><code>} else if (datatype=="CSV_INTERNAL") {
+    QString csv;
+    if (e) {
+        QDomElement te=e-&gt;firstChildElement("internal_csv");
+        csv=te.text();
+    }
+    if (csv.isEmpty()) {
+        csv=getQFProperty("CSV", "").toString();
+    }
+    if (csv.size()&gt;0) {
+        QFTableModel* table=new QFTableModel();
+        table-&gt;setReadonly(false);
+        if (table-&gt;fromCSV(csv, colsep, decsep, headstart, commentstart,0,0,true)) {
+            table-&gt;setReadonly(true);
+            for (int i=0; i&lt;colXL.size(); i++) {
+                CurveData cd;
+                cd.table=table;
+                cd.xcolumn=colXL.value(i,-1);
+                cd.ycolumn=colYL.value(i,-1);
+                cd.xerrorcolumn=colXErrL.value(i,-1);
+                cd.yerrorcolumn=colYErrL.value(i,-1);
+                cd.logX=logXL.value(i, false);
+                cd.logY=logYL.value(i, false);
+                cd.xlabel=xlabelL.value(i, xlabelL.value(0, cd.table-&gt;getColumnTitle(cd.xcolumn)));
+                cd.ylabel=xlabelL.value(i, ylabelL.value(0, cd.table-&gt;getColumnTitle(cd.ycolumn)));
+                cd.name=nameL.value(i, tr("columns %1/%3 vs. %2/%4").arg(cd.xcolumn).arg(cd.ycolumn).arg(cd.xerrorcolumn).arg(cd.yerrorcolumn));
+                cd.type=QFRDRCurvesInterfaceStringToCurveType(curveTypeL.value(i, curveTypeL.value(0,"points")));
+                curves.append(cd);
+            }
+        } else {
+            delete table;
+            setError(tr("Error while reading internal CSV data for RDR '%1':\n   ERROR PARSING DATA!").arg(getName()));
+            return ;
+        }
+    } else {
+        setError(tr("Error while reading internal CSV data for RDR '%1':\n   NO DATA PROVIDED IN PROJECT!").arg(getName()));
+        return;
+    }
+} else {
+    setError(tr("Error while reading data for RDR '%1':\n   UNKNOWN DATATYPE '%2'!").arg(getName()).arg(datatype));
+    return;
+}
+</code></pre>
+</blockquote>
+
+<p>When storing a curve-RDR we only have to save the meta-data, as the actual curve-data cannot be editor. Therefore the method `` is significantly simpler. However it uses some custom macros to save some repeated writing. They basically collect a given property from all curves and store them as a QStringList or a list of ints/strings:</p>
+
+<blockquote>
+<pre><code>   #define COLLECTSTRINGCURVEPROPS(prop,pname) { \
+       QStringList lst; \
+       for (int i=0; i&lt;curves.size(); i++) {\
+           lst&lt;&lt;curves[i].prop;\
+       } \
+       setQFProperty(pname,lst,false,false);\
+   }
+   #define COLLECTINTCURVEPROPS(prop,pname) { \
+       QStringList lst; \
+       for (int i=0; i&lt;curves.size(); i++) {\
+           lst&lt;&lt;QString::number(curves[i].prop);\
+       } \
+       setQFProperty(pname,lst.join(","),false,false);\
+   }
+   #define COLLECTBOOLCURVEPROPS(prop,pname) { \
+       QStringList lst; \
+       for (int i=0; i&lt;curves.size(); i++) {\
+           lst&lt;&lt;(curves[i].prop?"true":"false");\
+       } \
+       setQFProperty(pname,lst.join(","),false,false);\
+   }
+   #define COLLECTCURVETYPECURVEPROPS(prop,pname) { \
+       QStringList lst; \
+       for (int i=0; i&lt;curves.size(); i++) {\
+           lst&lt;&lt;QFRDRCurvesInterfaceCurveTypeToString(curves[i].prop);\
+       } \
+       setQFProperty(pname,lst,false,false);\
+   }
+</code></pre>
+</blockquote>
+
+<p>Here is the actual writer function:</p>
+
+<blockquote>
+<pre><code>   void QFRDRCurveData::intWriteData(QXmlStreamWriter&amp; /*w*/) {
+       COLLECTSTRINGCURVEPROPS(name, "curvename");
+       COLLECTSTRINGCURVEPROPS(xlabel, "xlabel");
+       COLLECTSTRINGCURVEPROPS(ylabel, "ylabel");
+       COLLECTCURVETYPECURVEPROPS(type, "curvetype");
+       COLLECTINTCURVEPROPS(xcolumn, "column_x");
+       COLLECTINTCURVEPROPS(ycolumn, "column_y");
+       COLLECTINTCURVEPROPS(xerrorcolumn, "column_xerr");
+       COLLECTINTCURVEPROPS(yerrorcolumn, "column_yerr");
+   }
+</code></pre>
+</blockquote>
+
+<h1>
+<a id="user-content-rdr-editor-widget" class="anchor" href="#rdr-editor-widget" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDR Editor Widget</h1>
+
+<p>Finally we are left with defining an editor widget for our new RDR, which is displayed in the RDR editor window (on the second tab). This widget is defined in the class <code>QFRDRCurveDataEditor</code> in the files <code>qfrdrcurve_dataeditor.h/cpp/ui</code>. This class is derived from <code>QFRawDataEditor</code>, which is a QWidget-decsendent that adds usefull methods to define an editor. We use the Qt-UI-editor to create a simple GUI, which is set up around a central <code>QFPlotter</code> widget, which will display the curves. ABove the widget, a QComboBox <code>cmbCurve</code> allows the user to select one of the available curves. Below the plot, several widgets allow to edit the plot meta-data.</p>
+
+<p>The class <code>QFRDRCurveDataEditor</code> implements two functions that react to major events for the widget:</p>
+
+<p>First the function <code>connectWidgets()</code> is called whenever the widget should display the contents of a different (or no) QFRawDataRecord:</p>
+
+<blockquote>
+<pre><code>   void QFRDRCurveDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
+       // this functions connects to a new QFRawDataRecord which could also be NULL, so
+       // you will have to connect and disconnect the signals! This is called whenever
+       // a user navigates to the next record.
+       // here is a basic skeleton:
+       disConnectWidgets(false);
+
+       QFRDRCurveData* m=qobject_cast&lt;QFRDRCurveData*&gt;(current); // check whether we have the right QFRawDataRecord class
+
+       if (m) {
+           // if so (and if current!=NULL anyways), fill the widget with the data
+           rawDataChanged();
+       } else {
+           ui-&gt;plotter-&gt;clearGraphs();
+       }
+   }
+</code></pre>
+</blockquote>
+
+<p>It uses <code>disConnectWidgets(false)</code> to disconnect any signal/slots that connect widgets and functions in this class (that e.g. react to user input). The it calls <code>rawDataChanged()</code> which updates the data in the widget. This function is calso connected to the SIGNAL 'rawDataChanged()' of the current <code>QFRawDataRecord</code>, which is emitted whenever the core data changes (and also by the <code>curveSet..()</code> functions that are used to edit the curve metadata!). This function has the following code:</p>
+
+<blockquote>
+<pre><code>   void QFRDRCurveDataEditor::rawDataChanged() {
+       // emitted when the raw data changes 
+
+       // check for correct RDR object in current
+       QFRDRCurveData* m=qobject_cast&lt;QFRDRCurveData*&gt;(current);
+       if (!m) return;
+
+       // disconnect widgets, so we can edit their contents
+       disConnectWidgets(false);
+
+       // add new curves to cmbCurve
+       ui-&gt;cmbCurve-&gt;clear();
+       for (int i=0; i&lt;m-&gt;curvesGetCount(); i++) {
+           ui-&gt;cmbCurve-&gt;addItem(tr("%1: %2").arg(i+1).arg(m-&gt;curvesGetName(i)));
+       }
+       ui-&gt;cmbCurve-&gt;setCurrentIndex(m-&gt;getQFProperty("QFRDRCurveDataEditor/currentCurve", 0).toInt()); // read last curve
+
+       // reconnect widgets
+       disConnectWidgets(true);
+
+       // update plot/widgets
+       currentCurveChanged(ui-&gt;cmbCurve-&gt;currentIndex());
+   }
+</code></pre>
+</blockquote>
+
+<p>It disconnects all widgets, clears the QComboBox that display the list of available curves and fills it with the currently available curves again. Finally it calls <code>currentCurveChanged(ui-&gt;cmbCurve-&gt;currentIndex())</code>, which updates the actual metadata-widgets and the plot:</p>
+
+<blockquote>
+<pre><code>   void QFRDRCurveDataEditor::currentCurveChanged(int curve)
+   {
+       // check for correct RDR object in current
+       QFRDRCurveData* m=qobject_cast&lt;QFRDRCurveData*&gt;(current);
+       if (!m) return;
+
+       disConnectWidgets(false);
+
+       // store current curve (to a non-user-editable/visible QFProperty
+       if (curve&gt;=0) m-&gt;setQFProperty("QFRDRCurveDataEditor/currentCurve", curve, false, false);
+
+       // set metadata widgets
+       ui-&gt;edtName-&gt;setText(m-&gt;curvesGetName(curve));
+       ui-&gt;edtLabelX-&gt;setText(m-&gt;curvesGetXLabel(curve));
+       ui-&gt;edtLabelY-&gt;setText(m-&gt;curvesGetYLabel(curve));
+       ui-&gt;chkLogX-&gt;setChecked(m-&gt;curvesGetLogX(curve));
+       ui-&gt;chkLogY-&gt;setChecked(m-&gt;curvesGetLogY(curve));
+       ui-&gt;cmbType-&gt;setCurrentIndex((int)m-&gt;curvesGetType(curve));
+
+       // disable plot-updates while we edit the plot data
+       ui-&gt;plotter-&gt;set_doDrawing(false);
+       JKQTPdatastore* ds=ui-&gt;plotter-&gt;getDatastore();
+
+       // clear plots and datastore
+       ui-&gt;plotter-&gt;clearGraphs(true);
+       ds-&gt;clear();
+
+       // set plot properties
+       ui-&gt;plotter-&gt;getXAxis()-&gt;set_axisLabel(m-&gt;curvesGetXLabel(curve));
+       ui-&gt;plotter-&gt;getXAxis()-&gt;set_logAxis(m-&gt;curvesGetLogX(curve));
+       ui-&gt;plotter-&gt;getYAxis()-&gt;set_axisLabel(m-&gt;curvesGetYLabel(curve));
+       ui-&gt;plotter-&gt;getYAxis()-&gt;set_logAxis(m-&gt;curvesGetLogY(curve));
+
+       // add new plot:
+       switch(m-&gt;curvesGetType(curve)) {
+           case QFRDRCurvesInterface::ctPoints: {
+                   JKQTPxyLineErrorGraph* plt=new JKQTPxyLineErrorGraph(ui-&gt;plotter);
+                   plt-&gt;set_drawLine(false);
+                   plt-&gt;set_symbol(JKQTPfilledCircle);
+                   plt-&gt;set_title(m-&gt;curvesGetName(curve));
+                   if (m-&gt;curvesGetX(curve).size()&gt;0) plt-&gt;set_xColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetX(curve), "x-data"));
+                   if (m-&gt;curvesGetY(curve).size()&gt;0) plt-&gt;set_yColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetY(curve), "y-data"));
+                   if (m-&gt;curvesGetXError(curve).size()&gt;0) plt-&gt;set_xErrorColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetX(curve), "x-error"));
+                   if (m-&gt;curvesGetYError(curve).size()&gt;0) plt-&gt;set_yErrorColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetX(curve), "y-error"));
+                   ui-&gt;plotter-&gt;addGraph(plt);
+               } break;
+           case QFRDRCurvesInterface::ctLines: {
+                   JKQTPxyLineErrorGraph* plt=new JKQTPxyLineErrorGraph(ui-&gt;plotter);
+                   plt-&gt;set_drawLine(true);
+                   plt-&gt;set_symbol(JKQTPnoSymbol);
+                   plt-&gt;set_title(m-&gt;curvesGetName(curve));
+                   if (m-&gt;curvesGetX(curve).size()&gt;0) plt-&gt;set_xColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetX(curve), "x-data"));
+                   if (m-&gt;curvesGetY(curve).size()&gt;0) plt-&gt;set_yColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetY(curve), "y-data"));
+                   if (m-&gt;curvesGetXError(curve).size()&gt;0) plt-&gt;set_xErrorColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetX(curve), "x-error"));
+                   if (m-&gt;curvesGetYError(curve).size()&gt;0) plt-&gt;set_yErrorColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetX(curve), "y-error"));
+                   ui-&gt;plotter-&gt;addGraph(plt);
+               } break;
+           case QFRDRCurvesInterface::ctBars: {
+                   JKQTPbarHorizontalGraph* plt=new JKQTPbarHorizontalGraph(ui-&gt;plotter);
+                   plt-&gt;set_title(m-&gt;curvesGetName(curve));
+                   if (m-&gt;curvesGetX(curve).size()&gt;0) plt-&gt;set_xColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetX(curve), "x-data"));
+                   if (m-&gt;curvesGetY(curve).size()&gt;0) plt-&gt;set_yColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetY(curve), "y-data"));
+                   if (m-&gt;curvesGetXError(curve).size()&gt;0) plt-&gt;set_xErrorColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetX(curve), "x-error"));
+                   if (m-&gt;curvesGetYError(curve).size()&gt;0) plt-&gt;set_yErrorColumn(ds-&gt;addCopiedColumn(m-&gt;curvesGetX(curve), "y-error"));
+                   ui-&gt;plotter-&gt;addGraph(plt);
+               } break;
+        }
+
+       // zoom full range and re-activate plotting and update plot
+       ui-&gt;plotter-&gt;zoomToFit();
+       ui-&gt;plotter-&gt;set_doDrawing(true);
+       ui-&gt;plotter-&gt;update_plot();
+
+       disConnectWidgets(true);
+   }
+</code></pre>
+</blockquote>
+
+<p>The last functionw e need in the editor class is a slot that is called when the user edits a text. It is:</p>
+
+<blockquote>
+<pre><code>   void QFRDRCurveDataEditor::curveMetadataEdited()
+   {
+       // check for correct RDR object in current
+       QFRDRCurveData* m=qobject_cast&lt;QFRDRCurveData*&gt;(current);
+       if (!m) return;
+       // disconnect widgets
+       disConnectWidgets(false);
+       // write curve data
+       int curve=ui-&gt;cmbCurve-&gt;currentIndex();
+       if (curve&gt;=0) {
+           m-&gt;curvesSetName(curve, ui-&gt;edtName-&gt;text());
+           if (curve&gt;=0 &amp;&amp; curve&lt;ui-&gt;cmbCurve-&gt;count()) ui-&gt;cmbCurve-&gt;setItemText(curve, ui-&gt;edtName-&gt;text());
+           m-&gt;curvesSetXLabel(curve, ui-&gt;edtLabelX-&gt;text());
+           m-&gt;curvesSetYLabel(curve, ui-&gt;edtLabelY-&gt;text());
+           m-&gt;curvesSetLogX(curve, ui-&gt;chkLogX-&gt;isChecked());
+           m-&gt;curvesSetLogY(curve, ui-&gt;chkLogY-&gt;isChecked());
+           m-&gt;curvesSetTypeI(curve, ui-&gt;cmbType-&gt;currentIndex());
+       }
+       // eat all intermediate events
+       QApplication::processEvents();
+       // reconnect widgets
+       disConnectWidgets(true);
+       // replot, as the plot may have changed:
+       if (curve&gt;=0) currentCurveChanged(curve);
+   }
+</code></pre>
+</blockquote>
+
+<h1>
+<a id="user-content-example-data--online-help" class="anchor" href="#example-data--online-help" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example Data &amp; Online-Help</h1>
+
+<p>The <code>plugins/qfrdrcurve</code> directory contains a subdir <code>plugins/qfrdrcurve/examples</code>. This directory contains several test-dataset and example projects for this plugin. Its contents will be automatically installed by the QuickFit 3 installer 8on WIndows/MacOS X), if you bind the plugin into the QuickFit 3 main project!!!</p>
+
+
+<h1>
+<a id="user-content-add-parser-functions-that-allow-to-access-the-curve-data" class="anchor" href="#add-parser-functions-that-allow-to-access-the-curve-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Add parser functions that allow to access the curve-data</h1>
+
+<p>In many cases it is convenient to be able to access the data from an RDR with functions in the internal expression parser <code>QFMathParser</code>, e.g. to read curve-data into a table. To register such functions, you simply have to define the function as a C-function <code>fParserFunction()</code> and then call</p>
+
+<blockquote>
+<pre><code>   QFMathParser::addGlobalFunction("parser_function_name", fParserFunction);
+</code></pre>
+</blockquote>
+
+<p>when the plugin is initialized, i.e. add a function</p>
+
+<blockquote>
+<pre><code>   virtual void init();
+</code></pre>
+</blockquote>
+
+<p>To the class <code>QFRDRCurvePlugin</code> and register all functions there. It is good practice to simply collect all these function in an additional CPP/H-file, e.g. <code>qfrdrcurveparserfunctions.h/cpp</code>. One typical parser function looks like this:</p>
+
+<blockquote>
+<pre><code>   // res is the function result, params is a vector of the function parameters and n is its count. 
+   // The final parameter p is a pointer to the QFMathParser object that can e.g. be used for error reporting.
+   void fCurve_getCount(qfmpResult &amp;res, const qfmpResult *params, unsigned int n, QFMathParser *p)
+   {
+       // default return value is invalid
+       res.setInvalid();
+       // get a pointer to the current QFProject
+       QFProject* p=QFPluginServices::getInstance()-&gt;getCurrentProject();
+       if (p)  {
+           // the first parameter has to be a number (qfmpDouble) and specifies the RDR ID
+           int evalID=-1;
+           if (n==1 &amp;&amp; params[0].isUInt()) {
+               evalID=params[0].toInteger();
+               // get the specified RDR from the project and check whether it is a curve RDR (i.e. implements the interface QFRDRCurvesInterface)
+               QFRDRCurvesInterface* rdr=dynamic_cast&lt;QFRDRCurvesInterface*&gt;(p-&gt;getRawDataByID(evalID));
+               if (rdr ) {
+                   // if all is OK, return the nuber of curves in the RDR
+                   res.setDouble(rdr-&gt;curvesGetCount());
+               } else {
+                   // report an error
+                   parser-&gt;qfmpError(QObject::tr("curve_getcount(rdrid): the specified RDR is no curve record"));
+                   res.setInvalid();
+                   return;
+               }
+           } else {
+               parser-&gt;qfmpError(QObject::tr("curve_getcount(rdrid) needs one unsigned integer arguments (%1 given)").arg(n));
+               res.setInvalid();
+               return;
+           }
+       }
+   }
+</code></pre>
+</blockquote>
+
+<p>This function returns the number of curves in a curve RDR. A second function will return the x-data of a specified curve in a given RDR:</p>
+
+<blockquote>
+<pre><code>   void fCurve_getDataX(qfmpResult &amp;res, const qfmpResult *params, unsigned int n, QFMathParser *p)
+   {
+       res.setInvalid();
+       QFProject* p=QFPluginServices::getInstance()-&gt;getCurrentProject();
+       if (p)  {
+           int RDRID=-1;
+           if (n&gt;=1 &amp;&amp; n&lt;=2 &amp;&amp; params[0].type==qfmpDouble) {
+               RDRID=params[0].toInteger();
+               QFRDRCurvesInterface* rdr=dynamic_cast&lt;QFRDRCurvesInterface*&gt;(p-&gt;getRawDataByID(RDRID));
+               int curve=0;
+               if (n&gt;=2 &amp;&amp; params[1].type==qfmpDouble ) {
+                   curve=params[1].toInteger();
+               } else  if (n&lt;=0 || n&gt;2){
+                   parser-&gt;qfmpError(QObject::tr("curve_getx(rdrid, curve=0) requires 1-2  integer arguments (%1 given)").arg(n));
+                   res.setInvalid();
+                   return;
+               }
+               if (rdr &amp;&amp; curve&gt;=0 &amp;&amp; curve&lt;rdr-&gt;curvesGetCount()) {
+                   res.setDoubleVec(rdr-&gt;curvesGetX(curve));
+               } else {
+                   if (!rdr) {
+                       parser-&gt;qfmpError(QObject::tr("curve_getx(rdrid, curve=0): the specified RDR is no curve record"));
+                       res.setInvalid();
+                       return;
+                   } else if (!(curve&gt;=0 &amp;&amp; curve&lt;rdr-&gt;curvesGetCount())) {
+                       parser-&gt;qfmpError(QObject::tr("curve_getx(rdrid, curve=0): the specified curve (%1) is not available in the RDR (only %2 curves are available)").arg(channel).arg(rdr-&gt;curvesGetCount()));
+                       res.setInvalid();
+                       return;
+                   }
+               }
+           } else {
+               parser-&gt;qfmpError(QObject::tr("curve_getx(rdrid, curve=0) needs 1-2 integer arguments (%1 given)").arg(n));
+               res.setInvalid();
+               return;
+           }
+       }
+   }
+</code></pre>
+</blockquote>
+
+<p>This function basically works like the last one, but has an additrional optional parameter to specify a curve inside the RDR (default is 0):
+1. get a pointer to the current QFProject
+2. read the RDR ID from the function parameters
+3. get a pointer to the specified RDR and cast it to the QFRDRCurvesInterface interface, used to access the data
+4. now read the curve and check whether it is available in the RDR.
+5. if the curve and RDR are OK, return the X-data as vector, otherwise return an invalid result and emit an error message.</p>
+
+<p>The online-help for the parser function follows a special format. It is stored in the file <code>plugins/qfrdrcurve/help/parserreference/curves.html</code>. This file has to be referenced in a file <code>plugins/qfrdrcurve/help/parserref.inc</code> with the following contents that adds a link to the main parser function reference:</p>
+
+<blockquote>
+<pre><code>   &lt;li&gt;&lt;b&gt;&lt;a href="&dollar;&dollar;plugin_info:helpdir:curves&dollar;&dollar;/parserreference/curve.html"&gt;Curve RDR data access&lt;/a&gt;&lt;/b&gt;&lt;/li&gt;
+</code></pre>
+</blockquote>
+
+<p>In addition, you have to add these lines to the function QFRDRCurvePlugin::init(), which finally registers the parser online-help directory:</p>
+
+<blockquote>
+<pre><code>       QFPluginServices::getInstance()-&gt;appendOrAddHTMLReplacement("qfmathparser_ref", QString("&dollar;&dollar;insert:%1/parserref.inc&dollar;&dollar;").arg(QFPluginServices::getInstance()-&gt;getPluginHelpDirectory(getID())));
+       QStringList sl=QFPluginServices::getInstance()-&gt;getGlobalConfigValue("QFMathParser_ref").toStringList();
+       sl.append(QFPluginServices::getInstance()-&gt;getPluginHelpDirectory(getID())+QString("/parserreference/"));
+       QFPluginServices::getInstance()-&gt;setGlobalConfigValue("QFMathParser_ref", sl);           
+       QFPluginServices::getInstance()-&gt;addQFMathParserRefernceDir(QFPluginServices::getInstance()-&gt;getPluginHelpDirectory(getID())+QString("/parserreference/"));
+</code></pre>
+</blockquote>
+
+<p>The first line adds the <code>parserref.inc</code> file to the help replace <code>&dollar;&dollar;qfmathparser_ref&dollar;&dollar;</code>, which is used to display a list of all parser-reference help pages. The remaining four add the directory with the parser refernce HTML file to the central list of such directories.</p>
+
+
+    </div>
+    </body>
+</html>

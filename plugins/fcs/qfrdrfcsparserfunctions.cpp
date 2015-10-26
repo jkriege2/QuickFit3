@@ -21,32 +21,26 @@
 */
 
 #include "qfrdrfcsparserfunctions.h"
-#include "statistics_tools.h"
-#include "qfrdrsimplecountrateinterface.h"
-#include "qfrdrfcsdatainterface.h"
-#include "qfrdrcountratesinterface.h"
-#include <stdint.h>
-#include "qfproject.h"
-#include "qfrawdatarecord.h"
 
 
-void fRDR_isfcs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
-{
-    res.setInvalid();
-    QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-    if (p)  {
-        int evalID=-1;
-        if (n==1 && params[0].type==qfmpDouble) {
-            evalID=params[0].toInteger();
-            QFRDRFCSDataInterface* rdr=dynamic_cast<QFRDRFCSDataInterface*>(p->getRawDataByID(evalID));
-            res.setBoolean(rdr);
-        } else {
-            parser->qfmpError(QObject::tr("rdr_isfcs(rdrid) needs one integer arguments (%1 given)").arg(n));
-            res.setInvalid();
-            return;
-        }
-    }
-}
+
+//void fRDR_isfcs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+//{
+//    res.setInvalid();
+//    QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+//    if (p)  {
+//        int evalID=-1;
+//        if (n==1 && params[0].type==qfmpDouble) {
+//            evalID=params[0].toInteger();
+//            QFRDRFCSDataInterface* rdr=dynamic_cast<QFRDRFCSDataInterface*>(p->getRawDataByID(evalID));
+//            res.setBoolean(rdr);
+//        } else {
+//            parser->qfmpError(QObject::tr("rdr_isfcs(rdrid) needs one integer arguments (%1 given)").arg(n));
+//            res.setInvalid();
+//            return;
+//        }
+//    }
+//}
 
 void fFCS_correlation(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
 {

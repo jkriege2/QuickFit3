@@ -24,7 +24,7 @@
 #ifndef QFFitFunctionGeneralExp_H
 #define QFFitFunctionGeneralExp_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -32,7 +32,7 @@
     \ingroup qf3fitfunp_fitfunction_general
 
 */
-class QFFitFunctionGeneralExp: public QFFitFunction {
+class QFFitFunctionGeneralExp: public QFDecayFitFunctionBase {
     public:
         QFFitFunctionGeneralExp();
         virtual ~QFFitFunctionGeneralExp() {}
@@ -61,8 +61,6 @@ class QFFitFunctionGeneralExp: public QFFitFunction {
         virtual bool get_implementsDerivatives() const;
 
 
-        /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
-        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL) const;
 
 };
 

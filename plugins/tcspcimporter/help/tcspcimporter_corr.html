@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>$$local_plugin_name$$</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        <h2>Introduction</h2>
+        This tool allows to read data from single-photon counting (or time-correlated single-photon counting, TCSPC) experiments. The data may be processed in several ways:
+        <ul>
+          <li><b><a href="correlator.html">FCS/FCCS:</a></b> The auto- and cross-correlation functions between any two (or of any) input signal channels may be calculated.</li>
+          <li><b><a href="countrate.html">Countrate:</a></b> This bins the photons into a countrate-timeseries with a gien binning time.</li>
+          <li><b><a href="lifetime.html">Lifetime/Microtime Analysis:</a></b> This creates histograms of the microtime in the TCSPC data, which allows to measure the fluorescence lifetime of a sample.</li>
+        </ul>
+        
+        <a name="#usage"><h2>Usage</h2>
+        The basic usage of the tool is the same for all options mentioned above:
+        <ol>
+          <li>In the main window of QuickFit, click on <b>Data Items | Insert Raw Data | import/process TCSPC</b>. THe TCSPC processing dialog will open:
+          <center><a name="tcspcimporter_pic000"><img src="./pic/tcspcimporter_pic000.png" border="1">
+          </center>
+          </li>
+          <li>First you select the input file using <img src=":/tcspcimporter/fileopen.png">. Subsequently all the input widgets will be activated.</li>
+          <li>This plugin will write the processing results into separate files on the hard disk. The filenames of these files are built from a <b>prefix</b>, the filename of the input file and a <b>postfix</b>. The typical/initial settings for this are:$$codeexample:prefix = "./results/"<br>postfix = "_corr%correlator%_%COUNTER%"$$These are good choices in most cases and will result in the file to be created in a sub-directory <tt>results</tt> of the input file's directory.<br><br>The different functions of this plugin may add an additional part to distinguish between several output data types. The pre- and postfix may also contain templates that are replaced by certain information afterwards. these templates are defined:
+          <ul>
+              <li><tt>%COUNTER%</tt> will first simply be deleted. If a set of output files with the given name already exist, the counter is increased until no output files with the given name exist.</li>
+              <li><tt>%start%</tt> input range start time</li>
+              <li><tt>%end%</tt> input range end time</li>
+              <li><tt>%fcs_segments%</tt> segments the input data is cut into</li>
+              <li><tt>%fcs_taumin%</tt> minimum lag time of the FCS/FCCS correlator</li>
+              <li><tt>%s%</tt> S parameter of the FCS/FCCS  correlator</li>
+              <li><tt>%p%</tt> P parameter of the FCS/FCCS correlator</li>
+              <li><tt>%m%</tt> m parameter of the FCS/FCCS correlator</li>
+              <li><tt>%correlator%</tt> FCS/FCCS correlator type used</li>
+              <li><tt>%correlatorid%</tt> FCS/FCCS correlator type used as number</li>
+              <li><tt>%cr_binning%</tt> binning time for the countrate output</li>
+           </ul>
+           The prefix may also be used to divert the result files into a sub-directory. If the output directory for a file does not exist, it is created automatically by QuickFit.
+           <br>As an example if <tt><i>[prefix]</i>="./results/"</tt> and <tt><i>[postfix]</i>="%COUNTER%"</tt>, the these output files will be created:
+          <blockquote><tt>[path_to]/results/[inputfilename].ccf11.dat<br>[path_to]/results/[inputfilename].ccf22.dat<br>...
+          </tt></blockquote>
+          If you start a job for the same input file and the same postfox/prefix again, these files will be created:
+          <blockquote><tt>[path_to]/results/[inputfilename]<b>1</b>.ccf11.dat<br>[path_to]/results/[inputfilename]<b>1</b>.ccf22.dat<br>...
+          </tt></blockquote>
+          </li>
+          <li>The widgets in the "input range" row allow to only process a part of the input sequence (e.g. only the first 10 seconds). Initially start and end of the processed segment are set to auto (checkboxes checked). If you release one of the checkboxes, the according input widget will be activated and you can enter the start/end time of the segment in seconds.</li>
+          <li>Now you set all options for the data processing:<ul>
+          <li><b><a href="correlator.html">FCS/FCCS:</a></b> The auto- and cross-correlation functions between any two (or of any) input signal channels may be calculated.</li>
+          <li><b><a href="countrate.html">Countrate:</a></b> This bins the photons into a countrate-timeseries with a gien binning time.</li>
+          <li><b><a href="lifetime.html">Arrivaltime-Histogram:</a></b> This extracts photon arrival-time histograms, or more exactly microtime-histograms from the TCSPC data. These allow to measure fluorescnece lifetimes.</li>
+        </ul>
+        </li>
+          <li>Finally you have to start the "processing job" by clicking on <img src=":/tcspcimporter/add_job.png"><b>Add Job</b>. As the processing may take a longer amount of time, the jobs are processed in the background. After adding the job, it will appear in the list towards the end of the dialog. Now it is also possible to define the next job (return to 1) and also add it. You may set the number of jobs that are processed in parallel on the top-right corner of the jobs-list.<br>
+          While a job is running, status-messages and the progress are displayed in the list. The state of each job is indicated by an icon on the left:
+              <blockquote>
+        <img src=":/tcspcimporter/thread_wait.png"> <b>waiting:</b> The job waits for an empty processing slot.<br>
+        <img src=":/tcspcimporter/thread_run.png"> <b>running:</b> The job is currently processed.<br>
+        <img src=":/tcspcimporter/thread_ok.png"> <b>done:</b> Processing of the job finished successfully.<br>
+        <img src=":/tcspcimporter/thread_error.png"> <b>error: Processing of the job finished with an error. The error is displayed together with the job status.</b>
+    </blockquote>
+        </li>
+        <li>Finally, when all jobs are done, you may click on <b>"Close"</b> to close the tool window. All jobs where the checkbox <b>"add to project"</b> was checked, are now added to the project as raw data records (possibly several of them).
+          </li>
+        </ol>
+    </body>
+</html>

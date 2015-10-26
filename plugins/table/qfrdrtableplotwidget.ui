@@ -214,12 +214,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFEnhancedTabWidget</class>
-   <extends>QTabWidget</extends>
-   <header>qfenhancedtabwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
@@ -229,6 +223,12 @@
    <class>QVisibleHandleSplitter</class>
    <extends>QSplitter</extends>
    <header>qvisiblehandlesplitter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFEnhancedTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>qfenhancedtabwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -251,6 +251,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>scrollArea</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>btnAddGraph</tabstop>
   <tabstop>btnDeleteGraph</tabstop>
@@ -258,16 +259,18 @@
   <tabstop>btnMoveUp</tabstop>
   <tabstop>btnMoveDown</tabstop>
   <tabstop>btnResetColoring</tabstop>
+  <tabstop>btnColorByPalette</tabstop>
   <tabstop>listGraphs</tabstop>
+  <tabstop>scrollArea_2</tabstop>
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections/>

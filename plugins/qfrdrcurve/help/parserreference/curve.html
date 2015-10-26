@@ -1,0 +1,52 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>FCS Online-Help: Expression parser: Curve RDR data access</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  <h2>Check for Curve RDR</h2>
+  $$funcref_start$$<a name="rdr_iscurve"/><!-- func:rdr_iscurve -->
+    <b><tt><!-- template -->rdr_iscurve(rdrid)<!-- /template --></tt> - <i> returns <tt>true</tt> is the given raw data record (RDR) in the current project is a curve record</i>:</b>
+  $$funcref_description$$
+        <!-- /func:rdr_iscurve -->
+  $$funcref_end$$
+  
+  <h2>Curve data access</h2>
+  
+   $$funcref_start$$<a name="curve_getcount"/><!-- func:curve_getcount -->
+   <b><tt><!-- template -->curve_getcount(rdr_id)<!-- /template --></tt> - <i> returns the number of curves in the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:curve_getcount -->
+   $$funcref_end$$
+  
+  
+  $$funcref_start$$<a name="curve_getx"/><!-- func:curve_getx -->
+    <b><tt><!-- template -->curve_getx(rdr_id)<!-- /template --> / <!-- template -->curve_getx(rdr_id, curve)<!-- /template --> </tt> - <i> returns the x-data vector for the specified curve (default: 0) in the given raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:curve_getx -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="curve_gety"/><!-- func:curve_gety -->
+    <b><tt><!-- template -->curve_gety(rdr_id)<!-- /template --> / <!-- template -->curve_gety(rdr_id, curve)<!-- /template --> </tt> - <i> returns the y-data vector for the specified curve (default: 0) in the given raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:curve_gety -->
+  $$funcref_end$$
+
+  $$funcref_start$$<a name="curve_getxerror"/><!-- func:curve_getxerror -->
+    <b><tt><!-- template -->curve_getxerror(rdr_id)<!-- /template --> / <!-- template -->curve_getxerror(rdr_id, curve)<!-- /template --> </tt> - <i> returns the x-error vector for the specified curve (default: 0) in the given raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:curve_getxerror -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="curve_getyerror"/><!-- func:curve_getyerror -->
+    <b><tt><!-- template -->curve_getyerror(rdr_id)<!-- /template --> / <!-- template -->curve_getyerror(rdr_id, curve)<!-- /template --> </tt> - <i> returns the y-error vector for the specified curve (default: 0) in the given raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:curve_getyerror -->
+  $$funcref_end$$
+  
+  </body>
+  </html>
+  

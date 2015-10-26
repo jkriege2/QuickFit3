@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/fonts/hack">
+        <file alias="Hack-Bold.otf">hack/Hack-Bold.otf</file>
+        <file alias="Hack-BoldOblique.otf">hack/Hack-BoldOblique.otf</file>
+        <file alias="Hack-Regular.otf">hack/Hack-Regular.otf</file>
+        <file alias="Hack-RegularOblique.otf">hack/Hack-RegularOblique.otf</file>
+    </qresource>
+</RCC>

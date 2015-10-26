@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>973</width>
-    <height>715</height>
+    <width>963</width>
+    <height>647</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,9 +29,9 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
-           <width>933</width>
-           <height>551</height>
+           <y>-417</y>
+           <width>906</width>
+           <height>900</height>
           </rect>
          </property>
          <layout class="QFormLayout" name="formLayout">
@@ -39,6 +39,9 @@
            <widget class="QLabel" name="label">
             <property name="text">
              <string>output filename:</string>
+            </property>
+            <property name="buddy">
+             <cstring>edtFilename</cstring>
             </property>
            </widget>
           </item>
@@ -64,30 +67,122 @@ You can use some special substrings to add information from the simulation into 
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>simulation type:</string>
             </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="cmbType">
-            <item>
-             <property name="text">
-              <string>2D random walk</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>simulation size:&lt;br&gt;&lt;small&gt;(1 color channel)&lt;/small&gt;</string>
+            <property name="buddy">
+             <cstring>cmbType</cstring>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <item>
+             <widget class="QComboBox" name="cmbType">
+              <item>
+               <property name="text">
+                <string>2D random walk</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_40">
+              <property name="text">
+               <string>boundary conditions: </string>
+              </property>
+              <property name="buddy">
+               <cstring>cmbBoundary</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cmbBoundary">
+              <item>
+               <property name="text">
+                <string>periodic</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>random re-introduction</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="chkSaveMSD">
+              <property name="text">
+               <string>save MSDs (slows down simulation!) for </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinMsdMaxSteps">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="specialValueText">
+               <string>all steps</string>
+              </property>
+              <property name="suffix">
+               <string> steps</string>
+              </property>
+              <property name="minimum">
+               <number>0</number>
+              </property>
+              <property name="maximum">
+               <number>100000000</number>
+              </property>
+              <property name="singleStep">
+               <number>1000</number>
+              </property>
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>simulation size:&lt;br&gt;&lt;small&gt;(1 color channel)&lt;/small&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>spinWidth</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
              <widget class="QSpinBox" name="spinWidth">
@@ -144,19 +239,25 @@ You can use some special substrings to add information from the simulation into 
             </item>
            </layout>
           </item>
-          <item row="3" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="label_22">
             <property name="text">
-             <string>simultaion settings:</string>
+             <string>simulation settings:</string>
+            </property>
+            <property name="buddy">
+             <cstring>spinFrametime</cstring>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="6" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
              <widget class="QLabel" name="label_23">
               <property name="text">
-               <string>timestep: </string>
+               <string>frametime:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinFrametime</cstring>
               </property>
              </widget>
             </item>
@@ -180,9 +281,86 @@ You can use some special substrings to add information from the simulation into 
              </widget>
             </item>
             <item>
+             <spacer name="horizontalSpacer_15">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_41">
+              <property name="text">
+               <string>timestep:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinTimestep</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="spinTimestep">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="suffix">
+               <string> µs</string>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <double>1000000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>10.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>500.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="chkTimeStepEqFrametime">
+              <property name="text">
+               <string>=frametime</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_14">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <widget class="QLabel" name="label_18">
               <property name="text">
                <string>frames:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinFrames</cstring>
               </property>
              </widget>
             </item>
@@ -203,9 +381,28 @@ You can use some special substrings to add information from the simulation into 
              </widget>
             </item>
             <item>
+             <spacer name="horizontalSpacer_13">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <widget class="QLabel" name="label_24">
               <property name="text">
-               <string>       warm-up steps::</string>
+               <string>warm-up steps:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinWarmup</cstring>
               </property>
              </widget>
             </item>
@@ -240,22 +437,88 @@ You can use some special substrings to add information from the simulation into 
             </item>
            </layout>
           </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_5">
+          <item row="7" column="1">
+           <widget class="QLabel" name="labSimSettings">
             <property name="text">
-             <string>pixel size:</string>
+             <string/>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::RichText</enum>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="8" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
+            <item>
+             <widget class="QLabel" name="label_52">
+              <property name="text">
+               <string>simulation space size-increase:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinSizeIncrease</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="spinSizeIncrease">
+              <property name="suffix">
+               <string> µm</string>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>3.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_23">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>pixels &amp; PSF:</string>
+            </property>
+            <property name="buddy">
+             <cstring>spinPixelSize</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_60">
+              <property name="text">
+               <string>pixel size:</string>
+              </property>
+             </widget>
+            </item>
             <item>
              <widget class="QDoubleSpinBox" name="spinPixelSize">
               <property name="suffix">
                <string> µm</string>
               </property>
               <property name="decimals">
-               <number>1</number>
+               <number>3</number>
               </property>
               <property name="maximum">
                <double>1000.000000000000000</double>
@@ -269,54 +532,90 @@ You can use some special substrings to add information from the simulation into 
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_17">
+             <spacer name="horizontalSpacer_19">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_61">
               <property name="text">
-               <string>      green  PSF size (1/e²): </string>
+               <string>PSF type: </string>
+              </property>
+              <property name="buddy">
+               <cstring>cmbPSF</cstring>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="spinPSFSizeGreen">
+             <widget class="QComboBox" name="cmbPSF">
+              <item>
+               <property name="text">
+                <string>Gaussian</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Pixel-Gaussian</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_22">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>15</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_62">
+              <property name="text">
+               <string>PSF cutoff:</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinPSFCutoff</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="spinPSFCutoff">
               <property name="suffix">
-               <string> µm</string>
+               <string> * max(pixel_size, wxy)</string>
               </property>
               <property name="decimals">
-               <number>1</number>
+               <number>2</number>
+              </property>
+              <property name="minimum">
+               <double>1.000000000000000</double>
               </property>
               <property name="maximum">
                <double>1000.000000000000000</double>
               </property>
               <property name="singleStep">
-               <double>0.100000000000000</double>
+               <double>1.000000000000000</double>
               </property>
               <property name="value">
-               <double>0.600000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_25">
-              <property name="text">
-               <string>      red  PSF size (1/e²): </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="spinPSFSizeRed">
-              <property name="suffix">
-               <string> µm</string>
-              </property>
-              <property name="decimals">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <double>1000.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.100000000000000</double>
-              </property>
-              <property name="value">
-               <double>0.600000000000000</double>
+               <double>3.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -335,14 +634,92 @@ You can use some special substrings to add information from the simulation into 
             </item>
            </layout>
           </item>
-          <item row="5" column="0">
+          <item row="11" column="0">
+           <widget class="QLabel" name="label_20">
+            <property name="text">
+             <string>background:</string>
+            </property>
+            <property name="buddy">
+             <cstring>spinBackground</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QDoubleSpinBox" name="spinBackground">
+              <property name="suffix">
+               <string> / frame</string>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>100.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_21">
+              <property name="text">
+               <string>   noise (S.D.):</string>
+              </property>
+              <property name="buddy">
+               <cstring>spinBackgroundNoise</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="spinBackgroundNoise">
+              <property name="suffix">
+               <string> / frame</string>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>2.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="12" column="0">
            <widget class="QLabel" name="label_27">
             <property name="text">
              <string>red-green pixel shift:</string>
             </property>
+            <property name="buddy">
+             <cstring>spinDeltaX</cstring>
+            </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="12" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_9">
             <item>
              <widget class="QLabel" name="label_28">
@@ -351,6 +728,9 @@ You can use some special substrings to add information from the simulation into 
               </property>
               <property name="textFormat">
                <enum>Qt::RichText</enum>
+              </property>
+              <property name="buddy">
+               <cstring>spinDeltaX</cstring>
               </property>
              </widget>
             </item>
@@ -377,6 +757,9 @@ You can use some special substrings to add information from the simulation into 
               </property>
               <property name="textFormat">
                <enum>Qt::RichText</enum>
+              </property>
+              <property name="buddy">
+               <cstring>spinDeltaY</cstring>
               </property>
              </widget>
             </item>
@@ -411,29 +794,125 @@ You can use some special substrings to add information from the simulation into 
             </item>
            </layout>
           </item>
-          <item row="6" column="0">
+          <item row="13" column="0">
            <widget class="QLabel" name="label_14">
             <property name="text">
              <string>DualView:</string>
             </property>
+            <property name="buddy">
+             <cstring>chkDualView</cstring>
+            </property>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="13" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <widget class="QCheckBox" name="chkDualView">
+              <property name="text">
+               <string>enabled</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="horizontalWidget_2" native="true">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <spacer name="horizontalSpacer_8">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Preferred</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_26">
+                 <property name="text">
+                  <string>crosstalk (green &amp;rarr; red):</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::RichText</enum>
+                 </property>
+                 <property name="buddy">
+                  <cstring>spinCrosstalk</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="spinCrosstalk">
+                 <property name="suffix">
+                  <string> %</string>
+                 </property>
+                 <property name="decimals">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <double>100.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>5.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_7">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="14" column="0">
            <widget class="QLabel" name="label_9">
             <property name="text">
              <string>walkers 1:</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
-           <layout class="QGridLayout" name="gridLayout">
+          <item row="14" column="1">
+           <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,1,1">
             <item row="3" column="2">
              <widget class="QDoubleSpinBox" name="spinBrigthnessR">
               <property name="enabled">
                <bool>false</bool>
               </property>
               <property name="suffix">
-               <string/>
+               <string> / sec</string>
               </property>
               <property name="decimals">
                <number>1</number>
@@ -452,7 +931,7 @@ You can use some special substrings to add information from the simulation into 
             <item row="3" column="1">
              <widget class="QDoubleSpinBox" name="spinBrightnessG">
               <property name="suffix">
-               <string/>
+               <string> / sec</string>
               </property>
               <property name="decimals">
                <number>1</number>
@@ -645,14 +1124,14 @@ You can use some special substrings to add information from the simulation into 
             </item>
            </layout>
           </item>
-          <item row="8" column="0">
+          <item row="15" column="0">
            <widget class="QLabel" name="label_30">
             <property name="text">
              <string>walkers 2:</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="1">
+          <item row="15" column="1">
            <layout class="QGridLayout" name="gridLayout_2">
             <item row="3" column="2">
              <widget class="QDoubleSpinBox" name="spinBrigthnessR_2">
@@ -660,7 +1139,7 @@ You can use some special substrings to add information from the simulation into 
                <bool>false</bool>
               </property>
               <property name="suffix">
-               <string/>
+               <string> / sec</string>
               </property>
               <property name="decimals">
                <number>1</number>
@@ -679,7 +1158,7 @@ You can use some special substrings to add information from the simulation into 
             <item row="3" column="1">
              <widget class="QDoubleSpinBox" name="spinBrightnessG_2">
               <property name="suffix">
-               <string/>
+               <string> / sec</string>
               </property>
               <property name="decimals">
                <number>1</number>
@@ -872,45 +1351,47 @@ You can use some special substrings to add information from the simulation into 
             </item>
            </layout>
           </item>
-          <item row="9" column="0">
-           <widget class="QLabel" name="label_20">
+          <item row="16" column="0">
+           <widget class="QLabel" name="label_42">
             <property name="text">
-             <string>background:</string>
+             <string>walkers 3:</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
-            <item>
-             <widget class="QDoubleSpinBox" name="spinBackground">
-              <property name="suffix">
-               <string> /step</string>
-              </property>
-              <property name="decimals">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>1.000000000000000</double>
-              </property>
-              <property name="value">
-               <double>100.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_21">
+          <item row="16" column="1">
+           <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,1,1,1">
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_49">
               <property name="text">
-               <string>   noise (S.D.):</string>
+               <string>present only for &lt;i&gt;y&gt;&lt;tt&gt;height&lt;/tt&gt;/2&lt;/i&gt;:</string>
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="spinBackgroundNoise">
+            <item row="4" column="1">
+             <widget class="QCheckBox" name="chkBottomG_3">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_47">
+              <property name="text">
+               <string>number:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_48">
+              <property name="text">
+               <string>diffusion coefficient:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QDoubleSpinBox" name="spinBrightnessG_3">
               <property name="suffix">
-               <string> /step</string>
+               <string> / sec</string>
               </property>
               <property name="decimals">
                <number>1</number>
@@ -922,12 +1403,68 @@ You can use some special substrings to add information from the simulation into 
                <double>1.000000000000000</double>
               </property>
               <property name="value">
-               <double>2.000000000000000</double>
+               <double>20.000000000000000</double>
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="horizontalSpacer_6">
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_43">
+              <property name="text">
+               <string>green</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_44">
+              <property name="text">
+               <string>brightness:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <spacer name="horizontalSpacer_16">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="spinWalkersG_3">
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="value">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QDoubleSpinBox" name="spinDG_3">
+              <property name="suffix">
+               <string> µm²/s</string>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <double>1000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>5.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <spacer name="horizontalSpacer_17">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -941,14 +1478,14 @@ You can use some special substrings to add information from the simulation into 
             </item>
            </layout>
           </item>
-          <item row="10" column="0">
+          <item row="18" column="0">
            <widget class="QLabel" name="label_3">
             <property name="text">
              <string>flow:</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="1">
+          <item row="18" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <widget class="QLabel" name="label_15">
@@ -1051,90 +1588,597 @@ p, li { white-space: pre-wrap; }
             </item>
            </layout>
           </item>
-          <item row="6" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QCheckBox" name="chkDualView">
+          <item row="19" column="0">
+           <widget class="QLabel" name="label_45">
+            <property name="text">
+             <string>environment:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="19" column="1">
+           <widget class="QWidget" name="verticalWidget" native="true">
+            <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QRadioButton" name="radUnhinderedDiff">
+               <property name="text">
+                <string>free diffusion</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QRadioButton" name="radBarriers">
+               <property name="text">
+                <string>barrier mesh:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QRadioButton" name="radTraps">
+               <property name="text">
+                <string>trapping regions:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="2" column="1" rowspan="2">
+              <widget class="QWidget" name="widget_2" native="true">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_2">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_16">
+                  <item>
+                   <widget class="QLabel" name="label_56">
+                    <property name="text">
+                     <string>grid spacing:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="spinTrapGridSpacing">
+                    <property name="suffix">
+                     <string> µm</string>
+                    </property>
+                    <property name="decimals">
+                     <number>3</number>
+                    </property>
+                    <property name="minimum">
+                     <double>1.000000000000000</double>
+                    </property>
+                    <property name="maximum">
+                     <double>10000.000000000000000</double>
+                    </property>
+                    <property name="value">
+                     <double>5.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_24">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Preferred</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_57">
+                    <property name="text">
+                     <string>trap diameter</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="spinTrapDiameter">
+                    <property name="suffix">
+                     <string> µm</string>
+                    </property>
+                    <property name="decimals">
+                     <number>3</number>
+                    </property>
+                    <property name="minimum">
+                     <double>1.000000000000000</double>
+                    </property>
+                    <property name="maximum">
+                     <double>10000.000000000000000</double>
+                    </property>
+                    <property name="value">
+                     <double>5.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_26">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Preferred</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="chkTrapOnlyHalf">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_58">
+                    <property name="text">
+                     <string>present only for &lt;i&gt;x&gt;&lt;tt&gt;width&lt;/tt&gt;/2&lt;/i&gt;:</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_17">
+                  <item>
+                   <widget class="QLabel" name="label_59">
+                    <property name="text">
+                     <string>slow-down factor:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QFDoubleEdit" name="edtTrapSlowdown"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_28">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Fixed</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_63">
+                    <property name="text">
+                     <string>jump probability, in:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QFDoubleEdit" name="edtTrapJumpIn"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_29">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Preferred</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_64">
+                    <property name="text">
+                     <string>out:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QFDoubleEdit" name="edtTrapJumpOut"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_30">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Preferred</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QWidget" name="widget" native="true">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_12">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_46">
+                  <property name="text">
+                   <string>grid spacing:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="spinBarrierGridSpacing">
+                  <property name="suffix">
+                   <string> nm</string>
+                  </property>
+                  <property name="decimals">
+                   <number>1</number>
+                  </property>
+                  <property name="minimum">
+                   <double>1.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>50.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_20">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Preferred</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_50">
+                  <property name="text">
+                   <string>jump probability:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QFDoubleEdit" name="edtBarrierJumpProb"/>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_21">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Preferred</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chkBarrierOnlyHalf">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_51">
+                  <property name="text">
+                   <string>present only for &lt;i&gt;x&gt;&lt;tt&gt;width&lt;/tt&gt;/2&lt;/i&gt;:</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_53">
               <property name="text">
-               <string>enabled</string>
+               <string>add to filenames:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QFEnhancedLineEdit" name="edtFilenameAdd">
+              <property name="toolTip">
+               <string>give a filename for the main output file (with extension &lt;tt&gt;.tif&lt;/tt&gt; or &lt;tt&gt;.tiff&lt;/tt&gt;) on the hard-disk.&lt;br&gt;
+You can use some special substrings to add information from the simulation into the filename:
+&lt;ul&gt;
+  &lt;li&gt;&lt;tt&gt;%counter%&lt;/tt&gt;: is increased, until a non-existent filename is found (prevents overwriting of old filenames)&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%type%&lt;/tt&gt;: simulation type&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%timestep%&lt;/tt&gt;: simulation timestep in &amp;mu;s&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%shift%&lt;/tt&gt;: shift between g/r foci&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%dvmode%&lt;/tt&gt;: DualView mode&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D1g%&lt;/tt&gt;: D1, green&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D1r%&lt;/tt&gt;: D1, red&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D1gr%&lt;/tt&gt;: D1, green-red&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D2g%&lt;/tt&gt;: D2, green&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D2r%&lt;/tt&gt;: D2, red&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%D2gr%&lt;/tt&gt;: D2, green-red&lt;/li&gt;
+  &lt;li&gt;&lt;tt&gt;%flow%&lt;/tt&gt;: flow velocity&lt;/li&gt;
+&lt;/ul&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_54">
+              <property name="text">
+               <string>=&gt; final full filename:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="labFilename">
+              <property name="font">
+               <font>
+                <italic>true</italic>
+               </font>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_14">
+            <item>
+             <spacer name="horizontalSpacer_25">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="chkSaveTrajectories">
+              <property name="text">
+               <string>save Trajectories (slows down simulation!) for </string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="horizontalWidget_2" native="true">
+             <widget class="QSpinBox" name="spinTrajMax">
               <property name="enabled">
                <bool>false</bool>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_8">
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <spacer name="horizontalSpacer_8">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Preferred</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_26">
-                 <property name="text">
-                  <string>crosstalk:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="spinCrosstalk">
-                 <property name="suffix">
-                  <string> %</string>
-                 </property>
-                 <property name="decimals">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <double>100.000000000000000</double>
-                 </property>
-                 <property name="singleStep">
-                  <double>1.000000000000000</double>
-                 </property>
-                 <property name="value">
-                  <double>5.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_7">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
+              <property name="suffix">
+               <string> particles per species</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>100000000</number>
+              </property>
+              <property name="singleStep">
+               <number>1000</number>
+              </property>
+              <property name="value">
+               <number>10</number>
+              </property>
              </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_55">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>for</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinTrajMaxSteps">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="specialValueText">
+               <string>all steps</string>
+              </property>
+              <property name="suffix">
+               <string> steps</string>
+              </property>
+              <property name="minimum">
+               <number>0</number>
+              </property>
+              <property name="maximum">
+               <number>100000000</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>1000</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="10" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_15">
+            <item>
+             <widget class="QLabel" name="label_17">
+              <property name="text">
+               <string>green  PSF size (1/e²): </string>
+              </property>
+              <property name="buddy">
+               <cstring>spinPSFSizeGreen</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="spinPSFSizeGreen">
+              <property name="suffix">
+               <string> µm</string>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="maximum">
+               <double>1000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.600000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_18">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>15</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_25">
+              <property name="text">
+               <string>red  PSF size (1/e²): </string>
+              </property>
+              <property name="buddy">
+               <cstring>spinPSFSizeRed</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="spinPSFSizeRed">
+              <property name="suffix">
+               <string> µm</string>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="maximum">
+               <double>1000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.600000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_27">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </item>
@@ -1230,11 +2274,92 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
    <class>QFEnhancedLineEdit</class>
    <extends>QLineEdit</extends>
    <header>qfenhancedlineedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>edtFilename</tabstop>
+  <tabstop>edtFilenameAdd</tabstop>
+  <tabstop>cmbType</tabstop>
+  <tabstop>cmbBoundary</tabstop>
+  <tabstop>chkSaveMSD</tabstop>
+  <tabstop>spinMsdMaxSteps</tabstop>
+  <tabstop>chkSaveTrajectories</tabstop>
+  <tabstop>spinTrajMax</tabstop>
+  <tabstop>spinTrajMaxSteps</tabstop>
+  <tabstop>spinWidth</tabstop>
+  <tabstop>spinHeight</tabstop>
+  <tabstop>spinFrametime</tabstop>
+  <tabstop>spinTimestep</tabstop>
+  <tabstop>chkTimeStepEqFrametime</tabstop>
+  <tabstop>spinFrames</tabstop>
+  <tabstop>spinWarmup</tabstop>
+  <tabstop>spinSizeIncrease</tabstop>
+  <tabstop>spinPixelSize</tabstop>
+  <tabstop>cmbPSF</tabstop>
+  <tabstop>spinPSFCutoff</tabstop>
+  <tabstop>spinPSFSizeGreen</tabstop>
+  <tabstop>spinPSFSizeRed</tabstop>
+  <tabstop>spinBackground</tabstop>
+  <tabstop>spinBackgroundNoise</tabstop>
+  <tabstop>spinDeltaX</tabstop>
+  <tabstop>spinDeltaY</tabstop>
+  <tabstop>chkDualView</tabstop>
+  <tabstop>spinCrosstalk</tabstop>
+  <tabstop>spinWalkersG</tabstop>
+  <tabstop>spinWalkersR</tabstop>
+  <tabstop>spinWalkersRG</tabstop>
+  <tabstop>spinDG</tabstop>
+  <tabstop>spinDR</tabstop>
+  <tabstop>spinDRG</tabstop>
+  <tabstop>spinBrightnessG</tabstop>
+  <tabstop>spinBrigthnessR</tabstop>
+  <tabstop>chkBottomG</tabstop>
+  <tabstop>chkBottomR</tabstop>
+  <tabstop>chkBottomRG</tabstop>
+  <tabstop>spinWalkersG_2</tabstop>
+  <tabstop>spinWalkersR_2</tabstop>
+  <tabstop>spinWalkersRG_2</tabstop>
+  <tabstop>spinDG_2</tabstop>
+  <tabstop>spinDR_2</tabstop>
+  <tabstop>spinDRG_2</tabstop>
+  <tabstop>spinBrightnessG_2</tabstop>
+  <tabstop>spinBrigthnessR_2</tabstop>
+  <tabstop>chkBottomG_2</tabstop>
+  <tabstop>chkBottomR_2</tabstop>
+  <tabstop>chkBottomRG_2</tabstop>
+  <tabstop>spinWalkersG_3</tabstop>
+  <tabstop>spinDG_3</tabstop>
+  <tabstop>spinBrightnessG_3</tabstop>
+  <tabstop>chkBottomG_3</tabstop>
+  <tabstop>spinVX</tabstop>
+  <tabstop>spinVY</tabstop>
+  <tabstop>chkFlowOnlyHalf</tabstop>
+  <tabstop>radUnhinderedDiff</tabstop>
+  <tabstop>radBarriers</tabstop>
+  <tabstop>spinBarrierGridSpacing</tabstop>
+  <tabstop>edtBarrierJumpProb</tabstop>
+  <tabstop>chkBarrierOnlyHalf</tabstop>
+  <tabstop>radTraps</tabstop>
+  <tabstop>spinTrapGridSpacing</tabstop>
+  <tabstop>spinTrapDiameter</tabstop>
+  <tabstop>chkTrapOnlyHalf</tabstop>
+  <tabstop>edtTrapSlowdown</tabstop>
+  <tabstop>btnHelp</tabstop>
+  <tabstop>btnCancel</tabstop>
+  <tabstop>btnRun</tabstop>
+ </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
@@ -1252,12 +2377,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>166</x>
-     <y>219</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>226</x>
-     <y>223</y>
+     <x>487</x>
+     <y>7</y>
     </hint>
    </hints>
   </connection>
@@ -1268,12 +2393,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>181</x>
-     <y>211</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>557</x>
-     <y>240</y>
+     <x>758</x>
+     <y>35</y>
     </hint>
    </hints>
   </connection>
@@ -1284,12 +2409,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>159</x>
-     <y>213</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>785</x>
-     <y>242</y>
+     <x>967</x>
+     <y>35</y>
     </hint>
    </hints>
   </connection>
@@ -1300,12 +2425,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>196</x>
-     <y>217</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>604</x>
-     <y>269</y>
+     <x>758</x>
+     <y>54</y>
     </hint>
    </hints>
   </connection>
@@ -1316,12 +2441,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>146</x>
-     <y>216</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>777</x>
-     <y>268</y>
+     <x>967</x>
+     <y>54</y>
     </hint>
    </hints>
   </connection>
@@ -1332,12 +2457,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>172</x>
-     <y>217</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>597</x>
-     <y>290</y>
+     <x>758</x>
+     <y>80</y>
     </hint>
    </hints>
   </connection>
@@ -1348,12 +2473,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>183</x>
-     <y>216</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>788</x>
-     <y>294</y>
+     <x>967</x>
+     <y>80</y>
     </hint>
    </hints>
   </connection>
@@ -1364,12 +2489,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>145</x>
-     <y>217</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>597</x>
-     <y>319</y>
+     <x>758</x>
+     <y>106</y>
     </hint>
    </hints>
   </connection>
@@ -1380,12 +2505,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>167</x>
-     <y>218</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>567</x>
-     <y>337</y>
+     <x>758</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>
@@ -1396,12 +2521,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>178</x>
-     <y>221</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>773</x>
-     <y>343</y>
+     <x>967</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>
@@ -1412,12 +2537,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>190</x>
-     <y>216</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>564</x>
-     <y>364</y>
+     <x>758</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>
@@ -1428,12 +2553,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>188</x>
-     <y>222</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>774</x>
-     <y>358</y>
+     <x>967</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>
@@ -1444,12 +2569,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>165</x>
-     <y>221</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>599</x>
-     <y>390</y>
+     <x>758</x>
+     <y>174</y>
     </hint>
    </hints>
   </connection>
@@ -1460,12 +2585,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>182</x>
-     <y>220</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>766</x>
-     <y>384</y>
+     <x>967</x>
+     <y>174</y>
     </hint>
    </hints>
   </connection>
@@ -1476,12 +2601,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>171</x>
-     <y>216</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>581</x>
-     <y>411</y>
+     <x>758</x>
+     <y>200</y>
     </hint>
    </hints>
   </connection>
@@ -1492,12 +2617,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>187</x>
-     <y>218</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>773</x>
-     <y>417</y>
+     <x>967</x>
+     <y>200</y>
     </hint>
    </hints>
   </connection>
@@ -1508,12 +2633,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>173</x>
-     <y>217</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>592</x>
-     <y>440</y>
+     <x>758</x>
+     <y>226</y>
     </hint>
    </hints>
   </connection>
@@ -1524,12 +2649,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>218</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>560</x>
-     <y>457</y>
+     <x>758</x>
+     <y>253</y>
     </hint>
    </hints>
   </connection>
@@ -1540,12 +2665,124 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>169</x>
-     <y>214</y>
+     <x>197</x>
+     <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>766</x>
-     <y>459</y>
+     <x>967</x>
+     <y>253</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkSaveMSD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinMsdMaxSteps</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>853</x>
+     <y>-243</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>967</x>
+     <y>-244</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkTimeStepEqFrametime</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinTimestep</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>563</x>
+     <y>-151</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>478</x>
+     <y>-152</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radBarriers</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widget</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>227</x>
+     <y>452</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>540</x>
+     <y>451</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkSaveTrajectories</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinTrajMax</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>648</x>
+     <y>-215</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>833</x>
+     <y>-216</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkSaveTrajectories</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_55</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>648</x>
+     <y>-215</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>853</x>
+     <y>-216</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkSaveTrajectories</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinTrajMaxSteps</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>648</x>
+     <y>-215</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>967</x>
+     <y>-216</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radTraps</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widget_2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>190</x>
+     <y>487</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>253</x>
+     <y>499</y>
     </hint>
    </hints>
   </connection>

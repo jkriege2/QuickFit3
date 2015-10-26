@@ -1425,6 +1425,9 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
             QCheckBox* chkOverwriteTable=new QCheckBox(tr("(unchecked: append)"), dlg);
             chkOverwriteTable->setEnabled(true);
             dlg->addWidget(tr("overwrite existing table:"), chkOverwriteTable);
+            QCheckBox* chkUseColExpressions=new QCheckBox(tr(""), dlg);
+            chkUseColExpressions->setEnabled(true);
+            dlg->addWidget(tr("prefer column expressions where possible:"), chkUseColExpressions);
 
             QCheckBox* chkUseMask=new QCheckBox(QString(""), dlg);
             dlg->addWidget(tr("mind excluded indexes/mask"), chkUseMask);
@@ -1460,6 +1463,7 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
 
             ProgramOptions::getConfigQComboBox(cmbSingleLineMode, QString("evaleditor/%1/cmbSingleLineMode").arg(d->current->getType()), 1);
             ProgramOptions::getConfigQCheckBox(chkOverwriteTable, QString("evaleditor/%1/chkOverwriteTable").arg(d->current->getType()), false);
+            ProgramOptions::getConfigQCheckBox(chkUseColExpressions, QString("evaleditor/%1/chkUseColExpressions").arg(d->current->getType()), false);
             ProgramOptions::getConfigQCheckBox(chkUseMask, QString("evaleditor/%1/chkUseMask").arg(d->current->getType()), true);
             ProgramOptions::getConfigQCheckBox(chkMedian, QString("evaleditor/%1/chkMedian").arg(d->current->getType()), false);
             ProgramOptions::getConfigQCheckBox(chkAvg, QString("evaleditor/%1/chkAvg").arg(d->current->getType()), true);
@@ -1471,6 +1475,7 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
             if (dlg->exec()) {
                 ProgramOptions::setConfigQComboBox(cmbSingleLineMode, QString("evaleditor/%1/cmbSingleLineMode").arg(d->current->getType()));
                 ProgramOptions::setConfigQCheckBox(chkOverwriteTable, QString("evaleditor/%1/chkOverwriteTable").arg(d->current->getType()));
+                ProgramOptions::setConfigQCheckBox(chkUseColExpressions, QString("evaleditor/%1/chkUseColExpressions").arg(d->current->getType()));
                 ProgramOptions::setConfigQCheckBox(chkUseMask, QString("evaleditor/%1/chkUseMask").arg(d->current->getType()));
                 ProgramOptions::setConfigQCheckBox(chkMedian, QString("evaleditor/%1/chkMedian").arg(d->current->getType()));
                 ProgramOptions::setConfigQCheckBox(chkAvg, QString("evaleditor/%1/chkAvg").arg(d->current->getType()));
@@ -1530,6 +1535,7 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
                         simple_error_expression=QString("result_id = \"%1\";\nitemorfirst(rdr_getresulterror(%3, %2, result_id), runex_mask(%3))");
                     }*/
 
+                    bool useColExpressionsForData=false;
                     QString stat_expression=QString("result_id = \"%1\";\n%4(rdr_getresult(data(row, col-%3), data(row, col-%2), result_id))");
                     QString prop_expression=QString("prop_id = \"%1\";\nrdr_getproperty(data(row, col-%2), prop_id)");
                     QString data_expression=QString("result_id = \"%1\";\nfirstinvector(rdr_getresult(data(row, col-%3), data(row, col-%2), result_id))");
@@ -1542,6 +1548,15 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
                         error_expression=QString("result_id = \"%1\";\ncollength(col-%3), itemorfirst(rdr_getresulterror(data(row, col-%3), data(row, col-%2), result_id), runex_mask(data(row, col-%3)))");
                         simple_data_expression=QString("result_id = \"%1\";\nitemorfirst(rdr_getresult(%3, %2, result_id), runex_mask(%3))");
                         simple_error_expression=QString("result_id = \"%1\";\nitemorfirst(rdr_getresulterror(%3, %2, result_id), runex_mask(%3))");
+                    } else {
+                        if (chkUseColExpressions->isChecked()){
+                            useColExpressionsForData=true;
+                            prop_expression=QString("prop_id = \"%1\";\nfor(c, column(col-%2), rdr_getproperty(c, prop_id))");
+                            data_expression=QString("result_id = \"%1\";\nfor(r, 1:length(column(col-%3)), firstinvector(rdr_getresult(data(r, col-%3), data(r, col-%2), result_id, NAN)))");
+                            error_expression=QString("result_id = \"%1\";\nfor(r, 1:length(column(col-%3)), firstinvector(rdr_getresulterror(data(r, col-%3), data(r, col-%2), result_id, NAN)))");
+                            //simple_data_expression=QString("result_id = \"%1\";\nrdr_getresult(%3, %2, result_id)");
+                            //simple_error_expression=QString("result_id = \"%1\";\nrdr_getresulterror(%3, %2, result_id)");
+                        }
                     }
 
 
@@ -1551,13 +1566,23 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
                         rdrid_col=col;
                         evalid_col=col+2;
                         tab->tableSetColumnTitle(col, dlg->getPrefix()+"RDR_ID");
-                        tab->tableSetColumnTitle(col+1, dlg->getPrefix()+"FILE");
+                        tab->tableSetColumnExpression(col, QString());
+                        tab->tableSetColumnTitle(col+1, dlg->getPrefix()+"FILENAME");
+                        tab->tableSetColumnExpression(col+1, QString());
                         tab->tableSetColumnTitle(col+2, dlg->getPrefix()+"EVAL_ID");
+                        tab->tableSetColumnExpression(col+2, QString());
+                        if (chkUseColExpressions->isChecked()) {
+                            tab->tableSetColumnExpression(col+2);
+                        }
                         for (int r=0; r<rdrids_int.size(); r++) {
                             tab->tableSetData(r, col, rdrids_int[r]);
                             tab->tableSetData(r, col+2, evalnames[r]);
-                            tab->tableSetData(r, col+1, QLatin1String("rdr_getname(data(row, col-1))"));
+                            if (!chkUseColExpressions->isChecked()) tab->tableSetExpression(r, col+1, QLatin1String("rdr_getname(data(row, col-1))"));
                         }
+                        if (chkUseColExpressions->isChecked()) {
+                            tab->tableSetColumnExpression(col+1, QLatin1String("for(r, column(col-1), rdr_getname(r))"));
+                        }
+
                         //tab->tableSetColumnExpression(col+1, QLatin1String("for(r, column(col-1), rdr_getname(r))"));
                         col+=3;
 
@@ -1582,8 +1607,12 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
                                         tab->tableSetData(r, col, data_tab.value(c, QList<QVariant>()).value(r, QVariant()));
                                     }
                                 } else {
-                                    for (int r=0; r<datarows; r++) {
-                                        tab->tableSetExpression(r, col, prop_expression.arg(propnames[c]).arg(col-rdrid_col));
+                                    if (!useColExpressionsForData) {
+                                        for (int r=0; r<datarows; r++) {
+                                            tab->tableSetExpression(r, col, prop_expression.arg(propnames[c]).arg(col-rdrid_col));
+                                        }
+                                    } else {
+                                        tab->tableSetColumnExpression(col, prop_expression.arg(propnames[c]).arg(col-rdrid_col));
                                     }
                                 }
                                 col++;
@@ -1592,8 +1621,12 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
                                 if (!thisHasVector) {
                                     tab->tableSetColumnTitle(col, dlg->getPrefix()+colnames.value(c, ""));
                                     //tab->tableSetColumnExpression(col, data_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
-                                    for (int r=0; r<datarows; r++) {
-                                        tab->tableSetExpression(r, col, data_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
+                                    if (!useColExpressionsForData) {
+                                        for (int r=0; r<datarows; r++) {
+                                            tab->tableSetExpression(r, col, data_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
+                                        }
+                                    } else {
+                                        tab->tableSetColumnExpression(col, data_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
                                     }
                                     col++;
                                 } else {
@@ -1663,8 +1696,12 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
                                     if (!thisHasVector) {
                                         tab->tableSetColumnTitle(col, dlg->getPrefix()+QString("error(%1)").arg(colnames.value(c, "")));
                                         //tab->tableSetColumnExpression(col, error_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
-                                        for (int r=0; r<datarows; r++) {
-                                            tab->tableSetExpression(r, col, error_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
+                                        if (!useColExpressionsForData) {
+                                            for (int r=0; r<datarows; r++) {
+                                                tab->tableSetExpression(r, col, error_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
+                                            }
+                                        } else {
+                                            tab->tableSetColumnExpression(col, error_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
                                         }
 
                                         col++;

@@ -25,15 +25,17 @@ CONFIG += plugin
 TARGET = importers_simpletcspcimporter
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input
 HEADERS += qfsimpletcspcimporterplugin.h \
-           qfsimpletcspcimporter.h
+           qfsimpletcspcimporter.h \
+    qfpicoquanttexttcspcimporter.h
 
 SOURCES += qfsimpletcspcimporterplugin.cpp\
-           qfsimpletcspcimporter.cpp
+           qfsimpletcspcimporter.cpp \
+    qfpicoquanttexttcspcimporter.cpp
 
 FORMS =
 

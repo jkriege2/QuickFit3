@@ -66,10 +66,10 @@ QString QFFCSWeightingTools::dataWeightToName(QFFCSWeightingTools::DataWeight we
 {
     if (weight==StdDevWeighting) return "stddev";
     if (weight==RunErrorWeighting) return QString("per ")+runname;
-    if (weight==RunningStdDev3Weight) return QString("SD 3-")+runname+QString("s");;
-    if (weight==RunningStdDev5Weight) return QString("SD 5-")+runname+QString("s");;
-    if (weight==RunningStdDev7Weight) return QString("SD 7-")+runname+QString("s");;
-    if (weight==RunningStdDev11Weight) return QString("SD 11-")+runname+QString("s");;
+    if (weight==RunningStdDev3Weight) return QString("SD 3-pointss");;
+    if (weight==RunningStdDev5Weight) return QString("SD 5-pointss");;
+    if (weight==RunningStdDev7Weight) return QString("SD 7-pointss");;
+    if (weight==RunningStdDev11Weight) return QString("SD 11-pointss");;
     if (weight==Poly2Weight) return QString("dev. from poly(2)");
     if (weight==Poly3Weight) return QString("dev. from poly(3)");
     if (weight==Poly5Weight) return QString("dev. from poly(5)");

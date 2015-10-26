@@ -124,8 +124,14 @@ class QFWIDLIB_EXPORT QFFunctionReferenceTool : public QObject
         /** \brief opens an online-help window and displays the help entry for the function currentyl under the cursor */
         void showCurrentFunctionHelp();
         void showDefaultHelp();
+
+    protected:
+        int last_old;
+        int last_newPos;
+        QObject* last_sender;
     protected slots:
-        void onCursorPositionChanged(int old=0, int newPos=0);
+        void onCursorPositionChanged();
+        void onCursorPositionChangedDelayed(int old=0, int newPos=0);
         void threadFinished();
         void delayedStartSearchThreads();
         void addFunction(QString name, QString templ, QString help, QString helplink);
@@ -168,6 +174,7 @@ class QFWIDLIB_EXPORT QFFunctionReferenceTool : public QObject
         QAction* actCurrentFunctionHelp;
         QStringList namesToAdd, templatesToAdd;
         QTimer timDelayedAddNamesAndTemplates;
+        QTimer timDelayedCursorChange;
 };
 
 #endif // QFFUNCTIONREFERENCETOOL_H

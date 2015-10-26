@@ -254,6 +254,8 @@ class QFWIDLIB_EXPORT QFCompleterTextEditWidget : public QTextEdit
          */
         bool findNext();
 
+        void setPlainText(const QString &text);
+
         /** \brief replace the first occurence of the specified \a phrase by \a replaceBy
          *
          * \param phrase the phrase to search for

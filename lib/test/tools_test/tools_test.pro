@@ -21,8 +21,8 @@
 
 
 
-QT       += core network
-QT += gui xml
+QT       += core network gui xml
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 DEFINES += QFLIB_LIBRARY
 CONFIG   += console
@@ -32,6 +32,7 @@ TARGET = tools_test
 
 TEMPLATE = app
 
+include(../../../extlibsb040/tinymat.pri)
 
 SOURCES += main.cpp \
     ../../qftools.cpp \
@@ -43,7 +44,13 @@ SOURCES += main.cpp \
     ../../qfdlgcsvparameters.cpp \
     ../../qfhtmlhelptools.cpp \
     ../../qfpluginservices.cpp \
-    threadtest.cpp
+    threadtest.cpp \
+    ../../qconfigcomboboxwidget.cpp \
+    ../../qvisiblehandlesplitter.cpp \
+    ../../qfdoubleedit.cpp \
+    ../../qffitfunctionbase.cpp \
+    ../../qftablemodel.cpp \
+    ../../qfversion.cpp
 
 HEADERS += \
     ../../qftools.h \
@@ -56,7 +63,15 @@ HEADERS += \
     ../../binarydatatools.h \
     ../../qfdlgcsvparameters.h \
     ../../qfhtmlhelptools.h \
-    threadtest.h
+    threadtest.h \
+    ../../qconfigcomboboxwidget.h \
+    ../../qvisiblehandlesplitter.h \
+    ../../qfdoubleedit.h \
+    ../../qffitfunctionbase.h \
+    ../../qftablemodel.h \
+    ../../qfversion.h
 
 FORMS += \
     ../../qfdlg_csvparameters.ui
+
+INCLUDEPATH += ../../

@@ -169,7 +169,8 @@ bool QF3CorrelationDataFormatTool::loadFile(const QString &filename, bool proper
                             int idx=rxPC.cap(1).toInt();
                             preferred_channels[idx]=value.toInt();
                         } else {
-                            properties[name]=value;
+                            properties[name]=qfStringToVariantAutoRecognizeType(value);
+
                         }
                     } else if (!propertiesOnly && section==1) { // correlation data section
                         if (correlations.size()<=0) reserveCorrelations(); // if data arrays have to yet been reserved, do so now

@@ -107,13 +107,15 @@ QString qfInfoCompileDate() {
     QRegExp rx("\\s*(\\d\\d)\\.(\\d\\d)\\.(\\d\\d\\d\\d)\\s*");
     rx.setCaseSensitivity(Qt::CaseInsensitive);
     if (rx.indexIn(s)==0 && rx.matchedLength()==s.length()) {
-        s=QDate(rx.cap(3).toInt(), rx.cap(2).toInt(), rx.cap(1).toInt()).toString("yyyy/MM/dd");
+        s=QDate(rx.cap(3).toInt(), rx.cap(2).toInt(), rx.cap(1).toInt()).toString("yyyy-MM-dd");
     }
+    s=s.replace('/', '-');
     return s;
 }
 
 
-QUrl qfUpdateXMLURL() {
+QUrl qfUpdateXMLURL(bool alternative) {
+    if (alternative) return QUrl::fromEncoded(QString(QF_ALTUPDATEXMLURL).toLocal8Bit());
     if (qfIsSpecialVersion())  return QUrl::fromEncoded(QString(QF_UPDATESPECIALXMLURL).toLocal8Bit());
     return QUrl::fromEncoded(QString(QF_UPDATEXMLURL).toLocal8Bit());
 }

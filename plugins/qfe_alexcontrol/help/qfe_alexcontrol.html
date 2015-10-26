@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>ALEX spFRET Control PLugin Help</title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		
+		<h2>Description</h2>
+		<p>This plugin can be used to control an AOTF via a National Instruments card to output patterns for alternating laser-excitation (ALEX) spFRET-measurements.  You can start the plugin by clicking on the menu entry <b>Extensions | Start ALEX Control (for spFRET)</b> in QuickFit's main widnow.</p>
+		
+		<h2>Configuring the National Instruments Hardware</h2>
+		<p>
+		$$note:Before using this plugin, you will have to write three configuration files that tell the plugin which NI-cards to use and which channels are available on them. This section describes how this is done$$
+		The configuration files are stored in the global config directory of QuickFit (<tt>$$globalconfigdir$$</tt>): If they are not found there, the plugin will ask you to select a configuration to use! Here are examples for the three files together with a short description.
+		</p>
+		<h3><tt>alexc_channels.ini</tt></h3>
+		<p>
+		This file defines which input/output channels are available in the system. For each channel a type (AO/AI/DO/DI), the device, the pin and additional properties (e.g. min/max for anaolg outputs) are defines. The pin with <tt>required=true</tt> has to be used in the output sequence, or an error will occur.
+		$$startbox_example$$<code>
+[AO1]<br>
+type=AO<br>
+device=Dev1<br>
+pin=ao0<br>
+min=-10<br>
+max=10<br>
+required=true<br>
+<br>
+[AO2]<br>
+type=AO<br>
+device=Dev1<br>
+pin=ao1<br>
+min=-10<br>
+max=10<br>
+<br>
+[AO3]<br>
+type=AO<br>
+device=Dev1<br>
+pin=ao2<br>
+min=-10<br>
+max=10<br>
+<br>
+[AO4]<br>
+type=AO<br>
+device=Dev1<br>
+pin=ao3<br>
+min=-10<br>
+max=10<br>
+<br>
+<br>
+<br>
+[D0.1]<br>
+type=DO<br>
+device=Dev1<br>
+port=port0<br>
+pin=line0<br>
+<br>
+[D0.2]<br>
+type=DO<br>
+device=Dev1<br>
+port=port0<br>
+pin=line1<br>
+<br>
+[D0.3]<br>
+type=DO<br>
+device=Dev1<br>
+port=port0<br>
+pin=line2<br>
+
+		</code>$$endbox$$
+		</p>
+		<h3><tt>alexc_ports.ini</tt></h3>		
+		<p>This specifies digital ports on your card.$$startbox_example$$<code>
+[Dev1/port0]<br>
+width = 32<br>
+grouping = pin_name<br>		
+		</code>$$endbox$$
+		</p>
+		<h3><tt>alexc_timing.ini</tt></h3>
+		<p>This file controls the timing of the ports on the card. In the example below, the analog output is used as master and the digital output uses the ao/SampleClock for synchronized output!
+$$startbox_example$$<code>
+# use PCIe-6323 card Dev2 as master output card <br>
+<br>
+[Dev1/ao]<br>
+source=<br>
+edge=rising<br>
+last=true<br>
+<br>
+#synchronize digital output to analog output (bot use the same sample clock!!!)<br>
+[Dev1/do]<br>
+source=ao/SampleClock<br>
+edge=rising<br>
+<br>
+[Dev1/ai]<br>
+source=<br>
+edge=rising<br>
+		</code>$$endbox$$
+		</p>
+		
+		<h2>Copyright</h2>
+		<p>The major part of this plugin was written by Sebastian Isbaner. The plugin is dirstributed under the terms of the GPL 3.0.</p>
+	</body>
+</html>

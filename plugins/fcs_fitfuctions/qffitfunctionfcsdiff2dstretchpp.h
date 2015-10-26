@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFitFunctionFCSDiff2DStretchPP_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 /*! \brief plugin class for FCS Normal Diffusion Fit Functions with stretched photophysics
     \ingroup qf3fitfunp_fcs
@@ -64,7 +64,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
       \f[ \Delta \mbox{cpm}=\sqrt{\left(\Delta\mbox{cps}\cdot\frac{1}{N}\right)^2+\left(\Delta b\cdot\frac{1}{N}\right)^2+\left(\Delta N\cdot\frac{\mbox{cps}-b}{N^2}\right)^2} \f]
 
 */
-class QFFitFunctionFCSDiff2DStretchPP: public QFFitFunction {
+class QFFitFunctionFCSDiff2DStretchPP: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSDiff2DStretchPP(bool isTIRF=false);
         virtual ~QFFitFunctionFCSDiff2DStretchPP() {}

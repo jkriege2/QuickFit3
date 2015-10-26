@@ -34,6 +34,10 @@ class QFFitResultsByIndexEvaluationFitToolsBase {
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
         virtual QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1, const QString &prefix=QString("fitstat_"), const QString &pgroup=QString("fit statistics"), const QVector<double>& COV=QVector<double>(), double paramrange_size=200, bool storeCOV=false, QStringList *returnFitParamNames=NULL);
+        inline QFFitStatistics calcFitStatisticsV(bool storeAsResults, QFFitFunction* ffunc, long N, const QVector<double>& tauvals, const QVector<double>& corrdata, const QVector<double>& weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1, const QString &prefix=QString("fitstat_"), const QString &pgroup=QString("fit statistics"), const QVector<double>& COV=QVector<double>(), double paramrange_size=200, bool storeCOV=false, QStringList *returnFitParamNames=NULL) {
+            return calcFitStatistics(storeAsResults, ffunc,  N,  tauvals.data(),  corrdata.data(), weights.data(),  datacut_min,  datacut_max, fullParams,  errors, paramsFix,  runAvgWidth,  residualHistogramBins,  record,  run, prefix, pgroup,  COV,  paramrange_size,  storeCOV, returnFitParamNames);
+        }
+
         virtual void saveFitStatistics(QFBasicFitStatistics& results, QFRawDataRecord* record, int run=-1, const QString &prefix=QString("fitstat_"), const QString &pgroup=QString("fit statistics"));
 
     protected:
@@ -57,7 +61,7 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
 
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
           */
-        virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL, bool doLog=false)=0;
+        virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL, bool doLog=false, bool guessOnly=false)=0;
         /*! \brief perform a fit for the given \a record and \a run
 
             The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
@@ -67,7 +71,7 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
 
             \note THIS FUNCTION NEEDS TO BE THREAD SAFE!!!
           */
-        virtual void doFitForMultithread(QFFitAlgorithm* falg, QFFitFunction* ffunc, QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const =0;
+        virtual void doFitForMultithread(QFFitAlgorithm* falg, QFFitFunction* ffunc, QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL, bool guessOnly=false) const =0;
 
 
         /*! \brief perform a fit for the given \a record and \a run
@@ -79,7 +83,7 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
 
             \note THIS FUNCTION NEEDS TO BE THREAD SAFE!!!
           */
-        virtual void doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const =0;
+        virtual void doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL, bool guessOnly=false) const =0;
 
 
         /*! \brief This function should return a usable QFFitAlgoruthm and QFFitFunction as freshly created objects for the given record and run

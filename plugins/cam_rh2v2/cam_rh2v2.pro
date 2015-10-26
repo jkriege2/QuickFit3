@@ -21,6 +21,7 @@
 
 include(../../extlibsb040/processing_chain/processing_chain.pri)
 
+
 QMAKE_CXXFLAGS += -ggdb
 
 TEMPLATE = lib
@@ -31,7 +32,7 @@ DEPENDPATH += ./
 
 LIBS += -lusb
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/usb1.0.pri)
 
 DESTDIR = $$QFOUTPUT/plugins

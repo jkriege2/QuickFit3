@@ -39,6 +39,8 @@ class QFRDRImagingFCSSimulator : public QDialog
         ~QFRDRImagingFCSSimulator();
         
         QString getSimulationFilename() const;
+        QStringList getLastMSDNames() const;
+        QStringList getLastTrajNames() const;
     protected slots:
         void on_btnHelp_clicked();
         void writeSettings() const;
@@ -47,7 +49,15 @@ class QFRDRImagingFCSSimulator : public QDialog
         void on_btnCancel_clicked();
         void threadFinished();
         void updateSimStatus(int status);
+        void on_spinFrametime_valueChanged(double val);
+        void on_spinFrames_valueChanged(int val);
+        void on_spinWarmup_valueChanged(int val);
+        void on_spinTimestep_valueChanged(double val);
+        void on_chkTimeStepEqFrametime_toggled(bool val);
+        void on_edtFilename_textChanged(QString text);
+        void on_edtFilenameAdd_textChanged(QString text);
     private:
+        QString transformedFilename() const;
         Ui::QFRDRImagingFCSSimulator *ui;
 
         enum DialogState {
@@ -61,6 +71,8 @@ class QFRDRImagingFCSSimulator : public QDialog
         void setState(DialogState new_state);
 
         QString lastSimFile;
+        QStringList lastMSDNames;
+        QStringList lastTrajNames;
 
         QFRDRImagingFCSSimulationThread* sim;
         QDateTime timeSimStart;

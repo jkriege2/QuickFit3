@@ -123,7 +123,7 @@ class QFWIDLIB_EXPORT QtLogFile : public QWidget {
         virtual QString indentify(const QString& text);
 
 		/** \brief internal: output some text message without indetify step  */
-        virtual void raw_log_text(const QString& message);
+        virtual void raw_log_text(const QString& message, bool procEvents=true);
     public:
         /** \brief class constructor */
         QtLogFile(QWidget *parent = 0);
@@ -144,6 +144,8 @@ class QFWIDLIB_EXPORT QtLogFile : public QWidget {
         void saveSettings(QSettings& s, QString namePrefix=QString(""));
         /** \brief read the widget settings from a QSettings object */
         void readSettings(QSettings& s, QString namePrefix=QString(""));
+
+        QString toPlainText() const;
 
 
 		/** \brief get the current log file name */
@@ -223,11 +225,11 @@ class QFWIDLIB_EXPORT QtLogFile : public QWidget {
 
 
 		/** \brief output some text message */
-        virtual void log_text(const QString& message);
+        virtual void log_text(const QString& message, bool processEvents=true);
 		/** \brief output some warning message */
-        virtual void log_warning(const QString& message);
+        virtual void log_warning(const QString& message, bool processEvents=true);
 		/** \brief output some error message */
-        virtual void log_error(const QString& message);
+        virtual void log_error(const QString& message, bool processEvents=true);
         /** \brief output some error message  and adds a linebreak*/
         virtual void log_error_linebreak(const QString& message);
         /** \brief output some warning message  and adds a linebreak*/

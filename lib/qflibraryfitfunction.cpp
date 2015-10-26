@@ -64,6 +64,7 @@ class QFLibraryFitFunction_private {
         QF3SimpleFFSortParameters lib_sortParams;
         QF3SimpleFFEvaluateDerivatives lib_evalDerivative;
         QF3SimpleFFEstimateInitial lib_estimateInitial;
+        QF3SimpleFFEstimateParameterFromXY lib_estimateFromXY;
         QF3SimpleFFGetAdditionalPlotCount lib_getAdditionalPlots;
         QF3SimpleFFTransformParametersForAdditionalPlot lib_transformAdditionalPlot;
         QF3SimpleFFGetVersionFunc lib_getVersion;
@@ -95,6 +96,7 @@ QFLibraryFitFunction::QFLibraryFitFunction(QLibrary *library)
         d->lib_isParamVisible=(QF3SimpleFFIsParameterVisible) d->library->resolve("isParameterVisible");
         d->lib_sortParams=(QF3SimpleFFSortParameters) d->library->resolve("sortParameters");
         d->lib_evalDerivative=(QF3SimpleFFEvaluateDerivatives) d->library->resolve("evaluateDerivatives");
+        d->lib_estimateFromXY=(QF3SimpleFFEstimateParameterFromXY) d->library->resolve("estimateParameterFromXY");
         d->lib_estimateInitial=(QF3SimpleFFEstimateInitial) d->library->resolve("estimateInitial");
         d->lib_getAdditionalPlots=(QF3SimpleFFGetAdditionalPlotCount) d->library->resolve("getAdditionalPlotCount");
         d->lib_transformAdditionalPlot=(QF3SimpleFFTransformParametersForAdditionalPlot) d->library->resolve("transformParametersForAdditionalPlot");
@@ -112,6 +114,7 @@ QFLibraryFitFunction::QFLibraryFitFunction(QLibrary *library)
             if (d->lib_sortParams) additional<<QString("sortParams()");
             if (d->lib_evalDerivative) additional<<QString("evalDerivative()");
             if (d->lib_estimateInitial) additional<<QString("estimateInitial()");
+            if (d->lib_estimateFromXY) additional<<QString("estimateParameterFromXY()");
             if (d->lib_getAdditionalPlots) additional<<QString("getAdditionalPlots()");
             if (d->lib_transformAdditionalPlot) additional<<QString("transformAdditionalPlot()");
             d->m_features="";
@@ -292,4 +295,14 @@ bool QFLibraryFitFunction::estimateInitial(double *params, const double *dataX, 
             return d->lib_estimateInitial(params, dataX, dataY, N, NULL);
         }
     } else return QFFitFunction::estimateInitial(params, dataX, dataY, N, fix);
+}
+
+bool QFLibraryFitFunction::estimateParameterFromXY(double &newparam, int param, double x, double y, const double *params) const
+{
+    if (d->lib_estimateFromXY) {
+        double tmp=newparam;
+        bool res= d->lib_estimateFromXY(&tmp, param, x, y, params)!=QF3SFF_FALSE;
+        newparam=tmp;
+        return res;
+    } else return QFFitFunction::estimateParameterFromXY(newparam, param, x, y, params);
 }

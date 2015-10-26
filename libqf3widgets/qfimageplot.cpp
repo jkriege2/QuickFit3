@@ -7,6 +7,13 @@
 #include "qfimportermanager.h"
 #include "qfimporter.h"
 #include "image_tools.h"
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#  include <QtConcurrent/QtConcurrent>
+#else
+#  include <QtConcurrentRun>
+#endif
+#include <QFuture>
+
 
 QFImagePlot::QFImagePlot(QWidget *parent, const QString &prefix):
     QWidget(parent),
@@ -153,7 +160,7 @@ void QFImagePlot::update_plot()
         double imin=0, imax=0;
         if (binning>1) {
             double* imgb=qfBinImageCreate(image_data, image_width, image_height, binning);
-            statisticsMinMax(imgb, (image_width/binning)*(image_height/binning), imin, imax);
+            statisticsMinMax(imgb, qMax(1,image_width/binning)*qMax(1,image_height/binning), imin, imax);
             qfFree(imgb);
         } else {
             statisticsMinMax(image_data, image_width*image_height, imin, imax);
@@ -213,10 +220,19 @@ void QFImagePlot::new_plots()
         if (binning<=1){
             plteImage->set_imageColumn(ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image")));
         } else {
-            double* tmp=NULL;
-            plteImage->set_imageColumn(ds->addCopiedImageAsColumn(tmp=qfBinImageCreate(image_data, image_width, image_height, binning), image_width/binning, image_height/binning, tr("image, %1x%1 binned").arg(binning)));
-            qfFree(tmp);
-            ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image"));
+            int imgcol=ds->addCopiedImageAsColumn(image_data, image_width, image_height, tr("image"));
+            try {
+                double* tmp=qfBinImageCreate(image_data, image_width, image_height,binning);
+                int nw=qMax(1,image_width/binning);
+                int nh=qMax(1,image_height/binning);
+                if (!tmp) { nw=nh=0; }
+                //qDebug()<<tmp<<nw<<nh<<ds;
+                int col=ds->addCopiedImageAsColumn(tmp, nw, nh, tr("image, %1x%1 binned").arg(binning));
+                plteImage->set_imageColumn(col);
+                qfFree(tmp);
+            } catch(std::exception& E) {
+                plteImage->set_imageColumn(imgcol);
+            }
         }
         plteImage->set_x(0);
         plteImage->set_y(0);
@@ -283,8 +299,11 @@ void QFImagePlot::plotMouseMove(double x, double y)
             int xx=floor(x);
             int yy=floor(y);
             double v=0;
-            if (xx>=0 && xx<image_width/binning && yy>=0 && yy<image_height/binning) {
-                v=image_data[yy*(image_width/binning)+xx];
+            int nw=qMax(1,image_width/binning);
+            int nh=qMax(1,image_height/binning);
+            if (!img) { nw=nh=0; }
+            if (xx>=0 && xx<nw && yy>=0 && yy<nh) {
+                v=img[yy*nw+xx];
                 ui->labMouse->setText(tr("image(%1, %2) = %3").arg(xx).arg(yy).arg(v));
             } else {
                 ui->labMouse->setText("");
@@ -354,14 +373,55 @@ void QFImagePlotWizardPage::setImage(double *image, int32_t width, int32_t heigh
     }
 }
 
+
+class QFImporterImageSeriesOpener {
+    public:
+        QFImporterImageSeriesOpener(QFImporterImageSeries* reader) {
+            this->reader=reader;
+        }
+
+        bool operator()(const QString &filename) {
+            return reader->open(filename);
+        }
+        typedef bool result_type;
+
+        protected:
+            QFImporterImageSeries* reader;
+};
+
+class QFImporterImageSeriesFrameCounter {
+    public:
+        QFImporterImageSeriesFrameCounter(QFImporterImageSeries* reader) {
+            this->reader=reader;
+        }
+
+        uint32_t operator()() {
+            return reader->countFrames();
+        }
+        typedef uint32_t result_type;
+
+        protected:
+            QFImporterImageSeries* reader;
+};
+
 void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, int frameNum, QFImporter::FileInfo* fileinfo)
 {
     QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
     QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
     if (r) {
-        if (r->open(filename)) {
+        QFImporterImageSeriesOpener opener(r);
+        QFuture<bool> opened=QtConcurrent::run(opener, filename);
+        while (!opened.isFinished()) {
+            QApplication::processEvents();
+        }
+        if (opened.result()) {
             if (frameNum<0) {
-                frameNum=r->countFrames()/2;
+                QFImporterImageSeriesFrameCounter counter(r);
+                QFuture<uint32_t> cnt=QtConcurrent::run(counter);
+                while (!cnt.isFinished()) {
+                    QApplication::processEvents();
+                }
+                frameNum=cnt.result()/2;
             }
             if (frameNum>0) {
                 for (int i=0; i<frameNum; i++) {
@@ -383,18 +443,28 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
     }
 }
 
-void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, int frameNum, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo, int* frames)
+void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, int frameNum, double **image, int &width, int &height, QFImporter::FileInfo *fileinfo, int* frames)
 {
     QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
     QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
     if (r) {
-        if (r->open(filename)) {
+        QFImporterImageSeriesOpener opener(r);
+        QFuture<bool> opened=QtConcurrent::run(opener, filename);
+        while (!opened.isFinished()) {
+            QApplication::processEvents();
+        }
+        if (opened.result()) {
             int fs=0;
+            QFImporterImageSeriesFrameCounter counter(r);
+            QFuture<uint32_t> cnt=QtConcurrent::run(counter);
+            while (!cnt.isFinished()) {
+                QApplication::processEvents();
+            }
             if (frameNum<0) {
-                fs=r->countFrames();
-                frameNum=r->countFrames()/2;
+                fs=cnt.result();
+                frameNum=cnt.result()/2;
             } else {
-                if (frames) fs=r->countFrames();
+                if (frames) fs=cnt.result();
             }
             if (frames) *frames=fs;
             if (frameNum>0) {
@@ -406,7 +476,7 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
             double* frame=qfMallocT<double>(r->frameHeight()*r->frameWidth());
             r->readFrameDouble(frame);
             if (fileinfo) *fileinfo=r->getFileInfo();
-            image=duplicateArray(frame, r->frameHeight()*r->frameWidth());
+            if (image) *image=duplicateArray(frame, r->frameHeight()*r->frameWidth());
             height=r->frameHeight();
             width=r->frameWidth();
             r->close();
@@ -421,21 +491,31 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
     }
 }
 
-void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &imageReaderID, int frameStart, int frameCount, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo, int *frames)
+void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &imageReaderID, int frameStart, int frameCount, double **image, int &width, int &height, QFImporter::FileInfo *fileinfo, int *frames)
 {
     QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
     QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
     //qDebug()<<imp<<r;
     if (r) {
-        if (r->open(filename)) {
+        QFImporterImageSeriesOpener opener(r);
+        QFuture<bool> opened=QtConcurrent::run(opener, filename);
+        while (!opened.isFinished()) {
+            QApplication::processEvents();
+        }
+        if (opened.result()) {
             //qDebug()<<"opened "<<filename;
             int fs=0;
             frameCount=qMax(frameCount, 1);
+            QFImporterImageSeriesFrameCounter counter(r);
+            QFuture<uint32_t> cnt=QtConcurrent::run(counter);
+            while (!cnt.isFinished()) {
+                QApplication::processEvents();
+            }
             if (frameStart<0) {
-                fs=r->countFrames();
-                frameStart=qMax((uint32_t)0,(r->countFrames()-frameCount)/2);
+                fs=cnt.result();
+                frameStart=qMax((uint32_t)0,(cnt.result()-frameCount)/2);
             } else {
-                if (frames) fs=r->countFrames();
+                if (frames) fs=cnt.result();
             }
             if (frames) *frames=fs;
             if (frameStart>0) {
@@ -451,7 +531,7 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
             double* frame=qfMallocT<double>(width*height);
             r->readFrameDouble(frame);
             if (fileinfo) *fileinfo=r->getFileInfo();
-            image=duplicateArray(frame, width*height);
+            if (image) *image=duplicateArray(frame, width*height);
             //qDebug()<<width<<height;
             double fcnt=1;
             for (int i=1; i<frameCount; i++) {
@@ -459,20 +539,23 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
                     if (r->readFrameDouble(frame)) {
                         fcnt++;
                         //qDebug()<<fcnt;
-                        for (int j=0; j<width*height; j++) {
-                            image[j]=image[j]+frame[j];
+                        if (image) for (int j=0; j<width*height; j++) {
+                            (*image)[j]=(*image)[j]+frame[j];
                         }
                     }
                 } else {
                     break;
                 }
+                if (i%5==0) {
+                    QApplication::processEvents();
+                }
             }
             //qDebug()<<"normalize "<<fcnt;
-            for (int j=0; j<width*height; j++) {
-                image[j]=image[j]/fcnt;
+            if (image) for (int j=0; j<width*height; j++) {
+                (*image)[j]=(*image)[j]/fcnt;
             }
             r->close();
-            plot->setImage(image, width, height);
+            if (image) plot->setImage(*image, width, height);
             qfFree(frame);
             //qfFree(image);
         } else {
@@ -487,9 +570,9 @@ void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &
 void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &imageReaderID, int frameStart, int frameCount, QFImporter::FileInfo *fileinfo)
 {
     double* image=NULL;
-    int width;
-    int height;
-    setImageAvg(filename, imageReaderID, frameStart, frameCount, image, width, height, fileinfo);
+    int width=0;
+    int height=0;
+    setImageAvg(filename, imageReaderID, frameStart, frameCount, &image, width, height, fileinfo);
     if (image) qfFree(image);
 
 }
@@ -499,7 +582,7 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
     setImage(filename, imageReaderID, 0, fileinfo);
 }
 
-void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo)
+void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, double **image, int &width, int &height, QFImporter::FileInfo *fileinfo)
 {
     setImage(filename, imageReaderID, 0, image, width, height, fileinfo);
 }

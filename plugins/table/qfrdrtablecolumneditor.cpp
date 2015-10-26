@@ -96,6 +96,8 @@ QFRDRTableColumnEditor::QFRDRTableColumnEditor(QFRDRTable *table, QFTablePluginM
         ui->edtFormula->addInsertContextMenuEntry(tr("insert rel. column 'col-id'';;&%1: %2").arg(deltacol_r).arg(model->columnTitle(i)), QString("col%1%2").arg(sign).arg(deltacol));
     }
 
+    QFont f(ProgramOptions::getConfigValue("quickfit/code_font", "Hack").toString(), ProgramOptions::getConfigValue("quickfit/code_pointsize", 10).toInt());
+    ui->edtFormula->setFont(f);
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
 
@@ -156,9 +158,9 @@ QString QFRDRTableColumnEditor::getColumnTitle() const
     return ui->edtTitle->text();
 }
 
-void QFRDRTableColumnEditor::on_edtFormula_textChanged(QString /*text*/) {
-    on_edtFormula_textChanged();
-}
+//void QFRDRTableColumnEditor::on_edtFormula_textChanged(QString /*text*/) {
+//    on_edtFormula_textChanged();
+//}
 
 void QFRDRTableColumnEditor::on_edtFormula_textChanged() {
 

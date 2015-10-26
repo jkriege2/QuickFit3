@@ -39,7 +39,6 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "cpptools.h"
 #include "dlgqfprogressdialog.h"
 #include "qmoretextobject.h"
-#include "qffcsfitchi2landscapedialog.h"
 #include "qffitfunctionmanager.h"
 #include "qffitresultsbyindexevaluationfitthread.h"
 #include "qffitfunctionconfigforglobalfittools.h"
@@ -999,7 +998,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                         paramsV<<params[i];
                         //qDebug()<<ff->getParameterID(i)<<" = "<<params[i];
                     }
-                    JKQTPxQFFitFunctionLineGraph* g_fit=new JKQTPxQFFitFunctionLineGraph();
+                    JKQTPxQFFitFunctionLineGraph* g_fit=new JKQTPxQFFitFunctionLineGraph(ui->pltData);
                     g_fit->set_title(tr("fit: %1").arg(plotname));
                     g_fit->set_fitFunction(ff, false);
                     g_fit->set_params(paramsV);

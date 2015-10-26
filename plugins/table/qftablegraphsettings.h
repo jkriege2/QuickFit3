@@ -76,6 +76,7 @@ class QFTableGraphSettings : public QWidget
 
         void on_btnShiftAuto_clicked();
         void on_cmbSelectDataCompare_currentIndexChanged(int index);
+        void on_cmbRangeMode_currentIndexChanged(int index);
 
 
         void on_btnClearLinesXData_clicked();
@@ -126,6 +127,8 @@ class QFTableGraphSettings : public QWidget
         QAction* actRegression;
 
         bool isFitResult;
+
+        bool m_connected;
 };
 
 #endif // QFTABLEGRAPHSETTINGS_H

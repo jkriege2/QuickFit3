@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = fit_lmfit
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 #include(../../extlibs/lmfit.pri)
 include(../../extlibs/lmfit5.pri)
 

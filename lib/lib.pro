@@ -192,7 +192,12 @@ HEADERS += dlgnewproperty.h \
     highrestimer.h \
     ticktock.h \
     jkiniparser2.h \
-    cpptools.h
+    cpptools.h \
+    qfrdrcurvesinterface.h \
+    qcheckablestringlistmodel.h \
+    qfdoublerangeedit.h \
+    qfweightingtools.h \
+    qfgeneralfitfunctionbase.h
 
 
 SOURCES += dlgnewproperty.cpp \
@@ -310,7 +315,11 @@ SOURCES += dlgnewproperty.cpp \
     jkmathparser.cpp \
     highrestimer.cpp \
     jkiniparser2.cpp \
-    cpptools.cpp
+    cpptools.cpp \
+    qcheckablestringlistmodel.cpp \
+    qfdoublerangeedit.cpp \
+    qfweightingtools.cpp \
+    qfgeneralfitfunctionbase.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

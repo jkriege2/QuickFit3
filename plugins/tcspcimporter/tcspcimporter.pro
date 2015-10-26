@@ -27,7 +27,7 @@ DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
 
@@ -40,7 +40,8 @@ HEADERS += qfetcspcimporter.h \
     qfetcspcimporterdialog.h \
     ../base_classes/qf3correlationdataformattool.h \
     ../base_classes/tttrtools.h \
-    qfetcspcimporterlifetimeview.h
+    qfetcspcimporterlifetimeview.h \
+    qfetcspcimporterfretchen2.h
 
 SOURCES += qfetcspcimporter.cpp \
     qfetcspcimporterthreadprogress.cpp \
@@ -48,12 +49,14 @@ SOURCES += qfetcspcimporter.cpp \
     qfetcspcimporterdialog.cpp \
     ../base_classes/qf3correlationdataformattool.cpp \
     ../base_classes/tttrtools.cpp \
-    qfetcspcimporterlifetimeview.cpp
+    qfetcspcimporterlifetimeview.cpp \
+    qfetcspcimporterfretchen2.cpp
 
 FORMS = \
     qfetcspcimporterthreadprogress.ui \
     qfetcspcimporterdialog.ui \
-    qfetcspcimporterlifetimeview.ui
+    qfetcspcimporterlifetimeview.ui \
+    qfetcspcimporterfretchen2.ui
 
 RESOURCES += qfetcspcimporter.qrc \
     ../../lib/lib.qrc

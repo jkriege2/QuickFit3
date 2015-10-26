@@ -66,6 +66,10 @@ SUBDIRS += plg_rdrsettings
 plg_rdrsettings.subdir=./plugins/rdrsettings
 plg_rdrsettings.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfrdrcurve
+plg_qfrdrcurve.subdir=./plugins/qfrdrcurve
+plg_qfrdrcurve.depends = lib libqf3widgets
+
 SUBDIRS += plg_qfe_calculator
 plg_qfe_calculator.subdir=./plugins/qfe_calculator
 plg_qfe_calculator.depends = lib libqf3widgets
@@ -84,12 +88,66 @@ SUBDIRS += plg_qfe_helpeditor
 plg_qfe_helpeditor.subdir=./plugins/qfe_helpeditor
 plg_qfe_helpeditor.depends = lib libqf3widgets
 
-SUBDIRS += plg_cam_server
-plg_cam_server.subdir=./plugins/cam_server
-plg_cam_server.depends = lib libqf3widgets
+SUBDIRS += plg_qfqtimageimporter
+plg_qfqtimageimporter.subdir=./plugins/qfqtimageimporter
+plg_qfqtimageimporter.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfe_dataexportbasics
+plg_qfe_dataexportbasics.subdir=./plugins/qfe_dataexportbasics
+plg_qfe_dataexportbasics.depends = lib libqf3widgets
+
+SUBDIRS += plg_qfe_dataexportbasics_xlsx
+plg_qfe_dataexportbasics_xlsx.subdir=./plugins/qfe_dataexportbasics_xlsx
+plg_qfe_dataexportbasics_xlsx.depends = lib libqf3widgets
+
+SUBDIRS += plg_basicimageimporters
+plg_basicimageimporters.subdir=./plugins/basicimageimporters
+plg_basicimageimporters.depends = lib
+
+SUBDIRS += plg_basicimageexporters
+plg_basicimageexporters.subdir=./plugins/basicimageexporters
+plg_basicimageexporters.depends = lib
+
+SUBDIRS += plg_qfe_plotterexporterlatex
+plg_qfe_plotterexporterlatex.subdir=./plugins/qfe_plotterexporterlatex
+plg_qfe_plotterexporterlatex.depends = lib libqf3widgets
+
+SUBDIRS += plg_qfe_gslmathparserextensions
+plg_qfe_gslmathparserextensions.subdir=./plugins/qfe_gslmathparserextensions
+plg_qfe_gslmathparserextensions.depends = lib libqf3widgets
+
+
+SUBDIRS += plg_fitalgorithm_levmar
+plg_fitalgorithm_levmar.subdir=./plugins/fitalgorithm_levmar
+plg_fitalgorithm_levmar.depends = lib libqf3widgets
+
+
+SUBDIRS += plg_fitalgorithm_fit_gsl
+plg_fitalgorithm_fit_gsl.subdir=./plugins/fitalgorithm_fit_gsl
+plg_fitalgorithm_fit_gsl.depends = lib libqf3widgets
+
+!contains(QF3CONFIG, nonlopt) {
+    SUBDIRS += plg_fitalgorithm_fit_nlopt
+    plg_fitalgorithm_fit_nlopt.subdir=./plugins/fitalgorithm_fit_nlopt
+    plg_fitalgorithm_fit_nlopt.depends = lib libqf3widgets
+}
+
+!contains(QF3CONFIG, nonidaqmx) {
+    SUBDIRS += plg_qfe_nidaqmxreader
+    plg_qfe_nidaqmxreader.subdir=./plugins/qfe_nidaqmxreader
+    plg_qfe_nidaqmxreader.depends = lib libqf3widgets
+}
+
+SUBDIRS += plg_curve_fit
+plg_curve_fit.subdir=./plugins/curve_fit
+plg_curve_fit.depends = lib libqf3widgets
 
 !contains(QF3CONFIG,basicqfpluginsonly) {
+
+    SUBDIRS += plg_cam_server
+    plg_cam_server.subdir=./plugins/cam_server
+    plg_cam_server.depends = lib libqf3widgets
+
     SUBDIRS += plg_fcs
     plg_fcs.subdir = ./plugins/fcs
     plg_fcs.depends = lib libqf3widgets
@@ -114,6 +172,10 @@ plg_cam_server.depends = lib libqf3widgets
     plg_fccsfit.subdir = ./plugins/fccsfit
     plg_fccsfit.depends = lib libqf3widgets
 
+    SUBDIRS += plg_qfe_fcssimulator
+    plg_qfe_fcssimulator.subdir = ./plugins/qfe_fcssimulator
+    plg_qfe_fcssimulator.depends = lib libqf3widgets
+
     SUBDIRS += plg_photoncounts
     plg_photoncounts.subdir = ./plugins/photoncounts
     plg_photoncounts.depends = lib libqf3widgets
@@ -121,6 +183,10 @@ plg_cam_server.depends = lib libqf3widgets
     SUBDIRS += plg_tcspcimporter
     plg_tcspcimporter.subdir = ./plugins/tcspcimporter
     plg_tcspcimporter.depends = lib libqf3widgets
+
+    SUBDIRS += plg_qfe_alexeval
+    plg_qfe_alexeval.subdir = ./plugins/qfe_alexeval
+    plg_qfe_alexeval.depends = lib libqf3widgets
 
     SUBDIRS += plg_importers_simpletcspcimporter
     plg_importers_simpletcspcimporter.subdir = ./plugins/importers_simpletcspcimporter
@@ -158,28 +224,8 @@ plg_cam_server.depends = lib libqf3widgets
     plg_fitfunction_2ffcs.subdir=./plugins/fitfunction_2ffcs
 
 
-    SUBDIRS += plg_fitalgorithm_levmar
-    plg_fitalgorithm_levmar.subdir=./plugins/fitalgorithm_levmar
-    plg_fitalgorithm_levmar.depends = lib libqf3widgets
 
 
-    SUBDIRS += plg_fitalgorithm_fit_gsl
-    plg_fitalgorithm_fit_gsl.subdir=./plugins/fitalgorithm_fit_gsl
-    plg_fitalgorithm_fit_gsl.depends = lib libqf3widgets
-
-    !contains(QF3CONFIG, nonlopt) {
-        SUBDIRS += plg_fitalgorithm_fit_nlopt
-        plg_fitalgorithm_fit_nlopt.subdir=./plugins/fitalgorithm_fit_nlopt
-        plg_fitalgorithm_fit_nlopt.depends = lib libqf3widgets
-    }
-
-    SUBDIRS += plg_basicimageimporters
-    plg_basicimageimporters.subdir=./plugins/basicimageimporters
-    plg_basicimageimporters.depends = lib
-
-    SUBDIRS += plg_basicimageexporters
-    plg_basicimageexporters.subdir=./plugins/basicimageexporters
-    plg_basicimageexporters.depends = lib
 
     SUBDIRS += plg_picoquantimporters
     plg_picoquantimporters.subdir=./plugins/picoquantimporters
@@ -199,9 +245,6 @@ plg_cam_server.depends = lib libqf3widgets
     plg_qfe_spectraviewer.subdir=./plugins/qfe_spectraviewer
     plg_qfe_spectraviewer.depends = lib libqf3widgets
 
-    SUBDIRS += plg_qfe_plotterexporterlatex
-    plg_qfe_plotterexporterlatex.subdir=./plugins/qfe_plotterexporterlatex
-    plg_qfe_plotterexporterlatex.depends = lib libqf3widgets
 
         SUBDIRS += plg_numberandbrightness
     plg_numberandbrightness.subdir=./plugins/numberandbrightness
@@ -211,13 +254,6 @@ plg_cam_server.depends = lib libqf3widgets
     plg_spim_lightsheet_eval.subdir=./plugins/spim_lightsheet_eval
     plg_spim_lightsheet_eval.depends = lib libqf3widgets
 
-    SUBDIRS += plg_qfe_gslmathparserextensions
-    plg_qfe_gslmathparserextensions.subdir=./plugins/qfe_gslmathparserextensions
-    plg_qfe_gslmathparserextensions.depends = lib libqf3widgets
-
-    SUBDIRS += plg_qfe_dataexportbasics
-    plg_qfe_dataexportbasics.subdir=./plugins/qfe_dataexportbasics
-    plg_qfe_dataexportbasics.depends = lib libqf3widgets
 
     SUBDIRS += plg_qfevalcameracalibration
     plg_qfevalcameracalibration.subdir=./plugins/qfevalcameracalibration
@@ -242,7 +278,7 @@ plg_cam_server.depends = lib libqf3widgets
                     plg_cam_testcamera.subdir=./plugins/cam_testcamera
                     plg_cam_testcamera.depends = lib libqf3widgets
 
-                    !contains(QF3CONFIG, bits64) {
+                    !contains(BIT_DEPTH, 64) | linux {
                             SUBDIRS += plg_cam_systemcamera
                             plg_cam_systemcamera.subdir=./plugins/cam_systemcamera
                             plg_cam_systemcamera.depends = lib libqf3widgets
@@ -315,6 +351,14 @@ plg_cam_server.depends = lib libqf3widgets
                     plg_qfextensioncoboltlaser.subdir=./plugins/lights_b040laserbox
                     plg_lights_b040laserbox.depends = lib libqf3widgets
 
+                    !contains(QF3CONFIG, nonidaqmx) {
+                        SUBDIRS += plg_qfe_alexcontrol
+                        plg_qfe_alexcontrol.subdir=./plugins/qfe_alexcontrol
+                        plg_qfe_alexcontrol.depends = lib libqf3widgets
+                    }
+
+
+
                     contains(QF3CONFIG, ffmdrivers) {
                             SUBDIRS += plg_b040_ffmcontrol
                             plg_b040_ffmcontrol.subdir=./plugins/b040_ffmcontrol
@@ -328,19 +372,17 @@ plg_cam_server.depends = lib libqf3widgets
                             plg_alv_autocorrelator5000.subdir=./plugins/alv_autocorrelator5000
                             plg_alv_autocorrelator5000.depends = lib libqf3widgets
 
-                            SUBDIRS += plg_scanner2000_nicounter
-                            plg_scanner2000_nicounter.subdir=./plugins/scanner2000_nicounter
-                            plg_scanner2000_nicounter.depends = lib libqf3widgets
+                            !contains(QF3CONFIG, nonidaqmx) {
+                                SUBDIRS += plg_scanner2000_nicounter
+                                plg_scanner2000_nicounter.subdir=./plugins/scanner2000_nicounter
+                                plg_scanner2000_nicounter.depends = lib libqf3widgets
+                            }
                     }
             }
     }
 }
 
-RESOURCES += \
-    ../lib/lib.qrc
 
-DISTFILES += \
-    quickfit3.supp
 
 
 # if you have custom plugins, add them to a file userplugins.inc:

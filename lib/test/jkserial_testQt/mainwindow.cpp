@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    serial=new JKSerialConnection();
+    serial=new QFSerialConnection();
     tim=new QTimer(this);
     tim->setInterval(1);
     tim->setSingleShot(true);

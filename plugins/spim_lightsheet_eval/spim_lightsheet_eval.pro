@@ -26,7 +26,7 @@ TARGET = spim_lightsheet_eval
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 include(../../libquickfitwidgets.pri)

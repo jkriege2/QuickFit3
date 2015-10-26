@@ -6,9 +6,9 @@
 #include <QDebug>
 #include <unistd.h> //usleep
 
-#include "../../../../LIB/trunk/qt/qqueue.h"
-#include "../../../../LIB/trunk/frame.h"
-#include "../../../../LIB/trunk/helper.h"
+#include "qqueue.h"
+#include "frame.h"
+#include "helper.h"
 
 #include "worker_element.h"
 #include "worker_thread.h"

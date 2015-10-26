@@ -1019,7 +1019,7 @@ void QFFCCSFitEvaluationEditor::displayData() {
                     paramsV<<params[i];
                     //qDebug()<<ff->getParameterID(i)<<" = "<<params[i];
                 }
-                JKQTPxQFFitFunctionLineGraph* g_fit=new JKQTPxQFFitFunctionLineGraph();
+                JKQTPxQFFitFunctionLineGraph* g_fit=new JKQTPxQFFitFunctionLineGraph(ui->pltData);
                 g_fit->set_title(tr("fit: %1").arg(plotname));
                 g_fit->set_fitFunction(ff, false);
                 g_fit->set_params(paramsV);

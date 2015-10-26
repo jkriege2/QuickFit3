@@ -39,3 +39,5 @@ HEADERS += $$PWD/we_frame_gen_chspad.h
 SOURCES += $$PWD/worker_element.cpp
 SOURCES += $$PWD/worker_thread.cpp
 SOURCES += $$PWD/worker_interface.cpp
+
+include(../yaidtools.pri)

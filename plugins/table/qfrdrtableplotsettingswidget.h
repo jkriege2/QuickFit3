@@ -72,6 +72,7 @@ class QFRDRTablePlotSettingsWidget : public QWidget
         void updateGraph();
         void autoscaleX();
         void autoscaleY();
+        void autoscaleXY();
         void plotSettingsChanged();
     protected slots:
         void on_btnLoadSystem_clicked();
@@ -81,6 +82,7 @@ class QFRDRTablePlotSettingsWidget : public QWidget
         void on_btnAutoscaleXY_clicked();
         void doAutoscaleX();
         void doAutoscaleY();
+        void doAutoscaleXY();
 
     protected:
 

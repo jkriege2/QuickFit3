@@ -16,10 +16,18 @@ RequestExecutionLevel admin
 
 # Set some basic installer properties
 Name "${PRODUCT_NAME}"
-BrandingText "Copyright (c) 2013 by Jan W. Krieger (German Cancer research Center - DKFZ)"
+BrandingText "Copyright (c) 2013-2015 by Jan W. Krieger (German Cancer research Center - DKFZ)"
 ShowInstDetails show
 ShowUninstDetails show
 SetCompressor /FINAL  LZMA 
+
+# we have two install-types:
+InstType "default: (imaging) FCS/FCCS + ALEX spFRET"
+InstType "minimal (basic plugins only)"
+InstType "full"
+InstType "FCS/FCCS"
+InstType "FCS/FCCS + ALEX spFRET"
+InstType "(imaging) FCS/FCCS"
 
 # Set Version Information
 #VIProductVersion ${PRODUCT_VERSION}
@@ -48,17 +56,12 @@ Var StartMenuFolder
 !define MUI_WELCOMEFINISHPAGE_BITMAP "..\images\splash_installer.bmp"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP  "..\images\splash_installer.bmp"
 !define MUI_WELCOMEPAGE_TITLE "Install ${PRODUCT_NAME}, ${BIT_DEPTH}-bit (%%SVNVER%%, %%COMPILEDATE%%)!"
-!insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_README "README.txt"
-!insertmacro MUI_PAGE_LICENSE "LICENSE.txt"
-!insertmacro MUI_PAGE_COMPONENTS
-!insertmacro MUI_PAGE_DIRECTORY
+!define MUI_COMPONENTSPAGE
+!define MUI_COMPONENTSPAGE_NODESC
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM" 
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REG_KEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder" 
 !define MUI_STARTMENUPAGE_DEFAULT_FOLDER "${PRODUCT_NAME}"
-!insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder
-!insertmacro MUI_PAGE_INSTFILES
 !define MUI_FINISHPAGE_RUN "quickfit3.exe"
 !define MUI_FINISHPAGE_RUN_TEXT "Launch ${PRODUCT_NAME} now!"
 !define MUI_FINISHPAGE_SHOWREADME ""
@@ -67,6 +70,15 @@ Var StartMenuFolder
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION finishpageaction
 !define MUI_FINISHPAGE_LINK "QuickFit Webpage"
 !define MUI_FINISHPAGE_LINK_LOCATION ${URLInfoAbout}
+
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_README "README.txt"
+!insertmacro MUI_PAGE_LICENSE "LICENSE.txt"
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder
+!insertmacro MUI_PAGE_INSTFILES
+
 !insertmacro MUI_PAGE_FINISH
 
 !include "FileFunc.nsh"
@@ -123,12 +135,20 @@ Function finishpageaction
 	CreateShortCut "$desktop\${PRODUCT_NAME}.lnk" "$INSTDIR\quickfit3.exe"
 FunctionEnd
 
+SectionGroup "${PRODUCT_NAME} Basic Install"
 
 # This installs the main application
 Section "${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_main
 	Push $OUTDIR ; Store previous output directory
 	SetOutPath "$INSTDIR\" ; Set output directory
 
+	SectionIn 1 RO
+	SectionIn 2 RO
+	SectionIn 3 RO
+	SectionIn 4 RO
+	SectionIn 5 RO
+	SectionIn 6 RO
+	
 	#CreateShortCut "$SMPROGRAMS${COMPANY_NAME}${PRODUCT_NAME}.lnk" "$OUTDIRquickfit3.exe"
 	
 	# automatically created list of install files
@@ -196,6 +216,13 @@ Section "associate file extensions (*.qfp/qfpz)" sec_assoc
 	Push $OUTDIR ; Store previous output directory
 	SetOutPath "$INSTDIR\" ; Set output directory
 	
+	SectionIn 1
+	SectionIn 2
+	SectionIn 3 
+	SectionIn 4
+	SectionIn 5 
+	SectionIn 6 
+	
 	${registerExtension} "$INSTDIR\quickfit3.exe" ".qfp" "QFP_File"
 	${registerExtension} "$INSTDIR\quickfit3.exe" ".qfpz" "QFPZ_File"
 	${registerExtension} "$INSTDIR\quickfit3.exe" ".qfp.gz" "QFPGZ_File"
@@ -203,24 +230,15 @@ Section "associate file extensions (*.qfp/qfpz)" sec_assoc
 	Pop $OUTDIR ; Restore the original output directory
 SectionEnd
 
+SectionGroupEnd
+
+SectionGroup "Additional Plugins"
+
+%%ADDITIONAL_SECTIONS%%
+
+SectionGroupEnd
 
 
-# This installs the SPIM plugins
-Section "Microscope Control Plugins (SPIM...)" sec_spim
-	Push $OUTDIR ; Store previous output directory
-	SetOutPath "$INSTDIR\" ; Set output directory
-	
-	# automatically created list of install files
-	%%SPIMINSTALLER_DIRS%%
-	%%SPIMINSTALLER_FILES%%
-	
-	# Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
-	 ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
-	IntFmt $0 "0x%08X" $0
-	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "EstimatedSize" "$0"
-
-	Pop $OUTDIR ; Restore the original output directory
-SectionEnd
 
 
 
@@ -257,14 +275,11 @@ function .onInit
 	  !insertmacro MULTIUSER_INIT
 	  IntOp $0 ${SF_SELECTED} | ${SF_RO}
 	  IntOp $0 $0 | ${SF_BOLD}
-	  IntOp $1 ${SF_SELECTED} | ${SF_BOLD}
       SectionSetFlags ${sec_main} $0
-      SectionSetFlags ${sec_assoc} $1
-      SectionSetFlags ${sec_spim} 0
+
+	  %%SEC_MODES%%
 
 functionEnd
-
-
 
 
 #Uninstaller
@@ -281,29 +296,29 @@ function un.onInit
 functionEnd
 
 
-# This uninstalls the main application
+# This uninstalls the main application and everything else
 Section "un.${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_un_main
 
 	!insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
 	
 	# Remove the program and Start menu shortcut
-	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_uninstall.lnk"
-	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME} homepage.url"
-	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_releasenotes.lnk"
-	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_license.lnk"
-	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_readme.lnk"
-	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}.lnk"
-	RMDir /REBOOTOK "$SMPROGRAMS\$StartMenuFolder"
+	Delete "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_uninstall.lnk"
+	Delete "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME} homepage.url"
+	Delete "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_releasenotes.lnk"
+	Delete "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_license.lnk"
+	Delete "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_readme.lnk"
+	Delete "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}.lnk"
+	RMDir "$SMPROGRAMS\$StartMenuFolder"
 
 	# automatically created list of install files
-	%%SPIMUNINSTALLER_FILES%%
 	%%UNINSTALLER_FILES%%
-	RMDir /REBOOTOK "$SMPROGRAMS${COMPANY_NAME}"
+	
+	RMDir "$SMPROGRAMS${COMPANY_NAME}"
 	
 	# Remove the uninstaller and Add/Remove programs information
-	Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
+	Delete "$INSTDIR\Uninstall.exe"
 	DeleteRegKey HKLM  "${UNINSTALL_KEY}"
 	
 	# Remove the installation directory if empty
-	RMDir /r /REBOOTOK "$INSTDIR"
+	RMDir /r "$INSTDIR"
 SectionEnd

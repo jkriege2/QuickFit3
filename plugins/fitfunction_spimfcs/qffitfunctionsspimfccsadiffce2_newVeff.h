@@ -22,14 +22,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFitFunctionsSPIMFCCSADiffCENewVeff2_H
 #define QFFitFunctionsSPIMFCCSADiffCENewVeff2_H
 #include "qfpluginfitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
 /*! \brief QFFitFunction class for a SPIM-FCCS fit model with pure diffusion and flow and 1/sqrt(e) lateral width
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 */
-class QFFitFunctionsSPIMFCCSADiffCENewVeff2: public QFFitFunction {
+class QFFitFunctionsSPIMFCCSADiffCENewVeff2: public QFFCSLargeFocusFitFunctionBase {
     public:
         QFFitFunctionsSPIMFCCSADiffCENewVeff2();
         virtual ~QFFitFunctionsSPIMFCCSADiffCENewVeff2() {}

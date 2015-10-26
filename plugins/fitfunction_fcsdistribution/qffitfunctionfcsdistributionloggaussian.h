@@ -24,7 +24,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfpluginfitfunction.h"
 #include <QVector>
 #include <QPair>
-
+#include "qfgeneralfitfunctionbase.h"
 #include <stdint.h>
 
 
@@ -67,14 +67,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
       \f[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \f]
 
 */
-class QFFitFunctionFCSDistributionLogGaussian: public QFFitFunction {
+class QFFitFunctionFCSDistributionLogGaussian: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSDistributionLogGaussian();
         virtual ~QFFitFunctionFCSDistributionLogGaussian() {}
         /*! \copydoc QFFitFunction::name()   */
         virtual QString name() const { return QString("FCS SD: Normal Diffuion 3D with log-normal size distribution"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("FCS SD: log-norm"); }
+        virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_dist_lognorm"); }
         /*! \copydoc QFFitFunction::category()   */

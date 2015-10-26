@@ -201,6 +201,11 @@ void QFRDRTablePlotSettingsWidget::doAutoscaleY() {
     emit autoscaleY();
 }
 
+void QFRDRTablePlotSettingsWidget::doAutoscaleXY()
+{
+    emit autoscaleXY();
+}
+
 void QFRDRTablePlotSettingsWidget::graphDataChanged(int r) {
     //qDebug()<<"graphDataChanged    updating="<<updating;
     if (updating) return;
@@ -602,6 +607,5 @@ void QFRDRTablePlotSettingsWidget::on_btnPasteSystem_clicked()
 
 void QFRDRTablePlotSettingsWidget::on_btnAutoscaleXY_clicked()
 {
-    doAutoscaleX();
-    doAutoscaleY();
+    doAutoscaleXY();
 }

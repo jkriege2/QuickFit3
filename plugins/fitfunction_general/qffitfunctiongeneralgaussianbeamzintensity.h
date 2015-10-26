@@ -59,7 +59,6 @@ class QFFitFunctionPSFGaussianBeamZIntensity: public QFFitFunction {
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params) const;
 
-        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionGeneralGaussianBeamZIntensity_H

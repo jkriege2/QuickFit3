@@ -491,10 +491,13 @@ class QFLIB_EXPORT QFMathParser
                 qfmpVariable(bool* ref);
                 qfmpVariable(QVector<double>* ref);
                 qfmpVariable(QVector<bool>* ref);
+                qfmpVariable(QVector<double>* ref, int* columnref);
+                qfmpVariable(QVector<bool>* ref, int* columnref);
                 qfmpVariable(QStringList* ref);
                 qfmpVariable(QMap<QString,qfmpResult>* ref);
+                qfmpVariable(QList<qfmpResult>* ref);
                 qfmpVariable(qfmpCustomResult* ref);
-                //~qfmpVariable();
+                ~qfmpVariable();
                 QFLIB_EXPORT void clearMemory();
                 QFLIB_EXPORT qfmpResult toResult() const;
                 QFLIB_EXPORT void toResult(qfmpResult& r) const;
@@ -508,6 +511,8 @@ class QFLIB_EXPORT QFMathParser
                 inline QVector<bool>* getBoolVec() const { return boolVec; }
                 inline QStringList* getStrVec() const { return strVec; }
                 inline QMap<QString,qfmpResult>* getStructData() const { return structData; }
+                inline QList<qfmpResult>* getListData() const { return listData; }
+                inline int* getColumns() const { return matrix_columns; }
 
 
             protected:
@@ -521,6 +526,8 @@ class QFLIB_EXPORT QFMathParser
                 QStringList* strVec; /*!< \brief this points to the variable data if \c type==qfmpStringVector */
                 qfmpCustomResult* custom;
                 QMap<QString,qfmpResult>* structData;
+                QList<qfmpResult>* listData;
+                int* matrix_columns;
         };
 
 
@@ -554,6 +561,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result)=0;
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(QList<qfmpResult>& result);
 
             /** \brief return a pointer to the QFMathParser  */
             inline QFMathParser* getParser(){ return parser; }
@@ -1144,6 +1153,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(QList<qfmpResult>& result);
 
             /** \brief get the number of nodes in the list */
             int getCount() {return list.size();};
@@ -1159,19 +1170,58 @@ class QFLIB_EXPORT QFMathParser
         };
 
         /**
-         * \brief This class represents a fector of qfmpNode.
+         * \brief This class represents a vector of qfmpNode.
          *
          * when evaluating the result will be the result of the last node in the list.
          */
-        class QFLIB_EXPORT qfmpVectorList: public qfmpNodeList {
+        class QFLIB_EXPORT qfmpVectorMatrixConstructionList: public qfmpNodeList {
+            public:
+                /** \brief constructor for a qfmpNodeList
+                 *  \param p a pointer to a QFMathParser object
+                 */
+                explicit qfmpVectorMatrixConstructionList(QFMathParser* p, qfmpNode* par=NULL): qfmpNodeList(p, par) { m_isMatrix=false; setParser(p); setParent(par); }
+
+                /** \brief standard destructor, also destroy the children (recursively) */
+                virtual ~qfmpVectorMatrixConstructionList() {}
+
+
+                /** \brief evaluate this node, return result as call-by-reference (faster!) */
+                virtual void evaluate(qfmpResult& result);
+
+                /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+                virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+                /** \brief create bytecode that evaluates the current node */
+                virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) ;
+                /** \brief print the expression */
+                virtual QString print() const;
+                /** \brief print the expression tree */
+                virtual QString printTree(int level=0) const;
+
+                inline bool isMatrix() const {
+                    return m_isMatrix;
+                }
+                inline void setIsMatrix(bool en) {
+                    m_isMatrix=en;
+                }
+
+            protected:
+                bool m_isMatrix;
+        };
+
+        /**
+         * \brief This class represents a list of qfmpNode.
+         *
+         * when evaluating the result will be the result of the last node in the list.
+         */
+        class QFLIB_EXPORT qfmpListConstruction: public qfmpNodeList {
           public:
             /** \brief constructor for a qfmpNodeList
              *  \param p a pointer to a QFMathParser object
              */
-            explicit qfmpVectorList(QFMathParser* p, qfmpNode* par=NULL): qfmpNodeList(p, par) { setParser(p); setParent(par); };
+            explicit qfmpListConstruction(QFMathParser* p, qfmpNode* par=NULL): qfmpNodeList(p, par) { setParser(p); setParent(par); };
 
             /** \brief standard destructor, also destroy the children (recursively) */
-            virtual ~qfmpVectorList() {};
+            virtual ~qfmpListConstruction() {};
 
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
@@ -1186,7 +1236,6 @@ class QFLIB_EXPORT QFMathParser
                 /** \brief print the expression tree */
                 virtual QString printTree(int level=0) const;
         };
-
 
         /**
          * \brief This class represents a vector construction in the form start:end or start:step:end

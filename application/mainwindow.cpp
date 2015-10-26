@@ -130,7 +130,7 @@ void myMessageOutput(QtMsgType type, const char *msg)
 MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     QMainWindow(NULL)
 {
-
+    latestUpdateVersion=0;
     dlgUserFitFunctionEditor=NULL;
     projectModeEnabled=true;
     nonprojectTitle=tr("non-project mode");
@@ -221,6 +221,20 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     logFileMainWidget->log_text(tr("- productVersion: %1\n").arg(QSysInfo::productVersion()));
     logFileMainWidget->dec_indent();
 #endif
+    logFileMainWidget->log_header(tr("C/C++ System info:"));
+    logFileMainWidget->inc_indent();
+    logFileMainWidget->log_text(tr("- sizeof(void*): %1 bits\n").arg(sizeof(void*)*8));
+    logFileMainWidget->log_text(tr("- sizeof(char): %1 bits\n").arg(sizeof(char)*8));
+    logFileMainWidget->log_text(tr("- sizeof(int): %1 bits\n").arg(sizeof(int)*8));
+    logFileMainWidget->log_text(tr("- sizeof(short): %1 bits\n").arg(sizeof(short)*8));
+    logFileMainWidget->log_text(tr("- sizeof(long int): %1 bits\n").arg(sizeof(long int)*8));
+    logFileMainWidget->log_text(tr("- sizeof(long long int): %1 bits\n").arg(sizeof(long long int)*8));
+    logFileMainWidget->log_text(tr("- sizeof(float): %1 bits\n").arg(sizeof(float)*8));
+    logFileMainWidget->log_text(tr("- sizeof(double): %1 bits\n").arg(sizeof(double)*8));
+    logFileMainWidget->log_text(tr("- sizeof(bool): %1 bits\n").arg(sizeof(bool)*8));
+    logFileMainWidget->dec_indent();
+
+
     logFileMainWidget->log_header(tr("System directories:"));
     logFileMainWidget->inc_indent();
     logFileMainWidget->log_text(tr("- example temporary file: %1\n").arg(qfGetTempFilename()));
@@ -375,6 +389,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("assetsdir"), settings->getAssetsDirectory()));
     htmlReplaceList.append(qMakePair(QString("examplesdir"), settings->getExamplesDirectory()));
     htmlReplaceList.append(qMakePair(QString("configdir"), settings->getConfigFileDirectory()));
+    htmlReplaceList.append(qMakePair(QString("globalconfigdir"), settings->getGlobalConfigFileDirectory()));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("settings_contents"), QString("<ul>")+createPluginDocSettings("<li>%1 settings:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("help_contents"), QString("<ul>")+createPluginDocHelp("<li>%1 help:<ul>", "</ul></li>")+QString("</ul>")));
@@ -411,7 +426,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitalg"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_fitalg.html\">Fit Algorithms Help</a>")));
     htmlReplaceList.append(qMakePair(QString("qf_further_reading"), QString("")));
 
-    htmlReplaceList.append(qMakePair(QString("qf_css_mainfile"), readFile(settings->getMainHelpDirectory()+"/qf3style.css")));
+    htmlReplaceList.append(qMakePair(QString("qf_css_mainfile"), QString(readFile(settings->getMainHelpDirectory()+"/qf3style.css"))));
     htmlReplaceList.append(qMakePair(QString("qf_css_mainfile_block"), QString("<style>\n$$qf_css_mainfile$$\n</style>\n")));
     htmlReplaceList.append(qMakePair(QString("fitfunc_lib_searchdirs_list"), QString("<ol><li><tt>%1</tt></li></ol>\n").arg(QFFitFunctionManager::getUserFitFunctionSearchDirectories(true).join("</tt></li><li><tt>"))));
     htmlReplaceList.append(qMakePair(QString("fitfunc_parser_searchdirs_list"), QString("<ol><li><tt>%1</tt></li></ol>\n").arg(QFFitFunctionManager::getUserFitFunctionSearchDirectories(false).join("</tt></li><li><tt>"))));
@@ -486,6 +501,11 @@ MainWindow::~MainWindow() {
     if (tetris) {
         tetris->close();
         delete tetris;
+    }
+
+    if (helpWindow) {
+        helpWindow->close();
+        delete helpWindow;
     }
     //std::cout<<"deleting MainWindow\n";
     if (project) delete project;
@@ -4276,31 +4296,40 @@ void MainWindow::checkUpdates(bool userRequest)
     QNetworkProxy proxy;
     ProgramOptionsSetQNetworkProxy(proxy);
     networkManager.setProxy(proxy);
-
-    QUrl url = qfUpdateXMLURL();
-    QNetworkRequest request(url);
-    //qDebug()<<"request updates from: "<<qfUpdateXMLURL();
-    //qDebug()<<"user request "<<userRequest;
-    QNetworkReply *reply = networkManager.get(request);
-    if (!userRequest) lastUpdateRequest=reply;
+    QModernProgressDialog progress(tr("getting update information ..."), tr("Cancel"), this);
+    if (userRequest) progress.open();
     else {
-        //qDebug()<<"  user request !";
-        lastUpdateRequestUser=reply;
-        QModernProgressDialog progress(tr("getting update information ..."), tr("Cancel"), this);
-        progress.open();
-        QElapsedTimer time;
-        time.start();
-        while (!reply->atEnd() && time.elapsed()<60000) {
-            QApplication::processEvents();
-            if (progress.wasCanceled()) {
-                lastUpdateRequestUser=NULL;
-                reply->abort();
-                //delete reply;
-            }
-            //qDebug()<<"  user request ! "<<time.elapsed();
-        }
         progress.hide();
+        progress.close();
     }
+
+    for (int i=0; i<2; i++) {
+        QUrl url;
+        if (i==0) url= qfUpdateXMLURL(false);
+        else if (i==1) url= qfUpdateXMLURL(true);
+        QNetworkRequest request(url);
+        //qDebug()<<"request updates from: "<<qfUpdateXMLURL();
+        //qDebug()<<"user request "<<userRequest;
+        QNetworkReply *reply = networkManager.get(request);
+        if (!userRequest) lastUpdateRequest=reply;
+        else {
+            //qDebug()<<"  user request !";
+            lastUpdateRequestUser=reply;
+            QElapsedTimer time;
+            time.start();
+            while (!reply->atEnd() && time.elapsed()<60000) {
+                QApplication::processEvents();
+                if (progress.wasCanceled()) {
+                    lastUpdateRequestUser=NULL;
+                    reply->abort();
+                    return;
+                    //delete reply;
+                }
+                //qDebug()<<"  user request ! "<<time.elapsed();
+            }
+        }
+    }
+    progress.hide();
 }
 
 void MainWindow::checkUpdatesAutomatic()
@@ -4329,58 +4358,62 @@ void MainWindow::showUpdateInfo(QNetworkReply* reply) {
             bool ok=false;
             int svn=qfReadFirstInt(qfInfoGITVersion(), &ok);
 
-            if (info.valid) {
-                log_global_text("update info from "+reply->url().toString()+":\n");
-                log_global_text("   current version: "+QString::number(svn)+"\n");
-                log_global_text("   newest version "+QString::number(info.latestVersion)+":\n");
-                log_global_text("      date:         "+info.date+"\n");
-                log_global_text("      os:           "+info.os+"\n");
-                log_global_text("      description:  "+info.description+"\n");
-                log_global_text("      download:     "+info.download+"\n");
-                log_global_text("      link:         "+info.link+"\n");
-                log_global_text("      releasenotes: "+info.releasenotes+"\n");
-                for (int i=0; i<info.warnings.size(); i++) {
-                    if (svn<=info.warnings[i].warnSince) log_global_text("      warning (cur. version <= "+QString::number(info.warnings[i].warnSince)+"): "+info.warnings[i].message+"\n");
-                }
-            }
-            if (ok && info.valid && svn<info.latestVersion) {
-                if (lastUpdateRequestUser==reply) {
-                    QString warning="";
-                    if (info.warnings.size()>0) {
-                        warning+=tr("\n\nIt is no longer advised to use your current version (SVN%1). Reasons:").arg(svn);
-                    }
-                    for (int i=0; i<info.warnings.size(); i++) {
-                        if (svn<=info.warnings[i].warnSince) {
-                            warning+=tr("\n   warning (older than SVN%1): %2").arg(info.warnings[i].warnSince).arg(info.warnings[i].message);
-                        }
-                    }
+            if (info.valid && latestUpdateVersion<=info.latestVersion) {
+                latestUpdateVersion=info.latestVersion;
+                if (info.valid) {
 
-                    if (QMessageBox::information(this, tr("QuickFit updates"), tr("new QuickFit 3.0 version (SVN version: %3, date: %2) available:\n\n  %4%5\n\n  Link: %1\n Go to Download site?").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description).arg(warning), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
-                        QDesktopServices::openUrl(info.link);
-                    }
-                    lastUpdateRequestUser=NULL;
-                } else if (lastUpdateRequest==reply) {
-                    QString message=tr("<b>new QuickFit 3.0 version (SVN version: %3, date: %2) available: <a href=\"%1\">go to download</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><a href=\"close_labupdate\">close message</a></small><br>&nbsp;&nbsp;&nbsp;&nbsp;description: <i>%4</i>").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description);
-                    if (info.warnings.size()>0) {
-                        message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">It is no longer advised to use your current version (SVN%1). Reasons:</font>").arg(svn);
-                    }
+                    log_global_text("update info from "+reply->url().toString()+":\n");
+                    log_global_text("   current version: "+QString::number(svn)+"\n");
+                    log_global_text("   newest version "+QString::number(info.latestVersion)+":\n");
+                    log_global_text("      date:         "+info.date+"\n");
+                    log_global_text("      os:           "+info.os+"\n");
+                    log_global_text("      description:  "+info.description+"\n");
+                    log_global_text("      download:     "+info.download+"\n");
+                    log_global_text("      link:         "+info.link+"\n");
+                    log_global_text("      releasenotes: "+info.releasenotes+"\n");
                     for (int i=0; i<info.warnings.size(); i++) {
-                        if (svn<=info.warnings[i].warnSince) {
-                            message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">warning (older than %1): <i>%2</i></font>").arg(info.warnings[i].warnSince).arg(info.warnings[i].message);
-                        }
+                        if (svn<=info.warnings[i].warnSince) log_global_text("      warning (cur. version <= "+QString::number(info.warnings[i].warnSince)+"): "+info.warnings[i].message+"\n");
                     }
-                    labUpgrade->setText(message);
-                    labUpgrade->setVisible(true);
-                    lastUpdateRequest=NULL;
                 }
-            } else {
-                labUpgrade->setText("");
-                labUpgrade->setVisible(false);
-                if (lastUpdateRequestUser==reply) {
-                    QMessageBox::information(this, tr("QuickFit updates"), tr("no updates available"));
-                    lastUpdateRequestUser=NULL;
-                } else if (lastUpdateRequest==reply) {
-                    lastUpdateRequest=NULL;
+                if (ok && info.valid && svn<info.latestVersion) {
+                    if (lastUpdateRequestUser==reply) {
+                        QString warning="";
+                        if (info.warnings.size()>0) {
+                            warning+=tr("\n\nIt is no longer advised to use your current version (SVN%1). Reasons:").arg(svn);
+                        }
+                        for (int i=0; i<info.warnings.size(); i++) {
+                            if (svn<=info.warnings[i].warnSince) {
+                                warning+=tr("\n   warning (older than SVN%1): %2").arg(info.warnings[i].warnSince).arg(info.warnings[i].message);
+                            }
+                        }
+
+                        if (QMessageBox::information(this, tr("QuickFit updates"), tr("new QuickFit 3.0 version (SVN version: %3, date: %2) available:\n\n  %4%5\n\n  Link: %1\n Go to Download site?").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description).arg(warning), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                            QDesktopServices::openUrl(info.link);
+                        }
+                        lastUpdateRequestUser=NULL;
+                    } else if (lastUpdateRequest==reply) {
+                        QString message=tr("<b>new QuickFit 3.0 version (SVN version: %3, date: %2) available: <a href=\"%1\">go to download</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><a href=\"close_labupdate\">close message</a></small><br>&nbsp;&nbsp;&nbsp;&nbsp;description: <i>%4</i>").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description);
+                        if (info.warnings.size()>0) {
+                            message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">It is no longer advised to use your current version (SVN%1). Reasons:</font>").arg(svn);
+                        }
+                        for (int i=0; i<info.warnings.size(); i++) {
+                            if (svn<=info.warnings[i].warnSince) {
+                                message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">warning (older than %1): <i>%2</i></font>").arg(info.warnings[i].warnSince).arg(info.warnings[i].message);
+                            }
+                        }
+                        labUpgrade->setText(message);
+                        labUpgrade->setVisible(true);
+                        lastUpdateRequest=NULL;
+                    }
+                } else {
+                    labUpgrade->setText("");
+                    labUpgrade->setVisible(false);
+                    if (lastUpdateRequestUser==reply) {
+                        QMessageBox::information(this, tr("QuickFit updates"), tr("no updates available"));
+                        lastUpdateRequestUser=NULL;
+                    } else if (lastUpdateRequest==reply) {
+                        lastUpdateRequest=NULL;
+                    }
                 }
             }
         } else {
@@ -4676,7 +4709,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     localreplaces<<qMakePair<QString, QString>("funcref_end", "</td></tr></table></blockquote>");
     localreplaces<<qMakePair<QString, QString>("main_fontsize", QString("%1pt").arg(settings->getConfigValue("quickfit/help_pointsize", 11).toInt()));
     localreplaces<<qMakePair<QString, QString>("math_fontsize", QString("%1pt").arg(settings->getConfigValue("quickfit/math_pointsize", 14).toInt()));
-    localreplaces<<qMakePair<QString, QString>("main_font", QString("%1").arg(settings->getConfigValue("quickfit/help_font", font().family()).toString()));
+    localreplaces<<qMakePair<QString, QString>("main_font", QString("%1").arg(settings->getConfigValue("quickfit/help_font", QGuiApplication::font().family()).toString()));
+    localreplaces<<qMakePair<QString, QString>("main_fontcode", QString("%1").arg(settings->getConfigValue("quickfit/code_font", "Hack").toString()));
 
     if (QFile::exists(basedir.absoluteFilePath("localreplaces.ini"))) {
         QSettings setLocalReplace(basedir.absoluteFilePath("localreplaces.ini"), QSettings::IniFormat);
@@ -4913,7 +4947,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 result=result.replace(bidx, rxBody.matchedLength(), QString("$$qf_css_mainfile_block$$\n%1\n$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$").arg(rxBody.cap(0)));
                 //result=result.replace(QString("<body>"), QString("<body>$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$"));
             } else {
-                result=result.replace(bidx, rxBody.matchedLength(), QString("$$qf_css_mainfile_block$$\n%1").arg(rxBody.cap(0)));
+                result=result.replace(bidx, rxBody.matchedLength(), QString("$$qf_css_mainfile_block$$\n<body bgcolor=\"white\" %1>").arg(rxBody.cap(1)));
             }
         }
 
@@ -6023,6 +6057,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
     }
 
+    //saveStringToFile("c:/temp/test.html", result);
     return result;
 
 

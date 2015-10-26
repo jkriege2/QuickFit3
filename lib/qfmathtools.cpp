@@ -26,6 +26,7 @@
 #include <complex>
 #include "Faddeeva.hh"
 #include "statistics_tools.h"
+#include "programoptions.h"
 
 double qfTanc(  double x ) {
     if (x==0) return 1;
@@ -71,6 +72,50 @@ double qfFaddeevaRealW( double xi) {
     std::complex<double> d(0,xi);
     std::complex<double> w=Faddeeva::w(d);
     return w.real();
+}
+
+uint64_t qfFactorial( uint64_t kmax) {
+    if (kmax<=1) return 1;
+    else if (kmax==2) return 2;
+    else if (kmax==3) return 6;
+    else if (kmax==4) return 24;
+    else if (kmax==5) return 120;
+    else if (kmax==6) return 720;
+    else if (kmax==7) return 5040;
+    else if (kmax==8) return 40320;
+    else if (kmax==9) return 362880;
+    else if (kmax==10) return 3628800;
+    uint64_t k=3628800;
+    for (uint64_t i=11; i<=kmax; i++) {
+        k=k*i;
+    }
+    return k;
+}
+
+uint64_t qfBinomialCoefficient(int64_t n, int64_t k) {
+    if (n<0 || k<0) return 0;
+    if (k>n) return 0;
+    if (k==n) return 1;
+    if (k==0) return 1;
+    uint64_t r1=1;
+    uint64_t r2=1;
+    for (uint64_t j=1; j<=uint64_t(k); j++) {
+        r1=r1*(n+1+j);
+        r2=r2*j;
+    }
+    return r1/r2;
+}
+
+double qfPoissonDist(int64_t k, double lambda) {
+    if (k<0) return 0;
+    return pow(lambda, k)*exp(-lambda)/double(qfFactorial(uint64_t(k)));
+}
+
+double qfBinomialDist(int64_t k, int64_t N, double p) {
+    if (k<0 || N<0) return 0;
+    if (p<=0 || p>1) return 0;
+    if (N<k) return 0;
+    return double(qfBinomialCoefficient(N,k))*pow(p, k)*pow(1.0-p, N-k);
 }
 
 template <class T>
@@ -273,7 +318,7 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
     result.rmaxw=0;      // max of weighted residuals
     result.weightSum=0; // weight sum (for normalization)
     bool hfirst=true;
-    bool hasWeights=(weights!=NULL);
+    //bool hasWeights=(weights!=NULL);
     bool allWeightsOne=true;
     bool allWeightsEqual=true;
     //double prodsigma=1.0;
@@ -377,7 +422,7 @@ QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const doub
 
     if (QFFloatIsOK(paramrange_size) && QFFloatIsOK(detCOV)){
         const double k=double(result.fitparamN);
-        const double n=double(result.dataSize);
+        //const double n=double(result.dataSize);
         const double chi2=result.residWeightSqrSum;
         const double ln2pi=log(2.0*M_PI);
 
@@ -599,7 +644,7 @@ QString QFBasicFitStatistics::getAsHTMLTable(bool addExplanation, bool includeR2
         int n=floor(sqrt(COV.size()));
         std::string colorlegend;
         QString m=QString("<br><br>Var-Cov-Matrix:<blockquote><table border=\"1\" cellspacing=\"0\" cellpadding=\"3\"><tr><td>")
-                +QString::fromStdString(linalgMatrixToHTMLString(COV.data(), n, n, 9, 3, "g", " border=\"0\" cellpadding=\"3\" cellspacing=\"0\" ", "&nbsp;&nbsp;", "&nbsp;&nbsp;", true, true, &colorlegend))
+                +QString::fromStdString(linalgMatrixToHTMLString(COV.data(), n, n, 9, 3, "g", " border=\"0\" cellpadding=\"3\" cellspacing=\"0\" ", "&nbsp;&nbsp;", "&nbsp;&nbsp;", true, true, &colorlegend, ProgramOptions::getConfigValue("quickfit/nonlin_color_covmatrix_enabled", true).toBool(), ProgramOptions::getConfigValue("quickfit/nonlin_color_covmatrix_gamma", 0.25).toDouble(), " width=\"75%\" "))
                 +QString("</td></tr></table><br><br>Colors: ");
         m+=(QString::fromStdString(colorlegend)+QString("</blockquote>"));
         //m=m.replace("<td>", "<td>&nbsp;&nbsp;&nbsp;");

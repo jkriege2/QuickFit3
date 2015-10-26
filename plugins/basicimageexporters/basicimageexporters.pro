@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = exporters_basicimage
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 include(../../extlibs/zlib.pri)
@@ -51,7 +51,8 @@ SOURCES += qfpbasicimageexporters.cpp\
 FORMS = \
     qfbasicimageexportersoptionswidget.ui
 
-RESOURCES +=
+RESOURCES += \
+    basicimageexporters.qrc
 
 TRANSLATIONS= ./translations/de.exporters_basicimage.ts
 

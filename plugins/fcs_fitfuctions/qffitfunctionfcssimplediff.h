@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define QFFITFUNCTIONFCSSIMPLEDIFF_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
-
+#include "qfgeneralfitfunctionbase.h"
 
 
 
@@ -69,7 +69,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
                                                                                                                                                                                                                                                                                                            derivatives[FCSSDiff_diff_tau1]=fT/N*(t/sqr(tauD)/fDG12/sqr(fD) + t/2.0/fD/cube(fDG12)/gamma2/sqr(tauD));
 
 */
-class QFFitFunctionFCSSimpleDiff: public QFFitFunction {
+class QFFitFunctionFCSSimpleDiff: public QFFCSFitFunctionBase {
     public:
         QFFitFunctionFCSSimpleDiff();
         virtual ~QFFitFunctionFCSSimpleDiff() {}

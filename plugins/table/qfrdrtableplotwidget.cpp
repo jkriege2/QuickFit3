@@ -31,6 +31,8 @@
 #include "qffitfunction.h"
 #include "dlgcolorbarcoloring.h"
 
+#define DELAYEDUPDATEGRAPH_DELAY 200
+
 
 QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     QWidget(parent),
@@ -65,8 +67,9 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     connect(ui->widGraphSettings, SIGNAL(performRefit(int)), this, SLOT(doRefit(int)));
     connect(ui->widGraphSettings, SIGNAL(performFit(int,int,int,int,QString,QFRDRTable::GraphDataSelection)), this, SLOT(doFit(int,int,int,int,QString,QFRDRTable::GraphDataSelection)));
     connect(ui->widGraphSettings, SIGNAL(performRegression(int,int,int,int, QFRDRTable::GraphDataSelection)), this, SLOT(doRegression(int,int,int,int,QFRDRTable::GraphDataSelection)));
-    connect(ui->widSystemSettings, SIGNAL(plotSettingsChanged()), this, SLOT(updateGraph()));
-    connect(ui->widGraphSettings, SIGNAL(reloadGraph()), this, SLOT(reloadGraphData()));
+    connect(ui->widSystemSettings, SIGNAL(plotSettingsChanged()), this, SLOT(delayedUpdateGraph()));
+    connect(ui->widSystemSettings, SIGNAL(plotTitleChanged(int,QString)), this, SLOT(emitPlotTitleChanged(int,QString)));
+    connect(ui->widGraphSettings, SIGNAL(reloadGraph()), this, SLOT(delayedReloadGraphData()));
 
     //ui->formLayout_3->removeWidget(ui->widSaveCoordSettings);
     //ui->tabWidget->setCornerWidget(ui->widSaveCoordSettings);
@@ -118,9 +121,25 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     updating=false;
 
     ui->tabWidget->setCurrentIndex(0);
+    timUpdateGraph.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timUpdateGraph.setSingleShot(true);
+    timUpdateData.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timUpdateData.setSingleShot(true);
+    timReloadGraphData.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timReloadGraphData.setSingleShot(true);
+    timPlotDataChanged.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timPlotDataChanged.setSingleShot(true);
+    timGraphDataChanged.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timGraphDataChanged.setSingleShot(true);
+    connect(&timUpdateGraph, SIGNAL(timeout()), this, SLOT(updateGraph()));
+    connect(&timUpdateData, SIGNAL(timeout()), this, SLOT(updateData()));
+    connect(&timReloadGraphData, SIGNAL(timeout()), this, SLOT(reloadGraphData()));
+    connect(&timPlotDataChanged, SIGNAL(timeout()), this, SLOT(plotDataChanged()));
+    connect(&timGraphDataChanged, SIGNAL(timeout()), this, SLOT(graphDataChanged()));
 
     connect(ui->widSystemSettings, SIGNAL(autoscaleX()), this, SLOT(doAutoscaleX()));
     connect(ui->widSystemSettings, SIGNAL(autoscaleY()), this, SLOT(doAutoscaleY()));
+    connect(ui->widSystemSettings, SIGNAL(autoscaleXY()), this, SLOT(doAutoscaleXY()));
 
 
     if (ProgramOptions::getInstance() && ProgramOptions::getInstance()->getQSettings()) readSettings(*(ProgramOptions::getInstance()->getQSettings()), "table/QFRDRTablePlotWidget/");
@@ -135,6 +154,7 @@ QFRDRTablePlotWidget::~QFRDRTablePlotWidget()
 
 void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
 {
+
     current=record;
     this->plot=graph;
     updating=true;
@@ -168,6 +188,7 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
     connectWidgets();
     listGraphs_currentRowChanged(ui->listGraphs->currentRow());
     updateGraph();
+
 }
 
 void QFRDRTablePlotWidget::rawDataChanged() {
@@ -313,6 +334,18 @@ void QFRDRTablePlotWidget::doAutoscaleY() {
     plotDataChanged();
 }
 
+void QFRDRTablePlotWidget::doAutoscaleXY()
+{
+    ui->plotter->zoomToFit(true, true);
+    updating=true;
+    //qDebug()<<"autoX: "<<ui->plotter->getXMin()<<ui->plotter->getXMax();
+    ui->widSystemSettings->setXRange(ui->plotter->getXMin(), ui->plotter->getXMax());
+    ui->widSystemSettings->setYRange(ui->plotter->getYMin(), ui->plotter->getYMax());
+    updating=false;
+    plotDataChanged();
+
+}
+
 void QFRDRTablePlotWidget::on_plotter_plotMouseMove(double x, double y)
 {
     labPlotPosition->setText(tr("position: (%1, %2)").arg(floattohtmlstr(x).c_str()).arg(floattohtmlstr(y).c_str()));
@@ -351,6 +384,14 @@ void QFRDRTablePlotWidget::graphDataChanged() {
     updateGraph();
 }
 
+void QFRDRTablePlotWidget::delayedGraphDataChanged()
+{
+    timGraphDataChanged.stop();
+    timGraphDataChanged.setSingleShot(true);
+    timGraphDataChanged.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timGraphDataChanged.start();
+}
+
 void QFRDRTablePlotWidget::plotDataChanged() {
     //qDebug()<<"plotDataChanged   updating="<<updating;
     if (updating) return;
@@ -361,6 +402,14 @@ void QFRDRTablePlotWidget::plotDataChanged() {
         //QFRDRTable::GraphInfo graph=current->getPlot(this->plot).graphs.value(currentRow, QFRDRTable::GraphInfo());
     }
     updateGraph();
+}
+
+void QFRDRTablePlotWidget::delayedPlotDataChanged()
+{
+    timPlotDataChanged.stop();
+    timPlotDataChanged.setSingleShot(true);
+    timPlotDataChanged.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timPlotDataChanged.start();
 }
 
 
@@ -1319,9 +1368,19 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_invertedRange(g.rangeInverted);
                 pg->set_plotCenterLine(g.rangeDrawCenter);
                 pg->set_plotRangeLines(g.drawLine);
-                pg->set_rangeMin(g.rangeStart);
-                pg->set_rangeMax(g.rangeEnd);
-                pg->set_rangeCenter(g.rangeCenter);
+                if (g.rangeMode==QFRDRTable::rgmRange) {
+                    pg->set_rangeMin(g.rangeStart);
+                    pg->set_rangeMax(g.rangeEnd);
+                    pg->set_rangeCenter(g.rangeCenter);
+                } else if (g.rangeMode==QFRDRTable::rgmLineError) {
+                    pg->set_rangeMin(g.rangeCenter-g.rangeStart);
+                    pg->set_rangeMax(g.rangeCenter+g.rangeStart);
+                    pg->set_rangeCenter(g.rangeCenter);
+                } else if (g.rangeMode==QFRDRTable::rgmLineOnly) {
+                    pg->set_rangeMin(g.rangeCenter);
+                    pg->set_rangeMax(g.rangeCenter);
+                    pg->set_rangeCenter(g.rangeCenter);
+                }
                 pg->set_centerStyle(g.rangeCenterStyle);
                 pg->set_centerLineWidth(g.rangeCenterStyle);
                 pg->set_lineWidth(g.linewidth);
@@ -1348,9 +1407,19 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_invertedRange(g.rangeInverted);
                 pg->set_plotCenterLine(g.rangeDrawCenter);
                 pg->set_plotRangeLines(g.drawLine);
-                pg->set_rangeMin(g.rangeStart);
-                pg->set_rangeMax(g.rangeEnd);
-                pg->set_rangeCenter(g.rangeCenter);
+                if (g.rangeMode==QFRDRTable::rgmRange) {
+                    pg->set_rangeMin(g.rangeStart);
+                    pg->set_rangeMax(g.rangeEnd);
+                    pg->set_rangeCenter(g.rangeCenter);
+                } else if (g.rangeMode==QFRDRTable::rgmLineError) {
+                    pg->set_rangeMin(g.rangeCenter-g.rangeStart);
+                    pg->set_rangeMax(g.rangeCenter+g.rangeStart);
+                    pg->set_rangeCenter(g.rangeCenter);
+                } else if (g.rangeMode==QFRDRTable::rgmLineOnly) {
+                    pg->set_rangeMin(g.rangeCenter);
+                    pg->set_rangeMax(g.rangeCenter);
+                    pg->set_rangeCenter(g.rangeCenter);
+                }
                 pg->set_centerLineWidth(g.rangeCenterStyle);
                 pg->set_centerStyle(g.rangeCenterStyle);
                 pg->set_lineWidth(g.linewidth);
@@ -1455,6 +1524,14 @@ void QFRDRTablePlotWidget::updateGraph() {
     QApplication::restoreOverrideCursor();
 }
 
+void QFRDRTablePlotWidget::delayedUpdateGraph()
+{
+    timUpdateGraph.stop();
+    timUpdateGraph.setSingleShot(true);
+    timUpdateGraph.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timUpdateGraph.start();
+}
+
 void QFRDRTablePlotWidget::updateData() {
     bool update=ui->plotter->get_doDrawing();
     ui->plotter->set_doDrawing(false);
@@ -1498,6 +1575,14 @@ void QFRDRTablePlotWidget::updateData() {
     }
 }
 
+void QFRDRTablePlotWidget::delayedUpdateData()
+{
+    timUpdateData.stop();
+    timUpdateData.setSingleShot(true);
+    timUpdateData.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timUpdateData.start();
+}
+
 void QFRDRTablePlotWidget::updatePlotWidgetVisibility() {
     if (current) {
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
@@ -1522,7 +1607,7 @@ void QFRDRTablePlotWidget::connectWidgets()
 {
     //qDebug()<<"connectWidgets";
     connect(ui->listGraphs, SIGNAL(currentRowChanged(int)), this, SLOT(listGraphs_currentRowChanged(int)));
-    connect(ui->widGraphSettings, SIGNAL(graphDataChanged()), this, SLOT(graphDataChanged()));
+    connect(ui->widGraphSettings, SIGNAL(graphDataChanged()), this, SLOT(delayedGraphDataChanged()));
     ui->widSystemSettings->connectWidgets();
 }
 
@@ -1530,7 +1615,7 @@ void QFRDRTablePlotWidget::disconnectWidgets()
 {
     //qDebug()<<"disconnectWidgets";
     disconnect(ui->listGraphs, SIGNAL(currentRowChanged(int)), this, SLOT(listGraphs_currentRowChanged(int)));
-    disconnect(ui->widGraphSettings, SIGNAL(graphDataChanged()), this, SLOT(graphDataChanged()));
+    disconnect(ui->widGraphSettings, SIGNAL(graphDataChanged()), this, SLOT(delayedGraphDataChanged()));
     ui->widSystemSettings->disconnectWidgets();
 }
 
@@ -1563,158 +1648,6 @@ int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::Grap
 
     }
     return newCol;
-    /*
-    //qDebug()<<"getColumnWithStride  column="<<column<<"    strided: "<<g.isStrided<<" stride="<<g.stride<<" strideStart="<<g.strideStart;
-    if (column==-2) return ui->plotter->getDatastore()->ensureColumnNum(QString("rowNumColSpecial"));
-    if (column>=0 && column<(long)ui->plotter->getDatastore()->getColumnCount()) {
-        QVector<double> data=ui->plotter->getDatastore()->getColumn(column).copyData();
-        if (g.isDataSelect) {
-            QVector<double> dataS, dataS2, dataS3;
-            if (g.dataSelect1Column>=0 && g.dataSelect1Column<(long)ui->plotter->getDatastore()->getColumnCount()) {
-                dataS=ui->plotter->getDatastore()->getColumn(g.dataSelect1Column).copyData();
-            }
-            int cnt=qMin(data.size(), dataS.size());
-            if (g.dataSelectLogic12!=QFRDRTable::dsoNone && g.dataSelect2Column>=0 && g.dataSelect2Column<(long)ui->plotter->getDatastore()->getColumnCount()) {
-                dataS2=ui->plotter->getDatastore()->getColumn(g.dataSelect2Column).copyData();
-                cnt=qMin(cnt, dataS2.size());
-            }
-            if (g.dataSelectLogic12!=QFRDRTable::dsoNone && g.dataSelectLogic23!=QFRDRTable::dsoNone && g.dataSelect3Column>=0 && g.dataSelect3Column<(long)ui->plotter->getDatastore()->getColumnCount()) {
-                dataS3=ui->plotter->getDatastore()->getColumn(g.dataSelect3Column).copyData();
-                cnt=qMin(cnt, dataS3.size());
-            }
-            QVector<double> dataO;
-            int istart=0;
-            int iinc=1;
-            if (g.isStrided) {
-                istart=g.strideStart-1;
-                iinc=g.stride;
-            }
-
-            for (int i=istart; i< cnt; i=i+iinc) {
-                bool ok=true;
-                if (dataS.size()>0) {
-                    ok=false;
-                    switch(g.dataSelect1Operation) {
-                        case QFRDRTable::dsoEquals:
-                            if (dataS[i]==g.dataSelect1CompareValue) ok=true;
-                            break;
-                        case QFRDRTable::dsoUnequal:
-                            if (dataS[i]!=g.dataSelect1CompareValue) ok=true;
-                            break;
-                        case QFRDRTable::dsoGreaterOrEqual:
-                            if (dataS[i]>=g.dataSelect1CompareValue) ok=true;
-                            break;
-                        case QFRDRTable::dsoSmallerOrEqual:
-                            if (dataS[i]<=g.dataSelect1CompareValue) ok=true;
-                            break;
-                        case QFRDRTable::dsoGreater:
-                            if (dataS[i]>g.dataSelect1CompareValue) ok=true;
-                            break;
-                        case QFRDRTable::dsoSmaller:
-                            if (dataS[i]<g.dataSelect1CompareValue) ok=true;
-                            break;
-                        case QFRDRTable::dsoInRange:
-                            if (dataS[i]>=g.dataSelect1CompareValue && dataS[i]<=g.dataSelect1CompareValue2) ok=true;
-                            break;
-                        case QFRDRTable::dsoOutOfRange:
-                            if (!(dataS[i]>=g.dataSelect1CompareValue && dataS[i]<=g.dataSelect1CompareValue2)) ok=true;
-                            break;
-                    }
-                    if (g.dataSelectLogic12!=QFRDRTable::dsoNone && dataS2.size()>0) {
-                        bool okLocal=false;
-                        switch(g.dataSelect2Operation) {
-                            case QFRDRTable::dsoEquals:
-                                if (dataS2[i]==g.dataSelect2CompareValue) okLocal=true;
-                                break;
-                            case QFRDRTable::dsoUnequal:
-                                if (dataS2[i]!=g.dataSelect2CompareValue) okLocal=true;
-                                break;
-                            case QFRDRTable::dsoGreaterOrEqual:
-                                if (dataS2[i]>=g.dataSelect2CompareValue) okLocal=true;
-                                break;
-                            case QFRDRTable::dsoSmallerOrEqual:
-                                if (dataS2[i]<=g.dataSelect2CompareValue) okLocal=true;
-                                break;
-                            case QFRDRTable::dsoGreater:
-                                if (dataS2[i]>g.dataSelect2CompareValue) okLocal=true;
-                                break;
-                            case QFRDRTable::dsoSmaller:
-                                if (dataS2[i]<g.dataSelect2CompareValue) okLocal=true;
-                                break;
-                            case QFRDRTable::dsoInRange:
-                                if (dataS2[i]>=g.dataSelect2CompareValue && dataS2[i]<=g.dataSelect2CompareValue2) okLocal=true;
-                                break;
-                            case QFRDRTable::dsoOutOfRange:
-                                if (!(dataS2[i]>=g.dataSelect2CompareValue && dataS2[i]<=g.dataSelect2CompareValue2)) okLocal=true;
-                                break;
-                        }
-                        if (g.dataSelectLogic12==QFRDRTable::dsoAnd) ok=ok&&okLocal;
-                        else if (g.dataSelectLogic12==QFRDRTable::dsoOr) ok=ok||okLocal;
-                        else if (g.dataSelectLogic12==QFRDRTable::dsoXor) ok=(ok&&!okLocal) || (!ok&&okLocal);
-                        if (g.dataSelectLogic23!=QFRDRTable::dsoNone && dataS3.size()>0) {
-                            okLocal=false;
-                            switch(g.dataSelect3Operation) {
-                                case QFRDRTable::dsoEquals:
-                                    if (dataS3[i]==g.dataSelect3CompareValue) okLocal=true;
-                                    break;
-                                case QFRDRTable::dsoUnequal:
-                                    if (dataS3[i]!=g.dataSelect3CompareValue) okLocal=true;
-                                    break;
-                                case QFRDRTable::dsoGreaterOrEqual:
-                                    if (dataS3[i]>=g.dataSelect3CompareValue) okLocal=true;
-                                    break;
-                                case QFRDRTable::dsoSmallerOrEqual:
-                                    if (dataS3[i]<=g.dataSelect3CompareValue) okLocal=true;
-                                    break;
-                                case QFRDRTable::dsoGreater:
-                                    if (dataS3[i]>g.dataSelect3CompareValue) okLocal=true;
-                                    break;
-                                case QFRDRTable::dsoSmaller:
-                                    if (dataS3[i]<g.dataSelect3CompareValue) okLocal=true;
-                                    break;
-                                case QFRDRTable::dsoInRange:
-                                    if (dataS3[i]>=g.dataSelect3CompareValue && dataS3[i]<=g.dataSelect3CompareValue2) okLocal=true;
-                                    break;
-                                case QFRDRTable::dsoOutOfRange:
-                                    if (!(dataS3[i]>=g.dataSelect3CompareValue && dataS3[i]<=g.dataSelect3CompareValue2)) okLocal=true;
-                                    break;
-                            }
-                            if (g.dataSelectLogic23==QFRDRTable::dsoAnd) ok=ok&&okLocal;
-                            else if (g.dataSelectLogic23==QFRDRTable::dsoOr) ok=ok||okLocal;
-                            else if (g.dataSelectLogic23==QFRDRTable::dsoXor) ok=(ok&&!okLocal) || (!ok&&okLocal);
-                        }
-                    }
-                }
-
-                if (ok) dataO.append(data[i]);
-            }
-            QString s1=tr("%1 %2 %3").arg(ui->plotter->getDatastore()->getColumnNames().at(g.dataSelect1Column)).arg(QFRDRTable::DataSelectOperation2String(g.dataSelect1Operation)).arg(g.dataSelect1CompareValue);
-            QString s2="";
-            QString s3="";
-            if (g.dataSelectLogic12!=QFRDRTable::dsoNone) {
-                if (g.dataSelectLogic12==QFRDRTable::dsoAnd) s2=s2+" && ";
-                if (g.dataSelectLogic12==QFRDRTable::dsoOr) s2=s2+" || ";
-                if (g.dataSelectLogic12==QFRDRTable::dsoXor) s2=s2+" ~~ ";
-                s2=s2+tr("%1 %2 %3").arg(ui->plotter->getDatastore()->getColumnNames().at(g.dataSelect2Column)).arg(QFRDRTable::DataSelectOperation2String(g.dataSelect2Operation)).arg(g.dataSelect2CompareValue);
-                if (g.dataSelectLogic23!=QFRDRTable::dsoNone) {
-                    if (g.dataSelectLogic23==QFRDRTable::dsoAnd) s3=s3+" && ";
-                    if (g.dataSelectLogic23==QFRDRTable::dsoOr) s3=s3+" || ";
-                    if (g.dataSelectLogic23==QFRDRTable::dsoXor) s3=s3+" ~~ ";
-                    s3=s3+tr("%1 %2 %3").arg(ui->plotter->getDatastore()->getColumnNames().at(g.dataSelect3Column)).arg(QFRDRTable::DataSelectOperation2String(g.dataSelect3Operation)).arg(g.dataSelect3CompareValue);
-                }
-            }
-            QString nam= tr("(%2,%3)-strided, selected (%4%5%6) \"%1\"").arg(ui->plotter->getDatastore()->getColumnNames().at(column)).arg(g.strideStart).arg(g.stride).arg(s1).arg(s2).arg(s3);
-            if (dataO.size()>0) return ui->plotter->getDatastore()->addCopiedColumn(dataO.data(), dataO.size(),nam);
-            else return -1;
-        } else {
-            if (g.isStrided) {
-                return ui->plotter->getDatastore()->copyColumn(column, g.strideStart-1, g.stride, tr("(%2,%3)-strided \"%1\"").arg(ui->plotter->getDatastore()->getColumnNames().at(column)).arg(g.strideStart).arg(g.stride));
-            } else {
-                return column;
-            }
-        }
-    }
-    return -1;*/
 }
 
 void QFRDRTablePlotWidget::autoColorGraph(QFRDRTable::GraphInfo &g, int autocolor)
@@ -1827,7 +1760,17 @@ void QFRDRTablePlotWidget::on_btnColorByPalette_clicked()
 
 void QFRDRTablePlotWidget::reloadGraphData()
 {
+    QWidget* w=QApplication::focusWidget();
     listGraphs_currentRowChanged(ui->listGraphs->currentRow());
+    if (w) w->setFocus(Qt::MouseFocusReason);
+}
+
+void QFRDRTablePlotWidget::delayedReloadGraphData()
+{
+    timReloadGraphData.stop();
+    timReloadGraphData.setSingleShot(true);
+    timReloadGraphData.setInterval(DELAYEDUPDATEGRAPH_DELAY);
+    timReloadGraphData.start();
 }
 
 

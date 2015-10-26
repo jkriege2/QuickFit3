@@ -1,0 +1,17 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="qfe_nidaqmxreader/qfe_nidaqmxreader_large.png">qfe_nidaqmxreader_large.png</file>
+    <file alias="qfe_nidaqmxreader/qfe_nidaqmxreader.png">qfe_nidaqmxreader.png</file>
+</qresource>
+<qresource prefix="/qfe_nidaqmxreader">
+    <file>images/pause.png</file>
+    <file>images/play.png</file>
+    <file>images/running.png</file>
+    <file>images/settings.png</file>
+    <file>images/stop.png</file>
+    <file>images/close.png</file>
+    <file>images/graphs.png</file>
+    <file>images/preview.png</file>
+</qresource>
+
+</RCC>

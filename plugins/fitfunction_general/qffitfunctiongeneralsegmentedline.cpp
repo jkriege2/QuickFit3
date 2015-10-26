@@ -116,7 +116,3 @@ bool QFFitFunctionGeneralSegmentedLine::get_implementsDerivatives() const
 }
 
 
-bool QFFitFunctionGeneralSegmentedLine::estimateInitial(double */*params*/, const double */*dataX*/, const double */*dataY*/, long /*N*/, const bool* /*fix*/) const
-{
-    return false;
-}

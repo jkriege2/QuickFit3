@@ -76,6 +76,14 @@ public:
     void on_spinM_valueChanged(int val);
     void on_spinFCSTauMin_valueChanged(double val);
     void on_spinSegments_valueChanged(int val);
+    void on_spinSegmentsLT_valueChanged(int val);
+    void on_spinSegDuration_valueChanged(double val);
+    void on_spinSegDurationLT_valueChanged(double val);
+    void on_radSegDuration_toggled(bool chk);
+    void on_radSegNum_toggled(bool chk);
+    void on_radSegDurationLT_toggled(bool chk);
+    void on_radSegNumLT_toggled(bool chk);
+
     void on_cmbCorrelator_currentIndexChanged(int idx);
     void on_btnPeekLifetime_clicked();
 
@@ -95,8 +103,9 @@ protected:
     int runningThreads() const;
     int waitingThreads() const;
 private:
-    QFPluginServices* pluginServices;
     Ui::QFETCSPCImporterDialog *ui;
+protected:
+    QFPluginServices* pluginServices;
     QPointer<QFProject> project;
     ProgramOptions* options;
     QString lastTCSPCFileDir;
@@ -105,6 +114,7 @@ private:
     QStringList tcspcFormatNames;
     QList<TCSPCImporterJob> jobs;
     QFTableModel* tmCR;
+    //QFTableModel* tmCRLifetime;
     QFTableModel* tmFCS;
     QFTableModel* tmFCSLifetimeFilter;
     //QList<Job> jobsToAdd;

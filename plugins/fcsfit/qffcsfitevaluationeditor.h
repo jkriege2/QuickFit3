@@ -168,7 +168,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
             This function only adds the fit function plot objects and does NOT cause a replot of the graphs. It is called by
             replotData().
         */
-        virtual void updateFitFunctions();
+        virtual void updateFitFunctionsPlot();
 
         /** \brief called when the weights changes */
         void weightsChanged(int weight);

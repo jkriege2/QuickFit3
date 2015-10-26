@@ -1,0 +1,61 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Expression parser: Matrix Functions</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  <h2>Number Matrices</h2>
+  $$funcref_start$$<a name="doublematrix"/><!-- func:doublematrix -->
+    <b><tt><!-- template -->doublematrix()<!-- /template --> / <!-- template -->doublematrix(rows)<!-- /template --></tt> / <!-- template -->doublematrix(rows,columns)<!-- /template --> / <!-- template -->doublematrix(rows,columns,value)<!-- /template --> - <i> creates a matrix of floating-point numbers</i>:</b>
+  $$funcref_description$$
+		<ul>
+		  <li>If no parameters are given, the resulting matrix is empty</li>
+		  <li>If one parameter <tt>rows</tt> is given, the resulting matrix has a size <tt>rows*rows</tt> and each entry contains <tt>0</tt>.</li>
+		  <li>If two parameters <tt>rows,columns</tt> are given, the resulting matrix has a size <tt>rows*columns</tt> and each entry contains <tt>0</tt>.</li>
+		  <li>If three parameter <tt>rows,columns,value</tt> are given, the resulting matrix has a size <tt>rows*rows</tt> and each entry contains <tt>value</tt>.</li>
+		</ul>
+        <!-- /func:doublematrix -->
+  $$funcref_end$$
+
+  <h2>Boolean Matrices</h2>
+  $$funcref_start$$<a name="boolmatrix"/><!-- func:boolmatrix -->
+    <b><tt><!-- template -->boolmatrix()<!-- /template --> / <!-- template -->boolmatrix(rows)<!-- /template --></tt> / <!-- template -->boolmatrix(rows,columns)<!-- /template --> / <!-- template -->boolmatrix(rows,columns,value)<!-- /template --> - <i> creates a matrix of booleans</i>:</b>
+  $$funcref_description$$
+		<ul>
+		  <li>If no parameters are given, the resulting matrix is empty</li>
+		  <li>If one parameter <tt>rows</tt> is given, the resulting matrix has a size <tt>rows*rows</tt> and each entry contains <tt>false</tt>.</li>
+		  <li>If two parameters <tt>rows,columns</tt> are given, the resulting matrix has a size <tt>rows*columns</tt> and each entry contains <tt>false</tt>.</li>
+		  <li>If three parameter <tt>rows,columns,value</tt> are given, the resulting matrix has a size <tt>rows*rows</tt> and each entry contains <tt>value</tt>.</li>
+		</ul>
+        <!-- /func:boolmatrix -->
+  $$funcref_end$$
+
+  <h2>Matrix conversion</h2>
+  $$funcref_start$$<a name="mat2vec"/><!-- func:mat2vec -->
+    <b><tt><!-- template -->mat2vec(x)<!-- /template --> - <i> creates a vector with all entries (row-major order) from the given matrix <tt>x</tt></i>:</b>
+  $$funcref_description$$
+        <!-- /func:mat2vec -->
+  $$funcref_end$$
+  
+ $$funcref_start$$<a name="vec2mat"/><!-- func:vec2mat -->
+    <b><tt><!-- template -->vec2mat(x,cols)<!-- /template --> - <i> creates a matrix with all entries (row-major order) from the given vector <tt>x</tt>. The matrix will have <tt>cols</tt> entries</i>:</b>
+  $$funcref_description$$
+        If <tt>x</tt> does not have enough entries to fill the matrix, an error will be generated. The number of rows in tzhe output matrix is $(\mbox{rows}=\lfloor \mbox{entries}/\mbox{cols} \rfloor)$
+        <!-- /func:vec2mat -->
+  $$funcref_end$$
+  
+  <h2>Matrix reshaping</h2>
+  
+  
+ $$funcref_start$$<a name="reshape"/><!-- func:reshape -->
+    <b><tt><!-- template -->reshape(x, rows, cols)<!-- /template --> - <i> creates a matrix with all entries (row-major order) from the given matrix <tt>x</tt>, but with a new size of  <tt>rows</tt> * <tt>cols</tt> entries</i>:</b>
+  $$funcref_description$$
+        If <tt>x</tt> does not have enough entries to fill the new matrix, an error will be generated.
+        <!-- /func:reshape -->
+  $$funcref_end$$
+  </body>
+  </html>
+  

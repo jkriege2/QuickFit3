@@ -283,7 +283,7 @@ QString QtLogFile::indentify(const QString &text){
   return res;
 };
 
-void QtLogFile::raw_log_text(const QString &message){
+void QtLogFile::raw_log_text(const QString &message, bool procEvents){
   QMutexLocker locker(mutex);
 
   //try {
@@ -308,7 +308,7 @@ void QtLogFile::raw_log_text(const QString &message){
     tc.insertText(message);
     //tc.insertHtml(message);
     browser->setTextCursor(tc);
-    QApplication::processEvents();
+    if (procEvents) QApplication::processEvents();
   }
 //  } catch(...) {
 
@@ -377,11 +377,16 @@ void QtLogFile::readSettings(QSettings& s, QString namePrefix) {
   textColor=QColor(s.value(namePrefix+"logTextColor", textColor.name()).toString());;
 }
 
+QString QtLogFile::toPlainText() const
+{
+    return browser->toPlainText();
+}
 
-void QtLogFile::log_text(const QString& message) {
+
+void QtLogFile::log_text(const QString& message, bool processEvents) {
   QMutexLocker locker(mutex);
   do_indent();
-  raw_log_text(indentify(message));
+  raw_log_text(indentify(message), processEvents);
   if (message.size()>0) {
     last_was_linebreak=false;
     if (message[message.size()-1]=='\n') last_was_linebreak=true;
@@ -494,18 +499,18 @@ QString QtLogFile::dehtmlify(const QString &message) const
     return res;
 }
 
-void QtLogFile::log_warning(const QString& message){
+void QtLogFile::log_warning(const QString& message, bool processEvents){
     QMutexLocker locker(mutex);
   currentColor=warningColor;
-  log_text(message);
+  log_text(message, processEvents);
   currentColor=textColor;
 }
 
-void QtLogFile::log_error(const QString& message){
+void QtLogFile::log_error(const QString& message, bool processEvents){
     QMutexLocker locker(mutex);
   currentColor=errorColor;
   currentBold=true;
-  log_text(message);
+  log_text(message, processEvents);
   currentBold=false;
   currentColor=textColor;
 }

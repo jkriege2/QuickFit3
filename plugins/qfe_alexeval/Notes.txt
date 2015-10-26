@@ -1,0 +1,35 @@
+    Alex Auswertung
+
+
+AlexSim: class to generate photon data streams to test the burst search algorithms
+We assume values for background and fluorophore count rates.
+Since the photons follow a poisson distribution (event at any point in time), the time between two photons (the interphoton time) follows an exponential distribution (wiki on poisson distribution cites S. M. Ross (2007). Introduction to Probability Models (ninth ed.). Boston: Academic Press. ISBN 978-0-12-598062-3. pp. 307–308.) A possible alternative might be the Erlang distribution, which models the sum of several exponentially distributed random variables.
+During bursts, the specified donor and acceptor rates apply for the interphoton times (mean time=1/rate - \tau=frac{1}{k_{Donor}}). The length of a burst (i.e. its duration) has approximately a lognormal distribution (see experimental values). From experimental data a fit gave estimates for expectation values of the underlying normal distribution (these are then converted to the lognormal parameter values). During the burst duration, the interphoton times are sampled as described before. The possible scenarios in a burst are donor-only and acceptor-only burst and all sorts of relative alignment.
+The time between bursts is as well sampled from an exponential distribution because the occurence of a burst should again be poisson distributed (?). During this time, inter-photon times with the background rate are sampled.
+
+Blinking
+Blinkingof a flourophore occurs mainly because of a transition of an electron to a triplet state. Lifetimes of this state are much longer than for normal flourescent states, since the transition is forbidden. Typical lifetime of a triplet state of Alexa flourophores is 3 us.
+or conformational changes
+The time a flourophore blinks is chosen at random (from a uniform distribtion of times during the burst) and its length is again drawn from an exponential distribution with mean value of the triplet lifetime.
+
+
+Bleaching
+If a flourophore loses its ability to flouresce, it is called "bleached". A flourophore may be permanently damaged by destruction of a covalent bond (\pi electron system) so that no flourescence can take place any more.
+
+
+Coincidence
+For single molecule experiments it is vital that not more than one molecule is present in the focal volume. This is usually accomplished by using low concentrations of the flourophore. There is, however, always a certain chance that there will be more than one pair of flourophores present. Each additional flourescent molecule (may it be a donor, an acceptor or a pair of it), may alter the intensity and therefore the S and PR values but is usually not detected in a dual channel burst search.
+For the simulation, the most likely case of one additional donor or acceptor molecule is considered.
+Start and end point of the entrance of such a molecule is drawn from a uniform distribution.
+
+
+Sliding Burst Search
+A burst consists of at least L photons, which have at least M neighbours in a time window T centered around itself.
+The SBS has a weakness: Assume two bursts with a well defined start and end. No matter how much time between the burst events, if there are no background photons these two bursts will count as one. Fortunately, the background is always present, rendering large distances between bursts with no photons impossible.
+
+
+
+Gansen Diss: The background follows a Poissonian distribution4, whereas the fluorescence emission shows non-Poissonian character.
+
+
+In experiments, the burst size distribution appears to be exponentially distributed. The burrst duration appears to be lognormal distributed. For diffusion through the focal volume however, the dwell time (= burst duration if blinking is excluded) is exponentially distributed (paper by seidel 199...)

@@ -29,6 +29,8 @@
 #include "statistics_tools.h"
 #include <QVector>
 #include <stdint.h>
+#include "qftcspcreader.h"
+
 
 /** \group qf3_tttr_tools TTTR Tools
  *  \ingroup qf3tools
@@ -48,19 +50,45 @@
  * \param ntau number of discrete lag times
  */
 template<typename TDATA, typename TCORR>
-inline void TTTRcrosscorrelate(const TDATA *t, int64_t Nt, const TDATA *u, int64_t Nu, TCORR *g, const TCORR *tau, const uint ntau) {
-
+inline void TTTRcrosscorrelate(const TDATA *t, uint64_t Nt, const TDATA *u, uint64_t Nu, TCORR *g, const TCORR *tau, const uint ntau) {
+    if (Nt<=1 || Nu<=1 || ntau<=1 || !t || !u || !g || !tau) return;
     TCORR tStart=qMin(t[0],u[0]);
     TCORR tEnd = qMax(t[Nt-1],u[Nu-1]);
     TCORR T = tEnd - tStart; // total acquisition time
-    int64_t *lk=qfMallocT<int64_t>(ntau); // photon indices
-    int64_t *mk=qfMallocT<int64_t>(ntau); // photon indices
+    uint64_t *lk=qfMallocT<uint64_t>(ntau); // photon indices
+    if (!lk) return;
+    uint64_t *mk=qfMallocT<uint64_t>(ntau); // photon indices
+    if (!mk) {
+        qfFree(lk);
+        return;
+    }
+    uint64_t *gg=qfMallocT<uint64_t>(ntau); // photon indices
+    if (!gg) {
+        qfFree(mk);
+        qfFree(lk);
+        return;
+    }
     TCORR *nt=qfMallocT<TCORR>(ntau); // photon count in channel t
+    if (!nt) {
+        qfFree(mk);
+        qfFree(lk);
+        qfFree(gg);
+        return;
+    }
     TCORR *nu=qfMallocT<TCORR>(ntau); // photon count in channel u
+    if (!nu) {
+        qfFree(mk);
+        qfFree(lk);
+        qfFree(nt);
+        qfFree(gg);
+        return;
+    }
+
 
     //    (1) Initialize a correlogram Yk with M bins to 0.
     for(uint k=0;k<ntau;++k) {
         g[k]=0;
+        gg[k]=0;
         lk[k]=1;
         mk[k]=1;
         nt[k]=0;
@@ -72,29 +100,29 @@ inline void TTTRcrosscorrelate(const TDATA *t, int64_t Nt, const TDATA *u, int64
     //fdbg.open(QFile::WriteOnly|QFile::Text);
     //QTextStream txt(&fdbg);
 
-    qDebug()<<"correlating";
+    //qDebug()<<"correlating";
 
-    for(int64_t i=0;i<Nt;++i) {// loop over all photons in channel t
+    for(uint64_t i=0;i<Nt;++i) {// loop over all photons in channel t
         const TCORR ti=t[i];
         for(register uint k=0;k<ntau;++k) { // loop over bins
             //const TCORR tauk=tau[k];
             //const TCORR taukp1=tau[k+1];
-            const TCORR tauk=(k>0)?tau[k-1]:0;
+            const TCORR tauk=(k>0)?tau[k-1]:(tau[k]/TCORR(2));
             const TCORR taukp1=tau[k];
 
             const TCORR tauStart = ti + tauk;
             const TCORR tauEnd = ti + taukp1;
-            int64_t l=lk[k];
+            uint64_t l=lk[k];
 
             //txt<<i<<k<<": ti="<<ti<<"\n";
             //txt<<"    l="<<l<<" tauStart="<<tauStart<<" u[l-1]="<<u[l-1]<<")    u[l]="<<u[l]<<"\n";
-            while( (l<Nu-1) && u[l]<=tauStart /*!(u[l-1]<tauStart && tauStart<=u[l])*/) { // start photon in bin k
+            while( (l>=0)&&(l<Nu-1) && u[l]<tauStart /*!(u[l-1]<tauStart && tauStart<=u[l])*/) { // start photon in bin k
                 l++;
             }
 
-            int64_t m=mk[k];
+            uint64_t m=mk[k];
             //txt<<"    m="<<m<<" tauEnd="<<tauEnd<<"   u[l-1]="<<u[m-1]<<")    u[l]="<<u[m]<<"\n";
-            while( (m<Nu-1) && u[m]<tauEnd /*!(u[m-1]<tauEnd && tauEnd<=u[m])*/ ) { // end photon in bin k
+            while( (m>=0) && (m<Nu-1) && u[m]<tauEnd /*!(u[m-1]<tauEnd && tauEnd<=u[m])*/ ) { // end photon in bin k
                 m++;
             }
 
@@ -102,16 +130,16 @@ inline void TTTRcrosscorrelate(const TDATA *t, int64_t Nt, const TDATA *u, int64
             //if (l<Nu-1 && m<Nu-1) {
                 lk[k] = l;
                 mk[k] = m;
-                if (m-l>0 && l<Nu-1 && m<Nu-1) g[k] = g[k] + TCORR(m-l);  // update correlogram
+                if (m-l>0 && l<Nu-1 && m<Nu-1) gg[k] = gg[k] + (m-l);  // update correlogram
             //}
         }
     }
 
     // Normalize
-    qDebug()<<"normalizing: find factors";
+    //qDebug()<<"normalizing: find factors";
     for(uint k=0;k<ntau;++k) { // loop over bins
         int64_t i=0;
-        while (i<Nu && u[i]-tStart<tau[k]) {
+        while ((uint64_t)i<Nu && u[i]-tStart<tau[k]) {
             i++;
         }
         nu[k]=Nu-i;
@@ -123,15 +151,15 @@ inline void TTTRcrosscorrelate(const TDATA *t, int64_t Nt, const TDATA *u, int64
     }
 
 
-    qDebug()<<"normalizing: apply factors";
+    //qDebug()<<"normalizing: apply factors";
     for(uint k=0;k<ntau;++k) {
         // normalize by the number of photons for the lag times (symmetrically for u and t)
         // and the binwidth tau_{k+1} - tau_k (rectangular averaging).
-        TCORR o=g[k];
-        const TCORR taukm1=(k>0)?tau[k-1]:0;
+        TCORR o=gg[k];
+        const TCORR taukm1=(k>0)?tau[k-1]:(tau[k]/TCORR(2));
         const TCORR tauk=tau[k];
-        g[k]=g[k]*(T-tau[k])/(tauk-taukm1)/(TCORR)nt[k]/(TCORR)nu[k];
-        qDebug()<<k<<":"<<tau[k]<<T<<(tauk-taukm1)<<(TCORR)nt[k]<<(TCORR)nu[k]<<o<<"  => "<<g[k];
+        g[k]=o*(T-tau[k])/(tauk-taukm1)/(TCORR)nt[k]/(TCORR)nu[k];
+        //qDebug()<<k<<":"<<tau[k]<<T<<(tauk-taukm1)<<(TCORR)nt[k]<<(TCORR)nu[k]<<o<<"  => "<<g[k];
     }
 
     if (nt) qfFree(nt);
@@ -296,7 +324,7 @@ inline void TTTRcrosscorrelateWithAvg(const TDATA *t_inn, int64_t Ntn, const TDA
     TCORR tStart=qMin(t_in[0],u_in[0]);
     TCORR tEnd = qMax(t_in[Nt-1],u_in[Nu-1]);
     TCORR T = tEnd - tStart; // total acquisition time
-    qDebug()<<"TTTRcrosscorrelateWithAvg: tStart="<<tStart<<"  tEnd="<<tEnd<<"  T="<<T<<"  S="<<S<<"  P="<<P<<"  m="<<m<<"  tauMin="<<tauMin;
+    //qDebug()<<"TTTRcrosscorrelateWithAvg: tStart="<<tStart<<"  tEnd="<<tEnd<<"  T="<<T<<"  S="<<S<<"  P="<<P<<"  m="<<m<<"  tauMin="<<tauMin;
     int ntau=S*P;
     int gi=0;
 
@@ -319,9 +347,9 @@ inline void TTTRcrosscorrelateWithAvg(const TDATA *t_inn, int64_t Ntn, const TDA
     Ntt=TTTRcoarseData(t, wt, Ntt, (int64_t)1);
     Nuu=TTTRcoarseData(uu, wu, Nuu, (int64_t)1);
     //Ntt=TTTRcoarseData(t, wt, Ntt, tauMin);
-    qDebug()<<"Ntt="<<Ntt<<Nt<<t[0]<<"("<<wt[0]<<t_in[0]<<"), "<<t[1]<<"("<<wt[1]<<t_in[1]<<"), "<<t[2]<<"("<<wt[2]<<t_in[2]<<"), "<<t[3]<<"("<<wt[3]<<t_in[3]<<")";
+    //qDebug()<<"Ntt="<<Ntt<<Nt<<t[0]<<"("<<wt[0]<<t_in[0]<<"), "<<t[1]<<"("<<wt[1]<<t_in[1]<<"), "<<t[2]<<"("<<wt[2]<<t_in[2]<<"), "<<t[3]<<"("<<wt[3]<<t_in[3]<<")";
     //Nuu=TTTRcoarseData(uu, wu, Nuu, tauMin);
-    qDebug()<<"Nuu="<<Nuu<<Nu<<uu[0]<<"("<<wu[0]<<u_in[0]<<"), "<<uu[1]<<"("<<wu[1]<<u_in[1]<<"), "<<uu[2]<<"("<<wu[2]<<u_in[2]<<"), "<<uu[3]<<"("<<wu[3]<<u_in[3]<<")";
+    //qDebug()<<"Nuu="<<Nuu<<Nu<<uu[0]<<"("<<wu[0]<<u_in[0]<<"), "<<uu[1]<<"("<<wu[1]<<u_in[1]<<"), "<<uu[2]<<"("<<wu[2]<<u_in[2]<<"), "<<uu[3]<<"("<<wu[3]<<u_in[3]<<")";
     //TDATA* u=qfDuplicateArray(uu, Nuu);
     int64_t* u=qfDuplicateArray(uu, Nuu);
     int64_t lasttau=0;
@@ -334,7 +362,7 @@ inline void TTTRcrosscorrelateWithAvg(const TDATA *t_inn, int64_t Ntn, const TDA
                 if (gi==0) { lasttau=1; tau.append(TCORR(lasttau)*tauMin); }
                 else { lasttau=lasttau+pow(m, s); tau.append(TCORR(lasttau)*tauMin); }
                 g.append(0);
-                qDebug()<<gi<<s<<p<<lasttau<<tau[gi];
+                //qDebug()<<gi<<s<<p<<lasttau<<tau[gi];
                 register int64_t pcnt=0, ti=0, ui=0;
 
                 int64_t in=Nu-1;
@@ -383,7 +411,7 @@ inline void TTTRcrosscorrelateWithAvg(const TDATA *t_inn, int64_t Ntn, const TDA
 
                 // update correlation
                 g[gi]=TCORR(pcnt)/pow(m, s)/(T-tau[gi])/(N1all/T)/(N2tau/(T-tau[gi]));
-                qDebug()<<gi<<s<<p<<tau[gi]<<":  "<<pcnt<<pcnt/pow(m, s)<<N1tau*N2tau<<N1tau<<N2tau<<T<<g[gi];
+                //qDebug()<<gi<<s<<p<<tau[gi]<<":  "<<pcnt<<pcnt/pow(m, s)<<N1tau*N2tau<<N1tau<<N2tau<<T<<g[gi];
 
                 //lasttau=tau[gi];
                 gi++;
@@ -393,14 +421,14 @@ inline void TTTRcrosscorrelateWithAvg(const TDATA *t_inn, int64_t Ntn, const TDA
         // time-coarsening
         Ntt=TTTRcoarseData(t, wt, Ntt, (int64_t)pow(m, s+1));
         Nuu=TTTRcoarseData(uu, wu, Nuu, (int64_t)pow(m, s+1));
-        qDebug()<<"Ntt="<<Ntt<<Nt<<t[0]<<"("<<wt[0]<<t_in[0]<<"), "<<t[1]<<"("<<wt[1]<<t_in[1]<<"), "<<t[2]<<"("<<wt[2]<<t_in[2]<<"), "<<t[3]<<"("<<wt[3]<<t_in[3]<<")";
+        //qDebug()<<"Ntt="<<Ntt<<Nt<<t[0]<<"("<<wt[0]<<t_in[0]<<"), "<<t[1]<<"("<<wt[1]<<t_in[1]<<"), "<<t[2]<<"("<<wt[2]<<t_in[2]<<"), "<<t[3]<<"("<<wt[3]<<t_in[3]<<")";
         int64_t wsum=0;
         for (int64_t jj=0; jj<Ntt; jj++) wsum+=wt[jj];
-        qDebug()<<"wtsum="<<wsum;
-        qDebug()<<"Nuu="<<Nuu<<Nu<<uu[0]<<"("<<wu[0]<<u_in[0]<<"), "<<uu[1]<<"("<<wu[1]<<u_in[1]<<"), "<<uu[2]<<"("<<wu[2]<<u_in[2]<<"), "<<uu[3]<<"("<<wu[3]<<u_in[3]<<")";
+        //qDebug()<<"wtsum="<<wsum;
+        //qDebug()<<"Nuu="<<Nuu<<Nu<<uu[0]<<"("<<wu[0]<<u_in[0]<<"), "<<uu[1]<<"("<<wu[1]<<u_in[1]<<"), "<<uu[2]<<"("<<wu[2]<<u_in[2]<<"), "<<uu[3]<<"("<<wu[3]<<u_in[3]<<")";
         wsum=0;
         for (int64_t jj=0; jj<Nuu; jj++) wsum+=wu[jj];
-        qDebug()<<"wusum="<<wsum;
+        //qDebug()<<"wusum="<<wsum;
     }
 
 
@@ -416,5 +444,96 @@ template<typename TDATA, typename TCORR>
 inline void TTTRcorrelateWithAvg(const TDATA *t_in, int64_t Nt,QVector<TCORR>&g, QVector<TCORR>&tau, int S, int m, int P, double tauMin) {
     TTTRcrosscorrelateWithAvg(t_in, Nt, t_in, Nt, g, tau, S, m, P, tauMin);
 }
+
+
+struct TCSPCPhotonData {
+    uint8_t channel;
+    double arrivaltime;
+    double IPT; // interphotontime
+    double IPT_filtered; // interphotontime
+    uint16_t microtime;
+};
+
+struct TCSPCPhotonsData {
+    QVector<TCSPCPhotonData> photondata;
+    QVector<double> backgroundrate;
+    QVector<double> avgrate;
+    double backgroundDuration;
+    double duration;
+    double micrrotime_dt;
+    double firstPhoton;
+    double avg_IPT;
+    uint64_t photonsG;
+    uint64_t photonsR;
+
+    double lastLEESigma0;
+    int lastLEEWindowSize;
+
+    void applyLEEFilter(int win, double sigma0);
+};
+
+struct TCSPCBurstData {
+    TCSPCBurstData() {
+        start=0;
+        duration=0;
+        photonG=0;
+        photonR=0;
+        P=0;
+        size=0;
+        rDA=0;
+    }
+
+    double start;
+    double duration;
+    int photonG;
+    int photonR;
+    double P;
+    double E;
+    double rDA;
+    int size;
+
+    inline double getRate() const {
+        return double(photonG+photonR)/duration;
+    }
+
+
+};
+
+struct TCSPCBurstsData {
+    QVector<TCSPCBurstData> burstdata;
+    double avgDuration;
+};
+
+struct TTTRReadPhotonsDataEvalProps {
+    double start;
+    double end;
+    int chG;
+    int chR;
+};
+
+bool TTTRReadPhotonsData(TCSPCPhotonsData* output, QFTCSPCReader* readerData, QFTCSPCReader* readerBackground, TTTRReadPhotonsDataEvalProps props);
+
+struct TTTRFindBurstsEvalProps {
+    double maxBurstDuration;
+    double maxIPT;
+    int minBurstSize;
+    int chG;
+    int chR;
+    bool filtered;
+};
+
+void TTTRFindBursts(TCSPCBurstsData* output, const TCSPCPhotonsData& photons, TTTRFindBurstsEvalProps props);
+
+
+struct TTTRCalcBurstPropertiesProps {
+    double backG;
+    double backR;
+    double crosstalk;
+    double fdirect;
+    double gamma;
+    double R0;
+};
+
+void TTTRCalcBurstProperties(TCSPCBurstsData* output, TTTRCalcBurstPropertiesProps props);
 
 #endif // TTTRTOOLS_H

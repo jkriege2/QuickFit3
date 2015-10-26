@@ -34,9 +34,9 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3rdrdp_fcs
     */
 
-class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
+class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase, public QFPluginCommandsInterface {
         Q_OBJECT
-        Q_INTERFACES(QFPluginRawDataRecord)
+        Q_INTERFACES(QFPluginRawDataRecord QFPluginCommandsInterface)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
         Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFPRDRFCS")
 #endif
@@ -83,6 +83,15 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
 
         /** \brief icon for the plugin */
         virtual QString getIconFilename() const  { return QString(":/fcs_logo.png"); }
+
+        /** \brief send a text command to another plugin
+         *
+         *  This function supports these commands:
+         *    - \c "load_alv5000" loads the given ALV5000-file (1. argument) into the project
+         *    - \c "load_qf3asciicorr" loads the given QF3ASCIICORR-file (1. argument) into the project
+         *  .
+         */
+        virtual QVariant sendPluginCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
 
     public slots:
         /** \brief start a dialog, which allows to set the background intensity for records
@@ -157,6 +166,7 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         void insertDiffusion4File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
         void insertOlegFile(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
         void insertPicoQuantASCIIFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
+        void insertPicoQuantCORFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
 
         /*! \brief add a Zeiss Confocor3 file to the current project
 

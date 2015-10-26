@@ -141,6 +141,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tableView</tabstop>
+  <tabstop>cmbImportWhere</tabstop>
+  <tabstop>radImportAll</tabstop>
+  <tabstop>radImportSelected</tabstop>
+  <tabstop>chkImportExressions</tabstop>
+  <tabstop>btnPivot</tabstop>
+  <tabstop>btnPasteAgain</tabstop>
+ </tabstops>
  <resources>
   <include location="qfrdrtable.qrc"/>
  </resources>

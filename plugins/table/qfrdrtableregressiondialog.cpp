@@ -402,6 +402,12 @@ void QFRDRTableRegressionDialog::replotGraph()
     size_t c_ResY=ds->addCopiedColumn(residualsY.data(), residualsY.size(), tr("residuals"));
     size_t c_ResYW=ds->addCopiedColumn(residualsYW.data(), residualsYW.size(), tr("weighted residuals"));
 
+    size_t c_Xlim=ds->addCopiedColumn(dataX.data(), qMin(dataX.size()-getRangeMin(), getRangeMax()-getRangeMin()), tr("x-data, limited"));
+    size_t c_Ylim=ds->addCopiedColumn(dataY.data(), qMin(dataY.size()-getRangeMin(), getRangeMax()-getRangeMin()), tr("y-data, limited"));
+    size_t c_Wlim=ds->addCopiedColumn(dataW.data(), qMin(dataW.size()-getRangeMin(), getRangeMax()-getRangeMin()), tr("weight, limited"));
+    size_t c_ResYlim=ds->addCopiedColumn(residualsY.data(), qMin(residualsY.size()-getRangeMin(), getRangeMax()-getRangeMin()), tr("residuals, limited"));
+    size_t c_ResYWlim=ds->addCopiedColumn(residualsYW.data(), qMin(residualsYW.size()-getRangeMin(), getRangeMax()-getRangeMin()), tr("weighted residuals, limited"));
+
 
     JKQTPxyLineErrorGraph* g_data=new JKQTPxyLineErrorGraph(ui->pltDistribution->get_plotter());
     g_data->set_drawLine(true);
@@ -449,15 +455,15 @@ void QFRDRTableRegressionDialog::replotGraph()
 
     JKQTPxyLineGraph* g_res=new JKQTPxyLineGraph(ui->pltResiduals->get_plotter());
     g_res->set_drawLine(true);
-    g_res->set_xColumn(c_X);
-    g_res->set_yColumn(c_ResY);
+    g_res->set_xColumn(c_Xlim);
+    g_res->set_yColumn(c_ResYlim);
     g_res->set_sortData(JKQTPxyGraph::SortedX);
     if (ui->chkWeightedResiduals->isChecked()) {
         g_res->set_title(tr("weighted residuals"));
-        g_res->set_yColumn(c_ResYW);
+        g_res->set_yColumn(c_ResYWlim);
     } else {
         g_res->set_title(tr("residuals"));
-        g_res->set_yColumn(c_ResY);
+        g_res->set_yColumn(c_ResYlim);
     }
     g_res->set_color(g_data->get_color());
     g_res->set_symbol(JKQTPcross);

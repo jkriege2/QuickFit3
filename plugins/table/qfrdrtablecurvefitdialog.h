@@ -66,9 +66,11 @@ class QFRDRTableCurveFitDialog : public QDialog
         QVector<double> lastResultD;
         QString resultComment;
         QString resultCommentLong;
+
         QString resultStat;
         QString resultStatLong;
         QString resultPars;
+        QString fitresultStats;
         int datapoints;
         QString fitresult;
         int colX,  colY,  colW;

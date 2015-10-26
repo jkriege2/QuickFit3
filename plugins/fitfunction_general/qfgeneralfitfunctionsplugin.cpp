@@ -52,6 +52,9 @@
 #include "qffitfunctiongeneralcdfcauchy.h"
 #include "qffitfunctiongeneralpdfloggaussian.h"
 #include "qffitfunctiongeneralcdfloggaussian.h"
+#include "qffitfunctiongeneralmultigaussianvar.h"
+#include "qffitfunctiongeneralmultiexp.h"
+#include "qffitfunctiongeneralmultilognormal.h"
 
 QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     QStringList res;
@@ -85,6 +88,9 @@ QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     res<<"gen_cdf_loggaussian";
     res<<"gen_pdf_cauchy";
     res<<"gen_cdf_cauchy";
+    res<<"gen_multigaussian_sqrte";
+    res<<"gen_multilognormal";
+    res<<"gen_multiexp";
     return res;
 }
 
@@ -149,6 +155,12 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(const QString &id) const  {
         return new QFFitFunctionGeneralPDFCauchy();
     } else if (id=="gen_cdf_cauchy") {
         return new QFFitFunctionGeneralCDFCauchy();
+    } else if (id=="gen_multigaussian_sqrte") {
+        return new QFFitFunctionGeneralMultiGaussianVar();
+    } else if (id=="gen_multilognormal") {
+        return new QFFitFunctionGeneralMultiLogNormal();
+    } else if (id=="gen_multiexp") {
+        return new QFFitFunctionGeneralMultiExp();
     }
     return NULL;
 }

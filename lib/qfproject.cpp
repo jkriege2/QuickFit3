@@ -994,7 +994,7 @@ static bool QFProject_compressFile(QuaZip* zip, QString fileName, QString fileDe
 }
 
 
-static bool QFProject_writeCompressedTextFile(QuaZip* zip, QByteArray text, QString fileDest, QString& error, QFProgressMinorProgress* pdlg) {
+static bool QFProject_writeCompressedTextFile(QuaZip* zip, QByteArray text, QString fileDest, QString& error, QFProgressMinorProgress* /*pdlg*/) {
     QuaZipFile outFile(zip);
     if(!outFile.open(QIODevice::WriteOnly|QIODevice::Text, QuaZipNewInfo(fileDest))) {
         error=QObject::tr("error opening file '%1 in ZIP '%3':\n   error description: %2").arg(fileDest).arg(outFile.errorString()).arg(zip->getZipName());

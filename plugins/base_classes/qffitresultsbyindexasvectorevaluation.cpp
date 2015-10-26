@@ -108,10 +108,10 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultBasicFitStatisticsInResu
     fitresult.resultsSetGroupAndLabels( param, group, tr("total sum of squares (TSS)"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"bayes_model_probability_paramrangesize",  result.bayesProbabilityParamRangeSize, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("Bayes model probability"), tr("p<sub>Bayes</sub>(model|data)"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("parameter range size for Bayes model probability"), tr("param_range<sub>Bayes</sub>"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"bayes_model_probability",  result.bayesProbability, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
-    fitresult.resultsSetGroupAndLabels( param, group, tr("parameter range size for Bayes model probability"), tr("param_range<sub>Bayes</sub>"));
+    fitresult.resultsSetGroupAndLabels( param, group, tr("Bayes model probability"), tr("p<sub>Bayes</sub>(model|data)"));
 
     fitresult.resultsSetNumberAndBool( param=prefix+"bayes_model_probability_log10",  result.bayesProbabilityLog10, QString(""), getParamNameLocalStore(param),  true, fitresult.index>=0);
     fitresult.resultsSetGroupAndLabels( param, group, tr("log10 Bayes model probability"), tr("log<sub>10</sub>(p<sub>Bayes</sub>(model|data))"));

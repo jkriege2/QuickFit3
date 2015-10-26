@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = fitfunctions_fcsdistribution
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/gsl.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
@@ -36,14 +36,16 @@ HEADERS += qfpfitfunctionsfcsdistribution.h \
     qffitfunctionfcsdistributiongaussianD.h \
     qffitfunctionfcsdistributiongaussian.h \
     qffitfunctionfcsdistributiongaussianint.h \
-    qffitfunctionfcsdistributionloggaussianint.h
+    qffitfunctionfcsdistributionloggaussianint.h \
+    qffitfunctionfcsdistributiongaussianDint.h
 
 SOURCES += qfpfitfunctionsfcsdistribution.cpp\
            qffitfunctionfcsdistributionloggaussian.cpp \
     qffitfunctionfcsdistributiongaussianD.cpp \
     qffitfunctionfcsdistributiongaussian.cpp \
     qffitfunctionfcsdistributiongaussianint.cpp \
-    qffitfunctionfcsdistributionloggaussianint.cpp
+    qffitfunctionfcsdistributionloggaussianint.cpp \
+    qffitfunctionfcsdistributiongaussianDint.cpp
 
 FORMS =
 

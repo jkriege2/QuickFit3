@@ -29,7 +29,11 @@
 #else
 #include <QtGui>
 #endif
-
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#  include <QtConcurrent/QtConcurrent>
+#else
+#  include <QtConcurrentRun>
+#endif
 
 #include <QDebug>
 #include "qmodernprogresswidget.h"
@@ -67,6 +71,14 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     tmCR->setReadonly(true);
     ui->tabCR->setModel(tmCR);
 
+//    tmCRLifetime=new QFTableModel(ui->tabCRLifetime);
+//    tmCRLifetime->setReadonly(true);
+//    tmCRLifetime->setReadonlyButStillCheckable(true);
+//    tmCRLifetime->setReadonly(false);
+//    tmCRLifetime->clear();
+//    tmCRLifetime->setReadonly(true);
+//    ui->tabCRLifetime->setModel(tmCR);
+
 
     tmFCS=new QFTableModel(ui->tvFCS);
     tmFCS->setReadonlyButStillCheckable(true);
@@ -80,6 +92,11 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     tmFCSLifetimeFilter->clear();
     ui->tvFCSLifetimeFilter->setModel(tmFCSLifetimeFilter);
     ui->tvFCSLifetimeFilter->setItemDelegate(new QFTableDelegate(ui->tvFCSLifetimeFilter));
+    ui->cmbCorrelator->clear();
+    ui->cmbCorrelator->addItem(tr("bin and correlate: Multi-Tau 1 (one monitor per lag)"), CORRELATOR_MTAUALLMON);
+    ui->cmbCorrelator->addItem(tr("photon arrival times correlator (Multi-Tau)"), CORRELATOR_TTTR);
+    //ui->cmbCorrelator->addItem(tr("photon arrival times correlator with averaging (Multi-Tau)"), CORRELATOR_TTTRAVG);
+    ui->cmbCorrelator->setCurrentIndex(0);
 /*
 %counter% by the value of \a counter, if this value is >0, or by an empty string
           - \c %S% S parameter of the correlator
@@ -249,6 +266,48 @@ void QFETCSPCImporterDialog::on_spinSegments_valueChanged(int /*val*/) {
     updateCorrelator();
 }
 
+void QFETCSPCImporterDialog::on_spinSegmentsLT_valueChanged(int /*val*/)
+{
+    updateDuration();
+    updateCorrelator();
+}
+
+void QFETCSPCImporterDialog::on_spinSegDuration_valueChanged(double /*val*/)
+{
+    updateDuration();
+    updateCorrelator();
+}
+
+void QFETCSPCImporterDialog::on_spinSegDurationLT_valueChanged(double /*val*/)
+{
+    updateDuration();
+    updateCorrelator();
+}
+
+void QFETCSPCImporterDialog::on_radSegDuration_toggled(bool /*chk*/)
+{
+    updateDuration();
+    updateCorrelator();
+}
+
+void QFETCSPCImporterDialog::on_radSegNum_toggled(bool /*chk*/)
+{
+    updateDuration();
+    updateCorrelator();
+}
+
+void QFETCSPCImporterDialog::on_radSegDurationLT_toggled(bool /*chk*/)
+{
+    updateDuration();
+    updateCorrelator();
+}
+
+void QFETCSPCImporterDialog::on_radSegNumLT_toggled(bool /*chk*/)
+{
+    updateDuration();
+    updateCorrelator();
+}
+
 void QFETCSPCImporterDialog::on_spinRangeStart_valueChanged(double /*val*/) {
     updateDuration();
     updateCorrelator();
@@ -297,7 +356,7 @@ void QFETCSPCImporterDialog::on_btnSelectFile_clicked() {
 }
 
 void QFETCSPCImporterDialog::on_btnHelp_clicked() {
-    pluginServices->displayHelpWindow(pluginServices->getPluginHelpDirectory("tcspcimporter")+"tcspcimporter.html");
+    pluginServices->displayHelpWindow(pluginServices->getPluginHelpDirectory("tcspcimporter")+"tcspcimporter_corr.html");
 }
 
 void QFETCSPCImporterDialog::on_btnLoad_clicked() {
@@ -316,7 +375,7 @@ void QFETCSPCImporterDialog::writeSettings() {
     if (!options) return;
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/last_imagefile_dir", lastTCSPCFileDir);
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/last_imagefile_filter", lastTCSPCFileFilter);
-    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/correlator", ui->cmbCorrelator->currentIndex());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/correlator", ui->cmbCorrelator->currentData().toInt());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/prefix", ui->edtPrefix->text());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/postfix", ui->edtPostfix->text());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/S", ui->spinS->value());
@@ -324,15 +383,26 @@ void QFETCSPCImporterDialog::writeSettings() {
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/m", ui->spinM->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/parallel_threads", ui->spinProcesses->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/add_to_project", ui->chkAddToProject->isChecked());
-    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/segments", ui->spinSegments->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/cr_binning", ui->spinCountrateBinning->value());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/fcs_cr_binning", ui->spinFCSCRBinning->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/fcs_taumin", ui->spinFCSTauMin->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/range_start", ui->spinRangeStart->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/range_end", ui->spinRangeEnd->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkCountrate", ui->chkCountrate->isChecked());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkFCS", ui->chkFCS->isChecked());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkLifetimeHistogram", ui->chkLifetimeHistogram->isChecked());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkFCSLifetimeFilter", ui->chkFCSLifetimeFilter->isChecked());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/tmFCSLifetimeFilter", tmFCSLifetimeFilter->toCSV());
+
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/radSegDuration", ui->radSegDuration->isChecked());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/radSegNum", ui->radSegNum->isChecked());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/spinSegDuration", ui->spinSegDuration->value());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/segments", ui->spinSegments->value());
+
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/radSegDurationLT", ui->radSegDurationLT->isChecked());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/radSegNumLT", ui->radSegNumLT->isChecked());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/spinSegDurationLT", ui->spinSegDurationLT->value());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/segmentsLT", ui->spinSegmentsLT->value());
     saveWidgetGeometry(*(options->getQSettings()), this, "tcspcimporter/dlg_correlate/window/");
 }
 
@@ -344,7 +414,7 @@ void QFETCSPCImporterDialog::readSettings() {
     lastTCSPCFileDir=options->getQSettings()->value("tcspcimporter/dlg_correlate/last_imagefile_dir", lastTCSPCFileDir).toString();
     lastTCSPCFileFilter=options->getQSettings()->value("tcspcimporter/dlg_correlate/last_imagefile_filter", lastTCSPCFileFilter).toString();
 
-    ui->cmbCorrelator->setCurrentIndex(options->getQSettings()->value("tcspcimporter/dlg_correlate/correlator", ui->cmbCorrelator->currentIndex()).toInt());
+    ui->cmbCorrelator->setCurrentData(options->getQSettings()->value("tcspcimporter/dlg_correlate/correlator", ui->cmbCorrelator->currentData().toInt()).toInt());
     ui->spinS->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/S", ui->spinS->value()).toInt());
     ui->spinP->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/P", ui->spinP->value()).toInt());
     ui->spinM->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/m", ui->spinM->value()).toInt());
@@ -352,19 +422,36 @@ void QFETCSPCImporterDialog::readSettings() {
     ui->chkAddToProject->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/add_to_project", ui->chkAddToProject->isChecked()).toBool());
     ui->edtPrefix->setText(options->getQSettings()->value("tcspcimporter/dlg_correlate/prefix", ui->edtPrefix->text()).toString());
     ui->edtPostfix->setText(options->getQSettings()->value("tcspcimporter/dlg_correlate/postfix", ui->edtPostfix->text()).toString());
-    ui->spinSegments->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/segments", ui->spinSegments->value()).toInt());
     ui->spinCountrateBinning->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/cr_binning", ui->spinCountrateBinning->value()).toDouble());
+    ui->spinFCSCRBinning->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/fcs_cr_binning", ui->spinFCSCRBinning->value()).toDouble());
     ui->spinFCSTauMin->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/fcs_taumin", ui->spinFCSTauMin->value()).toDouble());
     ui->spinRangeEnd->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_end", ui->spinRangeEnd->value()).toDouble());
     ui->spinRangeStart->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_start", ui->spinRangeStart->value()).toDouble());
     ui->chkCountrate->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/chkCountrate", ui->chkAddToProject->isChecked()).toBool());
+
     ui->chkFCS->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/chkFCS", ui->chkFCS->isChecked()).toBool());
+    ui->chkLifetimeHistogram->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/chkLifetimeHistogram", ui->chkLifetimeHistogram->isChecked()).toBool());
     ui->chkFCSLifetimeFilter->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/chkFCSLifetimeFilter", ui->chkFCSLifetimeFilter->isChecked()).toBool());
     for (int r=0; r<tmFCSLifetimeFilter->rowCount(); r++) {
+        tmFCSLifetimeFilter->setRowTitleCreate(r, tr("channel %1:").arg(r+1));
         tmFCSLifetimeFilter->setCell(r, 0, 0);
         tmFCSLifetimeFilter->setCell(r, 1, 100);
     }
+    tmFCSLifetimeFilter->setColumnTitleCreate(0, tr("min. lifetime [ns]"));
+    tmFCSLifetimeFilter->setColumnTitleCreate(1, tr("max. lifetime [ns]"));
+
     tmFCSLifetimeFilter->fromCSV(options->getQSettings()->value("tcspcimporter/dlg_correlate/tmFCSLifetimeFilter", "").toString());
+
+    ui->radSegDuration->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/radSegDuration", ui->radSegDuration->isChecked()).toBool());
+    ui->radSegNum->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/radSegNum", ui->radSegNum->isChecked()).toBool());
+    if (ui->radSegDuration->isChecked()) ui->spinSegDuration->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/spinSegDuration", ui->spinSegDuration->value()).toDouble());
+    else ui->spinSegments->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/segments", ui->spinSegments->value()).toInt());
+
+    ui->radSegDurationLT->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/radSegDurationLT", ui->radSegDurationLT->isChecked()).toBool());
+    ui->radSegNumLT->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/radSegNumLT", ui->radSegNumLT->isChecked()).toBool());
+    if (ui->radSegDurationLT->isChecked()) ui->spinSegDurationLT->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/spinSegDurationLT", ui->spinSegDurationLT->value()).toDouble());
+    else ui->spinSegmentsLT->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/segmentsLT", ui->spinSegmentsLT->value()).toInt());
+
 
 }
 
@@ -426,7 +513,7 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
     connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
     job.filename=ui->edtTCSPCFile->text();
     job.importerParameter=ui->edtTCSPCFileParameter->text();
-    job.fcs_correlator=ui->cmbCorrelator->currentIndex();
+    job.fcs_correlator=ui->cmbCorrelator->currentData().toInt();
     job.fileFormat=ui->cmbFileformat->currentIndex();
     //qDebug()<<"job.fileFormat="<<job.fileFormat<<"  "<<ui->cmbFileformat->count();
     job.fcs_S=ui->spinS->value();
@@ -438,9 +525,15 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
     job.postfix=ui->edtPostfix->text();
     job.fcs_taumin=ui->spinFCSTauMin->value()*1e-6;
     job.fcs_segments=ui->spinSegments->value();
+    job.fcs_segment_duration=ui->spinSegDuration->value();
+    job.fcs_segments_by_duration=ui->radSegDuration->isChecked();
     job.doFCS=ui->chkFCS->isChecked();
     job.doCountrate=ui->chkCountrate->isChecked();
-    //job.fcs_crbinning=1e-2;
+    job.doLifetimeHistogram=ui->chkLifetimeHistogram->isChecked();
+    job.lt_segments=ui->spinSegmentsLT->value();
+    job.lt_segment_duration=ui->spinSegDurationLT->value();
+    job.lt_segments_by_duration=ui->radSegDurationLT->isChecked();
+
     job.fcs_crbinning=ui->spinFCSCRBinning->value()/1000.0;
 
     job.fcs_correlate.clear();
@@ -457,6 +550,9 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
         if (tmCR->data(tmCR->index(0, i),Qt::CheckStateRole).toInt()!=Qt::Unchecked) {
             job.countrate_channels.insert(i);
         }
+//        if (tmCRLifetime->data(tmCRLifetime->index(0, i),Qt::CheckStateRole).toInt()!=Qt::Unchecked) {
+//            job.lt_channels.insert(i);
+//        }
     }
 
     job.fcs_uselifetimefilter=ui->chkFCSLifetimeFilter->isChecked();
@@ -497,7 +593,7 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
 
 
 void QFETCSPCImporterDialog::updateCorrelator() {
-    int corrType=ui->cmbCorrelator->currentIndex();
+    int corrType=ui->cmbCorrelator->currentData().toInt();
     if (corrType==1) {
         ui->spinM->setEnabled(false);
         ui->labM->setEnabled(false);
@@ -541,7 +637,17 @@ void QFETCSPCImporterDialog::updateDuration() {
         stop=qMin(duration, ui->spinRangeEnd->value());
     }
     ui->labRange->setText(tr("duration: %1s,    countrates: [ %2 ] kHz").arg(fabs(stop-start)).arg(countRateString));
-    ui->labSegments->setText(tr("%1 seconds each").arg(fabs(stop-start)/double(ui->spinSegments->value())));
+    //ui->labSegments->setText(tr("%1 seconds each").arg(fabs(stop-start)/double(ui->spinSegments->value())));
+    if (ui->radSegDuration->isChecked()) {
+        ui->spinSegments->setValue(fabs(stop-start)/ui->spinSegDuration->value());
+    } else {
+        ui->spinSegDuration->setValue(fabs(stop-start)/double(ui->spinSegments->value()));
+    }
+    if (ui->radSegDurationLT->isChecked()) {
+        ui->spinSegmentsLT->setValue(fabs(stop-start)/ui->spinSegDurationLT->value());
+    } else {
+        ui->spinSegDurationLT->setValue(fabs(stop-start)/double(ui->spinSegmentsLT->value()));
+    }
 }
 
 
@@ -596,9 +702,52 @@ void QFETCSPCImporterDialog::on_btnPeekLifetime_clicked()
     }
 }
 
+class QFTCSPCReaderOpener {
+    public:
+        QFTCSPCReaderOpener(QFTCSPCReader* reader) {
+            this->reader=reader;
+        }
+
+        bool operator()(const QString &filename, const QString &parameters) {
+            return reader->open(filename, parameters);
+        }
+        typedef bool result_type;
+
+        protected:
+            QFTCSPCReader* reader;
+};
+
+/*
+ *
+        #include <QtConcurrent/QtConcurrent>
+        QModernProgressDialog progress(this);
+        progress.setHasCancel(false);
+        progress.setLabelText(tr("reading properties from TCSPC file ..."));
+        progress.setMode(true, false);
+        progress.show();
+
+
+
+        QFTCSPCReaderOpener opener(reader);
+        QFuture<bool> opened=QtConcurrent::run(opener, ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text());
+        while (!opened.isFinished()) {
+            QApplication::processEvents();
+        }
+
+
+        if (opened.result()) {
+
+ * */
+
 void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFTCSPCReader* reader=QFETCSPCImporterJobThread::getImporter(ui->cmbFileformat->currentIndex(), pluginServices);    
     if (reader) {
+        QModernProgressDialog progress(this);
+        progress.setHasCancel(false);
+        progress.setLabelText(tr("reading properties from TCSPC file ..."));
+        progress.setMode(true, false);
+        progress.show();
         QString paramName="";
         ui->edtTCSPCFileParameter->setEnabled(false);
         ui->labParameter->setEnabled(false);
@@ -611,14 +760,27 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
                 ui->edtTCSPCFileParameter->setText(QInputDialog::getText(this, tr("TCSPC import parameter"), tr("Please specify the TCSPC import parameter\n%1:").arg(paramName)));
             }
         }
-        qDebug()<<"opening file: "<<ui->edtTCSPCFile->text();
-        if (reader->open(ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text())) {
+        //qDebug()<<"opening file: "<<ui->edtTCSPCFile->text();
+        QFTCSPCReaderOpener opener(reader);
+        QFuture<bool> opened=QtConcurrent::run(opener, ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text());
+        while (!opened.isFinished()) {
+            QApplication::processEvents();
+        }
+
+        if (opened.result()) {//reader->open(ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text())) {
             duration=reader->measurementDuration();
-            qDebug()<<"  duration: "<<duration;
+            //qDebug()<<"  duration: "<<duration;
             channels=reader->inputChannels();
-            qDebug()<<"  channels: "<<channels;
+            ui->labLifetimeInfo->setText(tr("resolution: %1 ps,   channels: %2").arg(reader->microtimeChannelsResolutionPicoSeconds()).arg(reader->microtimeChannels()));
+            ui->chkLifetimeHistogram->setEnabled(reader->microtimeChannels()>0);
+            ui->chkFCSLifetimeFilter->setEnabled(reader->microtimeChannels()>0);
+            if (reader->microtimeChannels()<=0) {
+                ui->chkLifetimeHistogram->setChecked(false);
+                ui->chkFCSLifetimeFilter->setChecked(false);
+            }
+            //qDebug()<<"  channels: "<<channels;
             reader->close();
-            qDebug()<<"  file closed";
+            //qDebug()<<"  file closed";
 
 
             ui->tabCR->setModel(NULL);
@@ -644,7 +806,31 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
             tmCR->setReadonly(true);
             ui->tabCR->setModel(tmCR);
 
+            //ui->tabCRLifetime->setModel(NULL);
+
+//            tmCRLifetime->setReadonly(false);
+//            if (tmCRLifetime->rowCount()<=0) tmCRLifetime->appendRow();
+//            if (channels>tmCRLifetime->columnCount()) {
+//                int cols=tmCRLifetime->columnCount();
+//                for (int i=cols; i<channels; i++) {
+//                    tmCRLifetime->appendColumn();
+//                    tmCRLifetime->setCell(0,i, tr("CH %1").arg(i+1));
+//                    if (reader->avgCountRate(i)>0) tmCRLifetime->setCellCheckedRole(0,i, Qt::Checked);
+//                    else tmCRLifetime->setCellCheckedRole(0,i, Qt::Unchecked);
+//                }
+//            } else if (channels<tmCRLifetime->columnCount()) {
+//                while (tmCRLifetime->columnCount()>channels) {
+//                    tmCRLifetime->deleteColumn(tmCRLifetime->columnCount()-1);
+//                }
+//            }
+//            while (tmCRLifetime->rowCount()>1) {
+//                tmCRLifetime->deleteRow(tmCRLifetime->rowCount()-1);
+//            }
+//            tmCRLifetime->setReadonly(true);
+//            ui->tabCRLifetime->setModel(tmCRLifetime);
+
             ui->tvFCSLifetimeFilter->setModel(NULL);
+            tmFCSLifetimeFilter->setReadonly(false);
             tmFCSLifetimeFilter->setColumnTitleCreate(0, tr("min. lifetime [ns]"));
             tmFCSLifetimeFilter->setColumnTitleCreate(1, tr("max. lifetime [ns]"));
             while (tmFCSLifetimeFilter->rowCount()<channels) {
@@ -652,19 +838,19 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
                 tmFCSLifetimeFilter->setRowTitleCreate(r, tr("channel %1:").arg(r+1));
                 tmFCSLifetimeFilter->setCellCreate(r, 0, 0.0);
                 tmFCSLifetimeFilter->setCellCreate(r, 1, 100.0);
-                qDebug()<<"    adding filter channel "<<r;
+                //qDebug()<<"    adding filter channel "<<r;
             }
 
             tmFCSLifetimeFilter->resize(qMin(tmFCSLifetimeFilter->rowCount(),channels), tmFCSLifetimeFilter->columnCount());
-
+            //tmFCSLifetimeFilter->setReadonly(true);
 
             ui->tvFCSLifetimeFilter->setModel(tmFCSLifetimeFilter);
             ui->tvFCSLifetimeFilter->resizeColumnsToContents();
 
             ui->tvFCS->setModel(NULL);
             tmFCS->setReadonly(false);
-            if (tmFCS->rowCount()<=0) tmCR->appendRow();
-            if (tmFCS->columnCount()<=0) tmCR->appendColumn();
+            if (tmFCS->rowCount()<=0) { tmCR->appendRow(); }//tmCRLifetime->appendRow(); }
+            if (tmFCS->columnCount()<=0) { tmCR->appendColumn(); }//tmCRLifetime->appendColumn(); }
             //qDebug()<<channels<<tmFCS->columnCount();
             if (channels>tmFCS->columnCount()) {
                 int cols=tmFCS->columnCount();
@@ -693,18 +879,23 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
             }
             tmFCS->setReadonly(true);
             ui->tvFCS->setModel(tmFCS);
-            ui->spinFCSCRBinning->setValue((duration/double(ui->spinSegments->value())/1000.0)*1.0e3);
+            //ui->spinFCSCRBinning->setValue((duration/double(ui->spinSegments->value())/1000.0)*1.0e3);
 
             countRateString="";
             for (int i=0; i<channels; i++) {
                 if (countRateString.size()>0) countRateString=countRateString+"; ";
-                countRateString.append(QString::number(reader->avgCountRate(i)*1e-3));
+                countRateString.append(QString::number(reader->avgCountRate(i)));
             }
 
+        } else {
+            QApplication::restoreOverrideCursor();
+            QMessageBox::critical(this, tr("TCSPC Importer"), tr("Could not read file '%1'.\n   ERROR: %2").arg(ui->edtTCSPCFile->text()).arg(reader->lastError()));
+            return;
         }
     }
     updateDuration();
     updateCorrelator();
+    QApplication::restoreOverrideCursor();
 }
 
 

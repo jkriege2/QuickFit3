@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/exporters_basicimages">
+        <file alias="icon.png">icons/image_exporter_icon.png</file>
+        <file alias="icon_large.png">icons/image_exporter_icon_large.png</file>
+    </qresource>
+</RCC>

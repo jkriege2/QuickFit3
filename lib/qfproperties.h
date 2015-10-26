@@ -161,7 +161,7 @@ class QFLIB_EXPORT QFProperties {
         void storeProperties(QXmlStreamWriter& w) const;
 
         /*! \brief read properties from a given QDomElement, which were written using storeProperties before */
-        void readProperties(QDomElement& e);
+        void readProperties(QDomElement& e, bool clearProps=true);
 };
 
 

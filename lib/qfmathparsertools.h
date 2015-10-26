@@ -51,11 +51,22 @@ class QFMathParser; // forward
 
 
 /** possible result types
- *    - \c qfmpDouble: a floating-point number with double precision. This is
+ *    - \c qfmpDouble \c =0b00000001=0x01: a floating-point number with double precision. This is
  *                     also used to deal with integers
- *    - \c qfmpString: a string of characters
- *    - \c qfmpBool:   a boolean value true|false
+ *    - \c qfmpString \c =0b00000010=0x02: a string of characters
+ *    - \c qfmpBool \c =0b00000100=0x04:   a boolean value true|false
+ *    - \c qfmpDoubleVector \c =0b00001000=0x08:   a double-vector
+ *    - \c qfmpStringVector \c =0b00010000=0x10:   a string-vector
+ *    - \c qfmpBoolVector \c =0b00100000=0x20:   a boolean-vector
+ *    - \c qfmpVoid \c =0b01000000=0x40:   a VOID value (i.e. no value)
+ *    - \c qfmpStruct \c =0b10000000=0x80:   a struct
+ *    - \c qfmpList \c =0b100000000=0x100:   a list of values
+ *    - \c qfmpDoubleMatrix \c =0b1000000000=0x200:   a 2D matrix of numbers
+ *    - \c qfmpBoolMatrix \c =0b10000000000=0x400:   a 2D matrix of booleans
+ *    - \c qfmpCustom \c =0b1000000000000000=0x8000:   a struct
  *  .
+ *
+ *
  */
 enum qfmpResultType {qfmpDouble=0x01,  /*!< \brief a floating-point number with double precision. This is also used to deal with integers */
                      qfmpString=0x02,  /*!< \brief a string of characters */
@@ -64,7 +75,10 @@ enum qfmpResultType {qfmpDouble=0x01,  /*!< \brief a floating-point number with 
                      qfmpStringVector=0x10, /*!< \brief a vector of strings */
                      qfmpBoolVector=0x20, /*!< \brief a vector of booleans */
                      qfmpVoid=0x40,  /*!< \brief a void/non-evaluatable result */
-                     qfmpStruct=0x80,  /*!< \brief a struct datatype (qfmpStruct) */
+                     qfmpStruct=0x80,  /*!< \brief a struct datatype, i.e. a map string->qfmpResult */
+                     qfmpList=0x100,  /*!< \brief a list of qfmpResult datatype */
+                     qfmpDoubleMatrix=0x200,  /*!< \brief a 2D matrix of floating point numbers */
+                     qfmpBoolMatrix=0x400, /*!< \brief a 2D matrix of booleans */
                      qfmpCustom=0x8000,  /*!< \brief a custom datatype (qfmpCustomResult) */
                      };
 QFLIB_EXPORT QString qfmpResultTypeToString(qfmpResultType type);
@@ -85,6 +99,9 @@ class QFLIB_EXPORT qfmpCustomResult {
         QFLIB_EXPORT virtual QString toTypeString(int precision=10) const;
         /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
         QFLIB_EXPORT virtual int length() const;
+        /** \brief the dimensions in the datatype */
+        QFLIB_EXPORT virtual int dimensions() const;
+
         /** \brief clear all contained data */
         QFLIB_EXPORT virtual void clear();
 
@@ -140,14 +157,15 @@ struct QFLIB_EXPORT qfmpResult {
         ~qfmpResult();
         qfmpResult(double value);
         qfmpResult(int value);
+        qfmpResult(unsigned int value);
         qfmpResult(QString value);
         qfmpResult(bool value);
         qfmpResult(const QVector<double> &value);
         qfmpResult(const QVector<bool> &value);
         qfmpResult(const QStringList &value);
-
         qfmpResult(const qfmpResult &value);
         QFLIB_EXPORT qfmpResult& operator=(const qfmpResult &value);
+
         QFLIB_EXPORT void set(const qfmpResult &value);
 
         QFLIB_EXPORT void setInvalid();
@@ -162,14 +180,67 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT int32_t toInteger() const;
         /** \brief convert the value this struct to an integer */
         QFLIB_EXPORT uint32_t toUInt() const;
+        QFLIB_EXPORT QVector<uint32_t> toUIntVector() const;
+        QFLIB_EXPORT QVector<int32_t> toIntVector() const;
         /** \brief is this result convertible to integer? */
-        QFLIB_EXPORT bool isInteger() const;
+        inline bool isInteger() const {
+            return (type==qfmpDouble)&&(fabs(num)<4294967296.0)&&(num==round(num));
+        }
         /** \brief is this result convertible to unsigned integer? */
-        QFLIB_EXPORT bool isUInt() const;
+        inline bool isUInt() const {
+            return (type==qfmpDouble)&&(fabs(num)<2147483648.0)&&(num>=0)&&(num==round(num));
+        }
         /** \brief returns the size of the result (number of characters for string, numbers of entries in vectors, 0 for void and 1 else) */
         QFLIB_EXPORT int length() const;
+        /** \brief returns \c true, if the datatype is a matrix */
+        QFLIB_EXPORT int dimensions() const;
+        /** \brief for a mtrix, returns the x-size/number of columns */
+        QFLIB_EXPORT int sizeX() const;
+        /** \brief for a mtrix, returns the y-size/number of rows */
+        QFLIB_EXPORT int sizeY() const;
+        /** \brief for a mtrix, returns the x-size/number of columns */
+        inline int columns() const {
+            return sizeX();
+        }
+        /** \brief for a mtrix, returns the y-size/number of rows */
+        inline int rows() const {
+            return sizeY();
+        }
+        /** \brief returns the number of dimensions in the datatype */
+        QFLIB_EXPORT bool isMatrix() const;
         /** \brief is this a custom result type */
-        QFLIB_EXPORT bool isCustom() const;
+        inline  bool isCustom() const  {
+            return type==qfmpCustom;
+        }
+        /** \brief is this a double value */
+        inline  bool isDouble() const  {
+            return type==qfmpDouble;
+        }
+        inline  bool isDoubleVector() const  {
+            return type==qfmpDoubleVector;
+        }
+        inline  bool isBool() const  {
+            return type==qfmpBool;
+        }
+        inline  bool isBoolVector() const  {
+            return type==qfmpBoolVector;
+        }
+        QFLIB_EXPORT  bool isUIntVector() const;
+        QFLIB_EXPORT  bool isIntVector() const;
+        /** \brief is this a double value */
+        inline  bool convertsToDouble() const  {
+            return (type==qfmpDouble || type==qfmpBool);
+        }
+        inline  bool convertsToBool() const  {
+            return (type==qfmpDouble || type==qfmpBool);
+        }
+        /** \brief is this a double value */
+        inline  bool convertsToInteger() const  {
+            return (type==qfmpDouble || type==qfmpBool);
+        }
+        inline  bool convertsToUInt() const  {
+            return ((type==qfmpDouble && num>=0) || type==qfmpBool);
+        }
 
         QFLIB_EXPORT void setCustomCopy(const qfmpCustomResult *val);
         QFLIB_EXPORT void setCustom( qfmpCustomResult* val);
@@ -178,19 +249,23 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT void setString(const QString& val);
         QFLIB_EXPORT void setString(int size=0, QChar defaultChar=QLatin1Char(' '));
         QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
-        QFLIB_EXPORT void setDoubleVec(int size=0, double defaultVal=0);
+        QFLIB_EXPORT void setDoubleVec(int size=0, double defaultVal=0.0);
+        QFLIB_EXPORT void setDoubleMatrix(int size=0, int cols=1, double  defaultVal=0);
         template <typename T>
         inline void setDoubleVec(T* data, int size) {
-            setDoubleVec(size);
+            setDoubleVec(size,0.0);
             for (int i=0; i<size; i++) {
                 numVec[i]=double(data[i]);
             }
         }
 
         QFLIB_EXPORT void setStruct(const QStringList& items=QStringList());
+        QFLIB_EXPORT void setList(int items=0);
+        QFLIB_EXPORT void setList(const QList<qfmpResult>& dat);
 
         QFLIB_EXPORT void setBoolVec(const QVector<bool>& val);
         QFLIB_EXPORT void setBoolVec(int size=0, bool defaultVal=false);
+        QFLIB_EXPORT void setBoolMatrix(int size=0, int cols=1, bool defaultVal=false);
 
         template <typename T>
         inline void setBoolVec(T* data, int size) {
@@ -235,23 +310,52 @@ struct QFLIB_EXPORT qfmpResult {
         /** \brief converst the result to a vector of integers (numbers and number vectors are converted!) */
         QFLIB_EXPORT QVector<int> asIntVector() const;
         /** \brief returns \c true, if the result may be converted to a vector of integers */
-        QFLIB_EXPORT bool  convertsToIntVector() const;
+        inline bool  convertsToIntVector() const {
+            return convertsToVector();
+        }
         /** \brief returns \c true if the result is valid and not void */
-        QFLIB_EXPORT bool isUsableResult() const;
+        inline bool isUsableResult() const {
+            return isValid && (type!=qfmpVoid);
+        }
         /** \brief converst the result to a number (numbers are converted!) */
-        QFLIB_EXPORT double asNumber() const;
+        inline double asNumber() const {
+            if (type==qfmpDouble) return num;
+            if (type==qfmpBool) return boolean?1:0;
+            return NAN;
+        }
         /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
-        QFLIB_EXPORT double asNumberAlsoVector() const;
+        inline double asNumberAlsoVector() const {
+            if (type==qfmpDouble) return num;
+            if (type==qfmpDoubleVector && numVec.size()>0) return numVec[0];
+            return NAN;
+        }
         /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
-        QFLIB_EXPORT QString asStringAlsoVector() const;
+        inline QString asStringAlsoVector() const {
+            if (type==qfmpString) return str;
+            if (type==qfmpStringVector && strVec.size()>0) return strVec[0];
+            return QString();
+        }
         /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
-        QFLIB_EXPORT bool asBooleanAlsoVector() const;
+        inline bool asBooleanAlsoVector() const {
+            if (type==qfmpBool) return boolean;
+            if (type==qfmpBoolVector && boolVec.size()>0) return boolVec[0];
+            return false;
+        }
         /** \brief converst the result to a string (strings are converted!) */
-        QFLIB_EXPORT QString asString() const;
+        inline QString asString() const {
+            if (type==qfmpString) return str;
+            return QString();
+        }
         /** \brief converst the result to a boolean (numbers and booleans are converted!) */
-        QFLIB_EXPORT bool asBool() const;
+        inline bool asBool() const {
+            if (type==qfmpBool) return boolean;
+            if (type==qfmpDouble) return num!=0;
+            return false;
+        }
         /** \brief returns the type */
-        QFLIB_EXPORT qfmpResultType getType() const;
+        inline qfmpResultType getType() const {
+            return type;
+        }
         /** \brief returns a string, describing the type of this result */
         QFLIB_EXPORT QString typeName() const;
 
@@ -262,11 +366,21 @@ struct QFLIB_EXPORT qfmpResult {
 
         /** \brief returns an entry from a struct */
         QFLIB_EXPORT qfmpResult getStructItem(const QString& item);
-
         /** \brief returns an entry from a struct */
         QFLIB_EXPORT void setStructItem(const QString& item, const qfmpResult& value);
         /** \brief returns an entry from a struct */
         QFLIB_EXPORT void setStruct(const QMap<QString,qfmpResult>& data);
+
+        /** \brief returns an entry from a qfmptList */
+        QFLIB_EXPORT qfmpResult getListItem(int item) const;
+        /** \brief returns an entry from a qfmptList */
+        QFLIB_EXPORT qfmpResult getListItem(int item, const qfmpResult& defaultResult) const;
+        /** \brief remove an entry from a qfmptList */
+        QFLIB_EXPORT void removeListItem(int item);
+        /** \brief append an entry to a qfmptList */
+        QFLIB_EXPORT void appendListItem(const qfmpResult& item);
+        /** \brief insert an entry to a qfmptList */
+        QFLIB_EXPORT void insertListItem(int i, const qfmpResult& item);
 
 
         QFLIB_EXPORT static void add(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
@@ -307,6 +421,8 @@ struct QFLIB_EXPORT qfmpResult {
         QStringList strVec;
         QVector<bool> boolVec;
         QMap<QString,qfmpResult> structData;
+        QList<qfmpResult> listData;
+        int matrix_columns;
 
 
         /*!< \brief clear the current qfmpCustomResult object */
@@ -1487,6 +1603,45 @@ static inline void FName(qfmpResult& r, const qfmpResult* params, unsigned int  
 #define QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC_SIMPLE(FName, CFUNC) QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC(FName, CFUNC, CFUNC)
 
 
+
+/*! \brief a parser function of the type rdr_is...(rdr_id) that checks the RDR referenced by the given ID for beeing castableto a specified class
+
+    The resulting function will:
+      - check the number of arguments
+      - apply the C-function to any number parameter
+      - apply the C-function item-wise to any number vector parameter, i.e. [ fmod(x1,y1), fmod(x2,y2), ... ]
+      - result is also a number or number vector
+    .
+    \param FName name of the function to declare
+    \param NAME_IN_PARSER name the function should have in the parser (used for error messages only)
+    \param CFUNC name of the C function to call
+*/
+#define QFMATHPARSER_DEFINE_RDRIS_FUNC(FName, NAME_IN_PARSER, CHECK_CLASS) \
+static inline void FName(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* parser){\
+    res.setInvalid();\
+    QFProject* p=QFPluginServices::getInstance()->getCurrentProject();\
+    if (p)  {\
+        int evalID=-1;\
+        if (n==1 && params[0].type==qfmpDouble) {\
+            evalID=params[0].toInteger();\
+            CHECK_CLASS* rdr=dynamic_cast<CHECK_CLASS*>(p->getRawDataByID(evalID));\
+            res.setBoolean(rdr);\
+        } else if (n==1 && params[0].type==qfmpDoubleVector) {\
+            res.setBoolVec(params[0].numVec.size()); \
+            for (int i=0; i<params[0].numVec.size(); i++) {\
+                evalID=params[0].numVec[i];\
+                CHECK_CLASS* rdr=dynamic_cast<CHECK_CLASS*>(p->getRawDataByID(evalID));\
+                res.boolVec[i]=rdr;\
+            }\
+        } else {\
+            parser->qfmpError(QObject::tr("%1(rdrid) needs one integer arguments (%2 given)").arg(#NAME_IN_PARSER).arg(n)); \
+            res.setInvalid();\
+            return;\
+        }\
+    }\
+}
+
 /*@}*/
 
 #endif // QFMATHPARSERTOOLS_H
+

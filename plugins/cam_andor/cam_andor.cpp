@@ -633,7 +633,13 @@ bool QFExtensionCameraAndor::connectCameraDevice(unsigned int camera) {
         CameraInfo info;
         //if (camInfos.contains(camera)) info=camInfos[camera];
 
+        at_u32 DMAAd1=0, DMAAd2=0;
+        at_u32 imagesPerDMA=0;
+
+
         CHECK(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
+        CHECK(GetPhysicalDMAAddress(&DMAAd1, &DMAAd2), tr("error while getting physical DMA adresses"));
+        CHECK(GetImagesPerDMA(&imagesPerDMA), tr("error while getting images per DMA"));
         //info.subImage=QRect(1,1,info.width, info.height);
         info.subImage_hstart=1;
         info.subImage_vstart=1;
@@ -648,6 +654,8 @@ bool QFExtensionCameraAndor::connectCameraDevice(unsigned int camera) {
             log_text(tr("    head model = %1\n").arg(info.headModel));
             log_text(tr("    serial number = %1\n").arg(info.serialNumber));
             log_text(tr("    controller card = %1\n").arg(info.controllerCard));
+            log_text(tr("    physical DMA adresses = %1 / %2\n").arg(intToHexQString(DMAAd1)).arg(intToHexQString(DMAAd2)));
+            log_text(tr("    images per DMA = %1\n").arg(imagesPerDMA));
 
             camInfos[camera]=info;
             if (!setGlobalSettings(camera)) {

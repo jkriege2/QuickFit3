@@ -27,8 +27,9 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "jkqtpimagetools.h"
 
 #include <QtGlobal>
-#include<QtGlobal>
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include<QWindowList>
 #include <QtWidgets>
 #else
 #include <QtGui>
@@ -67,9 +68,19 @@ int main(int argc, char * argv[])
             std::cout<<sizeof(void*)*8<<std::endl;
             return 0;
         }
+        if (QString(argv[i])=="--gitversion" || QString(argv[i])=="--svnversion") {
+            std::cout<<qfInfoGITVersion().toStdString()<<std::endl;
+            return 0;
+        }
+        if (QString(argv[i])=="--compiledate") {
+            std::cout<<qfInfoCompileDate().toStdString()<<std::endl;
+            return 0;
+        }
     }
 
+
 #ifdef __WINDOWS__
+    qDebug()<<"setting Qt lib paths: "<<"./qtplugins"<<(QFileInfo(argv[0]).absolutePath()+"/qtplugins");
     QCoreApplication::addLibraryPath("./qtplugins");
     QCoreApplication::addLibraryPath(QFileInfo(argv[0]).absolutePath()+"/qtplugins");
 #endif
@@ -79,13 +90,14 @@ int main(int argc, char * argv[])
     macoslibpaths<<"../QtPlugIns";
     macoslibpaths<<(QFileInfo(argv[0]).absolutePath()+"/../QtPlugIns");
 
-    if (!QDir::exists(macoslibpaths[0]) && !QDir::exists(macoslibpaths[1])){
+    if (!QDir(macoslibpaths[0]).exists() && !QDir(macoslibpaths[1]).exists()){
         macoslibpaths<<"../../../QtPlugIns";
     }
     QCoreApplication::setLibraryPaths(macoslibpaths);
     qDebug()<<"lib paths:"<<QCoreApplication::libraryPaths();
 #endif
 
+    qDebug()<<"Q_INIT_RESOURCE(quickfit3)";
     Q_INIT_RESOURCE(quickfit3);
     int res=0;
     {
@@ -141,13 +153,23 @@ int main(int argc, char * argv[])
             app.processEvents();
             //if (!fdb.families().contains("XITS")) {
             QList<int> appFonts;
-            if (QFile::exists(":/JKQTmathText/fonts/xits-bold.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-bold.otf")); }
-            if (QFile::exists(":/JKQTmathText/fonts/xits-bolditalic.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-bolditalic.otf")); }
+            if (QFile::exists(":/JKQTmathText/fonts/Hack-Bold.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/Hack-Bold.otf")); }
+            if (QFile::exists(":/JKQTmathText/fonts/Hack-Bolditalic.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/Hack-Bolditalic.otf")); }
             if (QFile::exists(":/JKQTmathText/fonts/xits-italic.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-italic.otf")); }
             if (QFile::exists(":/JKQTmathText/fonts/xits-math.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-math.otf")); }
             if (QFile::exists(":/JKQTmathText/fonts/xits-mathbold.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-mathbold.otf")); }
             if (QFile::exists(":/JKQTmathText/fonts/xits-regular.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/JKQTmathText/fonts/xits-regular.otf")); }
             //}
+
+            splash->showMessage("loading HACK fonts ...");
+            app.processEvents();
+            app.processEvents();
+            app.processEvents();
+            //QList<int> appFonts;
+            if (QFile::exists(":/fonts/hack/Hack-Bold.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/fonts/hack/Hack-Bold.otf")); }
+            if (QFile::exists(":/fonts/hack/Hack-BoldOblique.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/fonts/hack/Hack-BoldOblique.otf")); }
+            if (QFile::exists(":/fonts/hack/Hack-Regular.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/fonts/hack/Hack-Regular.otf")); }
+            if (QFile::exists(":/fonts/hack/Hack-RegularOblique.otf")) { appFonts<<QFontDatabase::addApplicationFont(QLatin1String(":/fonts/hackHack-RegularOblique.otf")); }
             splash->showMessage("initializing ...");
             app.processEvents();
             app.processEvents();
@@ -163,6 +185,14 @@ int main(int argc, char * argv[])
             res=app.exec();
 
             //QFontDatabase::removeAllApplicationFonts();
+            if(settings) delete settings;
+        }
+
+        QWidgetList tlw=app.topLevelWidgets();
+        foreach(QWidget *widget, tlw) {
+            qDebug()<<"deleting widget after application shutdown: "<<widget;
+            widget->close();
+            delete widget;
         }
 
         /*for (int i=0; i<appFonts.size(); i++) {

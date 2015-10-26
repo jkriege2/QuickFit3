@@ -398,6 +398,16 @@ QFLIB_EXPORT QString intToOctQString(int64_t value);
 
 */
 QFLIB_EXPORT QString doubleVecToQString(const QVector<double>& value, int prec = 10, char f = 'g', QChar decimalSeparator='.', const QString itemSeparator=", " );
+/*! \brief convert a matrix of numbers to a QString with a given decimalSeparator
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString doubleMatrixToQString(const QVector<double>& value, int columns, int prec = 10, char f = 'g', QChar decimalSeparator='.', const QString& itemSeparator=", ", const QString& columnSeparator="\n");
+/*! \brief convert a matrix of numbers to a QString with a given decimalSeparator
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString boolMatrixToQString(const QVector<bool>& value, int columns, const QString& itemSeparator=", ", const QString& columnSeparator="\n", const QString& trueName=QString("true"), const QString& falseName=QString("false"));
 /*! \brief convert a vector of booleans to a QString
     \ingroup qf3lib_tools
 
@@ -440,13 +450,13 @@ QFLIB_EXPORT QString CDoubleListToQString(const QList<double> values, const QStr
     \ingroup qf3lib_tools
 
 */
-QFLIB_EXPORT double CQStringToDouble(QString value);
+QFLIB_EXPORT double CQStringToDouble(const QString& value);
 
 /*! \brief convert a QString to a double and accept ',' and '.' as decimal separator
     \ingroup qf3lib_tools
 
 */
-QFLIB_EXPORT double QStringToDouble(QString value);
+QFLIB_EXPORT double QStringToDouble(const QString& value);
 
 /*! \brief convert a string \a data to a boolean
     \ingroup qf3lib_tools
@@ -479,7 +489,7 @@ QFLIB_EXPORT QString replaceFileExt(const QString& filename, const QString& exte
     \ingroup qf3lib_tools
 
 */
-QFLIB_EXPORT QString readFile(const QString& filename);
+QFLIB_EXPORT QByteArray readFile(const QString& filename);
 /*! \brief convert a QChar \a data to a human-readable string
     \ingroup qf3lib_tools
 
@@ -1332,20 +1342,46 @@ inline T* copyArrayOrDefault(T* out, const T* input, long long N, T defaultValue
 
 */
 template <class T>
-inline QString arrayToString(const T* input, long long N, bool withBrackets=true) {
+inline QString arrayToString(const T* input, long long N, bool withBrackets=true, const QString& inRowseparator=QString(", "), const QString& openBrack="[", const QString& closeBrack="]") {
     QString res;
     {
         QTextStream txt(&res, QIODevice::WriteOnly);
         bool first=true;
         for (int i=0; i<N; i++) {
             if (!first) {
-                txt<<QString(", ");
+                txt<<inRowseparator;
             }
             txt<<input[i];
             first=false;
         }
     }
-    if (withBrackets) return QString("[ %1 ]").arg(res);
+    if (withBrackets) return openBrack+res+closeBrack;
+    return res;
+}
+
+/*! \brief builds a string out of a given array, which is interpreted as a row-major matrix
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+inline QString matrixToString(const T* input, long long N, long long columns, bool withBrackets=true, const QString& inRowseparator=QString(", "), const QString& columnSeparator=QString("\n"), const QString& openBrack="[ ", const QString& closeBrack=" ]") {
+    QString res;
+    {
+        QTextStream txt(&res, QIODevice::WriteOnly);
+        bool first=true;
+        for (int i=0; i<N; i++) {
+            if (!first) {
+                txt<<inRowseparator;
+            }
+            txt<<input[i];
+            first=false;
+            if (i>0 && i%columns==0 && i<N-1) {
+                txt<<columnSeparator;
+                first=true;
+            }
+        }
+    }
+    if (withBrackets) return openBrack+res+closeBrack;
     return res;
 }
 
@@ -1354,8 +1390,21 @@ inline QString arrayToString(const T* input, long long N, bool withBrackets=true
     \ingroup qf3lib_tools
 
 */
+QFLIB_EXPORT QList<int> stringToIntList(const QString& data, const QList<int>& defaultList=QList<int>());
+inline QList<int> stringToIntList(const QString& data, int defaultOneItemListItem) {
+    QList<int> l; l<<defaultOneItemListItem;
+    return stringToIntList(data, l);
+}
 
-QFLIB_EXPORT QList<int> stringToIntList(const QString& data);
+/*! \brief takes an array of booleans, e.g. "true,false,false,true" and returns it as a QList<bool>
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QList<bool> stringToBoolList(const QString& data, const QList<bool>& defaultList=QList<bool>());
+inline QList<bool> stringToBoolList(const QString& data, bool defaultOneItemListItem) {
+    QList<bool> l; l<<defaultOneItemListItem;
+    return stringToBoolList(data, l);
+}
 
 /*! \brief builds a string out of a given container (with size() and operator[]). If \a withIDs is \c true, the index will be output in front of each value.
     \ingroup qf3lib_tools
@@ -2054,17 +2103,98 @@ QFLIB_EXPORT QImage cropTopBottom(const QImage& pix, QRgb cropcolor);
 QFLIB_EXPORT QPixmap cropTopBottom(const QPixmap& pix);
 QFLIB_EXPORT QImage cropTopBottom(const QImage& pix);
 
+QFLIB_EXPORT QVariant qfStringToVariantAutoRecognizeType(const QString& value);
 
 
 QFLIB_EXPORT QString qfCanonicalOrAbsoluteFilePath(const QString& file);
+QFLIB_EXPORT QString qfRemoveMultipleWhitespaces(const QString& line);
 
 QFLIB_EXPORT QString qfHTMLEscape(const QString& input);
+QFLIB_EXPORT QString qfLeftPaddedString(const QString& input, int fieldWidth, QChar padchar=QChar(' '));
+QFLIB_EXPORT QString qfRightPaddedString(const QString& input, int fieldWidth, QChar padchar=QChar(' '));
 
 QFLIB_EXPORT QHBoxLayout* qfBuildQHBoxLayout(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
 QFLIB_EXPORT QVBoxLayout* qfBuildQVBoxLayout(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
 QFLIB_EXPORT QHBoxLayout* qfBuildQHBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
 QFLIB_EXPORT QVBoxLayout* qfBuildQVBoxLayoutWithFinalStretch(QWidget* w1, QWidget* w2, QWidget* w3=NULL, QWidget* w4=NULL, QWidget* w5=NULL, QWidget* w6=NULL, QWidget* w7=NULL, QWidget* w8=NULL, QWidget* w9=NULL);
 QFLIB_EXPORT QFormLayout* qfBuildQFormLayout(const QString& l1, QWidget* w1, const QString& l2, QWidget* w2, const QString& l3=QString(), QWidget* w3=NULL, const QString& l4=QString(), QWidget* w4=NULL, const QString& l5=QString(), QWidget* w5=NULL, const QString& l6=QString(), QWidget* w6=NULL, const QString& l7=QString(), QWidget* w7=NULL, const QString& l8=QString(), QWidget* w8=NULL, const QString& l9=QString(), QWidget* w9=NULL);
+
+inline QChar qfGetFirstChar( const QString& data, QChar defaultChar='\0') {
+    if (data.size()>0) return data[0];
+    return defaultChar;
+}
+
+inline QChar qfGetChar( const QString& data, int idx, QChar defaultChar='\0') {
+    if (idx>=0 && idx<data.size()) return data[idx];
+    return defaultChar;
+}
+
+
+/** \brief return a list of ranges, which compress consecutive, increasing integers */
+template<class T>
+QList<QPair<T,T> > qfConsecutiveIncIntsToRange(const QList<T>& data, T increment=T(1)) {
+    QList<QPair<T,T> > res;
+    if (data.size()<=0) return res;
+    if (data.size()==1) {
+        res.append(qMakePair(data[0],data[0]));
+        return res;
+    }
+    T rangestart=data[0];
+    //int rangestart_idx=0;
+    for (int i=1; i<data.size(); i++) {
+        if (data[i]!=data[i-1]+increment) {
+            res.append(qMakePair(rangestart,data[i-1]));
+            if (i!=data.size()-1) {
+                rangestart=data[i];
+                //rangestart_idx=i;
+            } else {
+                res.append(qMakePair(data[i],data[i]));
+                //rangestart_idx=-1;
+            }
+        } else {
+            if (i==data.size()-1) {
+                res.append(qMakePair(rangestart,data[i]));
+                //rangestart_idx=-1;
+            }
+        }
+    }
+    return res;
+}
+
+
+
+/** \brief return a list of ranges, which compress consecutive, increasing integers */
+template<class T>
+QVector<QPair<T,T> > qfConsecutiveIncIntsToRange(const QVector<T>& data, T increment=T(1)) {
+    QVector<QPair<T,T> > res;
+    if (data.size()<=0) return res;
+    if (data.size()==1) {
+        res.append(qMakePair(data[0],data[0]));
+        return res;
+    }
+    T rangestart=data[0];
+    //int rangestart_idx=0;
+    for (int i=1; i<data.size(); i++) {
+        if (data[i]!=data[i-1]+increment) {
+            res.append(qMakePair(rangestart,data[i-1]));
+            if (i!=data.size()-1) {
+                rangestart=data[i];
+                //rangestart_idx=i;
+            } else {
+                res.append(qMakePair(data[i],data[i]));
+                //rangestart_idx=-1;
+            }
+        } else {
+            if (i==data.size()-1) {
+                res.append(qMakePair(rangestart,data[i-1]));
+                //rangestart_idx=-1;
+            }
+        }
+    }
+    return res;
+}
+
+
 
 #endif // QFTOOLS_H
 

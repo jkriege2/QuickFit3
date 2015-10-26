@@ -25,7 +25,7 @@ CONFIG += plugin
 TARGET = importers_basicimages
 DEPENDPATH += ./
 
-include(../plugins.pri)
+include(../../qf3plugins.pri)
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
 include(../../extlibsb040/tinytiff.pri)
