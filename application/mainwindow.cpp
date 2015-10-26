@@ -226,6 +226,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     logFileMainWidget->log_text(tr("- sizeof(void*): %1 bits\n").arg(sizeof(void*)*8));
     logFileMainWidget->log_text(tr("- sizeof(char): %1 bits\n").arg(sizeof(char)*8));
     logFileMainWidget->log_text(tr("- sizeof(int): %1 bits\n").arg(sizeof(int)*8));
+    logFileMainWidget->log_text(tr("- sizeof(short): %1 bits\n").arg(sizeof(short)*8));
     logFileMainWidget->log_text(tr("- sizeof(long int): %1 bits\n").arg(sizeof(long int)*8));
     logFileMainWidget->log_text(tr("- sizeof(long long int): %1 bits\n").arg(sizeof(long long int)*8));
     logFileMainWidget->log_text(tr("- sizeof(float): %1 bits\n").arg(sizeof(float)*8));
@@ -4296,7 +4297,11 @@ void MainWindow::checkUpdates(bool userRequest)
     ProgramOptionsSetQNetworkProxy(proxy);
     networkManager.setProxy(proxy);
     QModernProgressDialog progress(tr("getting update information ..."), tr("Cancel"), this);
-    progress.open();
+    if (userRequest) progress.open();
+    else {
+        progress.hide();
+        progress.close();
+    }
 
     for (int i=0; i<2; i++) {
         QUrl url;

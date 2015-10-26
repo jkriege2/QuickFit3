@@ -64,10 +64,10 @@ bool QFTCSPCReaderPicoquant::open(const QString &filename, const QString &parame
         }
 
         if (isV6) {
-            fileinfo.properties["CommentField"]=txtHeader6.CommentField;
-            fileinfo.properties["FileTime"]=txtHeader6.FileTime;
-            fileinfo.properties["CreatorName"]=txtHeader6.CreatorName;
-            fileinfo.properties["CreatorVersion"]=txtHeader6.CreatorVersion;
+            fileinfo.properties["CommentField"]=(char*)txtHeader6.CommentField;
+            fileinfo.properties["FileTime"]=(char*)txtHeader6.FileTime;
+            fileinfo.properties["CreatorName"]=(char*)txtHeader6.CreatorName;
+            fileinfo.properties["CreatorVersion"]=(char*)txtHeader6.CreatorVersion;
 
             fileinfo.properties["NumberOfChannels"]=(qlonglong)binHeader6.Channels;
             fileinfo.properties["NumberOfBoards"]=(qlonglong)binHeader6.NumberOfBoards;
@@ -91,10 +91,10 @@ bool QFTCSPCReaderPicoquant::open(const QString &filename, const QString &parame
             fileinfo.properties["TTTRStopReason"]=(qlonglong)TTTRHeader6.TTTRStopReason;
             fileinfo.properties["NoOfRecords"]=(qlonglong)TTTRHeader6.NoOfRecords;
         } else {
-            fileinfo.properties["CommentField"]=txtHeader.CommentField;
-            fileinfo.properties["FileTime"]=txtHeader.FileTime;
-            fileinfo.properties["HardwareVersion"]=txtHeader.HardwareVersion;
-            fileinfo.properties["SoftwareVersion"]=txtHeader.SoftwareVersion;
+            fileinfo.properties["CommentField"]=(char*)txtHeader.CommentField;
+            fileinfo.properties["FileTime"]=(char*)txtHeader.FileTime;
+            fileinfo.properties["HardwareVersion"]=(char*)txtHeader.HardwareVersion;
+            fileinfo.properties["SoftwareVersion"]=(char*)txtHeader.SoftwareVersion;
 
             fileinfo.properties["NumberOfChannels"]=(qlonglong)binHeader.Channels;
             fileinfo.properties["NumberOfBoards"]=(qlonglong)binHeader.NumberOfBoards;

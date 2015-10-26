@@ -12,6 +12,7 @@ QFEFCSSimMainWidnow::QFEFCSSimMainWidnow(QWidget *parent) :
     QFStyledButton* btn;
     ui->edtExeDir->addButton(btn=new QFStyledButton(QFStyledButton::SelectDirectory, ui->edtExeDir, ui->edtExeDir));
     ui->edtSimulator->addButton(btn=new QFStyledButton(QFStyledButton::SelectFile, ui->edtSimulator, ui->edtSimulator));
+    ui->edtSimulatorSpectra->addButton(btn=new QFStyledButton(QFStyledButton::SelectFile, ui->edtSimulatorSpectra, ui->edtSimulatorSpectra));
     btn->setFilter(tr("Executable Files (*.exe *.);;All Files (*.*"));
     ui->tabWidget->setTabsClosable(true);
     loadSettings();
@@ -26,9 +27,9 @@ QFEFCSSimMainWidnow::~QFEFCSSimMainWidnow()
 
 void QFEFCSSimMainWidnow::loadSettings()
 {
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     QString sim=QApplication::applicationDirPath()+"/diffusion4.exe";
-#elifdef Q_OS_MAC
+#elif defined(Q_OS_MAC)
     QString sim=QFPluginServices::getInstance()->getPluginAssetsDirectory("qfe_fcssimulator")+"/diffusion4";
 #else
     QString sim=QApplication::applicationDirPath()+"/diffusion4";
@@ -37,9 +38,10 @@ void QFEFCSSimMainWidnow::loadSettings()
     spectradir.cd("spectra");
     ProgramOptions::getConfigWindowGeometry(this, "QFEFCSSimMainWidnow/window");
     ProgramOptions::getConfigQLineEdit(ui->edtExeDir, "QFEFCSSimMainWidnow/edtExeDir", QDir::homePath());
-    ProgramOptions::getConfigQLineEdit(ui->edtExeDir, "QFEFCSSimMainWidnow/edtSimulatorSpectra", spectradir.absolutePath());
+    ProgramOptions::getConfigQLineEdit(ui->edtSimulatorSpectra, "QFEFCSSimMainWidnow/edtSimulatorSpectra", spectradir.absolutePath());
     ProgramOptions::getConfigQLineEdit(ui->edtSimulator, "QFEFCSSimMainWidnow/edtSimulator", sim);
     ProgramOptions::getConfigQSpinBox(ui->spinMaxProcesses, "QFEFCSSimMainWidnow/spinMaxProcesses", 1);
+    ProgramOptions::getConfigQCheckBox(ui->chkSaveLog, "QFEFCSSimMainWidnow/chkSaveLog", true);
 }
 
 void QFEFCSSimMainWidnow::saveSettings()
@@ -49,6 +51,7 @@ void QFEFCSSimMainWidnow::saveSettings()
     ProgramOptions::setConfigQLineEdit(ui->edtSimulator, "QFEFCSSimMainWidnow/edtSimulator");
     ProgramOptions::setConfigQLineEdit(ui->edtSimulatorSpectra, "QFEFCSSimMainWidnow/edtSimulatorSpectra");
     ProgramOptions::setConfigQSpinBox(ui->spinMaxProcesses, "QFEFCSSimMainWidnow/spinMaxProcesses");
+    ProgramOptions::setConfigQCheckBox(ui->chkSaveLog, "QFEFCSSimMainWidnow/chkSaveLog");
 }
 
 bool QFEFCSSimMainWidnow::mayStartProcess() const
@@ -68,6 +71,11 @@ QString QFEFCSSimMainWidnow::getWorkingDir() const
 QString QFEFCSSimMainWidnow::getSpectraDir() const
 {
     return ui->edtSimulatorSpectra->text();
+}
+
+bool QFEFCSSimMainWidnow::getSaveLog() const
+{
+    return ui->chkSaveLog->isChecked();
 }
 
 QString QFEFCSSimMainWidnow::getSimulator() const
@@ -90,7 +98,20 @@ void QFEFCSSimMainWidnow::on_btnOpen_clicked()
 void QFEFCSSimMainWidnow::on_btnNew_clicked()
 {
     tabs.append(new QFEFCSSimScriptTab(this));
-     ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(lastTab(), tabs.last()->getFilename()));
+    connect(tabs.last(), SIGNAL(textChanged(bool)), this, SLOT(textChanged(bool)));
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(lastTab(), tabs.last()->getFilename()));
+}
+
+void QFEFCSSimMainWidnow::on_btnNewFromTemplate_clicked()
+{
+    tabs.append(new QFEFCSSimScriptTab(this));
+    if (!tabs.last()->loadTemplate()) {
+        delete tabs.last();
+        tabs.removeLast();
+        return;
+    }
+    connect(tabs.last(), SIGNAL(textChanged(bool)), this, SLOT(textChanged(bool)));
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(lastTab(), tabs.last()->getFilename()));
 }
 
 void QFEFCSSimMainWidnow::on_btnSave_clicked()
@@ -169,6 +190,18 @@ bool QFEFCSSimMainWidnow::closeTab(int i)
         return true;
     }
     return false;
+}
+
+void QFEFCSSimMainWidnow::on_btnHelp_clicked()
+{
+    QFPluginServices::getInstance()->displayPluginHelpWindow("qfe_fcssimulator");
+}
+
+void QFEFCSSimMainWidnow::on_btnManual_clicked()
+{
+    QUrl url(QString("file:///")+QFPluginServices::getInstance()->getPluginHelpDirectory("qfe_fcssimulator")+"/manual.pdf", QUrl::TolerantMode);
+    qDebug()<<"opening "<<url;
+    QDesktopServices::openUrl(url);
 }
 
 void QFEFCSSimMainWidnow::textChanged(bool changed)

@@ -60,10 +60,10 @@ bool QFTCSPCReaderPicoquantPT3::open(const QString &filename, const QString &par
         }
 
 
-        fileinfo.properties["CommentField"]=txtHeader.CommentField;
-        fileinfo.properties["FileTime"]=txtHeader.FileTime;
-        fileinfo.properties["CreatorName"]=txtHeader.CreatorName;
-        fileinfo.properties["CreatorVersion"]=txtHeader.CreatorVersion;
+        fileinfo.properties["CommentField"]=(char*)txtHeader.CommentField;
+        fileinfo.properties["FileTime"]=(char*)txtHeader.FileTime;
+        fileinfo.properties["CreatorName"]=(char*)txtHeader.CreatorName;
+        fileinfo.properties["CreatorVersion"]=(char*)txtHeader.CreatorVersion;
 
         fileinfo.properties["Tacq"]=(qlonglong)binHeader.Tacq;
         fileinfo.properties["NumberOfBoards"]=(qlonglong)binHeader.NumberOfBoards;
@@ -73,8 +73,8 @@ bool QFTCSPCReaderPicoquantPT3::open(const QString &filename, const QString &par
         fileinfo.properties["StopAt"]=(qlonglong)binHeader.StopAt;
         fileinfo.properties["StopOnOvfl"]=(qlonglong)binHeader.StopOnOvfl;
 
-        fileinfo.properties["HardwareIdent"]=boardHeader.HardwareIdent;
-        fileinfo.properties["HardwareVersion"]=boardHeader.HardwareVersion;
+        fileinfo.properties["HardwareIdent"]=(char*)boardHeader.HardwareIdent;
+        fileinfo.properties["HardwareVersion"]=(char*)boardHeader.HardwareVersion;
         fileinfo.properties["HardwareSerial"]=boardHeader.HardwareSerial;
         fileinfo.properties["SyncDivider"]=(qlonglong)boardHeader.SyncDivider;
         fileinfo.properties["CFDZeroCross0"]=(qlonglong)boardHeader.CFDZeroCross0;

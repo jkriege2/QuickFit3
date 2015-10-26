@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>FCS SImulator (&quot;diffusion4&quot;)</string>
+   <string>FCS Simulator (&quot;diffusion4&quot;)</string>
   </property>
   <property name="windowIcon">
    <iconset resource="qfe_fcssimulator.qrc">
@@ -20,6 +20,9 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="toolTip">
+      <string>choose the number of parallel simulator taks on this machine</string>
+     </property>
      <property name="title">
       <string> Configuration </string>
      </property>
@@ -32,7 +35,11 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QFEnhancedLineEdit" name="edtExeDir"/>
+       <widget class="QFEnhancedLineEdit" name="edtExeDir">
+        <property name="toolTip">
+         <string>choose the execution directory of the simulator. relative paths in a script will be generated relative to this directory.</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label">
@@ -42,7 +49,11 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QFEnhancedLineEdit" name="edtSimulator"/>
+       <widget class="QFEnhancedLineEdit" name="edtSimulator">
+        <property name="toolTip">
+         <string>choose the simulator executable (you can choose a custom version here, if you have one!)</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_4">
@@ -52,7 +63,11 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QFEnhancedLineEdit" name="edtSimulatorSpectra"/>
+       <widget class="QFEnhancedLineEdit" name="edtSimulatorSpectra">
+        <property name="toolTip">
+         <string>choose the directory with the simulatoir fluorophore database</string>
+        </property>
+       </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_3">
@@ -83,6 +98,16 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QCheckBox" name="chkSaveLog">
+          <property name="toolTip">
+           <string>if checked, a &lt;tt&gt;script.ini.log&lt;/tt&gt; with the log-output of the simulator will be generated in the execution directory.</string>
+          </property>
+          <property name="text">
+           <string>save log-file in exe-directory</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -111,6 +136,9 @@
       </property>
       <item>
        <widget class="QToolButton" name="btnClose">
+        <property name="toolTip">
+         <string>Close the simulator window</string>
+        </property>
         <property name="text">
          <string>&amp;Close</string>
         </property>
@@ -129,6 +157,9 @@
       </item>
       <item>
        <widget class="QToolButton" name="btnNew">
+        <property name="toolTip">
+         <string>create a new simulator configuration</string>
+        </property>
         <property name="text">
          <string>&amp;New</string>
         </property>
@@ -139,7 +170,24 @@
        </widget>
       </item>
       <item>
+       <widget class="QToolButton" name="btnNewFromTemplate">
+        <property name="toolTip">
+         <string>create a new simulator configuration from a template</string>
+        </property>
+        <property name="text">
+         <string>New From &amp;Template</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/lib/icons/document_import.png</normaloff>:/lib/icons/document_import.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="btnOpen">
+        <property name="toolTip">
+         <string>open an existing simulator configuration script ...</string>
+        </property>
         <property name="text">
          <string>&amp;Open</string>
         </property>
@@ -151,6 +199,9 @@
       </item>
       <item>
        <widget class="QToolButton" name="btnSave">
+        <property name="toolTip">
+         <string>save the current script</string>
+        </property>
         <property name="text">
          <string>&amp;Save</string>
         </property>
@@ -162,6 +213,9 @@
       </item>
       <item>
        <widget class="QToolButton" name="btnSaveAs">
+        <property name="toolTip">
+         <string>save the current script under a new name</string>
+        </property>
         <property name="text">
          <string>Save &amp;as</string>
         </property>
@@ -180,6 +234,9 @@
       </item>
       <item>
        <widget class="QToolButton" name="btnExecute">
+        <property name="toolTip">
+         <string>execute the current simulator configuration script</string>
+        </property>
         <property name="text">
          <string>Execute</string>
         </property>
@@ -191,6 +248,9 @@
       </item>
       <item>
        <widget class="QToolButton" name="btnStop">
+        <property name="toolTip">
+         <string>cancel the execution (if it is running) in the current simulator script tab</string>
+        </property>
         <property name="text">
          <string>Stop</string>
         </property>
@@ -212,6 +272,40 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnHelp">
+        <property name="toolTip">
+         <string>open the plugin help window</string>
+        </property>
+        <property name="text">
+         <string>&amp;Help</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/lib/help/help.png</normaloff>:/lib/help/help.png</iconset>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnManual">
+        <property name="toolTip">
+         <string>open the PDF-file with the simulator manual</string>
+        </property>
+        <property name="text">
+         <string>simulator manual</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/pdf.png</normaloff>:/pdf.png</iconset>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

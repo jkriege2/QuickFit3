@@ -22,79 +22,96 @@ Copyright (c) 2012-2015 by Sebastian Isbaner
 #include "readArrivalTimes.h"
 #include<QDebug>
 
+/* ensuring these bit-lengths of datatypes
+ *
+ *    - sizeof(void*): 64 bits
+ *    - sizeof(char): 8 bits
+ *    - sizeof(int): 32 bits
+ *    - sizeof(short): 16 bits
+ *    - sizeof(long int): 32 bits
+ *    - sizeof(long long int): 64 bits
+ *    - sizeof(float): 32 bits
+ *    - sizeof(double): 64 bits
+ *    - sizeof(bool): 8 bits
+ *
+ * */
+
 int readTTTRfile( Photons& photons, QVector<double> &markerTimePin4, QVector<double> &markerTimePin5, const QString filename, const Channel route0, const Marker Pin4, bool forceAlternation, bool isV6)
 {
 
+#pragma pack(push)  /* push current alignment to stack */
+#pragma pack(4)     /* set alignment to 1 byte boundary */
+
     /* The following represents the readable ASCII file header portion} */
 
-    typedef struct{ long int Start;
-                    long int Step;
-                    long int End;  } tParamStruct;
+    typedef struct{ int32_t Start;
+                    int32_t Step;
+                    int32_t End;  } tParamStruct;
 
-    typedef struct{ long int MapTo;
-                    long int Show; } tCurveMapping;
+    typedef struct{ int32_t MapTo;
+                    int32_t Show; } tCurveMapping;
 
     struct {
-        char Ident[16];
-        char SoftwareVersion[6];
-        char HardwareVersion[6];
-        char FileTime[18];
-        char CRLF[2];
-        char CommentField[256]; } TxtHdr;
+        int8_t Ident[16];
+        int8_t SoftwareVersion[6];
+        int8_t HardwareVersion[6];
+        int8_t FileTime[18];
+        int8_t CRLF[2];
+        int8_t CommentField[256]; } TxtHdr;
 
     /* The following is binary header information */
 
     struct {
-        long int Channels;
-        long int Curves;
-        long int BitsPerChannel;
-        long int RoutingChannels;
-        long int NumberOfBoards;
-        long int ActiveCurve;
-        long int MeasMode;
-        long int SubMode;
-        long int RangeNo;
-        long int Offset;			/* in ns */
-        long int Tacq;				/* in ms */
-        long int StopAt;
-        long int StopOnOvfl;
-        long int Restart;
-        long int DispLinLog;
-        long int DispTimeFrom;
-        long int DispTimeTo;
-        long int DispCountsFrom;
-        long int DispCountsTo;
+        int32_t Channels;
+        int32_t Curves;
+        int32_t BitsPerChannel;
+        int32_t RoutingChannels;
+        int32_t NumberOfBoards;
+        int32_t ActiveCurve;
+        int32_t MeasMode;
+        int32_t SubMode;
+        int32_t RangeNo;
+        int32_t Offset;			/* in ns */
+        int32_t Tacq;				/* in ms */
+        int32_t StopAt;
+        int32_t StopOnOvfl;
+        int32_t Restart;
+        int32_t DispLinLog;
+        int32_t DispTimeFrom;
+        int32_t DispTimeTo;
+        int32_t DispCountsFrom;
+        int32_t DispCountsTo;
         tCurveMapping DispCurves[8];
         tParamStruct Params[3];
-        long int RepeatMode;
-        long int RepeatsPerCurve;
-        long int RepeatTime;
-        long int RepeatWaitTime;
-        char ScriptName[20];} BinHdr;
+        int32_t RepeatMode;
+        int32_t RepeatsPerCurve;
+        int32_t RepeatTime;
+        int32_t RepeatWaitTime;
+        int8_t ScriptName[20];} BinHdr;
 
     struct {
-        long int BoardSerial;
-        long int CFDZeroCross;
-        long int CFDDiscrMin;
-        long int SyncLevel;
-        long int CurveOffset;
+        int32_t BoardSerial;
+        int32_t CFDZeroCross;
+        int32_t CFDDiscrMin;
+        int32_t SyncLevel;
+        int32_t CurveOffset;
         float Resolution;} BoardHdr;
 
 
     struct {
-        long int Globclock;
-        long int Reserved1;
-        long int Reserved2;
-        long int Reserved3;
-        long int Reserved4;
-        long int Reserved5;
-        long int Reserved6;
-        long int SyncRate;
-        long int TTTRCFDRate;
-        long int TTTRStopAfter;
-        long int TTTRStopReason;
-        long int NoOfRecords;
-        long int SpecialHeaderSize;} TTTRHdr;
+        int32_t Globclock;
+        int32_t Reserved1;
+        int32_t Reserved2;
+        int32_t Reserved3;
+        int32_t Reserved4;
+        int32_t Reserved5;
+        int32_t Reserved6;
+        int32_t SyncRate;
+        int32_t TTTRCFDRate;
+        int32_t TTTRStopAfter;
+        int32_t TTTRStopReason;
+        int32_t NoOfRecords;
+        int32_t SpecialHeaderSize;} TTTRHdr;
 
 
     typedef struct{ float Start;
@@ -102,66 +119,66 @@ int readTTTRfile( Photons& photons, QVector<double> &markerTimePin4, QVector<dou
                     float End;  } tParamStruct6;
 
      struct {
-        long int Globclock;
-        long int ExtDevices;
-        long int Reserved1;
-        long int Reserved2;
-        long int Reserved3;
-        long int Reserved4;
-        long int Reserved5;
-        long int SyncRate;
-        long int TTTRCFDRate;
-        long int TTTRStopAfter;
-        long int TTTRStopReason;
-        long int NoOfRecords;
-        long int SpecialHeaderSize;} TTTRHdr6;
+        int32_t Globclock;
+        int32_t ExtDevices;
+        int32_t Reserved1;
+        int32_t Reserved2;
+        int32_t Reserved3;
+        int32_t Reserved4;
+        int32_t Reserved5;
+        int32_t SyncRate;
+        int32_t TTTRCFDRate;
+        int32_t TTTRStopAfter;
+        int32_t TTTRStopReason;
+        int32_t NoOfRecords;
+        int32_t SpecialHeaderSize;} TTTRHdr6;
 
      struct {
-        char HardwareIdent[16];
-        char HardwareVersion[8];
-        long int BoardSerial;
-        long int CFDZeroCross;
-        long int CFDDiscrMin;
-        long int SyncLevel;
-        long int CurveOffset;
+        int8_t HardwareIdent[16];
+        int8_t HardwareVersion[8];
+        int32_t BoardSerial;
+        int32_t CFDZeroCross;
+        int32_t CFDDiscrMin;
+        int32_t SyncLevel;
+        int32_t CurveOffset;
         float Resolution;} TTTRBoardHdr6;
 
      struct {
-        long int Channels;
-        long int Curves;
-        long int BitsPerChannel;
-        long int RoutingChannels;
-        long int NumberOfBoards;
-        long int ActiveCurve;
-        long int MeasMode;
-        long int SubMode;
-        long int RangeNo;
-        long int Offset;			/* in ns */
-        long int Tacq;				/* in ms */
-        long int StopAt;
-        long int StopOnOvfl;
-        long int Restart;
-        long int DispLinLog;
-        long int DispTimeFrom;
-        long int DispTimeTo;
-        long int DispCountsFrom;
-        long int DispCountsTo;
+        int32_t Channels;
+        int32_t Curves;
+        int32_t BitsPerChannel;
+        int32_t RoutingChannels;
+        int32_t NumberOfBoards;
+        int32_t ActiveCurve;
+        int32_t MeasMode;
+        int32_t SubMode;
+        int32_t RangeNo;
+        int32_t Offset;			/* in ns */
+        int32_t Tacq;				/* in ms */
+        int32_t StopAt;
+        int32_t StopOnOvfl;
+        int32_t Restart;
+        int32_t DispLinLog;
+        int32_t DispTimeFrom;
+        int32_t DispTimeTo;
+        int32_t DispCountsFrom;
+        int32_t DispCountsTo;
         tCurveMapping DispCurves[8];
         tParamStruct6 Params[3];
-        long int RepeatMode;
-        long int RepeatsPerCurve;
-        long int RepeatTime;
-        long int RepeatWaitTime;
-        char ScriptName[20];} TTTRBinHdr6;
+        int32_t RepeatMode;
+        int32_t RepeatsPerCurve;
+        int32_t RepeatTime;
+        int32_t RepeatWaitTime;
+        int8_t ScriptName[20];} TTTRBinHdr6;
 
      struct {
-        char Ident[16];
-        char FormatVersion[6];
-        char CreatorName[18];
-        char CreatorVersion[12];
-        char FileTime[18];
-        char CRLF[2];
-        char CommentField[256]; } TTTRTxtHdr6;
+        int8_t Ident[16];
+        int8_t FormatVersion[6];
+        int8_t CreatorName[18];
+        int8_t CreatorVersion[12];
+        int8_t FileTime[18];
+        int8_t CRLF[2];
+        int8_t CommentField[256]; } TTTRTxtHdr6;
 
 
 
@@ -174,7 +191,7 @@ int readTTTRfile( Photons& photons, QVector<double> &markerTimePin4, QVector<dou
         unsigned Valid		:1;
         unsigned Reserved	:1; }  TTTRrecord;
 
-
+#pragma pack(pop)   /* restore original alignment from stack */
 
     if (!isV6) {
 
@@ -192,7 +209,7 @@ int readTTTRfile( Photons& photons, QVector<double> &markerTimePin4, QVector<dou
         //--------------------------------------------------------
 
         FILE *fpin;
-        long int result,ii;
+        int32_t result,ii;
         long markerPin4=0, markerPin5=0, markerPin9=0; // count the markers in the data stream
         unsigned long overflows=0;
         double ofltime=0, truetime=0;
@@ -221,13 +238,13 @@ int readTTTRfile( Photons& photons, QVector<double> &markerTimePin4, QVector<dou
         if (result!= sizeof(TxtHdr))
         { AlexEvalLog::warning("\nerror reading input file, aborted. 1");return EXIT_FAILURE;}
 
-        if(strncmp(TxtHdr.SoftwareVersion,"5.",2)!=0)
+        if(strncmp((char*)TxtHdr.SoftwareVersion,"5.",2)!=0)
         {
-            if(strncmp(TxtHdr.SoftwareVersion,"6.",2)==0) {
+            if(strncmp((char*)TxtHdr.SoftwareVersion,"6.",2)==0) {
                 return readTTTRfile(photons, markerTimePin4, markerTimePin5,filename,route0,Pin4,forceAlternation, true);
             } else {
                 AlexEvalLog::warning(QString("\nInput file version is %1. This program is for v5.x/6.x only. Aborted.").arg(
-                                         TxtHdr.SoftwareVersion));return EXIT_FAILURE;
+                                         (char*)TxtHdr.SoftwareVersion));return EXIT_FAILURE;
             }
         }
         result = fread( &BinHdr, 1, sizeof(BinHdr) ,fpin);
@@ -370,7 +387,7 @@ int readTTTRfile( Photons& photons, QVector<double> &markerTimePin4, QVector<dou
         //--------------------------------------------------------
 
         FILE *fpin;
-        long int result,ii;
+        int32_t result,ii;
         long markerPin4=0, markerPin5=0, markerPin9=0; // count the markers in the data stream
         unsigned long overflows=0;
         double ofltime=0, truetime=0;
@@ -399,10 +416,10 @@ int readTTTRfile( Photons& photons, QVector<double> &markerTimePin4, QVector<dou
         if (result!= sizeof(TTTRTxtHdr6))
         { AlexEvalLog::warning("\nerror reading input file, aborted. 1");return EXIT_FAILURE;}
 
-        if(strncmp(TTTRTxtHdr6.FormatVersion,"6.",2)!=0)
+        if(strncmp((char*)TTTRTxtHdr6.FormatVersion,"6.",2)!=0)
         {
             AlexEvalLog::warning(QString("\nInput file version is %1. This program is for v5.x/6.x only. Aborted.").arg(
-                                     TTTRTxtHdr6.FormatVersion));return EXIT_FAILURE;
+                                     (char*)TTTRTxtHdr6.FormatVersion));return EXIT_FAILURE;
         }
         result = fread( &TTTRBinHdr6, 1, sizeof(TTTRBinHdr6) ,fpin);
         if (result!= sizeof(TTTRBinHdr6))
@@ -600,75 +617,77 @@ int readCSVtoList(QList<QVector<double> >& data, const QString filename, const Q
 int readTTTRfileOld( QVector<double> &photonArrivalTimeRoute0, QVector<double> &photonArrivalTimeRoute1, QVector<double> &markerTimePin4, QVector<double> &markerTimePin5, const QString filename, bool forceAlternation)
 {
     /* The following represents the readable ASCII file header portion} */
+#pragma pack(push)  /* push current alignment to stack */
+#pragma pack(4)     /* set alignment to 1 byte boundary */
 
-    typedef struct{ long int Start;
-                    long int Step;
-                    long int End;  } tParamStruct;
+    typedef struct{ int32_t Start;
+                    int32_t Step;
+                    int32_t End;  } tParamStruct;
 
-    typedef struct{ long int MapTo;
-                    long int Show; } tCurveMapping;
+    typedef struct{ int32_t MapTo;
+                    int32_t Show; } tCurveMapping;
 
     struct {
-        char Ident[16];
-        char SoftwareVersion[6];
-        char HardwareVersion[6];
-        char FileTime[18];
-        char CRLF[2];
-        char CommentField[256]; } TxtHdr;
+        int8_t Ident[16];
+        int8_t SoftwareVersion[6];
+        int8_t HardwareVersion[6];
+        int8_t FileTime[18];
+        int8_t CRLF[2];
+        int8_t CommentField[256]; } TxtHdr;
 
     /* The following is binary header information */
 
     struct {
-        long int Channels;
-        long int Curves;
-        long int BitsPerChannel;
-        long int RoutingChannels;
-        long int NumberOfBoards;
-        long int ActiveCurve;
-        long int MeasMode;
-        long int SubMode;
-        long int RangeNo;
-        long int Offset;			/* in ns */
-        long int Tacq;				/* in ms */
-        long int StopAt;
-        long int StopOnOvfl;
-        long int Restart;
-        long int DispLinLog;
-        long int DispTimeFrom;
-        long int DispTimeTo;
-        long int DispCountsFrom;
-        long int DispCountsTo;
+        int32_t Channels;
+        int32_t Curves;
+        int32_t BitsPerChannel;
+        int32_t RoutingChannels;
+        int32_t NumberOfBoards;
+        int32_t ActiveCurve;
+        int32_t MeasMode;
+        int32_t SubMode;
+        int32_t RangeNo;
+        int32_t Offset;			/* in ns */
+        int32_t Tacq;				/* in ms */
+        int32_t StopAt;
+        int32_t StopOnOvfl;
+        int32_t Restart;
+        int32_t DispLinLog;
+        int32_t DispTimeFrom;
+        int32_t DispTimeTo;
+        int32_t DispCountsFrom;
+        int32_t DispCountsTo;
         tCurveMapping DispCurves[8];
         tParamStruct Params[3];
-        long int RepeatMode;
-        long int RepeatsPerCurve;
-        long int RepeatTime;
-        long int RepeatWaitTime;
-        char ScriptName[20];} BinHdr;
+        int32_t RepeatMode;
+        int32_t RepeatsPerCurve;
+        int32_t RepeatTime;
+        int32_t RepeatWaitTime;
+        int8_t ScriptName[20];} BinHdr;
 
     struct {
-        long int BoardSerial;
-        long int CFDZeroCross;
-        long int CFDDiscrMin;
-        long int SyncLevel;
-        long int CurveOffset;
+        int32_t BoardSerial;
+        int32_t CFDZeroCross;
+        int32_t CFDDiscrMin;
+        int32_t SyncLevel;
+        int32_t CurveOffset;
         float Resolution;} BoardHdr;
 
 
     struct {
-        long int Globclock;
-        long int Reserved1;
-        long int Reserved2;
-        long int Reserved3;
-        long int Reserved4;
-        long int Reserved5;
-        long int Reserved6;
-        long int SyncRate;
-        long int TTTRCFDRate;
-        long int TTTRStopAfter;
-        long int TTTRStopReason;
-        long int NoOfRecords;
-        long int SpecialHeaderSize;} TTTRHdr;
+        int32_t Globclock;
+        int32_t Reserved1;
+        int32_t Reserved2;
+        int32_t Reserved3;
+        int32_t Reserved4;
+        int32_t Reserved5;
+        int32_t Reserved6;
+        int32_t SyncRate;
+        int32_t TTTRCFDRate;
+        int32_t TTTRStopAfter;
+        int32_t TTTRStopReason;
+        int32_t NoOfRecords;
+        int32_t SpecialHeaderSize;} TTTRHdr;
 
     // The following data records will appear in the file NoOfRecords times
 
@@ -680,7 +699,7 @@ int readTTTRfileOld( QVector<double> &photonArrivalTimeRoute0, QVector<double> &
         unsigned Reserved	:1; }  TTTRrecord;
 
 
-
+#pragma pack(pop)   /* restore original alignment from stack */
     AlexEvalLog::text("reading TTTR file...");
     if((photonArrivalTimeRoute0.size()>0)||(photonArrivalTimeRoute1.size()>0)||(markerTimePin4.size()>0)||(markerTimePin5.size()>0)) {
         AlexEvalLog::warning("Warning: overwriting data");
@@ -696,7 +715,7 @@ int readTTTRfileOld( QVector<double> &photonArrivalTimeRoute0, QVector<double> &
     //--------------------------------------------------------
 
     FILE *fpin;
-    long int result,ii;
+    int32_t result,ii;
     long markerPin4=0, markerPin5=0, markerPin9=0; // count the markers in the data stream
     unsigned long overflows=0;
     double ofltime=0, truetime=0;
@@ -716,10 +735,10 @@ int readTTTRfileOld( QVector<double> &photonArrivalTimeRoute0, QVector<double> &
     if (result!= sizeof(TxtHdr))
     { AlexEvalLog::warning("\nerror reading input file, aborted. 1");return EXIT_FAILURE;}
 
-    if(strncmp(TxtHdr.SoftwareVersion,"5.",2))
+    if(strncmp((char*)TxtHdr.SoftwareVersion,"5.",2))
     {
         AlexEvalLog::warning(QString("\nInput file version is %1. This program is for v5.0 only. Aborted.").arg(
-                   TxtHdr.SoftwareVersion));return EXIT_FAILURE;
+                   (char*)TxtHdr.SoftwareVersion));return EXIT_FAILURE;
     }
     result = fread( &BinHdr, 1, sizeof(BinHdr) ,fpin);
     if (result!= sizeof(BinHdr))

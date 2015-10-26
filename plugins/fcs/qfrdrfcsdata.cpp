@@ -312,7 +312,7 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
     correlation=(double*)qfCalloc(correlationN*correlationRuns, sizeof(double));
     correlationErrors=(double*)qfCalloc(correlationN*correlationRuns, sizeof(double));
     if (!correlationT || !correlation || !correlationMean || !correlationStdDev || !correlationErrors)
-        setError(tr("Error while allocating memory for correlation function data!"));
+        setError(tr("Error while allocating memory for correlation function data (N=%1, runs=%2!").arg(correlationN).arg(correlationRuns));
     emitRawDataChanged();
 }
 
@@ -354,7 +354,7 @@ void QFRDRFCSData::resizeBinnedRates(long long N) {
         binnedRateT=(double*)qfCalloc(binnedRateN, sizeof(double));
         binnedRate=(double*)qfCalloc(rateChannels*binnedRateN*rateRuns, sizeof(double));
         if (!binnedRateT || !binnedRate)
-            setError(tr("Error while allocating memory for binned count rate data!"));
+            setError(tr("Error while allocating memory forbinned count rate data (N=%1, runs=%2, channels=%3)!").arg(N).arg(binnedRateN).arg(rateChannels));
         setIntProperty("BINNED_RATE_N", binnedRateN, false, false);
     }
     emitRawDataChanged();

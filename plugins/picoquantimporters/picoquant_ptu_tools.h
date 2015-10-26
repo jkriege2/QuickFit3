@@ -59,7 +59,19 @@
 
 #pragma pack(8) //structure alignment to 8 byte boundaries
 
-
+/* ensuring these bit-lengths of datatypes
+ *
+ *    - sizeof(void*): 64 bits
+ *    - sizeof(char): 8 bits
+ *    - sizeof(int): 32 bits
+ *    - sizeof(short): 16 bits
+ *    - sizeof(long int): 32 bits
+ *    - sizeof(long long int): 64 bits
+ *    - sizeof(float): 32 bits
+ *    - sizeof(double): 64 bits
+ *    - sizeof(bool): 8 bits
+ *
+ * */
 
 
 time_t TDateTime_TimeT(double Convertee);
