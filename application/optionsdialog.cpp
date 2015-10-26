@@ -189,9 +189,9 @@ void OptionsDialog::open(ProgramOptions* options) {
     edtTempFolder->setText(options->getConfigValue("quickfit/temp_folder", QDir::tempPath()).toString());
     chkDefaultTempFolder->setChecked(options->getConfigValue("quickfit/temp_folder_default", true).toBool());
     spinMath->setValue(options->getConfigValue("quickfit/math_pointsize", 14).toInt());
-    spinHelpFontsize->setValue(options->getConfigValue("quickfit/help_pointsize", 11).toInt());
-    cmbHelpFont->setCurrentFont(QFont(options->getConfigValue("quickfit/help_font", font().family()).toString()));
-    spinCodeFontsize->setValue(options->getConfigValue("quickfit/code_pointsize", 10).toInt());
+    spinHelpFontsize->setValue(options->getConfigValue("quickfit/help_pointsize", 12).toInt());
+    cmbHelpFont->setCurrentFont(QFont(options->getConfigValue("quickfit/help_font", QGuiApplication::font().family()).toString()));
+    spinCodeFontsize->setValue(options->getConfigValue("quickfit/code_pointsize", 12).toInt());
     cmbCodeFont->setCurrentFont(QFont(options->getConfigValue("quickfit/code_font", "Hack").toString()));
     chkVARCOVNonLin->setChecked(options->getConfigValue("quickfit/nonlin_color_covmatrix_enabled", true).toBool());
     spinCodeFontsize->setValue(options->getConfigValue("quickfit/nonlin_color_covmatrix_gamma", 0.25).toDouble());
