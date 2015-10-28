@@ -66,7 +66,7 @@ bool QFFitAlgorithmManager::registerPlugin(const QString& filename_in, QObject *
         QFHelpDirectoryInfo info;
         info.plugin=iRecord;
         QString libbasename=QFileInfo(fileName).baseName();
-        if (fileName.contains(".so")) {
+        if (fileName.contains(".so") ||fileName.contains(".dylib")) {
             if (libbasename.startsWith("lib")) libbasename=libbasename.right(libbasename.size()-3);
         }
         info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+libbasename+QString("/");

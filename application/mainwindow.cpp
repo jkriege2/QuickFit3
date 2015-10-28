@@ -1837,7 +1837,7 @@ void MainWindow::createActions() {
 
     optionsAct = new QFActionWithNoMenuRole(QIcon(":/configure.png"), tr("&Preferences ..."), this);
     optionsAct->setStatusTip(tr("Application settings dialog"));
-    optionsAct->setMenuRole(QAction::PreferencesRole);
+    //optionsAct->setMenuRole(QAction::PreferencesRole);
     connect(optionsAct, SIGNAL(triggered()), this, SLOT(openSettingsDialog()));
 
     exitAct = new QFActionWithNoMenuRole(QIcon(":/exit.png"), tr("E&xit"), this);
@@ -1996,9 +1996,11 @@ void MainWindow::createActions() {
 
 void MainWindow::createMenus() {
     fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->menuAction()->setMenuRole(QAction::NoRole);
     fileMenu->addAction(newProjectAct);
 
     fileMenu->addAction(openProjectAct);
+    projectWizardsMenu=fileMenu->addMenu(tr("&Project Wizards ..."));
 
 
     /*recentMenu=fileMenu->addMenu(QIcon(":/project_open_recent.png"), tr("&Recent Files"));
@@ -2076,8 +2078,9 @@ void MainWindow::createMenus() {
     toolsMenu->addSeparator();
     wizardsMenu=toolsMenu->addMenu(tr("&Wizards"));
     wizardsMenu->setIcon(QIcon(":/wizard.png"));
-    projectWizardsMenu=wizardsMenu->addMenu(tr("&Projects Wizards"));
+    wizardsMenu->addMenu(projectWizardsMenu);
     projectWizardsMenu->setIcon(QIcon(":/project_wizard.png"));
+    //projectWizardsMenu2->setIcon(QIcon(":/project_wizard.png"));
     rdrWizardsMenu=wizardsMenu->addMenu(tr("&Raw Data Wizards"));
     rdrWizardsMenu->setIcon(QIcon(":/rdr_wizard.png"));
     evalWizardsMenu=wizardsMenu->addMenu(tr("&Evaluation Wizards"));
@@ -2085,7 +2088,7 @@ void MainWindow::createMenus() {
     dataMenu->addSeparator();
     dataMenu->addMenu(rdrWizardsMenu);
     dataMenu->addMenu(evalWizardsMenu);
-    fileMenu->insertAction(openProjectAct, projectWizardsMenu->menuAction());
+    //fileMenu->insertAction(openProjectAct, projectWizardsMenu->menuAction());
     fileMenu->insertSeparator(openProjectAct);
     wizardsMenu->addSeparator();
     toolsMenu->addSeparator();
@@ -2121,7 +2124,7 @@ void MainWindow::createMenus() {
     menuAboutMAC->addAction(aboutPluginsAct);
     menuAboutMAC->addAction(aboutQtAct);
     actMenuAboutMAC=menuAboutMAC->menuAction();
-    actMenuAboutMAC->setMenuRole(QAction::AboutRole);
+    actMenuAboutMAC->setMenuRole(QAction::NoRole);
     helpMenu->addAction(actMenuAboutMAC);
 #else
     helpMenu->addAction(aboutAct);
