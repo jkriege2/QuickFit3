@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "qfefcssimscripttab.h"
 #include <QList>
+#include "qfrecentfilesmenu.h"
 namespace Ui {
     class QFEFCSSimMainWidnow;
 }
@@ -39,6 +40,8 @@ class QFEFCSSimMainWidnow : public QWidget
 
         void textChanged(bool changed);
 
+        void loadFile(const QString &filename);
+        void filenameChanged(const QString& filename);
     protected:
         void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
@@ -47,6 +50,7 @@ class QFEFCSSimMainWidnow : public QWidget
         QList<QFEFCSSimScriptTab*> tabs;
         QFEFCSSimScriptTab* lastTab() const ;
         QFEFCSSimScriptTab* currentTab() const ;
+        QFRecentFilesMenu menuRecent;
 };
 
 #endif // QFEFCSSIMMAINWIDNOW_H

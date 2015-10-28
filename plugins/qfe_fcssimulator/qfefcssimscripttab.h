@@ -57,6 +57,7 @@ class QFEFCSSimScriptTab : public QWidget
         void on_btnImport_clicked();
     signals:
         void textChanged(bool changed);
+        void filenameChanged(const QString& filename);
 };
 
 #endif // QFEFCSSIMSCRIPTTAB_H
