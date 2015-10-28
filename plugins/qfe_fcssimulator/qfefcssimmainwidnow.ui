@@ -195,6 +195,12 @@
          <iconset resource="../../lib/lib.qrc">
           <normaloff>:/lib/icons/document_open.png</normaloff>:/lib/icons/document_open.png</iconset>
         </property>
+        <property name="popupMode">
+         <enum>QToolButton::MenuButtonPopup</enum>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::NoArrow</enum>
+        </property>
        </widget>
       </item>
       <item>
@@ -323,10 +329,10 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfe_fcssimulator.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>

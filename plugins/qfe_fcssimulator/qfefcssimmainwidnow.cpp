@@ -16,6 +16,8 @@ QFEFCSSimMainWidnow::QFEFCSSimMainWidnow(QWidget *parent) :
     btn->setFilter(tr("Executable Files (*.exe *.);;All Files (*.*"));
     ui->tabWidget->setTabsClosable(true);
     loadSettings();
+    connect(&menuRecent, SIGNAL(openRecentFile(QString)), this, SLOT(loadFile(QString)));
+    ui->btnOpen->setMenu(&menuRecent);
     //on_btnNew_clicked();
 }
 
@@ -42,6 +44,7 @@ void QFEFCSSimMainWidnow::loadSettings()
     ProgramOptions::getConfigQLineEdit(ui->edtSimulator, "QFEFCSSimMainWidnow/edtSimulator", sim);
     ProgramOptions::getConfigQSpinBox(ui->spinMaxProcesses, "QFEFCSSimMainWidnow/spinMaxProcesses", 1);
     ProgramOptions::getConfigQCheckBox(ui->chkSaveLog, "QFEFCSSimMainWidnow/chkSaveLog", true);
+    menuRecent.readSettings(*(ProgramOptions::getInstance()->getQSettings()), "QFEFCSSimMainWidnow/recentfiles/");
 }
 
 void QFEFCSSimMainWidnow::saveSettings()
@@ -52,6 +55,7 @@ void QFEFCSSimMainWidnow::saveSettings()
     ProgramOptions::setConfigQLineEdit(ui->edtSimulatorSpectra, "QFEFCSSimMainWidnow/edtSimulatorSpectra");
     ProgramOptions::setConfigQSpinBox(ui->spinMaxProcesses, "QFEFCSSimMainWidnow/spinMaxProcesses");
     ProgramOptions::setConfigQCheckBox(ui->chkSaveLog, "QFEFCSSimMainWidnow/chkSaveLog");
+    menuRecent.storeSettings(*(ProgramOptions::getInstance()->getQSettings()), "QFEFCSSimMainWidnow/recentfiles/");
 }
 
 bool QFEFCSSimMainWidnow::mayStartProcess() const
@@ -92,13 +96,38 @@ void QFEFCSSimMainWidnow::on_btnOpen_clicked()
         return;
     }
     connect(tabs.last(), SIGNAL(textChanged(bool)), this, SLOT(textChanged(bool)));
+    connect(tabs.last(), SIGNAL(filenameChanged(QString)), this, SLOT(filenameChanged(QString)));
+    filenameChanged(tabs.last()->getFullFilename());
     ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(lastTab(), tabs.last()->getFilename()));
+}
+
+void QFEFCSSimMainWidnow::loadFile(const QString& filename)
+{
+    tabs.append(new QFEFCSSimScriptTab(this));
+    if (!tabs.last()->loadFile(filename)) {
+        delete tabs.last();
+        tabs.removeLast();
+        return;
+    }
+    connect(tabs.last(), SIGNAL(textChanged(bool)), this, SLOT(textChanged(bool)));
+    connect(tabs.last(), SIGNAL(filenameChanged(QString)), this, SLOT(filenameChanged(QString)));
+    filenameChanged(tabs.last()->getFullFilename());
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(lastTab(), tabs.last()->getFilename()));
+}
+
+void QFEFCSSimMainWidnow::filenameChanged(const QString &filename)
+{
+    if (QFile::exists(filename)) {
+        menuRecent.addRecentFile(filename);
+    }
 }
 
 void QFEFCSSimMainWidnow::on_btnNew_clicked()
 {
     tabs.append(new QFEFCSSimScriptTab(this));
     connect(tabs.last(), SIGNAL(textChanged(bool)), this, SLOT(textChanged(bool)));
+    connect(tabs.last(), SIGNAL(filenameChanged(QString)), this, SLOT(filenameChanged(QString)));
+    filenameChanged(tabs.last()->getFullFilename());
     ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(lastTab(), tabs.last()->getFilename()));
 }
 
@@ -111,6 +140,8 @@ void QFEFCSSimMainWidnow::on_btnNewFromTemplate_clicked()
         return;
     }
     connect(tabs.last(), SIGNAL(textChanged(bool)), this, SLOT(textChanged(bool)));
+    connect(tabs.last(), SIGNAL(filenameChanged(QString)), this, SLOT(filenameChanged(QString)));
+    filenameChanged(tabs.last()->getFullFilename());
     ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(lastTab(), tabs.last()->getFilename()));
 }
 
