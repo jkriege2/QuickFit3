@@ -27,6 +27,7 @@
 #include <QList>
 #include "lib_imexport.h"
 #include <QVariant>
+#include "qfaction.h"
 
 /*! \brief enhanced QLineEdit which adds some features missing in the basic Qt implementation
     \ingroup qf3lib_widgets

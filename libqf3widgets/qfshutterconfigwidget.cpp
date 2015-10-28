@@ -153,18 +153,18 @@ void QFShutterConfigWidget::createWidgets() {
 }
 
 void QFShutterConfigWidget::createActions() {
-    actConnect=new QAction(QIcon(":/libqf3widgets/connect_shutter.png"), tr("Connect to shutter driver/hardware ..."), this);
+    actConnect=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/connect_shutter.png"), tr("Connect to shutter driver/hardware ..."), this);
     actConnect->setCheckable(true);
     connect(actConnect, SIGNAL(toggled(bool)), this, SLOT(disConnect()));
     btnConnect->setDefaultAction(actConnect);
 
 
-    actConfigure=new QAction(QIcon(":/libqf3widgets/configure_shutter.png"), tr("Configure shutter ..."), this);
+    actConfigure=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/configure_shutter.png"), tr("Configure shutter ..."), this);
     connect(actConfigure, SIGNAL(triggered()), this, SLOT(configure()));
     btnConfigure->setDefaultAction(actConfigure);
 
 
-    actState=new QAction(iconClosed, tr("closed"), this);
+    actState=new QFActionWithNoMenuRole(iconClosed, tr("closed"), this);
     actState->setCheckable(true);
     actState->setToolTip(tr("click to open and close the shutter"));
     connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));

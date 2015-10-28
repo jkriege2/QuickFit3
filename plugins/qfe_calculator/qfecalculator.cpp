@@ -73,7 +73,7 @@ void QFECalculator::projectChanged(QFProject* oldProject, QFProject* project) {
 void QFECalculator::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
     
-    actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Calculator"), this);
+    actStartPlugin=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Calculator"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
     QMenu* extm=services->getMenu("tools");
     if (extm) {

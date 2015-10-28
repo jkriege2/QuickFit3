@@ -69,15 +69,15 @@ QFRawDataRecord* QFPRDRFCS::createRecord(QFProject* parent) {
 
 void QFPRDRFCS::registerToMenu(QMenu* menu) {
     QMenu* smenu=menu->addMenu(QIcon(":/fcs_logo.png"), tr("FCS/DLS data"));
-    QAction* actFCS=new QAction(QIcon(":/fcs_open.png"), tr("Open FCS/DLS Data from File"), parentWidget);
+    QAction* actFCS=new QFActionWithNoMenuRole(QIcon(":/fcs_open.png"), tr("Open FCS/DLS Data from File"), parentWidget);
     actFCS->setStatusTip(tr("opens a file selection dialog and inserts a new FCS/DLS raw data record for each selected file"));
     connect(actFCS, SIGNAL(triggered()), this, SLOT(insertFCS()));
     smenu->addAction(actFCS);
-    QAction* actMultiFCS=new QAction(QIcon(":/fcs_multifileopen.png"), tr("Insert Multi-File FCS/DLS Data"), parentWidget);
+    QAction* actMultiFCS=new QFActionWithNoMenuRole(QIcon(":/fcs_multifileopen.png"), tr("Insert Multi-File FCS/DLS Data"), parentWidget);
     actMultiFCS->setStatusTip(tr("opens a file selection dialog and inserts a single FCS/DLS raw data record containing all selected files"));
     connect(actMultiFCS, SIGNAL(triggered()), this, SLOT(insertMultiFileFCS()));
     smenu->addAction(actMultiFCS);
-    QAction* actFCSSim=new QAction(QIcon(":/fcs_simulate.png"), tr("FCS/DLS data from fit function"), parentWidget);
+    QAction* actFCSSim=new QFActionWithNoMenuRole(QIcon(":/fcs_simulate.png"), tr("FCS/DLS data from fit function"), parentWidget);
     connect(actFCSSim, SIGNAL(triggered()), this, SLOT(openSimulator()));
     smenu->addAction(actFCSSim);
 }
@@ -85,10 +85,10 @@ void QFPRDRFCS::registerToMenu(QMenu* menu) {
 void QFPRDRFCS::init()
 {
     QMenu* tmenu=services->getMenu("tools")->addMenu(QIcon(getIconFilename()), tr("FCS/DLS tools"));
-    QAction* actBackground=new QAction(tr("set &background intensity in FCS/DLS datasets"), parentWidget);
+    QAction* actBackground=new QFActionWithNoMenuRole(tr("set &background intensity in FCS/DLS datasets"), parentWidget);
     connect(actBackground, SIGNAL(triggered()), this, SLOT(setBackgroundInFCS()));
     tmenu->addAction(actBackground);
-    QAction* actOffset=new QAction(tr("subtract &offset of correlation functions"), parentWidget);
+    QAction* actOffset=new QFActionWithNoMenuRole(tr("subtract &offset of correlation functions"), parentWidget);
     connect(actOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
     tmenu->addAction(actOffset);
     services->registerWizard("project_wizards", tr("FCS Wizard"), QIcon(getIconFilename()), this, SLOT(startFCSProjectWizard()));

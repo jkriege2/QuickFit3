@@ -34,10 +34,10 @@ QFFitFunctionComboBox::QFFitFunctionComboBox(QWidget *parent) :
     //m_model=new QFSimpleTreeModel(this);
     updateFitFunctions("");
     connect(QFFitFunctionManager::getInstance(), SIGNAL(fitFunctionsChanged()), this, SLOT(reloadFitFunctions()));
-    actHelp=new QAction(QIcon(":/lib/help/help.png"), tr("Fit model help ..."), this);
+    actHelp=new QFActionWithNoMenuRole(QIcon(":/lib/help/help.png"), tr("Fit model help ..."), this);
     connect(actHelp, SIGNAL(triggered()), this, SLOT(showHelpCurrent()));
     addAction(actHelp);
-    actSelectModel=new QAction(QIcon(":/lib/select_fitfunction.png"), tr("select fit model ..."), this);
+    actSelectModel=new QFActionWithNoMenuRole(QIcon(":/lib/select_fitfunction.png"), tr("select fit model ..."), this);
     connect(actSelectModel, SIGNAL(triggered()), this, SLOT(selectModelDialog()));
     addAction(actSelectModel);
     setModel(m_model);

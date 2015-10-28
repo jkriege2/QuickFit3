@@ -46,58 +46,58 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
     selectionHeight=0;
     selectionEditing=false;
 
-    actMaskSelected=new QAction(QIcon(":/qfrdrmaskeditor/mask.png"), tr("mask &selected pixels"), this);
+    actMaskSelected=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/mask.png"), tr("mask &selected pixels"), this);
     actMaskSelected->setToolTip(tr("mask all currently selected pixels"));
     connect(actMaskSelected, SIGNAL(triggered()), this, SLOT(maskSelected()));
 
-    actUnmaskSelected=new QAction(QIcon(":/qfrdrmaskeditor/unmask.png"), tr("unmask &selected pixels"), this);
+    actUnmaskSelected=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/unmask.png"), tr("unmask &selected pixels"), this);
     actUnmaskSelected->setToolTip(tr("unmask all currently selected pixels"));
     connect(actUnmaskSelected, SIGNAL(triggered()), this, SLOT(unmaskSelected()));
 
-    actSaveMask=new QAction(QIcon(":/qfrdrmaskeditor/savemask.png"), tr("&save mask"), parentWidget);
+    actSaveMask=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/savemask.png"), tr("&save mask"), parentWidget);
     actSaveMask->setToolTip(tr("save the mask to harddisk"));
     connect(actSaveMask, SIGNAL(triggered()), this, SLOT(saveMask()));
-    actLoadMask=new QAction(QIcon(":/qfrdrmaskeditor/loadmask.png"), tr("&load mask"), parentWidget);
+    actLoadMask=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/loadmask.png"), tr("&load mask"), parentWidget);
     actLoadMask->setToolTip(tr("load a mask from harddisk"));
     connect(actLoadMask, SIGNAL(triggered()), this, SLOT(loadMask()));
-    actCopyMask=new QAction(QIcon(":/qfrdrmaskeditor/copymask.png"), tr("&copy mask"), parentWidget);
+    actCopyMask=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/copymask.png"), tr("&copy mask"), parentWidget);
     actCopyMask->setToolTip(tr("copy the mask to clipboard"));
     connect(actCopyMask, SIGNAL(triggered()), this, SLOT(copyMask()));
-    actPasteMask=new QAction(QIcon(":/qfrdrmaskeditor/pastemask.png"), tr("&paste mask"), parentWidget);
+    actPasteMask=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/pastemask.png"), tr("&paste mask"), parentWidget);
     actPasteMask->setToolTip(tr("paste a mask from clipboard"));
     connect(actPasteMask, SIGNAL(triggered()), this, SLOT(pasteMask()));
 
-    actClearMask=new QAction(QIcon(":/qfrdrmaskeditor/clearmask.png"), tr("&clear mask"), parentWidget);
+    actClearMask=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/clearmask.png"), tr("&clear mask"), parentWidget);
     actClearMask->setToolTip(tr("clear the current mask"));
     connect(actClearMask, SIGNAL(triggered()), this, SLOT(clearMask()));
-    actInvertMask=new QAction(QIcon(":/qfrdrmaskeditor/invertmask.png"), tr("&invert mask"), parentWidget);
+    actInvertMask=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/invertmask.png"), tr("&invert mask"), parentWidget);
     actInvertMask->setToolTip(tr("invert the current mask"));
     connect(actInvertMask, SIGNAL(triggered()), this, SLOT(invertMask()));
 
-    actUndoMask=new QAction(QIcon(":/qfrdrmaskeditor/undomask.png"), tr("&undo"), parentWidget);
+    actUndoMask=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/undomask.png"), tr("&undo"), parentWidget);
     actUndoMask->setToolTip(tr("undo last change to mask"));
     connect(actUndoMask, SIGNAL(triggered()), this, SLOT(undoMask()));
-    actRedoMask=new QAction(QIcon(":/qfrdrmaskeditor/redomask.png"), tr("&redo"), parentWidget);
+    actRedoMask=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/redomask.png"), tr("&redo"), parentWidget);
     actRedoMask->setToolTip(tr("redo peviously undone change to mask"));
     connect(actRedoMask, SIGNAL(triggered()), this, SLOT(redoMask()));
 
-    actMaskBorder=new QAction(QIcon(":/qfrdrmaskeditor/maskborder.png"), tr("mask &border"), parentWidget);
+    actMaskBorder=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/maskborder.png"), tr("mask &border"), parentWidget);
     actMaskBorder->setToolTip(tr("mask a border around the image"));
     connect(actMaskBorder, SIGNAL(triggered()), this, SLOT(maskBorder()));
 
-    actMaskByImage=new QAction(tr("mask by image"), parentWidget);
+    actMaskByImage=new QFActionWithNoMenuRole(tr("mask by image"), parentWidget);
     actMaskByImage->setToolTip(tr("create a mask by segmenting an overview image"));
     connect(actMaskByImage, SIGNAL(triggered()), this, SLOT(maskByImage()));
 
-    actCopyMaskToGroup=new QAction(tr("copy mask to all RDRs in same &group"), parentWidget);
+    actCopyMaskToGroup=new QFActionWithNoMenuRole(tr("copy mask to all RDRs in same &group"), parentWidget);
     actCopyMaskToGroup->setToolTip(tr(""));
     connect(actCopyMaskToGroup, SIGNAL(triggered()), this, SLOT(copyMaskToGroup()));
 
-    actCopyMaskToFiles=new QAction(tr("copy mask to other RDRs"), parentWidget);
+    actCopyMaskToFiles=new QFActionWithNoMenuRole(tr("copy mask to other RDRs"), parentWidget);
     actCopyMaskToFiles->setToolTip(tr(""));
     connect(actCopyMaskToFiles, SIGNAL(triggered()), this, SLOT(copyMaskToFiles()));
 
-    actCopyMaskToFilesOfSameType=new QAction(tr("copy mask to other RDRs of the same type"), parentWidget);
+    actCopyMaskToFilesOfSameType=new QFActionWithNoMenuRole(tr("copy mask to other RDRs of the same type"), parentWidget);
     actCopyMaskToFilesOfSameType->setToolTip(tr(""));
     connect(actCopyMaskToFilesOfSameType, SIGNAL(triggered()), this, SLOT(copyMaskToFilesOfSameType()));
 
@@ -111,10 +111,10 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
     actMode->setDefaultWidget(cmbMode);
     actMode->setVisible(false);
 
-    actImagesZoom=new QAction(QIcon(":/qfrdrmaskeditor/zoom.png"), tr("zoom"), this);
+    actImagesZoom=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/zoom.png"), tr("zoom"), this);
     actImagesZoom->setToolTip(tr("in this mode the user may zoom into a plot by drawing a rectangle (draging with the left mouse key)\nA click toggles the current selection/mask position."));
     actImagesZoom->setCheckable(true);
-    actImagesDrawPoints=new QAction(QIcon(":/qfrdrmaskeditor/draw_point.png"), tr("point-wise mask editing"), this);
+    actImagesDrawPoints=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/draw_point.png"), tr("point-wise mask editing"), this);
     actImagesDrawPoints->setToolTip(tr("in this mode the user may click on single points.<br>"
                                  "to add and remove them to/from the mask. A click<br>"
                                  "will toggle the state of the clicked pixel<ul>"
@@ -122,7 +122,7 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
                                  "<li>SHIFT: pixel will be removed from current mask</li>"
                                  "</ul>"));
     actImagesDrawPoints->setCheckable(true);
-    actImagesDrawRectangle=new QAction(QIcon(":/qfrdrmaskeditor/draw_rectangle.png"), tr("rectangular mask editing"), this);
+    actImagesDrawRectangle=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/draw_rectangle.png"), tr("rectangular mask editing"), this);
     actImagesDrawRectangle->setToolTip(tr("in this mode the user may draw a rectangle.<br>"
                                  "All pixels inside the rectangle will be selected<br>"
                                  "when the user releases the left mouse key. You may<br>"
@@ -132,7 +132,7 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
                                  "</ul>"));
     actImagesDrawRectangle->setCheckable(true);
 
-    actImagesDrawCircle=new QAction(QIcon(":/qfrdrmaskeditor/draw_circle.png"), tr("circular mask editing"), this);
+    actImagesDrawCircle=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/draw_circle.png"), tr("circular mask editing"), this);
     actImagesDrawCircle->setToolTip(tr("in this mode the user may draw a circle.<br>"
                                  "All pixels inside the cirle will be selected<br>"
                                  "when the user releases the left mouse key. The point of first<br>"
@@ -142,7 +142,7 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
                                  "<li>SHIFT: pixels will be removed from current mask</li>"
                                  "</ul>"));
     actImagesDrawCircle->setCheckable(true);
-    actImagesDrawEllipse=new QAction(QIcon(":/qfrdrmaskeditor/draw_ellipse.png"), tr("elliptical mask editing"), this);
+    actImagesDrawEllipse=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/draw_ellipse.png"), tr("elliptical mask editing"), this);
     actImagesDrawEllipse->setToolTip(tr("in this mode the user may draw a ellipse.<br>"
                                  "All pixels inside the ellipse will be selected<br>"
                                 "when the user releases the left mouse key. The point of first<br>"
@@ -152,7 +152,7 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
                                  "<li>SHIFT: pixels will be removed from current mask</li>"
                                  "</ul>"));
     actImagesDrawEllipse->setCheckable(true);
-    actImagesDrawLine=new QAction(QIcon(":/qfrdrmaskeditor/draw_line.png"), tr("line mask editing"), this);
+    actImagesDrawLine=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/draw_line.png"), tr("line mask editing"), this);
     actImagesDrawLine->setToolTip(tr("in this mode the user may draw a line.<br>"
                                  "All pixels on the line will be selected<br>"
                                  "when the user releases the left mouse key. You may<br>"
@@ -162,7 +162,7 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
                                  "</ul>"));
     actImagesDrawLine->setCheckable(true);
 
-    actImagesScribble=new QAction(QIcon(":/qfrdrmaskeditor/draw_scribble.png"), tr("scribble mask editing"), this);
+    actImagesScribble=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/draw_scribble.png"), tr("scribble mask editing"), this);
     actImagesScribble->setToolTip(tr("in this mode the user may select/deselect pixels by.<br>"
                                  "keeping the left mouse button pressed and moving the mouse<br>"
                                  "over the image. Depending on the key pressed on the keyboard,<br>"

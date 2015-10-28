@@ -27,10 +27,10 @@
 QFCorrelationMaskTools::QFCorrelationMaskTools(QWidget *parentWidget, const QString& settingsPrefix) :
     QFRDRImageMaskEditTools(parentWidget, settingsPrefix)
 {
-    actFindErroneousPixels=new QAction(tr("Filter CFs for &outliers ..."), this);
+    actFindErroneousPixels=new QFActionWithNoMenuRole(tr("Filter CFs for &outliers ..."), this);
     connect(actFindErroneousPixels, SIGNAL(triggered()), this, SLOT(findErroneousPixels()));
 
-    actMaskAllZero=new QAction(tr("mask CFs that are all 0 ..."), this);
+    actMaskAllZero=new QFActionWithNoMenuRole(tr("mask CFs that are all 0 ..."), this);
     connect(actMaskAllZero, SIGNAL(triggered()), this, SLOT(maskAllZeroCorrelations()));
 }
 

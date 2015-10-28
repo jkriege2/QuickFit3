@@ -100,40 +100,40 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     imageFilters.clear();
     ui->cmbFileformat->clear();
 
-    actCropCenter=new QAction(tr("crop center ..."), this);
+    actCropCenter=new QFActionWithNoMenuRole(tr("crop center ..."), this);
     connect(actCropCenter, SIGNAL(triggered()), this, SLOT(cropCenter()));
     ui->btnSelCrop->addAction(actCropCenter);
 
-    actCropLeftCenter=new QAction(tr("crop left center ..."), this);
+    actCropLeftCenter=new QFActionWithNoMenuRole(tr("crop left center ..."), this);
     connect(actCropLeftCenter, SIGNAL(triggered()), this, SLOT(cropLeftCenter()));
     ui->btnSelCrop->addAction(actCropLeftCenter);
 
-    actCropRightCenter=new QAction(tr("crop right center ..."), this);
+    actCropRightCenter=new QFActionWithNoMenuRole(tr("crop right center ..."), this);
     connect(actCropRightCenter, SIGNAL(triggered()), this, SLOT(cropRightCenter()));
     ui->btnSelCrop->addAction(actCropRightCenter);
 
-    actCropTopCenter=new QAction(tr("crop top center ..."), this);
+    actCropTopCenter=new QFActionWithNoMenuRole(tr("crop top center ..."), this);
     connect(actCropTopCenter, SIGNAL(triggered()), this, SLOT(cropTopCenter()));
     ui->btnSelCrop->addAction(actCropTopCenter);
 
-    actCropBottomCenter=new QAction(tr("crop bottom center ..."), this);
+    actCropBottomCenter=new QFActionWithNoMenuRole(tr("crop bottom center ..."), this);
     connect(actCropBottomCenter, SIGNAL(triggered()), this, SLOT(cropBottomCenter()));
     ui->btnSelCrop->addAction(actCropBottomCenter);
 
 
-    actCropLeftHalf=new QAction(tr("crop left half-image ..."), this);
+    actCropLeftHalf=new QFActionWithNoMenuRole(tr("crop left half-image ..."), this);
     connect(actCropLeftHalf, SIGNAL(triggered()), this, SLOT(cropLeftHalf()));
     ui->btnSelCrop->addAction(actCropLeftHalf);
 
-    actCropRightHalf=new QAction(tr("crop right half-image ..."), this);
+    actCropRightHalf=new QFActionWithNoMenuRole(tr("crop right half-image ..."), this);
     connect(actCropRightHalf, SIGNAL(triggered()), this, SLOT(cropRightHalf()));
     ui->btnSelCrop->addAction(actCropRightHalf);
 
-    actCropTopHalf=new QAction(tr("crop top half-image ..."), this);
+    actCropTopHalf=new QFActionWithNoMenuRole(tr("crop top half-image ..."), this);
     connect(actCropTopHalf, SIGNAL(triggered()), this, SLOT(cropTopHalf()));
     ui->btnSelCrop->addAction(actCropTopHalf);
 
-    actCropBottomHalf=new QAction(tr("crop bottom half-image ..."), this);
+    actCropBottomHalf=new QFActionWithNoMenuRole(tr("crop bottom half-image ..."), this);
     connect(actCropBottomHalf, SIGNAL(triggered()), this, SLOT(cropBottomHalf()));
     ui->btnSelCrop->addAction(actCropBottomHalf);
 

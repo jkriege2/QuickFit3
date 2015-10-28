@@ -4534,7 +4534,7 @@ void MainWindow::updateWindowsList()
 
     for (int i=0; i<wl.size(); i++) {
         if (wl[i] && (wl[i]->parent()==NULL || wl[i]->parent()==this) && wl[i]->isVisible() && (actsWindows.key(wl[i], NULL)==NULL)) {
-            QAction* act=new QAction(wl[i]->windowTitle(), this);
+            QAction* act=new QFActionWithNoMenuRole(wl[i]->windowTitle(), this);
             connect(act, SIGNAL(triggered()), this, SLOT(raiseOpenedWindow()));
             actsWindows[act]=wl[i];
             menuOpenWindows->addAction(act);

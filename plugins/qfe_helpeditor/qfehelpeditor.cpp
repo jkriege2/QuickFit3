@@ -77,9 +77,9 @@ void QFEHelpEditor::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
 	services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
     
-    actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Online-Help Editor [last window]"), this);
+    actStartPlugin=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Online-Help Editor [last window]"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
-    actStartNewPlugin=new QAction(QIcon(getIconFilename()), tr("Online-Help Editor [new window]"), this);
+    actStartNewPlugin=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Online-Help Editor [new window]"), this);
     connect(actStartNewPlugin, SIGNAL(triggered()), this, SLOT(startNewPlugin()));
     QMenu* extm=services->getMenu("tools");
     if (extm) {

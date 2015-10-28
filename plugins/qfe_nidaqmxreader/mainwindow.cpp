@@ -19,19 +19,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loadSettings(QString(), "qfe_nidaqmxreader/");
 
-    actExit=new QAction(QIcon(":/qfe_nidaqmxreader/images/close.png"), tr("&Exit"), this);
+    actExit=new QFActionWithNoMenuRole(QIcon(":/qfe_nidaqmxreader/images/close.png"), tr("&Exit"), this);
     connect(actExit, SIGNAL(triggered()), this, SLOT(close()));
-    actStartAcquisition=new QAction(QIcon(":/qfe_nidaqmxreader/images/play.png"), tr("Start &Acquisition"), this);
+    actStartAcquisition=new QFActionWithNoMenuRole(QIcon(":/qfe_nidaqmxreader/images/play.png"), tr("Start &Acquisition"), this);
     actStartAcquisition->setCheckable(true);
     actStartAcquisition->setChecked(false);
 
-    actStartPreview=new QAction(QIcon(":/qfe_nidaqmxreader/images/preview.png"), tr("Start &Preview"), this);
+    actStartPreview=new QFActionWithNoMenuRole(QIcon(":/qfe_nidaqmxreader/images/preview.png"), tr("Start &Preview"), this);
     actStartPreview->setCheckable(true);
     actStartPreview->setChecked(false);
 
-    actSaveINI=new QAction(tr("Save Program Settings (INI) ..."), this);
+    actSaveINI=new QFActionWithNoMenuRole(tr("Save Program Settings (INI) ..."), this);
     connect(actSaveINI, SIGNAL(triggered()), this, SLOT(saveINI()));
-    actLoadINI=new QAction(tr("Load Program Settings (INI) ..."), this);
+    actLoadINI=new QFActionWithNoMenuRole(tr("Load Program Settings (INI) ..."), this);
     connect(actLoadINI, SIGNAL(triggered()), this, SLOT(loadINI()));
 
 

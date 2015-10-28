@@ -90,7 +90,7 @@ void QFExtensionLinearStagePI2::initExtension() {
         }
     }
 
-    actCalibrateJoysticks=new QAction(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks, v2"), this);
+    actCalibrateJoysticks=new QFActionWithNoMenuRole(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks, v2"), this);
     connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));
     if (services) {
         QMenu* m=services->getMenu("extensions");

@@ -186,13 +186,13 @@ void QFMeasurementDeviceConfigWidget::createWidgets() {
 }
 
 void QFMeasurementDeviceConfigWidget::createActions() {
-    actConnect=new QAction(QIcon(":/libqf3widgets/connect_measurementdevice.png"), tr("Connect to measurement device driver/hardware ..."), this);
+    actConnect=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/connect_measurementdevice.png"), tr("Connect to measurement device driver/hardware ..."), this);
     actConnect->setCheckable(true);
     connect(actConnect, SIGNAL(toggled(bool)), this, SLOT(disConnect()));
     btnConnect->setDefaultAction(actConnect);
 
 
-    actConfigure=new QAction(QIcon(":/libqf3widgets/configure_measurementdevice.png"), tr("Configure measurement device ..."), this);
+    actConfigure=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/configure_measurementdevice.png"), tr("Configure measurement device ..."), this);
     connect(actConfigure, SIGNAL(triggered()), this, SLOT(configure()));
     btnConfigure->setDefaultAction(actConfigure);
 

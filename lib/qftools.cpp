@@ -186,7 +186,7 @@ void qfFree(void* data) {
 
 
 QAction* getSeparatorAction(QObject* parent) {
-    QAction* a=new QAction(parent);
+    QAction* a=new QFActionWithNoMenuRole(parent);
     a->setSeparator(true);
     return a;
 }
@@ -204,7 +204,7 @@ QAction* createActionAndButton(QToolButton*& button, const QString& text, QWidge
 }
 
 QAction* createActionAndButton(QToolButton*& button, const QIcon& icon, const QString& text, QWidget* parent) {
-    QAction* act=new QAction(icon, text, parent);
+    QAction* act=new QFActionWithNoMenuRole(icon, text, parent);
     button=new QToolButton(parent);
     button->setDefaultAction(act);
     return act;
@@ -223,7 +223,7 @@ QToolButton* createButtonAndAction(QAction*& action, const QString& text, QWidge
 }
 
 QToolButton* createButtonAndAction(QAction*& action, const QIcon& icon, const QString& text, QWidget* parent) {
-    action=new QAction(icon, text, parent);
+    action=new QFActionWithNoMenuRole(icon, text, parent);
     QToolButton* button=new QToolButton(parent);
     button->setDefaultAction(action);
     return button;

@@ -30,6 +30,7 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QPrinterInfo>
+#include "qfaction.h"
 
 /*! \brief this class extends the QTableView
     \ingroup qf3lib_widgets

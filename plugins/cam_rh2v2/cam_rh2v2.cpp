@@ -135,7 +135,7 @@ void QFExtensionCameraRh2v2::initExtension() {
     services->log_global_text(tr("%2initializing extension '%1' ...\n").arg(getName()).arg(LOG_PREFIX));
     bitfileMaster=autoflashbitfileMaster=services->getOptions()->getAssetsDirectory()+"/plugins/"+getID()+"/radhard2_top_cell_master.bit";
     bitfileSlave=autoflashbitfileSlave=services->getOptions()->getAssetsDirectory()+"/plugins/"+getID()+"/radhard2_top_cell_slave.bit";
-    actProgramFPGA=new QAction(QIcon(":/cam_radhard2/flash.png"), tr("Flash FPGAs"), this);
+    actProgramFPGA=new QFActionWithNoMenuRole(QIcon(":/cam_radhard2/flash.png"), tr("Flash FPGAs"), this);
     connect(actProgramFPGA, SIGNAL(triggered()), this, SLOT(programFPGA()));
     QMenu* extm=services->getMenu("extensions");
     if (extm) {

@@ -45,7 +45,7 @@ QFEvaluationItem* QFEValColocalization::createRecord(QFProject* parent) {
 
 
 void QFEValColocalization::registerToMenu(QMenu* menu) {
-    QAction* actAddEval=new QAction(QIcon(getIconFilename()), getName(), parentWidget);
+    QAction* actAddEval=new QFActionWithNoMenuRole(QIcon(getIconFilename()), getName(), parentWidget);
     actAddEval->setStatusTip(getDescription());
     connect(actAddEval, SIGNAL(triggered()), this, SLOT(insertEvaluation()));
     menu->addAction(actAddEval);

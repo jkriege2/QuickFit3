@@ -139,7 +139,7 @@ void QFECamSystemcamera::initExtension() {
         if (vids[i]->getConfigDialogCount()>0) {
             QMenu* m=scm->addMenu(cameras[i].c_str());
             for (int d=0; d<vids[i]->getConfigDialogCount(); d++) {
-                QAction* a=new QAction(vids[i]->getConfigDialogName(d).c_str(), this);
+                QAction* a=new QFActionWithNoMenuRole(vids[i]->getConfigDialogName(d).c_str(), this);
                 dlgActions[a]=qMakePair(vids[i], d);
                 m->addAction(a);
                 connect(a, SIGNAL(triggered()), this, SLOT(dlgActionTriggered()));

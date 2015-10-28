@@ -28,7 +28,7 @@
 #include <QString>
 #include <QtPlugin>
 #include <QVariant>
-
+#include "qfaction.h"
 class QFPluginEvaluationItem; // forward
 class QFPluginRawDataRecord; // forward
 class QFExtension; // forward

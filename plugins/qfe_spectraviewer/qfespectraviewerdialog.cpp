@@ -64,11 +64,11 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
 
     QToolBar* mainToolbar=new QToolBar(plugin->getID()+"maintoolbar", this);
     ui->mainLayout->insertWidget(0,mainToolbar);
-    QAction* actClose=new QAction(QIcon(":/lib/exit.png"), tr("&Close"), this);
+    QAction* actClose=new QFActionWithNoMenuRole(QIcon(":/lib/exit.png"), tr("&Close"), this);
     connect(actClose, SIGNAL(triggered()), this, SLOT(close()));
     mainToolbar->addAction(actClose);
     mainToolbar->addSeparator();
-    QAction* actHelp=new QAction(QIcon(":/lib/help.png"), tr("Online-&Help"), this);
+    QAction* actHelp=new QFActionWithNoMenuRole(QIcon(":/lib/help.png"), tr("Online-&Help"), this);
     connect(actHelp, SIGNAL(triggered()), this, SLOT(showHelp()));
     mainToolbar->addAction(actHelp);
     mainToolbar->addSeparator();
@@ -81,20 +81,20 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
     ui->btnNewFluorophore->setText(tr("create new ..."));
 
     //btn->setPopupMode(QToolButton::InstantPopup);
-    QAction* actNewLightsource=new QAction(QIcon(":/qfe_spectraviewer/lightsource.png"), tr("... &lightsource"), this);
+    QAction* actNewLightsource=new QFActionWithNoMenuRole(QIcon(":/qfe_spectraviewer/lightsource.png"), tr("... &lightsource"), this);
     connect(actNewLightsource, SIGNAL(triggered()), this, SLOT(createLightSourceSpectrum()));
     //btn->addAction(actNewLightsource);
     ui->btnNewFluorophore->addAction(actNewLightsource);
-    QAction* actNewFilter=new QAction(QIcon(":/qfe_spectraviewer/filter.png"), tr("... &filter"), this);
+    QAction* actNewFilter=new QFActionWithNoMenuRole(QIcon(":/qfe_spectraviewer/filter.png"), tr("... &filter"), this);
     connect(actNewFilter, SIGNAL(triggered()), this, SLOT(createFilterSpectrum()));
     //btn->addAction(actNewFilter);
     ui->btnNewFluorophore->addAction(actNewFilter);
-    QAction* actFluorophore=new QAction(QIcon(":/qfe_spectraviewer/fluorophore.png"), tr("... f&luorophore"), this);
+    QAction* actFluorophore=new QFActionWithNoMenuRole(QIcon(":/qfe_spectraviewer/fluorophore.png"), tr("... f&luorophore"), this);
     connect(actFluorophore, SIGNAL(triggered()), this, SLOT(createFluorophoreSpectrum()));
     //btn->addAction(actFluorophore);
     ui->btnNewFluorophore->addAction(actFluorophore);
     //mainToolbar->addWidget(btn);
-    QAction* actDetector=new QAction(QIcon(":/qfe_spectraviewer/detector.png"), tr("... &detector"), this);
+    QAction* actDetector=new QFActionWithNoMenuRole(QIcon(":/qfe_spectraviewer/detector.png"), tr("... &detector"), this);
     connect(actDetector, SIGNAL(triggered()), this, SLOT(createDetectorSpectrum()));
     //btn->addAction(actDetector);
     ui->btnNewFluorophore->addAction(actDetector);
@@ -102,10 +102,10 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
 
     mainToolbar->addSeparator();
 
-    QAction* actSpillover=new QAction(tr("&Spillover Table"), this);
+    QAction* actSpillover=new QFActionWithNoMenuRole(tr("&Spillover Table"), this);
     connect(actSpillover, SIGNAL(triggered()), this, SLOT(calcSpilloverTable()));
     mainToolbar->addAction(actSpillover);
-    QAction* actFRET=new QAction(tr("&FRET Calculator"), this);
+    QAction* actFRET=new QFActionWithNoMenuRole(tr("&FRET Calculator"), this);
     connect(actFRET, SIGNAL(triggered()), this, SLOT(FRETCalculator()));
     mainToolbar->addAction(actFRET);
     actFRET->setVisible(true);

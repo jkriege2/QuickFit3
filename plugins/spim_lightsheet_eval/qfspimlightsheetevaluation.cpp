@@ -48,7 +48,7 @@ QFEvaluationItem* QFSPIMLightsheetEvaluation::createRecord(QFProject* parent) {
 
 
 void QFSPIMLightsheetEvaluation::registerToMenu(QMenu* menu) {
-    QAction* actAddEval=new QAction(QIcon(":/spim_lightsheet_eval/qfspimlightsheetevaluation_small.png"), getName(), parentWidget);
+    QAction* actAddEval=new QFActionWithNoMenuRole(QIcon(":/spim_lightsheet_eval/qfspimlightsheetevaluation_small.png"), getName(), parentWidget);
     actAddEval->setStatusTip(getDescription());
     connect(actAddEval, SIGNAL(triggered()), this, SLOT(insertEvaluation()));
     menu->addAction(actAddEval);

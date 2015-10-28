@@ -122,7 +122,7 @@ void QFExtensionServoPololuMaestro::initExtension() {
         }
     }
 
-    QAction* action=new QAction(QIcon(getIconFilename()), tr("Test Pololu Maestro"), this);
+    QAction* action=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Test Pololu Maestro"), this);
     connect(action, SIGNAL(triggered()), this, SLOT(showTester()));
     if (services) {
         QMenu* m=services->getMenu("extensions");

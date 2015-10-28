@@ -963,7 +963,7 @@ void QFCurveFitEvaluationEditor::replotData() {
 //            if (ffunc->isParameterXYEstimateable(i)
 //                    && (d.widgetType==QFFitFunction::LogFloatNumber || d.widgetType==QFFitFunction::FloatNumber)
 //                    && d.fit) {
-//                QAction* act=new QAction(tr("estimate '%1'").arg(d.name), this);
+//                QAction* act=new QFActionWithNoMenuRole(tr("estimate '%1'").arg(d.name), this);
 //                connect(act, SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
 //                actsEstimate.insert(act, id);
 //                menuEstimate->addAction(act);

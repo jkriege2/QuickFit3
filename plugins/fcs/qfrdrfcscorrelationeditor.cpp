@@ -227,9 +227,9 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     splitter->setStretchFactor(0,5);
     splitter->setStretchFactor(1,1);
 
-    actCopyNormalizedACF=new QAction(tr("copy normalized CFs to table"), this);
+    actCopyNormalizedACF=new QFActionWithNoMenuRole(tr("copy normalized CFs to table"), this);
     connect(actCopyNormalizedACF, SIGNAL(triggered()), this, SLOT(copyNormalizedACFs()));
-    actCorrectOffset=new QAction(tr("correct CFs for offset"), this);
+    actCorrectOffset=new QFActionWithNoMenuRole(tr("correct CFs for offset"), this);
     connect(actCorrectOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
 
     menuMask=propertyEditor->addMenu("&Selection/Mask", 0);

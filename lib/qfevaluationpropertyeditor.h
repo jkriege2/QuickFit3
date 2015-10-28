@@ -31,6 +31,7 @@
 #include <QtGui>
 #endif
 
+#include "qfaction.h"
 
 #include <QSortFilterProxyModel>
 #include "qfproject.h"

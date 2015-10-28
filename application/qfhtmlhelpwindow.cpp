@@ -175,7 +175,7 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     layFind->addWidget(edtFind);
     connect(edtFind, SIGNAL(textEdited(QString)), this, SLOT(findNext()));
 
-    actFindNext=new QAction(QIcon(":/lib/help_findnext.png"), tr("&find next"), this);
+    actFindNext=new QFActionWithNoMenuRole(QIcon(":/lib/help_findnext.png"), tr("&find next"), this);
     actFindNext->setShortcut(QKeySequence::FindNext);
     connect(actFindNext, SIGNAL(triggered()), this, SLOT(findNext()));
 
@@ -183,7 +183,7 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     btnFindNext->setDefaultAction(actFindNext);
     layFind->addWidget(btnFindNext);
 
-    actFindPrev=new QAction(QIcon(":/lib/help_findprev.png"), tr("find &previous"), this);
+    actFindPrev=new QFActionWithNoMenuRole(QIcon(":/lib/help_findprev.png"), tr("find &previous"), this);
     actFindPrev->setShortcut(QKeySequence::FindPrevious);
     connect(actFindPrev, SIGNAL(triggered()), this, SLOT(findPrev()));
 

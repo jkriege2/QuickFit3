@@ -561,9 +561,9 @@ void QConfigComboboxWidget::createWidgets()
     combobox=new QComboBox(this);
     connect(combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentConfigChanged(int)));
     hbl->addWidget(combobox, 1);
-    actSave=new QAction(QIcon(":/libqf3widgets/config_add.png"), tr("save config"), this);
+    actSave=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/config_add.png"), tr("save config"), this);
     connect(actSave, SIGNAL(triggered()), this, SLOT(saveCurrentConfig()));
-    actDelete=new QAction(QIcon(":/libqf3widgets/config_delete.png"), tr("delete config"), this);
+    actDelete=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/config_delete.png"), tr("delete config"), this);
     connect(actDelete, SIGNAL(triggered()), this, SLOT(deleteCurrentConfig()));
     QToolButton* btn;
     btn=new QToolButton(this);

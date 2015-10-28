@@ -41,9 +41,9 @@ QFTableModel::QFTableModel(QObject * parent):
     undoMaxSteps=50;
     undoIsMultiStep=0;
     rdlID=0;
-    actUndo=new QAction(QIcon(":/lib/undo.png"), tr("Undo"), this);
+    actUndo=new QFActionWithNoMenuRole(QIcon(":/lib/undo.png"), tr("Undo"), this);
     actUndo->setShortcut(QKeySequence::Undo);
-    actRedo=new QAction(QIcon(":/lib/redo.png"), tr("Redo"), this);
+    actRedo=new QFActionWithNoMenuRole(QIcon(":/lib/redo.png"), tr("Redo"), this);
     actRedo->setShortcut(QKeySequence::Redo);
     setUndoEnabled(false);
     //quint64 a=xyAdressToUInt32(5, 5);

@@ -178,20 +178,20 @@ void QFPLayerControls::createWidgets() {
 }
 
 void QFPLayerControls::createActions() {
-    actPlayPause=new QAction(QIcon(":/libqf3widgets/player_play.png"), tr("play"), this);
+    actPlayPause=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/player_play.png"), tr("play"), this);
     actPlayPause->setCheckable(true);
     actPlayPause->setChecked(false);
     lastPlaying=false;
     connect(actPlayPause, SIGNAL(toggled(bool)), this, SLOT(playPauseTriggered(bool)));
-    actRewind=new QAction(QIcon(":/libqf3widgets/player_start.png"), tr("back to first frame"), this);
+    actRewind=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/player_start.png"), tr("back to first frame"), this);
     connect(actRewind, SIGNAL(triggered()), this, SLOT(rewind()));
-    actNextFrame=new QAction(QIcon(":/libqf3widgets/player_fwd.png"), tr("one frame forward"), this);
+    actNextFrame=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/player_fwd.png"), tr("one frame forward"), this);
     connect(actNextFrame, SIGNAL(triggered()), this, SLOT(nextTriggered()));
-    actNextMoreFrame=new QAction(QIcon(":/libqf3widgets/player_ffwd.png"), tr("some frames forward"), this);
+    actNextMoreFrame=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/player_ffwd.png"), tr("some frames forward"), this);
     connect(actNextMoreFrame, SIGNAL(triggered()), this, SLOT(nextMoreTriggered()));
-    actPrevFrame=new QAction(QIcon(":/libqf3widgets/player_rew.png"), tr("one frame backward"), this);
+    actPrevFrame=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/player_rew.png"), tr("one frame backward"), this);
     connect(actPrevFrame, SIGNAL(triggered()), this, SLOT(prevTriggered()));
-    actPrevMoreFrame=new QAction(QIcon(":/libqf3widgets/player_rrew.png"), tr("some frames backward"), this);
+    actPrevMoreFrame=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/player_rrew.png"), tr("some frames backward"), this);
     connect(actPrevMoreFrame, SIGNAL(triggered()), this, SLOT(prevMoreTriggered()));
 }
 

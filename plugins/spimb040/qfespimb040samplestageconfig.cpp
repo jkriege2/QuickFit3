@@ -480,36 +480,36 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
 
 void QFESPIMB040SampleStageConfig::createActions() {
     qDebug()<<">>>> QFESPIMB040SampleStageConfig::createActions()\n";
-    actConnectX=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect x-axis ..."), this);
+    actConnectX=new QFActionWithNoMenuRole(QIcon(":/spimb040/stageconnect.png"), tr("Connect x-axis ..."), this);
     actConnectX->setCheckable(true);
     connect(actConnectX, SIGNAL(triggered()), this, SLOT(disConnectX()));
     btnConnectX->setDefaultAction(actConnectX);
 
-    actConnectY=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect y-axis ..."), this);
+    actConnectY=new QFActionWithNoMenuRole(QIcon(":/spimb040/stageconnect.png"), tr("Connect y-axis ..."), this);
     actConnectY->setCheckable(true);
     connect(actConnectY, SIGNAL(triggered()), this, SLOT(disConnectY()));
     btnConnectY->setDefaultAction(actConnectY);
 
-    actConnectZ=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect z-axis ..."), this);
+    actConnectZ=new QFActionWithNoMenuRole(QIcon(":/spimb040/stageconnect.png"), tr("Connect z-axis ..."), this);
     actConnectZ->setCheckable(true);
     connect(actConnectZ, SIGNAL(triggered()), this, SLOT(disConnectZ()));
     btnConnectZ->setDefaultAction(actConnectZ);
 
 
 
-    actConfigureX=new QAction(QIcon(":/spimb040/stagesettings.png"), tr("Configure x-axis ..."), this);
+    actConfigureX=new QFActionWithNoMenuRole(QIcon(":/spimb040/stagesettings.png"), tr("Configure x-axis ..."), this);
     connect(actConfigureX, SIGNAL(triggered()), this, SLOT(configureX()));
     btnConfigureX->setDefaultAction(actConfigureX);
 
-    actConfigureY=new QAction(QIcon(":/spimb040/stagesettings.png"), tr("Configure y-axis ..."), this);
+    actConfigureY=new QFActionWithNoMenuRole(QIcon(":/spimb040/stagesettings.png"), tr("Configure y-axis ..."), this);
     connect(actConfigureY, SIGNAL(triggered()), this, SLOT(configureY()));
     btnConfigureY->setDefaultAction(actConfigureY);
 
-    actConfigureZ=new QAction(QIcon(":/spimb040/stagesettings.png"), tr("Configure z-axis ..."), this);
+    actConfigureZ=new QFActionWithNoMenuRole(QIcon(":/spimb040/stagesettings.png"), tr("Configure z-axis ..."), this);
     connect(actConfigureZ, SIGNAL(triggered()), this, SLOT(configureZ()));
     btnConfigureZ->setDefaultAction(actConfigureZ);
 
-    actConfigSteps=new QAction(QIcon(":/spimb040/configsteps.png"), tr("Configure step sizes ..."), this);
+    actConfigSteps=new QFActionWithNoMenuRole(QIcon(":/spimb040/configsteps.png"), tr("Configure step sizes ..."), this);
     connect(actConfigSteps, SIGNAL(triggered()), this, SLOT(configSteps()));
     btnConfigSteps->setDefaultAction(actConfigSteps);
 

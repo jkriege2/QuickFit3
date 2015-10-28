@@ -29,6 +29,7 @@
 #include "qftools.h"
 #include "lib_imexport.h"
 #include <QVariant>
+#include "qfaction.h"
 
 // forward declaration
 class QFRawDataRecord;

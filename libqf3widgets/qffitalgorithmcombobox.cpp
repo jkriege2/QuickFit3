@@ -28,7 +28,7 @@ QFFitAlgorithmComboBox::QFFitAlgorithmComboBox(QWidget *parent) :
 {
     onlyFMin=false;
     updateFitAlgorithms();
-    actHelp=new QAction(QIcon(":/lib/help/help.png"), tr("Fit algorithm help ..."), this);
+    actHelp=new QFActionWithNoMenuRole(QIcon(":/lib/help/help.png"), tr("Fit algorithm help ..."), this);
     connect(actHelp, SIGNAL(triggered()), this, SLOT(showHelpCurrent()));
     addAction(actHelp);
 }

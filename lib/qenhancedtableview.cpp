@@ -20,6 +20,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 */
 
 #include "qenhancedtableview.h"
+#include "qfaction.h"
 #include <QDebug>
 #include <QSet>
 #include <QApplication>
@@ -77,37 +78,37 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent, bool noCopyShortcut):
     addAction(menuCopyMatlab->menuAction());
 
 
-    actCopyExcel=new QAction(QIcon(":/lib/copy16_excel.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
+    actCopyExcel=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_excel.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
     connect(actCopyExcel, SIGNAL(triggered()), this, SLOT(copySelectionToExcel()));
     insertAction(menuCopyExcel->menuAction(), actCopyExcel);
     menuCopyExcel->addAction(actCopyExcel);
-    actCopyExcelNoHead=new QAction(QIcon(":/lib/copy16_excel_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
+    actCopyExcelNoHead=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_excel_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
     if (!noCopyShortcut) actCopyExcelNoHead->setShortcut(QKeySequence::Copy);
     connect(actCopyExcelNoHead, SIGNAL(triggered()), this, SLOT(copySelectionToExcelNoHead()));
     menuCopyExcel->addAction(actCopyExcelNoHead);
     insertAction(menuCopyExcel->menuAction(), actCopyExcelNoHead);
 
-    actCopyCSV=new QAction(QIcon(":/lib/copy16_csv.png"), tr("Copy Selection to Clipboard (CSV)"), this);
+    actCopyCSV=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_csv.png"), tr("Copy Selection to Clipboard (CSV)"), this);
     connect(actCopyCSV, SIGNAL(triggered()), this, SLOT(copySelectionToCSV()));
     menuCopyCSV->addAction(actCopyCSV);
-    actCopyCSVNoHead=new QAction(QIcon(":/lib/copy16_csv_nohead.png"), tr("Copy Selection to clipboard (CSV) without header row/column"), this);
+    actCopyCSVNoHead=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_csv_nohead.png"), tr("Copy Selection to clipboard (CSV) without header row/column"), this);
     //if (!noCopyShortcut) actCopyCSVNoHead->setShortcut(QKeySequence::Copy);
     connect(actCopyCSVNoHead, SIGNAL(triggered()), this, SLOT(copySelectionToCSVNoHead()));
     menuCopyCSV->addAction(actCopyCSVNoHead);
 
-    actCopyMatlab=new QAction(QIcon(":/lib/copy16_matlab.png"), tr("Copy Selection to clipboard (Matlab)"), this);
+    actCopyMatlab=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_matlab.png"), tr("Copy Selection to clipboard (Matlab)"), this);
     connect(actCopyMatlab, SIGNAL(triggered()), this, SLOT(copySelectionToMatlabNoHead()));
     menuCopyMatlab->addAction(actCopyMatlab);
 
-    actCopyImage=new QAction(QIcon(":/lib/copy16_image.png"), tr("Copy table as image"), this);
+    actCopyImage=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_image.png"), tr("Copy table as image"), this);
     connect(actCopyImage, SIGNAL(triggered()), this, SLOT(copyAsImage()));
     addAction(actCopyImage);
 
-    actSaveImage=new QAction(tr("Save table as image"), this);
+    actSaveImage=new QFActionWithNoMenuRole(tr("Save table as image"), this);
     connect(actSaveImage, SIGNAL(triggered()), this, SLOT(saveAsImage()));
     addAction(actSaveImage);
 
-    actPrint=new QAction(QIcon(":/lib/print.png"), tr("&Print Table"), this);
+    actPrint=new QFActionWithNoMenuRole(QIcon(":/lib/print.png"), tr("&Print Table"), this);
     actPrint->setShortcut(QKeySequence::Print);
     connect(actPrint, SIGNAL(triggered()), this, SLOT(print()));
     addAction(actPrint);
@@ -116,16 +117,16 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent, bool noCopyShortcut):
     menuSave->setIcon(QIcon(":/lib/savedata.png"));
     addAction(menuSave->menuAction());
 
-    actSave=new QAction(QIcon(":/lib/savedata.png"), tr("&Save selection"), this);
+    actSave=new QFActionWithNoMenuRole(QIcon(":/lib/savedata.png"), tr("&Save selection"), this);
     connect(actSave, SIGNAL(triggered()), this, SLOT(save()));
     menuSave->addAction(actSave);
-    actSaveFlipped=new QAction(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, flipped"), this);
+    actSaveFlipped=new QFActionWithNoMenuRole(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, flipped"), this);
     connect(actSaveFlipped, SIGNAL(triggered()), this, SLOT(saveFlipped()));
     menuSave->addAction(actSaveFlipped);
-    actSaveExtended=new QAction(QIcon(":/lib/savedata.png"), tr("&Save selection, extended form"), this);
+    actSaveExtended=new QFActionWithNoMenuRole(QIcon(":/lib/savedata.png"), tr("&Save selection, extended form"), this);
     connect(actSaveExtended, SIGNAL(triggered()), this, SLOT(saveExtended()));
     menuSave->addAction(actSaveExtended);
-    actSaveExtendedFlipped=new QAction(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, extended form, flipped"), this);
+    actSaveExtendedFlipped=new QFActionWithNoMenuRole(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, extended form, flipped"), this);
     connect(actSaveExtendedFlipped, SIGNAL(triggered()), this, SLOT(saveExtendedFlipped()));
     menuSave->addAction(actSaveExtendedFlipped);
 
@@ -133,16 +134,16 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent, bool noCopyShortcut):
     menuSaveTable->setIcon(QIcon(":/table/table_insert.png"));
     addAction(menuSaveTable->menuAction());
 
-    actSaveTable=new QAction(QIcon(":/lib/savedata.png"), tr("&Save selection"), this);
+    actSaveTable=new QFActionWithNoMenuRole(QIcon(":/lib/savedata.png"), tr("&Save selection"), this);
     connect(actSaveTable, SIGNAL(triggered()), this, SLOT(saveTable()));
     menuSaveTable->addAction(actSaveTable);
-    actSaveTableFlipped=new QAction(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, flipped"), this);
+    actSaveTableFlipped=new QFActionWithNoMenuRole(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, flipped"), this);
     connect(actSaveTableFlipped, SIGNAL(triggered()), this, SLOT(saveTableFlipped()));
     menuSaveTable->addAction(actSaveTableFlipped);
-    actSaveTableExtended=new QAction(QIcon(":/lib/savedata.png"), tr("&Save selection, extended form"), this);
+    actSaveTableExtended=new QFActionWithNoMenuRole(QIcon(":/lib/savedata.png"), tr("&Save selection, extended form"), this);
     connect(actSaveTableExtended, SIGNAL(triggered()), this, SLOT(saveTableExtended()));
     menuSaveTable->addAction(actSaveTableExtended);
-    actSaveTableExtendedFlipped=new QAction(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, extended form, flipped"), this);
+    actSaveTableExtendedFlipped=new QFActionWithNoMenuRole(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, extended form, flipped"), this);
     connect(actSaveTableExtendedFlipped, SIGNAL(triggered()), this, SLOT(saveTableExtendedFlipped()));
     menuSaveTable->addAction(actSaveTableExtendedFlipped);
 }

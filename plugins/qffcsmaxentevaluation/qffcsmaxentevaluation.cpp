@@ -51,7 +51,7 @@ QFEvaluationItem* QFFCSMaxEntEvaluation::createRecord(QFProject* parent) {
 
 
 void QFFCSMaxEntEvaluation::registerToMenu(QMenu* menu) {
-    QAction* actAddEval=new QAction(QIcon(":/fcs_maxent/qffcsmaxentevaluation_small.png"), getName(), parentWidget);
+    QAction* actAddEval=new QFActionWithNoMenuRole(QIcon(":/fcs_maxent/qffcsmaxentevaluation_small.png"), getName(), parentWidget);
     actAddEval->setStatusTip(getDescription());
     connect(actAddEval, SIGNAL(triggered()), this, SLOT(insertEvaluation()));
     menu->addAction(actAddEval);

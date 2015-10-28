@@ -56,7 +56,7 @@ void Scanner2000NICounter ::initExtension() {
     // some example code that may be used to register a menu and a tool button:
 /*
     services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
-    QAction *actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Start Extension Scanner2000NICounter "), this);
+    QAction *actStartPlugin=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Start Extension Scanner2000NICounter "), this);
     QObject::connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
 
     QToolBar* exttb=services->getToolbar("extensions");

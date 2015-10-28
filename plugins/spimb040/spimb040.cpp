@@ -118,7 +118,7 @@ void QFESPIMB040::updateFromConfig()
             QString name=set.value("General/name", "").toString();
             if (name.isEmpty()) name=files[i];
             else name=QString("%1 [%2]").arg(name).arg(files[i]);
-            QAction* act=new QAction(name, this);
+            QAction* act=new QFActionWithNoMenuRole(name, this);
             act->setData(globalDir.absoluteFilePath(files[i]));
             connect(act, SIGNAL(triggered()), this, SLOT(startPluginNew()));
             actsOptSetups.append(act);
@@ -135,8 +135,8 @@ void QFESPIMB040::initExtension() {
     QFPluginServices::getInstance()->registerSettingsPane(this);
 
     services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
-    actStartPlugin=new QAction(QIcon(":/spimb040_logo.png"), tr("Start B040 SPIM Control"), this);
-    //actStartPluginNew=new QAction(QIcon(":/spimb040_logo.png"), tr("Start B040 SPIM Control, new optics setup"), this);
+    actStartPlugin=new QFActionWithNoMenuRole(QIcon(":/spimb040_logo.png"), tr("Start B040 SPIM Control"), this);
+    //actStartPluginNew=new QFActionWithNoMenuRole(QIcon(":/spimb040_logo.png"), tr("Start B040 SPIM Control, new optics setup"), this);
 
     QDir d(services->getConfigFileDirectory());
     // make sure the directory for the config files of this extension exists

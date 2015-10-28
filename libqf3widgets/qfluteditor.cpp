@@ -31,6 +31,7 @@
 #include <QPlainTextEdit>
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
+#include "qfaction.h"
 #define JKQTPIsOKFloat(v) (std::isfinite(v)&&(!std::isinf(v))&&(!std::isnan(v)))
 
 
@@ -87,10 +88,10 @@ QFLUTEditor::QFLUTEditor(QWidget *parent):
     lutTimer->setSingleShot(true);
     connect(lutTimer, SIGNAL(timeout()), this, SLOT(emitLUTChanged()));
 
-    actResetLUT=new QAction(tr("reset LUT to linear"), this);
+    actResetLUT=new QFActionWithNoMenuRole(tr("reset LUT to linear"), this);
     connect(actResetLUT, SIGNAL(triggered()), this, SLOT(resetLUT()));
     addAction(actResetLUT);
-    actGetLUTInfo=new QAction(tr("show LUT info"), this);
+    actGetLUTInfo=new QFActionWithNoMenuRole(tr("show LUT info"), this);
     connect(actGetLUTInfo, SIGNAL(triggered()), this, SLOT(showLUTInfo()));
     addAction(actGetLUTInfo);
 }

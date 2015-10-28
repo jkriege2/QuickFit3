@@ -48,7 +48,7 @@ QFEvaluationItem* QFFCSMSDEvaluation::createRecord(QFProject* parent) {
 
 
 void QFFCSMSDEvaluation::registerToMenu(QMenu* menu) {
-    QAction* actAddEval=new QAction(QIcon(":/fcsmsdevaluation/fcsmsdevaluation_small.png"), getName(), parentWidget);
+    QAction* actAddEval=new QFActionWithNoMenuRole(QIcon(":/fcsmsdevaluation/fcsmsdevaluation_small.png"), getName(), parentWidget);
     actAddEval->setStatusTip(getDescription());
     connect(actAddEval, SIGNAL(triggered()), this, SLOT(insertEvaluation()));
     menu->addAction(actAddEval);

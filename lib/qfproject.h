@@ -37,6 +37,7 @@
 #include <QPointer>
 #include "qfproperties.h"
 #include "qtriple.h"
+#include "qfaction.h"
 
 // forward declaration
 class QFRawDataRecord;

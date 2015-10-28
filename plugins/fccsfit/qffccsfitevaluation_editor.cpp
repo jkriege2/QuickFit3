@@ -139,98 +139,98 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
     menuEvaluation=propEditor->addOrFindMenu(tr("&Evaluation"), 0);
     menuFCCSFit=propEditor->addOrFindMenu(tr("&Tools"), 0);
 
-    actFitCurrent=new QAction(QIcon(":/fccs_fit/fit_fitcurrent.png"), tr("Fit &Current"), this);
+    actFitCurrent=new QFActionWithNoMenuRole(QIcon(":/fccs_fit/fit_fitcurrent.png"), tr("Fit &Current"), this);
     connect(actFitCurrent, SIGNAL(triggered()), this, SLOT(fitCurrent()));
     ui->btnEvaluateCurrent->setDefaultAction(actFitCurrent);
     menuEvaluation->addAction(actFitCurrent);
 
-    actFitAllRunsMT=new QAction(QIcon(":/fccs_fit/fit_fitallruns.png"), tr("Fit &All Runs (MT)"), this);
+    actFitAllRunsMT=new QFActionWithNoMenuRole(QIcon(":/fccs_fit/fit_fitallruns.png"), tr("Fit &All Runs (MT)"), this);
     connect(actFitAllRunsMT, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
     actFitAllRunsMT->setEnabled(false);
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllRunsMT);
     menuEvaluation->addAction(actFitAllRunsMT);
 
-    actFitAllRuns=new QAction(QIcon(":/fccs_fit/fit_fitallruns.png"), tr("Fit &All Runs"), this);
+    actFitAllRuns=new QFActionWithNoMenuRole(QIcon(":/fccs_fit/fit_fitallruns.png"), tr("Fit &All Runs"), this);
     connect(actFitAllRuns, SIGNAL(triggered()), this, SLOT(fitAllRuns()));
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllRuns);
     ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllRuns);
     menuEvaluation->addAction(actFitAllRuns);
 
 
-    actFitAllFilesetsAllPixels=new QAction(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets && Pixels"), this);
+    actFitAllFilesetsAllPixels=new QFActionWithNoMenuRole(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets && Pixels"), this);
     connect(actFitAllFilesetsAllPixels, SIGNAL(triggered()), this, SLOT(fitAllFilesetsAllPixels()));
     menuEvaluation->addAction(actFitAllFilesetsAllPixels);
 
-    actResetCurrent=new QAction(tr("&Reset Current"), this);
+    actResetCurrent=new QFActionWithNoMenuRole(tr("&Reset Current"), this);
     actResetCurrent->setToolTip(tr("reset the currently displayed file (and runs) to the initial parameters\nThis deletes all fit results stored for the current file."));
     connect(actResetCurrent, SIGNAL(triggered()), this, SLOT(resetCurrent()));
     ui->btnClearCurrent->setDefaultAction(actResetCurrent);
     menuEvaluation->addSeparator();
     menuEvaluation->addAction(actResetCurrent);
 
-    actResetAllPixelsInAllFilesets=new QAction(tr("Reset All &Runs in all filesets"), this);
+    actResetAllPixelsInAllFilesets=new QFActionWithNoMenuRole(tr("Reset All &Runs in all filesets"), this);
     actResetAllPixelsInAllFilesets->setToolTip(tr("reset all runs to the initial parameters in all files fitted so far."));
     connect(actResetAllPixelsInAllFilesets, SIGNAL(triggered()), this, SLOT(resetAllPixelsInAllFilesets()));
     connect(ui->btnClearEverything, SIGNAL(clicked()), this, SLOT(resetAllPixelsInAllFilesets()));
     menuEvaluation->addAction(actResetAllPixelsInAllFilesets);
 
-    actResetAllRuns=new QAction(tr("Reset All &Runs"), this);
+    actResetAllRuns=new QFActionWithNoMenuRole(tr("Reset All &Runs"), this);
     actResetAllRuns->setToolTip(tr("reset all runs to the initial parameters in the current file.\nThis deletes all fit results stored for all runs in the current file."));
     connect(actResetAllRuns, SIGNAL(triggered()), this, SLOT(resetAllPixels()));
     ui->btnClearAllPixels->setDefaultAction(actResetAllRuns);
     menuEvaluation->addAction(actResetAllRuns);
 
-    actCopyToInitial=new QAction(tr("Copy to &Initial"), this);
+    actCopyToInitial=new QFActionWithNoMenuRole(tr("Copy to &Initial"), this);
     actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/runs that were not fit yet."));
     connect(actCopyToInitial, SIGNAL(triggered()), this, SLOT(copyToInitial()));
     ui->btnCopyToInitial->setDefaultAction(actCopyToInitial);
     menuEvaluation->addAction(actCopyToInitial);
 
-    actCheckFilesets=new QAction(tr("Check fitted filesets"), this);
+    actCheckFilesets=new QFActionWithNoMenuRole(tr("Check fitted filesets"), this);
     actCheckFilesets->setToolTip(tr("removes all fitted filesets, for which no fit results exist."));
     connect(actCheckFilesets, SIGNAL(triggered()), this, SLOT(checkFitFileSets()));
     menuEvaluation->addAction(actCheckFilesets);
 
 
-    actSaveReport=new QAction(QIcon(":/fccs_fit/fit_savereport.png"), tr("&Save Report"), this);
+    actSaveReport=new QFActionWithNoMenuRole(QIcon(":/fccs_fit/fit_savereport.png"), tr("&Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
     ui->btnSaveReport->setDefaultAction(actSaveReport);
     menuEvaluation->addSeparator();
     menuEvaluation->addAction(actSaveReport);
 
-    actPrintReport=new QAction(QIcon(":/fccs_fit/fit_printreport.png"), tr("&Print Report"), this);
+    actPrintReport=new QFActionWithNoMenuRole(QIcon(":/fccs_fit/fit_printreport.png"), tr("&Print Report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     menuEvaluation->addAction(actPrintReport);
 
     /*QMenu* m=menuFCCSFit->addMenu(tr("configure evaluation for ..."));
 
-    actConfigureForNormalFCCS=new QAction(tr("FCCS: normal diffusion"), this);
+    actConfigureForNormalFCCS=new QFActionWithNoMenuRole(tr("FCCS: normal diffusion"), this);
     connect(actConfigureForNormalFCCS, SIGNAL(triggered()), this, SLOT(configureForSPFCCS()));
     m->addAction(actConfigureForNormalFCCS);
-    actConfigureFor2CFCCS=new QAction(tr("FCCS: 2-component normal diffusion"), this);
+    actConfigureFor2CFCCS=new QFActionWithNoMenuRole(tr("FCCS: 2-component normal diffusion"), this);
     connect(actConfigureFor2CFCCS, SIGNAL(triggered()), this, SLOT(configureFor2CSPIMFCCS()));
     m->addAction(actConfigureFor2CFCCS);
 
-    actConfigureForAnomalousFCCS=new QAction(tr("FCCS: anomalous diffusion"), this);
+    actConfigureForAnomalousFCCS=new QFActionWithNoMenuRole(tr("FCCS: anomalous diffusion"), this);
     connect(actConfigureForAnomalousFCCS, SIGNAL(triggered()), this, SLOT(configureForASPFCCS()));
     m->addAction(actConfigureForAnomalousFCCS);*/
 
     menuFCCSFit->addSeparator();
-    actGuess=new QAction(tr("Guess file sets ..."), this);
+    actGuess=new QFActionWithNoMenuRole(tr("Guess file sets ..."), this);
     connect(actGuess, SIGNAL(triggered()), this, SLOT(guessFromCurrentFileSet()));
     menuFCCSFit->addAction(actGuess);
 
 
     menuFCCSFit->addSeparator();
-    actLoadGLobalFitConfig=new QAction(tr("&load global fit config ..."), this);
+    actLoadGLobalFitConfig=new QFActionWithNoMenuRole(tr("&load global fit config ..."), this);
     connect(actLoadGLobalFitConfig, SIGNAL(triggered()), this, SLOT(loadGlobalFitConfig()));
     menuFCCSFit->addAction(actLoadGLobalFitConfig);
-    actSaveGLobalFitConfig=new QAction(tr("&save global fit config ..."), this);
+    actSaveGLobalFitConfig=new QFActionWithNoMenuRole(tr("&save global fit config ..."), this);
     connect(actSaveGLobalFitConfig, SIGNAL(triggered()), this, SLOT(saveGlobalFitConfig()));
     menuFCCSFit->addAction(actSaveGLobalFitConfig);
 
-    actSetResetFitParameters=new QAction(tr("set/reset fit &parameters ..."), this);
+    actSetResetFitParameters=new QFActionWithNoMenuRole(tr("set/reset fit &parameters ..."), this);
     connect(actSetResetFitParameters, SIGNAL(triggered()), this, SLOT(setParameterInRDRs()));
     menuFCCSFit->addAction(actSetResetFitParameters);
     menuFCCSFit->addSeparator();
@@ -1926,10 +1926,12 @@ void QFFCCSFitEvaluationEditor::buildGlobalConfigs(QFFCCSFitEvaluationItem *curr
             }
             if (!menu) {
                 menu=menuFCCSFit->addMenu(c.groupLabel);
+                menu->menuAction()->setMenuRole(QAction::NoRole);
                 menusGlobalConfig<<menu;
             }
             if (menu) {
                 QAction * act=menu->addAction(c.menuEntryLabel);
+                act->setMenuRole(QAction::NoRole);
                 connect(act, SIGNAL(triggered()), this, SLOT(onConfigureGlobalItemClicked()));
                 actsGlobalConfig<<act;
                 globalConfig<<c;

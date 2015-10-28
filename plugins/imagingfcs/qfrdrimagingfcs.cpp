@@ -52,7 +52,7 @@ void QFRDRImagingFCSPlugin::deinit() {
 void QFRDRImagingFCSPlugin::init()
 {
     QMenu* tmenu=services->getMenu("tools")->addMenu(QIcon(getIconFilename()), tr("imaging FCS tools"));
-    QAction* actOffset=new QAction(tr("subtract &offset of correlation functions"), parentWidget);
+    QAction* actOffset=new QFActionWithNoMenuRole(tr("subtract &offset of correlation functions"), parentWidget);
     connect(actOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
     tmenu->addAction(actOffset);
 
@@ -151,28 +151,28 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
 
     // create menu entries to insert data with this type
 
-    QAction* actWizard=new QAction(QIcon(":/imaging_fcs/rdrwizard.png"), tr("imaging FCS Correlation &Wizard (don't add fits) ..."), parentWidget);
+    QAction* actWizard=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/rdrwizard.png"), tr("imaging FCS Correlation &Wizard (don't add fits) ..."), parentWidget);
     actWizard->setStatusTip(tr("Correlate an image series and insert the result into the current project. This wizard simplifies the process, but the option \"correlate images and insert\" will offer finer control and more options."));
     connect(actWizard, SIGNAL(triggered()), this, SLOT(startWizard()));
     m->addAction(actWizard);
-    actWizard=new QAction(QIcon(":/imaging_fcs/projectwizard.png"), tr("imaging FCS Project &Wizard (also add fits) ..."), parentWidget);
+    actWizard=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/projectwizard.png"), tr("imaging FCS Project &Wizard (also add fits) ..."), parentWidget);
     actWizard->setStatusTip(tr("Correlate an image series and insert the result into the current project. This wizard simplifies the process, but the option \"correlate images and insert\" will offer finer control and more options.\n\nIn addition, this wizard also allows you to add relevant fitting objects to the project, based on your selection during the wizard."));
     connect(actWizard, SIGNAL(triggered()), this, SLOT(startWizard()));
     m->addAction(actWizard);
 
     m->addSeparator();
 
-    QAction* actCorrelate=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_correlate.png"), tr("&correlate images and insert"), parentWidget);
+    QAction* actCorrelate=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/qfrdrimagingfcs_correlate.png"), tr("&correlate images and insert"), parentWidget);
     actCorrelate->setStatusTip(tr("Correlate an image series and insert the result into the current project"));
     connect(actCorrelate, SIGNAL(triggered()), this, SLOT(correlateAndInsert()));
     m->addAction(actCorrelate);
 
-    QAction* actSimulate=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_simulate.png"), tr("&simulate images for correlation"), parentWidget);
+    QAction* actSimulate=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/qfrdrimagingfcs_simulate.png"), tr("&simulate images for correlation"), parentWidget);
     actSimulate->setStatusTip(tr("Simulates an image series for ImFCS that can afterwards be correlated"));
     connect(actSimulate, SIGNAL(triggered()), this, SLOT(simulateForCorrelation()));
     m->addAction(actSimulate);
 
-    QAction* actionLoadDataset=new QAction(QIcon(getIconFilename()), tr("&load imFCS dataset"), parentWidget);
+    QAction* actionLoadDataset=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("&load imFCS dataset"), parentWidget);
     actionLoadDataset->setStatusTip(tr("Insert a new imaging FCS record"));
     connect(actionLoadDataset, SIGNAL(triggered()), this, SLOT(insertRecord()));
     m->addAction(actionLoadDataset);

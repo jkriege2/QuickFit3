@@ -141,76 +141,76 @@ QFESPIMB040ScriptedAcquisition::QFESPIMB040ScriptedAcquisition(QFESPIMB040MainWi
 
 
 
-    cutAct = new QAction(QIcon(":/spimb040/script_cut.png"), tr("Cu&t"), this);
+    cutAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_cut.png"), tr("Cu&t"), this);
     cutAct->setShortcut(tr("Ctrl+X"));
     cutAct->setStatusTip(tr("Cut the current selection's contents to the "
                             "clipboard"));
     connect(cutAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(cut()));
 
-    copyAct = new QAction(QIcon(":/spimb040/script_copy.png"), tr("&Copy"), this);
+    copyAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_copy.png"), tr("&Copy"), this);
     copyAct->setShortcut(tr("Ctrl+C"));
     copyAct->setStatusTip(tr("Copy the current selection's contents to the "
                              "clipboard"));
     connect(copyAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(copy()));
 
-    pasteAct = new QAction(QIcon(":/spimb040/script_paste.png"), tr("&Paste"), this);
+    pasteAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_paste.png"), tr("&Paste"), this);
     pasteAct->setShortcut(tr("Ctrl+V"));
     pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
                               "selection"));
     connect(pasteAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(paste()));
 
-    undoAct = new QAction(QIcon(":/spimb040/script_undo.png"), tr("&Undo"), this);
+    undoAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_undo.png"), tr("&Undo"), this);
     undoAct->setShortcut(tr("Ctrl+Z"));
     undoAct->setStatusTip(tr("Undo the last change "));
     connect(undoAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(undo()));
 
-    redoAct = new QAction(QIcon(":/spimb040/script_redo.png"), tr("&Redo"), this);
+    redoAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_redo.png"), tr("&Redo"), this);
     redoAct->setShortcut(tr("Ctrl+Shift+Z"));
     redoAct->setStatusTip(tr("Redo the last undone change "));
     connect(redoAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(redo()));
 
-    findAct = new QAction(QIcon(":/spimb040/script_find.png"), tr("&Find ..."), this);
+    findAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_find.png"), tr("&Find ..."), this);
     findAct->setShortcut(tr("Ctrl+F"));
     findAct->setStatusTip(tr("Find a string in sequence "));
     connect(findAct, SIGNAL(triggered()), this, SLOT(findFirst()));
 
-    findNextAct = new QAction(QIcon(":/spimb040/script_find_next.png"), tr("Find &next"), this);
+    findNextAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_find_next.png"), tr("Find &next"), this);
     findNextAct->setShortcut(tr("F3"));
     findNextAct->setStatusTip(tr("Find the next occurence "));
     connect(findNextAct, SIGNAL(triggered()), this, SLOT(findNext()));
     findNextAct->setEnabled(false);
 
-    replaceAct = new QAction(QIcon(":/spimb040/script_find_replace.png"), tr("Find && &replace ..."), this);
+    replaceAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_find_replace.png"), tr("Find && &replace ..."), this);
     replaceAct->setShortcut(tr("Ctrl+R"));
     replaceAct->setStatusTip(tr("Find a string in sequence and replace it with another string "));
     connect(replaceAct, SIGNAL(triggered()), this, SLOT(replaceFirst()));
 
-    commentAct = new QAction(tr("&Comment text"), this);
+    commentAct = new QFActionWithNoMenuRole(tr("&Comment text"), this);
     commentAct->setShortcut(tr("Ctrl+B"));
     commentAct->setStatusTip(tr("add (single line) comment at the beginning of each line "));
     connect(commentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(comment()));
 
-    unCommentAct = new QAction(tr("&Uncomment text"), this);
+    unCommentAct = new QFActionWithNoMenuRole(tr("&Uncomment text"), this);
     unCommentAct->setShortcut(tr("Ctrl+Shift+B"));
     unCommentAct->setStatusTip(tr("remove (single line) comment at the beginning of each line "));
     connect(unCommentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(uncomment()));
 
-    indentAct = new QAction(QIcon(":/spimb040/script_indent.png"), tr("&Increase indention"), this);
+    indentAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_indent.png"), tr("&Increase indention"), this);
     commentAct->setShortcut(tr("Ctrl+I"));
     indentAct->setStatusTip(tr("increase indention "));
     connect(indentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(indentInc()));
 
-    unindentAct = new QAction(QIcon(":/spimb040/script_unindent.png"), tr("&Decrease indention"), this);
+    unindentAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_unindent.png"), tr("&Decrease indention"), this);
     unindentAct->setShortcut(tr("Ctrl+Shift+I"));
     unindentAct->setStatusTip(tr("decrease indention "));
     connect(unindentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(indentDec()));
 
-    gotoLineAct = new QAction(tr("&Goto line ..."), this);
+    gotoLineAct = new QFActionWithNoMenuRole(tr("&Goto line ..."), this);
     gotoLineAct->setShortcut(tr("Alt+G"));
     gotoLineAct->setStatusTip(tr("goto a line in the opened file "));
     connect(gotoLineAct, SIGNAL(triggered()), this, SLOT(gotoLine()));
 
-    printAct = new QAction(QIcon(":/spimb040/script_print.png"), tr("&Print ..."), this);
+    printAct = new QFActionWithNoMenuRole(QIcon(":/spimb040/script_print.png"), tr("&Print ..."), this);
     printAct->setStatusTip(tr("print the current SDFF file "));
     connect(printAct, SIGNAL(triggered()), this, SLOT(print()));
 
