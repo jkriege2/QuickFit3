@@ -23,7 +23,7 @@
 #ifndef QFESPECTRAVIEWERSPILLOVERDIALOG_H
 #define QFESPECTRAVIEWERSPILLOVERDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qftablemodel.h"
 #include "qfespectraviewerdialog.h"
 #include "spectrummanager.h"
@@ -31,7 +31,7 @@ namespace Ui {
     class QFESpectraViewerSpilloverDialog;
 }
 
-class QFESpectraViewerSpilloverDialog : public QDialog
+class QFESpectraViewerSpilloverDialog : public QFDialog
 {
         Q_OBJECT
         

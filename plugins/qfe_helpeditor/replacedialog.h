@@ -39,7 +39,7 @@
 #define REPLACEDIALOG_H
 
 #include <QString>
-
+#include "qfdialog.h"
 #include "ui_replacedialog.h"
 
 
@@ -49,7 +49,7 @@
  *
  *  \image html editor_findreplace.png
  */
-class QFEHelpEditorReplaceDialog : public QDialog, private Ui::ReplaceDialog
+class QFEHelpEditorReplaceDialog : public QFDialog, private Ui::ReplaceDialog
 {
     Q_OBJECT
 private:

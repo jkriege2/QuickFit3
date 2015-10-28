@@ -24,13 +24,13 @@
 #ifndef TABLERESIZEDIALOG_H
 #define TABLERESIZEDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class TableResizeDialog;
 }
 
-class TableResizeDialog : public QDialog
+class TableResizeDialog : public QFDialog
 {
         Q_OBJECT
         

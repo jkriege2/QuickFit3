@@ -312,7 +312,7 @@ void QFETCSPCImporterJobThread::run() {
                         if (crFile.open(QIODevice::WriteOnly)) {
                             QFETCSPCImporterJobThreadAddFileProps fp(QStringList(crFilenameBin), QString("photoncounts_binary"), job.props);
                             fp.comment=job.comment;
-                            fp.group=job.filename;
+                            fp.group=QString("%1_fcsdata").arg(outputFilenameBase);
                             addFiles.append(fp);
                             crFile.write("QF3.0CNTRT");
                             binfileWriteUint16(crFile, job.countrate_channels.size());
@@ -376,11 +376,55 @@ void QFETCSPCImporterJobThread::run() {
                         emit messageChanged(tr("saving FCS results ..."));
 
                         QSet<int> usedChannels;
+                        QMap<uint32_t, double> cntCorrected;
 
                         for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
                              QPair<int, int> ccf=*i;
                              usedChannels.insert(ccf.first);
                              usedChannels.insert(ccf.second);
+
+                             if (job.fcs_usebackcorrect) {
+                                 double b1=job.fcs_backcorrect.value(ccf.first, 0.0)/1000.0;
+                                 double b2=job.fcs_backcorrect.value(ccf.second, 0.0)/1000.0;
+                                 if (b1>0 && b2>0) {
+                                     for (uint32_t r=0; r<fcs_segments; r++) {
+                                         const uint64_t id=xyzAdressToUInt64(ccf.first, ccf.second, r);
+                                         uint32_t idcnt1=xyAdressToUInt32(r, ccf.first);
+                                         double cnt1=0;
+                                         uint32_t idcnt2=xyAdressToUInt32(r, ccf.second);
+                                         double cnt2=0;
+                                         if (!cntCorrected.contains(idcnt1)) {
+                                             for (int i=0; i<fcs_crs[idcnt1].size(); i++) {
+                                                 cnt1+=fcs_crs[idcnt1].at(i)/double(fcs_crs[idcnt1].size());
+                                                 fcs_crs[idcnt1].operator [](i)=fcs_crs[idcnt1].operator [](i)-b1;
+                                             }
+                                             cntCorrected.insert(idcnt1, cnt1);
+                                         } else {
+                                             cnt1=cntCorrected[idcnt1];
+                                         }
+                                         if (!cntCorrected.contains(idcnt2)) {
+                                             for (int i=0; i<fcs_crs[idcnt2].size(); i++) {
+                                                 cnt2+=fcs_crs[idcnt2].at(i)/double(fcs_crs[idcnt2].size());
+                                                 fcs_crs[idcnt2].operator [](i)=fcs_crs[idcnt2].operator [](i)-b2;
+                                             }
+                                             cntCorrected.insert(idcnt2, cnt2);
+                                         } else {
+                                             cnt2=cntCorrected[idcnt2];
+                                         }
+
+                                         const double corrfactor=cnt1*cnt2/(cnt1-b1)/(cnt2-b2);
+                                         for (int i=0; i<fcs_tau.size(); i++) {
+                                             fcs_ccfs[id].operator [](i)= fcs_ccfs[id].value(i, 0)*corrfactor;
+                                         }
+                                     }
+                                 }
+                             }
+                        }
+
+                        for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
+                             QPair<int, int> ccf=*i;
+                             //usedChannels.insert(ccf.first);
+                             //usedChannels.insert(ccf.second);
 
                              QString localFilename=outputFilenameBase+QString(".ccf%1_%2.csv").arg(ccf.first).arg(ccf.second);
                              if (ccf.first==ccf.second) localFilename=outputFilenameBase+QString(".acf%1.csv").arg(ccf.first);
@@ -652,7 +696,7 @@ void QFETCSPCImporterJobThread::run() {
                             //qDebug()<<"saving done to "<<localFilename;
                             QFETCSPCImporterJobThreadAddFileProps fp(QStringList(localFilename), "QF3ASCIICORR", job.props);
                             fp.comment=job.comment;
-                            fp.group=job.filename;
+                            fp.group=QString("%1_fcsdata").arg(outputFilenameBase);;
                             fp.role="";
                             addFiles.append(fp);
                         }
@@ -806,6 +850,11 @@ void QFETCSPCImporterJobThread::run() {
                                 if (job.fcs_uselifetimefilter) {
                                     for (int r=0; r<job.fcs_lifetimefilter.size(); r++) {
                                         text<<"FCS: lifetime filter, ch. "<<r<<"      : "<<doubleToQString(job.fcs_lifetimefilter[r].min_ns) << " ... "<<doubleToQString(job.fcs_lifetimefilter[r].max_ns) << "\n";
+                                    }
+                                }
+                                if (job.fcs_usebackcorrect) {
+                                    for (int r=0; r<job.fcs_backcorrect.size(); r++) {
+                                        text<<"FCS: background correction, ch. "<<r<<"      : "<<doubleToQString(job.fcs_backcorrect[r]) << "\n";
                                     }
                                 }
                                 text<<"FCS: count rate binning [s]      : "<<doubleToQString(job.fcs_crbinning) << "\n";

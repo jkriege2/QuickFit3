@@ -2,7 +2,7 @@
 #include "ui_qfrdrtablecolumnsboxplotdialog.h"
 
 QFRDRTableColumnsBoxplotDialog::QFRDRTableColumnsBoxplotDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableColumnsBoxplotDialog)
 {
     this->table=NULL;

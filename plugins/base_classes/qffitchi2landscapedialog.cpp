@@ -26,7 +26,7 @@
 
 
 QFFitChi2LandscapeDialog::QFFitChi2LandscapeDialog(QFFitResultsByIndexEvaluation* item, QFRawDataRecord *rec, int index, QFFitFunction *fitfunction, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFFitChi2LandscapeDialog)
 {
     this->item=item;

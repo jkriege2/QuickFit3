@@ -106,7 +106,7 @@ QVariant QFTableModel::headerData(int section, Qt::Orientation orientation, int 
          } else if (state.headerDataMap.contains(section)) {
              return state.headerDataMap[section].value(role, QVariant());
          }
-     } else if (orientation == Qt::Vertical && role == Qt::DisplayRole) {
+     } else if (orientation == Qt::Vertical) {
          if (role==Qt::DisplayRole) {
              QString name="";
              if (verticalHeaderShowRowNumbers) name=QString::number(section+1);
@@ -1274,7 +1274,14 @@ void QFTableModel::setRowTitleCreate(quint32 row, QString name)
     if (readonly) return;
     startMultiUndo();
     resize(qMax(state.rows, quint32(row+1)), state.columns);
-    if (int64_t(row)<state.rowNames.size()) state.rowNames[row]=name;
+    if (int64_t(row)<state.rowNames.size()) {
+        state.rowNames[row]=name;
+    } else {
+        while (state.rowNames.size()>=int64_t(row)) {
+            state.rowNames.append("");
+        }
+        state.rowNames[row]=name;
+    }
     if (doEmitSignals) {
         emit headerDataChanged(Qt::Vertical, row, row);
         emit rowTitleChanged(row);

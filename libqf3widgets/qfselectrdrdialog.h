@@ -21,7 +21,7 @@
 #ifndef QFSELECTRDRDIALOG_H
 #define QFSELECTRDRDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "libwid_imexport.h"
 #include "qfrawdatarecord.h"
 #include "qfproject.h"
@@ -50,7 +50,7 @@ namespace Ui {
 
     if no project is given in the contructor (i.e. \c project=NULL ) the current project is used.
   */
-class QFWIDLIB_EXPORT QFSelectRDRDialog : public QDialog
+class QFWIDLIB_EXPORT QFSelectRDRDialog : public QFDialog
 {
         Q_OBJECT
         

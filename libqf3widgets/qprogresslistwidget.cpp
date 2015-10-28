@@ -160,7 +160,7 @@ void QProgressListWidget::setItemText(int item, const QString& text) {
 }
 
 QProgressListDialog::QProgressListDialog(QWidget *parent, Qt::WindowFlags f):
-    QDialog(parent, f)
+    QFDialog(parent, f)
 {
     m_cancelRejects=false;
     m_wasCanceled=false;
@@ -169,7 +169,7 @@ QProgressListDialog::QProgressListDialog(QWidget *parent, Qt::WindowFlags f):
 }
 
 QProgressListDialog::QProgressListDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent, Qt::WindowFlags f):
-    QDialog(parent, f)
+    QFDialog(parent, f)
 {
     m_cancelRejects=false;
     m_wasCanceled=false;
@@ -190,7 +190,7 @@ void QProgressListDialog::cancel() {
 
 void QProgressListDialog::showEvent(QShowEvent *event) {
     m_wasCanceled=false;
-    QDialog::showEvent(event);
+    QFDialog::showEvent(event);
 }
 
 void QProgressListDialog::createWidgets() {

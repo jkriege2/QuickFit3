@@ -1,7 +1,7 @@
 #ifndef QFRDRIMAGINGFCSDIFFUSIONLAWDIALOG_H
 #define QFRDRIMAGINGFCSDIFFUSIONLAWDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QListWidgetItem>
 #include <QPointer>
 #include <QWidget>

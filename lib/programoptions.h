@@ -98,25 +98,25 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         int getMaxThreads() { return maxThreads; }
 
         inline QString getCurrentRawDataDir() { return currentRawDataDir; }
-        void setCurrentRawDataDir(QString d);
+        void setCurrentRawDataDir(QString d, bool write=true);
 
 
         /** \brief set languageID (which language to use for display) */
-        void setLanguageID(QString id);
+        void setLanguageID(QString id, bool write=true);
 
         /** \brief set the currently used stylesheet */
-        void setStylesheet(QString st);
+        void setStylesheet(QString st, bool write=true);
 
         /** \brief set the currently used style */
-        void setStyle(QString st);
+        void setStyle(QString st, bool write=true);
 
         /** \brief set the maximum number of threds */
-        void setMaxThreads(int threads);
+        void setMaxThreads(int threads, bool write=true);
 
         /** \brief autosave project every X minutes */
         int getAutosave() { return autosave; }
         /** \brief autosave project every X minutes (0 == off) */
-        void setAutosave(int interval);
+        void setAutosave(int interval, bool write=true);
 
         /** \brief the directory in which to save configuration data, see \ref qf3whereiswhat */
         QString getConfigFileDirectory() const;
@@ -143,24 +143,24 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         /** \brief set the directory from which to read global configuration data (do not expect to necessarily have write access to this directory!), see \ref qf3whereiswhat */
         void setGlobalConfigFileDirectory(const QString& dir);
 
-        void setProxyHost(const QString& host);
-        void setProxyPort(quint16 port);
+        void setProxyHost(const QString& host, bool write=true);
+        void setProxyPort(quint16 port, bool write=true);
         quint16 getProxyPort() const;
         QString getProxyHost() const;
         int getProxyType() const;
-        void setProxyType(int type);
+        void setProxyType(int type, bool write=true);
 
         bool getUserSaveAfterFirstEdit() const;
-        void setUserSaveAfterFirstEdit(bool set);
+        void setUserSaveAfterFirstEdit(bool set, bool write=true);
         bool getChildWindowsStayOnTop() const;
-        void setChildWindowsStayOnTop(bool set);
+        void setChildWindowsStayOnTop(bool set, bool write=true);
         bool getHelpWindowsStayOnTop() const;
-        void setHelpWindowsStayOnTop(bool set);
+        void setHelpWindowsStayOnTop(bool set, bool write=true);
         bool getProjectWindowsStayOnTop() const;
-        void setProjectWindowsStayOnTop(bool set);
+        void setProjectWindowsStayOnTop(bool set, bool write=true);
 
         bool debugLogVisible() const;
-        void setDebugLogVisible(bool visible);
+        void setDebugLogVisible(bool visible, bool write=true);
     public slots:
         /** \brief this function reads the current settings from the internal QSettings object settings */
         void readSettings();
@@ -248,19 +248,19 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         }
 
         /** \brief read a value from the main QSettings object */
-        static QVariant getConfigValue(const QString& name, QVariant defaultValue=QVariant()) {
+        static QVariant getConfigValue(const QString& name, QVariant defaultValue=QVariant(), bool sync=true) {
             if (!inst) return QVariant();
             if (!inst->settings) return QVariant();
-            inst->settings->sync();
+            if (sync) inst->settings->sync();
             return inst->settings->value(name, defaultValue);
         }
 
         /** \brief set a value in the main QSettings object */
-        static void setConfigValue(const QString& name, QVariant value) {
+        static void setConfigValue(const QString& name, QVariant value, bool sync=true) {
             if (!inst) return ;
             if (!inst->settings) return;
             inst->settings->setValue(name, value);
-            inst->settings->sync();
+            if (sync) inst->settings->sync();
         }
 
 

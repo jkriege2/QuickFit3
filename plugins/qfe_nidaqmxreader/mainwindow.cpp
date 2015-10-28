@@ -87,7 +87,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    storeSettings(QString(), "qfe_nidaqmxreader/");
     delete ui;
 }
 
@@ -126,38 +125,40 @@ void MainWindow::loadSettings(const QString &fn, const QString &prefix)
 {
     QString f=fn;
     QSettings* set=NULL;
-    if (f.isEmpty()) {
+    if (!f.isEmpty()) {
         set=new QSettings(f, QSettings::IniFormat);
     } else {
         set=ProgramOptions::getInstance()->getQSettings();
     }
-    channels->loadSettings(*set, prefix+QString("NIChannels/"));
-    ui->chkStartTrigger->setChecked(set->value(prefix+"chkStartTrigger", false).toBool());
-    ui->cmbStartTriggerEdge->setCurrentIndex(set->value(prefix+"cmbStartTriggerEdge", 0).toInt());
-    ui->edtStartTriggerChannel->setText(set->value(prefix+"edtStartTriggerChannel", "/Dev1/PFI0").toString());
-    ui->edtClockSource->setText(set->value(prefix+"edtClockSource", "").toString());
-    ui->chkStartTriggerRetrigger->setChecked(set->value(prefix+"chkStartTriggerRetrigger", false).toBool());
-    ui->chkRefTrigger->setChecked(set->value(prefix+"chkRefTrigger", true).toBool());
-    ui->cmbRefTriggerEdge->setCurrentIndex(set->value(prefix+"cmbRefTriggerEdge", 0).toInt());
-    ui->edtRefTriggerChannel->setText(set->value(prefix+"edtRefTriggerChannel", "/Dev1/PFI0").toString());
-    ui->spinSampleClock->setValue(set->value(prefix+"spinSampleClock", 1000).toDouble());
-    ui->spinUpdatePlotSamples->setValue(set->value(prefix+"spinUpdatePlotSamples", 100).toInt());
-    ui->spinSamples->setValue(set->value(prefix+"spinSamples", 10000).toInt());
-    ui->spinPreSamples->setValue(set->value(prefix+"spinPreSamples", 1000).toInt());
-    ui->spinPreviewSampleClock->setValue(set->value(prefix+"spinPreviewSampleClock", 200).toDouble());
-    ui->spinUpdatePreviewSamples->setValue(set->value(prefix+"spinUpdatePreviewSamples", 50).toInt());
-    ui->spinMaxPreviewSamples->setValue(set->value(prefix+"spinMaxPreviewSamples", 1000).toInt());
-    ui->chkAutoScaleY->setChecked(set->value(prefix+"chkAutoScaleY", false).toBool());
-    ui->spinYMin->setValue(set->value(prefix+"spinYMin", -10).toDouble());
-    ui->spinYMax->setValue(set->value(prefix+"spinYMax", 10).toDouble());
-    ui->spinDisplayAvg->setValue(set->value(prefix+"spinDisplayAvg", 10).toInt());
-    ui->spinPlotUpdate->setValue(set->value(prefix+"spinPlotUpdate", 100).toInt());
+    if (set) {
+        channels->loadSettings(*set, prefix+QString("NIChannels/"));
+        ui->chkStartTrigger->setChecked(set->value(prefix+"chkStartTrigger", false).toBool());
+        ui->cmbStartTriggerEdge->setCurrentIndex(set->value(prefix+"cmbStartTriggerEdge", 0).toInt());
+        ui->edtStartTriggerChannel->setText(set->value(prefix+"edtStartTriggerChannel", "/Dev1/PFI0").toString());
+        ui->edtClockSource->setText(set->value(prefix+"edtClockSource", "").toString());
+        ui->chkStartTriggerRetrigger->setChecked(set->value(prefix+"chkStartTriggerRetrigger", false).toBool());
+        ui->chkRefTrigger->setChecked(set->value(prefix+"chkRefTrigger", true).toBool());
+        ui->cmbRefTriggerEdge->setCurrentIndex(set->value(prefix+"cmbRefTriggerEdge", 0).toInt());
+        ui->edtRefTriggerChannel->setText(set->value(prefix+"edtRefTriggerChannel", "/Dev1/PFI0").toString());
+        ui->spinSampleClock->setValue(set->value(prefix+"spinSampleClock", 1000).toDouble());
+        ui->spinUpdatePlotSamples->setValue(set->value(prefix+"spinUpdatePlotSamples", 100).toInt());
+        ui->spinSamples->setValue(set->value(prefix+"spinSamples", 10000).toInt());
+        ui->spinPreSamples->setValue(set->value(prefix+"spinPreSamples", 1000).toInt());
+        ui->spinPreviewSampleClock->setValue(set->value(prefix+"spinPreviewSampleClock", 200).toDouble());
+        ui->spinUpdatePreviewSamples->setValue(set->value(prefix+"spinUpdatePreviewSamples", 50).toInt());
+        ui->spinMaxPreviewSamples->setValue(set->value(prefix+"spinMaxPreviewSamples", 1000).toInt());
+        ui->chkAutoScaleY->setChecked(set->value(prefix+"chkAutoScaleY", false).toBool());
+        ui->spinYMin->setValue(set->value(prefix+"spinYMin", -10).toDouble());
+        ui->spinYMax->setValue(set->value(prefix+"spinYMax", 10).toDouble());
+        ui->spinDisplayAvg->setValue(set->value(prefix+"spinDisplayAvg", 10).toInt());
+        ui->spinPlotUpdate->setValue(set->value(prefix+"spinPlotUpdate", 100).toInt());
 
-    ui->cmbCTransform->setCurrentIndex(set->value(prefix+"cmbCTransform", 0).toInt());
-    ui->spinCTransform1->setValue(set->value(prefix+"spinCTransform1", 0).toInt());
-    ui->spinCTransform2->setValue(set->value(prefix+"spinCTransform2", 1).toInt());
-    lastINIDir=set->value(prefix+"lastINIDir", "").toString();
-    if (f.isEmpty()) {
+        ui->cmbCTransform->setCurrentIndex(set->value(prefix+"cmbCTransform", 0).toInt());
+        ui->spinCTransform1->setValue(set->value(prefix+"spinCTransform1", 0).toInt());
+        ui->spinCTransform2->setValue(set->value(prefix+"spinCTransform2", 1).toInt());
+        lastINIDir=set->value(prefix+"lastINIDir", "").toString();
+    }
+    if (f.isEmpty() && set) {
         delete set;
     }
 }
@@ -167,37 +168,39 @@ void MainWindow::storeSettings(const QString &fn, const QString&prefix)
 {
     QString f=fn;
     QSettings* set=NULL;
-    if (f.isEmpty()) {
+    if (!f.isEmpty()) {
         set=new QSettings(f, QSettings::IniFormat);
     } else {
         set=ProgramOptions::getInstance()->getQSettings();
     }
-    set->setValue(prefix+"chkStartTrigger", ui->chkStartTrigger->isChecked());
-    set->setValue(prefix+"chkStartTriggerRetrigger", ui->chkStartTriggerRetrigger->isChecked());
-    set->setValue(prefix+"cmbStartTriggerEdge", ui->cmbStartTriggerEdge->currentIndex());
-    set->setValue(prefix+"edtStartTriggerChannel", ui->edtStartTriggerChannel->text());
-    set->setValue(prefix+"edtClockSource", ui->edtClockSource->text());
-    set->setValue(prefix+"chkRefTrigger", ui->chkRefTrigger->isChecked());
-    set->setValue(prefix+"cmbRefTriggerEdge", ui->cmbRefTriggerEdge->currentIndex());
-    set->setValue(prefix+"edtRefTriggerChannel", ui->edtRefTriggerChannel->text());
-    set->setValue(prefix+"spinSampleClock", ui->spinSampleClock->value());
-    set->setValue(prefix+"spinUpdatePlotSamples", ui->spinUpdatePlotSamples->value());
-    set->setValue(prefix+"spinSamples", ui->spinSamples->value());
-    set->setValue(prefix+"spinPreSamples", ui->spinPreSamples->value());
-    set->setValue(prefix+"spinPreviewSampleClock", ui->spinPreviewSampleClock->value());
-    set->setValue(prefix+"spinUpdatePreviewSamples", ui->spinUpdatePreviewSamples->value());
-    set->setValue(prefix+"spinMaxPreviewSamples", ui->spinMaxPreviewSamples->value());
-    set->setValue(prefix+"spinPlotUpdate", ui->spinPlotUpdate->value());
-    set->setValue(prefix+"spinCTransform1", ui->spinCTransform1->value());
-    set->setValue(prefix+"spinCTransform2", ui->spinCTransform2->value());
-    set->setValue(prefix+"cmbCTransform", ui->cmbCTransform->currentIndex());
-    set->setValue(prefix+"chkAutoScaleY", ui->chkAutoScaleY->isChecked());
-    set->setValue(prefix+"spinYMin", ui->spinYMin->value());
-    set->setValue(prefix+"spinYMax", ui->spinYMax->value());
-    set->setValue(prefix+"spinDisplayAvg", ui->spinDisplayAvg->value());
-    set->setValue(prefix+"lastINIDir", lastINIDir);
-    channels->storeSettings(*set, prefix+QString("NIChannels/"));
-    if (f.isEmpty()) {
+    if (set) {
+        set->setValue(prefix+"chkStartTrigger", ui->chkStartTrigger->isChecked());
+        set->setValue(prefix+"chkStartTriggerRetrigger", ui->chkStartTriggerRetrigger->isChecked());
+        set->setValue(prefix+"cmbStartTriggerEdge", ui->cmbStartTriggerEdge->currentIndex());
+        set->setValue(prefix+"edtStartTriggerChannel", ui->edtStartTriggerChannel->text());
+        set->setValue(prefix+"edtClockSource", ui->edtClockSource->text());
+        set->setValue(prefix+"chkRefTrigger", ui->chkRefTrigger->isChecked());
+        set->setValue(prefix+"cmbRefTriggerEdge", ui->cmbRefTriggerEdge->currentIndex());
+        set->setValue(prefix+"edtRefTriggerChannel", ui->edtRefTriggerChannel->text());
+        set->setValue(prefix+"spinSampleClock", ui->spinSampleClock->value());
+        set->setValue(prefix+"spinUpdatePlotSamples", ui->spinUpdatePlotSamples->value());
+        set->setValue(prefix+"spinSamples", ui->spinSamples->value());
+        set->setValue(prefix+"spinPreSamples", ui->spinPreSamples->value());
+        set->setValue(prefix+"spinPreviewSampleClock", ui->spinPreviewSampleClock->value());
+        set->setValue(prefix+"spinUpdatePreviewSamples", ui->spinUpdatePreviewSamples->value());
+        set->setValue(prefix+"spinMaxPreviewSamples", ui->spinMaxPreviewSamples->value());
+        set->setValue(prefix+"spinPlotUpdate", ui->spinPlotUpdate->value());
+        set->setValue(prefix+"spinCTransform1", ui->spinCTransform1->value());
+        set->setValue(prefix+"spinCTransform2", ui->spinCTransform2->value());
+        set->setValue(prefix+"cmbCTransform", ui->cmbCTransform->currentIndex());
+        set->setValue(prefix+"chkAutoScaleY", ui->chkAutoScaleY->isChecked());
+        set->setValue(prefix+"spinYMin", ui->spinYMin->value());
+        set->setValue(prefix+"spinYMax", ui->spinYMax->value());
+        set->setValue(prefix+"spinDisplayAvg", ui->spinDisplayAvg->value());
+        set->setValue(prefix+"lastINIDir", lastINIDir);
+        channels->storeSettings(*set, prefix+QString("NIChannels/"));
+    }
+    if (f.isEmpty() && set) {
         delete set;
     }
 }
@@ -206,7 +209,7 @@ void MainWindow::loadINI()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load INI"),
                                                     lastINIDir,
-                                                    tr("INI files (*.ini)"));
+                                                    tr("INI files (*.ini);;All Files (*.*)"));
     if (!fileName.isEmpty()) loadSettings(fileName);
 }
 
@@ -214,7 +217,7 @@ void MainWindow::saveINI()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save INI"),
                                                     lastINIDir,
-                                                    tr("INI files (*.ini)"));
+                                                    tr("INI files (*.ini);;All Files (*.*)"));
     if (!fileName.isEmpty()) storeSettings(fileName);
 }
 
@@ -235,7 +238,7 @@ void MainWindow::startAcquisition(bool start)
     }
 
     // store settings to INI
-    if (start) storeSettings(QString(), "qfe_nidaqmxreader/");
+    if (start) storeSettings(QString(), "General/");
 
     // disable settings tab, as the user may not alter the task settings during acquisition
     ui->tabSettings->setEnabled(!(start || actStartPreview->isChecked()));

@@ -35,7 +35,7 @@
 #include "qfexporter.h"
 
 SubPluginLinkDialog::SubPluginLinkDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::SubPluginLinkDialog)
 {
     ui->setupUi(this);

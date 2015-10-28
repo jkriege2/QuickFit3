@@ -31,7 +31,7 @@
 #ifndef QFFITALGORITHMLMFITCONFIG_H
 #define QFFITALGORITHMLMFITCONFIG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFFitAlgorithmLMFitConfigDialog;
@@ -40,7 +40,7 @@ namespace Ui {
 /*! \brief dialog class for lmfit Fit Algorithm
     \ingroup qf3fitalgp_lmfit
 */
-class QFFitAlgorithmLMFitConfigDialog : public QDialog
+class QFFitAlgorithmLMFitConfigDialog : public QFDialog
 {
     Q_OBJECT
 

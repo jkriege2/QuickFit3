@@ -21,7 +21,7 @@
 #ifndef OBJECTIVES_H
 #define OBJECTIVES_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QString>
 #include <QWidget>
 #include <QComboBox>
@@ -63,7 +63,7 @@ namespace Ui {
 
 
  */
-class QFWIDLIB_EXPORT QF3ObjectiveEditor : public QDialog
+class QFWIDLIB_EXPORT QF3ObjectiveEditor : public QFDialog
 {
     Q_OBJECT
 

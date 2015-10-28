@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "ui_qfimfccsfitchi2landscapedialog.h"
 
 QFImFCCSFitChi2LandscapeDialog::QFImFCCSFitChi2LandscapeDialog(QFImFCCSFitEvaluationItem *item, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFImFCCSFitChi2LandscapeDialog)
 {
     this->item=item;

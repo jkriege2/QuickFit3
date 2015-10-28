@@ -22,14 +22,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFITALGORITHMGSLSIMPLEXCONFIGDIALOG_H
 #define QFFITALGORITHMGSLSIMPLEXCONFIGDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qffitalgorithm.h"
 
 namespace Ui {
     class QFFitAlgorithmGSLSimplexConfigDialog;
 }
 
-class QFFitAlgorithmGSLSimplexConfigDialog : public QDialog
+class QFFitAlgorithmGSLSimplexConfigDialog : public QFDialog
 {
         Q_OBJECT
         

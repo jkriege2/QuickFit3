@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGSELECTPROJECTSUBSET_H
 #define DLGSELECTPROJECTSUBSET_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfproject.h"
 #include "qfprojectrawdatamodel.h"
 
@@ -30,7 +30,7 @@ namespace Ui {
     class DlgSelectProjectSubset;
 }
 
-class DlgSelectProjectSubset : public QDialog
+class DlgSelectProjectSubset : public QFDialog
 {
         Q_OBJECT
         

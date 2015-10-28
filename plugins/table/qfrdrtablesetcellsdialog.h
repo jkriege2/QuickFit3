@@ -23,14 +23,14 @@
 #ifndef QFRDRTABLESETCELLSDIALOG_H
 #define QFRDRTABLESETCELLSDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QVariant>
 
 namespace Ui {
     class QFRDRTableSetCellsDialog;
 }
 
-class QFRDRTableSetCellsDialog : public QDialog
+class QFRDRTableSetCellsDialog : public QFDialog
 {
         Q_OBJECT
 

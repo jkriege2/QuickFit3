@@ -14,7 +14,7 @@
 #include "qfpluginservices.h"
 
 
-class MulticontrolSettingsDialog : public QDialog
+class MulticontrolSettingsDialog : public QFDialog
 
 {
     Q_OBJECT

@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFRDRIMAGINGFCSCORRELATIONDIALOG_H
 #define QFRDRIMAGINGFCSCORRELATIONDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfproject.h"
 #include "programoptions.h"
 #include "qfrdrimagingfcsthreadprogress.h"
@@ -45,7 +45,7 @@ namespace Ui {
     Finally getFilesToAdd() returns a list of file constaining ACFs and CCFs to be added to the
     project, by calling QFRDRImagingFCSPlugin::insertVideoCorrelatorFile().
 */
-class QFRDRImagingFCSCorrelationDialog : public QDialog {
+class QFRDRImagingFCSCorrelationDialog : public QFDialog {
         Q_OBJECT
 
     public:

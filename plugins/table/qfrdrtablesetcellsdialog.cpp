@@ -24,7 +24,7 @@
 #include "ui_qfrdrtablesetcellsdialog.h"
 
 QFRDRTableSetCellsDialog::QFRDRTableSetCellsDialog(const QVariant &init, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableSetCellsDialog)
 {
     ui->setupUi(this);

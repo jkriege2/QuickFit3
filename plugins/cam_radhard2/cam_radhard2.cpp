@@ -178,7 +178,7 @@ void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int /*camera*/
 	   alternatively you may also display a window which stays open and allows the suer to set settings also
 	   during the measurement.
 	*/
-    QDialog* dlg=new QDialog(parent);
+    QFDialog* dlg=new QFDialog(parent);
 
     QVBoxLayout* lay=new QVBoxLayout();
     dlg->setLayout(lay);

@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef USERFITFUNCTIONSEDITOR_H
 #define USERFITFUNCTIONSEDITOR_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QListWidgetItem>
 #include "userfitfunctionmodel.h"
 #include "qffunctionreferencetool.h"
@@ -33,7 +33,7 @@ namespace Ui {
     class UserFitFunctionsEditor;
 }
 
-class UserFitFunctionsEditor : public QDialog
+class UserFitFunctionsEditor : public QFDialog
 {
         Q_OBJECT
         

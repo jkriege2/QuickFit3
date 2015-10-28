@@ -28,7 +28,7 @@
 #include "programoptions.h"
 
 DlgColorbarColoring::DlgColorbarColoring(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DlgColorbarColoring)
 {
     ui->setupUi(this);

@@ -24,7 +24,7 @@
 #include "programoptions.h"
 
 QFRDRImageCopyDataSelectDialog::QFRDRImageCopyDataSelectDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRImageCopyDataSelectDialog)
 {
     ui->setupUi(this);

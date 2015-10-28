@@ -405,7 +405,7 @@ void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& sett
 	// if you want the settings dialog to be modal, you may uncomment the next lines
 	// and add implementations
 	/////////////////////////////////////////////////////////////////////////////////
-	QDialog* dlg=new QDialog(parent);
+    QFDialog* dlg=new QFDialog(parent);
     dlg->setWindowTitle(tr("camera settings for %1 (sensor: %2)").arg(getCameraName(camera)).arg(getCameraSensorName(camera)));
 
     QVBoxLayout* lay=new QVBoxLayout();

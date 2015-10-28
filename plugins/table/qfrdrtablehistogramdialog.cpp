@@ -26,7 +26,7 @@
 #include "statistics_tools.h"
 
 QFRDRTableHistogramDialog::QFRDRTableHistogramDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableHistogramDialog)
 {
     selected=-1;

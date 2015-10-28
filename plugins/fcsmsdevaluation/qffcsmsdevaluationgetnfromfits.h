@@ -22,14 +22,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFCSMSDEVALUATIONGETNFROMFITS_H
 #define QFFCSMSDEVALUATIONGETNFROMFITS_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
 namespace Ui {
     class QFFCSMSDEvaluationGetNFromFits;
 }
 
-class QFFCSMSDEvaluationGetNFromFits : public QDialog
+class QFFCSMSDEvaluationGetNFromFits : public QFDialog
 {
         Q_OBJECT
         

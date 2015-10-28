@@ -30,7 +30,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 inline double sqr(double x) { return x*x; }
 
 dlgEstimateFocalVolume::dlgEstimateFocalVolume(ProgramOptions* settings, QWidget* parent):
-    QDialog(parent)
+    QFDialog(parent)
 {
     this->settings=settings;
     setupUi(this);

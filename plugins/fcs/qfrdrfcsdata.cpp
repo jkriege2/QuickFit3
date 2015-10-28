@@ -460,12 +460,35 @@ void QFRDRFCSData::correctCorrelations()
 {
     bool ok=false;
     double offset=getProperty("CF_CORRECT_OFFSET", 0.0).toDouble(&ok);
+    double factor=getProperty("CF_CORRECT_FACTOR", 1.0).toDouble();
+
     if (ok && !qFuzzyIsNull(offset) && correlation) {
         for (int r=0; r<correlationN*correlationRuns; r++) {
-            correlation[r]=correlation[r]-offset;
+            correlation[r]=factor*(correlation[r]-offset);
         }
         recalculateCorrelations();
     }
+}
+
+void QFRDRFCSData::correctRates()
+{
+    bool ok=false;
+    double B0=getProperty("CNT_CORRECT_OFFSET0", 0.0).toDouble();
+    double B1=getProperty("CNT_CORRECT_OFFSET1", 0.0).toDouble();
+
+    if (ok && (!qFuzzyIsNull(B0) || !qFuzzyIsNull(B1)) && rate) {
+        for (int c=0; c<rateChannels; c++) {
+            double B=(c==0)?B0:B1;
+            for (int r=0; r<rateRuns; r++) {
+                double* d=getRateRun(r, c);
+                for (int i=0; i<rateN; i++) {
+                    d[i]=d[i]-B;
+                }
+            }
+        }
+        calcBinnedRate();
+    }
+
 }
 
 double QFRDRFCSData::calcRateMean(int run, int channel) const {
@@ -791,7 +814,7 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
         reloadFromFiles();
     }
     correctCorrelations();
-
+    correctRates();
 
 
     //std::cout<<"intReadData ended\n";
@@ -2292,6 +2315,7 @@ void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
 
 
     double offset=getProperty("CF_CORRECT_OFFSET", 0.0).toDouble();
+    double factor=getProperty("CF_CORRECT_FACTOR", 1.0).toDouble();
     w.writeStartElement("internal_correlations_bin");
     w.writeAttribute("correlationN", QString::number(correlationN));
     w.writeAttribute("correlationRuns", QString::number(correlationRuns));
@@ -2302,7 +2326,7 @@ void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
         w.writeEndElement();
         w.writeStartElement("correlations");
         tmp=arrayToVector(correlation, correlationN*correlationRuns);
-        for (int i=0; i<tmp.size(); i++) tmp[i]=tmp[i]+offset;
+        for (int i=0; i<tmp.size(); i++) tmp[i]=tmp[i]/factor+offset;
         w.writeCDATA(doubleArrayToString_base64(tmp));
         w.writeEndElement();
         w.writeStartElement("correlation_errors");
@@ -2311,6 +2335,8 @@ void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
         w.writeEndElement();
     w.writeEndElement();
 
+    double B0=getProperty("CNT_CORRECT_OFFSET0", 0.0).toDouble();
+    double B1=getProperty("CNT_CORRECT_OFFSET1", 0.0).toDouble();
     w.writeStartElement("internal_countrate_bin");
     w.writeAttribute("encoding", "base64");
     w.writeAttribute("rateRuns", QString::number(rateRuns));
@@ -2322,7 +2348,10 @@ void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
         w.writeEndElement();
         w.writeStartElement("counts");
         tmp=arrayToVector(rate, rateRuns*rateChannels*rateN);
-        for (int i=0; i<tmp.size(); i++) tmp[i]=tmp[i]+offset;
+        for (int c=0; c<rateChannels; c++) {
+            double B=(c==0)?B0:B1;
+            for (int i=c*rateRuns*rateN; i<(c+1)*rateRuns*rateN; i++) tmp[i]=tmp[i]+B;
+        }
         w.writeCDATA(doubleArrayToString_base64(tmp));
         w.writeEndElement();
     w.writeEndElement();

@@ -25,7 +25,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qftools.h"
 
 QFRadhard2Flashtool::QFRadhard2Flashtool(QFExtensionCameraRadhard2 *ext, QWidget* parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRadhard2Flashtool)
 {
     this->radhard2extension=ext;

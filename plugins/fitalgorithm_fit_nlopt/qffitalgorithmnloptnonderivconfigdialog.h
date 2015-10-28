@@ -22,14 +22,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFitAlgorithmNLOptNonDerivConfigDialog_H
 #define QFFitAlgorithmNLOptNonDerivConfigDialog_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qffitalgorithm.h"
 
 namespace Ui {
     class QFFitAlgorithmNLOptNonDerivConfigDialog;
 }
 
-class QFFitAlgorithmNLOptNonDerivConfigDialog : public QDialog
+class QFFitAlgorithmNLOptNonDerivConfigDialog : public QFDialog
 {
         Q_OBJECT
         

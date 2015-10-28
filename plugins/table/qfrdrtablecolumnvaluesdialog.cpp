@@ -27,7 +27,7 @@
 #include "qftools.h"
 
 QFRDRTableColumnValuesDialog::QFRDRTableColumnValuesDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableColumnValuesDialog)
 {
     ui->setupUi(this);

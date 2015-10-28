@@ -475,6 +475,7 @@ void QFPRDRFCS::insertPicoQuantCORFile(const QStringList &filename, const QMap<Q
                 project->deleteRawData(e->getID());
             } else {
                 e->setRole(ro);
+                e->setGroup(project->addOrFindRDRGroup(filename.value(0, "")));
             }
 
         }

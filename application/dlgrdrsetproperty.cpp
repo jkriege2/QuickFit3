@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "ui_dlgrdrsetproperty.h"
 
 dlgRDRSetProperty::dlgRDRSetProperty(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::dlgRDRSetProperty)
 {
     ui->setupUi(this);

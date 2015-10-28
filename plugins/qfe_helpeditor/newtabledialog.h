@@ -23,13 +23,13 @@
 #ifndef NEWTABLEDIALOG_H
 #define NEWTABLEDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QLabel>
 namespace Ui {
     class NewTableDialog;
 }
 
-class NewTableDialog : public QDialog
+class NewTableDialog : public QFDialog
 {
         Q_OBJECT
 

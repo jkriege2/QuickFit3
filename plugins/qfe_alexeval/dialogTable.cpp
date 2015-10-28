@@ -23,7 +23,7 @@ Copyright (c) 2012-2015 by Sebastian Isbaner
 #include "ui_dialogTable.h"
 
 DialogTable::DialogTable(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DialogTable)
 {
     ui->setupUi(this);

@@ -28,7 +28,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfstyledbutton.h"
 
 QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFSelectRDRDialog)
 {
     ui->setupUi(this);
@@ -51,7 +51,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, QWidget *p
 }
 
 QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, bool functorPrivate, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFSelectRDRDialog)
 {
     ui->setupUi(this);
@@ -74,7 +74,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, bool funct
 }
 
 QFSelectRDRDialog::QFSelectRDRDialog(QWidget *parent):
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFSelectRDRDialog)
 {
     ui->setupUi(this);

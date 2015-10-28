@@ -24,7 +24,7 @@
 #ifndef QFRDRTABLECURVEFITDIALOG_H
 #define QFRDRTABLECURVEFITDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QVector>
 #include "qfrdrtable.h"
 #include "qffitfunctionvalueinputtable.h"
@@ -35,7 +35,7 @@ namespace Ui {
     class QFRDRTableCurveFitDialog;
 }
 
-class QFRDRTableCurveFitDialog : public QDialog
+class QFRDRTableCurveFitDialog : public QFDialog
 {
         Q_OBJECT
         

@@ -259,7 +259,7 @@ void QFExtensionServoPololuMaestro::showShutterSettingsDialog(unsigned int /*shu
         // and add implementations
         /////////////////////////////////////////////////////////////////////////////////
 
-        QDialog* dlg=new QDialog(parent);
+        QDialog* dlg=new QFDialog(parent);
 
         QVBoxLayout* lay=new QVBoxLayout();
         dlg->setLayout(lay);

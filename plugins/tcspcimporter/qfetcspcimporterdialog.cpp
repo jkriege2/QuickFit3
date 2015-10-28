@@ -42,8 +42,58 @@
 
 #define UPDATE_TIMEOUT 250
 
+class QFTCSPCReaderOpener {
+    public:
+        QFTCSPCReaderOpener(QFTCSPCReader* reader) {
+            this->reader=reader;
+        }
+
+        bool operator()(const QString &filename, const QString &parameters) {
+            return reader->open(filename, parameters);
+        }
+        typedef bool result_type;
+
+        protected:
+            QFTCSPCReader* reader;
+};
+class QFTCSPCReaderRateCounter {
+    public:
+        QFTCSPCReaderRateCounter(QFTCSPCReader* reader) {
+            this->reader=reader;
+        }
+
+        QVector<double> operator()() {
+            QVector<double> br;
+            QVector<uint64_t> b;
+            int bch=reader->inputChannels();
+            for (int i=0; i<bch; i++) {
+                b<<0;
+            }
+            double dur=0;
+
+            do {
+                QFTCSPCRecord rec=reader->getCurrentRecord();
+                if (rec.isPhoton) {
+                    if ((int)rec.input_channel>=0 && rec.input_channel<b.size()) {
+                        b[rec.input_channel]=b[rec.input_channel]+1;
+                        dur=rec.absoluteTime();
+                    }
+                }
+            } while (reader->nextRecord());
+            for (int i=0; i<b.size(); i++) {
+                if (dur>0) br<<double(b[i])/dur;
+                else br<<0.0;
+            }
+            return br;
+        }
+        typedef QVector<double> result_type;
+
+        protected:
+            QFTCSPCReader* reader;
+};
+
 QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFETCSPCImporterDialog)
 {
     this->pluginServices=pluginservices;
@@ -92,6 +142,14 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     tmFCSLifetimeFilter->clear();
     ui->tvFCSLifetimeFilter->setModel(tmFCSLifetimeFilter);
     ui->tvFCSLifetimeFilter->setItemDelegate(new QFTableDelegate(ui->tvFCSLifetimeFilter));
+
+
+    tmBackgroundFCS=new QFTableModel(ui->tvBackgroundFCS);
+    tmBackgroundFCS->setReadonly(false);
+    tmBackgroundFCS->clear();
+    ui->tvBackgroundFCS->setModel(tmBackgroundFCS);
+    ui->tvBackgroundFCS->setItemDelegate(new QFTableDelegate(ui->tvBackgroundFCS));
+
     ui->cmbCorrelator->clear();
     ui->cmbCorrelator->addItem(tr("bin and correlate: Multi-Tau 1 (one monitor per lag)"), CORRELATOR_MTAUALLMON);
     ui->cmbCorrelator->addItem(tr("photon arrival times correlator (Multi-Tau)"), CORRELATOR_TTTR);
@@ -159,6 +217,7 @@ void QFETCSPCImporterDialog::setLifetimeFilter(int ch, double min_ns, double max
         tmFCSLifetimeFilter->setCell(ch,1,max_ns);
     }
 }
+
 
 bool QFETCSPCImporterDialog::allThreadsDone() const  {
     for (int i=0; i<jobs.size(); i++) {
@@ -242,7 +301,7 @@ void QFETCSPCImporterDialog::done(int status)  {
             delete jobs[i].thread;
         }
         prg.close();
-        QDialog::done(status);
+        QFDialog::done(status);
         close();
     }
 
@@ -371,6 +430,40 @@ void QFETCSPCImporterDialog::on_btnLoad_clicked() {
     writeSettings();
 }
 
+void QFETCSPCImporterDialog::on_btnBackFromFile_clicked()
+{
+    QFTCSPCReader* reader=QFETCSPCImporterJobThread::getImporter(ui->cmbFileformat->currentIndex(), pluginServices);
+    if (reader) {
+        QString fileName = qfGetOpenFileName(this, tr("Select TCSPC Background File ..."), lastTCSPCFileDir, tcspcFilters.value(ui->cmbFileformat->currentIndex()));
+        if (!fileName.isEmpty()) {
+            QFTCSPCReaderOpener opener(reader);
+            QFuture<bool> opened=QtConcurrent::run(opener, ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text());
+            while (!opened.isFinished()) {
+                QApplication::processEvents();
+            }
+
+            if (opened.result()) {//reader->open(ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text())) {
+
+                QFTCSPCReaderRateCounter counter(reader);
+                QFuture<QVector<double> > counted=QtConcurrent::run(counter);
+                while (!counted.isFinished()) {
+                    QApplication::processEvents();
+                }
+
+                QVector<double> b=counted.result();
+                for (int i=0; i<b.size(); i++) {
+                    tmBackgroundFCS->setCell(i, 0, b[i]);
+                }
+
+                reader->close();
+            }
+
+            writeSettings();
+        }
+        delete reader;
+    }
+}
+
 void QFETCSPCImporterDialog::writeSettings() {
     if (!options) return;
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/last_imagefile_dir", lastTCSPCFileDir);
@@ -392,7 +485,9 @@ void QFETCSPCImporterDialog::writeSettings() {
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkFCS", ui->chkFCS->isChecked());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkLifetimeHistogram", ui->chkLifetimeHistogram->isChecked());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkFCSLifetimeFilter", ui->chkFCSLifetimeFilter->isChecked());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkBackgroundFCS", ui->chkBackgroundFCS->isChecked());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/tmFCSLifetimeFilter", tmFCSLifetimeFilter->toCSV());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/tmBackgroundFCS", tmBackgroundFCS->toCSV());
 
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/radSegDuration", ui->radSegDuration->isChecked());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/radSegNum", ui->radSegNum->isChecked());
@@ -441,6 +536,16 @@ void QFETCSPCImporterDialog::readSettings() {
     tmFCSLifetimeFilter->setColumnTitleCreate(1, tr("max. lifetime [ns]"));
 
     tmFCSLifetimeFilter->fromCSV(options->getQSettings()->value("tcspcimporter/dlg_correlate/tmFCSLifetimeFilter", "").toString());
+
+
+    ui->chkBackgroundFCS->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/chkBackgroundFCS", ui->chkBackgroundFCS->isChecked()).toBool());
+    for (int r=0; r<tmBackgroundFCS->rowCount(); r++) {
+        tmBackgroundFCS->setRowTitleCreate(r, tr("channel %1:").arg(r+1));
+        tmBackgroundFCS->setCell(r, 0, 0);
+    }
+    tmBackgroundFCS->setColumnTitleCreate(0, tr("background countrate [Hz]"));
+
+    tmBackgroundFCS->fromCSV(options->getQSettings()->value("tcspcimporter/dlg_correlate/tmBackgroundFCS", "").toString());
 
     ui->radSegDuration->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/radSegDuration", ui->radSegDuration->isChecked()).toBool());
     ui->radSegNum->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/radSegNum", ui->radSegNum->isChecked()).toBool());
@@ -569,6 +674,20 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
                 if (!ok) fl.max_ns=0;
             }
             job.fcs_lifetimefilter.append(fl);
+        }
+    }
+
+    job.fcs_usebackcorrect=ui->chkBackgroundFCS->isChecked();
+    job.fcs_backcorrect.clear();
+    if (job.fcs_usebackcorrect) {
+        for (int i=0; i<channels; i++) {
+            double b=0;
+            if (i<tmBackgroundFCS->rowCount() && tmBackgroundFCS->columnCount()>=1) {
+                bool ok=false;
+                b=tmBackgroundFCS->cell(i, 0).toDouble(&ok);
+                if (!ok) b=0;
+            }
+            job.fcs_backcorrect.append(b);
         }
     }
 
@@ -702,20 +821,6 @@ void QFETCSPCImporterDialog::on_btnPeekLifetime_clicked()
     }
 }
 
-class QFTCSPCReaderOpener {
-    public:
-        QFTCSPCReaderOpener(QFTCSPCReader* reader) {
-            this->reader=reader;
-        }
-
-        bool operator()(const QString &filename, const QString &parameters) {
-            return reader->open(filename, parameters);
-        }
-        typedef bool result_type;
-
-        protected:
-            QFTCSPCReader* reader;
-};
 
 /*
  *
@@ -846,6 +951,27 @@ void QFETCSPCImporterDialog::updateFromFile(bool /*readFrameCount*/) {
 
             ui->tvFCSLifetimeFilter->setModel(tmFCSLifetimeFilter);
             ui->tvFCSLifetimeFilter->resizeColumnsToContents();
+
+
+
+
+            ui->tvBackgroundFCS->setModel(NULL);
+            tmBackgroundFCS->setReadonly(false);
+            tmBackgroundFCS->setColumnTitleCreate(0, tr("countrate [Hz]"));
+            while (tmBackgroundFCS->rowCount()<channels) {
+                int r=tmBackgroundFCS->rowCount();
+                tmBackgroundFCS->setRowTitleCreate(r, tr("channel %1:").arg(r+1));
+                tmBackgroundFCS->setCellCreate(r, 0, 0.0);
+                //qDebug()<<"    adding filter channel "<<r;
+            }
+
+            tmBackgroundFCS->resize(qMin(tmBackgroundFCS->rowCount(),channels), tmBackgroundFCS->columnCount());
+
+            ui->tvBackgroundFCS->setModel(tmBackgroundFCS);
+            ui->tvBackgroundFCS->resizeColumnsToContents();
+
+
+
 
             ui->tvFCS->setModel(NULL);
             tmFCS->setReadonly(false);

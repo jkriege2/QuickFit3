@@ -22,7 +22,7 @@ Copyright (c) 2012-2015 by Sebastian Isbaner
 #ifndef DIALOGRECONSTRUCTMARKERRECORDS_H
 #define DIALOGRECONSTRUCTMARKERRECORDS_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
 class DialogReconstructMarkerRecords;
@@ -44,7 +44,7 @@ enum ReconstructionMethod {
  * (otherwise false information will be displayed)
  * After calling exec(), you can acquire the user settings via the getter methods.
  */
-class DialogReconstructMarkerRecords : public QDialog
+class DialogReconstructMarkerRecords : public QFDialog
 {
     Q_OBJECT
 

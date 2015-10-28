@@ -24,7 +24,7 @@
 #ifndef QFRDRTABLEFORMULADIALOG_H
 #define QFRDRTABLEFORMULADIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfcompleterfromfile.h"
 #include <QCompleter>
 #include <QThread>
@@ -59,7 +59,7 @@ class QFRDRTable; // forward
     on the rhs of the dialog.
 */
 
-class QFRDRTableFormulaDialog : public QDialog
+class QFRDRTableFormulaDialog : public QFDialog
 {
         Q_OBJECT
         

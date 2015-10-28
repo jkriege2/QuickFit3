@@ -28,7 +28,7 @@
 #include "qftablepluginmodel.h"
 
 DlgIMportTable::DlgIMportTable(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DlgIMportTable)
 {
     ui->setupUi(this);
@@ -41,7 +41,7 @@ DlgIMportTable::DlgIMportTable(QWidget *parent) :
 }
 
 DlgIMportTable::DlgIMportTable(bool pastAgainEnabled, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DlgIMportTable)
 {
     ui->setupUi(this);

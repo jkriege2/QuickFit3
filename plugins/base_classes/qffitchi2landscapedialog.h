@@ -22,7 +22,7 @@
 #ifndef QFFitChi2LandscapeDialog_H
 #define QFFitChi2LandscapeDialog_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfrawdatarecord.h"
 #include "qffitfunction.h"
 #include "qffitresultsbyindexevaluation.h"
@@ -30,7 +30,7 @@ namespace Ui {
     class QFFitChi2LandscapeDialog;
 }
 
-class QFFitChi2LandscapeDialog : public QDialog
+class QFFitChi2LandscapeDialog : public QFDialog
 {
         Q_OBJECT
         

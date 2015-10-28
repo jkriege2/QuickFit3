@@ -22,13 +22,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGFCCSFITALLCONFIGURATION_H
 #define DLGFCCSFITALLCONFIGURATION_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class DlgFCCSFitAllConfiguration;
 }
 
-class DlgFCCSFitAllConfiguration : public QDialog
+class DlgFCCSFitAllConfiguration : public QFDialog
 {
         Q_OBJECT
         

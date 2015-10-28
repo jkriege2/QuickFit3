@@ -29,7 +29,7 @@
 #include "qfcompleterfromfile.h"
 
 QFESpectraViewerDetectorEditor::QFESpectraViewerDetectorEditor(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFESpectraViewerDetectorEditor)
 {
     ui->setupUi(this);

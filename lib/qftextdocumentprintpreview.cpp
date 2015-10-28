@@ -65,7 +65,7 @@ public:
 
 
 QFTextDocumentPrintPreview::QFTextDocumentPrintPreview(QPrinter * printer, QTextDocument* txt, QWidget *parent, bool hasFontSizeEdit) :
-    QDialog(parent)
+    QFDialog(parent)
 {
 
 

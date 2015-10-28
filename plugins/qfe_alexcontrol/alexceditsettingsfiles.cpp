@@ -4,7 +4,7 @@
 
 
 ALEXCEditSettingsFiles::ALEXCEditSettingsFiles(const QString &channels, const QString &timing, const QString &ports, QWidget *parent):
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::ALEXCEditSettingsFiles)
 {
     ui->setupUi(this);

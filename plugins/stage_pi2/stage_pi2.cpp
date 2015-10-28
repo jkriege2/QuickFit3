@@ -186,7 +186,7 @@ void QFExtensionLinearStagePI2::showSettingsDialog(unsigned int /*axis*/, QWidge
 //        // and add implementations
 //        /////////////////////////////////////////////////////////////////////////////////
 
-//        QDialog* dlg=new QDialog(parent);
+//        QDialog* dlg=new QFDialog(parent);
 
 //        QVBoxLayout* lay=new QVBoxLayout();
 //        dlg->setLayout(lay);

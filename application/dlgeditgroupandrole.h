@@ -1,14 +1,15 @@
 #ifndef DLGEDITGROUPANDROLE_H
 #define DLGEDITGROUPANDROLE_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfproject.h"
+
 
 namespace Ui {
     class DlgEditGroupAndRole;
 }
 
-class DlgEditGroupAndRole : public QDialog
+class DlgEditGroupAndRole : public QFDialog
 {
         Q_OBJECT
 

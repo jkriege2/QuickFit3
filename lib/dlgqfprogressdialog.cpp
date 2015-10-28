@@ -24,7 +24,7 @@
 #include <QTimer>
 
 dlgQFProgressDialog::dlgQFProgressDialog(QWidget* parent):
-    QDialog(parent), ui(new Ui::QFProgressDlg)
+    QFDialog(parent), ui(new Ui::QFProgressDlg)
 {
     ui->setupUi(this);
     m_canceled=false;

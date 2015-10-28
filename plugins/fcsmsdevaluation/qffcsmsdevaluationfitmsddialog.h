@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFCSMSDEVALUATIONFITMSDDIALOG_H
 #define QFFCSMSDEVALUATIONFITMSDDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qffcsmsdevaluation_item.h"
 #include <QVector>
 
@@ -30,7 +30,7 @@ namespace Ui {
     class QFFCSMSDEvaluationFitMSDDialog;
 }
 
-class QFFCSMSDEvaluationFitMSDDialog : public QDialog
+class QFFCSMSDEvaluationFitMSDDialog : public QFDialog
 {
         Q_OBJECT
         

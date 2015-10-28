@@ -27,7 +27,7 @@
 #include <QPainter>
 #include <QRadialGradient>
 #include <QMouseEvent>
-#include <QDialog>
+#include "qfdialog.h"
 #include <QPlainTextEdit>
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
@@ -489,7 +489,7 @@ void QFLUTEditor::resetLUT()
 
 void QFLUTEditor::showLUTInfo()
 {
-    QDialog* dlg=new QDialog(this);
+    QFDialog* dlg=new QFDialog(this);
     dlg->setWindowTitle(tr("LUT Info"));
     QVBoxLayout* lay=new QVBoxLayout();
     dlg->setLayout(lay);

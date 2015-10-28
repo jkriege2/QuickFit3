@@ -22,13 +22,13 @@ Copyright (c) 2008-2015 Jan Buchholz, German Cancer Research Center
 #ifndef CAM_RH2V2_CFGDLG_H
 #define CAM_RH2V2_CFGDLG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
 class cam_rh2v2_cfgdlg;
 }
 
-class cam_rh2v2_cfgdlg : public QDialog
+class cam_rh2v2_cfgdlg : public QFDialog
 {
     Q_OBJECT
     

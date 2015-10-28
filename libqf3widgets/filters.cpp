@@ -32,7 +32,7 @@ FilterDescription::FilterDescription() {
 
 
 QF3FilterEditor::QF3FilterEditor(const FilterDescription& filter, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QF3FilterEditor)
 {
     ui->setupUi(this);

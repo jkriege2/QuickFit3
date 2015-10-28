@@ -24,7 +24,7 @@
 #ifndef QFECALCULATORDIALOG_H
 #define QFECALCULATORDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfmathparser.h"
 #include "qftools.h"
 #include "qffunctionreferencetool.h"
@@ -36,7 +36,7 @@ namespace Ui {
 class QFECalculatorDialog;
 }
 
-class QFECalculatorDialog : public QDialog {
+class QFECalculatorDialog : public QFDialog {
         Q_OBJECT
 
     public:

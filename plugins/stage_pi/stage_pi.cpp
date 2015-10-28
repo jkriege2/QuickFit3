@@ -193,7 +193,7 @@ void QFExtensionLinearStagePI::showSettingsDialog(unsigned int /*axis*/, QWidget
         // and add implementations
         /////////////////////////////////////////////////////////////////////////////////
 
-        QDialog* dlg=new QDialog(parent);
+        QDialog* dlg=new QFDialog(parent);
 
         QVBoxLayout* lay=new QVBoxLayout();
         dlg->setLayout(lay);

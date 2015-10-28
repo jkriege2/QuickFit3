@@ -26,7 +26,7 @@
 #include "programoptions.h"
 
 QFFileEditDialog::QFFileEditDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFFileEditDialog)
 {
     ui->setupUi(this);

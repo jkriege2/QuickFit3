@@ -24,7 +24,7 @@
 #include "programoptions.h"
 
 QFRDRImagingFCSMaskBuilder::QFRDRImagingFCSMaskBuilder(const QStringList& parameters, const QStringList& parameterNames, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRImagingFCSMaskBuilder)
 {
     ui->setupUi(this);

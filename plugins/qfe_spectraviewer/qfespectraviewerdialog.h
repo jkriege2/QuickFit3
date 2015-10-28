@@ -23,7 +23,7 @@
 #ifndef QFESPECTRAVIEWERDIALOG_H
 #define QFESPECTRAVIEWERDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QList>
 #include <QSettings>
 #include <QListWidget>
@@ -59,7 +59,7 @@ struct QFESpectraViewerPlotItem {
     QString displayName;
 };
 
-class QFESpectraViewerDialog : public QDialog
+class QFESpectraViewerDialog : public QFDialog
 {
         Q_OBJECT
         

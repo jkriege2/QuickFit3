@@ -23,7 +23,7 @@
 #ifndef QFERTREGEXPDIALOG_H
 #define QFERTREGEXPDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QLabel>
 #include <QLineEdit>
 
@@ -31,7 +31,7 @@ namespace Ui {
     class QFERTRegExpDialog;
 }
 
-class QFERTRegExpDialog : public QDialog
+class QFERTRegExpDialog : public QFDialog
 {
         Q_OBJECT
 

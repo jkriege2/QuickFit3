@@ -36,7 +36,7 @@ qfmpResult QFRDRTableFormulaDialog_dummy(const qfmpResult* /*params*/, unsigned 
 }
 
 QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QFRDRTable *table, QFTablePluginModel *model, int col, int row, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableFormulaDialog)
 {
     this->table=table;

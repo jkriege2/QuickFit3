@@ -23,7 +23,7 @@
 #ifndef QFESPIMB040LIGHTPATHSAVEDIALOG_H
 #define QFESPIMB040LIGHTPATHSAVEDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QAbstractItemModel>
 #include "qftablemodel.h"
 #include <QList>
@@ -32,7 +32,7 @@ namespace Ui {
     class QFESPIMB040LightPathSaveDialog;
 }
 
-class QFESPIMB040LightPathSaveDialog : public QDialog
+class QFESPIMB040LightPathSaveDialog : public QFDialog
 {
         Q_OBJECT
         

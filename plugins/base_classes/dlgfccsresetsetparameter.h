@@ -1,13 +1,13 @@
 #ifndef DLGFCCSRESETSETPARAMETER_H
 #define DLGFCCSRESETSETPARAMETER_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class DlgFCCSResetSetParameter;
 }
 
-class DlgFCCSResetSetParameter : public QDialog
+class DlgFCCSResetSetParameter : public QFDialog
 {
         Q_OBJECT
 

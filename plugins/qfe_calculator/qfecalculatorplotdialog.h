@@ -23,14 +23,14 @@
 #ifndef QFECALCULATORPLOTDIALOG_H
 #define QFECALCULATORPLOTDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfplotter.h"
 
 namespace Ui {
     class QFECalculatorPlotDialog;
 }
 
-class QFECalculatorPlotDialog : public QDialog
+class QFECalculatorPlotDialog : public QFDialog
 {
         Q_OBJECT
 

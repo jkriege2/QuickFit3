@@ -40,7 +40,7 @@
 #define UPDATE_TIMEOUT 250
 
 QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRImagingFCSCorrelationDialog)
 {
     frame_data=NULL;
@@ -458,7 +458,7 @@ void QFRDRImagingFCSCorrelationDialog::done(int status)  {
             delete jobs[i].thread;
         }
         prg.close();
-        QDialog::done(status);
+        QFDialog::done(status);
         close();
     }
 

@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan Buchholz, German Cancer Research Center
 #ifndef CAM_RH2V2_CORDLG_H
 #define CAM_RH2V2_CORDLG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "jkqtfastplotter.h"
 #include <QDoubleSpinBox>
 
@@ -30,7 +30,7 @@ namespace Ui {
 class cam_rh2v2_cordlg;
 }
 
-class cam_rh2v2_cordlg : public QDialog
+class cam_rh2v2_cordlg : public QFDialog
 {
     Q_OBJECT
 

@@ -25,7 +25,7 @@
 #include "ui_qfrdrtableindexedstatdialog.h"
 
 QFRDRTableIndexedStatDialog::QFRDRTableIndexedStatDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableIndexedStatDialog)
 {
     ui->setupUi(this);

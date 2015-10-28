@@ -46,7 +46,7 @@ double plotFunctionSmoothSpectrum(double x, void* data) {
 }
 
 QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget *parent) :
-    QDialog(parent,  Qt::Window|Qt::WindowSystemMenuHint|Qt::WindowMaximizeButtonHint|Qt::WindowMinimizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
+    QFDialog(parent,  Qt::Window|Qt::WindowSystemMenuHint|Qt::WindowMaximizeButtonHint|Qt::WindowMinimizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
     ui(new Ui::QFESpectraViewerDialog)
 {
     currentIndex=-1;

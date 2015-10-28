@@ -23,7 +23,7 @@
 #ifndef DLGIMPORTTABLE_H
 #define DLGIMPORTTABLE_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QItemSelectionModel>
 #include <QAbstractItemModel>
 #include "qftablepluginmodel.h"
@@ -32,7 +32,7 @@ namespace Ui {
     class DlgIMportTable;
 }
 
-class DlgIMportTable : public QDialog
+class DlgIMportTable : public QFDialog
 {
         Q_OBJECT
 

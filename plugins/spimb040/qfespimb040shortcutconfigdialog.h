@@ -23,14 +23,14 @@
 #ifndef QFESPIMB040SHORTCUTCONFIGDIALOG_H
 #define QFESPIMB040SHORTCUTCONFIGDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qkeysequenceedit.h"
 
 namespace Ui {
     class QFESPIMB040ShortcutConfigDialog;
 }
 
-class QFESPIMB040ShortcutConfigDialog : public QDialog
+class QFESPIMB040ShortcutConfigDialog : public QFDialog
 {
         Q_OBJECT
         

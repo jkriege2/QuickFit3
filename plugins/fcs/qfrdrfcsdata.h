@@ -225,6 +225,8 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         virtual void recalculateCorrelations();
         /** \brief allows to perform an offset correction of the correlation curves, when loading the data */
         virtual void correctCorrelations();
+        /** \brief allows to perform an offset correction of the correlation curves, when loading the data */
+        virtual void correctRates();
 
         /** \brief set the number of datapoints in every binned count rate run.
          *

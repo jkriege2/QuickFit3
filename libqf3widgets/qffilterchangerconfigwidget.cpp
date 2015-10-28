@@ -302,7 +302,7 @@ void QFFilterChangerConfigWidget::selectFilters() {
 
     if (!FilterChanger) return;
 
-    QDialog* dlg=new QDialog(this);
+    QFDialog* dlg=new QFDialog(this);
 
     QVBoxLayout* lay=new QVBoxLayout();
     dlg->setLayout(lay);

@@ -484,6 +484,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
 
     menuBar=new QMenuBar(d);
     menuBar->setVisible(true);
+    menuBar->setNativeMenuBar(ProgramOptions::getConfigValue("quickfit/macxsubwinmenus_asmain", false).toBool());
     ml->addWidget(menuBar);
     menuResults=menuBar->addMenu("&Results");
     menuHelp=menuBar->addMenu("&Help");

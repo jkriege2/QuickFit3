@@ -1,13 +1,13 @@
 #ifndef ALEXCEDITSETTINGSFILES_H
 #define ALEXCEDITSETTINGSFILES_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class ALEXCEditSettingsFiles;
 }
 
-class ALEXCEditSettingsFiles : public QDialog
+class ALEXCEditSettingsFiles : public QFDialog
 {
         Q_OBJECT
 

@@ -28,7 +28,7 @@
 
 
 QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFECalculatorDialog)
 {
     this->calc=calc;

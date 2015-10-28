@@ -759,7 +759,7 @@ void QFRDRImageMaskEditTools::redoMask()
 void QFRDRImageMaskEditTools::maskBorder()
 {
     if (!imagemask) return;
-    QDialog* dlg=new QDialog(parentWidget);
+    QFDialog* dlg=new QFDialog(parentWidget);
     dlg->setWindowFlags(dlg->windowFlags()|Qt::WindowMinMaxButtonsHint);
     QGridLayout* grid=new QGridLayout();
     dlg->setLayout(grid);

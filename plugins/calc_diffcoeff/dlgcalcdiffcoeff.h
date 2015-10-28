@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGCALCDIFFCOEFF_H
 #define DLGCALCDIFFCOEFF_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qftablemodel.h"
 #include "qftools.h"
 #include "qfpluginservices.h"
@@ -36,7 +36,7 @@ namespace Ui {
     class DlgCalcDiffCoeff;
 }
 
-class DlgCalcDiffCoeff : public QDialog
+class DlgCalcDiffCoeff : public QFDialog
 {
         Q_OBJECT
         

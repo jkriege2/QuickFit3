@@ -25,7 +25,7 @@
 #include "pololu_tools.h"
 
 DlgPololuMaestroTester::DlgPololuMaestroTester(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DlgPololuMaestroTester)
 {
     serial=new QFBinarySerialProtocolHandler(&com, "popolu maestro");

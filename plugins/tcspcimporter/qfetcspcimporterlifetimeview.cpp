@@ -3,7 +3,7 @@
 
 #include "qfpluginservices.h"
 QFETCSPCImporterLifetimeView::QFETCSPCImporterLifetimeView(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFETCSPCImporterLifetimeView)
 {
     plteRange=NULL;

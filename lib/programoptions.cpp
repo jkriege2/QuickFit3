@@ -112,6 +112,15 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
 
     // default values
     style= app->style()->metaObject()->className();
+#if defined(Q_OS_WIN)
+    style="Fusion";
+#elif defined(Q_OS_MAC)
+    style="Macintosh";
+#elif defined(Q_OS_LINUX)
+    style="Cleanlooks";
+#else
+    style="Fusion";
+#endif
     stylesheet="default";
     languageID="en";
     maxThreads=qMax(4,QThread::idealThreadCount());
@@ -128,10 +137,10 @@ ProgramOptions::~ProgramOptions()
     if (inst==this) inst=NULL;
 }
 
-void ProgramOptions::setCurrentRawDataDir(QString d)
+void ProgramOptions::setCurrentRawDataDir(QString d, bool write)
 {
     currentRawDataDir=d;
-    writeSettings();
+    if (write) writeSettings();
 }
 
 
@@ -301,16 +310,18 @@ void ProgramOptions::setHomeQFDirectory(const QString &dir)
 }
 
 
-void ProgramOptions::setProxyHost(const QString &host)
+void ProgramOptions::setProxyHost(const QString &host, bool write)
 {
     //proxy.setHostName(host);
     proxyHost=host;
+    if (write) writeSettings();
 }
 
-void ProgramOptions::setProxyPort(quint16 port)
+void ProgramOptions::setProxyPort(quint16 port, bool write)
 {
     //proxy.setPort(port);
     proxyPort=port;
+    if (write) writeSettings();
 }
 
 quint16 ProgramOptions::getProxyPort() const
@@ -331,10 +342,11 @@ int ProgramOptions::getProxyType() const
     return proxyType;
 }
 
-void ProgramOptions::setProxyType(int type)
+void ProgramOptions::setProxyType(int type, bool write)
 {
     if (type<0) proxyType=0; //proxy.setType(QNetworkProxy::DefaultProxy);
     else proxyType=type; //proxy.setType(type);
+    if (write) writeSettings();
 }
 
 
@@ -343,10 +355,10 @@ bool ProgramOptions::getUserSaveAfterFirstEdit() const
     return userSaveAfterFirstEdit;
 }
 
-void ProgramOptions::setUserSaveAfterFirstEdit(bool set)
+void ProgramOptions::setUserSaveAfterFirstEdit(bool set, bool write)
 {
     userSaveAfterFirstEdit=set;
-    writeSettings();
+    if (write) writeSettings();
 }
 
 bool ProgramOptions::getChildWindowsStayOnTop() const
@@ -354,10 +366,10 @@ bool ProgramOptions::getChildWindowsStayOnTop() const
     return childWindowsStayOnTop;
 }
 
-void ProgramOptions::setChildWindowsStayOnTop(bool set)
+void ProgramOptions::setChildWindowsStayOnTop(bool set, bool write)
 {
     childWindowsStayOnTop=set;
-    writeSettings();
+    if (write) writeSettings();
 }
 
 bool ProgramOptions::getHelpWindowsStayOnTop() const
@@ -365,10 +377,10 @@ bool ProgramOptions::getHelpWindowsStayOnTop() const
     return helpWindowsStayOnTop;
 }
 
-void ProgramOptions::setHelpWindowsStayOnTop(bool set)
+void ProgramOptions::setHelpWindowsStayOnTop(bool set, bool write)
 {
     helpWindowsStayOnTop=set;
-    writeSettings();
+    if (write) writeSettings();
 }
 
 bool ProgramOptions::getProjectWindowsStayOnTop() const
@@ -376,10 +388,10 @@ bool ProgramOptions::getProjectWindowsStayOnTop() const
     return projectWindowStayOnTop;
 }
 
-void ProgramOptions::setProjectWindowsStayOnTop(bool set)
+void ProgramOptions::setProjectWindowsStayOnTop(bool set, bool write)
 {
     projectWindowStayOnTop=set;
-    writeSettings();
+    if (write) writeSettings();
 }
 
 bool ProgramOptions::debugLogVisible() const
@@ -387,37 +399,37 @@ bool ProgramOptions::debugLogVisible() const
     return m_debugLogVisible;
 }
 
-void ProgramOptions::setDebugLogVisible(bool visible)
+void ProgramOptions::setDebugLogVisible(bool visible, bool write)
 {
     m_debugLogVisible=visible;
-    writeSettings();
+    if (write) writeSettings();
 }
 
-void ProgramOptions::setLanguageID(QString id) {
+void ProgramOptions::setLanguageID(QString id, bool write) {
     languageID=id;
-    writeSettings();
+    if (write) writeSettings();
 }
 
-void ProgramOptions::setStylesheet(QString st) {
+void ProgramOptions::setStylesheet(QString st, bool write) {
     stylesheet=st;
-    writeSettings();
+    if (write) writeSettings();
 }
 
-void ProgramOptions::setStyle(QString st) {
+void ProgramOptions::setStyle(QString st, bool write) {
     style=st;
-    writeSettings();
+    if (write) writeSettings();
 }
 
-void ProgramOptions::setMaxThreads(int threads)
+void ProgramOptions::setMaxThreads(int threads, bool write)
 {
     maxThreads=threads;
-    writeSettings();
+    if (write) writeSettings();
 }
 
-void ProgramOptions::setAutosave(int interval)
+void ProgramOptions::setAutosave(int interval, bool write)
 {
     autosave=interval;
-    writeSettings();
+    if (write) writeSettings();
 }
 
 

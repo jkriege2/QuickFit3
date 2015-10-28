@@ -24,7 +24,7 @@ Copyright (c) 2008-2015 Jan Buchholz, German Cancer Research Center
 #include "qftools.h"
 
 cam_rh2v2_cordlg::cam_rh2v2_cordlg(QWidget *parent) :
-    QDialog(parent),width(3),height(3),plotters(NULL),camera(-1),
+    QFDialog(parent),width(3),height(3),plotters(NULL),camera(-1),
     ui(new Ui::cam_rh2v2_cordlg)
 {
     ui->setupUi(this);

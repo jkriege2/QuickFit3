@@ -22,14 +22,14 @@
 #ifndef DLG_QFFILEEDITDIALOG_H
 #define DLG_QFFILEEDITDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "lib_imexport.h"
 
 namespace Ui {
     class QFFileEditDialog;
 }
 
-class QFLIB_EXPORT QFFileEditDialog : public QDialog
+class QFLIB_EXPORT QFFileEditDialog : public QFDialog
 {
         Q_OBJECT
         
