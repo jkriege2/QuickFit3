@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGCSVPARAMETERS_H
 #define DLGCSVPARAMETERS_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QRegExp>
 #include <QMessageBox>
 #include "ui_dlg_csvparameters.h"
@@ -38,7 +38,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
  the same value).
 
  */
-class dlgCSVParameters : public QDialog, private Ui::dlgCSVParameters
+class dlgCSVParameters : public QFDialog, private Ui::dlgCSVParameters
 {
         Q_OBJECT
     public:

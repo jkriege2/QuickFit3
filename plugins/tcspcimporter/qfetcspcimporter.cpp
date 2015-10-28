@@ -87,10 +87,10 @@ void QFETCSPCImporter::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
 
 
-    QAction* actStartPlugin=new QAction(QIcon(":/tcspcimporter/correlator.png"), tr("import/process TCSPC ..."), this);
+    QAction* actStartPlugin=new QFActionWithNoMenuRole(QIcon(":/tcspcimporter/correlator.png"), tr("import/process TCSPC (FCS/FCCS, ...) ..."), this);
     actStartPlugin->setToolTip(tr("Import TCSPC Files as FCS, CountRates, ..."));
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
-    QAction* actStartBurstAnalyzer=new QAction(QIcon(":/tcspcimporter/burstanalyzer.png"), tr("TCSPC Burst Analyzer..."), this);
+    QAction* actStartBurstAnalyzer=new QFActionWithNoMenuRole(QIcon(":/tcspcimporter/burstanalyzer.png"), tr("TCSPC Burst Analyzer..."), this);
     actStartBurstAnalyzer->setToolTip(tr("Import TCSPC Files for Burst Analysis ..."));
     connect(actStartBurstAnalyzer, SIGNAL(triggered()), this, SLOT(startBurstAnalyzer()));
     QMenu* extm=services->getMenu("data/rdr");

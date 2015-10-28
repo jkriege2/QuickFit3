@@ -55,22 +55,22 @@ QFRawDataRecord* QFRDRNumberAndBrightnessPlugin::createRecord(QFProject* parent)
 void QFRDRNumberAndBrightnessPlugin::registerToMenu(QMenu* menu) {
     QMenu* m=menu->addMenu(QIcon(getIconFilename()), tr("&Number && Brightness Analysis"));
 
-    QAction* action=new QAction(QIcon(getIconFilename()), tr("&load from imFCS dataset"), parentWidget);
+    QAction* action=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("&load from imFCS dataset"), parentWidget);
     action->setStatusTip(tr("Insert a new record with data from an imaging FCS evaluation"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertFromImFCSRecord()));
     m->addAction(action);
 
-    action=new QAction(QIcon(getIconFilename()), tr("&load from average+StdDev images (TIFF)"), parentWidget);
+    action=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("&load from average+StdDev images (TIFF)"), parentWidget);
     action->setStatusTip(tr("Insert a new record with data from four files, that contain the average/stddev of the image and the backrgound."));
     connect(action, SIGNAL(triggered()), this, SLOT(startNANDBFromPreprocessedFilesWizard()));
     m->addAction(action);
 
-    action=new QAction(QIcon(getIconFilename()), tr("&calculate from image stack(s)"), parentWidget);
+    action=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("&calculate from image stack(s)"), parentWidget);
     action->setStatusTip(tr("Calculates the average and standard deviation from image stacks and adds N&B records from these datasets to the project."));
     connect(action, SIGNAL(triggered()), this, SLOT(startWizardImageStack()));
     m->addAction(action);
 
-    action=new QAction(QIcon(getIconFilename()), tr("Number and Brightness: &calculate from image stack(s)"), parentWidget);
+    action=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Number and Brightness: &calculate from image stack(s)"), parentWidget);
     action->setStatusTip(tr("Calculates the average and standard deviation from image stacks and adds N&B records from these datasets to the project."));
     connect(action, SIGNAL(triggered()), this, SLOT(startWizardImageStack()));
 

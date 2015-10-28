@@ -28,7 +28,7 @@ QFRDRImagingFCSEditTools::QFRDRImagingFCSEditTools(QObject *parent) :
 {
     imFCS=NULL;
 
-    actExcludeSegments=new QAction(tr("exclude segments"), this);
+    actExcludeSegments=new QFActionWithNoMenuRole(tr("exclude segments"), this);
     connect(actExcludeSegments, SIGNAL(triggered()), this, SLOT(excludeSegments()));
 
     setRDR(imFCS);

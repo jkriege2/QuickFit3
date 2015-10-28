@@ -27,7 +27,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfpluginservices.h"
 
 DlgFixFilepaths::DlgFixFilepaths(const QString& oldName, const QString& lastDir, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DlgFixFilepaths)
 {
     ui->setupUi(this);

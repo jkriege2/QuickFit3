@@ -154,7 +154,7 @@ bool QFECamTestCamera::prepareCameraAcquisition(unsigned int camera, const QSett
 
 
 void QFECamTestCamera::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
-    QDialog* dlg=new QDialog(parent);
+    QFDialog* dlg=new QFDialog(parent);
     dlg->setWindowTitle(tr("Configuration for Testcamera #%1").arg(camera));
 
     QVBoxLayout* lay=new QVBoxLayout();

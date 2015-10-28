@@ -22,14 +22,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFitAlgorithmGSLDerivativeBaseCONFIGDIALOG_H
 #define QFFitAlgorithmGSLDerivativeBaseCONFIGDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qffitalgorithm.h"
 
 namespace Ui {
     class QFFitAlgorithmGSLDerivativeBaseConfigDialog;
 }
 
-class QFFitAlgorithmGSLDerivativeBaseConfigDialog : public QDialog
+class QFFitAlgorithmGSLDerivativeBaseConfigDialog : public QFDialog
 {
         Q_OBJECT
         

@@ -23,7 +23,7 @@ Copyright (c) 2012-2015 by Sebastian Isbaner
 #include "ui_DialogGMMparams.h"
 
 DialogGMMparams::DialogGMMparams(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DialogGMMparams)
 {
     ui->setupUi(this);

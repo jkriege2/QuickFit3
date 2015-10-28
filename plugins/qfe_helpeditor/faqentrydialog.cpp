@@ -27,7 +27,7 @@
 #include "qftools.h"
 
 FAQEntryDialog::FAQEntryDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::FAQEntryDialog)
 {
     ui->setupUi(this);

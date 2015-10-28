@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGCOMPONENTINFO_H
 #define DLGCOMPONENTINFO_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qftablemodel.h"
 
 class QFEDiffusionCoefficientCalculator; // forward
@@ -30,7 +30,7 @@ namespace Ui {
     class DlgComponentInfo;
 }
 
-class DlgComponentInfo : public QDialog
+class DlgComponentInfo : public QFDialog
 {
         Q_OBJECT
         

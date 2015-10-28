@@ -25,7 +25,7 @@
 #include "programoptions.h"
 
 QFESPIMLightSheetEvaluationCopyConfigDialog::QFESPIMLightSheetEvaluationCopyConfigDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFESPIMLightSheetEvaluationCopyConfigDialog)
 {
     ui->setupUi(this);

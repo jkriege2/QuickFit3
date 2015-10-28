@@ -23,13 +23,13 @@
 #ifndef DLGCOLORBARCOLORING_H
 #define DLGCOLORBARCOLORING_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class DlgColorbarColoring;
 }
 
-class DlgColorbarColoring : public QDialog
+class DlgColorbarColoring : public QFDialog
 {
         Q_OBJECT
         

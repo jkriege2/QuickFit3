@@ -22,13 +22,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGWELCOMESCREEN_H
 #define DLGWELCOMESCREEN_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class DlgWelcomeScreen;
 }
 
-class DlgWelcomeScreen : public QDialog
+class DlgWelcomeScreen : public QFDialog
 {
         Q_OBJECT
 

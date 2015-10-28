@@ -21,7 +21,7 @@
 #ifndef QFSELECTIONLISTDIALOG_H
 #define QFSELECTIONLISTDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QList>
 #include <QSettings>
 #include <QMap>
@@ -43,7 +43,7 @@ namespace Ui {
     of items, the suer selected, call getSelect() which will return a list of the IDs or getSelectedIndexes() which will return
     the indexes of the selected items.
   */
-class QFWIDLIB_EXPORT QFSelectionListDialog : public QDialog
+class QFWIDLIB_EXPORT QFSelectionListDialog : public QFDialog
 {
         Q_OBJECT
         

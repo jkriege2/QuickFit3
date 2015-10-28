@@ -23,7 +23,7 @@
 #ifndef QFESPIMB00HISTOGRAMMASKDIALOG_H
 #define QFESPIMB00HISTOGRAMMASKDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFESPIMB00HistogramMaskDialog; // forward
@@ -34,7 +34,7 @@ namespace Ui {
 
 
  */
-class QFESPIMB00HistogramMaskDialog : public QDialog
+class QFESPIMB00HistogramMaskDialog : public QFDialog
 {
     Q_OBJECT
 

@@ -345,26 +345,26 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QWidget* parent, QString 
     layout->addWidget(combobox, 2);
     connect(combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCurrentIndexChanged(int)));
 
-    actConfig = new QAction(QIcon(":/libqf3widgets/acquisition_configuration.png"), tr("&Configure Camera"), this);
+    actConfig = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/acquisition_configuration.png"), tr("&Configure Camera"), this);
     connect(actConfig, SIGNAL(triggered()), combobox, SLOT(editCurrent()));
 
-    actAdd = new QAction(QIcon(":/libqf3widgets/config_add.png"), tr("&Add new Camera Configuration"), this);
+    actAdd = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/config_add.png"), tr("&Add new Camera Configuration"), this);
     connect(actAdd, SIGNAL(triggered()), combobox, SLOT(addNew()));
 
-    actRename = new QAction(QIcon(":/libqf3widgets/config_rename.png"), tr("&Rename Camera Configuration As ..."), this);
+    actRename = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/config_rename.png"), tr("&Rename Camera Configuration As ..."), this);
     connect(actRename, SIGNAL(triggered()), combobox, SLOT(renameCurrent()));
 
-    actSaveAs = new QAction(QIcon(":/libqf3widgets/config_saveas.png"), tr("&Save Camera Configuration As ..."), this);
+    actSaveAs = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/config_saveas.png"), tr("&Save Camera Configuration As ..."), this);
     connect(actSaveAs, SIGNAL(triggered()), combobox, SLOT(saveAsCurrent()));
 
-    actDelete = new QAction(QIcon(":/libqf3widgets/config_delete.png"), tr("&Delete Camera Configuration"), this);
+    actDelete = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/config_delete.png"), tr("&Delete Camera Configuration"), this);
     connect(actDelete, SIGNAL(triggered()), combobox, SLOT(deleteCurrent()));
 
-    actSetDefault = new QAction(QIcon(":/libqf3widgets/default_config_set.png"), tr("&Set current configuration as startup default"), this);
+    actSetDefault = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/default_config_set.png"), tr("&Set current configuration as startup default"), this);
     connect(actSetDefault, SIGNAL(triggered()), combobox, SLOT(setCurrentDefault()));
     actSetDefault->setVisible(false);
 
-    actGotoDefault = new QAction(QIcon(":/libqf3widgets/default_config.png"), tr("&Use default startup configuration"), this);
+    actGotoDefault = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/default_config.png"), tr("&Use default startup configuration"), this);
     connect(actGotoDefault, SIGNAL(triggered()), combobox, SLOT(gotoCurrentDefault()));
 
     layout->addSpacing(5);

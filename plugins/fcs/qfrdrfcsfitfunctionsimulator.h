@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFRDRFCSFITFUNCTIONSIMULATOR_H
 #define QFRDRFCSFITFUNCTIONSIMULATOR_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QTabBar>
 #include <QVBoxLayout>
 #include "jkverticalscrollarea.h"
@@ -39,7 +39,7 @@ namespace Ui {
     class QFRDRFCSFitFunctionSimulator;
 }
 
-class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicInterface {
+class QFRDRFCSFitFunctionSimulator : public QFDialog, public QFFitParameterBasicInterface {
         Q_OBJECT
         Q_INTERFACES(QFFitParameterBasicInterface)
         

@@ -34,7 +34,7 @@
 
 
 QFEHelpEditorFindDialog::QFEHelpEditorFindDialog(QWidget *parent)
-     : QDialog(parent)
+     : QFDialog(parent)
 {
     matchCase=false;
     searchFromStart=true;

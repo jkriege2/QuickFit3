@@ -307,16 +307,16 @@ void QFStageConfigWidget::createWidgets() {
 
 void QFStageConfigWidget::createActions() {
     std::cout<<">>>> QFStageConfigWidget::createActions()\n";
-    actConnectX=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect x-axis ..."), this);
+    actConnectX=new QFActionWithNoMenuRole(QIcon(":/spimb040/stageconnect.png"), tr("Connect x-axis ..."), this);
     actConnectX->setCheckable(true);
     connect(actConnectX, SIGNAL(triggered()), this, SLOT(disConnectX()));
     btnConnectX->setDefaultAction(actConnectX);
 
-    actConfigureX=new QAction(QIcon(":/spimb040/stagesettings.png"), tr("Configure x-axis ..."), this);
+    actConfigureX=new QFActionWithNoMenuRole(QIcon(":/spimb040/stagesettings.png"), tr("Configure x-axis ..."), this);
     connect(actConfigureX, SIGNAL(triggered()), this, SLOT(configureX()));
     btnConfigureX->setDefaultAction(actConfigureX);
 
-    actConfigSteps=new QAction(QIcon(":/spimb040/configsteps.png"), tr("Configure step sizes ..."), this);
+    actConfigSteps=new QFActionWithNoMenuRole(QIcon(":/spimb040/configsteps.png"), tr("Configure step sizes ..."), this);
     connect(actConfigSteps, SIGNAL(triggered()), this, SLOT(configSteps()));
     btnConfigSteps->setDefaultAction(actConfigSteps);
 

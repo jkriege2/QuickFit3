@@ -120,14 +120,14 @@ void QFExtensionLinearStagePI::initExtension() {
             d.name=axisname;
             d.label=inifile.value(axisname+"/label", tr("PI Mercury 863, axis %1").arg(i)).toString();
             axes.append(d);
-            actCalibrate.append(new QAction(tr("calibrate axis '%1'").arg(d.label), this));
+            actCalibrate.append(new QFActionWithNoMenuRole(tr("calibrate axis '%1'").arg(d.label), this));
             connect(actCalibrate.last(), SIGNAL(triggered()), this, SLOT(calibrateAxis()));
         }
     }
 
     menuStage=new QMenu(tr("PI stage"), parentWidget);
     menuStage->setIcon(QIcon(":/stage_pi_logo.png"));
-    actCalibrateJoysticks=new QAction(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks"), this);
+    actCalibrateJoysticks=new QFActionWithNoMenuRole(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks"), this);
     connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));
 
 
@@ -193,7 +193,7 @@ void QFExtensionLinearStagePI::showSettingsDialog(unsigned int /*axis*/, QWidget
         // and add implementations
         /////////////////////////////////////////////////////////////////////////////////
 
-        QDialog* dlg=new QDialog(parent);
+        QDialog* dlg=new QFDialog(parent);
 
         QVBoxLayout* lay=new QVBoxLayout();
         dlg->setLayout(lay);

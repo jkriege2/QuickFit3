@@ -49,7 +49,7 @@ QFEvaluationItem* QFPEvalFCSFit::createRecord(QFProject* parent) {
 
 
 void QFPEvalFCSFit::registerToMenu(QMenu* menu) {
-    QAction* actFCS=new QAction(QIcon(":/fcs_fit.png"), tr("FCS Curve Fitting"), parentWidget);
+    QAction* actFCS=new QFActionWithNoMenuRole(QIcon(":/fcs_fit.png"), tr("FCS Curve Fitting"), parentWidget);
     actFCS->setStatusTip(tr("Insert a new FCS least-squares fit evaluation"));
     connect(actFCS, SIGNAL(triggered()), this, SLOT(insertFCSFit()));
     menu->addAction(actFCS);

@@ -213,18 +213,18 @@ void QFFilterChangerConfigWidget::createWidgets() {
 }
 
 void QFFilterChangerConfigWidget::createActions() {
-    actConnect=new QAction(QIcon(":/libqf3widgets/connect_filterchanger.png"), tr("Connect to filter changer driver/hardware ..."), this);
+    actConnect=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/connect_filterchanger.png"), tr("Connect to filter changer driver/hardware ..."), this);
     actConnect->setCheckable(true);
     connect(actConnect, SIGNAL(toggled(bool)), this, SLOT(disConnect()));
     btnConnect->setDefaultAction(actConnect);
 
 
-    actConfigure=new QAction(QIcon(":/libqf3widgets/configure_filterchanger.png"), tr("Configure filter changer ..."), this);
+    actConfigure=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/configure_filterchanger.png"), tr("Configure filter changer ..."), this);
     connect(actConfigure, SIGNAL(triggered()), this, SLOT(configure()));
     btnConfigure->setDefaultAction(actConfigure);
 
 
-    actSetFilters=new QAction(QIcon(":/libqf3widgets/filterchanger_selectfilters.png"), tr("select the filters in the filter changer ..."), this);
+    actSetFilters=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/filterchanger_selectfilters.png"), tr("select the filters in the filter changer ..."), this);
     connect(actSetFilters, SIGNAL(triggered()), this, SLOT(selectFilters()));
     btnSelectFilters->setDefaultAction(actSetFilters);
 
@@ -302,7 +302,7 @@ void QFFilterChangerConfigWidget::selectFilters() {
 
     if (!FilterChanger) return;
 
-    QDialog* dlg=new QDialog(this);
+    QFDialog* dlg=new QFDialog(this);
 
     QVBoxLayout* lay=new QVBoxLayout();
     dlg->setLayout(lay);

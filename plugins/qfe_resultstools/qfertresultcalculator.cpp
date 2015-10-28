@@ -28,7 +28,7 @@
 #include "qfmathparser.h"
 
 QFERTResultCalculator::QFERTResultCalculator(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFERTResultCalculator)
 {
     ui->setupUi(this);

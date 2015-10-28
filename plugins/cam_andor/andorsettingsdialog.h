@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef ANDORSETTINGSDIALOG_H
 #define ANDORSETTINGSDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QSettings>
 #include <inttypes.h>
 
@@ -43,7 +43,7 @@ namespace Ui {
 
     \note call setupWidgets() before showing the dialog, so all comboboxes and other widgets are setup properly.
  */
-class AndorSettingsDialog : public QDialog
+class AndorSettingsDialog : public QFDialog
 {
     Q_OBJECT
 

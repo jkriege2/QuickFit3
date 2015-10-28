@@ -53,7 +53,7 @@ QFEvaluationItem* QFFCCSFitEvaluation::createRecord(QFProject* parent) {
 
 
 void QFFCCSFitEvaluation::registerToMenu(QMenu* menu) {
-    QAction* actAddEval=new QAction(QIcon(getIconFilename()), tr("FCCS Curve Fitting"), parentWidget);
+    QAction* actAddEval=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("FCCS Curve Fitting"), parentWidget);
     actAddEval->setStatusTip(getDescription());
     connect(actAddEval, SIGNAL(triggered()), this, SLOT(insertEvaluation()));
     menu->addAction(actAddEval);

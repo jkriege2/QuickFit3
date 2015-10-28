@@ -44,7 +44,7 @@ QFRawDataRecord* QFRDRPhotonCountsPlugin::createRecord(QFProject* parent) {
 
 void QFRDRPhotonCountsPlugin::registerToMenu(QMenu* menu) {
 	// create menu entries to insert data with this type
-    QAction* action=new QAction(QIcon(getIconFilename()), tr("insert photon counts"), parentWidget);
+    QAction* action=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("insert photon counts"), parentWidget);
     action->setStatusTip(tr("Insert a new record containing multi-channel photon counts"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertRecord()));
     menu->addAction(action);

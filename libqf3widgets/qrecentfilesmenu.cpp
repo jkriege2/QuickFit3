@@ -45,7 +45,7 @@ void QRecentFilesMenu::setMaxRecentFilesCount(int num) {
         }
     } else if (m_actions.count()<num) {
         for (int i=m_actions.count(); i<num; i++) {
-            QAction* act=new QAction(this);
+            QAction* act=new QFActionWithNoMenuRole(this);
             act->setVisible(false);
             connect(act, SIGNAL(triggered()), this, SLOT(intOpenRecentFile()));
             m_actions.append(act);

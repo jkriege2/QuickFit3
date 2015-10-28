@@ -1,7 +1,7 @@
 #ifndef QFLISTPROGRESSDIALOG_H
 #define QFLISTPROGRESSDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "lib_imexport.h"
 #include "qfproject.h"
 #include "qftools.h"
@@ -15,7 +15,7 @@ namespace Ui {
 
   */
 
-class QFLIB_EXPORT QFListProgressDialog : public QDialog, public QFProgressMinorProgress
+class QFLIB_EXPORT QFListProgressDialog : public QFDialog, public QFProgressMinorProgress
 {
         Q_OBJECT
 

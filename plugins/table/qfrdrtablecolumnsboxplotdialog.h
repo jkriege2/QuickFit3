@@ -1,7 +1,7 @@
 #ifndef QFRDRTABLECOLUMNSBOXPLOTDIALOG_H
 #define QFRDRTABLECOLUMNSBOXPLOTDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfproperties.h"
 #include <QMap>
 #include <QList>
@@ -14,7 +14,7 @@ namespace Ui {
     class QFRDRTableColumnsBoxplotDialog;
 }
 
-class QFRDRTableColumnsBoxplotDialog : public QDialog
+class QFRDRTableColumnsBoxplotDialog : public QFDialog
 {
         Q_OBJECT
 

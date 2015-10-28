@@ -65,7 +65,7 @@ QFEvaluationItem* QFPEvalIMFCSFit::createRecord(QFProject* parent) {
 
 
 void QFPEvalIMFCSFit::registerToMenu(QMenu* menu) {
-    QAction* actFCS=new QAction(QIcon(":/imfcs_fit.png"), tr("imFCS Curve Fitting"), parentWidget);
+    QAction* actFCS=new QFActionWithNoMenuRole(QIcon(":/imfcs_fit.png"), tr("imFCS Curve Fitting"), parentWidget);
     actFCS->setStatusTip(tr("Insert a new imFCS least-squares fit evaluation"));
     connect(actFCS, SIGNAL(triggered()), this, SLOT(insertFCSFit()));
     menu->addAction(actFCS);
@@ -81,29 +81,29 @@ void QFPEvalIMFCSFit::init()
         QMenu* menu=new QMenu(tr("imFCS &Calibration Tool"), parentWidget);
         menu->setIcon(QIcon(":/imfcsfit/imfcs_fitcalib.png"));
 
-        QAction* actHelp=new QAction(QIcon(":/lib/help.png"), tr("Calibration Tutorial"), this);
+        QAction* actHelp=new QFActionWithNoMenuRole(QIcon(":/lib/help.png"), tr("Calibration Tutorial"), this);
         connect(actHelp, SIGNAL(triggered()), this, SLOT(showCalibrationTutorial()));
         menu->addAction(actHelp);
-        QAction* actWizard=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("Calibration Wizard"), this);
+        QAction* actWizard=new QFActionWithNoMenuRole(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("Calibration Wizard"), this);
         connect(actWizard, SIGNAL(triggered()), this, SLOT(insertFCSCalibrationWizard()));
         menu->addAction(actWizard);
         QMenu* menu1=menu->addMenu("steps ...");
 
-        QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_calib_addfiles.png"), tr("&0: add imFCS Calibration Fits"), this);
+        QAction* actFCSCalib=new QFActionWithNoMenuRole(QIcon(":/imfcsfit/imfcs_calib_addfiles.png"), tr("&0: add imFCS Calibration Fits"), this);
         actFCSCalib->setStatusTip(tr("Insert a set of imFCS least-squares fit evaluations for a SPIM calibration"));
         connect(actFCSCalib, SIGNAL(triggered()), this, SLOT(insertFCSFitForCalibration()));
         menu1->addAction(actFCSCalib);
 
-        QAction* actImFCSCalibFit=new QAction(tr("&1: Fit D's"), this);
+        QAction* actImFCSCalibFit=new QFActionWithNoMenuRole(tr("&1: Fit D's"), this);
         menu1->addAction(actImFCSCalibFit);
         connect(actImFCSCalibFit, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool1()));
-        QAction* actImFCSCalib=new QAction(tr("&2: Collect D Data"), this);
+        QAction* actImFCSCalib=new QFActionWithNoMenuRole(tr("&2: Collect D Data"), this);
         menu1->addAction(actImFCSCalib);
         connect(actImFCSCalib, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool2()));
-        QAction* actImFCSCalib1=new QAction(tr("&3: Fit wxy"), this);
+        QAction* actImFCSCalib1=new QFActionWithNoMenuRole(tr("&3: Fit wxy"), this);
         menu1->addAction(actImFCSCalib1);
         connect(actImFCSCalib1, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool3()));
-        QAction* actImFCSCalib2=new QAction(tr("&4: Collect wxy Data"), this);
+        QAction* actImFCSCalib2=new QFActionWithNoMenuRole(tr("&4: Collect wxy Data"), this);
         menu1->addAction(actImFCSCalib2);
         connect(actImFCSCalib2, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool4()));
 

@@ -31,6 +31,8 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QtGui>
 #endif
 
+#include <QDropEvent>
+#include <QUrl>
 #include <QTimer>
 #include "qfproject.h"
 #include "qfprojecttreemodel.h"
@@ -70,7 +72,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qftableview.h"
 #include "qfexportermanager.h"
 #include "qfsplashscreen.h"
-
+#include "qfaction.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void myMessageOutputQt5(QtMsgType type, const QMessageLogContext &context, const QString &msg);
@@ -318,6 +320,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         void closeEvent(QCloseEvent *event);
         virtual void showEvent(QShowEvent* event);
 
+        virtual void dropEvent(QDropEvent *ev);
+        virtual void dragEnterEvent(QDragEnterEvent *ev);
+
         QString projectFileFilter;
         QString projectSaveFileFilter;
 
@@ -326,7 +331,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         void displayNewVersionDlg();
         void displayWelcomeDlg();
         void openWelcomeScreen();
-    private slots:
+    protected slots:
         /** \brief create a new project */
         void newProject();
         /** \brief close the current project */
@@ -454,6 +459,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
 
         void entertainMe();
 
+        void updateWindowsList();
+        void raiseOpenedWindow();
+
     private:
         bool clipboardContainsProjectXML() const;
 
@@ -547,6 +555,14 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
 
         QMenu* menuProjectSort;
         QActionGroup* actsSort;
+        QMenu* menuOpenWindows;
+        QMap<QAction*, QPointer<QWidget> > actsWindows;
+
+#ifdef Q_OS_MAC
+        QMenu* menuAboutMAC;
+        QAction* actMenuAboutMAC;
+#endif
+
 
 
 

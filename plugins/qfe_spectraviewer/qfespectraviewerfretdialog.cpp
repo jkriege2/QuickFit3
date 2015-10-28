@@ -25,7 +25,7 @@
 #include "programoptions.h"
 
 QFESpectraViewerFRETDialog::QFESpectraViewerFRETDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFESpectraViewerFRETDialog)
 {
     ui->setupUi(this);

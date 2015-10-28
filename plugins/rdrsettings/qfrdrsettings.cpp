@@ -44,7 +44,7 @@ QFRawDataRecord* QFRDRSettingsPlugin::createRecord(QFProject* parent) {
 
 void QFRDRSettingsPlugin::registerToMenu(QMenu* menu) {
 	// create menu entries to insert data with this type
-    QAction* action=new QAction(QIcon(getIconFilename()), tr("Insert configuration file"), parentWidget);
+    QAction* action=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Insert configuration file"), parentWidget);
     action->setStatusTip(tr("Insert a new record"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertRecord()));
     menu->addAction(action);

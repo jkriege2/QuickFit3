@@ -192,13 +192,13 @@ void QFLightSourceConfigWidget::createWidgets() {
 }
 
 void QFLightSourceConfigWidget::createActions() {
-    actConnect=new QAction(QIcon(":/libqf3widgets/connect_lightsource.png"), tr("Connect to filter changer driver/hardware ..."), this);
+    actConnect=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/connect_lightsource.png"), tr("Connect to filter changer driver/hardware ..."), this);
     actConnect->setCheckable(true);
     connect(actConnect, SIGNAL(toggled(bool)), this, SLOT(disConnect()));
     btnConnect->setDefaultAction(actConnect);
 
 
-    actConfigure=new QAction(QIcon(":/libqf3widgets/configure_lightsource.png"), tr("Configure filter changer ..."), this);
+    actConfigure=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/configure_lightsource.png"), tr("Configure filter changer ..."), this);
     connect(actConfigure, SIGNAL(triggered()), this, SLOT(configure()));
     btnConfigure->setDefaultAction(actConfigure);
 

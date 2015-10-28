@@ -23,13 +23,13 @@
 #ifndef QFESPIMB040SAMPLESTAGESTEPCONFIGDIALOG_H
 #define QFESPIMB040SAMPLESTAGESTEPCONFIGDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFESPIMB040SampleStageStepConfigDialog;
 }
 
-class QFESPIMB040SampleStageStepConfigDialog : public QDialog
+class QFESPIMB040SampleStageStepConfigDialog : public QFDialog
 {
         Q_OBJECT
         

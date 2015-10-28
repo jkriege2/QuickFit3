@@ -103,7 +103,7 @@ QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServi
     //connect(ui->btnEvaluateAll, SIGNAL(clicked()), this, SLOT(evaluateAll()));
     connect(ui->btnEvaluateCurrent, SIGNAL(clicked()), this, SLOT(evaluateCurrent()));
 
-    actSaveImageCutSeries=new QAction(tr("save image cut series"), this);
+    actSaveImageCutSeries=new QFActionWithNoMenuRole(tr("save image cut series"), this);
     connect(actSaveImageCutSeries, SIGNAL(triggered()), this, SLOT(saveImageCutSeries()));
     QMenu* menuTools=propEditor->addMenu("Tools", 0);
     menuTools->addAction(actSaveImageCutSeries);

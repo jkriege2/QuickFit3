@@ -22,13 +22,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGFIXFILEPATHS_H
 #define DLGFIXFILEPATHS_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class DlgFixFilepaths;
 }
 
-class DlgFixFilepaths : public QDialog
+class DlgFixFilepaths : public QFDialog
 {
     Q_OBJECT
 

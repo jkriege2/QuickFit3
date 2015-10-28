@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGESTIMATEFOCALVOLUME_H
 #define DLGESTIMATEFOCALVOLUME_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "ui_estimatefocalvolumedlg.h"
 #include "programoptions.h"
 #include "qfpluginservices.h"
@@ -45,7 +45,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
       where \f[ h:=\frac{10^{10}}{\pi^{3/2}\cdot\gamma\cdot C\cdot 6.02214179} \f]
 */
 
-class dlgEstimateFocalVolume : public QDialog, private Ui::dlgEstimateFocalVolume {
+class dlgEstimateFocalVolume : public QFDialog, private Ui::dlgEstimateFocalVolume {
         Q_OBJECT
     public:
         dlgEstimateFocalVolume(ProgramOptions* settings, QWidget* parent=NULL);

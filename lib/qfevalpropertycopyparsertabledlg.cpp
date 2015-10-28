@@ -3,7 +3,7 @@
 #include "programoptions.h"
 
 QFEvalPropertyCopyParsertableDlg::QFEvalPropertyCopyParsertableDlg(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFEvalPropertyCopyParsertableDlg)
 {
     ui->setupUi(this);

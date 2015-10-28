@@ -113,7 +113,7 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
         QList<QPointer<QFETCSPCImporterFretchen2> > FRETDialogs;
 
         QPointer<QFETCSPCImporterDialog> dlgCorrelate;
-	protected:
+    protected:
         QFPluginLogService* logService;
 		
 	protected slots:

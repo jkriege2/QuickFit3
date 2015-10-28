@@ -21,7 +21,7 @@
 #ifndef QFExportToTableDialog_H
 #define QFExportToTableDialog_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfrdrtableinterface.h"
 #include "qfrawdatarecord.h"
 #include "lib_imexport.h"
@@ -30,7 +30,7 @@ namespace Ui {
     class QFExportToTableDialog;
 }
 
-class QFLIB_EXPORT QFExportToTableDialog : public QDialog
+class QFLIB_EXPORT QFExportToTableDialog : public QFDialog
 {
         Q_OBJECT
         

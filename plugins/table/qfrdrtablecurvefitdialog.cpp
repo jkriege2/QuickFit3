@@ -31,7 +31,7 @@
 #include "qffitalgorithmmanager.h"
 
 QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, int colY, int colW, QFRDRTable::GraphDataSelection sel, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, int sourceGraph) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableCurveFitDialog)
 {
     ui->setupUi(this);
@@ -45,7 +45,7 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, 
 }
 
 QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int plotid, int graphid, QWidget *parent):
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableCurveFitDialog)
 {
     ui->setupUi(this);

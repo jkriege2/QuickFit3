@@ -22,7 +22,7 @@
 #ifndef QFIMFCSSETPARAMFROMFILEDIALOG_H
 #define QFIMFCSSETPARAMFROMFILEDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfrawdatarecord.h"
 #include "qfplotter.h"
 #include "qfimfcsfitevaluation.h"
@@ -34,7 +34,7 @@ namespace Ui {
 
 
 
-class QFImFCSSetParamFromFileDialog : public QDialog
+class QFImFCSSetParamFromFileDialog : public QFDialog
 {
         Q_OBJECT
         

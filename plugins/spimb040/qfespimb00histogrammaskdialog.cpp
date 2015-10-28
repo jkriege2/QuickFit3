@@ -24,7 +24,7 @@
 #include "ui_qfespimb00histogrammaskdialog.h"
 
 QFESPIMB00HistogramMaskDialog::QFESPIMB00HistogramMaskDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFESPIMB00HistogramMaskDialog)
 {
     ui->setupUi(this);

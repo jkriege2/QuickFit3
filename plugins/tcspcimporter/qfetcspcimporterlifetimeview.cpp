@@ -1,9 +1,9 @@
 #include "qfetcspcimporterlifetimeview.h"
 #include "ui_qfetcspcimporterlifetimeview.h"
-
+#include "qfaction.h"
 #include "qfpluginservices.h"
 QFETCSPCImporterLifetimeView::QFETCSPCImporterLifetimeView(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFETCSPCImporterLifetimeView)
 {
     plteRange=NULL;
@@ -66,7 +66,7 @@ void QFETCSPCImporterLifetimeView::initArrialtimes(const QList<QVector<int16_t> 
     ds->addCopiedColumn(microtime.data(), microtime.size(), tr("microtime [ns]"));
     for (int c=0; c<arrivaltimes.size(); c++) {
         if (arrivaltimes[c].size()>0) {
-            QAction* act=new QAction(tr("use lifetime range for channel %1").arg(c+1), this);
+            QAction* act=new QFActionWithNoMenuRole(tr("use lifetime range for channel %1").arg(c+1), this);
             connect(act, SIGNAL(triggered()), this, SLOT(sendRange()));
             actsCopyRange.insert(act, c);
             ui->plotter->addAction(act);

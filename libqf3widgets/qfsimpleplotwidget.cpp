@@ -500,7 +500,7 @@ void QFSimplePlotWidget::setAxesEditable(bool editable)
 
 
 QFSimplePlotDialog::QFSimplePlotDialog(QWidget *parent, Qt::WindowFlags f):
-    QDialog(parent, f|Qt::WindowStaysOnTopHint)
+    QFDialog(parent, f|Qt::WindowStaysOnTopHint)
 {
     setWindowModality(Qt::ApplicationModal);
     setWindowTitle(tr("QuickFit: simple plot"));

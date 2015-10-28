@@ -161,7 +161,7 @@
 
 
 QFECalculatorPlotDialog::QFECalculatorPlotDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFECalculatorPlotDialog)
 {
     ui->setupUi(this);

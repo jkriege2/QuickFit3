@@ -484,6 +484,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
 
     menuBar=new QMenuBar(d);
     menuBar->setVisible(true);
+    menuBar->setNativeMenuBar(ProgramOptions::getConfigValue("quickfit/macxsubwinmenus_asmain", false).toBool());
     ml->addWidget(menuBar);
     menuResults=menuBar->addMenu("&Results");
     menuHelp=menuBar->addMenu("&Help");
@@ -615,40 +616,40 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     rwvlayout->addWidget(tbResultsSettings);
 
 
-    actRefreshResults=new QAction(QIcon(":/lib/refresh16.png"), tr("Refresh results ..."), d);
+    actRefreshResults=new QFActionWithNoMenuRole(QIcon(":/lib/refresh16.png"), tr("Refresh results ..."), d);
     actRefreshResults->setShortcut(tr("F5"));
     tbResults->addAction(actRefreshResults);
     tbResults->addSeparator();
-    actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected results"), d);
+    actDeleteResults=new QFActionWithNoMenuRole(QIcon(":/lib/delete16.png"), tr("Delete selected results"), d);
     actDeleteResults->setShortcut(QKeySequence::Delete);
     tbResults->addAction(actDeleteResults);
-    actDeleteAllVisibleResults=new QAction(tr("Delete all visible results"), d);
+    actDeleteAllVisibleResults=new QFActionWithNoMenuRole(tr("Delete all visible results"), d);
     tbResults->addSeparator();
 
 
     tvResults->addActionsToToolbar(tbResults);
-    actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as value+error pairs"), this);
+    actCopyValErrResults=new QFActionWithNoMenuRole(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as value+error pairs"), this);
     tbResults->addAction(actCopyValErrResults);
-    actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as value+error pairs, w/o header"), d);
+    actCopyValErrResultsNoHead=new QFActionWithNoMenuRole(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as value+error pairs, w/o header"), d);
     tbResults->addAction(actCopyValErrResultsNoHead);
 
-    actCopyMedianQuantilesResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as median+q25+q75"), d);
-    actCopyMedianQuantilesNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as median+q25+q75, w/o header"), d);
+    actCopyMedianQuantilesResults=new QFActionWithNoMenuRole(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as median+q25+q75"), d);
+    actCopyMedianQuantilesNoHead=new QFActionWithNoMenuRole(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as median+q25+q75, w/o header"), d);
 
     menuExpanded=new QMenu(tr("copy in expanded form"), tvResults);
     menuExpanded->setIcon(QIcon(":/lib/copy16.png"));
     tvResults->addAction(menuExpanded->menuAction());
-    actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), d);
+    actCopyExpanded=new QFActionWithNoMenuRole( tr("Copy Selection in expanded form"), d);
     menuExpanded->addAction(actCopyExpanded);
-    actCopyExpandedFlipped=new QAction( tr("Copy Selection in expanded form, flipped"), d);
+    actCopyExpandedFlipped=new QFActionWithNoMenuRole( tr("Copy Selection in expanded form, flipped"), d);
     menuExpanded->addAction(actCopyExpandedFlipped);
-    actCopyExpandedNoHead=new QAction( tr("Copy Selection in expanded form, w/o header"), d);
+    actCopyExpandedNoHead=new QFActionWithNoMenuRole( tr("Copy Selection in expanded form, w/o header"), d);
     menuExpanded->addAction(actCopyExpandedNoHead);
-    actCopyExpandedNoHeadFlipped=new QAction( tr("Copy Selection in expanded form, w/o header, flipped"), d);
+    actCopyExpandedNoHeadFlipped=new QFActionWithNoMenuRole( tr("Copy Selection in expanded form, w/o header, flipped"), d);
     menuExpanded->addAction(actCopyExpandedNoHeadFlipped);
-    actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection in expanded form, to Matlab"), d);
+    actCopyExpandedNoHeadMatlab=new QFActionWithNoMenuRole( tr("Copy Selection in expanded form, to Matlab"), d);
     menuExpanded->addAction(actCopyExpandedNoHeadMatlab);
-    actCopyExpandedNoHeadMatlabFlipped=new QAction( tr("Copy Selection in expanded form, to Matlab, flipped"), d);
+    actCopyExpandedNoHeadMatlabFlipped=new QFActionWithNoMenuRole( tr("Copy Selection in expanded form, to Matlab, flipped"), d);
     menuExpanded->addAction(actCopyExpandedNoHeadMatlabFlipped);
 
 
@@ -656,28 +657,28 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     menuCopyIDs=new QMenu(tr("Copy Result/Evaluation IDs"), tvResults);
     menuCopyIDs->setIcon(QIcon(":/lib/copy_forparser.png"));
     tvResults->addAction(menuCopyIDs->menuAction());
-    actCopyRDRID=new QAction( tr("Copy RDR ID"), d);
+    actCopyRDRID=new QFActionWithNoMenuRole( tr("Copy RDR ID"), d);
     menuCopyIDs->addAction(actCopyRDRID);;
-    actCopyEvaluationID=new QAction( tr("Copy Evaluation ID"), d);
+    actCopyEvaluationID=new QFActionWithNoMenuRole( tr("Copy Evaluation ID"), d);
     menuCopyIDs->addAction(actCopyEvaluationID);;
-    actCopyResultID=new QAction( tr("Copy Result ID"), d);
+    actCopyResultID=new QFActionWithNoMenuRole( tr("Copy Result ID"), d);
     menuCopyIDs->addAction(actCopyResultID);;
-    actCopyResultAccessParserFunction=new QAction( tr("Copy Result Access Parser Function rdr_getresult(...)"), d);
+    actCopyResultAccessParserFunction=new QFActionWithNoMenuRole( tr("Copy Result Access Parser Function rdr_getresult(...)"), d);
     menuCopyIDs->addAction(actCopyResultAccessParserFunction);;
 
-    actCopyResultAccessParserFunctionTable=new QAction(QIcon(":/table/table_insert.png"), tr("Copy selected cells as table RDR with result access parser functions"), d);
+    actCopyResultAccessParserFunctionTable=new QFActionWithNoMenuRole(QIcon(":/table/table_insert.png"), tr("Copy selected cells as table RDR with result access parser functions"), d);
     tvResults->addAction(actCopyResultAccessParserFunctionTable);
 
-    actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), d);
+    actSaveResults=new QFActionWithNoMenuRole(QIcon(":/lib/save16.png"), tr("Save all results to file"), d);
     tbResults->addAction(actSaveResults);
-    actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), d);
+    actSaveResultsAveraged=new QFActionWithNoMenuRole(tr("Save all results to file, averaged vector/matrix results"), d);
 
     tbResults->addSeparator();
-    actShowData=new QAction(QIcon(":/lib/result_table.png"), tr("show selected data as table"), d);
+    actShowData=new QFActionWithNoMenuRole(QIcon(":/lib/result_table.png"), tr("show selected data as table"), d);
     tbResults->addAction(actShowData);
-    actStatistics=new QAction(QIcon(":/lib/result_statistics.png"), tr("histogram: column-wise"), d);
+    actStatistics=new QFActionWithNoMenuRole(QIcon(":/lib/result_statistics.png"), tr("histogram: column-wise"), d);
     tbResults->addAction(actStatistics);
-    actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("histogram: cell-wise"), d);
+    actStatisticsComparing=new QFActionWithNoMenuRole(QIcon(":/lib/result_statistics_compare.png"), tr("histogram: cell-wise"), d);
     tbResults->addAction(actStatisticsComparing);
 
     //tbResults->addSeparator();
@@ -840,23 +841,23 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
 
-    actHelp=new QAction(QIcon(":/lib/help.png"), tr("&Help"), d);
+    actHelp=new QFActionWithNoMenuRole(QIcon(":/lib/help.png"), tr("&Help"), d);
     actHelp->setToolTip(tr("display online-help"));
     connect(actHelp, SIGNAL(triggered()), this, SLOT(displayHelp()));
 
-    actHelpPlugin=new QAction(QIcon(":/lib/help.png"), tr("&Plugin Help"), d);
+    actHelpPlugin=new QFActionWithNoMenuRole(QIcon(":/lib/help.png"), tr("&Plugin Help"), d);
     actHelpPlugin->setToolTip(tr("display online-help for the specific plugin"));
     connect(actHelpPlugin, SIGNAL(triggered()), this, SLOT(displayHelpPlugin()));
 
-    actHelpPluginTutorial=new QAction(QIcon(":/lib/help/help_tutorial.png"), tr("&Plugin Tutorial"), d);
+    actHelpPluginTutorial=new QFActionWithNoMenuRole(QIcon(":/lib/help/help_tutorial.png"), tr("&Plugin Tutorial"), d);
     actHelpPluginTutorial->setToolTip(tr("display the tutorial for the specific plugin"));
     connect(actHelpPluginTutorial, SIGNAL(triggered()), this, SLOT(displayHelpPluginTutorial()));
 
-    actHelpPluginCopyright=new QAction(QIcon(":/lib/help/help_copyright.png"), tr("&Plugin Copyright"), d);
+    actHelpPluginCopyright=new QFActionWithNoMenuRole(QIcon(":/lib/help/help_copyright.png"), tr("&Plugin Copyright"), d);
     actHelpPluginCopyright->setToolTip(tr("display copyright note for the specific plugin"));
     connect(actHelpPluginCopyright, SIGNAL(triggered()), this, SLOT(displayHelpPluginCopyright()));
 
-    actHelpEval=new QAction(QIcon(":/lib/help_rdr.png"), tr("&Evaluation item help"), d);
+    actHelpEval=new QFActionWithNoMenuRole(QIcon(":/lib/help_rdr.png"), tr("&Evaluation item help"), d);
     actHelpEval->setToolTip(tr("display online-help common to all plugins, i.e. for the basic evaluation editor dialog"));
     connect(actHelpEval, SIGNAL(triggered()), this, SLOT(displayHelpEval()));
 

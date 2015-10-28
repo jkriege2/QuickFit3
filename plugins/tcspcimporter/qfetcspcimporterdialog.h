@@ -23,7 +23,7 @@
 #ifndef QFETCSPCImporterDIALOG_H
 #define QFETCSPCImporterDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfproject.h"
 #include "programoptions.h"
 #include "qfetcspcimporterthreadprogress.h"
@@ -48,7 +48,7 @@ namespace Ui {
     Finally getFilesToAdd() returns a list of file constaining ACFs and CCFs to be added to the
     project, by calling QFRDRImagingFCSPlugin::insertVideoCorrelatorFile().
 */
-class QFETCSPCImporterDialog : public QDialog
+class QFETCSPCImporterDialog : public QFDialog
 {
     Q_OBJECT
 
@@ -70,6 +70,7 @@ public:
     void on_btnSelectFile_clicked();
     void on_btnAddJob_clicked();
     void on_btnLoad_clicked();
+    void on_btnBackFromFile_clicked();
     void on_btnHelp_clicked();
     void on_spinP_valueChanged(int val);
     void on_spinS_valueChanged(int val);
@@ -117,6 +118,7 @@ protected:
     //QFTableModel* tmCRLifetime;
     QFTableModel* tmFCS;
     QFTableModel* tmFCSLifetimeFilter;
+    QFTableModel* tmBackgroundFCS;
     //QList<Job> jobsToAdd;
     QList<QFETCSPCImporterJobThreadAddFileProps > filesToAdd;
     QString countRateString;

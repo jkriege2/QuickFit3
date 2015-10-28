@@ -42,9 +42,9 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/table/table_expression.txt");
     functionRef->setDefaultWordsMathExpression();
 
-    actFit=new QAction(QIcon(":/table/fit.png"), tr("least squares fit"), this);
+    actFit=new QFActionWithNoMenuRole(QIcon(":/table/fit.png"), tr("least squares fit"), this);
     connect(actFit, SIGNAL(triggered()), this, SLOT(doFit()));
-    actRegression=new QAction(QIcon(":/table/regression.png"), tr("regression analysis"), this);
+    actRegression=new QFActionWithNoMenuRole(QIcon(":/table/regression.png"), tr("regression analysis"), this);
     connect(actRegression, SIGNAL(triggered()), this, SLOT(doRegression()));
 
 

@@ -45,7 +45,7 @@ ColorComboBox::ColorComboBox(QWidget* parent):
 
 
 
-    actNewColor=new QAction(tr("add new color"), this);
+    actNewColor=new QFActionWithNoMenuRole(tr("add new color"), this);
     connect(actNewColor, SIGNAL(triggered()), this, SLOT(newUserColor()));
 
     addAction(actNewColor);

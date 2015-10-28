@@ -174,7 +174,7 @@ void QFESpectraViewer::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
     log_text(tr("initializing ...\n"));
     log_text(tr("   registering plugin ...\n"));
-    actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Spectra Viewer"), this);
+    actStartPlugin=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Spectra Viewer"), this);
     actStartPlugin->setEnabled(false);
     actStartPlugin->setToolTip(tr("SpectraViewer: loading spectra database ... \n ... please wait until data is loaded, before starting this plugin!"));
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(showViewer()));

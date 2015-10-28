@@ -29,7 +29,7 @@
 #include "qfstyledbutton.h"
 
 QFESpectraViewerFilterEditor::QFESpectraViewerFilterEditor(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFESpectraVieweFilterEditor)
 {
     ui->setupUi(this);

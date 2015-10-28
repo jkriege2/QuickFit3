@@ -137,6 +137,8 @@ struct TCSPCImporterJob {
 
     bool fcs_uselifetimefilter;
     QList<FCSLifetimeFilter> fcs_lifetimefilter;
+    bool fcs_usebackcorrect;
+    QList<double> fcs_backcorrect;
 
     QMap<QString, QVariant> props;
     QString comment;

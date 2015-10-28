@@ -27,7 +27,7 @@
 #include "csvtools.h"
 
 QFImFCSSetParamFromFileDialog::QFImFCSSetParamFromFileDialog(int width, int height, QFImFCSFitEvaluation* eval, QStringList parameters, QStringList parameterIDs, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFImFCSSetParamFromFileDialog)
 {
     this->parameterIDs=parameterIDs;

@@ -72,9 +72,9 @@ void QFEResultsTools::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
 	services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
     
-    QAction* actStartResultsCalculator=new QAction(QIcon(getIconFilename()), tr("results &calculator ..."), this);
+    QAction* actStartResultsCalculator=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("results &calculator ..."), this);
     connect(actStartResultsCalculator, SIGNAL(triggered()), this, SLOT(startResultsCalculator()));
-    QAction* actStartRegExpTool=new QAction(tr("Regular Expressions Test Tool"), this);
+    QAction* actStartRegExpTool=new QFActionWithNoMenuRole(tr("Regular Expressions Test Tool"), this);
     connect(actStartRegExpTool, SIGNAL(triggered()), this, SLOT(startRegExp()));
     QMenu* extm=services->getMenu("tools");
     if (extm) {

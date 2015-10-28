@@ -227,9 +227,9 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     splitter->setStretchFactor(0,5);
     splitter->setStretchFactor(1,1);
 
-    actCopyNormalizedACF=new QAction(tr("copy normalized CFs to table"), this);
+    actCopyNormalizedACF=new QFActionWithNoMenuRole(tr("copy normalized CFs to table"), this);
     connect(actCopyNormalizedACF, SIGNAL(triggered()), this, SLOT(copyNormalizedACFs()));
-    actCorrectOffset=new QAction(tr("correct CFs for offset"), this);
+    actCorrectOffset=new QFActionWithNoMenuRole(tr("correct CFs for offset"), this);
     connect(actCorrectOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
 
     menuMask=propertyEditor->addMenu("&Selection/Mask", 0);
@@ -305,20 +305,82 @@ void QFRDRFCSCorrelationEditor::slidersChanged(int userMin, int userMax, int /*m
     replotData();
 }
 
-void QFRDRFCSCorrelationEditor::copyNormalizedACFs()
+void QFRDRFCSCorrelationEditor::correctBackground()
 {
+    QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
+    if (!m) return;
+    QFSelectRDRDialog* dlg=new QFSelectRDRDialog(new QFMatchRDRFunctorSelectType(current->getType()), this);
+    QList<QFRawDataRecord*> grpmem=current->getGroupMembers();
+    dlg->selectNone();
 
+    if (grpmem.size()<=0) {
+        dlg->selectAll();
+    } else {
+        for (int i=0; i<grpmem.size(); i++) {
+            dlg->selectRDR(grpmem[i]);
+        }
+    }
+
+    double B0=m->getProperty("BACKGROUND_INTENSITY1", m->getProperty("BACKGROUND1",
+                                                       m->getProperty("BACKGROUND_INTENSITY",
+                                                       m->getProperty("BACKGROUND",
+                                                                      m->getProperty("BACKGROUND_KHZ1",
+                                                                      m->getProperty("BACKGROUND_KHZ", 0).toDouble()).toDouble()*1000.0).toDouble()).toDouble()).toDouble()).toDouble();
+    double B1=m->getProperty("BACKGROUND_INTENSITY2", m->getProperty("BACKGROUND2", m->getProperty("BACKGROUND_INTENSITY", m->getProperty("BACKGROUND",
+                                                                                                                                   m->getProperty("BACKGROUND_KHZ2", m->getProperty("BACKGROUND_KHZ", 0).toDouble()).toDouble()*1000.0
+                                                                                                                                   ).toDouble()).toDouble()).toDouble()).toDouble();
+
+
+    QFDoubleEdit* edtB1=new QFDoubleEdit(dlg);
+    edtB1->setValue(B0);
+    dlg->addWidget("Background, channel 0 [kHz]", edtB1);
+    QFDoubleEdit* edtB2=new QFDoubleEdit(dlg);
+    edtB2->setValue(B1);
+    dlg->addWidget("Background, channel 1 [kHz]", edtB2);
+    QFDoubleEdit* edtOffset=new QFDoubleEdit(dlg);
+    edtOffset->setValue(0);
+    dlg->addWidget("correlation function offset", edtOffset);
+
+    if (dlg->exec()) {
+        B0=edtB1->value();
+        B1=edtB2->value();
+        double offset=edtOffset->value();
+        QList<QFRawDataRecord*> lst=dlg->getSelectedRDRsp();
+        for (int i=0; i<lst.size(); i++) {
+            QFRDRFCSData* mi=qobject_cast<QFRDRFCSData*>(lst[i]);
+            if (mi) {
+//                double I0=mi->getRateMean(r, 0);
+//                double I1=mi->getRateMean(r, 1);
+            }
+        }
+    }
+    delete dlg;
 }
 
 void QFRDRFCSCorrelationEditor::correctOffset()
 {
     if (!current) return;
     bool ok=false;
-    double offset=QInputDialog::getDouble(this, tr("FCS Offset correction"), tr("enter the offset, which should be subtracted (NOTE: A reload of the project will be required!)"), current->getProperty("CORR_OFFSET", 0.0).toDouble(),-2147483647,2147483647,5, &ok);
+    double offset=QInputDialog::getDouble(this, tr("FCS Offset correction"), tr("enter the offset, which should be subtracted"), current->getProperty("CORR_OFFSET", 0.0).toDouble(),-2147483647,2147483647,5, &ok);
     if (ok)  {
+        double oldoff=current->getProperty("CF_CORRECT_OFFSET", 0.0).toDouble();
         current->setQFProperty("CF_CORRECT_OFFSET", offset, true, true);
-        if (QMessageBox::information(this, tr("corect correlation offset"), tr("The project needs to be saved and reloaded for the offset correction to take effect!\nReload project now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+        /*if (QMessageBox::information(this, tr("corect correlation offset"), tr("The project needs to be saved and reloaded for the offset correction to take effect!\nReload project now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
             QFPluginServices::getInstance()->reloadCurrentProject();
+        }*/
+        QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
+        if (m) {
+            for (int r=-1; r<m->getCorrelationRuns(); r++) {
+                double* d=m->getCorrelationRun(r);
+                int64_t N=m->getCorrelationN();
+                for (int64_t i=0; i<N; i++) {
+                    d[i]=d[i]+oldoff-offset;
+                }
+            }
+        } else {
+            if (QMessageBox::information(this, tr("corect correlation offset"), tr("The project needs to be saved and reloaded for the offset correction to take effect!\nReload project now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                QFPluginServices::getInstance()->reloadCurrentProject();
+            }
         }
 
     }

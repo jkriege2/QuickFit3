@@ -22,13 +22,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFFCSMSDEVALUATIONAVERAGECHANNELSDIALOG_H
 #define QFFCSMSDEVALUATIONAVERAGECHANNELSDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFFCSMSDEvaluationAverageChannelsDialog;
 }
 
-class QFFCSMSDEvaluationAverageChannelsDialog : public QDialog
+class QFFCSMSDEvaluationAverageChannelsDialog : public QFDialog
 {
         Q_OBJECT
         

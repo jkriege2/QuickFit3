@@ -21,7 +21,7 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QString>
 #include <QWidget>
 #include <QComboBox>
@@ -66,7 +66,7 @@ namespace Ui {
 
 
  */
-class QFWIDLIB_EXPORT QF3FilterEditor : public QDialog {
+class QFWIDLIB_EXPORT QF3FilterEditor : public QFDialog {
         Q_OBJECT
 
     public:

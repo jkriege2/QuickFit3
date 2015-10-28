@@ -27,7 +27,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfpluginservices.h"
 
 QFSelectionListDialog::QFSelectionListDialog(QWidget *parent, bool selection_saveable) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFSelectionListDialog)
 {
     this->selection_saveable=selection_saveable;

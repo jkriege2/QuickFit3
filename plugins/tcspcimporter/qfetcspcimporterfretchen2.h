@@ -1,7 +1,7 @@
 #ifndef QFETCSPCIMPORTERFRETCHEN2_H
 #define QFETCSPCIMPORTERFRETCHEN2_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qftcspcreader.h"
 #include "qfpluginservices.h"
 #include "tttrtools.h"
@@ -14,7 +14,7 @@ namespace Ui {
 }
 
 
-class QFETCSPCImporterFretchen2 : public QDialog
+class QFETCSPCImporterFretchen2 : public QFDialog
 {
         Q_OBJECT
 

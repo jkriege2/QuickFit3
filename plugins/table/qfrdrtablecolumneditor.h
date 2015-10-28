@@ -24,7 +24,7 @@
 #ifndef QFRDRTableColumnEditor_H
 #define QFRDRTableColumnEditor_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfcompleterfromfile.h"
 #include <QCompleter>
 #include <QThread>
@@ -61,7 +61,7 @@ namespace Ui {
     on the rhs of the dialog.
 */
 
-class QFRDRTableColumnEditor : public QDialog
+class QFRDRTableColumnEditor : public QFDialog
 {
         Q_OBJECT
         

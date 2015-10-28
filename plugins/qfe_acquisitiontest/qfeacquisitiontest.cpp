@@ -65,7 +65,7 @@ void QFEAcquisitionTest::initExtension() {
     
 	// some example code that may be used to register a menu and a tool button:
     
-    QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Test Acquisitions"), this);
+    QAction* actStartPlugin=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Test Acquisitions"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
     /*QToolBar* exttb=services->getToolbar("extensions");
     if (exttb) {

@@ -34,7 +34,7 @@
 #include "csvtools.h"
 
 QFDlgCSVParameters::QFDlgCSVParameters(QWidget* parent, QString columnSeparator, QString decimalSeparator, QString commentStart, QString headerStart):
-    QDialog(parent), ui(new Ui::QFDlgCSVParameters)
+    QFDialog(parent), ui(new Ui::QFDlgCSVParameters)
 {
     colselcombos=0;
     tabmodel=new QFTableModel(this);

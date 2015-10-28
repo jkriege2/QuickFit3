@@ -23,6 +23,7 @@
 #define QFTOOLS_H
 #include <QTextStream>
 #include "qfmathtools.h"
+#include "qfaction.h"
 
 #include <cmath>
 #include <cfloat>

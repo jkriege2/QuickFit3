@@ -22,13 +22,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFRDRIMAGINGFCSMASKBUILDER_H
 #define QFRDRIMAGINGFCSMASKBUILDER_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFRDRImagingFCSMaskBuilder;
 }
 
-class QFRDRImagingFCSMaskBuilder : public QDialog
+class QFRDRImagingFCSMaskBuilder : public QFDialog
 {
         Q_OBJECT
 

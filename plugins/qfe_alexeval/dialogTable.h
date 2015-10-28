@@ -22,14 +22,14 @@ Copyright (c) 2012-2015 by Sebastian Isbaner
 #ifndef DIALOGTABLE_H
 #define DIALOGTABLE_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include<QTableWidget>
 
 namespace Ui {
 class DialogTable;
 }
 
-class DialogTable : public QDialog
+class DialogTable : public QFDialog
 {
     Q_OBJECT
     

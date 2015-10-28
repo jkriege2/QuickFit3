@@ -38,7 +38,7 @@
 #define FINDDIALOG_H
 
 #include <QString>
-
+#include "qfdialog.h"
 #include "ui_finddialog.h"
 
 
@@ -48,7 +48,7 @@
  *
  *  \image html editor_find.png
  */
-class QFESPIMB040FindDialog : public QDialog, private Ui::FindDialog
+class QFESPIMB040FindDialog : public QFDialog, private Ui::FindDialog
 {
     Q_OBJECT
 private:

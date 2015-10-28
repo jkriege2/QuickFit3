@@ -448,12 +448,12 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
 
 
 
-    actBackgroundFromMask=new QAction(tr("background from mask"), this);
+    actBackgroundFromMask=new QFActionWithNoMenuRole(tr("background from mask"), this);
     connect(actBackgroundFromMask, SIGNAL(triggered()), this, SLOT(setUserBackgroundFromMask()));
-    actBackgroundFromSelection=new QAction(tr("background from selection"), this);
+    actBackgroundFromSelection=new QFActionWithNoMenuRole(tr("background from selection"), this);
     connect(actBackgroundFromSelection, SIGNAL(triggered()), this, SLOT(setUserBackgroundFromSelection()));
 
-    actCopyData=new QAction(tr("copy N&&B data"), this);
+    actCopyData=new QFActionWithNoMenuRole(tr("copy N&&B data"), this);
     connect(actCopyData, SIGNAL(triggered()), this, SLOT(copyData()));
 
     menuNAB=propertyEditor->addMenu("&Evaluation Tools", -1);

@@ -21,7 +21,7 @@
 #ifndef QFSimpleCurveFitDialog_H
 #define QFSimpleCurveFitDialog_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QVector>
 #include "qffitfunctionvalueinputtable.h"
 #include "qffitfunctionvalueinputdelegate.h"
@@ -31,7 +31,7 @@ namespace Ui {
     class QFSimpleCurveFitDialog;
 }
 
-class QFSimpleCurveFitDialog : public QDialog
+class QFSimpleCurveFitDialog : public QFDialog
 {
         Q_OBJECT
         

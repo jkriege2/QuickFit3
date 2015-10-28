@@ -21,7 +21,7 @@
 #ifndef QFPLOTTERCOPYTOTABLEDIALOG_H
 #define QFPLOTTERCOPYTOTABLEDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfrdrtableinterface.h"
 #include "qfrdrcolumngraphsinterface.h"
 #include "qfrawdatarecord.h"
@@ -32,7 +32,7 @@ namespace Ui {
     class QFPlotterCopyToTableDialog;
 }
 
-class QFWIDLIB_EXPORT QFPlotterCopyToTableDialog : public QDialog
+class QFWIDLIB_EXPORT QFPlotterCopyToTableDialog : public QFDialog
 {
         Q_OBJECT
         

@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFMathParserWidget_H
 #define QFMathParserWidget_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfcompleterfromfile.h"
 #include <QCompleter>
 #include <QThread>

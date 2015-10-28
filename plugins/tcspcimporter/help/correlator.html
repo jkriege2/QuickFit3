@@ -35,6 +35,18 @@ For the FCS/FCCS functionality you may set several options:
 <p>This plugin saves a binned countrate together with the correlation function. This is used to present a rough overview of the countrate during the experiment to the user. It has no influence on the data processing! Set this bining to an intermediate level such as 10-100ms, which will result an intermediate number of datapoints to the user. A finer resolution usually does not contain more information, but will slow down the display routines.</p>
 </ul>
 
+<a name="#backcorrect"><h3>Background Correction</h3>
+<p>The FCS/FCCS correlator can also perform a background-intensity correction of the FCS-results. If this function is actiavted, the FCS-countrates and the correlation curves are corrected for a background intenisty $(B_i)$ specified for each channel $(i)$. The countrates are simply corrected, by subtracting $(B_i)$:
+$[F_i^\text{corrected}=F_i^\text{measured}-B_i]$
+The correltion curves $(g_{ij}^\text{measured}(\tau))$ are corrected as follows:
+$[g_{ij}^\text{corrected}(\tau)=g_{ij}^\text{measured}(\tau)\cdot\frac{F_i^\text{measured}\cdot F_j^\text{measured}}{(F_i^\text{measured}-B_i)\cdot(F_j^\text{measured}-B_j)}]$
+</p>
+
+
+<h3>FCS countrate binning</h3>
+<p>This plugin saves a binned countrate together with the correlation function. This is used to present a rough overview of the countrate during the experiment to the user. It has no influence on the data processing! Set this bining to an intermediate level such as 10-100ms, which will result an intermediate number of datapoints to the user. A finer resolution usually does not contain more information, but will slow down the display routines.</p>
+</ul>
+
 
 <a name="#createdFiles"><h2>Created Files</h2>
 <ul>

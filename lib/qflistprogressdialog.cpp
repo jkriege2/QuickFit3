@@ -2,7 +2,7 @@
 #include "ui_qflistprogressdialog.h"
 
 QFListProgressDialog::QFListProgressDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFListProgressDialog)
 {
     m_canceled=false;

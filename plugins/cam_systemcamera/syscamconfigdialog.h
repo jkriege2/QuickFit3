@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef SYSCAMCONFIGDIALOG_H
 #define SYSCAMCONFIGDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QSettings>
 #include "qfecamsystemcamera.h"
 #include <QMap>
@@ -36,7 +36,7 @@ namespace Ui {
     class SyscamConfigDialog;
 }
 
-class SyscamConfigDialog : public QDialog
+class SyscamConfigDialog : public QFDialog
 {
         Q_OBJECT
         

@@ -24,7 +24,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "programoptions.h"
 
 QFRDRImagingFCSCopyCorrAsRDRDialog::QFRDRImagingFCSCopyCorrAsRDRDialog(bool isFCCS, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRImagingFCSCopyCorrAsRDRDialog)
 {
     ui->setupUi(this);

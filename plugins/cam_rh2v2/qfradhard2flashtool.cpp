@@ -25,7 +25,7 @@ Copyright (c) 2008-2015 Jan Buchholz, German Cancer Research Center
 #include "qftools.h"
 
 QFRadhard2FlashtoolV2::QFRadhard2FlashtoolV2(QFExtensionCameraRh2v2 *ext, QWidget* parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRadhard2FlashtoolV2)
 {
     this->radhard2extension=ext;

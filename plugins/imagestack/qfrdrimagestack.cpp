@@ -53,20 +53,20 @@ QFRawDataRecord* QFRDRImageStackPlugin::createRecord(QFProject* parent) {
 void QFRDRImageStackPlugin::registerToMenu(QMenu* menuMain) {
     // create menu entries to insert data with this type
     QMenu* menu=menuMain->addMenu(QIcon(getIconFilename()), tr("image &stacks"));
-    QAction* action=new QAction(QIcon(":/image_stack/singlefile_stack.png"), tr("single-file image stack(s)"), parentWidget);
+    QAction* action=new QFActionWithNoMenuRole(QIcon(":/image_stack/singlefile_stack.png"), tr("single-file image stack(s)"), parentWidget);
     action->setStatusTip(tr("Insert each image file as image stack with one channel"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertSingleFileImageStack()));
     menu->addAction(action);
-    action=new QAction(QIcon(":/image_stack/singlefile_dvh_stack.png"), tr("single-file, horizontal DualView image stack"), parentWidget);
+    action=new QFActionWithNoMenuRole(QIcon(":/image_stack/singlefile_dvh_stack.png"), tr("single-file, horizontal DualView image stack"), parentWidget);
     action->setStatusTip(tr("Insert each image file as a dual-channel image-stack, where each frame is split horozontally (left=channel 0, right=channel 1)"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertSingleFileHDualViewImageStack()));
     menu->addAction(action);
-    action=new QAction(QIcon(":/image_stack/singlefile_dvv_stack.png"), tr("single-file, vertical DualView image stack"), parentWidget);
+    action=new QFActionWithNoMenuRole(QIcon(":/image_stack/singlefile_dvv_stack.png"), tr("single-file, vertical DualView image stack"), parentWidget);
     action->setStatusTip(tr("Insert each image file as a dual-channel image-stack, where each frame is split vertically (top=channel 0, bottom=channel 1)"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertSingleFileVDualViewImageStack()));
     menu->addAction(action);
     menu->addSeparator();
-    action=new QAction(QIcon(":/image_stack/multifile_stack.png"), tr("multi-file image stack"), parentWidget);
+    action=new QFActionWithNoMenuRole(QIcon(":/image_stack/multifile_stack.png"), tr("multi-file image stack"), parentWidget);
     action->setStatusTip(tr("Insert several image files as channels into a single image stack"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertMultiFileImageStack()));
     menu->addAction(action);

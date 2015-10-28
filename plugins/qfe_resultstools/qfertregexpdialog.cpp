@@ -27,7 +27,7 @@
 #include "qfpluginservices.h"
 
 QFERTRegExpDialog::QFERTRegExpDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFERTRegExpDialog)
 {
     ui->setupUi(this);

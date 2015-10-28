@@ -22,13 +22,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFRDRIMAGINGFCSCOPYCORRASRDRDIALOG_H
 #define QFRDRIMAGINGFCSCOPYCORRASRDRDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
 class QFRDRImagingFCSCopyCorrAsRDRDialog;
 }
 
-class QFRDRImagingFCSCopyCorrAsRDRDialog : public QDialog
+class QFRDRImagingFCSCopyCorrAsRDRDialog : public QFDialog
 {
     Q_OBJECT
     

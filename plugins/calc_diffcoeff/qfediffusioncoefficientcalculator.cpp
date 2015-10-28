@@ -328,7 +328,7 @@ void QFEDiffusionCoefficientCalculator::initExtension() {
     
     loadComponents();
 
-    actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Diffusion Coefficient Calculator"), this);
+    actStartPlugin=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Diffusion Coefficient Calculator"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
     QMenu* extm=services->getMenu("tools");
     if (extm) {

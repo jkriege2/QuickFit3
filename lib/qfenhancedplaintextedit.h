@@ -33,6 +33,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QTextEdit>
 #include <QTextBlock>
 #include <QTextCursor>
+#include "qfaction.h"
 
 /*! \brief enhanced QPlainTextEdit which adds some features missing in the basic Qt implementation
     \ingroup qf3lib_widgets

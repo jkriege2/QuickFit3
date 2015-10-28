@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan Buchholz, German Cancer Research Center
 #include "ui_cam_rh2v2_cfgdlg.h"
 
 cam_rh2v2_cfgdlg::cam_rh2v2_cfgdlg(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::cam_rh2v2_cfgdlg),
     isEditing(false)
 {

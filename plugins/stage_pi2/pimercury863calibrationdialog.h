@@ -23,7 +23,7 @@
 #ifndef PIMERCURY863CALIBRATIONDIALOG_H
 #define PIMERCURY863CALIBRATIONDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QProgressBar>
 #include <QPushButton>
 #include <QLabel>
@@ -35,7 +35,7 @@
 class QFExtensionLinearStagePI2; // forward
 
 
-class PIMercury863CalibrationDialog : public QDialog {
+class PIMercury863CalibrationDialog : public QFDialog {
         Q_OBJECT
     public:
         /** Default constructor */

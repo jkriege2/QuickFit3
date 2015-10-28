@@ -24,7 +24,7 @@
 #include <QTimer>
 
 dlgQFFitAlgorithmProgressDialog::dlgQFFitAlgorithmProgressDialog(QWidget* parent):
-    QDialog(parent), ui(new Ui::QFFitAlgorithmProgressDlg)
+    QFDialog(parent), ui(new Ui::QFFitAlgorithmProgressDlg)
 {
     ui->setupUi(this);
     m_canceled=false;

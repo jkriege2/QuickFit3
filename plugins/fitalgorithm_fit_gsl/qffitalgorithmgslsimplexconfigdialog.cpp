@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "ui_qffitalgorithmgslsimplexconfigdialog.h"
 
 QFFitAlgorithmGSLSimplexConfigDialog::QFFitAlgorithmGSLSimplexConfigDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFFitAlgorithmGSLSimplexConfigDialog)
 {
     ui->setupUi(this);

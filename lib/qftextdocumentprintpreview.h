@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFTEXTDOCUMENTPRINTPREVIEW_H
 #define QFTEXTDOCUMENTPRINTPREVIEW_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QTextDocument>
@@ -41,7 +41,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "lib_imexport.h"
 
 
-class QFLIB_EXPORT QFTextDocumentPrintPreview : public QDialog
+class QFLIB_EXPORT QFTextDocumentPrintPreview : public QFDialog
 {
         Q_OBJECT
         

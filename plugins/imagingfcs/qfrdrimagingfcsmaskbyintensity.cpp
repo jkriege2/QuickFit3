@@ -26,7 +26,7 @@
 #include "statistics_tools.h"
 
 QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent, bool selection) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRImagingFCSMaskByIntensity)
 {
     m_mask=NULL;

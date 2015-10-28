@@ -24,7 +24,7 @@ Copyright (c) 2012-2015 by Sebastian Isbaner
 #include <QMessageBox>
 
 DialogReconstructMarkerRecords::DialogReconstructMarkerRecords(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DialogReconstructMarkerRecords)
 {
     ui->setupUi(this);

@@ -65,7 +65,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 /* qDebug()<<QString("error during '%4'\n  error code was: %1 [%2]").arg(error).arg(andorErrorToString(error)).arg(#s); \
 */
 AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::AndorSettingsDialog)
 {
     m_image=NULL;
@@ -549,12 +549,12 @@ void AndorSettingsDialog::calcTiming() {
 
 
 void AndorSettingsDialog::resizeEvent(QResizeEvent* event) {
-    QDialog::resizeEvent(event);
+    QFDialog::resizeEvent(event);
     updatePreview();
 }
 
 void AndorSettingsDialog::showEvent(QShowEvent* event) {
-    QDialog::showEvent(event);
+    QFDialog::showEvent(event);
     updatePreview();
 }
 

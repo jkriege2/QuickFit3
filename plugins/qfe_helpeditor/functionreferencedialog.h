@@ -24,13 +24,13 @@
 #ifndef FUNCTIONREFERENCEDIALOG_H
 #define FUNCTIONREFERENCEDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class FunctionReferenceDialog;
 }
 
-class FunctionReferenceDialog : public QDialog
+class FunctionReferenceDialog : public QFDialog
 {
         Q_OBJECT
 

@@ -30,7 +30,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QPushButton>
-#include <QDialog>
+#include "qfdialog.h"
 #include <QProgressBar>
 
 
@@ -98,7 +98,7 @@ class QFWIDLIB_EXPORT QProgressListWidget : public QWidget {
 /** \brief a dialog with a QProgressListWidget and a cancel button (optional)
  *  \ingroup tools_qt
  */
-class QFWIDLIB_EXPORT QProgressListDialog : public QDialog {
+class QFWIDLIB_EXPORT QProgressListDialog : public QFDialog {
         Q_OBJECT
     public:
         QProgressListDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);

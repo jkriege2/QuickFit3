@@ -621,23 +621,23 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     splitterDist->setCollapsible(1, false);
 
     QAction* actFirst=menuParameters->actions().value(0, NULL);
-    actAverageFirstLags=new QAction(tr("&average first few lags for N"), this);
+    actAverageFirstLags=new QFActionWithNoMenuRole(tr("&average first few lags for N"), this);
     connect(actAverageFirstLags, SIGNAL(triggered()), this, SLOT(averageFirstFewLags()));
-    actGetNFromFits=new QAction(tr("get N+other parameters from FCS fits"), this);
+    actGetNFromFits=new QFActionWithNoMenuRole(tr("get N+other parameters from FCS fits"), this);
     connect(actGetNFromFits, SIGNAL(triggered()), this, SLOT(getNFromFits()));
     menuParameters->insertAction(actFirst, actGetNFromFits);
     menuParameters->insertAction(actFirst, actAverageFirstLags);
     menuParameters->insertSeparator(actFirst);
 
-    actFitAllMSD=new QAction(tr("fit theory to several MSDs"), this);
+    actFitAllMSD=new QFActionWithNoMenuRole(tr("fit theory to several MSDs"), this);
     connect(actFitAllMSD, SIGNAL(triggered()), this, SLOT(fitAllMSD()));
-    actUpdateCalculated=new QAction(tr("update plots derived from fit"), this);
+    actUpdateCalculated=new QFActionWithNoMenuRole(tr("update plots derived from fit"), this);
     connect(actUpdateCalculated, SIGNAL(triggered()), this, SLOT(theoryChanged()));
     menuFit->addSeparator();
     menuFit->addAction(actFitAllMSD);
     menuFit->addAction(actUpdateCalculated);
 
-    actCopyAverageData=new QAction(QIcon(":/copy.png"), tr("&copy runs-average of MSD"), this);
+    actCopyAverageData=new QFActionWithNoMenuRole(QIcon(":/copy.png"), tr("&copy runs-average of MSD"), this);
     connect(actCopyAverageData, SIGNAL(triggered()), this, SLOT(copyAverageData()));
 
     menuResults->addSeparator();

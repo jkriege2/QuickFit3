@@ -23,6 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrecentfilesmenu.h"
 #include <QFileInfo>
 #include <QFileIconProvider>
+#include "qfaction.h"
 
 QFRecentFilesMenu::QFRecentFilesMenu(QWidget *parent) :
     QMenu(parent)
@@ -46,7 +47,7 @@ void QFRecentFilesMenu::setMaxRecentFilesCount(int num) {
         }
     } else if (m_actions.count()<num) {
         for (int i=m_actions.count(); i<num; i++) {
-            QAction* act=new QAction(this);
+            QAction* act=new QFActionWithNoMenuRole(this);
             act->setVisible(false);
             connect(act, SIGNAL(triggered()), this, SLOT(intOpenRecentFile()));
             m_actions.append(act);

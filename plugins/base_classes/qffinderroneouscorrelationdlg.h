@@ -22,7 +22,7 @@
 #ifndef QFFINDERRONEOUSCORRELATIONDLG_H
 #define QFFINDERRONEOUSCORRELATIONDLG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfrawdatarecord.h"
 #include "qfrdrrunselection.h"
 #include "qfrdrfcsdatainterface.h"
@@ -32,7 +32,7 @@ namespace Ui {
     class QFFindErroneousCorrelationDlg;
 }
 
-class QFFindErroneousCorrelationDlg : public QDialog
+class QFFindErroneousCorrelationDlg : public QFDialog
 {
         Q_OBJECT
         

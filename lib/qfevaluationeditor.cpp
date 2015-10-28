@@ -36,10 +36,10 @@ QFEvaluationEditor::QFEvaluationEditor(QFPluginServices* services, QFEvaluationP
     this->propertyEditor=propEditor;
     peID=0;
     this->services=services;
-    actSaveReport=new QAction(QIcon(":/lib/savereport.png"), tr("Save &Report"), this);
+    actSaveReport=new QFActionWithNoMenuRole(QIcon(":/lib/savereport.png"), tr("Save &Report"), this);
     actSaveReport->setToolTip(tr("save the evaluation results as a report in PDF, HTML, ... format"));
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
-    actPrintReport=new QAction(QIcon(":/lib/printreport.png"), tr("&Print Report"), this);
+    actPrintReport=new QFActionWithNoMenuRole(QIcon(":/lib/printreport.png"), tr("&Print Report"), this);
     actPrintReport->setToolTip(tr("print the evaluation results as a report"));
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
 }

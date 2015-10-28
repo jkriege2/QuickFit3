@@ -24,13 +24,13 @@
 #ifndef SubPluginLinkDialog_H
 #define SubPluginLinkDialog_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class SubPluginLinkDialog;
 }
 
-class SubPluginLinkDialog : public QDialog
+class SubPluginLinkDialog : public QFDialog
 {
         Q_OBJECT
 

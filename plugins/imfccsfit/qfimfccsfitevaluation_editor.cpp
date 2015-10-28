@@ -149,24 +149,24 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     menuEvaluation=propEditor->addOrFindMenu(tr("&Evaluation"), 0);
     menuImFCCSFit=propEditor->addOrFindMenu(tr("&Tools"), 0);
 
-    actFitCurrent=new QAction(QIcon(":/imfccsfit/fit_fitcurrent.png"), tr("Fit &Current"), this);
+    actFitCurrent=new QFActionWithNoMenuRole(QIcon(":/imfccsfit/fit_fitcurrent.png"), tr("Fit &Current"), this);
     connect(actFitCurrent, SIGNAL(triggered()), this, SLOT(fitCurrent()));
     ui->btnEvaluateCurrent->setDefaultAction(actFitCurrent);
     menuEvaluation->addAction(actFitCurrent);
 
-    actFitAllPixelsMT=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (MT)"), this);
+    actFitAllPixelsMT=new QFActionWithNoMenuRole(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (MT)"), this);
     connect(actFitAllPixelsMT, SIGNAL(triggered()), this, SLOT(fitAllPixelsThreaded()));
     //actFitAllPixelsMT->setEnabled(false);
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixelsMT);
     menuEvaluation->addAction(actFitAllPixelsMT);
 
-    actFitAllPixelsMTExp=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (new MT)"), this);
+    actFitAllPixelsMTExp=new QFActionWithNoMenuRole(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (new MT)"), this);
     connect(actFitAllPixelsMTExp, SIGNAL(triggered()), this, SLOT(fitAllPixelsThreadedWriter()));
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixelsMTExp);
     ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllPixelsMTExp);
     menuEvaluation->addAction(actFitAllPixelsMTExp);
 
-    actFitAllPixels=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels"), this);
+    actFitAllPixels=new QFActionWithNoMenuRole(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels"), this);
     connect(actFitAllPixels, SIGNAL(triggered()), this, SLOT(fitAllPixels()));
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixels);
     ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllPixels);
@@ -174,61 +174,61 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
 
     //ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllPixels);
 
-    actFitAllFilesetsAllPixels=new QAction(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets + Pixels"), this);
+    actFitAllFilesetsAllPixels=new QFActionWithNoMenuRole(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets + Pixels"), this);
     connect(actFitAllFilesetsAllPixels, SIGNAL(triggered()), this, SLOT(fitAllFilesetsAllPixels()));
     ui->btnFitAllFilesetsAllPixels->addAction(actFitAllFilesetsAllPixels);
     ui->btnFitAllFilesetsAllPixels->setDefaultAction(actFitAllFilesetsAllPixels);
     menuEvaluation->addAction(actFitAllFilesetsAllPixels);
 
-    actFitAllFilesetsAllPixelsMTExp=new QAction(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets + Pixels (new MT)"), this);
+    actFitAllFilesetsAllPixelsMTExp=new QFActionWithNoMenuRole(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets + Pixels (new MT)"), this);
     connect(actFitAllFilesetsAllPixelsMTExp, SIGNAL(triggered()), this, SLOT(fitAllFilesetsAllPixelsThreadedWriter()));
     ui->btnFitAllFilesetsAllPixels->addAction(actFitAllFilesetsAllPixelsMTExp);
     ui->btnFitAllFilesetsAllPixels->setDefaultAction(actFitAllFilesetsAllPixelsMTExp);
     menuEvaluation->addAction(actFitAllFilesetsAllPixelsMTExp);
 
-    actResetCurrent=new QAction(tr("&Reset Current"), this);
+    actResetCurrent=new QFActionWithNoMenuRole(tr("&Reset Current"), this);
     actResetCurrent->setToolTip(tr("reset the currently displayed file (and pixel) to the initial parameters\nThis deletes all fit results stored for the current file."));
     connect(actResetCurrent, SIGNAL(triggered()), this, SLOT(resetCurrent()));
     ui->btnClearCurrent->setDefaultAction(actResetCurrent);
     menuEvaluation->addSeparator();
     menuEvaluation->addAction(actResetCurrent);
 
-    actResetAllPixels=new QAction(tr("Reset All &Pixels"), this);
+    actResetAllPixels=new QFActionWithNoMenuRole(tr("Reset All &Pixels"), this);
     actResetAllPixels->setToolTip(tr("reset all pixels to the initial parameters in the current file.\nThis deletes all fit results stored for all pixels in the current file."));
     connect(actResetAllPixels, SIGNAL(triggered()), this, SLOT(resetAllPixels()));
     ui->btnClearAllPixels->setDefaultAction(actResetAllPixels);
     menuEvaluation->addAction(actResetAllPixels);
 
-    actResetAllPixelsInAllFilesets=new QAction(tr("Reset All &Pixels in all filesets"), this);
+    actResetAllPixelsInAllFilesets=new QFActionWithNoMenuRole(tr("Reset All &Pixels in all filesets"), this);
     actResetAllPixelsInAllFilesets->setToolTip(tr("reset all pixels to the initial parameters in all files fitted so far."));
     connect(actResetAllPixelsInAllFilesets, SIGNAL(triggered()), this, SLOT(resetAllPixelsInAllFilesets()));
     connect(ui->btnClearEverything, SIGNAL(clicked()), this, SLOT(resetAllPixelsInAllFilesets()));
     menuEvaluation->addAction(actResetAllPixelsInAllFilesets);
 
-    actCopyToInitial=new QAction(tr("Copy to &Initial"), this);
+    actCopyToInitial=new QFActionWithNoMenuRole(tr("Copy to &Initial"), this);
     actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/runs that were not fit yet."));
     connect(actCopyToInitial, SIGNAL(triggered()), this, SLOT(copyToInitial()));
     ui->btnCopyToInitial->setDefaultAction(actCopyToInitial);
     menuEvaluation->addAction(actCopyToInitial);
 
-    actCheckFilesets=new QAction(tr("Check fitted filesets"), this);
+    actCheckFilesets=new QFActionWithNoMenuRole(tr("Check fitted filesets"), this);
     actCheckFilesets->setToolTip(tr("removes all fitted filesets, for which no fit results exist."));
     connect(actCheckFilesets, SIGNAL(triggered()), this, SLOT(checkFitFileSets()));
     menuEvaluation->addAction(actCheckFilesets);
 
 
-    actSaveReport=new QAction(QIcon(":/imfccsfit/fit_savereport.png"), tr("&Save Report"), this);
+    actSaveReport=new QFActionWithNoMenuRole(QIcon(":/imfccsfit/fit_savereport.png"), tr("&Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
     ui->btnSaveReport->setDefaultAction(actSaveReport);
     menuEvaluation->addSeparator();
     menuEvaluation->addAction(actSaveReport);
 
-    actPrintReport=new QAction(QIcon(":/imfccsfit/fit_printreport.png"), tr("&Print Report"), this);
+    actPrintReport=new QFActionWithNoMenuRole(QIcon(":/imfccsfit/fit_printreport.png"), tr("&Print Report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     menuEvaluation->addAction(actPrintReport);
 
-    actChi2Landscape=new QAction(tr("Plot &Chi^2 Landscape"), this);
+    actChi2Landscape=new QFActionWithNoMenuRole(tr("Plot &Chi^2 Landscape"), this);
     connect(actChi2Landscape, SIGNAL(triggered()), this, SLOT(plotChi2Landscape()));
     menuImFCCSFit->addAction(actChi2Landscape);
 
@@ -238,22 +238,22 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
 
     menuImFCCSFit->addSeparator();
 
-    actGuess=new QAction(tr("Guess file sets ..."), this);
+    actGuess=new QFActionWithNoMenuRole(tr("Guess file sets ..."), this);
     connect(actGuess, SIGNAL(triggered()), this, SLOT(guessFromCurrentFileSet()));
     menuImFCCSFit->addAction(actGuess);
 
     menuImFCCSFit->addSeparator();
-    actLoadGLobalFitConfig=new QAction(tr("&load global fit config ..."), this);
+    actLoadGLobalFitConfig=new QFActionWithNoMenuRole(tr("&load global fit config ..."), this);
     connect(actLoadGLobalFitConfig, SIGNAL(triggered()), this, SLOT(loadGlobalFitConfig()));
     menuImFCCSFit->addAction(actLoadGLobalFitConfig);
-    actSaveGLobalFitConfig=new QAction(tr("&save global fit config ..."), this);
+    actSaveGLobalFitConfig=new QFActionWithNoMenuRole(tr("&save global fit config ..."), this);
     connect(actSaveGLobalFitConfig, SIGNAL(triggered()), this, SLOT(saveGlobalFitConfig()));
     menuImFCCSFit->addAction(actSaveGLobalFitConfig);
 
     menuImFCCSFit->addSeparator();
 
     
-    actSetResetFitParameters=new QAction(tr("set/reset fit &parameters ..."), this);
+    actSetResetFitParameters=new QFActionWithNoMenuRole(tr("set/reset fit &parameters ..."), this);
     connect(actSetResetFitParameters, SIGNAL(triggered()), this, SLOT(setParameterInRDRs()));
     menuImFCCSFit->addAction(actSetResetFitParameters);
     menuImFCCSFit->addSeparator();
@@ -486,6 +486,7 @@ void QFImFCCSFitEvaluationEditor::buildGlobalConfigs(QFImFCCSFitEvaluationItem* 
                 //qDebug()<<5.1<<i<<j<<menu;
                 if (!menu) {
                     menu=menuImFCCSFit->addMenu(c.groupLabel);
+                    menu->menuAction()->setMenuRole(QAction::NoRole);
                     menusGlobalConfig<<menu;
                 }
                 //qDebug()<<5.1<<i<<j<<menu;

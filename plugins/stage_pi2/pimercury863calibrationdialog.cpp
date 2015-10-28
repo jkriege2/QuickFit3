@@ -32,7 +32,7 @@
 
 
 PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, QFExtensionLinearStagePI2 *stage, int axis):
-    QDialog(parent)
+    QFDialog(parent)
 {
     this->stage=stage;
     this->com=stage->axes[axis].serial->getCOM();

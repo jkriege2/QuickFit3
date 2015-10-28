@@ -26,7 +26,7 @@
 #include "programoptions.h"
 
 SelectResourceImage::SelectResourceImage(const QString &directory, QWidget *parent, const QString& pathPrefix) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::SelectResourceImage)
 {
     ui->setupUi(this);
@@ -54,7 +54,7 @@ SelectResourceImage::SelectResourceImage(const QString &directory, QWidget *pare
 }
 
 SelectResourceImage::SelectResourceImage(const QStringList &directories, QWidget *parent, const QStringList &pathPrefixes, const QStringList &baseNodeNames) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::SelectResourceImage)
 {
     ui->setupUi(this);

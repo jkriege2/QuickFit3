@@ -23,7 +23,7 @@
 #ifndef DLGPOLOLUMAESTROTESTER_H
 #define DLGPOLOLUMAESTROTESTER_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfserialconnection.h"
 #include "programoptions.h"
 #include "qfbinaryserialprotocolhandler.h"
@@ -32,7 +32,7 @@ namespace Ui {
     class DlgPololuMaestroTester;
 }
 
-class DlgPololuMaestroTester : public QDialog
+class DlgPololuMaestroTester : public QFDialog
 {
         Q_OBJECT
         

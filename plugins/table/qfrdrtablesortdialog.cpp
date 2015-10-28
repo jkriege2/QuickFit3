@@ -25,7 +25,7 @@
 #include "ui_qfrdrtablesortdialog.h"
 
 QFRDRTableSortDialog::QFRDRTableSortDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableSortDialog)
 {
     ui->setupUi(this);

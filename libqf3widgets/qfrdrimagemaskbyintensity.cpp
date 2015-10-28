@@ -25,7 +25,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "programoptions.h"
 #include "qftools.h"
 QFRDRImageMaskByIntensity::QFRDRImageMaskByIntensity(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRImageMaskByIntensity)
 {
     m_mask=NULL;

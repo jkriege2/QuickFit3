@@ -50,12 +50,12 @@ void QFRDRCurvePlugin::registerToMenu(QMenu* menu) {
     QMenu* m=menu->addMenu(QIcon(getIconFilename()), tr("XY-Curves"));
 
 	// create menu entries to insert data with this type
-    QAction* action=new QAction(QIcon(getIconFilename()), tr("Insert single-file curves"), parentWidget);
+    QAction* action=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Insert single-file curves"), parentWidget);
     action->setStatusTip(tr("Insert a new record, which represents one curve from one file"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertRecord()));
     m->addAction(action);
 
-    action=new QAction(QIcon(getIconFilename()), tr("Insert multi-file curves"), parentWidget);
+    action=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Insert multi-file curves"), parentWidget);
     action->setStatusTip(tr("Insert a new record, which represents several curves form several files in one RDR"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertMultiFileRecord()));
     m->addAction(action);

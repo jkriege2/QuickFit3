@@ -28,7 +28,7 @@
 #include <QApplication>
 
 QFOverlayPlotDialog::QFOverlayPlotDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFOverlayPlotDialog)
 {
     ui->setupUi(this);

@@ -24,7 +24,7 @@
 #include "ui_qfespectraviewerspilloverdialog.h"
 
 QFESpectraViewerSpilloverDialog::QFESpectraViewerSpilloverDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFESpectraViewerSpilloverDialog)
 {
     ui->setupUi(this);

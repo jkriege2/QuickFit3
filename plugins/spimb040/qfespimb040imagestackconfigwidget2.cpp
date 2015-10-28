@@ -60,12 +60,12 @@ QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QFESPIMB0
     this->expDescription=expDescription;
     ui->setupUi(this);
 
-    actGetCurrent=new QAction(QIcon(":/spimb040/get_current_pos.png"), tr("stage 1: scan starts at current position"), this);
-    actGetCurrentAround=new QAction(QIcon(":/spimb040/get_current_pos_around.png"), tr("stage 1: scan around current position"), this);
-    actGetCurrent2=new QAction(QIcon(":/spimb040/get_current_pos.png"), tr("stage 1: scan starts at current position"), this);
-    actGetCurrentAround2=new QAction(QIcon(":/spimb040/get_current_pos_around.png"), tr("stage 1: scan around current position"), this);
-    actGetCurrent3=new QAction(QIcon(":/spimb040/get_current_pos.png"), tr("stage 1: scan starts at current position"), this);
-    actGetCurrentAround3=new QAction(QIcon(":/spimb040/get_current_pos_around.png"), tr("stage 1: scan around current position"), this);
+    actGetCurrent=new QFActionWithNoMenuRole(QIcon(":/spimb040/get_current_pos.png"), tr("stage 1: scan starts at current position"), this);
+    actGetCurrentAround=new QFActionWithNoMenuRole(QIcon(":/spimb040/get_current_pos_around.png"), tr("stage 1: scan around current position"), this);
+    actGetCurrent2=new QFActionWithNoMenuRole(QIcon(":/spimb040/get_current_pos.png"), tr("stage 1: scan starts at current position"), this);
+    actGetCurrentAround2=new QFActionWithNoMenuRole(QIcon(":/spimb040/get_current_pos_around.png"), tr("stage 1: scan around current position"), this);
+    actGetCurrent3=new QFActionWithNoMenuRole(QIcon(":/spimb040/get_current_pos.png"), tr("stage 1: scan starts at current position"), this);
+    actGetCurrentAround3=new QFActionWithNoMenuRole(QIcon(":/spimb040/get_current_pos_around.png"), tr("stage 1: scan around current position"), this);
 
     actGetCurrentG=new QActionGroup(this);
     actGetCurrentG->setExclusive(false);

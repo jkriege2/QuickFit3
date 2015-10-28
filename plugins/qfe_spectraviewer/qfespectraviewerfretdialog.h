@@ -23,7 +23,7 @@
 #ifndef QFESpectraViewerFRETDialog_H
 #define QFESpectraViewerFRETDialog_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qftablemodel.h"
 #include "qfespectraviewerdialog.h"
 #include "spectrummanager.h"
@@ -31,7 +31,7 @@ namespace Ui {
     class QFESpectraViewerFRETDialog;
 }
 
-class QFESpectraViewerFRETDialog : public QDialog
+class QFESpectraViewerFRETDialog : public QFDialog
 {
         Q_OBJECT
         

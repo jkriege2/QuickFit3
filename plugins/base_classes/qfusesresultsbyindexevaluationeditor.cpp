@@ -41,10 +41,10 @@ QFUsesResultsByIndexEvaluationEditor::QFUsesResultsByIndexEvaluationEditor(QFPlu
     m_iniPrefix=iniPrefix;
 
 
-    actOverlayPlot=new QAction(tr("&overlay current run in several RDRs"), this);
+    actOverlayPlot=new QFActionWithNoMenuRole(tr("&overlay current run in several RDRs"), this);
     connect(actOverlayPlot, SIGNAL(triggered()), this, SLOT(createOverlayPlot()));
 
-    actOverlayPlotRuns=new QAction(tr("overlay current RDR's &runs"), this);
+    actOverlayPlotRuns=new QFActionWithNoMenuRole(tr("overlay current RDR's &runs"), this);
     connect(actOverlayPlotRuns, SIGNAL(triggered()), this, SLOT(createOverlayPlotRuns()));
 
     menuOverlays=new QMenu(tr("&Overlay Plots"), this);

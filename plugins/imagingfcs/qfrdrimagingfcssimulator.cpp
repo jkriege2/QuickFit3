@@ -27,7 +27,7 @@
 
 
 QFRDRImagingFCSSimulator::QFRDRImagingFCSSimulator(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRImagingFCSSimulator)
 {
     dstate=dsParameterInput;

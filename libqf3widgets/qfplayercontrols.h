@@ -33,7 +33,7 @@
 #include <QElapsedTimer>
 #include "libwid_imexport.h"
 #include <QResizeEvent>
-
+#include "qfaction.h"
 
 
 /*! \brief a This widget may be used as a media player control panel

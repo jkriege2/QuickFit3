@@ -24,7 +24,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfpluginservices.h"
 
 RenameGroupsDialog::RenameGroupsDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::RenameGroupsDialog)
 {
     ui->setupUi(this);

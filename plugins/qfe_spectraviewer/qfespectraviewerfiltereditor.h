@@ -23,7 +23,7 @@
 #ifndef QFESpectraVieweFilterEditor_H
 #define QFESpectraVieweFilterEditor_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "spectrummanager.h"
 #include "qftablemodel.h"
 
@@ -31,7 +31,7 @@ namespace Ui {
     class QFESpectraVieweFilterEditor;
 }
 
-class QFESpectraViewerFilterEditor : public QDialog
+class QFESpectraViewerFilterEditor : public QFDialog
 {
         Q_OBJECT
         
