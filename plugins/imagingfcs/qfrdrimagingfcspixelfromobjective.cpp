@@ -3,7 +3,7 @@
 #include "programoptions.h"
 
 QFRDRImagingFCSPixelFromObjective::QFRDRImagingFCSPixelFromObjective(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRImagingFCSPixelFromObjective)
 {
     ui->setupUi(this);

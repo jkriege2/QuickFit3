@@ -24,13 +24,13 @@
 #ifndef PLUGINLINKDIALOG_H
 #define PLUGINLINKDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class PluginLinkDialog;
 }
 
-class PluginLinkDialog : public QDialog
+class PluginLinkDialog : public QFDialog
 {
         Q_OBJECT
 

@@ -338,14 +338,14 @@
            <item row="5" column="1">
             <widget class="QComboBox" name="cmbStylesheet"/>
            </item>
-           <item row="6" column="0">
+           <item row="9" column="0">
             <widget class="QLabel" name="label_22">
              <property name="text">
               <string>font for online-help:</string>
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
+           <item row="9" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
               <widget class="QSpinBox" name="spinHelpFontsize">
@@ -385,14 +385,14 @@
              </item>
             </layout>
            </item>
-           <item row="7" column="0">
+           <item row="10" column="0">
             <widget class="QLabel" name="label_17">
              <property name="text">
               <string>font size for math rendering:</string>
              </property>
             </widget>
            </item>
-           <item row="7" column="1">
+           <item row="10" column="1">
             <layout class="QGridLayout" name="gridLayout_2">
              <item row="0" column="0">
               <widget class="QSpinBox" name="spinMath">
@@ -436,14 +436,14 @@
              </item>
             </layout>
            </item>
-           <item row="9" column="0">
+           <item row="12" column="0">
             <widget class="QLabel" name="label_19">
              <property name="text">
               <string>RDR/evaluation editor window title: </string>
              </property>
             </widget>
            </item>
-           <item row="9" column="1">
+           <item row="12" column="1">
             <widget class="QComboBox" name="cmbWindowHeader">
              <item>
               <property name="text">
@@ -462,14 +462,14 @@
              </item>
             </widget>
            </item>
-           <item row="10" column="0">
+           <item row="13" column="0">
             <widget class="QLabel" name="label_25">
              <property name="text">
               <string>file dialogs:</string>
              </property>
             </widget>
            </item>
-           <item row="10" column="1">
+           <item row="13" column="1">
             <widget class="QComboBox" name="cmbFileDialog">
              <item>
               <property name="text">
@@ -483,14 +483,14 @@
              </item>
             </widget>
            </item>
-           <item row="11" column="0">
+           <item row="14" column="0">
             <widget class="QLabel" name="label_26">
              <property name="text">
               <string>welcome screen:</string>
              </property>
             </widget>
            </item>
-           <item row="11" column="1">
+           <item row="14" column="1">
             <widget class="QCheckBox" name="chkStartupScreen">
              <property name="font">
               <font>
@@ -503,7 +503,7 @@
              </property>
             </widget>
            </item>
-           <item row="13" column="0">
+           <item row="16" column="0">
             <widget class="QLabel" name="label_9">
              <property name="enabled">
               <bool>false</bool>
@@ -516,7 +516,7 @@
              </property>
             </widget>
            </item>
-           <item row="13" column="1">
+           <item row="16" column="1">
             <widget class="QCheckBox" name="chkChildWindowsStayOnTop">
              <property name="enabled">
               <bool>false</bool>
@@ -533,7 +533,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="14" column="0">
+           <item row="17" column="0">
             <widget class="QLabel" name="label_10">
              <property name="enabled">
               <bool>false</bool>
@@ -546,7 +546,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="14" column="1">
+           <item row="17" column="1">
             <widget class="QCheckBox" name="chkProjectWindowsStayOnTop">
              <property name="enabled">
               <bool>false</bool>
@@ -563,7 +563,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="15" column="0">
+           <item row="18" column="0">
             <widget class="QLabel" name="label_11">
              <property name="enabled">
               <bool>false</bool>
@@ -576,7 +576,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="15" column="1">
+           <item row="18" column="1">
             <widget class="QCheckBox" name="chkHelpWindowsStayOnTop">
              <property name="enabled">
               <bool>false</bool>
@@ -593,7 +593,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="16" column="0">
+           <item row="19" column="0">
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -606,7 +606,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </spacer>
            </item>
-           <item row="16" column="1">
+           <item row="19" column="1">
             <widget class="QFrame" name="frame">
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
@@ -616,7 +616,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="17" column="0" colspan="2">
+           <item row="20" column="0" colspan="2">
             <widget class="QLabel" name="label_5">
              <property name="text">
               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -627,14 +627,14 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="8" column="0">
+           <item row="11" column="0">
             <widget class="QLabel" name="label_28">
              <property name="text">
               <string>font for code-editing:</string>
              </property>
             </widget>
            </item>
-           <item row="8" column="1">
+           <item row="11" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <widget class="QSpinBox" name="spinCodeFontsize">
@@ -674,14 +674,14 @@ p, li { white-space: pre-wrap; }
              </item>
             </layout>
            </item>
-           <item row="12" column="0">
+           <item row="15" column="0">
             <widget class="QLabel" name="label_29">
              <property name="text">
               <string>VAR-COV-matrices:</string>
              </property>
             </widget>
            </item>
-           <item row="12" column="1">
+           <item row="15" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <item>
               <widget class="QCheckBox" name="chkVARCOVNonLin">
@@ -718,6 +718,86 @@ p, li { white-space: pre-wrap; }
              </item>
              <item>
               <spacer name="horizontalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="labMacOSXSubWinMenus">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>MacOS X: sub-window menus:</string>
+             </property>
+             <property name="buddy">
+              <cstring>cmbStylesheet</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QCheckBox" name="chkMacOSXSubWinMenus">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>use sub-window menus (e.g. RDR editor) as main menu (unchecked: menus are shown in window!)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_31">
+             <property name="text">
+              <string>number-edit widgtes:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QCheckBox" name="chkDoubleEditWheel">
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>allow mouse-wheel scrolling to increase/decrease value</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_32">
+             <property name="text">
+              <string>base font-size for application</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QSpinBox" name="spinBaseFontsize">
+               <property name="suffix">
+                <string> pt</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>11</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_6">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -1032,8 +1112,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateFontExample()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>481</x>
-     <y>147</y>
+     <x>496</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
      <x>1053</x>
@@ -1048,8 +1128,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateFontExample()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>621</x>
-     <y>147</y>
+     <x>690</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
      <x>1049</x>
@@ -1080,8 +1160,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateFontExample()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>459</x>
-     <y>225</y>
+     <x>496</x>
+     <y>254</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -1096,8 +1176,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateFontExample()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>559</x>
-     <y>223</y>
+     <x>690</x>
+     <y>254</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1113,11 +1193,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>659</x>
-     <y>324</y>
+     <y>355</y>
     </hint>
     <hint type="destinationlabel">
-     <x>676</x>
-     <y>324</y>
+     <x>707</x>
+     <y>357</y>
     </hint>
    </hints>
   </connection>
@@ -1128,12 +1208,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>472</x>
-     <y>328</y>
+     <x>659</x>
+     <y>355</y>
     </hint>
     <hint type="destinationlabel">
-     <x>742</x>
-     <y>330</y>
+     <x>796</x>
+     <y>357</y>
     </hint>
    </hints>
   </connection>

@@ -406,7 +406,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     pltOverview->setSelectionEditable(true);
     tabResidulas->addTab(pltOverview, tr("Overview Image"));
 
-    actCopyAverageData=new QAction(QIcon(":/copy.png"), tr("&copy runs-average of MaxEnt distributions"), this);
+    actCopyAverageData=new QFActionWithNoMenuRole(QIcon(":/copy.png"), tr("&copy runs-average of MaxEnt distributions"), this);
     connect(actCopyAverageData, SIGNAL(triggered()), this, SLOT(copyAverageData()));
     menuResults->addSeparator();
     menuResults->addAction(actCopyAverageData);

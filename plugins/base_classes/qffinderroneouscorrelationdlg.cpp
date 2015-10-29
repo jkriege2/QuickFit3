@@ -24,7 +24,7 @@
 #include "programoptions.h"
 
 QFFindErroneousCorrelationDlg::QFFindErroneousCorrelationDlg(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFFindErroneousCorrelationDlg)
 {
     ui->setupUi(this);

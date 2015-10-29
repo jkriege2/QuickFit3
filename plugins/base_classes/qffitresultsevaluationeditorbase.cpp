@@ -34,9 +34,9 @@ QFFitResultsEvaluationEditorBase::QFFitResultsEvaluationEditorBase(QString iniPr
     m_iniPrefix=iniPrefix;
     m_currentFPSSaveDir=ProgramOptions::getInstance()->getHomeQFDirectory();
     m_currentSaveDirectory="";
-    actSaveReport=new QAction(QIcon(":/lib/savereport.png"), tr("Save Report"), this);
+    actSaveReport=new QFActionWithNoMenuRole(QIcon(":/lib/savereport.png"), tr("Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
-    actPrintReport=new QAction(QIcon(":/lib/printreport.png"), tr("Print Report"), this);
+    actPrintReport=new QFActionWithNoMenuRole(QIcon(":/lib/printreport.png"), tr("Print Report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
 }
 

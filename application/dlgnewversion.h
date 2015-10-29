@@ -22,13 +22,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGNEWVERSION_H
 #define DLGNEWVERSION_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class DlgNewVersion;
 }
 
-class DlgNewVersion : public QDialog
+class DlgNewVersion : public QFDialog
 {
         Q_OBJECT
         

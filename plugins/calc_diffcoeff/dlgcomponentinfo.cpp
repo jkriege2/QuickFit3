@@ -28,7 +28,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfversion.h"
 
 DlgComponentInfo::DlgComponentInfo(QFEDiffusionCoefficientCalculator *plugin, int component, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DlgComponentInfo)
 {
     this->plugin=plugin;

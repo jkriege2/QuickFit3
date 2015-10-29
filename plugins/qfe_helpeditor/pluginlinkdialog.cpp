@@ -31,7 +31,7 @@
 #include "qfevaluationitemfactory.h"
 
 PluginLinkDialog::PluginLinkDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::PluginLinkDialog)
 {
     ui->setupUi(this);

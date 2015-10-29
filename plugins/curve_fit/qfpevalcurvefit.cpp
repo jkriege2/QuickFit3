@@ -50,16 +50,16 @@ QFEvaluationItem* QFPEvalCurveFit::createRecord(QFProject* parent) {
 
 void QFPEvalCurveFit::registerToMenu(QMenu* menu_main) {
     QMenu* menu=menu_main->addMenu(QIcon(":/curve_fit.png"), tr("General Curve Fitting"));
-    QAction* actCURVE=new QAction(QIcon(":/curve_fit.png"), tr("Curve Fitting"), parentWidget);
+    QAction* actCURVE=new QFActionWithNoMenuRole(QIcon(":/curve_fit.png"), tr("Curve Fitting"), parentWidget);
     actCURVE->setStatusTip(tr("Insert a least-squares fit evaluation"));
     connect(actCURVE, SIGNAL(triggered()), this, SLOT(insertCurveFit()));
     menu->addAction(actCURVE);
     menu->addSeparator();
-    QAction* actHIST=new QAction(QIcon(":/curve_fit/hist.png"), tr("Histogram Fitting"), parentWidget);
+    QAction* actHIST=new QFActionWithNoMenuRole(QIcon(":/curve_fit/hist.png"), tr("Histogram Fitting"), parentWidget);
     actHIST->setStatusTip(tr("Insert a least-squares fit evaluation with presets for fitting histograms"));
     connect(actHIST, SIGNAL(triggered()), this, SLOT(insertHistogramFit()));
     menu->addAction(actHIST);
-    QAction* actMEXP=new QAction(QIcon(":/curve_fit/mexp.png"), tr("Multi-Exponential Decay Fitting"), parentWidget);
+    QAction* actMEXP=new QFActionWithNoMenuRole(QIcon(":/curve_fit/mexp.png"), tr("Multi-Exponential Decay Fitting"), parentWidget);
     actMEXP->setStatusTip(tr("Insert a least-squares fit evaluation with presets for fitting multi-exponential decays"));
     connect(actMEXP, SIGNAL(triggered()), this, SLOT(insertHistogramFit()));
     menu->addAction(actMEXP);

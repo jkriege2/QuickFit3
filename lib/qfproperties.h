@@ -29,6 +29,7 @@
 #include <QStringList>
 #include "qftools.h"
 #include "lib_imexport.h"
+#include "qfaction.h"
 
 class QDomElement; // forward
 class QXmlStreamWriter;

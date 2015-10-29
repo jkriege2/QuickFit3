@@ -37,7 +37,7 @@ qfmpResult QFRDRTableColumnEditor_dummy(const qfmpResult* /*params*/, unsigned i
 }
 
 QFRDRTableColumnEditor::QFRDRTableColumnEditor(QFRDRTable *table, QFTablePluginModel *model, int col, QWidget *parent):
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableColumnEditor)
 {
     this->table=table;
@@ -330,7 +330,7 @@ void QFRDRTableColumnEditor::showEvent(QShowEvent *event)
 {
     ui->edtTitle->setFocus();
     ui->edtTitle->selectAll();
-    QDialog::showEvent(event);
+    QFDialog::showEvent(event);
 }
 
 

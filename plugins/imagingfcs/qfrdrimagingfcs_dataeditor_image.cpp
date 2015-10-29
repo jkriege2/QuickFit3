@@ -143,40 +143,40 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     excludedColor=ovlExCol;
 
 
-    actUseSelStyleForAll=new QAction(tr("use this selection style for all records ..."), this);
+    actUseSelStyleForAll=new QFActionWithNoMenuRole(tr("use this selection style for all records ..."), this);
     connect(actUseSelStyleForAll, SIGNAL(triggered()), this, SLOT(useThisSelectionStyleForAllRDRs()));
 
-    actUseOverviewForAll=new QAction(tr("use this overview image style for all records ..."), this);
+    actUseOverviewForAll=new QFActionWithNoMenuRole(tr("use this overview image style for all records ..."), this);
     connect(actUseOverviewForAll, SIGNAL(triggered()), this, SLOT(useThisOverviewStyleForAllRDRs()));
 
-    actUseHist1ForAll=new QAction(tr("use settings for all RDRs (histogram 1)"), this);
+    actUseHist1ForAll=new QFActionWithNoMenuRole(tr("use settings for all RDRs (histogram 1)"), this);
     connect(actUseHist1ForAll, SIGNAL(triggered()), this, SLOT(useThisHist1ForAllRDRs()));
 
-    actUseHist2ForAll=new QAction(tr("use settings for all RDRs (histogram 2)"), this);
+    actUseHist2ForAll=new QFActionWithNoMenuRole(tr("use settings for all RDRs (histogram 2)"), this);
     connect(actUseHist2ForAll, SIGNAL(triggered()), this, SLOT(useThisHist2ForAllRDRs()));
 
-    actUseCorrForAll=new QAction(tr("use settings for all RDRs (correlation plot)"), this);
+    actUseCorrForAll=new QFActionWithNoMenuRole(tr("use settings for all RDRs (correlation plot)"), this);
     connect(actUseCorrForAll, SIGNAL(triggered()), this, SLOT(useThisCorrForAllRDRs()));
 
-    actUseParam1StyleForAll=new QAction(tr("use these parameter image 1 styles for all records ..."), this);
+    actUseParam1StyleForAll=new QFActionWithNoMenuRole(tr("use these parameter image 1 styles for all records ..."), this);
     connect(actUseParam1StyleForAll, SIGNAL(triggered()), this, SLOT(useThisParam1StyleForAllRDRs()));
 
-    actUseParam2StyleForAll=new QAction(tr("use  these parameter image 2 styles for all records ..."), this);
+    actUseParam2StyleForAll=new QFActionWithNoMenuRole(tr("use  these parameter image 2 styles for all records ..."), this);
     connect(actUseParam2StyleForAll, SIGNAL(triggered()), this, SLOT(useThisParam2StyleForAllRDRs()));
 
-    actUseParam1and2StyleForAll=new QAction(tr("use these parameter image 1 and 2 styles for all records ..."), this);
+    actUseParam1and2StyleForAll=new QFActionWithNoMenuRole(tr("use these parameter image 1 and 2 styles for all records ..."), this);
     connect(actUseParam1and2StyleForAll, SIGNAL(triggered()), this, SLOT(useThisParam1and2StyleForAllRDRs()));
 
-    actUseResultSetForAll=new QAction(tr("use this result set for all records ..."), this);
+    actUseResultSetForAll=new QFActionWithNoMenuRole(tr("use this result set for all records ..."), this);
     connect(actUseResultSetForAll, SIGNAL(triggered()), this, SLOT(useThisResultSetForAllRDRs()));
 
-    actUseParam1SetForAll=new QAction(tr("use this parameter 1 selection for all records ..."), this);
+    actUseParam1SetForAll=new QFActionWithNoMenuRole(tr("use this parameter 1 selection for all records ..."), this);
     connect(actUseParam1SetForAll, SIGNAL(triggered()), this, SLOT(useThisParam1SetForAllRDRs()));
 
-    actUseParam2SetForAll=new QAction(tr("use this parameter 2 selection for all records ..."), this);
+    actUseParam2SetForAll=new QFActionWithNoMenuRole(tr("use this parameter 2 selection for all records ..."), this);
     connect(actUseParam2SetForAll, SIGNAL(triggered()), this, SLOT(useThisParam2SetForAllRDRs()));
 
-    actUseParam1and2SetForAll=new QAction(tr("use this parameter 1 and 2 selection for all records ..."), this);
+    actUseParam1and2SetForAll=new QFActionWithNoMenuRole(tr("use this parameter 1 and 2 selection for all records ..."), this);
     connect(actUseParam2SetForAll, SIGNAL(triggered()), this, SLOT(useThisParamsSetForAllRDRs()));
 
     ///////////////////////////////////////////////////////////////
@@ -458,14 +458,14 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(actSetBackgroundFromMasked, SIGNAL(triggered()), this, SLOT(setBackgroundFromMasked()));
     glmask->addWidget(btnSetBackgroundFromMasked, mskgrpRow,0 ,1,2);
 
-    actSetBackgroundFromMaskedInAll=new QAction(tr("background from mask in all RDRs"), this);
+    actSetBackgroundFromMaskedInAll=new QFActionWithNoMenuRole(tr("background from mask in all RDRs"), this);
     connect(actSetBackgroundFromMaskedInAll, SIGNAL(triggered()), this, SLOT(setBackgroundFromMaskedInAll()));
 
     btnCopyMaskToGroup=createButtonForActionShowText(correlationMaskTools->get_actCopyMaskToGroup(), w);//createButtonAndActionShowText(actSetBackgroundFromMasked, tr("set background from masked"), w);
     correlationMaskTools->get_actCopyMaskToGroup()->setIconText(tr("copy mask to group"));
     glmask->addWidget(btnCopyMaskToGroup, mskgrpRow, 2, 1,2);
 
-    actCopyMaskToAll=new QAction(tr("copy mask to files"), this);
+    actCopyMaskToAll=new QFActionWithNoMenuRole(tr("copy mask to files"), this);
     connect(actCopyMaskToAll, SIGNAL(triggered()), this, SLOT(copyMaskToAll()));
 
 
@@ -506,42 +506,42 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
-    actSelectionByIntensity=new QAction( tr("select by &overview"), w);
+    actSelectionByIntensity=new QFActionWithNoMenuRole( tr("select by &overview"), w);
     actSelectionByIntensity->setToolTip(tr("create a selection according to the <b>overview image, channel 1</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
     connect(actSelectionByIntensity, SIGNAL(triggered()), this, SLOT(selectByIntensity()));
-    actSelectionByIntensity2=new QAction( tr("select by &overview"), w);
+    actSelectionByIntensity2=new QFActionWithNoMenuRole( tr("select by &overview"), w);
     actSelectionByIntensity2->setToolTip(tr("create a selection according to the <b>overview image, channel 2</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
     connect(actSelectionByIntensity2, SIGNAL(triggered()), this, SLOT(selectByIntensity2()));
-    actSelectByParam2Intensity=new QAction( tr("select by param &2"), w);
+    actSelectByParam2Intensity=new QFActionWithNoMenuRole( tr("select by param &2"), w);
     actSelectByParam2Intensity->setToolTip(tr("create a selection according to the <b>parameter image 2</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
     connect(actSelectByParam2Intensity, SIGNAL(triggered()), this, SLOT(selectByParam2Intensity()));
-    actSelectByParamIntensity=new QAction(tr("select by &param"), w);
+    actSelectByParamIntensity=new QFActionWithNoMenuRole(tr("select by &param"), w);
     actSelectByParamIntensity->setToolTip(tr("create a selection according to the <b>parameter image</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
     connect(actSelectByParamIntensity, SIGNAL(triggered()), this, SLOT(selectByParamIntensity()));
 
-    actDeselctMasked=new QAction(tr("deselect masked pixels"), w);
+    actDeselctMasked=new QFActionWithNoMenuRole(tr("deselect masked pixels"), w);
     connect(actDeselctMasked, SIGNAL(triggered()), this, SLOT(deselectMask()));
 
-    actSelectionBuilder=new QAction(tr("selection builder"), w);
+    actSelectionBuilder=new QFActionWithNoMenuRole(tr("selection builder"), w);
     connect(actSelectionBuilder, SIGNAL(triggered()), this, SLOT(buildSelection()));
     btnSelectionBuilder=createButtonForActionShowText(actSelectionBuilder, w);
 
-    actMaskBuilder=new QAction(tr("mask builder"), w);
+    actMaskBuilder=new QFActionWithNoMenuRole(tr("mask builder"), w);
     connect(actMaskBuilder, SIGNAL(triggered()), this, SLOT(buildMask()));
 
-    actSetBackgroundFromSelection=new QAction(tr("set background from selection"), w);
+    actSetBackgroundFromSelection=new QFActionWithNoMenuRole(tr("set background from selection"), w);
     actSetBackgroundFromSelection->setIconText(tr("background from sel."));
     connect(actSetBackgroundFromSelection, SIGNAL(triggered()), this, SLOT(setBackgroundFromSelection()));
     btnSetBackgroundFromSelection=createButtonForActionShowText(actSetBackgroundFromSelection,w);
@@ -1143,7 +1143,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, parameter 2, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
     connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
 
-    actInsertSelectedCorrelationsAsFCSRDR=new QAction(tr("Insert Correlation Curves as new RDR into Project"), this);
+    actInsertSelectedCorrelationsAsFCSRDR=new QFActionWithNoMenuRole(tr("Insert Correlation Curves as new RDR into Project"), this);
     connect(actInsertSelectedCorrelationsAsFCSRDR, SIGNAL(triggered()), this, SLOT(insertSelectedCorrelationsAsFCSRDR()));
 
     btnCopyDataToMatlab = createButtonAndActionShowText(actCopyDataToMatlab, QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy Images to &Matlab"), this);
@@ -1153,7 +1153,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actCopyDataAsColumns->setToolTip(tr("copy the currently dispalyed images (parameter, mask, parameter 2, overview) as columns of data to the clipboard. The data may be pasted e.g. into a spreadsheet program like Excel"));
     connect(actCopyDataAsColumns, SIGNAL(triggered()), this, SLOT(copyDataAsColumns()));
 
-    actCopyFitResultStatistics=new QAction(tr("copy fit result statistics for Excel/Origin..."), this);
+    actCopyFitResultStatistics=new QFActionWithNoMenuRole(tr("copy fit result statistics for Excel/Origin..."), this);
     actCopyFitResultStatistics->setIconText(tr("copy result stats."));
     btnCopyFitResults=createButtonForActionShowText(actCopyFitResultStatistics, w);
     connect(actCopyFitResultStatistics, SIGNAL(triggered()), this, SLOT(copyFitResultStatistics()));
@@ -1180,10 +1180,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
     // TOOLBAR & ACTIONS: edit image plots
     ///////////////////////////////////////////////////////////////
-    actImagesZoom=new QAction(QIcon(":/imaging_fcs/zoom.png"), tr("zoom"), this);
+    actImagesZoom=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/zoom.png"), tr("zoom"), this);
     actImagesZoom->setToolTip(tr("in this mode the user may zoom into a plot by drawing a rectangle (draging with the left mouse key)\nA click toggles the current selection/mask position."));
     actImagesZoom->setCheckable(true);
-    actImagesDrawRectangle=new QAction(QIcon(":/imaging_fcs/draw_rectangle.png"), tr("rectangular selection"), this);
+    actImagesDrawRectangle=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_rectangle.png"), tr("rectangular selection"), this);
     actImagesDrawRectangle->setToolTip(tr("in this mode the user may draw a rectangle.<br>"
                                  "All pixels inside the rectangle will be selected<br>"
                                  "when the user releases the left mouse key. You may<br>"
@@ -1193,7 +1193,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                                  "</ul>"));
     actImagesDrawRectangle->setCheckable(true);
 
-    actImagesDrawPoints=new QAction(QIcon(":/imaging_fcs/draw_point.png"), tr("point-wise selection"), this);
+    actImagesDrawPoints=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_point.png"), tr("point-wise selection"), this);
     actImagesDrawPoints->setToolTip(tr("in this mode the user may click on single points.<br>"
                                  "to add and remove them to/from the mask/selection. A click<br>"
                                  "will toggle the state of the clicked pixel<ul>"
@@ -1202,7 +1202,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                                  "</ul>"));
     actImagesDrawPoints->setCheckable(true);
 
-    actImagesDrawCircle=new QAction(QIcon(":/imaging_fcs/draw_circle.png"), tr("circular selection"), this);
+    actImagesDrawCircle=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_circle.png"), tr("circular selection"), this);
     actImagesDrawCircle->setToolTip(tr("in this mode the user may draw a circle.<br>"
                                  "All pixels inside the cirle will be selected<br>"
                                  "when the user releases the left mouse key. The point of first<br>"
@@ -1212,7 +1212,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                                  "<li>SHIFT: selection will be removed from current selection</li>"
                                  "</ul>"));
     actImagesDrawCircle->setCheckable(true);
-    actImagesDrawEllipse=new QAction(QIcon(":/imaging_fcs/draw_ellipse.png"), tr("elliptical selection"), this);
+    actImagesDrawEllipse=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_ellipse.png"), tr("elliptical selection"), this);
     actImagesDrawEllipse->setToolTip(tr("in this mode the user may draw a ellipse.<br>"
                                  "All pixels inside the ellipse will be selected<br>"
                                 "when the user releases the left mouse key. The point of first<br>"
@@ -1222,7 +1222,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                                  "<li>SHIFT: selection will be removed from current selection</li>"
                                  "</ul>"));
     actImagesDrawEllipse->setCheckable(true);
-    actImagesDrawLine=new QAction(QIcon(":/imaging_fcs/draw_line.png"), tr("line selection"), this);
+    actImagesDrawLine=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_line.png"), tr("line selection"), this);
     actImagesDrawLine->setToolTip(tr("in this mode the user may draw a line.<br>"
                                  "All pixels on the line will be selected<br>"
                                  "when the user releases the left mouse key. You may<br>"
@@ -1232,7 +1232,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                                  "</ul>"));
     actImagesDrawLine->setCheckable(true);
 
-    actImagesScribble=new QAction(QIcon(":/imaging_fcs/draw_scribble.png"), tr("scribble selection"), this);
+    actImagesScribble=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_scribble.png"), tr("scribble selection"), this);
     actImagesScribble->setToolTip(tr("in this mode the user may select/deselect pixels by.<br>"
                                  "keeping the left mouse button pressed and moving the mouse<br>"
                                  "over the image. Depending on the key pressed on the keyboard,<br>"
@@ -1285,34 +1285,34 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actImagesDrawPoints->setChecked(true);
     setImageEditMode();
 
-    actCopyGroupACFsToTable=new QAction(tr("copy all CFs from group to table"), this);
+    actCopyGroupACFsToTable=new QFActionWithNoMenuRole(tr("copy all CFs from group to table"), this);
     connect(actCopyGroupACFsToTable, SIGNAL(triggered()), this, SLOT(copyGroupACFsToTable()));
 
-    actRecorrelate=new QAction(tr("recorrelate file"), this);
+    actRecorrelate=new QFActionWithNoMenuRole(tr("recorrelate file"), this);
     connect(actRecorrelate, SIGNAL(triggered()), this, SLOT(recorrelate()));
 
-    actPostProcessBinning=new QAction(tr("post processing: bin correlation functions"), this);
+    actPostProcessBinning=new QFActionWithNoMenuRole(tr("post processing: bin correlation functions"), this);
     connect(actPostProcessBinning, SIGNAL(triggered()), this, SLOT(postBin()));
 
-    actCopyMeanCFFromAll=new QAction(tr("copy average CF from all files to table"), this);
+    actCopyMeanCFFromAll=new QFActionWithNoMenuRole(tr("copy average CF from all files to table"), this);
     connect(actCopyMeanCFFromAll, SIGNAL(triggered()), this, SLOT(copyMeanCFFromAll()));
 
-    actCopyPixelCFFromAll=new QAction(tr("copy selected CF from all files to table"), this);
+    actCopyPixelCFFromAll=new QFActionWithNoMenuRole(tr("copy selected CF from all files to table"), this);
     connect(actCopyPixelCFFromAll, SIGNAL(triggered()), this, SLOT(copySelCFFromAll()));
 
-    actCopyPixelAvgCFFromAll=new QAction(tr("copy selected pixels average CF from all files to table"), this);
+    actCopyPixelAvgCFFromAll=new QFActionWithNoMenuRole(tr("copy selected pixels average CF from all files to table"), this);
     connect(actCopyPixelAvgCFFromAll, SIGNAL(triggered()), this, SLOT(copySelAvgCFFromAll()));
 
-    actGetFCSDiffusionLawPlot=new QAction(tr("calculate FCS diffusion law-typed plots"), this);
+    actGetFCSDiffusionLawPlot=new QFActionWithNoMenuRole(tr("calculate FCS diffusion law-typed plots"), this);
     connect(actGetFCSDiffusionLawPlot, SIGNAL(triggered()), this, SLOT(startFCSDiffusionLawPlot()));
 
-    actAnnotateModelComparison=new QAction(tr("annotate: Model comparison ..."), this);
+    actAnnotateModelComparison=new QFActionWithNoMenuRole(tr("annotate: Model comparison ..."), this);
     connect(actAnnotateModelComparison, SIGNAL(triggered()), this, SLOT(annotateModelComparison()));
 
-    actAnnotationDeleteCurrent=new QAction(tr("delete current annotation"), this);
+    actAnnotationDeleteCurrent=new QFActionWithNoMenuRole(tr("delete current annotation"), this);
     connect(actAnnotationDeleteCurrent, SIGNAL(triggered()), this, SLOT(annotateDeleteCurrent()));
 
-    actAnnotationDeleteAll=new QAction(tr("delete all annotations"), this);
+    actAnnotationDeleteAll=new QFActionWithNoMenuRole(tr("delete all annotations"), this);
     connect(actAnnotationDeleteAll, SIGNAL(triggered()), this, SLOT(annotateDeleteAll()));
 
     cmbRDRAnnotation->addAction(actAnnotationDeleteCurrent);

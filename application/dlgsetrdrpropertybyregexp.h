@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGSETRDRPROPERTYBYREGEXP_H
 #define DLGSETRDRPROPERTYBYREGEXP_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfproject.h"
 #include "qfrawdatarecord.h"
 #include <QRegExp>
@@ -34,7 +34,7 @@ namespace Ui {
     class DlgSetRDRPropertyByRegExp;
 }
 
-class DlgSetRDRPropertyByRegExp : public QDialog
+class DlgSetRDRPropertyByRegExp : public QFDialog
 {
         Q_OBJECT
         

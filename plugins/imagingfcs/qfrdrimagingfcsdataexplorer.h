@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFRDRIMAGINGFCSDATAEXPLORER_H
 #define QFRDRIMAGINGFCSDATAEXPLORER_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfimporterimageseries.h"
 #include "qmodernprogresswidget.h"
 #include "qfplotter.h"
@@ -37,7 +37,7 @@ namespace Ui {
 /*! \brief A image series explorer dialog for the imagingFCS plugin (used by the auto-correlator dialog)
     \ingroup qf3rdrdp_imaging_fcs
 */
-class QFRDRImagingFCSDataExplorer : public QDialog{
+class QFRDRImagingFCSDataExplorer : public QFDialog{
         Q_OBJECT
         
     public:

@@ -24,7 +24,7 @@
 #ifndef QFRDRTableRegressionDialog_H
 #define QFRDRTableRegressionDialog_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QVector>
 #include "qfrdrtable.h"
 #include "qffitfunctionvalueinputtable.h"
@@ -34,7 +34,7 @@ namespace Ui {
     class QFRDRTableRegressionDialog;
 }
 
-class QFRDRTableRegressionDialog : public QDialog
+class QFRDRTableRegressionDialog : public QFDialog
 {
         Q_OBJECT
         

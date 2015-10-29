@@ -28,7 +28,7 @@
 #include "float.h"
 
 QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int colX, int colY, int colW, QFRDRTable::GraphDataSelection sel, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, int sourcegraph) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableRegressionDialog)
 {
     selection=sel;
@@ -43,7 +43,7 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
 }
 
 QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int plotid, int graphid, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableRegressionDialog)
 {
     parameterTable=new QFFitFunctionValueInputTable(this);

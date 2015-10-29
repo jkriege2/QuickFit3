@@ -224,7 +224,7 @@ void QFRDRFCSRateEditor::createWidgets() {
     splitter->setStretchFactor(1,1);
 
     QMenu* menuFCSTools=propertyEditor->addOrFindMenu(tr("FCS Tools"));
-    QAction* actSetBackground=new QAction(tr("set background from this record ..."), this);
+    QAction* actSetBackground=new QFActionWithNoMenuRole(tr("set background from this record ..."), this);
     connect(actSetBackground, SIGNAL(triggered()), this, SLOT(setBackrgoundFromThisRDR()));
     menuFCSTools->addAction(actSetBackground);
 

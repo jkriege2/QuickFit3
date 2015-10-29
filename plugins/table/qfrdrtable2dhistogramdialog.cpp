@@ -27,7 +27,7 @@
 #include "qfrdrtable.h"
 
 QFRDRTable2DHistogramDialog::QFRDRTable2DHistogramDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTable2DHistogramDialog)
 {
     selectedX=-1;

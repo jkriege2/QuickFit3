@@ -35,6 +35,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "datacutslider.h"
 #include "qvisiblehandlesplitter.h"
 #include "qfcorrelationmasktools.h"
+#include "qfselectrdrdialog.h"
 /*! \brief model for runs in QFRDRFCSCorrelationEditor
     \ingroup qf3rdrdp_fcs
 */
@@ -87,8 +88,9 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
         void runsModeChanged(int c);
         void slidersChanged(int userMin, int userMax, int min, int max);
 
-        void copyNormalizedACFs();
+        //void copyNormalizedACFs();
         void correctOffset();
+        void correctBackground();
     protected:
         /** \brief create widgets on object creation */
         void createWidgets();

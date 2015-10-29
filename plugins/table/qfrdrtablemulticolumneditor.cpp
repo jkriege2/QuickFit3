@@ -25,7 +25,7 @@
 #include "qfrdrtable.h"
 
 QFRDRTableMultiColumnEditor::QFRDRTableMultiColumnEditor(QFTableModel *model, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRTableMultiColumnEditor)
 {
     ui->setupUi(this);
@@ -56,7 +56,7 @@ QFRDRTableMultiColumnEditor::~QFRDRTableMultiColumnEditor()
 
 void QFRDRTableMultiColumnEditor::closeEvent(QCloseEvent *e)
 {
-    QDialog::closeEvent(e);
+    QFDialog::closeEvent(e);
     e->accept();
     deleteLater();
 

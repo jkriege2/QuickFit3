@@ -311,6 +311,11 @@ void QFDoubleEdit::resizeEvent ( QResizeEvent * event ) {
 
 void QFDoubleEdit::wheelEvent(QWheelEvent *event)
 {
+#ifdef Q_OS_MAC
+    if (!ProgramOptions::getConfigValue("quickfit/scroll_in_qfdoubleedit", false).toBool()) return;
+#else
+    if (!ProgramOptions::getConfigValue("quickfit/scroll_in_qfdoubleedit", true).toBool()) return;
+#endif
     int numDegrees = event->delta() / 8;
     int numSteps = numDegrees / 15;
     //qDebug()<<event->delta()<<event->orientation();

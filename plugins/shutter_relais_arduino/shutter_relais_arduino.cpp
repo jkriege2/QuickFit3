@@ -220,7 +220,7 @@ void QFExtensionShutterShuterArduino::showShutterSettingsDialog(unsigned int /*s
         // and add implementations
         /////////////////////////////////////////////////////////////////////////////////
 
-        QDialog* dlg=new QDialog(parent);
+        QDialog* dlg=new QFDialog(parent);
 
         QVBoxLayout* lay=new QVBoxLayout();
         dlg->setLayout(lay);

@@ -29,7 +29,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #else
 #include <QtGui>
 #endif
-
+#include "qfdialog.h"
 #include "ui_optionsdialog.h"
 #include "../lib/programoptions.h"
 #include "qfpluginoptionsdialog.h"
@@ -37,7 +37,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 /*! \brief options dialog wrapper class for QuickFit
     \ingroup qf3app
 */
-class OptionsDialog : public QDialog, public Ui::OptionsDlg {
+class OptionsDialog : public QFDialog, public Ui::OptionsDlg {
         Q_OBJECT
     public:
         /** Default constructor */

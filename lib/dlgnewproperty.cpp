@@ -23,7 +23,7 @@
 #include "ui_dlg_newproperty.h"
 
 dlgNewProperty::dlgNewProperty(QWidget* parent):
-    QDialog(parent), ui(new Ui::dlgNewProperty)
+    QFDialog(parent), ui(new Ui::dlgNewProperty)
 {
     ui->setupUi(this);
 

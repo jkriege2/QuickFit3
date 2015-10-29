@@ -32,7 +32,7 @@ ObjectiveDescription::ObjectiveDescription() {
 
 
 QF3ObjectiveEditor::QF3ObjectiveEditor(const ObjectiveDescription& objective, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QF3ObjectiveEditor)
 {
     ui->setupUi(this);

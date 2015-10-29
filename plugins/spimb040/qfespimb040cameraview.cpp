@@ -651,25 +651,25 @@ void QFESPIMB040CameraView::createMainWidgets() {
 
 
 void QFESPIMB040CameraView::createActions() {
-    actSaveRaw = new QAction(QIcon(":/spimb040/saveraw.png"), tr("Save &raw image as ..."), this);
+    actSaveRaw = new QFActionWithNoMenuRole(QIcon(":/spimb040/saveraw.png"), tr("Save &raw image as ..."), this);
     actSaveRaw->setShortcut(QKeySequence::Save);
     connect(actSaveRaw, SIGNAL(triggered()), this, SLOT(saveRaw()));
 
-    actSaveTransformed = new QAction(QIcon(":/spimb040/savetransformed.png"), tr("Save &transformed image as ..."), this);
+    actSaveTransformed = new QFActionWithNoMenuRole(QIcon(":/spimb040/savetransformed.png"), tr("Save &transformed image as ..."), this);
     connect(actSaveTransformed, SIGNAL(triggered()), this, SLOT(saveTransformedImage()));
-    actSaveMulti = new QAction(QIcon(":/spimb040/savemulti.png"), tr("Save &raw image as ..."), this);
+    actSaveMulti = new QFActionWithNoMenuRole(QIcon(":/spimb040/savemulti.png"), tr("Save &raw image as ..."), this);
     connect(actSaveMulti, SIGNAL(triggered()), this, SLOT(saveMulti()));
-    actSaveMultiSeries = new QAction(QIcon(":/spimb040/savemultiseries.png"), tr("Save &raw image series as ..."), this);
+    actSaveMultiSeries = new QFActionWithNoMenuRole(QIcon(":/spimb040/savemultiseries.png"), tr("Save &raw image series as ..."), this);
     connect(actSaveMultiSeries, SIGNAL(triggered()), this, SLOT(saveMultiSeries()));
 
 
-    actMaskClear = new QAction(QIcon(":/spimb040/maskclear.png"), tr("&Clear mask (broken pixels)"), this);
+    actMaskClear = new QFActionWithNoMenuRole(QIcon(":/spimb040/maskclear.png"), tr("&Clear mask (broken pixels)"), this);
     connect(actMaskClear, SIGNAL(triggered()), this, SLOT(clearMask()));
 
-    actMaskSave = new QAction(QIcon(":/spimb040/masksave.png"), tr("&Save mask (broken pixels)"), this);
+    actMaskSave = new QFActionWithNoMenuRole(QIcon(":/spimb040/masksave.png"), tr("&Save mask (broken pixels)"), this);
     connect(actMaskSave, SIGNAL(triggered()), this, SLOT(saveMask()));
 
-    actMaskLoad = new QAction(QIcon(":/spimb040/maskload.png"), tr("&Load mask (broken pixels)"), this);
+    actMaskLoad = new QFActionWithNoMenuRole(QIcon(":/spimb040/maskload.png"), tr("&Load mask (broken pixels)"), this);
     connect(actMaskLoad, SIGNAL(triggered()), this, SLOT(loadMask()));
     recentMaskFiles=new QFRecentFilesMenu(this);
     recentMaskFiles->setUseSystemFileIcons(false);
@@ -678,14 +678,14 @@ void QFESPIMB040CameraView::createActions() {
     connect(recentMaskFiles, SIGNAL(openRecentFile(QString)), this, SLOT(loadMask(QString)));
     actMaskLoad->setMenu(recentMaskFiles);
 
-    actMaskHisto = new QAction(QIcon(":/spimb040/maskhisto.png"), tr("&Create mask by histogram"), this);
+    actMaskHisto = new QFActionWithNoMenuRole(QIcon(":/spimb040/maskhisto.png"), tr("&Create mask by histogram"), this);
     connect(actMaskHisto, SIGNAL(triggered()), this, SLOT(histogramMask()));
 
-    actPrintReport = new QAction(QIcon(":/spimb040/report_print.png"), tr("&Print a report"), this);
+    actPrintReport = new QFActionWithNoMenuRole(QIcon(":/spimb040/report_print.png"), tr("&Print a report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
-    actSaveReport = new QAction(QIcon(":/spimb040/report_save.png"), tr("&Save a report"), this);
+    actSaveReport = new QFActionWithNoMenuRole(QIcon(":/spimb040/report_save.png"), tr("&Save a report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
-    actSaveData = new QAction(QIcon(":/spimb040/preview_savedata.png"), tr("&Save marginal and histogram data"), this);
+    actSaveData = new QFActionWithNoMenuRole(QIcon(":/spimb040/preview_savedata.png"), tr("&Save marginal and histogram data"), this);
     connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
 
 
@@ -693,10 +693,10 @@ void QFESPIMB040CameraView::createActions() {
     actCursor=actgMouse->addAction(QIcon(":/spimb040/cursor.png"), tr("default mouse cursor"));
     actCursor->setCheckable(true);
 
-    actMaskEdit = new QAction(QIcon(":/spimb040/maskedit.png"), tr("&Edit mask (broken pixels)"), actgMouse);
+    actMaskEdit = new QFActionWithNoMenuRole(QIcon(":/spimb040/maskedit.png"), tr("&Edit mask (broken pixels)"), actgMouse);
     actMaskEdit->setCheckable(true);
 
-    actMeasure = new QAction(QIcon(":/spimb040/measure.png"), tr("&Measure distances"), actgMouse);
+    actMeasure = new QFActionWithNoMenuRole(QIcon(":/spimb040/measure.png"), tr("&Measure distances"), actgMouse);
     actMeasure->setCheckable(true);
 
     actCursor->setChecked(true);

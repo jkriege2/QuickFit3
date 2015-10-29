@@ -279,7 +279,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
     toolbar->addSeparator();
     maskTools->registerPlotterMaskToolsToToolbar(toolbar);
 
-    act3DViewer=new QAction(QIcon(":/image_stack/viewer3d.png"), tr("&3D viewer"), this);
+    act3DViewer=new QFActionWithNoMenuRole(QIcon(":/image_stack/viewer3d.png"), tr("&3D viewer"), this);
     connect(act3DViewer, SIGNAL(triggered()), this, SLOT(show3DViewer()));
 
 

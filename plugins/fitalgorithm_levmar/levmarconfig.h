@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef LEVMARCONFIG_H
 #define LEVMARCONFIG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -34,7 +34,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 /*! \brief This class represents a configuration dialog for the Levmar Levenberg-Marquardt Library
     \ingroup qf3fitalgp_levmar
  */
-class LevmarConfigDialog : public QDialog {
+class LevmarConfigDialog : public QFDialog {
         Q_OBJECT
     public:
         /** \brief class constructor */

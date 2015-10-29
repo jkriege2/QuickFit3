@@ -23,7 +23,7 @@
 #include "ui_qfrdrimagingfcsseriesdialog.h"
 
 QFRDRImagingFCSSeriesDialog::QFRDRImagingFCSSeriesDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRImagingFCSSeriesDialog)
 {
     ui->setupUi(this);
@@ -75,7 +75,7 @@ void QFRDRImagingFCSSeriesDialog::closeEvent(QCloseEvent *event) {
         ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRImagingFCSSeriesDialog/delta", ui->edtDelta->value());
 
     }
-    QDialog::closeEvent(event);
+    QFDialog::closeEvent(event);
 }
 
 void QFRDRImagingFCSSeriesDialog::setParameter(int idx)

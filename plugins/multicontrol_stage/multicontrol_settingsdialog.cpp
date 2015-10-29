@@ -2,7 +2,7 @@
 #define LOG_PREFIX "[MulticontrolSettingsDialog]: "
 
 MulticontrolSettingsDialog::MulticontrolSettingsDialog(QSettings *newSettings, QWidget *parent) :
-    QDialog(parent)
+    QFDialog(parent)
 {
     settings = newSettings;
     setWindowTitle("Settings of the multicontrol stage");

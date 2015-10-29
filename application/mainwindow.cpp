@@ -170,6 +170,8 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
 
     splash->showMessage(tr("initializing UI ... "));
     QApplication::processEvents();
+    menuBar()->setNativeMenuBar(true);
+    setAcceptDrops(true);
     createWidgets();
     createActions();
     createMenus();
@@ -493,6 +495,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     QTimer::singleShot(100, this, SLOT(checkCallArguments()));
     connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(clipboardDataChanged()));
     clipboardDataChanged();
+    updateWindowsList();
 }
 
 
@@ -724,6 +727,20 @@ void MainWindow::showEvent(QShowEvent */*event*/) {
     }
 }
 
+void MainWindow::dropEvent(QDropEvent *ev)
+{
+    QList<QUrl> urls = ev->mimeData()->urls();
+    foreach(QUrl url, urls)
+    {
+        qDebug()<<"dropped: "<<url.toString();
+    }
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *ev)
+{
+    ev->accept();
+}
+
 void MainWindow::closeProject() {
     if (project) {
         logFileProjectWidget->clearLog();
@@ -924,7 +941,7 @@ bool MainWindow::saveProjectAs() {
 
 
 void MainWindow::about() {
-    QDialog *widget = new QDialog(this);
+    QFDialog *widget = new QFDialog(this);
     Ui::About ui;
     ui.setupUi(widget);
     QTextBrowser* ui_textEdit = widget->findChild<QTextBrowser*>( "edtInfo");
@@ -1670,7 +1687,7 @@ QString MainWindow::createPluginDocHelp(QString mainitem_before, QString mainite
 }
 
 void MainWindow::aboutPlugins() {
-    QDialog *widget = new QDialog(this);
+    QFDialog *widget = new QFDialog(this);
     Ui::AboutPlugins ui;
     ui.setupUi(widget);
     QTextEdit* ui_textEdit = widget->findChild<QTextEdit*>( "edtInfo");
@@ -1781,83 +1798,83 @@ void MainWindow::createWidgets() {
 
 
 void MainWindow::createActions() {
-    newProjectAct = new QAction(QIcon(":/project_new.png"), tr("&New Project"), this);
+    newProjectAct = new QFActionWithNoMenuRole(QIcon(":/project_new.png"), tr("&New Project"), this);
     newProjectAct->setShortcuts(QKeySequence::New);
     newProjectAct->setStatusTip(tr("Create a new project"));
     connect(newProjectAct, SIGNAL(triggered()), this, SLOT(newProject()));
 
 
-    openProjectAct = new QAction(QIcon(":/project_open.png"), tr("&Open Project..."), this);
+    openProjectAct = new QFActionWithNoMenuRole(QIcon(":/project_open.png"), tr("&Open Project..."), this);
     openProjectAct->setShortcuts(QKeySequence::Open);
     openProjectAct->setStatusTip(tr("Open an existing project"));
     connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
 
-    openProjectSubsetAct = new QAction(tr("&Open Project Subset"), this);
+    openProjectSubsetAct = new QFActionWithNoMenuRole(tr("&Open Project Subset"), this);
     openProjectSubsetAct->setStatusTip(tr("Let the user select a subset of records and evaluations to load from a project"));
     connect(openProjectSubsetAct, SIGNAL(triggered()), this, SLOT(openProjectSubset()));
 
-    openExampleAct = new QAction(tr("&Open Examples Projects ..."), this);
+    openExampleAct = new QFActionWithNoMenuRole(tr("&Open Examples Projects ..."), this);
     openExampleAct->setStatusTip(tr("lets the user open one of the example projects distributed together with the software"));
     connect(openExampleAct, SIGNAL(triggered()), this, SLOT(openExample()));
 
-    actReloadProject = new QAction(QIcon(":/reload_project.png"), tr("&Reload Current Project"), this);
+    actReloadProject = new QFActionWithNoMenuRole(QIcon(":/reload_project.png"), tr("&Reload Current Project"), this);
     actReloadProject->setStatusTip(tr("Reload the currently opened project"));
     connect(actReloadProject, SIGNAL(triggered()), this, SLOT(reloadProject()));
 
-    saveProjectAct = new QAction(QIcon(":/project_save.png"), tr("&Save Project"), this);
+    saveProjectAct = new QFActionWithNoMenuRole(QIcon(":/project_save.png"), tr("&Save Project"), this);
     saveProjectAct->setShortcuts(QKeySequence::Save);
     saveProjectAct->setStatusTip(tr("Save the project to disk"));
     connect(saveProjectAct, SIGNAL(triggered()), this, SLOT(saveProject()));
 
-    saveProjectAsAct = new QAction(QIcon(":/project_saveas.png"), tr("Save Project &As..."), this);
+    saveProjectAsAct = new QFActionWithNoMenuRole(QIcon(":/project_saveas.png"), tr("Save Project &As..."), this);
     saveProjectAsAct->setShortcuts(QKeySequence::SaveAs);
     saveProjectAsAct->setStatusTip(tr("Save the project under a new name"));
     connect(saveProjectAsAct, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
 
-    zipProjectAct = new QAction(QIcon(":/project_zip.png"), tr("&Compress Project"), this);
+    zipProjectAct = new QFActionWithNoMenuRole(QIcon(":/project_zip.png"), tr("&Compress Project"), this);
     zipProjectAct->setStatusTip(tr("compress project, icluding data files into a ZIP-archive"));
     connect(zipProjectAct, SIGNAL(triggered()), this, SLOT(zipProject()));
 
-    optionsAct = new QAction(QIcon(":/configure.png"), tr("&Preferences ..."), this);
+    optionsAct = new QFActionWithNoMenuRole(QIcon(":/configure.png"), tr("&Preferences ..."), this);
     optionsAct->setStatusTip(tr("Application settings dialog"));
-    optionsAct->setMenuRole(QAction::PreferencesRole);
+    //optionsAct->setMenuRole(QAction::PreferencesRole);
     connect(optionsAct, SIGNAL(triggered()), this, SLOT(openSettingsDialog()));
 
-    exitAct = new QAction(QIcon(":/exit.png"), tr("E&xit"), this);
+    exitAct = new QFActionWithNoMenuRole(QIcon(":/exit.png"), tr("E&xit"), this);
     exitAct->setShortcut(tr("Ctrl+Q"));
     exitAct->setStatusTip(tr("Exit the application"));
     exitAct->setMenuRole(QAction::QuitRole);
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
 
-    helpAct=new QAction(QIcon(":/help.png"), tr("&Help"), this);
+    helpAct=new QFActionWithNoMenuRole(QIcon(":/help.png"), tr("&Help"), this);
     connect(helpAct, SIGNAL(triggered()), this, SLOT(displayHelp()));
-    actEntertain=new QAction(QIcon(":/tetris.png"), tr("&Entertain Me ..."), this);
+    actEntertain=new QFActionWithNoMenuRole(QIcon(":/tetris.png"), tr("&Entertain Me ..."), this);
     connect(actEntertain, SIGNAL(triggered()), this, SLOT(entertainMe()));
 
-    helpCopyrightAct=new QAction(QIcon(":/help_copyright.png"), tr("QuickFit &Copyright"), this);
+    helpCopyrightAct=new QFActionWithNoMenuRole(QIcon(":/help_copyright.png"), tr("QuickFit &Copyright"), this);
     connect(helpCopyrightAct, SIGNAL(triggered()), this, SLOT(displayHelpCopyright()));
-    helpWelcomeScreenAct=new QAction(tr("Show Welcome Screen"), this);
+    helpWelcomeScreenAct=new QFActionWithNoMenuRole(tr("Show Welcome Screen"), this);
     connect(helpWelcomeScreenAct, SIGNAL(triggered()), this, SLOT(openWelcomeScreen()));
-    helpPluginCopyrightAct=new QAction(QIcon(":/lib/help/help_copyright.png"), tr("Plugin C&opyright"), this);
+    helpPluginCopyrightAct=new QFActionWithNoMenuRole(QIcon(":/lib/help/help_copyright.png"), tr("Plugin C&opyright"), this);
     connect(helpPluginCopyrightAct, SIGNAL(triggered()), this, SLOT(displayHelpPluginCopyright()));
-    helpCitingAct=new QAction(QIcon(":/help_copyright.png"), tr("Citing QuickFit ..."), this);
+    helpCitingAct=new QFActionWithNoMenuRole(QIcon(":/help_copyright.png"), tr("Citing QuickFit ..."), this);
     connect(helpCitingAct, SIGNAL(triggered()), this, SLOT(displayHelpCiting()));
-    helpFAQAct=new QAction(QIcon(":/lib/help/help_faq.png"), tr("&Frequently asked questions (FAQs)"), this);
+    helpFAQAct=new QFActionWithNoMenuRole(QIcon(":/lib/help/help_faq.png"), tr("&Frequently asked questions (FAQs)"), this);
     connect(helpFAQAct, SIGNAL(triggered()), this, SLOT(displayHelpFAQ()));
-    helpTutorialsAct=new QAction(QIcon(":/lib/help/help_tutorial.png"), tr("Plugin &Tutorials"), this);
+    helpTutorialsAct=new QFActionWithNoMenuRole(QIcon(":/lib/help/help_tutorial.png"), tr("Plugin &Tutorials"), this);
     connect(helpTutorialsAct, SIGNAL(triggered()), this, SLOT(displayHelpTutorials()));
-    helpPluginAct=new QAction(QIcon(":/lib/help/help_contents.png"), tr("&Plugin Help"), this);
+    helpPluginAct=new QFActionWithNoMenuRole(QIcon(":/lib/help/help_contents.png"), tr("&Plugin Help"), this);
     connect(helpPluginAct, SIGNAL(triggered()), this, SLOT(displayPluginHelp()));
-    helpContactAuthors=new QAction(QIcon(":/lib/mail.png"), tr("&Contact Authors (bugreport, question, ...)"), this);
+    helpContactAuthors=new QFActionWithNoMenuRole(QIcon(":/lib/mail.png"), tr("&Contact Authors (bugreport, question, ...)"), this);
     connect(helpContactAuthors, SIGNAL(triggered()), this, SLOT(contactAuhtors()));
-    helpContactMaillinglist=new QAction(QIcon(":/lib/mail.png"), tr("&Contact QuickFit Mailinglist"), this);
+    helpContactMaillinglist=new QFActionWithNoMenuRole(QIcon(":/lib/mail.png"), tr("&Contact QuickFit Mailinglist"), this);
     connect(helpContactMaillinglist, SIGNAL(triggered()), this, SLOT(contactMailinglist()));
-    helpOpenWebpageAct=new QAction(QIcon(":/lib/help/www.png"), tr("QuickFit &Webpage"), this);
+    helpOpenWebpageAct=new QFActionWithNoMenuRole(QIcon(":/lib/help/www.png"), tr("QuickFit &Webpage"), this);
     connect(helpOpenWebpageAct, SIGNAL(triggered()), this, SLOT(openWebpage()));
-    helpOpenWebpageSourceAct=new QAction(QIcon(":/lib/help/www.png"), tr("QuickFit &Sourcecode Repository"), this);
+    helpOpenWebpageSourceAct=new QFActionWithNoMenuRole(QIcon(":/lib/help/www.png"), tr("QuickFit &Sourcecode Repository"), this);
     connect(helpOpenWebpageSourceAct, SIGNAL(triggered()), this, SLOT(openWebpageSource()));
-    actCheckUpdate=new QAction(QIcon(":/lib/help/www.png"), tr("Check for updates ..."), this);
+    actCheckUpdate=new QFActionWithNoMenuRole(QIcon(":/lib/help/www.png"), tr("Check for updates ..."), this);
     connect(actCheckUpdate, SIGNAL(triggered()), this, SLOT(checkUpdates()));
 
     helpActList.append(helpAct);
@@ -1873,16 +1890,16 @@ void MainWindow::createActions() {
     QAction* actSort;
     actsSort=new QActionGroup(this);
     actsSort->setExclusive(true);
-    actsSort->addAction(actSort=new QAction(tr("... by ID"), this));
+    actsSort->addAction(actSort=new QFActionWithNoMenuRole(tr("... by ID"), this));
     actSort->setCheckable(true);
     actSort->setChecked(true);
-    actsSort->addAction(actSort=new QAction(tr("... by Name"), this));
+    actsSort->addAction(actSort=new QFActionWithNoMenuRole(tr("... by Name"), this));
     actSort->setCheckable(true);
-    actsSort->addAction(actSort=new QAction(tr("... by Folder-Type-Name-Role"), this));
+    actsSort->addAction(actSort=new QFActionWithNoMenuRole(tr("... by Folder-Type-Name-Role"), this));
     actSort->setCheckable(true);
-    actsSort->addAction(actSort=new QAction(tr("... by Folder-Name-Type-Role"), this));
+    actsSort->addAction(actSort=new QFActionWithNoMenuRole(tr("... by Folder-Name-Type-Role"), this));
     actSort->setCheckable(true);
-    actsSort->addAction(actSort=new QAction(tr("... by Folder-Role-Type-Name"), this));
+    actsSort->addAction(actSort=new QFActionWithNoMenuRole(tr("... by Folder-Role-Type-Name"), this));
     actSort->setCheckable(true);
     connect(actsSort, SIGNAL(triggered(QAction*)), this, SLOT(setProjectSortOrder(QAction*)));
 
@@ -1890,24 +1907,24 @@ void MainWindow::createActions() {
 
 
 
-    aboutAct = new QAction(QIcon(":/about.png"), tr("&About"), this);
+    aboutAct = new QFActionWithNoMenuRole(QIcon(":/about.png"), tr("&About QuickFit"), this);
     aboutAct->setStatusTip(tr("Show the application's About box"));
-    aboutAct->setMenuRole(QAction::AboutRole);
+    //aboutAct->setMenuRole(QAction::AboutRole);
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
-    aboutPluginsAct = new QAction(QIcon(":/about.png"), tr("About &Plugins"), this);
+    aboutPluginsAct = new QFActionWithNoMenuRole(QIcon(":/about.png"), tr("About &Plugins"), this);
     aboutPluginsAct->setStatusTip(tr("Show a list with all registered plugins"));
     connect(aboutPluginsAct, SIGNAL(triggered()), this, SLOT(aboutPlugins()));
 
 
-    aboutQtAct = new QAction(QIcon(":/aboutqt.png"), tr("About &Qt"), this);
+    aboutQtAct = new QFActionWithNoMenuRole(QIcon(":/aboutqt.png"), tr("About &Qt"), this);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-    aboutQtAct->setMenuRole(QAction::AboutQtRole);
+    //aboutQtAct->setMenuRole(QAction::AboutQtRole);
     connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
 
 
-    dupItemAct = new QAction(QIcon(":/lib/item_duplicate.png"), tr("&Duplicate Current Item(s)"), this);
+    dupItemAct = new QFActionWithNoMenuRole(QIcon(":/lib/item_duplicate.png"), tr("&Duplicate Current Item(s)"), this);
     dupItemAct->setStatusTip(tr("dupicates the currently selected items.\nIf a folder is selected, all files in the folder are duplicated"));
     dupItemAct->setShortcut(QKeySequence("Ctrl+D"));
     connect(dupItemAct, SIGNAL(triggered()), this, SLOT(duplicateItem()));
@@ -1915,7 +1932,7 @@ void MainWindow::createActions() {
     tvMain->addAction(dupItemAct);
 
 
-    delItemAct = new QAction(QIcon(":/lib/item_delete.png"), tr("&Delete Current Item(s)"), this);
+    delItemAct = new QFActionWithNoMenuRole(QIcon(":/lib/item_delete.png"), tr("&Delete Current Item(s)"), this);
     delItemAct->setStatusTip(tr("delete the currently selected item (if deletable) ..."));
     connect(delItemAct, SIGNAL(triggered()), this, SLOT(deleteItem()));
     //delItemAct->setShortcut(QKeySequence::Delete);
@@ -1924,62 +1941,66 @@ void MainWindow::createActions() {
 
     tvMain->addAction(getSeparatorAction(this));
 
-    copyItemAct = new QAction(QIcon(":/lib/item_copy.png"), tr("&Copy Current Item(s)"), this);
+    copyItemAct = new QFActionWithNoMenuRole(QIcon(":/lib/item_copy.png"), tr("&Copy Current Item(s)"), this);
     copyItemAct->setStatusTip(tr("copies the currently selected items into the clipboard"));
     copyItemAct->setShortcut(QKeySequence::Copy);
     connect(copyItemAct, SIGNAL(triggered()), this, SLOT(copyItem()));
     tvMain->addAction(copyItemAct);
 
-    cutItemAct = new QAction(QIcon(":/lib/item_cut.png"), tr("&Cut Current Item(s)"), this);
+    cutItemAct = new QFActionWithNoMenuRole(QIcon(":/lib/item_cut.png"), tr("&Cut Current Item(s)"), this);
     cutItemAct->setStatusTip(tr("cuts the currently selected items into the clipboard"));
     cutItemAct->setShortcut(QKeySequence::Cut);
     connect(cutItemAct, SIGNAL(triggered()), this, SLOT(cutItem()));
     tvMain->addAction(cutItemAct);
 
-    pastItemAct = new QAction(QIcon(":/lib/item_paste.png"), tr("&Paste Item(s)"), this);
+    pastItemAct = new QFActionWithNoMenuRole(QIcon(":/lib/item_paste.png"), tr("&Paste Item(s)"), this);
     pastItemAct->setStatusTip(tr("paste items from the clipboard into the current project"));
     connect(pastItemAct, SIGNAL(triggered()), this, SLOT(pasteItem()));
     pastItemAct->setShortcut(QKeySequence::Paste);
     tvMain->addAction(pastItemAct);
 
 
-    actExportRDR = new QAction(QIcon(":/lib/export_data.png"), tr("&Export Data from RDR"), this);
+    actExportRDR = new QFActionWithNoMenuRole(QIcon(":/lib/export_data.png"), tr("&Export Data from RDR"), this);
     actExportRDR->setStatusTip(tr("export the raw data represented by the current RDR element"));
     connect(actExportRDR, SIGNAL(triggered()), this, SLOT(exportRDR()));
     tvMain->addAction(actExportRDR);
 
 
-    actRDRReplace=new QAction(tr("find/replace in raw data record names/folders"), this);
+    actRDRReplace=new QFActionWithNoMenuRole(tr("find/replace in raw data record names/folders"), this);
     connect(actRDRReplace, SIGNAL(triggered()), this, SLOT(rdrReplace()));
-    actRDRUndoReplace=new QAction(tr("undo last find/replace"), this);
+    actRDRUndoReplace=new QFActionWithNoMenuRole(tr("undo last find/replace"), this);
     connect(actRDRUndoReplace, SIGNAL(triggered()), this, SLOT(rdrUndoReplace()));
-    actRDRSetProperty=new QAction(tr("set property in multiple RDRs"), this);
+    actRDRSetProperty=new QFActionWithNoMenuRole(tr("set property in multiple RDRs"), this);
     connect(actRDRSetProperty, SIGNAL(triggered()), this, SLOT(rdrSetProperty()));
-    actFixFilesPathes=new QAction(tr("fix files paths in project"), this);
+    actFixFilesPathes=new QFActionWithNoMenuRole(tr("fix files paths in project"), this);
     connect(actFixFilesPathes, SIGNAL(triggered()), this, SLOT(fixFilesPathesInProject()));
-    actRenameGroups=new QAction(tr("rename RDR groups"), this);
+    actRenameGroups=new QFActionWithNoMenuRole(tr("rename RDR groups"), this);
     connect(actRenameGroups, SIGNAL(triggered()), this, SLOT(renameGroups()));
-    actSetRDRPropertyByRegExp=new QAction(tr("set RDR property by RegExp"), this);
+    actSetRDRPropertyByRegExp=new QFActionWithNoMenuRole(tr("set RDR property by RegExp"), this);
     connect(actSetRDRPropertyByRegExp, SIGNAL(triggered()), this, SLOT(setRDRPropertyByRegExp()));
-    actSetRDRPropertyByExpression=new QAction(tr("caluclate RDR property"), this);
+    actSetRDRPropertyByExpression=new QFActionWithNoMenuRole(tr("caluclate RDR property"), this);
     connect(actSetRDRPropertyByExpression, SIGNAL(triggered()), this, SLOT(setRDRPropertyByExpression()));
-    actEditGroupAndRole=new QAction(tr("edit groups, roles and folders"), this);
+    actEditGroupAndRole=new QFActionWithNoMenuRole(tr("edit groups, roles and folders"), this);
     connect(actEditGroupAndRole, SIGNAL(triggered()), this, SLOT(editGroupAndRole()));
 
-    actUserFitfunctionsEditor=new QAction(QIcon(":/lib/edit_fitfunction.png"), tr("edit user fit functions"), this);
+    actUserFitfunctionsEditor=new QFActionWithNoMenuRole(QIcon(":/lib/edit_fitfunction.png"), tr("edit user fit functions"), this);
     connect(actUserFitfunctionsEditor, SIGNAL(triggered()), this, SLOT(editUserFitFunctions()));
-    actPerformanceTest=new QAction(tr("test QFProject performance"), this);
+    actPerformanceTest=new QFActionWithNoMenuRole(tr("test QFProject performance"), this);
     connect(actPerformanceTest, SIGNAL(triggered()), this, SLOT(projectPerformanceTest()));
 
-    actPrepareLibFitFunctions=new QAction(tr("Copy SDK For Dynamic User Fit Function Libraries ..."), this);
+    actPrepareLibFitFunctions=new QFActionWithNoMenuRole(tr("Copy SDK For Dynamic User Fit Function Libraries ..."), this);
     connect(actPrepareLibFitFunctions, SIGNAL(triggered()), this, SLOT(prepareLibFitFunctions()));
+
+
 }
 
 void MainWindow::createMenus() {
     fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->menuAction()->setMenuRole(QAction::NoRole);
     fileMenu->addAction(newProjectAct);
 
     fileMenu->addAction(openProjectAct);
+    projectWizardsMenu=fileMenu->addMenu(tr("&Project Wizards ..."));
 
 
     /*recentMenu=fileMenu->addMenu(QIcon(":/project_open_recent.png"), tr("&Recent Files"));
@@ -2057,8 +2078,9 @@ void MainWindow::createMenus() {
     toolsMenu->addSeparator();
     wizardsMenu=toolsMenu->addMenu(tr("&Wizards"));
     wizardsMenu->setIcon(QIcon(":/wizard.png"));
-    projectWizardsMenu=wizardsMenu->addMenu(tr("&Projects Wizards"));
+    wizardsMenu->addMenu(projectWizardsMenu);
     projectWizardsMenu->setIcon(QIcon(":/project_wizard.png"));
+    //projectWizardsMenu2->setIcon(QIcon(":/project_wizard.png"));
     rdrWizardsMenu=wizardsMenu->addMenu(tr("&Raw Data Wizards"));
     rdrWizardsMenu->setIcon(QIcon(":/rdr_wizard.png"));
     evalWizardsMenu=wizardsMenu->addMenu(tr("&Evaluation Wizards"));
@@ -2066,7 +2088,7 @@ void MainWindow::createMenus() {
     dataMenu->addSeparator();
     dataMenu->addMenu(rdrWizardsMenu);
     dataMenu->addMenu(evalWizardsMenu);
-    fileMenu->insertAction(openProjectAct, projectWizardsMenu->menuAction());
+    //fileMenu->insertAction(openProjectAct, projectWizardsMenu->menuAction());
     fileMenu->insertSeparator(openProjectAct);
     wizardsMenu->addSeparator();
     toolsMenu->addSeparator();
@@ -2076,11 +2098,13 @@ void MainWindow::createMenus() {
     viewMenu= menuBar()->addMenu(tr("&View"));
     menuProjectSort=viewMenu->addMenu(tr("project tree &sort order ..."));
     menuProjectSort->addActions(actsSort->actions());
+    menuOpenWindows=viewMenu->addMenu(tr("raise opened windows ..."));
 
 
     menuBar()->addSeparator();
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
+
     helpMenu->addAction(helpAct);
     helpMenu->addAction(helpCopyrightAct);
     helpMenu->addAction(helpCitingAct);
@@ -2093,9 +2117,20 @@ void MainWindow::createMenus() {
     helpMenu->addAction(helpPluginCopyrightAct);
 
     helpMenu->addSeparator();
+#ifdef Q_OS_MAC
+    menuAboutMAC=new QMenu(tr("&About ..."), this);
+    menuAboutMAC->setIcon(QIcon(":/about.png"));
+    menuAboutMAC->addAction(aboutAct);
+    menuAboutMAC->addAction(aboutPluginsAct);
+    menuAboutMAC->addAction(aboutQtAct);
+    actMenuAboutMAC=menuAboutMAC->menuAction();
+    actMenuAboutMAC->setMenuRole(QAction::NoRole);
+    helpMenu->addAction(actMenuAboutMAC);
+#else
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutPluginsAct);
     helpMenu->addAction(aboutQtAct);
+#endif
     helpMenu->addSeparator();
     helpMenu->addAction(actCheckUpdate);
     helpMenu->addSeparator();
@@ -3615,7 +3650,7 @@ void MainWindow::registerWizard(const QString &menu, const QString& title, const
 
 void MainWindow::registerWizard(const QString &menu, const QString &title, QIcon icon, const QObject *receiver, const char *method, QAction **actOut)
 {
-    QAction* actW=new QAction(icon, title, this);
+    QAction* actW=new QFActionWithNoMenuRole(icon, title, this);
     connect(actW, SIGNAL(triggered()), receiver, method);
     registerWizard(menu, actW);
     if (actOut) *actOut=actW;
@@ -4488,6 +4523,49 @@ void MainWindow::entertainMe()
     tetris->show();
 }
 
+void MainWindow::updateWindowsList()
+{
+    QWidgetList wl=QApplication::topLevelWidgets();
+
+    QList<QAction*> acts=actsWindows.keys();
+    for (int i=0; i<acts.size(); i++) {
+        if (!actsWindows[acts[i]] || (!actsWindows[acts[i]]->isVisible()) || ((actsWindows[acts[i]]->parent()!=NULL) && (actsWindows[acts[i]]->parent()!=this))) {
+            actsWindows.remove(acts[i]);
+            menuOpenWindows->removeAction(acts[i]);
+        }
+    }
+
+    for (int i=0; i<wl.size(); i++) {
+        if (wl[i] && (wl[i]->parent()==NULL || wl[i]->parent()==this) && wl[i]->isVisible() && (actsWindows.key(wl[i], NULL)==NULL)) {
+            QAction* act=new QFActionWithNoMenuRole(wl[i]->windowTitle(), this);
+            connect(act, SIGNAL(triggered()), this, SLOT(raiseOpenedWindow()));
+            actsWindows[act]=wl[i];
+            menuOpenWindows->addAction(act);
+        }
+    }
+
+    QMapIterator<QAction*, QPointer<QWidget> > it(actsWindows);
+    while (it.hasNext()) {
+        it.next();
+        if (it.key() && it.value()) {
+            it.key()->setText(it.value()->windowTitle());
+        }
+    }
+
+
+    QTimer::singleShot(500, this, SLOT(updateWindowsList()));
+}
+
+void MainWindow::raiseOpenedWindow()
+{
+    QAction* act=qobject_cast<QAction*>(sender());
+    if (act && actsWindows.contains(act) && actsWindows[act]) {
+        if (actsWindows[act]->isMinimized()) actsWindows[act]->showNormal();
+        actsWindows[act]->show();
+        actsWindows[act]->raise();
+    }
+}
+
 bool MainWindow::clipboardContainsProjectXML() const
 {
      QClipboard *clipboard = QApplication::clipboard();
@@ -4782,7 +4860,10 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         for (int i=0; i<pluginList->size(); i++) {
             QApplication::processEvents();
             //qDebug()<<"*** "
-            if (QDir(pluginList->at(i).directory)==basepath) { // we found the info for this directory
+            if (i<5) {
+                qDebug()<<"help: - "<<QDir(pluginList->at(i).directory)<<"\n      - "<<QDir(basepath)<<"\n      => "<<(QDir(pluginList->at(i).directory)==QDir(basepath));
+            }
+            if (QDir(pluginList->at(i).directory)==QDir(basepath)) { // we found the info for this directory
                 QString pid=pluginList->at(i).plugin->getID();
                 QString pid_sub_deocrated="";
                 QString faname="", fa_shortname="";

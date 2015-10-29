@@ -30,6 +30,7 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QPrinterInfo>
+#include "qfaction.h"
 
 /*! \brief this class extends the QTableView
     \ingroup qf3lib_widgets
@@ -74,6 +75,10 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         void saveExtended(int copyrole=Qt::EditRole, bool flipped=false, bool storeHead=true);
         void saveFlipped(int copyrole=Qt::EditRole);
         void saveExtendedFlipped(int copyrole=Qt::EditRole);
+        void saveTable(int copyrole=Qt::EditRole, bool flipped=false);
+        void saveTableExtended(int copyrole=Qt::EditRole, bool flipped=false);
+        void saveTableFlipped(int copyrole=Qt::EditRole);
+        void saveTableExtendedFlipped(int copyrole=Qt::EditRole);
         void copyAsImage();
         void saveAsImage();
         void copySelectionToExcel(int copyrole=Qt::EditRole, bool storeHead=true, bool flipped=false);
@@ -108,7 +113,12 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         QAction* actSaveExtended;
         QAction* actSaveFlipped;
         QAction* actSaveExtendedFlipped;
+        QAction* actSaveTable;
+        QAction* actSaveTableExtended;
+        QAction* actSaveTableFlipped;
+        QAction* actSaveTableExtendedFlipped;
         QMenu* menuSave;
+        QMenu* menuSaveTable;
         QMenu* menuCopyCSV;
         QMenu* menuCopyExcel;
         QMenu* menuCopyMatlab;

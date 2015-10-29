@@ -21,16 +21,17 @@ Copyright (c) 2012-2015 by Sebastian Isbaner
 
 #include "dialogTable.h"
 #include "ui_dialogTable.h"
+#include "qfaction.h"
 
 DialogTable::DialogTable(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DialogTable)
 {
     ui->setupUi(this);
 
     ui->tableWidget->verticalHeader()->setContextMenuPolicy(Qt::ActionsContextMenu);
-    QAction* insertAction = new QAction("insert new item",ui->tableWidget);
-    QAction* deleteAction = new QAction("delete item",ui->tableWidget);
+    QAction* insertAction = new QFActionWithNoMenuRole("insert new item",ui->tableWidget);
+    QAction* deleteAction = new QFActionWithNoMenuRole("delete item",ui->tableWidget);
     connect(insertAction, SIGNAL(triggered()), this, SLOT(insertItem()));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
     ui->tableWidget->verticalHeader()->addAction(insertAction);

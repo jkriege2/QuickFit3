@@ -63,7 +63,7 @@ static double QFRDRImagingFCSDataExplorer_fExp2( double t, const double *par )
 }*/
 
 QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRImagingFCSDataExplorer)
 {
     stddev=NULL;

@@ -2,7 +2,7 @@
 #define ALVSETTINGSDIALOG_H
 
 #include <QWidget>
-#include <QDialog>
+#include "qfdialog.h"
 #include<QtGlobal>
 #include <QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -16,7 +16,7 @@
 #include "qfpluginservices.h"
 #include "alvsma5edatain.h"
 
-class ALVSettingsDialog : public QDialog
+class ALVSettingsDialog : public QFDialog
 {
     Q_OBJECT
 public:

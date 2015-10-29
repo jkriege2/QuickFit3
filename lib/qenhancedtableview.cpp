@@ -20,6 +20,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 */
 
 #include "qenhancedtableview.h"
+#include "qfaction.h"
 #include <QDebug>
 #include <QSet>
 #include <QApplication>
@@ -31,7 +32,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "matlabtools.h"
 #include "qftextdocumentprintpreview.h"
 #include "programoptions.h"
-#include <QDialog>
+#include "qfdialog.h"
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QLabel>
@@ -42,6 +43,9 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfhtmldelegate.h"
 #include <QSvgGenerator>
 #include "datatools.h"
+#include "qfrdrtableinterface.h"
+#include "qfexporttotabledialog.h"
+#include "qfrawdatapropertyeditor.h"
 
 int copySelectionAsValueErrorToExcelcompare_firstrole=-1;
 
@@ -74,37 +78,37 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent, bool noCopyShortcut):
     addAction(menuCopyMatlab->menuAction());
 
 
-    actCopyExcel=new QAction(QIcon(":/lib/copy16_excel.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
+    actCopyExcel=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_excel.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
     connect(actCopyExcel, SIGNAL(triggered()), this, SLOT(copySelectionToExcel()));
     insertAction(menuCopyExcel->menuAction(), actCopyExcel);
     menuCopyExcel->addAction(actCopyExcel);
-    actCopyExcelNoHead=new QAction(QIcon(":/lib/copy16_excel_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
+    actCopyExcelNoHead=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_excel_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
     if (!noCopyShortcut) actCopyExcelNoHead->setShortcut(QKeySequence::Copy);
     connect(actCopyExcelNoHead, SIGNAL(triggered()), this, SLOT(copySelectionToExcelNoHead()));
     menuCopyExcel->addAction(actCopyExcelNoHead);
     insertAction(menuCopyExcel->menuAction(), actCopyExcelNoHead);
 
-    actCopyCSV=new QAction(QIcon(":/lib/copy16_csv.png"), tr("Copy Selection to Clipboard (CSV)"), this);
+    actCopyCSV=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_csv.png"), tr("Copy Selection to Clipboard (CSV)"), this);
     connect(actCopyCSV, SIGNAL(triggered()), this, SLOT(copySelectionToCSV()));
     menuCopyCSV->addAction(actCopyCSV);
-    actCopyCSVNoHead=new QAction(QIcon(":/lib/copy16_csv_nohead.png"), tr("Copy Selection to clipboard (CSV) without header row/column"), this);
+    actCopyCSVNoHead=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_csv_nohead.png"), tr("Copy Selection to clipboard (CSV) without header row/column"), this);
     //if (!noCopyShortcut) actCopyCSVNoHead->setShortcut(QKeySequence::Copy);
     connect(actCopyCSVNoHead, SIGNAL(triggered()), this, SLOT(copySelectionToCSVNoHead()));
     menuCopyCSV->addAction(actCopyCSVNoHead);
 
-    actCopyMatlab=new QAction(QIcon(":/lib/copy16_matlab.png"), tr("Copy Selection to clipboard (Matlab)"), this);
+    actCopyMatlab=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_matlab.png"), tr("Copy Selection to clipboard (Matlab)"), this);
     connect(actCopyMatlab, SIGNAL(triggered()), this, SLOT(copySelectionToMatlabNoHead()));
     menuCopyMatlab->addAction(actCopyMatlab);
 
-    actCopyImage=new QAction(QIcon(":/lib/copy16_image.png"), tr("Copy table as image"), this);
+    actCopyImage=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_image.png"), tr("Copy table as image"), this);
     connect(actCopyImage, SIGNAL(triggered()), this, SLOT(copyAsImage()));
     addAction(actCopyImage);
 
-    actSaveImage=new QAction(tr("Save table as image"), this);
+    actSaveImage=new QFActionWithNoMenuRole(tr("Save table as image"), this);
     connect(actSaveImage, SIGNAL(triggered()), this, SLOT(saveAsImage()));
     addAction(actSaveImage);
 
-    actPrint=new QAction(QIcon(":/lib/print.png"), tr("&Print Table"), this);
+    actPrint=new QFActionWithNoMenuRole(QIcon(":/lib/print.png"), tr("&Print Table"), this);
     actPrint->setShortcut(QKeySequence::Print);
     connect(actPrint, SIGNAL(triggered()), this, SLOT(print()));
     addAction(actPrint);
@@ -113,18 +117,35 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent, bool noCopyShortcut):
     menuSave->setIcon(QIcon(":/lib/savedata.png"));
     addAction(menuSave->menuAction());
 
-    actSave=new QAction(QIcon(":/lib/savedata.png"), tr("&Save selection"), this);
+    actSave=new QFActionWithNoMenuRole(QIcon(":/lib/savedata.png"), tr("&Save selection"), this);
     connect(actSave, SIGNAL(triggered()), this, SLOT(save()));
     menuSave->addAction(actSave);
-    actSaveFlipped=new QAction(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, flipped"), this);
+    actSaveFlipped=new QFActionWithNoMenuRole(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, flipped"), this);
     connect(actSaveFlipped, SIGNAL(triggered()), this, SLOT(saveFlipped()));
     menuSave->addAction(actSaveFlipped);
-    actSaveExtended=new QAction(QIcon(":/lib/savedata.png"), tr("&Save selection, extended form"), this);
+    actSaveExtended=new QFActionWithNoMenuRole(QIcon(":/lib/savedata.png"), tr("&Save selection, extended form"), this);
     connect(actSaveExtended, SIGNAL(triggered()), this, SLOT(saveExtended()));
     menuSave->addAction(actSaveExtended);
-    actSaveExtendedFlipped=new QAction(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, extended form, flipped"), this);
+    actSaveExtendedFlipped=new QFActionWithNoMenuRole(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, extended form, flipped"), this);
     connect(actSaveExtendedFlipped, SIGNAL(triggered()), this, SLOT(saveExtendedFlipped()));
     menuSave->addAction(actSaveExtendedFlipped);
+
+    menuSaveTable=new QMenu(tr("Save selection to Table RDR in Project"), this);
+    menuSaveTable->setIcon(QIcon(":/table/table_insert.png"));
+    addAction(menuSaveTable->menuAction());
+
+    actSaveTable=new QFActionWithNoMenuRole(QIcon(":/lib/savedata.png"), tr("&Save selection"), this);
+    connect(actSaveTable, SIGNAL(triggered()), this, SLOT(saveTable()));
+    menuSaveTable->addAction(actSaveTable);
+    actSaveTableFlipped=new QFActionWithNoMenuRole(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, flipped"), this);
+    connect(actSaveTableFlipped, SIGNAL(triggered()), this, SLOT(saveTableFlipped()));
+    menuSaveTable->addAction(actSaveTableFlipped);
+    actSaveTableExtended=new QFActionWithNoMenuRole(QIcon(":/lib/savedata.png"), tr("&Save selection, extended form"), this);
+    connect(actSaveTableExtended, SIGNAL(triggered()), this, SLOT(saveTableExtended()));
+    menuSaveTable->addAction(actSaveTableExtended);
+    actSaveTableExtendedFlipped=new QFActionWithNoMenuRole(QIcon(":/lib/savedata_flipped.png"), tr("&Save selection, extended form, flipped"), this);
+    connect(actSaveTableExtendedFlipped, SIGNAL(triggered()), this, SLOT(saveTableExtendedFlipped()));
+    menuSaveTable->addAction(actSaveTableExtendedFlipped);
 }
 
 QEnhancedTableView::~QEnhancedTableView()
@@ -752,7 +773,7 @@ void QEnhancedTableView::print()
     QPrinter* tablePrinter=getPrinter(NULL);
 
     if (tablePrinter) {
-        QDialog* dlg=new QDialog(this);
+        QFDialog* dlg=new QFDialog(this);
         dlg->setWindowTitle(tr("Table print options ..."));
         QGridLayout* lay=new QGridLayout();
         dlg->setLayout(lay);
@@ -825,6 +846,74 @@ void QEnhancedTableView::saveExtended(int copyrole, bool flipped, bool storeHead
 
 }
 
+void QEnhancedTableView::saveTableExtended(int copyrole, bool flipped)
+{
+    if (!model()) return;
+    if (!selectionModel()) return;
+    QList<QList<QVariant> > csvData;
+    QStringList colnames;
+    QStringList rownames;
+    getVariantDataTable(copyrole, csvData, colnames, rownames);
+    //qDebug()<<csvData.size()<<colnames.size();
+    dataExpand(csvData, &colnames);
+    if (flipped)  {
+        csvData=dataRotate(csvData);
+        qSwap(colnames, rownames);
+    }
+
+
+    //QFRDRTableInterface
+    QFExportToTableDialog* dlg=new QFExportToTableDialog(this);
+    QCheckBox* chkOverwriteTable=new QCheckBox(tr("(unchecked: append)"), dlg);
+    chkOverwriteTable->setEnabled(true);
+    dlg->addWidget(tr("overwrite existing table:"), chkOverwriteTable);
+    ProgramOptions::getConfigQCheckBox(chkOverwriteTable, QString("QEnhancedTableView/chkOverwriteTable"), false);
+    if (dlg->exec()) {
+        ProgramOptions::setConfigQCheckBox(chkOverwriteTable, QString("QEnhancedTableView/chkOverwriteTable"));
+        QFRDRTableInterface* tab=dlg->getTable();
+        QFRawDataRecord* rdr=dlg->getRDR();
+        int c=0;
+        bool ok=true;
+        if (tab) {
+            if (!chkOverwriteTable->isChecked()) c=tab->tableGetColumnCount();
+        }
+        QString tabname="";
+        if (dlg->getNewTable(tabname)) {
+            if (tabname.isEmpty()) tabname=tr("NEW_TABLE");
+            rdr=QFPluginServices::getInstance()->getCurrentProject()->addRawData("table", tabname, "");
+            tab=dynamic_cast<QFRDRTableInterface*>(rdr);
+            c=0;
+        }
+        if (tab) {
+            if (rownames.size()>0) {
+                for (int i=0; i<rownames.size(); i++) {
+                    tab->tableSetData(i, c, rownames[i]);
+                }
+                c++;
+            }
+            for (int i=0; i<colnames.size(); i++) {
+                tab->tableSetColumnTitle(i+c, dlg->getPrefix()+colnames[i]);
+            }
+            for (int i=0; i<csvData.size(); i++) {
+                tab->tableSetColumnData(c+i, csvData[i]);
+            }
+        } else {
+            QMessageBox::critical(this, tr("Add data to table"), tr("No table selected or could not create table, or table does not support expressions!"));
+            ok=false;
+        }
+
+        if (ok && rdr && dlg->getShowEditor()) {
+            QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(rdr, false);
+            editor->showTab(1);
+
+        }
+
+    }
+
+
+    delete dlg;
+
+}
 void QEnhancedTableView::saveFlipped(int copyRole)
 {
     save(copyRole, true, true);
@@ -835,7 +924,87 @@ void QEnhancedTableView::saveExtendedFlipped(int copyRole)
     saveExtended(copyRole, true, true);
 }
 
+void QEnhancedTableView::saveTable(int copyrole, bool flipped)
+{
+    if (!model()) return;
+    if (!selectionModel()) return;
+    QList<QList<QVariant> > csvData;
+    QStringList colnames;
+    QStringList rownames;
+    getVariantDataTable(copyrole, csvData, colnames, rownames);
 
+    if (csvData.size()==1) dataExpand(csvData, &colnames);
+    else dataReduce(csvData, &colnames);
+
+    if (flipped)  {
+        csvData=dataRotate(csvData);
+        qSwap(colnames, rownames);
+    }
+
+
+    //QFRDRTableInterface
+    QFExportToTableDialog* dlg=new QFExportToTableDialog(this);
+    QCheckBox* chkOverwriteTable=new QCheckBox(tr("(unchecked: append)"), dlg);
+    chkOverwriteTable->setEnabled(true);
+    dlg->addWidget(tr("overwrite existing table:"), chkOverwriteTable);
+    ProgramOptions::getConfigQCheckBox(chkOverwriteTable, QString("QEnhancedTableView/chkOverwriteTable"), false);
+    if (dlg->exec()) {
+        ProgramOptions::setConfigQCheckBox(chkOverwriteTable, QString("QEnhancedTableView/chkOverwriteTable"));
+        QFRDRTableInterface* tab=dlg->getTable();
+        QFRawDataRecord* rdr=dlg->getRDR();
+        int c=0;
+        bool ok=true;
+        if (tab) {
+            if (!chkOverwriteTable->isChecked()) c=tab->tableGetColumnCount();
+        }
+        QString tabname="";
+        if (dlg->getNewTable(tabname)) {
+            if (tabname.isEmpty()) tabname=tr("NEW_TABLE");
+            rdr=QFPluginServices::getInstance()->getCurrentProject()->addRawData("table", tabname, "");
+            tab=dynamic_cast<QFRDRTableInterface*>(rdr);
+            c=0;
+        }
+        if (tab) {
+            if (rownames.size()>0) {
+                for (int i=0; i<rownames.size(); i++) {
+                    tab->tableSetData(i, c, rownames[i]);
+                }
+                c++;
+            }
+            for (int i=0; i<colnames.size(); i++) {
+                tab->tableSetColumnTitle(i+c, dlg->getPrefix()+colnames[i]);
+            }
+            for (int i=0; i<csvData.size(); i++) {
+                tab->tableSetColumnData(c+i, csvData[i]);
+            }
+        } else {
+            QMessageBox::critical(this, tr("Add data to table"), tr("No table selected or could not create table, or table does not support expressions!"));
+            ok=false;
+        }
+
+        if (ok && rdr && dlg->getShowEditor()) {
+            QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(rdr, false);
+            editor->showTab(1);
+
+        }
+
+    }
+
+
+    delete dlg;
+
+}
+
+
+void QEnhancedTableView::saveTableFlipped(int copyRole)
+{
+    saveTable(copyRole, true);
+}
+
+void QEnhancedTableView::saveTableExtendedFlipped(int copyRole)
+{
+    saveTableExtended(copyRole, true);
+}
 
 void QEnhancedTableView::copyAsImage()
 {

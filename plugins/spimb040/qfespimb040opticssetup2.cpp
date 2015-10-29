@@ -211,7 +211,7 @@ QFESPIMB040OpticsSetup2::QFESPIMB040OpticsSetup2(QWidget* pluginMainWidget, QWid
     connect(ui->cmbLightpathConfig, SIGNAL(configsChanged(QFESPIMB040OpticsSetupItems)), this, SLOT(configsChanged(QFESPIMB040OpticsSetupItems)));
     connect(ui->cmbLightpathConfig, SIGNAL(currentConfigChanged(QString)), this, SLOT(userChangedLightpath(QString)));
 
-    actMainShutter=new QAction(QIcon(":/spimb040/shutter_opened.png"), tr("main shutter"), this);
+    actMainShutter=new QFActionWithNoMenuRole(QIcon(":/spimb040/shutter_opened.png"), tr("main shutter"), this);
     actMainShutter->setCheckable(true);
     actMainShutter->setChecked(true);
     connect(actMainShutter, SIGNAL(triggered(bool)), this, SLOT(mainShutterToggled(bool)));

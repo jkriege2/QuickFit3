@@ -24,14 +24,14 @@
 #ifndef QFERTRESULTCALCULATOR_H
 #define QFERTRESULTCALCULATOR_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfrawdatarecord.h"
 
 namespace Ui {
 class QFERTResultCalculator;
 }
 
-class QFERTResultCalculator : public QDialog
+class QFERTResultCalculator : public QFDialog
 {
     Q_OBJECT
     

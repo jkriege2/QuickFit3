@@ -22,13 +22,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef DLGCONTACTAUTHORS_H
 #define DLGCONTACTAUTHORS_H
 
-#include <QDialog>
+#include "qfdialog.h"
+#include "qfdialog.h"
 
 namespace Ui {
     class DlgContactAuthors;
 }
 
-class DlgContactAuthors : public QDialog
+class DlgContactAuthors : public QFDialog
 {
         Q_OBJECT
         

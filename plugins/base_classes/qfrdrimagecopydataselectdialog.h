@@ -22,13 +22,13 @@
 #ifndef QFRDRImageCOPYDATASELECTDIALOG_H
 #define QFRDRImageCOPYDATASELECTDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFRDRImageCopyDataSelectDialog;
 }
 
-class QFRDRImageCopyDataSelectDialog : public QDialog
+class QFRDRImageCopyDataSelectDialog : public QFDialog
 {
     Q_OBJECT
 

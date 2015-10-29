@@ -326,13 +326,13 @@ void QModernProgressWidget::paintEvent(QPaintEvent *event) {
 
 
 QModernProgressDialog::QModernProgressDialog(QWidget* parent, Qt::WindowFlags f):
-    QDialog(parent, f)
+    QFDialog(parent, f)
 {
     createWidgets();
 }
 
 QModernProgressDialog::QModernProgressDialog(const QString & labelText, const QString & cancelButtonText, QWidget* parent, Qt::WindowFlags f):
-    QDialog(parent, f)
+    QFDialog(parent, f)
 {
     createWidgets();
     setLabelText(labelText);
@@ -375,7 +375,7 @@ void QModernProgressDialog::createWidgets() {
 
 
 void QModernProgressDialog::showEvent(QShowEvent* event) {
-    QDialog::showEvent(event);
+    QFDialog::showEvent(event);
     m_wasCancel=false;
     progress->setSpin(true);
 

@@ -24,7 +24,7 @@
 #include "ui_qfespimb040shortcutconfigdialog.h"
 
 QFESPIMB040ShortcutConfigDialog::QFESPIMB040ShortcutConfigDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFESPIMB040ShortcutConfigDialog)
 {
     ui->setupUi(this);

@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFIMFCCSFITCHI2LANDSCAPEDIALOG_H
 #define QFIMFCCSFITCHI2LANDSCAPEDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfimfccsfitchi2landscapedialog.h"
 #include "qfimfccsfitevaluation_item.h"
 
@@ -30,7 +30,7 @@ namespace Ui {
     class QFImFCCSFitChi2LandscapeDialog;
 }
 
-class QFImFCCSFitChi2LandscapeDialog : public QDialog
+class QFImFCCSFitChi2LandscapeDialog : public QFDialog
 {
         Q_OBJECT
         

@@ -27,7 +27,7 @@
 #include <QClipboard>
 
 PasteImageDlg::PasteImageDlg(const QString &directory, QWidget *parent, const QString &inputImageFile, const QString &filenameTemplate) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::PasteImageDlg)
 {
     ui->setupUi(this);

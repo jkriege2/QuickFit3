@@ -33,7 +33,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "programoptions.h"
 
 dlgCSVParameters::dlgCSVParameters(QWidget* parent, int mode, QString startswith, QString endswith, QString columnSeparator, QString commentStart, double timefactor, int startInLine):
-    QDialog(parent)
+    QFDialog(parent)
 {
     updating=false;
     setupUi(this);

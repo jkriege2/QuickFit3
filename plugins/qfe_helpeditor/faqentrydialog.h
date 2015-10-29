@@ -24,13 +24,13 @@
 #ifndef FAQENTRYDIALOG_H
 #define FAQENTRYDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class FAQEntryDialog;
 }
 
-class FAQEntryDialog : public QDialog
+class FAQEntryDialog : public QFDialog
 {
         Q_OBJECT
 

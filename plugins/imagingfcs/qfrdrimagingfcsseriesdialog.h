@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFRDRIMAGINGFCSSERIESDIALOG_H
 #define QFRDRIMAGINGFCSSERIESDIALOG_H
 #include <QList>
-#include <QDialog>
+#include "qfdialog.h"
 #include <QSettings>
 #include "qfpluginservices.h"
 #include "programoptions.h"
@@ -31,7 +31,7 @@ namespace Ui {
     class QFRDRImagingFCSSeriesDialog;
 }
 
-class QFRDRImagingFCSSeriesDialog : public QDialog
+class QFRDRImagingFCSSeriesDialog : public QFDialog
 {
         Q_OBJECT
         

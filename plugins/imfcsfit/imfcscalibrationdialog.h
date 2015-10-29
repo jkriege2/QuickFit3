@@ -22,14 +22,14 @@
 #ifndef IMFCSCALIBRATIONDIALOG_H
 #define IMFCSCALIBRATIONDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QList>
 
 namespace Ui {
     class ImFCSCalibrationDialog;
 }
 
-class ImFCSCalibrationDialog : public QDialog
+class ImFCSCalibrationDialog : public QFDialog
 {
     Q_OBJECT
 

@@ -182,6 +182,7 @@ void QFEFCSSimScriptTab::setFilename(const QString &filename)
 {
     this->filename=filename;
     ui->labFile->setText(filename);
+    emit filenameChanged(QFileInfo(filename).absoluteFilePath());
 }
 
 void QFEFCSSimScriptTab::startProcess()

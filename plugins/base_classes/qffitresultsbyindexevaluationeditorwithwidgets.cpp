@@ -148,9 +148,9 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     vbl->addWidget(toolbar);
     vbl->addWidget(toolbar2);
     toolbar2->setVisible(twoToolbars);
-    /*actSaveReport=new QAction(QIcon(":/lib/fit_savereport.png"), tr("Save Report"), this);
+    /*actSaveReport=new QFActionWithNoMenuRole(QIcon(":/lib/fit_savereport.png"), tr("Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
-    actPrintReport=new QAction(QIcon(":/lib/fit_printreport.png"), tr("Print Report"), this);
+    actPrintReport=new QFActionWithNoMenuRole(QIcon(":/lib/fit_printreport.png"), tr("Print Report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));*/
     QLabel* lPS=new QLabel(tr("   &Curves: "), toolbar);
     lPS->setFont(boldfont);
@@ -495,7 +495,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     layButtons->addWidget(btnGuessRunsAll, row, 1);
 
     row++;
-    actChi2Landscape=new QAction(tr("&Plot &Chi2 Landscape"), this);
+    actChi2Landscape=new QFActionWithNoMenuRole(tr("&Plot &Chi2 Landscape"), this);
     connect(actChi2Landscape, SIGNAL(triggered()), this, SLOT(plotChi2Landscape()));
 
 
@@ -681,15 +681,15 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
 
 
-    actFitAllFilesThreaded=new QAction(QIcon(":/lib/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files, this %1 (MT)").arg(m_runName), this);
+    actFitAllFilesThreaded=new QFActionWithNoMenuRole(QIcon(":/lib/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files, this %1 (MT)").arg(m_runName), this);
     actFitAllFilesThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
     connect (actFitAllFilesThreaded, SIGNAL(triggered()), this, SLOT(fitAllFilesThreaded()));
 
-    actFitAllThreaded=new QAction(QIcon(":/lib/fit_fitall.png"), tr("Fit Everything (MT)"), this);
+    actFitAllThreaded=new QFActionWithNoMenuRole(QIcon(":/lib/fit_fitall.png"), tr("Fit Everything (MT)"), this);
     actFitAllThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, and all %1s therein (everything)").arg(m_runName));
     connect (actFitAllThreaded, SIGNAL(triggered()), this, SLOT(fitEverythingThreaded()));
 
-    actFitAllRunsThreaded=new QAction(QIcon(":/lib/fit_fitallruns.png"), tr("Fit All %1s, this file (MT)").arg(m_runName), this);
+    actFitAllRunsThreaded=new QFActionWithNoMenuRole(QIcon(":/lib/fit_fitallruns.png"), tr("Fit All %1s, this file (MT)").arg(m_runName), this);
     actFitAllRunsThreaded->setToolTip(tr("multi-threaded: perform a fit for all %1s, in the current file").arg(m_runName));
     connect (actFitAllRunsThreaded, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
 
@@ -1270,7 +1270,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
             if (ffunc->isParameterXYEstimateable(i)
                     && (d.widgetType==QFFitFunction::LogFloatNumber || d.widgetType==QFFitFunction::FloatNumber)
                     && (d.fit || d.userEditable)) {
-                QAction* act=new QAction(tr("... parameter '%1'").arg(d.name), this);
+                QAction* act=new QFActionWithNoMenuRole(tr("... parameter '%1'").arg(d.name), this);
                 connect(act, SIGNAL(triggered()), this, SLOT(estimateActionClicked()));
                 actsEstimate.insert(act, id);
                 menuEstimate->addAction(act);

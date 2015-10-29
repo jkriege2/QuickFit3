@@ -1,7 +1,7 @@
 #include "alvsettingsdialog.h"
 #define LOG_PREFIX "[ALV5000/alvsettingsdialog]: "
 ALVSettingsDialog::ALVSettingsDialog(QSettings& settings, AlvSmA5EDataIn *new_sm_data_in, QWidget *parent) :
-    QDialog(parent)
+    QFDialog(parent)
 {
     sm_data_in = new_sm_data_in;
 

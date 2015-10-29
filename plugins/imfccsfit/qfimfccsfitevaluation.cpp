@@ -79,7 +79,7 @@ QFEvaluationItem* QFImFCCSFitEvaluation::createRecord(QFProject* parent) {
 
 
 void QFImFCCSFitEvaluation::registerToMenu(QMenu* menu) {
-    QAction* actAddEval=new QAction(QIcon(getIconFilename()), tr("imFCCS Curve Fitting"), parentWidget);
+    QAction* actAddEval=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("imFCCS Curve Fitting"), parentWidget);
     actAddEval->setStatusTip(getDescription());
     connect(actAddEval, SIGNAL(triggered()), this, SLOT(insertEvaluation()));
     menu->addAction(actAddEval);
@@ -89,18 +89,18 @@ void QFImFCCSFitEvaluation::init()
 {
     QMenu* menu=new QMenu(tr("imFCCS"), parentWidget);
     menu->setIcon(QIcon(getIconFilename()));
-    QAction* actI=new QAction(tr("calculate &relative intensity"), menu);
+    QAction* actI=new QFActionWithNoMenuRole(tr("calculate &relative intensity"), menu);
     connect(actI, SIGNAL(triggered()), this, SLOT(calcRelativeIntensity()));
     menu->addAction(actI);
     menu->addSeparator();
-    QAction* actCCF=new QAction(tr("calculate &rel. CCF amplitude"), menu);
+    QAction* actCCF=new QFActionWithNoMenuRole(tr("calculate &rel. CCF amplitude"), menu);
     connect(actCCF, SIGNAL(triggered()), this, SLOT(calcRelativeCCF()));
     menu->addAction(actCCF);
-    QAction* actCCFCT=new QAction(tr("calculate &rel. CCF amplitude, crosstalk correction"), menu);
+    QAction* actCCFCT=new QFActionWithNoMenuRole(tr("calculate &rel. CCF amplitude, crosstalk correction"), menu);
     connect(actCCFCT, SIGNAL(triggered()), this, SLOT(calcRelativeCCFCrosstalk()));
     menu->addAction(actCCFCT);
     menu->addSeparator();
-    QAction* actAmpFit=new QAction(tr("imFCCS amplitude fit"), menu);
+    QAction* actAmpFit=new QFActionWithNoMenuRole(tr("imFCCS amplitude fit"), menu);
     connect(actAmpFit, SIGNAL(triggered()), this, SLOT(calcAmplitudeFit()));
     menu->addAction(actAmpFit);
     actAmpFit->setEnabled(false);

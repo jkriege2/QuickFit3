@@ -26,7 +26,7 @@
 #include "qftools.h"
 
 NewTableDialog::NewTableDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::NewTableDialog)
 {
     ui->setupUi(this);

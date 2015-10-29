@@ -29,7 +29,7 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
 {
 
     btnAvgRunVisible=true;
-    actMaskByImage=new QAction(QIcon(":/qfrdrmaskeditor/maskbyimage.png"), tr("create a mask from the current overview image ..."), this);
+    actMaskByImage=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/maskbyimage.png"), tr("create a mask from the current overview image ..."), this);
     connect(actMaskByImage, SIGNAL(triggered()), this, SLOT(excludeByImage()));
     runSelectWidget=false;
     int row=0;
@@ -111,7 +111,7 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     labInfo->setTextFormat(Qt::RichText);
     gl->addWidget(labInfo, row, 0, 1, 2);
 
-    actEditSelection=new QAction(QIcon(":/qfrdrmaskeditor/mask.png"), tr("edit mask"), this);
+    actEditSelection=new QFActionWithNoMenuRole(QIcon(":/qfrdrmaskeditor/mask.png"), tr("edit mask"), this);
     actEditSelection->setCheckable(true);
     actEditSelection->setChecked(false);
     actEditSelection->setVisible(false);

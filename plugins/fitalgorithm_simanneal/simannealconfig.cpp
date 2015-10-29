@@ -25,7 +25,7 @@
 
 
 SimannealConfigDialog::SimannealConfigDialog(QWidget *parent):
-    QDialog(parent)
+    QFDialog(parent)
 {
     // setup widgets
 

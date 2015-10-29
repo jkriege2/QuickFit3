@@ -335,15 +335,15 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
 
 
 void QFESPIMB040SimpleCameraConfig::createActions() {
-    actDisConnect = new QAction(QIcon(":/spimb040/acquisitionconnect.png"), tr("&Connect"), this);
+    actDisConnect = new QFActionWithNoMenuRole(QIcon(":/spimb040/acquisitionconnect.png"), tr("&Connect"), this);
     actDisConnect->setCheckable(true);
     connect(actDisConnect, SIGNAL(toggled(bool)), this, SLOT(disConnectAcquisitionDevice()));
 
-    actStartStopPreview = new QAction(QIcon(":/spimb040/acquisitionstart.png"), tr("&Start acquisition"), this);
+    actStartStopPreview = new QFActionWithNoMenuRole(QIcon(":/spimb040/acquisitionstart.png"), tr("&Start acquisition"), this);
     actStartStopPreview->setCheckable(true);
     connect(actStartStopPreview, SIGNAL(toggled(bool)), this, SLOT(startStopPreview()));
 
-    actPreviewSingle = new QAction(QIcon(":/spimb040/acquisitionsingle.png"), tr("&Acquire single image"), this);
+    actPreviewSingle = new QFActionWithNoMenuRole(QIcon(":/spimb040/acquisitionsingle.png"), tr("&Acquire single image"), this);
     connect(actPreviewSingle, SIGNAL(triggered()), this, SLOT(previewSingle()));
 
     actPreviewConfig=cmbPreviewConfiguration->configAction();

@@ -24,7 +24,7 @@
 #ifndef QFRDRTABLEINDEXEDSTATDIALOG_H
 #define QFRDRTABLEINDEXEDSTATDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfproperties.h"
 #include <QMap>
 #include <QList>
@@ -38,7 +38,7 @@ namespace Ui {
     class QFRDRTableIndexedStatDialog;
 }
 
-class QFRDRTableIndexedStatDialog : public QDialog
+class QFRDRTableIndexedStatDialog : public QFDialog
 {
         Q_OBJECT
 

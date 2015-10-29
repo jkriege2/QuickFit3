@@ -41,9 +41,9 @@ QFTableModel::QFTableModel(QObject * parent):
     undoMaxSteps=50;
     undoIsMultiStep=0;
     rdlID=0;
-    actUndo=new QAction(QIcon(":/lib/undo.png"), tr("Undo"), this);
+    actUndo=new QFActionWithNoMenuRole(QIcon(":/lib/undo.png"), tr("Undo"), this);
     actUndo->setShortcut(QKeySequence::Undo);
-    actRedo=new QAction(QIcon(":/lib/redo.png"), tr("Redo"), this);
+    actRedo=new QFActionWithNoMenuRole(QIcon(":/lib/redo.png"), tr("Redo"), this);
     actRedo->setShortcut(QKeySequence::Redo);
     setUndoEnabled(false);
     //quint64 a=xyAdressToUInt32(5, 5);
@@ -106,7 +106,7 @@ QVariant QFTableModel::headerData(int section, Qt::Orientation orientation, int 
          } else if (state.headerDataMap.contains(section)) {
              return state.headerDataMap[section].value(role, QVariant());
          }
-     } else if (orientation == Qt::Vertical && role == Qt::DisplayRole) {
+     } else if (orientation == Qt::Vertical) {
          if (role==Qt::DisplayRole) {
              QString name="";
              if (verticalHeaderShowRowNumbers) name=QString::number(section+1);
@@ -1274,7 +1274,14 @@ void QFTableModel::setRowTitleCreate(quint32 row, QString name)
     if (readonly) return;
     startMultiUndo();
     resize(qMax(state.rows, quint32(row+1)), state.columns);
-    if (int64_t(row)<state.rowNames.size()) state.rowNames[row]=name;
+    if (int64_t(row)<state.rowNames.size()) {
+        state.rowNames[row]=name;
+    } else {
+        while (state.rowNames.size()>=int64_t(row)) {
+            state.rowNames.append("");
+        }
+        state.rowNames[row]=name;
+    }
     if (doEmitSignals) {
         emit headerDataChanged(Qt::Vertical, row, row);
         emit rowTitleChanged(row);

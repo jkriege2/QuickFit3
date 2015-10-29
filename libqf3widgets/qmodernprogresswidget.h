@@ -25,7 +25,7 @@
 #include <QColor>
 #include <QTimer>
 #include <QImage>
-#include <QDialog>
+#include "qfdialog.h"
 #include <QLabel>
 #include <QPushButton>
 #include <QApplication>
@@ -183,7 +183,7 @@ class QFWIDLIB_EXPORT QModernProgressWidget : public QWidget {
 
     The dialog is displayed at the screen center if setCentered() is set \c true.
 */
-class QFWIDLIB_EXPORT QModernProgressDialog: public QDialog {
+class QFWIDLIB_EXPORT QModernProgressDialog: public QFDialog {
         Q_OBJECT
     public:
         QModernProgressDialog(QWidget* parent=NULL, Qt::WindowFlags f = 0);

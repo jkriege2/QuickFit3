@@ -22,13 +22,13 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFRDRREPLACEDIALOG_H
 #define QFRDRREPLACEDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFRDRReplaceDialog;
 }
 
-class QFRDRReplaceDialog : public QDialog
+class QFRDRReplaceDialog : public QFDialog
 {
         Q_OBJECT
         

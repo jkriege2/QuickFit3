@@ -27,7 +27,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfversion.h"
 
 DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DlgCalcDiffCoeff)
 {
 

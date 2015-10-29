@@ -67,7 +67,7 @@ void QFEFCSSimulator::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
 	services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
     
-    QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("FCS Simulator (\"diffusion4\")"), this);
+    QAction* actStartPlugin=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("FCS Simulator (\"diffusion4\")"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
 
     QMenu* extm=services->getMenu("tools");

@@ -229,7 +229,7 @@ void QFEnhancedLineEdit::addContextMenuEntry(const QString &name, QVariant data)
 }
 
 void QFEnhancedLineEdit::addContextMenuEntry(const QIcon& icon, const QString &name, QVariant data) {
-    QAction* act=new QAction(icon, name, this);
+    QAction* act=new QFActionWithNoMenuRole(icon, name, this);
     act->setData(data);
     intInsertAction(name, act);
 }
@@ -240,7 +240,7 @@ void QFEnhancedLineEdit::addContextMenuEntry(const QString &name, const QObject 
 }
 
 void QFEnhancedLineEdit::addContextMenuEntry(const QIcon &icon, const QString &name, const QObject *receiver, const char *method) {
-    QAction* act=new QAction(icon, name, this);
+    QAction* act=new QFActionWithNoMenuRole(icon, name, this);
     connect(act, SIGNAL(triggered()), receiver, method);
     intInsertAction(name, act);
 }
@@ -250,7 +250,7 @@ void QFEnhancedLineEdit::addInsertContextMenuEntry(const QString &name, const QS
 }
 
 void QFEnhancedLineEdit::addInsertContextMenuEntry(const QIcon &icon, const QString &name, const QString &insert) {
-    QAction* act=new QAction(icon, name, this);
+    QAction* act=new QFActionWithNoMenuRole(icon, name, this);
     act->setData(insert);
     connect(act, SIGNAL(triggered()), this, SLOT(insertActTriggered()));
     intInsertAction(name, act);

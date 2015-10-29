@@ -309,19 +309,19 @@ QFAcquisitionConfigEditorWidget::QFAcquisitionConfigEditorWidget(QWidget* parent
     layout->addWidget(combobox, 2);
     connect(combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCurrentIndexChanged(int)));
 
-    actConfig = new QAction(QIcon(":/libqf3widgets/acquisition_configuration.png"), tr("&Configure"), this);
+    actConfig = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/acquisition_configuration.png"), tr("&Configure"), this);
     connect(actConfig, SIGNAL(triggered()), combobox, SLOT(editCurrent()));
 
-    actAdd = new QAction(QIcon(":/libqf3widgets/config_add.png"), tr("&Add new Configuration"), this);
+    actAdd = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/config_add.png"), tr("&Add new Configuration"), this);
     connect(actAdd, SIGNAL(triggered()), combobox, SLOT(addNew()));
 
-    actRename = new QAction(QIcon(":/libqf3widgets/config_rename.png"), tr("&Rename Configuration As ..."), this);
+    actRename = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/config_rename.png"), tr("&Rename Configuration As ..."), this);
     connect(actRename, SIGNAL(triggered()), combobox, SLOT(renameCurrent()));
 
-    actSaveAs = new QAction(QIcon(":/libqf3widgets/config_saveas.png"), tr("&Save Configuration As ..."), this);
+    actSaveAs = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/config_saveas.png"), tr("&Save Configuration As ..."), this);
     connect(actSaveAs, SIGNAL(triggered()), combobox, SLOT(saveAsCurrent()));
 
-    actDelete = new QAction(QIcon(":/libqf3widgets/config_delete.png"), tr("&Delete Configuration"), this);
+    actDelete = new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/config_delete.png"), tr("&Delete Configuration"), this);
     connect(actDelete, SIGNAL(triggered()), combobox, SLOT(deleteCurrent()));
 
     layout->addSpacing(5);

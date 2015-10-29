@@ -24,7 +24,7 @@
 #ifndef QFRDRTABLE2DHISTOGRAMDIALOG_H
 #define QFRDRTABLE2DHISTOGRAMDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfproperties.h"
 #include <QMap>
 #include <QList>
@@ -35,7 +35,7 @@ namespace Ui {
     class QFRDRTable2DHistogramDialog;
 }
 
-class QFRDRTable2DHistogramDialog : public QDialog
+class QFRDRTable2DHistogramDialog : public QFDialog
 {
         Q_OBJECT
         

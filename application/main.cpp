@@ -104,6 +104,8 @@ int main(int argc, char * argv[])
         QApplication app(argc, argv);
 
         {
+
+
             if (!QFile::exists(app.applicationDirPath()+"/plugins/ATMCD32D.dll") && QFile::exists(app.applicationDirPath()+"/ATMCD32D.dll")) {
                 QFile::copy(app.applicationDirPath()+"/ATMCD32D.dll", app.applicationDirPath()+"/plugins/ATMCD32D.dll");
             }
@@ -139,6 +141,12 @@ int main(int argc, char * argv[])
             app.processEvents();
 
             ProgramOptions* settings=new ProgramOptions("", &app, &app);
+
+            {
+                QFont f=QApplication::font();
+                f.setPointSize(settings->getConfigValue("quickfit/base_pointsize", f.pointSize()).toInt());
+                QApplication::setFont(f);
+            }
 
             JKQtBasePlotter::setDefaultJKQtBasePrinterUserSettings(settings->getIniFilename(), "JKQtBasePlotterUserSettings/");
 

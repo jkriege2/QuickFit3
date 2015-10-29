@@ -1,7 +1,7 @@
 #ifndef QFETCSPCIMPORTERLIFETIMEVIEW_H
 #define QFETCSPCIMPORTERLIFETIMEVIEW_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfplotter.h"
 #include <QVector>
 #include <QList>
@@ -12,7 +12,7 @@ namespace Ui {
     class QFETCSPCImporterLifetimeView;
 }
 
-class QFETCSPCImporterLifetimeView : public QDialog
+class QFETCSPCImporterLifetimeView : public QFDialog
 {
         Q_OBJECT
 

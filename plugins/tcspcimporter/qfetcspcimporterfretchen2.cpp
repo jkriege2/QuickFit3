@@ -15,7 +15,7 @@
 #include "qfrawdatarecord.h"
 
 QFETCSPCImporterFretchen2::QFETCSPCImporterFretchen2(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFETCSPCImporterFretchen2)
 {
     setAttribute(Qt::WA_DeleteOnClose);
@@ -526,7 +526,7 @@ void QFETCSPCImporterFretchen2::on_btnSaveMultiToProject_clicked()
     QStringList files;
     int cnt=collectMultiData(out, outF, files);
     if (cnt>0) {
-        saveToProject(out, outF, files.join(", "), 1);
+        saveToProject(out, outF, files.join(", "));
     }
 }
 

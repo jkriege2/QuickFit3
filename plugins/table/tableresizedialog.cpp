@@ -25,7 +25,7 @@
 #include "ui_tableresizedialog.h"
 
 TableResizeDialog::TableResizeDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::TableResizeDialog)
 {
     ui->setupUi(this);

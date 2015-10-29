@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QFRDRIMAGINGFCSMASKBYINTENSITY_H
 #define QFRDRIMAGINGFCSMASKBYINTENSITY_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <stdint.h>
 #include "jkqtpimageelements.h"
 #include "jkqtpimagetools.h"
@@ -34,7 +34,7 @@ namespace Ui {
 /*! \brief This dialog allows to select pixels by intensity
     \ingroup qf3rdrdp_imaging_fcs
 */
-class QFRDRImagingFCSMaskByIntensity : public QDialog
+class QFRDRImagingFCSMaskByIntensity : public QFDialog
 {
         Q_OBJECT
         

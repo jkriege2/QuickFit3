@@ -24,7 +24,7 @@
 #include "ui_qfespimb040samplestagestepconfigdialog.h"
 
 QFESPIMB040SampleStageStepConfigDialog::QFESPIMB040SampleStageStepConfigDialog(double x, double y, double z, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFESPIMB040SampleStageStepConfigDialog)
 {
     ui->setupUi(this);

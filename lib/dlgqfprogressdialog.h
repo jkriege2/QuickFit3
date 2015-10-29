@@ -22,7 +22,7 @@
 #ifndef DLGQFPROGRESSDIALOG_H
 #define DLGQFPROGRESSDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "lib_imexport.h"
 #include "qffitalgorithm.h"
 
@@ -51,7 +51,7 @@ namespace Ui {
 
 
 */
-class QFLIB_EXPORT dlgQFProgressDialog : public QDialog
+class QFLIB_EXPORT dlgQFProgressDialog : public QFDialog
 {
         Q_OBJECT
     public:

@@ -22,7 +22,7 @@
 #ifndef QFQFDlgCSVParameters_H
 #define QFQFDlgCSVParameters_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QMessageBox>
 #include "lib_imexport.h"
 #include "qftablemodel.h"
@@ -42,7 +42,7 @@ namespace Ui {
     If you set any of the parameter in the constructor to an empty char or string, the according widget will be disabled.
 
  */
-class QFLIB_EXPORT QFDlgCSVParameters : public QDialog
+class QFLIB_EXPORT QFDlgCSVParameters : public QFDialog
 {
         Q_OBJECT
     public:

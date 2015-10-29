@@ -1,13 +1,13 @@
 #ifndef QFRDRIMAGINGFCSPIXELFROMOBJECTIVE_H
 #define QFRDRIMAGINGFCSPIXELFROMOBJECTIVE_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFRDRImagingFCSPixelFromObjective;
 }
 
-class QFRDRImagingFCSPixelFromObjective : public QDialog
+class QFRDRImagingFCSPixelFromObjective : public QFDialog
 {
         Q_OBJECT
 

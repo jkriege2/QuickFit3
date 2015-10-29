@@ -33,7 +33,7 @@
 #include "ui_qffitalgorithmlmfitconfig.h"
 
 QFFitAlgorithmLMFitConfigDialog::QFFitAlgorithmLMFitConfigDialog(QWidget *parent, bool IRLS) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFFitAlgorithmLMFitConfigDialog)
 {
     ui->setupUi(this);

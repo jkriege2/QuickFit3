@@ -145,7 +145,7 @@ void fFiles(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathPars
 
 
 DlgSetRDRPropertyByExpression::DlgSetRDRPropertyByExpression(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DlgSetRDRPropertyByExpression)
 {
 

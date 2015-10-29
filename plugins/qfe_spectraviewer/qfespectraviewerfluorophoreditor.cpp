@@ -29,7 +29,7 @@
 #include "qfstyledbutton.h"
 
 QFESpectraViewerFluorophoreEditor::QFESpectraViewerFluorophoreEditor(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFESpectraVieweFluorophoreEditor)
 {
     ui->setupUi(this);

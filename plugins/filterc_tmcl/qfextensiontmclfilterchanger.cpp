@@ -464,7 +464,7 @@ void QFExtensionTMCLFilterChanger::readGlobalSettings(QSettings &inifile, const 
         s.infoMessage="";
         s.lastAction=QTime::currentTime();
         s.tmcl=new QF3TMCLProtocolHandler(ports.getCOMPort(s.port), getName());
-        s.actRealign=new QAction(tr("realign filter changer #%1").arg(i+1), this);
+        s.actRealign=new QFActionWithNoMenuRole(tr("realign filter changer #%1").arg(i+1), this);
         connect(s.actRealign, SIGNAL(triggered()), this, SLOT(realignFW()));
         s.actRealign->setEnabled(false);
         if (fcMenu) fcMenu->addAction(s.actRealign);

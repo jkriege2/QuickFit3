@@ -31,6 +31,7 @@
 #include "qfrawdatarecord.h"
 #include <QVariant>
 #include "qfversion.h"
+#include "qfaction.h"
 
 // forward declaration
 class QFEvaluationItem;

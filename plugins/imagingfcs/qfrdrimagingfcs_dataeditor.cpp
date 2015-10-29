@@ -275,7 +275,7 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     menuMask->addSeparator();
     correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
 
-    actCorrectOffset=new QAction(tr("correct CFs for offset"), this);
+    actCorrectOffset=new QFActionWithNoMenuRole(tr("correct CFs for offset"), this);
     connect(actCorrectOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
     menuTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"), -1);
     //menuData->addAction(actCopyNormalizedACF);

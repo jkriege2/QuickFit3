@@ -120,8 +120,8 @@ QFFunctionReferenceTool::QFFunctionReferenceTool(QObject *parent) :
     labHelp=NULL;
     labTemplate=NULL;
 
-    actDefaultHelp=new QAction(tr("show parser help"), this);
-    actCurrentFunctionHelp=new QAction(tr("help for function under cursor"), this);
+    actDefaultHelp=new QFActionWithNoMenuRole(tr("show parser help"), this);
+    actCurrentFunctionHelp=new QFActionWithNoMenuRole(tr("help for function under cursor"), this);
     connect(actDefaultHelp, SIGNAL(triggered()), SLOT(showDefaultHelp()));
     connect(actCurrentFunctionHelp, SIGNAL(triggered()), SLOT(showCurrentFunctionHelp()));
     connect(&timDelayedAddNamesAndTemplates, SIGNAL(timeout()), this, SLOT(delayedAddNamesAndTemplates()));

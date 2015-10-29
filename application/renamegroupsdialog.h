@@ -22,14 +22,14 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef RENAMEGROUPSDIALOG_H
 #define RENAMEGROUPSDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QStringListModel>
 
 namespace Ui {
     class RenameGroupsDialog;
 }
 
-class RenameGroupsDialog : public QDialog
+class RenameGroupsDialog : public QFDialog
 {
         Q_OBJECT
         

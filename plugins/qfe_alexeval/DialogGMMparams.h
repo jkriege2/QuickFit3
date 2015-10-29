@@ -22,7 +22,7 @@ Copyright (c) 2012-2015 by Sebastian Isbaner
 #ifndef DIALOGGMMPARAMS_H
 #define DIALOGGMMPARAMS_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "alexdata.h"
 
 namespace Ui {
@@ -50,7 +50,7 @@ public:
 };
 
 
-class DialogGMMparams : public QDialog
+class DialogGMMparams : public QFDialog
 {
     Q_OBJECT
     

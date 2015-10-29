@@ -24,13 +24,13 @@
 #ifndef PASTEIMAGEDLG_H
 #define PASTEIMAGEDLG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class PasteImageDlg;
 }
 
-class PasteImageDlg : public QDialog
+class PasteImageDlg : public QFDialog
 {
         Q_OBJECT
         

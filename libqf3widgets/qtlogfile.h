@@ -53,6 +53,7 @@
 #include <QToolButton>
 #include <QCheckBox>
 #include "jkstyledbutton.h"
+#include "qfaction.h"
 
 
 /** \brief this is the indention increment when calling LogFile.inc_indent()

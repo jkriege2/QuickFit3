@@ -23,7 +23,7 @@
 #ifndef QFESpectraVieweFluorophoreEditor_H
 #define QFESpectraVieweFluorophoreEditor_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "spectrummanager.h"
 #include "qftablemodel.h"
 
@@ -31,7 +31,7 @@ namespace Ui {
     class QFESpectraVieweFluorophoreEditor;
 }
 
-class QFESpectraViewerFluorophoreEditor : public QDialog
+class QFESpectraViewerFluorophoreEditor : public QFDialog
 {
         Q_OBJECT
         

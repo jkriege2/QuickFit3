@@ -122,7 +122,7 @@ void QFExtensionServoPololuMaestro::initExtension() {
         }
     }
 
-    QAction* action=new QAction(QIcon(getIconFilename()), tr("Test Pololu Maestro"), this);
+    QAction* action=new QFActionWithNoMenuRole(QIcon(getIconFilename()), tr("Test Pololu Maestro"), this);
     connect(action, SIGNAL(triggered()), this, SLOT(showTester()));
     if (services) {
         QMenu* m=services->getMenu("extensions");
@@ -259,7 +259,7 @@ void QFExtensionServoPololuMaestro::showShutterSettingsDialog(unsigned int /*shu
         // and add implementations
         /////////////////////////////////////////////////////////////////////////////////
 
-        QDialog* dlg=new QDialog(parent);
+        QDialog* dlg=new QFDialog(parent);
 
         QVBoxLayout* lay=new QVBoxLayout();
         dlg->setLayout(lay);

@@ -26,7 +26,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QFile>
 
 DlgNewVersion::DlgNewVersion(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DlgNewVersion)
 {
     ui->setupUi(this);

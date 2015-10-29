@@ -24,7 +24,7 @@
 #ifndef QFRDRTABLECOLUMNVALUESDIALOG_H
 #define QFRDRTABLECOLUMNVALUESDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QList>
 
 
@@ -32,7 +32,7 @@ namespace Ui {
     class QFRDRTableColumnValuesDialog;
 }
 
-class QFRDRTableColumnValuesDialog : public QDialog
+class QFRDRTableColumnValuesDialog : public QFDialog
 {
         Q_OBJECT
         

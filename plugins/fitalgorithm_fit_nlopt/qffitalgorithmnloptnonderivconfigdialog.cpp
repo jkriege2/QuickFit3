@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "ui_qffitalgorithmnloptnonderivconfigdialog.h"
 
 QFFitAlgorithmNLOptNonDerivConfigDialog::QFFitAlgorithmNLOptNonDerivConfigDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFFitAlgorithmNLOptNonDerivConfigDialog)
 {
     ui->setupUi(this);

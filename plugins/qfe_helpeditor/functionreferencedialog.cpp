@@ -28,7 +28,7 @@
 
 
 FunctionReferenceDialog::FunctionReferenceDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::FunctionReferenceDialog)
 {
     ui->setupUi(this);

@@ -171,10 +171,10 @@ void QFRDROverviewImageDisplay::createWidgets() {
     ///////////////////////////////////////////////////////////////
     // TOOLBAR & ACTIONS: edit image plots
     ///////////////////////////////////////////////////////////////
-    actImagesZoom=new QAction(QIcon(":/imaging_fcs/zoom.png"), tr("zoom"), this);
+    actImagesZoom=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/zoom.png"), tr("zoom"), this);
     actImagesZoom->setToolTip(tr("in this mode the user may zoom into a plot by drawing a rectangle (draging with the left mouse key)\nA click toggles the current selection/mask position."));
     actImagesZoom->setCheckable(true);
-    actImagesDrawRectangle=new QAction(QIcon(":/imaging_fcs/draw_rectangle.png"), tr("rectangular selection"), this);
+    actImagesDrawRectangle=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_rectangle.png"), tr("rectangular selection"), this);
     actImagesDrawRectangle->setToolTip(tr("in this mode the user may draw a rectangle.<br>"
                                  "All pixels inside the rectangle will be selected<br>"
                                  "when the user releases the left mouse key. You may<br>"
@@ -184,7 +184,7 @@ void QFRDROverviewImageDisplay::createWidgets() {
                                  "</ul>"));
     actImagesDrawRectangle->setCheckable(true);
 
-    actImagesDrawPoints=new QAction(QIcon(":/imaging_fcs/draw_point.png"), tr("point-wise selection"), this);
+    actImagesDrawPoints=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_point.png"), tr("point-wise selection"), this);
     actImagesDrawPoints->setToolTip(tr("in this mode the user may click on single points.<br>"
                                  "to add and remove them to/from the mask/selection. A click<br>"
                                  "will toggle the state of the clicked pixel<ul>"
@@ -193,7 +193,7 @@ void QFRDROverviewImageDisplay::createWidgets() {
                                  "</ul>"));
     actImagesDrawPoints->setCheckable(true);
 
-    actImagesDrawCircle=new QAction(QIcon(":/imaging_fcs/draw_circle.png"), tr("circular selection"), this);
+    actImagesDrawCircle=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_circle.png"), tr("circular selection"), this);
     actImagesDrawCircle->setToolTip(tr("in this mode the user may draw a circle.<br>"
                                  "All pixels inside the cirle will be selected<br>"
                                  "when the user releases the left mouse key. The point of first<br>"
@@ -203,7 +203,7 @@ void QFRDROverviewImageDisplay::createWidgets() {
                                  "<li>SHIFT: selection will be removed from current selection</li>"
                                  "</ul>"));
     actImagesDrawCircle->setCheckable(true);
-    actImagesDrawEllipse=new QAction(QIcon(":/imaging_fcs/draw_ellipse.png"), tr("elliptical selection"), this);
+    actImagesDrawEllipse=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_ellipse.png"), tr("elliptical selection"), this);
     actImagesDrawEllipse->setToolTip(tr("in this mode the user may draw a ellipse.<br>"
                                  "All pixels inside the ellipse will be selected<br>"
                                 "when the user releases the left mouse key. The point of first<br>"
@@ -213,7 +213,7 @@ void QFRDROverviewImageDisplay::createWidgets() {
                                  "<li>SHIFT: selection will be removed from current selection</li>"
                                  "</ul>"));
     actImagesDrawEllipse->setCheckable(true);
-    actImagesDrawLine=new QAction(QIcon(":/imaging_fcs/draw_line.png"), tr("line selection"), this);
+    actImagesDrawLine=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_line.png"), tr("line selection"), this);
     actImagesDrawLine->setToolTip(tr("in this mode the user may draw a line.<br>"
                                  "All pixels on the line will be selected<br>"
                                  "when the user releases the left mouse key. You may<br>"
@@ -223,7 +223,7 @@ void QFRDROverviewImageDisplay::createWidgets() {
                                  "</ul>"));
     actImagesDrawLine->setCheckable(true);
 
-    actImagesScribble=new QAction(QIcon(":/imaging_fcs/draw_scribble.png"), tr("scribble selection"), this);
+    actImagesScribble=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/draw_scribble.png"), tr("scribble selection"), this);
     actImagesScribble->setToolTip(tr("in this mode the user may select/deselect pixels by.<br>"
                                  "keeping the left mouse button pressed and moving the mouse<br>"
                                  "over the image. Depending on the key pressed on the keyboard,<br>"
@@ -243,7 +243,7 @@ void QFRDROverviewImageDisplay::createWidgets() {
     agImageSelectionActions->addAction(actImagesDrawEllipse);
     connect(agImageSelectionActions, SIGNAL(triggered(QAction*)), this, SLOT(setImageEditMode()));
 
-    actImageAsResult=new QAction(tr("Image as RDR Result"), this);
+    actImageAsResult=new QFActionWithNoMenuRole(tr("Image as RDR Result"), this);
     connect(actImageAsResult, SIGNAL(triggered()), this, SLOT(imageAsResult()));
 
     toolbar->addAction(actImageAsResult);

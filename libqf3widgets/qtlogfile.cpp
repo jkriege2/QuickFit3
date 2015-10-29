@@ -53,21 +53,21 @@ QtLogFile::QtLogFile(QWidget *parent):
     log_date_time=false;
     log_date_time_template=QString("yyyy-MM-dd hh:mm:ss");
 
-    actSelectAll=new QAction(tr("select all"), this);
+    actSelectAll=new QFActionWithNoMenuRole(tr("select all"), this);
     actSelectAll->setShortcut(QKeySequence::SelectAll);
     connect(actSelectAll, SIGNAL(triggered()), browser, SLOT(selectAll()));
 
-    actClear=new QAction(QIcon(":/qtlogfile/clearall.png"), tr("clear all"), this);
+    actClear=new QFActionWithNoMenuRole(QIcon(":/qtlogfile/clearall.png"), tr("clear all"), this);
     connect(actClear, SIGNAL(triggered()), browser, SLOT(clear()));
 
-    actCopy=new QAction(QIcon(":/qtlogfile/copy.png"), tr("copy"), this);
+    actCopy=new QFActionWithNoMenuRole(QIcon(":/qtlogfile/copy.png"), tr("copy"), this);
     actCopy->setShortcut(QKeySequence::Copy);
     connect(actCopy, SIGNAL(triggered()), browser, SLOT(copy()));
 
-    actShowLogFolder=new QAction(QIcon(":/qtlogfile/openfolder.png"), tr("open logfile folder"), this);
+    actShowLogFolder=new QFActionWithNoMenuRole(QIcon(":/qtlogfile/openfolder.png"), tr("open logfile folder"), this);
     connect(actShowLogFolder, SIGNAL(triggered()), this, SLOT(showLogFolder()));
 
-    actFind=new QAction(QIcon(":/qtlogfile/find.png"), tr("search log contents ..."), this);
+    actFind=new QFActionWithNoMenuRole(QIcon(":/qtlogfile/find.png"), tr("search log contents ..."), this);
     actFind->setShortcut(QKeySequence::Find);
     actFind->setCheckable(true);
     actFind->setChecked(false);
@@ -112,11 +112,11 @@ QtLogFile::QtLogFile(QWidget *parent):
     layFind->addWidget(edtFind);
     connect(edtFind, SIGNAL(textEdited(QString)), this, SLOT(findNext()));
 
-    actFindNext=new QAction(QIcon(":/qtlogfile/findnext.png"), tr("find &next"), this);
+    actFindNext=new QFActionWithNoMenuRole(QIcon(":/qtlogfile/findnext.png"), tr("find &next"), this);
     actFindNext->setShortcut(QKeySequence::FindNext);
     connect(actFindNext, SIGNAL(triggered()), this, SLOT(findNext()));
 
-    actFindPrev=new QAction(QIcon(":/qtlogfile/findprev.png"), tr("find &previous"), this);
+    actFindPrev=new QFActionWithNoMenuRole(QIcon(":/qtlogfile/findprev.png"), tr("find &previous"), this);
     actFindPrev->setShortcut(QKeySequence::FindPrevious);
     connect(actFindPrev, SIGNAL(triggered()), this, SLOT(findPrev()));
 
@@ -442,7 +442,7 @@ void QtLogFile::showLogFolder()
 void QtLogFile::showContextMenu(const QPoint& /*p*/ ) {
     QMenu *menu = new QMenu(this);
 
-    QAction* act=new QAction(this);
+    QAction* act=new QFActionWithNoMenuRole(this);
     if (log_to_file) {
         act->setText(tr("log file: %1").arg(log_filename));
     } else {

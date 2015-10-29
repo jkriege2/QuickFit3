@@ -24,7 +24,7 @@
 #include "ui_qfespimb040lightpathsavedialog.h"
 
 QFESPIMB040LightPathSaveDialog::QFESPIMB040LightPathSaveDialog(QString name, QStringList names, QFTableModel *model, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFESPIMB040LightPathSaveDialog)
 {
     m_model=model;

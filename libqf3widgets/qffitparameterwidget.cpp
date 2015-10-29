@@ -91,45 +91,45 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
     scEnter=NULL;
     neditError=NULL;
 
-    actCopyValue = new QAction(tr("copy &value to all files"), this);
+    actCopyValue = new QFActionWithNoMenuRole(tr("copy &value to all files"), this);
     connect(actCopyValue, SIGNAL(triggered()), this, SLOT(s_actCopyValue()));
-    actCopyFix = new QAction(tr("copy &fix to all files"), this);
+    actCopyFix = new QFActionWithNoMenuRole(tr("copy &fix to all files"), this);
     connect(actCopyFix, SIGNAL(triggered()), this, SLOT(s_actCopyFix()));
-    actCopyValueFix = new QAction(tr("copy value && fix to all files"), this);
+    actCopyValueFix = new QFActionWithNoMenuRole(tr("copy value && fix to all files"), this);
     connect(actCopyValueFix, SIGNAL(triggered()), this, SLOT(s_actCopyValueFix()));
 
 
-    actCopyValueRuns = new QAction(tr("copy &value to all runs"), this);
+    actCopyValueRuns = new QFActionWithNoMenuRole(tr("copy &value to all runs"), this);
     connect(actCopyValueRuns, SIGNAL(triggered()), this, SLOT(s_actCopyValueRuns()));
-    actCopyFixRuns = new QAction(tr("copy &fix to all runs"), this);
+    actCopyFixRuns = new QFActionWithNoMenuRole(tr("copy &fix to all runs"), this);
     connect(actCopyFixRuns, SIGNAL(triggered()), this, SLOT(s_actCopyFixRuns()));
-    actCopyValueFixRuns = new QAction(tr("copy value && fix to all runs"), this);
+    actCopyValueFixRuns = new QFActionWithNoMenuRole(tr("copy value && fix to all runs"), this);
     connect(actCopyValueFixRuns, SIGNAL(triggered()), this, SLOT(s_actCopyValueFixRuns()));
 
 
-    actCopyValueInit = new QAction(tr("copy &value to initial"), this);
+    actCopyValueInit = new QFActionWithNoMenuRole(tr("copy &value to initial"), this);
     connect(actCopyValueInit, SIGNAL(triggered()), this, SLOT(s_actCopyValueInit()));
-    actCopyFixInit = new QAction(tr("copy &fix to initial"), this);
+    actCopyFixInit = new QFActionWithNoMenuRole(tr("copy &fix to initial"), this);
     connect(actCopyFixInit, SIGNAL(triggered()), this, SLOT(s_actCopyFixInit()));
-    actCopyValueFixInit = new QAction(tr("copy value && fix to initial"), this);
+    actCopyValueFixInit = new QFActionWithNoMenuRole(tr("copy value && fix to initial"), this);
     connect(actCopyValueFixInit, SIGNAL(triggered()), this, SLOT(s_actCopyValueFixInit()));
 
 
-    actResetValue = new QAction(tr("reset this value"), this);
+    actResetValue = new QFActionWithNoMenuRole(tr("reset this value"), this);
     connect(actResetValue, SIGNAL(triggered()), this, SLOT(s_actResetValue()));
-    actResetFix = new QAction(tr("reset this fix"), this);
+    actResetFix = new QFActionWithNoMenuRole(tr("reset this fix"), this);
     connect(actResetFix, SIGNAL(triggered()), this, SLOT(s_actResetFix()));
-    actResetValueFix = new QAction(tr("reset this value && fix"), this);
+    actResetValueFix = new QFActionWithNoMenuRole(tr("reset this value && fix"), this);
     connect(actResetValueFix, SIGNAL(triggered()), this, SLOT(s_actResetValueFix()));
 
 
-    sep1=new QAction(this);
+    sep1=new QFActionWithNoMenuRole(this);
     sep1->setSeparator(true);
-    sep2=new QAction(this);
+    sep2=new QFActionWithNoMenuRole(this);
     sep2->setSeparator(true);
-    sep3=new QAction(this);
+    sep3=new QFActionWithNoMenuRole(this);
     sep3->setSeparator(true);
-    sep4=new QAction(this);
+    sep4=new QFActionWithNoMenuRole(this);
     sep4->setSeparator(true);
 
 

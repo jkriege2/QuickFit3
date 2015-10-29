@@ -24,7 +24,7 @@
 #include "programoptions.h"
 #include "qftools.h"
 QFRDRMaskByOverviewImage::QFRDRMaskByOverviewImage(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFRDRMaskByOverviewImage)
 {
     m_mask=NULL;

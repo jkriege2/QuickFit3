@@ -22,7 +22,7 @@ Copyright (c) 2008-2015 Jan Buchholz, German Cancer Research Center
 #ifndef QFRADHARD2FLASHTOOL_H
 #define QFRADHARD2FLASHTOOL_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "../base_classes/radhard2flash.h"
 #include "programoptions.h"
 
@@ -37,7 +37,7 @@ class QFExtensionCameraRh2v2; // forward
     \ingroup qf3ext_rh2v2
 
 */
-class QFRadhard2FlashtoolV2 : public QDialog{
+class QFRadhard2FlashtoolV2 : public QFDialog{
         Q_OBJECT
     public:
         explicit QFRadhard2FlashtoolV2(QFExtensionCameraRh2v2 *ext, QWidget* parent = 0);

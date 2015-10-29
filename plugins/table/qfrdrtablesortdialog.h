@@ -24,13 +24,13 @@
 #ifndef QFRDRTABLESORTDIALOG_H
 #define QFRDRTABLESORTDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFRDRTableSortDialog;
 }
 
-class QFRDRTableSortDialog : public QDialog
+class QFRDRTableSortDialog : public QFDialog
 {
         Q_OBJECT
         

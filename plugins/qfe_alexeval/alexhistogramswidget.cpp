@@ -41,7 +41,7 @@ ALEXHistogramsWidget::ALEXHistogramsWidget(QWidget *parent, AlexData* data) :
     relativeLevels=false;
 //    plotRange.setDefault();
 
-    actZoomRange=new QAction(QIcon(":/images/jkqtp_zoomall.png"), tr("zoom full histogram"), this);
+    actZoomRange=new QFActionWithNoMenuRole(QIcon(":/images/jkqtp_zoomall.png"), tr("zoom full histogram"), this);
     connect(actZoomRange, SIGNAL(triggered()), this, SLOT(zoomFull2DHistogram()));
     ui->widPlotDensity->addAction(actZoomRange);
     ui->widPlotDensity->updateToolbarActions();

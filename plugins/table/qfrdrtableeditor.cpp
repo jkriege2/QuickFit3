@@ -175,145 +175,145 @@ void QFRDRTableEditor::createWidgets() {
 
 
 
-    actLoadTable=new QAction(QIcon(":/table/table_open.png"), "load table", this);
+    actLoadTable=new QFActionWithNoMenuRole(QIcon(":/table/table_open.png"), "load table", this);
     actLoadTable->setToolTip(tr("Load table ..."));
     actLoadTable->setShortcut(QKeySequence::Open);
     connect(actLoadTable, SIGNAL(triggered()), this, SLOT(slLoadTable()));
     connect(this, SIGNAL(enableActions(bool)), actLoadTable, SLOT(setEnabled(bool)));
 
-    actImportTable=new QAction(QIcon(":/table/table_import.png"), "import data from file", this);
+    actImportTable=new QFActionWithNoMenuRole(QIcon(":/table/table_import.png"), "import data from file", this);
     actImportTable->setToolTip(tr("import data from file into the current table ..."));
     connect(actImportTable, SIGNAL(triggered()), this, SLOT(slImportFile()));
     connect(this, SIGNAL(enableActions(bool)), actImportTable, SLOT(setEnabled(bool)));
 
 
 
-    actSaveTable=new QAction(QIcon(":/table/table_save.png"), "save table", this);
+    actSaveTable=new QFActionWithNoMenuRole(QIcon(":/table/table_save.png"), "save table", this);
     actSaveTable->setToolTip(tr("Save table ..."));
     actSaveTable->setShortcut(QKeySequence::SaveAs);
     connect(actSaveTable, SIGNAL(triggered()), this, SLOT(slSaveTable()));
 
-    actMakeEditable=new QAction(tr("make the table editable ..."), this);
+    actMakeEditable=new QFActionWithNoMenuRole(tr("make the table editable ..."), this);
     connect(actMakeEditable, SIGNAL(triggered()), this, SLOT(slMakeEditable()));
     connect(this, SIGNAL(enableActions(bool)), actMakeEditable, SLOT(setDisabled(bool)));
 
-    actCopy=new QAction(QIcon(":/table/copy.png"), tr("Copy"), this);
+    actCopy=new QFActionWithNoMenuRole(QIcon(":/table/copy.png"), tr("Copy"), this);
     actCopy->setShortcut(QKeySequence::Copy);
     connect(actCopy, SIGNAL(triggered()), this, SLOT(slCopy()));
-    actCut=new QAction(QIcon(":/table/cut.png"), tr("Cut"), this);
+    actCut=new QFActionWithNoMenuRole(QIcon(":/table/cut.png"), tr("Cut"), this);
     actCut->setShortcut(QKeySequence::Cut);
     connect(this, SIGNAL(enableActions(bool)), actCut, SLOT(setEnabled(bool)));
     connect(actCut, SIGNAL(triggered()), this, SLOT(slCut()));
-    actPaste=new QAction(QIcon(":/table/paste.png"), tr("Paste"), this);
+    actPaste=new QFActionWithNoMenuRole(QIcon(":/table/paste.png"), tr("Paste"), this);
     actPaste->setShortcut(QKeySequence::Paste);
     connect(this, SIGNAL(enableActions(bool)), actPaste, SLOT(setEnabled(bool)));
     connect(actPaste, SIGNAL(triggered()), this, SLOT(slPaste()));
 
-    actPasteNoEquations=new QAction(QIcon(":/table/paste.png"), tr("Paste without expressions"), this);
+    actPasteNoEquations=new QFActionWithNoMenuRole(QIcon(":/table/paste.png"), tr("Paste without expressions"), this);
     connect(this, SIGNAL(enableActions(bool)), actPasteNoEquations, SLOT(setEnabled(bool)));
     connect(actPasteNoEquations, SIGNAL(triggered()), this, SLOT(slPasteNoEquations()));
 
-    actImportFromClipboard=new QAction(tr("Import from Clipboard (extended Paste)"), this);
+    actImportFromClipboard=new QFActionWithNoMenuRole(tr("Import from Clipboard (extended Paste)"), this);
     connect(this, SIGNAL(enableActions(bool)), actImportFromClipboard, SLOT(setEnabled(bool)));
     connect(actImportFromClipboard, SIGNAL(triggered()), this, SLOT(slImportFromClipboard()));
 
-    actSaveTableTemplate=new QAction(tr("save table template"), this);
+    actSaveTableTemplate=new QFActionWithNoMenuRole(tr("save table template"), this);
     connect(actSaveTableTemplate, SIGNAL(triggered()), this, SLOT(slSaveTableTemplate()));
-    actLoadTableTemplate=new QAction(tr("load table template"), this);
+    actLoadTableTemplate=new QFActionWithNoMenuRole(tr("load table template"), this);
     connect(actLoadTableTemplate, SIGNAL(triggered()), this, SLOT(slLoadTableTemplate()));
     connect(this, SIGNAL(enableActions(bool)), actLoadTableTemplate, SLOT(setEnabled(bool)));
-    actCopyTemplate=new QAction(tr("copy selected table column template"), this);
+    actCopyTemplate=new QFActionWithNoMenuRole(tr("copy selected table column template"), this);
     connect(actCopyTemplate, SIGNAL(triggered()), this, SLOT(slCopyTableTemplate()));
-    actPasteTemplate=new QAction(tr("paste selected table column  template"), this);
+    actPasteTemplate=new QFActionWithNoMenuRole(tr("paste selected table column  template"), this);
     connect(actPasteTemplate, SIGNAL(triggered()), this, SLOT(slPasteTableTemplate()));
     connect(this, SIGNAL(enableActions(bool)), actPasteTemplate, SLOT(setEnabled(bool)));
 
-    actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy selection for clipboard (for Excel ...)"), this);
-    actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy selection to clipboard (for Excel ...) without herader rows/columns"), this);
+    actCopyResults=new QFActionWithNoMenuRole(QIcon(":/lib/copy16.png"), tr("Copy selection for clipboard (for Excel ...)"), this);
+    actCopyResultsNoHead=new QFActionWithNoMenuRole(QIcon(":/lib/copy16_nohead.png"), tr("Copy selection to clipboard (for Excel ...) without herader rows/columns"), this);
     connect(actCopyResults, SIGNAL(triggered()), tvMain, SLOT(copySelectionToExcel()));
     connect(actCopyResultsNoHead, SIGNAL(triggered()), tvMain, SLOT(copySelectionToExcelNoHead()));
 
 
-    actClear=new QAction(QIcon(":/table/table_clear.png"), "clear", this);
+    actClear=new QFActionWithNoMenuRole(QIcon(":/table/table_clear.png"), "clear", this);
     actClear->setToolTip(tr("Clear table ..."));
     connect(actClear, SIGNAL(triggered()), this, SLOT(slClear()));
     connect(this, SIGNAL(enableActions(bool)), actClear, SLOT(setEnabled(bool)));
 
 
 
-    actResize=new QAction(QIcon(":/table/table_resize.png"), "resize table", this);
+    actResize=new QFActionWithNoMenuRole(QIcon(":/table/table_resize.png"), "resize table", this);
     actResize->setToolTip(tr("Resize the table to a new size"));
     actResize->setShortcut(tr("Ctrl+R"));
     connect(actResize, SIGNAL(triggered()), this, SLOT(slResize()));
     connect(this, SIGNAL(enableActions(bool)), actResize, SLOT(setEnabled(bool)));
 
-    actInsertRow=new QAction(QIcon(":/table/row_insert.png"), "insert row", this);
+    actInsertRow=new QFActionWithNoMenuRole(QIcon(":/table/row_insert.png"), "insert row", this);
     actInsertRow->setToolTip(tr("Insert a row above of the currently selected cell ..."));
     connect(actInsertRow, SIGNAL(triggered()), this, SLOT(slInsertRow()));
     connect(this, SIGNAL(enableActions(bool)), actInsertRow, SLOT(setEnabled(bool)));
 
-    actAppendRow=new QAction(QIcon(":/table/row_append.png"), "append row", this);
+    actAppendRow=new QFActionWithNoMenuRole(QIcon(":/table/row_append.png"), "append row", this);
     actAppendRow->setToolTip(tr("Append a row to the table ..."));
     actAppendRow->setShortcut(tr("Ctrl++"));
     connect(actAppendRow, SIGNAL(triggered()), this, SLOT(slAppendRow()));
     connect(this, SIGNAL(enableActions(bool)), actAppendRow, SLOT(setEnabled(bool)));
 
-    actDeleteRow=new QAction(QIcon(":/table/row_delete.png"), "delete row", this);
+    actDeleteRow=new QFActionWithNoMenuRole(QIcon(":/table/row_delete.png"), "delete row", this);
     actDeleteRow->setToolTip(tr("Delete the currenty selected row(s) ..."));
     connect(actDeleteRow, SIGNAL(triggered()), this, SLOT(slDeleteRow()));
     connect(this, SIGNAL(enableActions(bool)), actDeleteRow, SLOT(setEnabled(bool)));
 
-    actInsertColumn=new QAction(QIcon(":/table/column_insert.png"), "insert column", this);
+    actInsertColumn=new QFActionWithNoMenuRole(QIcon(":/table/column_insert.png"), "insert column", this);
     actInsertColumn->setToolTip(tr("Insert a column left of the currently selected cell ..."));
     connect(actInsertColumn, SIGNAL(triggered()), this, SLOT(slInsertColumn()));
     connect(this, SIGNAL(enableActions(bool)), actInsertColumn, SLOT(setEnabled(bool)));
 
-    actAppendColumn=new QAction(QIcon(":/table/column_append.png"), "append column", this);
+    actAppendColumn=new QFActionWithNoMenuRole(QIcon(":/table/column_append.png"), "append column", this);
     actAppendColumn->setToolTip(tr("Append a column to the table ..."));
     actAppendColumn->setShortcut(tr("Ctrl+I"));
     connect(actAppendColumn, SIGNAL(triggered()), this, SLOT(slAppendColumn()));
     connect(this, SIGNAL(enableActions(bool)), actAppendColumn, SLOT(setEnabled(bool)));
 
-    actDeleteColumn=new QAction(QIcon(":/table/column_delete.png"), "delete column", this);
+    actDeleteColumn=new QFActionWithNoMenuRole(QIcon(":/table/column_delete.png"), "delete column", this);
     actDeleteColumn->setToolTip(tr("Delete the currenty selected column(s) ..."));
     connect(actDeleteColumn, SIGNAL(triggered()), this, SLOT(slDeleteColumn()));
     connect(this, SIGNAL(enableActions(bool)), actDeleteColumn, SLOT(setEnabled(bool)));
 
-    actSetCellsValue=new QAction(tr("set value in cells"), this);
+    actSetCellsValue=new QFActionWithNoMenuRole(tr("set value in cells"), this);
     actSetCellsValue->setToolTip(tr("set a new value in all currently selected cells ..."));
     connect(actSetCellsValue, SIGNAL(triggered()), this, SLOT(slSetCells()));
     connect(this, SIGNAL(enableActions(bool)), actSetCellsValue, SLOT(setEnabled(bool)));
 
-    actDelete=new QAction(QIcon(":/table/cell_clear.png"), "delete contents", this);
+    actDelete=new QFActionWithNoMenuRole(QIcon(":/table/cell_clear.png"), "delete contents", this);
     actDelete->setToolTip(tr("Delete contents from selected cells ..."));
     actDelete->setShortcut(QKeySequence::Delete);
     connect(actDelete, SIGNAL(triggered()), this, SLOT(slDelete()));
     connect(this, SIGNAL(enableActions(bool)), actDelete, SLOT(setEnabled(bool)));
 
-    actSetDatatype=new QAction(QIcon(":/table/cell_type.png"), "set datatype", this);
+    actSetDatatype=new QFActionWithNoMenuRole(QIcon(":/table/cell_type.png"), "set datatype", this);
     actSetDatatype->setToolTip(tr("set the datatype of the currently selected cells ..."));
     actSetDatatype->setShortcut(tr("Ctrl+T"));
     connect(actSetDatatype, SIGNAL(triggered()), this, SLOT(slSetDatatype()));
     connect(this, SIGNAL(enableActions(bool)), actSetDatatype, SLOT(setEnabled(bool)));
 
 
-    actSetDatatypeString=new QAction(QIcon(":/table/cell_string.png"), tr("... string"), this);
+    actSetDatatypeString=new QFActionWithNoMenuRole(QIcon(":/table/cell_string.png"), tr("... string"), this);
     actSetDatatypeString->setToolTip(tr("set the datatype of the currently selected cells to string"));
     connect(actSetDatatypeString, SIGNAL(triggered()), this, SLOT(slSetDatatypeString()));
     connect(this, SIGNAL(enableActions(bool)), actSetDatatypeString, SLOT(setEnabled(bool)));
-    actSetDatatypeInteger=new QAction(QIcon(":/table/cell_integer.png"), tr("... integer"), this);
+    actSetDatatypeInteger=new QFActionWithNoMenuRole(QIcon(":/table/cell_integer.png"), tr("... integer"), this);
     actSetDatatypeInteger->setToolTip(tr("set the datatype of the currently selected cells to integer"));
     connect(actSetDatatypeInteger, SIGNAL(triggered()), this, SLOT(slSetDatatypeInteger()));
     connect(this, SIGNAL(enableActions(bool)), actSetDatatypeInteger, SLOT(setEnabled(bool)));
-    actSetDatatypeDouble=new QAction(QIcon(":/table/cell_double.png"), tr("... floating-point number"), this);
+    actSetDatatypeDouble=new QFActionWithNoMenuRole(QIcon(":/table/cell_double.png"), tr("... floating-point number"), this);
     actSetDatatypeDouble->setToolTip(tr("set the datatype of the currently selected cells to floating-point number"));
     connect(actSetDatatypeDouble, SIGNAL(triggered()), this, SLOT(slSetDatatypeDouble()));
     connect(this, SIGNAL(enableActions(bool)), actSetDatatypeDouble, SLOT(setEnabled(bool)));
-    actSetDatatypeDate=new QAction(QIcon(":/table/cell_date.png"), tr("... date"), this);
+    actSetDatatypeDate=new QFActionWithNoMenuRole(QIcon(":/table/cell_date.png"), tr("... date"), this);
     actSetDatatypeDate->setToolTip(tr("set the datatype of the currently selected cells to date"));
     connect(actSetDatatypeDate, SIGNAL(triggered()), this, SLOT(slSetDatatypeDate()));
     connect(this, SIGNAL(enableActions(bool)), actSetDatatypeDate, SLOT(setEnabled(bool)));
-    actSetDatatypeBool=new QAction(QIcon(":/table/cell_bool.png"), tr("... boolean"), this);
+    actSetDatatypeBool=new QFActionWithNoMenuRole(QIcon(":/table/cell_bool.png"), tr("... boolean"), this);
     actSetDatatypeBool->setToolTip(tr("set the datatype of the currently selected cells to boolean"));
     connect(actSetDatatypeBool, SIGNAL(triggered()), this, SLOT(slSetDatatypeBool()));
     connect(this, SIGNAL(enableActions(bool)), actSetDatatypeBool, SLOT(setEnabled(bool)));
@@ -321,90 +321,90 @@ void QFRDRTableEditor::createWidgets() {
 
 
 
-    actSetColumnTitle=new QAction(QIcon(":/table/column_title.png"), tr("edit column properties"), this);
+    actSetColumnTitle=new QFActionWithNoMenuRole(QIcon(":/table/column_title.png"), tr("edit column properties"), this);
     actSetColumnTitle->setToolTip(tr("edit the column title and the clumn expression ..."));
     connect(actSetColumnTitle, SIGNAL(triggered()), this, SLOT(slEditColumnProperties()));
     connect(this, SIGNAL(enableActions(bool)), actSetColumnTitle, SLOT(setEnabled(bool)));
 
-    actSHowMultiColEditor=new QAction(tr("show multi-column properties editor"), this);
+    actSHowMultiColEditor=new QFActionWithNoMenuRole(tr("show multi-column properties editor"), this);
     connect(actSHowMultiColEditor, SIGNAL(triggered()), this, SLOT(slShowMultiColumnEditor()));
     connect(this, SIGNAL(enableActions(bool)), actSHowMultiColEditor, SLOT(setEnabled(bool)));
 
-    actSetColumnValues=new QAction("set column values (linear, ...)", this);
+    actSetColumnValues=new QFActionWithNoMenuRole("set column values (linear, ...)", this);
     actSetColumnValues->setToolTip(tr("init the current column with e.g. linearly increasing numbers ..."));
     connect(actSetColumnValues, SIGNAL(triggered()), this, SLOT(slSetColumnValues()));
     connect(this, SIGNAL(enableActions(bool)), actSetColumnValues, SLOT(setEnabled(bool)));
 
-    actCalcCell=new QAction(QIcon(":/table/formula.png"), tr("evaluate math expression"), this);
+    actCalcCell=new QFActionWithNoMenuRole(QIcon(":/table/formula.png"), tr("evaluate math expression"), this);
     actCalcCell->setToolTip(tr("set the value of the selected columns by a freely defineable mathematical expression"));
     actCalcCell->setShortcut(tr("="));
     connect(actCalcCell, SIGNAL(triggered()), this, SLOT(slCalcCell()));
     connect(this, SIGNAL(enableActions(bool)), actCalcCell, SLOT(setEnabled(bool)));
 
-    actClearExpression=new QAction(QIcon(":/table/formulaclear.png"), tr("clear math expression"), this);
+    actClearExpression=new QFActionWithNoMenuRole(QIcon(":/table/formulaclear.png"), tr("clear math expression"), this);
     actClearExpression->setToolTip(tr("clear any expressions from the selected cells"));
     connect(actClearExpression, SIGNAL(triggered()), this, SLOT(slClearExpression()));
     connect(this, SIGNAL(enableActions(bool)), actClearExpression, SLOT(setEnabled(bool)));
 
-    actRecalcAll=new QAction(QIcon(":/table/formularecalc.png"), tr("reevaluate all/selected math expression"), this);
+    actRecalcAll=new QFActionWithNoMenuRole(QIcon(":/table/formularecalc.png"), tr("reevaluate all/selected math expression"), this);
     actRecalcAll->setToolTip(tr("reevaluate all math expressions ..."));
     connect(actRecalcAll, SIGNAL(triggered()), this, SLOT(slRecalcAll()));
     connect(this, SIGNAL(enableActions(bool)), actRecalcAll, SLOT(setEnabled(bool)));
 
-    actExpressionSeedBeforeTableEval=new QAction(tr("use single seed for reevaluations"), this);
+    actExpressionSeedBeforeTableEval=new QFActionWithNoMenuRole(tr("use single seed for reevaluations"), this);
     actExpressionSeedBeforeTableEval->setCheckable(true);
     actExpressionSeedBeforeTableEval->setChecked(true);
     connect(actExpressionSeedBeforeTableEval, SIGNAL(triggered()), this, SLOT(slExpressionSeedBeforeTableEval()));
     connect(this, SIGNAL(enableActions(bool)), actExpressionSeedBeforeTableEval, SLOT(setEnabled(bool)));
 
-    actHistogram=new QAction(QIcon(":/table/histogram.png"), tr("calculate histogramn"), this);
+    actHistogram=new QFActionWithNoMenuRole(QIcon(":/table/histogram.png"), tr("calculate histogramn"), this);
     actHistogram->setToolTip(tr("calculate and insert histograms of the selected columns"));
     actHistogram->setVisible(true);
     connect(actHistogram, SIGNAL(triggered()), this, SLOT(slHistogram()));
     connect(this, SIGNAL(enableActions(bool)), actHistogram, SLOT(setEnabled(bool)));
 
-    actHistogram2D=new QAction(tr("calculate 2D histogramn"), this);
+    actHistogram2D=new QFActionWithNoMenuRole(tr("calculate 2D histogramn"), this);
     actHistogram2D->setToolTip(tr("calculate and insert 2D histograms of the selected columns"));
     actHistogram2D->setVisible(true);
     connect(actHistogram2D, SIGNAL(triggered()), this, SLOT(slHistogram2D()));
     connect(this, SIGNAL(enableActions(bool)), actHistogram2D, SLOT(setEnabled(bool)));
 
-    actSort=new QAction(QIcon(":/table/sort_inc.png"), tr("sort selected cells"), this);
+    actSort=new QFActionWithNoMenuRole(QIcon(":/table/sort_inc.png"), tr("sort selected cells"), this);
     actSort->setToolTip(tr("sort the selected cells"));
     connect(actSort, SIGNAL(triggered()), this, SLOT(slSort()));
     connect(this, SIGNAL(enableActions(bool)), actSort, SLOT(setEnabled(bool)));
 
-    actUndo=new QAction(QIcon(":/lib/undo.png"), tr("undo"), this);
+    actUndo=new QFActionWithNoMenuRole(QIcon(":/lib/undo.png"), tr("undo"), this);
     actUndo->setShortcut(QKeySequence::Undo);
     connect(this, SIGNAL(enableActions(bool)), actUndo, SLOT(setEnabled(bool)));
-    actRedo=new QAction(QIcon(":/lib/redo.png"), tr("redo"), this);
+    actRedo=new QFActionWithNoMenuRole(QIcon(":/lib/redo.png"), tr("redo"), this);
     actRedo->setShortcut(QKeySequence::Redo);
     connect(this, SIGNAL(enableActions(bool)), actRedo, SLOT(setEnabled(bool)));
 
-    actQuickStat=new QAction(QIcon(":/table/quickstat.png"), tr("Quick Statistics"), this);
+    actQuickStat=new QFActionWithNoMenuRole(QIcon(":/table/quickstat.png"), tr("Quick Statistics"), this);
     actQuickStat->setCheckable(true);
     actQuickStat->setChecked(false);
     connect(actQuickStat, SIGNAL(toggled(bool)), this, SLOT(slQuickStat(bool)));
 
-    actPreScript=new QAction(QIcon(":/table/prescript.png"), tr("Preevaluated Expressions"), this);
+    actPreScript=new QFActionWithNoMenuRole(QIcon(":/table/prescript.png"), tr("Preevaluated Expressions"), this);
     actPreScript->setCheckable(true);
     actPreScript->setChecked(false);
     connect(actPreScript, SIGNAL(toggled(bool)), this, SLOT(slPreScript(bool)));
 
-    actQuickHistogram=new QAction(QIcon(":/table/quickhist.png"), tr("Quick Histogram"), this);
+    actQuickHistogram=new QFActionWithNoMenuRole(QIcon(":/table/quickhist.png"), tr("Quick Histogram"), this);
     actQuickHistogram->setCheckable(true);
     actQuickHistogram->setChecked(false);
     connect(actQuickHistogram, SIGNAL(toggled(bool)), this, SLOT(slQuickHistogram(bool)));
 
-    actAutosetColumnWidth=new QAction(tr("Autoset column &width"), this);
+    actAutosetColumnWidth=new QFActionWithNoMenuRole(tr("Autoset column &width"), this);
     connect(actAutosetColumnWidth, SIGNAL(triggered()), this, SLOT(slAutoSetColumnWidth()));
 
-    actIndexedStat=new QAction(tr("insert indexed statistics for columns"), this);
+    actIndexedStat=new QFActionWithNoMenuRole(tr("insert indexed statistics for columns"), this);
     connect(actIndexedStat, SIGNAL(triggered()), this, SLOT(slInsertIndexedStat()));
     connect(this, SIGNAL(enableActions(bool)), actIndexedStat, SLOT(setEnabled(bool)));
 
 
-    actColumnsBoxplots=new QAction(tr("calculate boxplots from columns"), this);
+    actColumnsBoxplots=new QFActionWithNoMenuRole(tr("calculate boxplots from columns"), this);
     connect(actColumnsBoxplots, SIGNAL(triggered()), this, SLOT(slColumnsBoxplots()));
     connect(this, SIGNAL(enableActions(bool)), actColumnsBoxplots, SLOT(setEnabled(bool)));
 

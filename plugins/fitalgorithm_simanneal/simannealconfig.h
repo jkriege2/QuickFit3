@@ -24,7 +24,7 @@
 #ifndef SIMANNEALCONFIG_H
 #define SIMANNEALCONFIG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -36,7 +36,7 @@
     \ingroup qf3fitalgp_sa
 
  */
-class SimannealConfigDialog : public QDialog {
+class SimannealConfigDialog : public QFDialog {
         Q_OBJECT
     public:
         /** \brief class constructor */

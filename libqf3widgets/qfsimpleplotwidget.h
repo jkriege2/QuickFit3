@@ -1,7 +1,7 @@
 #ifndef QFSimplePlotWidget_H
 #define QFSimplePlotWidget_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfplotter.h"
 #include "qffitfunction.h"
 
@@ -69,7 +69,7 @@ class QFWIDLIB_EXPORT QFSimplePlotWidget : public QWidget
 };
 
 
-class QFWIDLIB_EXPORT QFSimplePlotDialog : public QDialog
+class QFWIDLIB_EXPORT QFSimplePlotDialog : public QFDialog
 {
         Q_OBJECT
     public:

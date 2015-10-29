@@ -4,7 +4,7 @@
 #include "qfpluginservices.h"
 
 DlgFCCSResetSetParameter::DlgFCCSResetSetParameter(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::DlgFCCSResetSetParameter)
 {
     ui->setupUi(this);

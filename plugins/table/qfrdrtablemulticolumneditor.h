@@ -23,7 +23,7 @@
 #ifndef QFRDRTABLEMULTICOLUMNEDITOR_H
 #define QFRDRTABLEMULTICOLUMNEDITOR_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qftablepluginmodel.h"
 #include "qfhtmldelegate.h"
 #include "qftablemodel.h"
@@ -32,7 +32,7 @@ namespace Ui {
     class QFRDRTableMultiColumnEditor;
 }
 
-class QFRDRTableMultiColumnEditor : public QDialog
+class QFRDRTableMultiColumnEditor : public QFDialog
 {
         Q_OBJECT
 

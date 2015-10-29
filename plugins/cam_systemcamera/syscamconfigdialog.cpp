@@ -24,7 +24,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "videocapture.h"
 
 SyscamConfigDialog::SyscamConfigDialog(VideoCapture *vid, int cam, QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::SyscamConfigDialog)
 {
     ui->setupUi(this);

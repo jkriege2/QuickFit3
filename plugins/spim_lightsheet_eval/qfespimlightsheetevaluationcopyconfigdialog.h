@@ -23,13 +23,13 @@
 #ifndef QFESPIMLIGHTSHEETEVALUATIONCOPYCONFIGDIALOG_H
 #define QFESPIMLIGHTSHEETEVALUATIONCOPYCONFIGDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFESPIMLightSheetEvaluationCopyConfigDialog;
 }
 
-class QFESPIMLightSheetEvaluationCopyConfigDialog : public QDialog
+class QFESPIMLightSheetEvaluationCopyConfigDialog : public QFDialog
 {
         Q_OBJECT
 

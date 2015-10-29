@@ -24,7 +24,7 @@
 #ifndef SELECTRESOURCEIMAGE_H
 #define SELECTRESOURCEIMAGE_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include <QDir>
 #include <QStandardItemModel>
 
@@ -32,7 +32,7 @@ namespace Ui {
     class SelectResourceImage;
 }
 
-class SelectResourceImage : public QDialog
+class SelectResourceImage : public QFDialog
 {
         Q_OBJECT
 

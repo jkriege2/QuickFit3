@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "ui_qffitalgorithmgslderivconfigdialog.h"
 
 QFFitAlgorithmGSLDerivativeBaseConfigDialog::QFFitAlgorithmGSLDerivativeBaseConfigDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::QFFitAlgorithmGSLDerivativeBaseConfigDialog)
 {
     ui->setupUi(this);

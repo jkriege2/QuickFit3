@@ -29,7 +29,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define TEST_MATH "g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\left(1+\\frac{\\tau}{\\tau_D}\\right)^{-1}\\cdot\\left(1+\\frac{\\tau}{\\gamma^2\\tau_D}\\right)^{-1/2}"
 
 OptionsDialog::OptionsDialog(QWidget* parent):
-    QDialog(parent)
+    QFDialog(parent)
 {
     setupUi(this);
     labMath->setMath(TEST_MATH);
@@ -55,6 +55,10 @@ OptionsDialog::OptionsDialog(QWidget* parent):
 
     updateFontExample();
     on_spinMath_valueChanged(spinMath->value());
+#ifdef Q_OS_MAC
+    chkMacOSXSubWinMenus->setEnabled(true)   ;
+    labMacOSXSubWinMenus->setEnabled(true)   ;
+#endif
 
     connect(cmbStyle, SIGNAL(currentIndexChanged(QString)), this, SLOT(styleChanged(QString)));
     connect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(stylesheetChanged(QString)));
@@ -180,6 +184,12 @@ void OptionsDialog::open(ProgramOptions* options) {
     cmbProxyType->setCurrentIndex(qBound(0,options->getProxyType(),2));
     chkUpdates->setChecked(options->getConfigValue("quickfit/checkupdates", true).toBool());
     chkStartupScreen->setChecked(options->getConfigValue("quickfit/welcomescreen", true).toBool());
+    chkMacOSXSubWinMenus->setChecked(options->getConfigValue("quickfit/macxsubwinmenus_asmain", false).toBool());
+#ifdef Q_OS_MAC
+    chkDoubleEditWheel->setChecked(options->getConfigValue("quickfit/scroll_in_qfdoubleedit", false).toBool());
+#else
+    chkDoubleEditWheel->setChecked(options->getConfigValue("quickfit/scroll_in_qfdoubleedit", true).toBool());
+#endif
     cmbWindowHeader->setCurrentIndex(options->getConfigValue("quickfit/windowheadermode", 1).toInt());
     QDir dhome(options->getHomeQFDirectory());
     if (!QDir(dhome.absolutePath()+"/userfitfunctions").exists()) dhome.mkdir("userfitfunctions");
@@ -195,7 +205,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     cmbCodeFont->setCurrentFont(QFont(options->getConfigValue("quickfit/code_font", "Hack").toString()));
     chkVARCOVNonLin->setChecked(options->getConfigValue("quickfit/nonlin_color_covmatrix_enabled", true).toBool());
     spinCodeFontsize->setValue(options->getConfigValue("quickfit/nonlin_color_covmatrix_gamma", 0.25).toDouble());
-
+    spinBaseFontsize->setValue(options->getConfigValue("quickfit/base_pointsize", QApplication::font().pointSizeF()).toInt());
     cmbFileDialog->setCurrentIndex(0);
     if (!ProgramOptions::getConfigValue("quickfit/native_file_dialog", true).toBool()) {
         cmbFileDialog->setCurrentIndex(1);
@@ -231,45 +241,55 @@ void OptionsDialog::open(ProgramOptions* options) {
         progress.setWindowModality(Qt::ApplicationModal);
         progress.setHasCancel(false);
         progress.open();
+        options->getQSettings()->sync();
         QApplication::processEvents(QEventLoop::AllEvents, 50);
 
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        options->setMaxThreads(spnMaxThreads->value());
-        options->setLanguageID(cmbLanguage->currentText());
-        options->setStylesheet(cmbStylesheet->currentText());
-        options->setStyle(cmbStyle->currentText());
-        options->setAutosave(spinAutosave->value());
+        options->setMaxThreads(spnMaxThreads->value(),false);
+        options->setLanguageID(cmbLanguage->currentText(),false);
+        options->setStylesheet(cmbStylesheet->currentText(),false);
+        options->setStyle(cmbStyle->currentText(),false);
+        options->setAutosave(spinAutosave->value(),false);
         QApplication::processEvents(QEventLoop::AllEvents, 50);
-        options->setChildWindowsStayOnTop(chkChildWindowsStayOnTop->isChecked());
-        options->setUserSaveAfterFirstEdit(chkUserSaveAfterFirstEdit->isChecked());
-        options->setHelpWindowsStayOnTop(chkHelpWindowsStayOnTop->isChecked());
-        options->setProjectWindowsStayOnTop(chkProjectWindowsStayOnTop->isChecked());
-        options->setDebugLogVisible(chkDebugMessages->isChecked());
+        options->setChildWindowsStayOnTop(chkChildWindowsStayOnTop->isChecked(),false);
+        options->setUserSaveAfterFirstEdit(chkUserSaveAfterFirstEdit->isChecked(),false);
+        options->setHelpWindowsStayOnTop(chkHelpWindowsStayOnTop->isChecked(),false);
+        options->setProjectWindowsStayOnTop(chkProjectWindowsStayOnTop->isChecked(),false);
+        options->setDebugLogVisible(chkDebugMessages->isChecked(),false);
+        options->setConfigValue("quickfit/scroll_in_qfdoubleedit", chkDoubleEditWheel->isChecked(), false);
         QApplication::processEvents(QEventLoop::AllEvents, 50);
-        options->setProxyHost(edtProxyHost->text());
-        options->setProxyPort(spinProxyPort->value());
-        options->setProxyType(cmbProxyType->currentIndex());
-        options->setConfigValue("quickfit/checkupdates", chkUpdates->isChecked());
-        options->setConfigValue("quickfit/welcomescreen", chkStartupScreen->isChecked());
+        options->setProxyHost(edtProxyHost->text(),false);
+        options->setProxyPort(spinProxyPort->value(),false);
+        options->setProxyType(cmbProxyType->currentIndex(),false);
+        options->setConfigValue("quickfit/checkupdates", chkUpdates->isChecked(), false);
+        options->setConfigValue("quickfit/welcomescreen", chkStartupScreen->isChecked(), false);
         QApplication::processEvents(QEventLoop::AllEvents, 50);
-        options->setConfigValue("quickfit/user_fitfunctions", edtUserFitFunctions->text());
+        options->setConfigValue("quickfit/user_fitfunctions", edtUserFitFunctions->text(), false);
         options->setHomeQFDirectory(edtUserSettings->text());
         options->setGlobalConfigFileDirectory(edtGlobalSettings->text());
-        options->setConfigValue("quickfit/math_pointsize", spinMath->value());
-        options->setConfigValue("quickfit/help_pointsize", spinHelpFontsize->value());
-        options->setConfigValue("quickfit/help_font", cmbHelpFont->currentFont().family());
+        options->setConfigValue("quickfit/base_pointsize", spinBaseFontsize->value(), false);
+        {
+            QFont f=QApplication::font();
+            f.setPointSize(spinBaseFontsize->value());
+            QApplication::setFont(f);
+        }
+        options->setConfigValue("quickfit/math_pointsize", spinMath->value(), false);
+        options->setConfigValue("quickfit/help_pointsize", spinHelpFontsize->value(), false);
+        options->setConfigValue("quickfit/help_font", cmbHelpFont->currentFont().family(), false);
         QApplication::processEvents(QEventLoop::AllEvents, 50);
-        options->setConfigValue("quickfit/code_pointsize", spinCodeFontsize->value());
-        options->setConfigValue("quickfit/code_fontsize", spinCodeFontsize->value());
-        options->setConfigValue("quickfit/code_font", cmbCodeFont->currentFont().family());
-        options->setConfigValue("quickfit/windowheadermode", cmbWindowHeader->currentIndex());
+        options->setConfigValue("quickfit/code_pointsize", spinCodeFontsize->value(), false);
+        options->setConfigValue("quickfit/code_fontsize", spinCodeFontsize->value(), false);
+        options->setConfigValue("quickfit/code_font", cmbCodeFont->currentFont().family(), false);
+        options->setConfigValue("quickfit/windowheadermode", cmbWindowHeader->currentIndex(), false);
+        options->setConfigValue("quickfit/macxsubwinmenus_asmain", chkMacOSXSubWinMenus->isChecked(), false);
 
-        options->setConfigValue("quickfit/nonlin_color_covmatrix_enabled", chkVARCOVNonLin->isChecked());
-        options->setConfigValue("quickfit/nonlin_color_covmatrix_gamma", spinCodeFontsize->value());
+        options->setConfigValue("quickfit/nonlin_color_covmatrix_enabled", chkVARCOVNonLin->isChecked(), false);
+        options->setConfigValue("quickfit/nonlin_color_covmatrix_gamma", spinCodeFontsize->value(), false);
 
         QApplication::processEvents(QEventLoop::AllEvents, 50);
-        options->setConfigValue("quickfit/temp_folder", edtTempFolder->text());
-        options->setConfigValue("quickfit/temp_folder_default", chkDefaultTempFolder->isChecked());
+        options->setConfigValue("quickfit/temp_folder", edtTempFolder->text(), false);
+        options->setConfigValue("quickfit/temp_folder_default", chkDefaultTempFolder->isChecked(), false);
+
 
         //options->setUserSaveAfterFirstEdit(chkAskSaveNewProject->isChecked());
 
@@ -288,7 +308,9 @@ void OptionsDialog::open(ProgramOptions* options) {
             if (!dir.exists()) dir.mkpath(dir.absolutePath());
             QApplication::processEvents(QEventLoop::AllEvents, 50);
         }
-        options->setConfigValue("quickfit/native_file_dialog", (cmbFileDialog->currentIndex()==0));
+        options->setConfigValue("quickfit/native_file_dialog", (cmbFileDialog->currentIndex()==0), false);
+        options->writeSettings();
+        options->getQSettings()->sync();
         QApplication::processEvents(QEventLoop::AllEvents, 50);
 
         for (int i=0; i<m_plugins.size(); i++) {

@@ -73,7 +73,7 @@ void QFExtensionCameraRadhard2::projectChanged(QFProject* /*oldProject*/, QFProj
 void QFExtensionCameraRadhard2::initExtension() {
     services->log_global_text(tr("%2initializing extension '%1' ...\n").arg(getName()).arg(LOG_PREFIX));
     bitfile=autoflashbitfile=bitfile=services->getOptions()->getAssetsDirectory()+"/plugins/"+getID()+"/radhard2_top_cell.bit";
-    actProgramFPGA=new QAction(QIcon(":/cam_radhard2_flash.png"), tr("Flash Radhard2 FPGA"), this);
+    actProgramFPGA=new QFActionWithNoMenuRole(QIcon(":/cam_radhard2_flash.png"), tr("Flash Radhard2 FPGA"), this);
     connect(actProgramFPGA, SIGNAL(triggered()), this, SLOT(programFPGA()));
     QMenu* extm=services->getMenu("extensions");
     if (extm) {
@@ -178,7 +178,7 @@ void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int /*camera*/
 	   alternatively you may also display a window which stays open and allows the suer to set settings also
 	   during the measurement.
 	*/
-    QDialog* dlg=new QDialog(parent);
+    QFDialog* dlg=new QFDialog(parent);
 
     QVBoxLayout* lay=new QVBoxLayout();
     dlg->setLayout(lay);

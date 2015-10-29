@@ -21,7 +21,7 @@
 #ifndef QFFITFUNCTIONSELECTDIALOG_H
 #define QFFITFUNCTIONSELECTDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "libwid_imexport.h"
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
@@ -32,7 +32,7 @@ namespace Ui {
     class QFFitFunctionSelectDialog;
 }
 
-class QFWIDLIB_EXPORT QFFitFunctionSelectDialog : public QDialog
+class QFWIDLIB_EXPORT QFFitFunctionSelectDialog : public QFDialog
 {
         Q_OBJECT
 

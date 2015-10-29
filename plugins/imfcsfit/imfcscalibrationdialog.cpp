@@ -27,7 +27,7 @@
 #include "qffitfunctionmanager.h"
 
 ImFCSCalibrationDialog::ImFCSCalibrationDialog(QWidget *parent) :
-    QDialog(parent),
+    QFDialog(parent),
     ui(new Ui::ImFCSCalibrationDialog)
 {
     ui->setupUi(this);
@@ -68,7 +68,7 @@ void ImFCSCalibrationDialog::closeEvent(QCloseEvent *event) {
         ProgramOptions::setConfigValue("ImFCSCalibrationDialog/bypixelshift", ui->radByPixelShift->isChecked());
         ProgramOptions::setConfigValue("ImFCSCalibrationDialog/bypixelsize", ui->radByPixelSize->isChecked());
     }
-    QDialog::closeEvent(event);
+    QFDialog::closeEvent(event);
 }
 
 QList<double> ImFCSCalibrationDialog::getValues() const {

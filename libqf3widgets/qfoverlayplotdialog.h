@@ -23,7 +23,7 @@
 #ifndef QFOVERLAYPLOTDIALOG_H
 #define QFOVERLAYPLOTDIALOG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 #include "qfgetplotdatainterface.h"
 #include "libwid_imexport.h"
 
@@ -34,7 +34,7 @@ namespace Ui {
     class QFOverlayPlotDialog;
 }
 
-class QFWIDLIB_EXPORT QFOverlayPlotDialog : public QDialog
+class QFWIDLIB_EXPORT QFOverlayPlotDialog : public QFDialog
 {
         Q_OBJECT
 

@@ -1,13 +1,13 @@
 #ifndef QFEVALPROPERTYCOPYPARSERTABLEDLG_H
 #define QFEVALPROPERTYCOPYPARSERTABLEDLG_H
 
-#include <QDialog>
+#include "qfdialog.h"
 
 namespace Ui {
     class QFEvalPropertyCopyParsertableDlg;
 }
 
-class QFEvalPropertyCopyParsertableDlg : public QDialog
+class QFEvalPropertyCopyParsertableDlg : public QFDialog
 {
         Q_OBJECT
 

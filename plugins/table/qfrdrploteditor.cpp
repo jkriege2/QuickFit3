@@ -53,15 +53,15 @@ void QFRDRPlotEditor::createWidgets() {
     connect(tabPlots, SIGNAL(tabCloseRequested(int)), this, SLOT(deletePlot(int)));
     l->addWidget(tabPlots);
 
-    actAddPlot=new QAction(QIcon(":/table/plot_add.png"), tr("add plot"), this);
+    actAddPlot=new QFActionWithNoMenuRole(QIcon(":/table/plot_add.png"), tr("add plot"), this);
     connect(actAddPlot, SIGNAL(triggered()), this, SLOT(addPlot()));
-    actDeletePlot=new QAction(QIcon(":/table/plot_delete.png"), tr("delete current plot"), this);
+    actDeletePlot=new QFActionWithNoMenuRole(QIcon(":/table/plot_delete.png"), tr("delete current plot"), this);
     connect(actDeletePlot, SIGNAL(triggered()), this, SLOT(deleteCurrentPlot()));
-    actDuplicatePlot=new QAction(QIcon(":/table/copy.png"), tr("duplicate the current plot"), this);
+    actDuplicatePlot=new QFActionWithNoMenuRole(QIcon(":/table/copy.png"), tr("duplicate the current plot"), this);
     connect(actDuplicatePlot, SIGNAL(triggered()), this, SLOT(duplicatePlot()));
-    actMovePlotLeft=new QAction(QIcon(":/table/leftarrow.png"), tr("move current plot to the left"), this);
+    actMovePlotLeft=new QFActionWithNoMenuRole(QIcon(":/table/leftarrow.png"), tr("move current plot to the left"), this);
     connect(actMovePlotLeft, SIGNAL(triggered()), this, SLOT(movePlotUp()));
-    actMovePlotRight=new QAction(QIcon(":/table/rightarrow.png"), tr("move current plot to the right"), this);
+    actMovePlotRight=new QFActionWithNoMenuRole(QIcon(":/table/rightarrow.png"), tr("move current plot to the right"), this);
     connect(actMovePlotRight, SIGNAL(triggered()), this, SLOT(movePlotDown()));
 
     tbMain->addAction(actAddPlot);
