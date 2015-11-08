@@ -140,8 +140,8 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     splashPix=splash->pixmap();
     project=NULL;
     helpWindow=NULL;
-    lastUpdateRequest=NULL;
-    lastUpdateRequestUser=NULL;
+    lastUpdateRequest.clear();
+    lastUpdateRequestUser.clear();
     connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(showUpdateInfo(QNetworkReply*)));
 
     QNetworkProxy proxy;
@@ -4346,16 +4346,16 @@ void MainWindow::checkUpdates(bool userRequest)
         //qDebug()<<"request updates from: "<<qfUpdateXMLURL();
         //qDebug()<<"user request "<<userRequest;
         QNetworkReply *reply = networkManager.get(request);
-        if (!userRequest) lastUpdateRequest=reply;
+        if (!userRequest) lastUpdateRequest.insert(reply);
         else {
             //qDebug()<<"  user request !";
-            lastUpdateRequestUser=reply;
+            lastUpdateRequestUser.insert(reply);
             QElapsedTimer time;
             time.start();
             while (!reply->atEnd() && time.elapsed()<60000) {
                 QApplication::processEvents();
                 if (progress.wasCanceled()) {
-                    lastUpdateRequestUser=NULL;
+                    lastUpdateRequestUser.remove(reply);
                     reply->abort();
                     return;
                     //delete reply;
@@ -4411,7 +4411,7 @@ void MainWindow::showUpdateInfo(QNetworkReply* reply) {
                     }
                 }
                 if (ok && info.valid && svn<info.latestVersion) {
-                    if (lastUpdateRequestUser==reply) {
+                    if (lastUpdateRequestUser.contains(reply) ){
                         QString warning="";
                         if (info.warnings.size()>0) {
                             warning+=tr("\n\nIt is no longer advised to use your current version (SVN%1). Reasons:").arg(svn);
@@ -4425,8 +4425,8 @@ void MainWindow::showUpdateInfo(QNetworkReply* reply) {
                         if (QMessageBox::information(this, tr("QuickFit updates"), tr("new QuickFit 3.0 version (SVN version: %3, date: %2) available:\n\n  %4%5\n\n  Link: %1\n Go to Download site?").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description).arg(warning), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
                             QDesktopServices::openUrl(info.link);
                         }
-                        lastUpdateRequestUser=NULL;
-                    } else if (lastUpdateRequest==reply) {
+                        lastUpdateRequestUser.remove(reply);
+                    } else if (lastUpdateRequest.contains(reply)) {
                         QString message=tr("<b>new QuickFit 3.0 version (SVN version: %3, date: %2) available: <a href=\"%1\">go to download</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><a href=\"close_labupdate\">close message</a></small><br>&nbsp;&nbsp;&nbsp;&nbsp;description: <i>%4</i>").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description);
                         if (info.warnings.size()>0) {
                             message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">It is no longer advised to use your current version (SVN%1). Reasons:</font>").arg(svn);
@@ -4438,16 +4438,16 @@ void MainWindow::showUpdateInfo(QNetworkReply* reply) {
                         }
                         labUpgrade->setText(message);
                         labUpgrade->setVisible(true);
-                        lastUpdateRequest=NULL;
+                        lastUpdateRequest.remove(reply);
                     }
                 } else {
                     labUpgrade->setText("");
-                    labUpgrade->setVisible(false);
-                    if (lastUpdateRequestUser==reply) {
+                    //labUpgrade->setVisible(false);
+                    if (lastUpdateRequestUser.contains(reply)) {
                         QMessageBox::information(this, tr("QuickFit updates"), tr("no updates available"));
-                        lastUpdateRequestUser=NULL;
-                    } else if (lastUpdateRequest==reply) {
-                        lastUpdateRequest=NULL;
+                        lastUpdateRequestUser.remove(reply);
+                    } else if (lastUpdateRequest.contains(reply)) {
+                        lastUpdateRequest.remove(reply);
                     }
                 }
             }
@@ -4612,6 +4612,7 @@ MainWindow::updateInfo MainWindow::readUpdateInfo(QIODevice *io)
                     updateWarning w;
                     w.warnSince=ee.attribute("fromversion").toLower().trimmed().toInt();
                     w.message=ee.text();
+                    if (w.message.simplified().trimmed().isEmpty()) w.message=tr("The new release contains improtant bugfixes to your current version!");
                     res.warnings.append(w);
                     ee=ee.nextSiblingElement("warning");
                 }
