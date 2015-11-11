@@ -128,7 +128,8 @@ void QFStyledButton::openBuddyContents() {
         QString fileName = qfGetOpenFileName(this, tr("Select File ..."), dir, m_filter);
         if (!fileName.isEmpty()) {
             dir=QFileInfo(fileName).dir().absolutePath();
-            m_buddy->metaObject()->userProperty().write(m_buddy, QDir((m_basepath.isEmpty())?QDir::currentPath():m_basepath).relativeFilePath(fileName));
+            if (m_basepath.isEmpty()) m_buddy->metaObject()->userProperty().write(m_buddy, QDir((m_basepath.isEmpty())?QDir::currentPath():m_basepath).absoluteFilePath(fileName));
+            else m_buddy->metaObject()->userProperty().write(m_buddy, QDir((m_basepath.isEmpty())?QDir::currentPath():m_basepath).relativeFilePath(fileName));
             m_buddy->setFocus(Qt::MouseFocusReason);
         }
     } else if (m_actionmode==SelectNewFile) {
@@ -136,14 +137,15 @@ void QFStyledButton::openBuddyContents() {
         QString fileName = qfGetSaveFileName(this, tr("Select New File ..."), dir, m_filter);
         if (!fileName.isEmpty()) {
             dir=QFileInfo(fileName).dir().absolutePath();
-            m_buddy->metaObject()->userProperty().write(m_buddy, QDir((m_basepath.isEmpty())?QDir::currentPath():m_basepath).relativeFilePath(fileName));
+            if (m_basepath.isEmpty()) m_buddy->metaObject()->userProperty().write(m_buddy, QDir((m_basepath.isEmpty())?QDir::currentPath():m_basepath).absoluteFilePath(fileName));
+            else m_buddy->metaObject()->userProperty().write(m_buddy, QDir((m_basepath.isEmpty())?QDir::currentPath():m_basepath).relativeFilePath(fileName));
             m_buddy->setFocus(Qt::MouseFocusReason);
         }
     } else if (m_actionmode==SelectDirectory) {
         static QString dir="";
         QString fileName = qfGetExistingDirectory(this, tr("Select Directory ..."), dir);
         if (!fileName.isEmpty()) {
-            m_buddy->metaObject()->userProperty().write(m_buddy, fileName);
+            m_buddy->metaObject()->userProperty().write(m_buddy, QDir(fileName).absolutePath());
             m_buddy->setFocus(Qt::MouseFocusReason);
         }
     }

@@ -12,8 +12,8 @@ QFEFCSSimMainWidnow::QFEFCSSimMainWidnow(QWidget *parent) :
     QFStyledButton* btn;
     ui->edtExeDir->addButton(btn=new QFStyledButton(QFStyledButton::SelectDirectory, ui->edtExeDir, ui->edtExeDir));
     ui->edtSimulator->addButton(btn=new QFStyledButton(QFStyledButton::SelectFile, ui->edtSimulator, ui->edtSimulator));
-    ui->edtSimulatorSpectra->addButton(btn=new QFStyledButton(QFStyledButton::SelectFile, ui->edtSimulatorSpectra, ui->edtSimulatorSpectra));
-    btn->setFilter(tr("Executable Files (*.exe *.);;All Files (*.*"));
+    btn->setFilter(tr("Executable Files (*.exe *.);;All Files (*.*)"));
+    ui->edtSimulatorSpectra->addButton(btn=new QFStyledButton(QFStyledButton::SelectDirectory, ui->edtSimulatorSpectra, ui->edtSimulatorSpectra));
     ui->tabWidget->setTabsClosable(true);
     loadSettings();
     connect(&menuRecent, SIGNAL(openRecentFile(QString)), this, SLOT(loadFile(QString)));

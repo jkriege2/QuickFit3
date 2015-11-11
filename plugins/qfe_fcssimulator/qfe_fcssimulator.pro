@@ -70,8 +70,10 @@ win32|win64 {
     }
 }
 
-fcssim_build.depends =
-fcssim_build.commands = $(MAKE) -C $$PWD/../../extlibsb040/FCSSimulator -f Makefile Release
+fcssim_clean.depends =
+fcssim_clean.commands = $(MAKE) -C $$PWD/../../extlibsb040/FCSSimulator -f Makefile clean
+fcssim_build.depends = fcssim_clean
+fcssim_build.commands = $(MAKE) -C $$PWD/../../extlibsb040/FCSSimulator -f Makefile QuickFit
 fcssim_copy.depends = fcssim_build
 fcssim_copy.commands = $(COPY) $${fcssim_exe} $${fcssim_exe_out}
 fcssim_spectracopy.depends = fcssim_build
@@ -80,7 +82,7 @@ fcssim_examplecopy.depends = fcssim_build
 fcssim_examplecopy.commands = $(MKDIR) $${exampledir_out} && $(COPY_DIR) $${exampledir} $${exampledir_out}
 fcssim_manualcopy.depends = fcssim_build
 fcssim_manualcopy.commands = $(MKDIR) $${manualpdf_out} && $(COPY_DIR) $${manualpdf} $${manualpdf_out}
-QMAKE_EXTRA_TARGETS += fcssim_build fcssim_copy fcssim_spectracopy fcssim_examplecopy fcssim_manualcopy
+QMAKE_EXTRA_TARGETS += fcssim_build fcssim_copy fcssim_spectracopy fcssim_examplecopy fcssim_manualcopy fcssim_clean
 PRE_TARGETDEPS += fcssim_copy fcssim_spectracopy fcssim_examplecopy fcssim_manualcopy
 
 

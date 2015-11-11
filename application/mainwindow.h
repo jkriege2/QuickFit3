@@ -666,8 +666,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QPixmap splashPix;
 
         QNetworkAccessManager networkManager;
-        QNetworkReply* lastUpdateRequest;
-        QNetworkReply* lastUpdateRequestUser;
+        QSet<QNetworkReply*> lastUpdateRequest;
+        QSet<QNetworkReply*> lastUpdateRequestUser;
         QLabel* labUpgrade;
 
         struct updateWarning {
