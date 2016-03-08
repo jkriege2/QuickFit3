@@ -58,7 +58,7 @@ void lmcurve_fit2( int n_par, double *par, int m_dat,
     lmcurve_data_struct data = { t, y, f };
 
     lmmin( n_par, par, m_dat, (const void*) &data,
-           lmcurve_evaluate2, control, status, lm_printout_std );
+           lmcurve_evaluate2, control, status);
 }
 
 QFRDRImagingFCSCountrateDisplay::QFRDRImagingFCSCountrateDisplay(QWidget *parent) :
@@ -614,7 +614,7 @@ void QFRDRImagingFCSCountrateDisplay::calcExpFit() {
 
 
     QString result=tr("<b>fit results:</b><br>&nbsp;&nbsp;&nbsp;&nbsp;decay time &tau; = %4 seconds<br>&nbsp;&nbsp;&nbsp;&nbsp;amplitude A = %5<br>&nbsp;&nbsp;&nbsp;&nbsp;offset B = %6<br>&nbsp;&nbsp;&nbsp;&nbsp;model: <i>f(x) = B + A&middot;</i>exp<i>(-t/&tau)</i><br>"
-                      "<b>fit algorithm message:</b> %1<br><b>iterations:</b> %2,&nbsp;&nbsp;&nbsp;&nbsp; <b>&chi;<sup>2</sup></b> = %3").arg(QString(lm_infmsg[status.info])).arg(status.nfev).arg(status.fnorm).arg(expParam[2]).arg(expParam[1]).arg(expParam[0]);
+                      "<b>fit algorithm message:</b> %1<br><b>iterations:</b> %2,&nbsp;&nbsp;&nbsp;&nbsp; <b>&chi;<sup>2</sup></b> = %3").arg(QString("NO INFO")).arg(status.nfev).arg(status.fnorm).arg(expParam[2]).arg(expParam[1]).arg(expParam[0]);
     ui->edtData->setText(result);
     current->setQFProperty("imfcs_crddisplay_fitresults", result);
     current->setQFProperty("imfcs_crddisplay_fitfunc", "exp");
@@ -653,7 +653,7 @@ void QFRDRImagingFCSCountrateDisplay::calc2ExpFit() {
 
 
     QString result=tr("<b>fit results:</b><br>&nbsp;&nbsp;&nbsp;&nbsp;decay time &tau;<sub>1</sub> = %4 seconds<br>&nbsp;&nbsp;&nbsp;&nbsp;amplitude A<sub>1</sub> = %5<br>&nbsp;&nbsp;&nbsp;&nbsp;decay time &tau;<sub>2</sub> = %8 seconds<br>&nbsp;&nbsp;&nbsp;&nbsp;amplitude A<sub>2</sub> = %7<br>&nbsp;&nbsp;&nbsp;&nbsp;offset B = %6<br>&nbsp;&nbsp;&nbsp;&nbsp;model: <i>f(x) = B + A<sub>1</sub>&middot;</i>exp<i>(-t/&tau;<sub>1</sub>) + A<sub>2</sub>&middot;</i>exp<i>(-t/&tau;<sub>2</sub>)</i><br>"
-                      "<b>fit algorithm message:</b> %1<br><b>iterations:</b> %2,&nbsp;&nbsp;&nbsp;&nbsp; <b>&chi;<sup>2</sup></b> = %3").arg(QString(lm_infmsg[status.info])).arg(status.nfev).arg(status.fnorm).arg(exp2Param[2]).arg(exp2Param[1]).arg(exp2Param[0]).arg(exp2Param[3]).arg(exp2Param[4]);
+                      "<b>fit algorithm message:</b> %1<br><b>iterations:</b> %2,&nbsp;&nbsp;&nbsp;&nbsp; <b>&chi;<sup>2</sup></b> = %3").arg(QString("NO INFO")).arg(status.nfev).arg(status.fnorm).arg(exp2Param[2]).arg(exp2Param[1]).arg(exp2Param[0]).arg(exp2Param[3]).arg(exp2Param[4]);
     ui->edtData->setText(result);
     current->setQFProperty("imfcs_crddisplay_fitresults", result);
     current->setQFProperty("imfcs_crddisplay_fitfunc", "exp");
