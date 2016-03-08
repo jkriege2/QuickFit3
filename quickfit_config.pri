@@ -39,8 +39,11 @@ HAS_BLAS = false
 BLAS_LIB =
 BLAS_INCLUDE =
 
-
-OUTPUTDIR_NAME = output
+OUTPUTDIR_NAME = $$DESTDIR
+isEmpty( OUTPUTDIR_NAME ) {
+	OUTPUTDIR_NAME = output
+}
+message (Installing to $$OUTPUTDIR_NAME)
 
 CXXTUNE= -mtune=generic
 exists(quickfit.inc):include(quickfit.inc)
