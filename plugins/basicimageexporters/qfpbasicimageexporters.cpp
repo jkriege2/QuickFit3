@@ -19,7 +19,10 @@ Copyright (c) 2014
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include <QtCore/qtextstream.h>
+#include <QtCore/qdir.h>
+#include <QtCore/qurl.h>
+#include <QtCore/qcoreevent.h>
 #include "qfpbasicimageexporters.h"
 #include <tiffio.h>
 #include "qfimagewriterlibtiff.h"
@@ -28,6 +31,7 @@ Copyright (c) 2014
 #include "qfimagewriterrawfloat.h"
 #include "qfbasicimageexportersoptionswidget.h"
 #include "qfpluginservices.h"
+#include <CImg.h>
 
 
 QFPBasicImageExporters::QFPBasicImageExporters(QObject *parent):
