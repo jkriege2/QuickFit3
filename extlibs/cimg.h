@@ -33,6 +33,6 @@
 #  endif
 #endif
 
-#include "cimg/CImg.h"
+#include "CImg.h"
 
 #endif //_QFCIMG
