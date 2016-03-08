@@ -39,7 +39,7 @@ HAS_BLAS = false
 BLAS_LIB =
 BLAS_INCLUDE =
 
-OUTPUTDIR_NAME = output
+OUTPUTDIR_NAME = $$PWD/output
 
 CXXTUNE= -mtune=generic
 exists(quickfit.inc):include(quickfit.inc)

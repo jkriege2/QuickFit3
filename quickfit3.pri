@@ -31,13 +31,7 @@ GPL3LICENSE = ../doc/gpl-3.0.txt
 include("autoversioning.pri")
 
 include(quickfit_config.pri)
-
-QFOUTPUT = $$DESTDIR
-isEmpty( QFOUTPUT ) {
-	QFOUTPUT = $$PWD/$${OUTPUTDIR_NAME}
-}
-message (Installing to $$QFOUTPUT)
-
+QFOUTPUT = $${OUTPUTDIR_NAME}
 
 HELP_FILES.files = ./help/*.*
 HELP_FILES.path = $${QFOUTPUT}/assets/help/
