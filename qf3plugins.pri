@@ -24,7 +24,7 @@
 
 include($$PWD/quickfit_config.pri)
 
-QFOUTPUT = $$PWD/$${OUTPUTDIR_NAME}
+QFOUTPUT = $${OUTPUTDIR_NAME}
 exists(qf3sdk_config.pri): include(qf3sdk_config.pri)
 
 

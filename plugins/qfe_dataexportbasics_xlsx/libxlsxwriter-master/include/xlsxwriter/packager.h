@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 #include "xlsxwriter/third_party/queue.h"
-#include "xlsxwriter/third_party/minizip/zip.h"
+#include <minizip/zip.h>
 
 #include "common.h"
 #include "workbook.h"

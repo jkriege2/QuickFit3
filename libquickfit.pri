@@ -27,7 +27,7 @@ macx {
     }
 } else {
     !contains( LIBS, -lquickfit3lib ) {
-        LIBS += -L$$QFOUTPUT  -lquickfit3lib
+        LIBS += -L$$QFOUTPUT/  -lquickfit3lib
     }
 }
 

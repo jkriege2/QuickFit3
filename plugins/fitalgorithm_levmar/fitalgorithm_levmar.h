@@ -23,7 +23,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define FITALGORITHM_LEVMAR_H
 
 #include "qfpluginfitalgorithm.h"
-#include <levmar/levmar.h>
+#include <levmar.h>
 
 /*!
     \defgroup qf3fitalgp_levmar Levmar Fitting Algorithm Plugin

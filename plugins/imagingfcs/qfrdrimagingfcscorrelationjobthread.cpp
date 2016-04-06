@@ -2620,7 +2620,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
+//                control.maxcall=500;
                 lm_status_struct status;
 
                 int NFitFramesInt=0;
@@ -2647,7 +2647,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
                     double par[2]={pA, -1.0/pB};
                     //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                    lmcurve_fit(2, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpLin, &control, &status);
+                    lmcurve(2, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpLin, &control, &status);
                     //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                     bleachAmplitude[i]=exp(par[0]);
@@ -2683,7 +2683,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
         if (fit_frames && fit_t && NFitFrames>3) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
+//                control.maxcall=500;
                 lm_status_struct status;
 
                 int NFitFramesInt=0;
@@ -2711,7 +2711,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     double par[4]={pA, -1.0/pB,0};
                     //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
                     int npar=3;
-                    lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                    lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
                     //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                     bleachAmplitude[i]=exp(par[0]);
@@ -2757,7 +2757,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
         if (fit_frames && fit_t && NFitFrames>4) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
+//                control.maxcall=500;
                 lm_status_struct status;
 
                 int NFitFramesInt=0;
@@ -2791,16 +2791,16 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                         par[2]=-pFit[2]/pFit[1];
                         par[3]=-pFit[3]/pFit[1];
                         npar=4;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
 
                     } else {
                         par[0]=pA;
                         par[1]=-1.0/pB;
 
                         npar=3;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
                         npar++;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
 
                     }
 
@@ -2855,7 +2855,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
         if (fit_frames && fit_t && NFitFrames>5) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
+//                control.maxcall=500;
                 lm_status_struct status;
 
                 int NFitFramesInt=0;
@@ -2900,7 +2900,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                         //qDebug()<<i<<" before LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
 
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
 
                         //qDebug()<<i<<" LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
 
@@ -2911,13 +2911,13 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                         //qDebug()<<i<<" before LMFit: "<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
 
                         npar=3;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
                         //qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
                         npar++;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
                         //qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
                         npar++;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
                         //qDebug()<<i<<" LMFit: "<<npar<<par[0]<<par[1]<<par[2]<<par[3]<<par[4];
 
                     }
@@ -2969,7 +2969,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
         if (fit_frames && fit_t && NFitFrames>6) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
+//                control.maxcall=500;
                 lm_status_struct status;
 
                 int NFitFramesInt=0;
@@ -2999,7 +2999,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                         par[4]=-pFit[4]/pFit[1];
                         par[5]=-pFit[5]/pFit[1];
                         npar=6;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin, &control, &status);
 
                     } else {
                         if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
@@ -3007,13 +3007,13 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                             par[1]=-1.0/pB;
                         }
                         npar=3;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
                         npar++;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
                         npar++;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
                         npar++;
-                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin, &control, &status);
+                        lmcurve(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin, &control, &status);
 
                     }
                     //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
@@ -3066,7 +3066,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
         if (fit_frames && fit_t && NFitFrames>4) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
+//                control.maxcall=500;
                 lm_status_struct status;
 
 
@@ -3098,12 +3098,12 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
                     double par[4]={exp(par[0]), -1.0/pB,0,0}; // A, tau, A2, tau2
                     //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                    lmcurve_fit(2, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExp, &control, &status);
+                    lmcurve(2, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExp, &control, &status);
                     par[0]=par[0]*0.98;
                     par[1]=par[1];
                     par[2]=par[0]*0.02;
                     par[3]=par[1]/10.0;
-                    lmcurve_fit(4, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fDblExp, &control, &status);
+                    lmcurve(4, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fDblExp, &control, &status);
                     //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                     bleachAmplitude[i]=par[0];

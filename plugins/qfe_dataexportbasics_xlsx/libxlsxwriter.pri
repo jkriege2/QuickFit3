@@ -1,7 +1,5 @@
 INCLUDEPATH += $$PWD/libxlsxwriter-master/include/xlsxwriter/ \
-               $$PWD/libxlsxwriter-master/include/ \
-               $$PWD/libxlsxwriter-master/include/third_party/ \
-               $$PWD/libxlsxwriter-master/include/third_party/minizip/
+               $$PWD/libxlsxwriter-master/include/
 
 HEADERS += \
     libxlsxwriter-master/include/xlsxwriter.h \
@@ -20,15 +18,7 @@ HEADERS += \
     libxlsxwriter-master/include/xlsxwriter/workbook.h \
     libxlsxwriter-master/include/xlsxwriter/worksheet.h \
     libxlsxwriter-master/include/xlsxwriter/xmlwriter.h \
-    libxlsxwriter-master/include/xlsxwriter/third_party/queue.h \
-    libxlsxwriter-master/include/xlsxwriter/third_party/minizip/ioapi.h \
-    libxlsxwriter-master/include/xlsxwriter/third_party/minizip/zip.h \
-    $$PWD/libxlsxwriter-master/third_party/minizip/crypt.h \
-    $$PWD/libxlsxwriter-master/third_party/minizip/ioapi.h \
-    $$PWD/libxlsxwriter-master/third_party/minizip/iowin32.h \
-    $$PWD/libxlsxwriter-master/third_party/minizip/mztools.h \
-    $$PWD/libxlsxwriter-master/third_party/minizip/unzip.h \
-    $$PWD/libxlsxwriter-master/third_party/minizip/zip.h
+    libxlsxwriter-master/include/xlsxwriter/third_party/queue.h
 
 SOURCES += \
     libxlsxwriter-master/src/app.c \
@@ -44,9 +34,7 @@ SOURCES += \
     libxlsxwriter-master/src/utility.c \
     libxlsxwriter-master/src/workbook.c \
     libxlsxwriter-master/src/worksheet.c \
-    libxlsxwriter-master/src/xmlwriter.c \
-    $$PWD/libxlsxwriter-master/third_party/minizip/ioapi.c \
-    $$PWD/libxlsxwriter-master/third_party/minizip/zip.c
+    libxlsxwriter-master/src/xmlwriter.c
 
 #win32 {
 #    SOURCES += \

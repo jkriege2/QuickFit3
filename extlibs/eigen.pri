@@ -20,3 +20,4 @@
 #
 
 INCLUDEPATH += $$PWD/eigen/include/
+INCLUDEPATH += /usr/include/eigen3/

@@ -21,7 +21,7 @@
 
 #!contains(DEFINES, QF_HAS_LMFIT) {
     DEFINES += QF_HAS_LMFIT
-    LIBS += -L$$PWD/lmfit/lib/ -L$$PWD/lmfit/lib64/ -llmmin
+    LIBS += -L$$PWD/lmfit/lib/ -L$$PWD/lmfit/lib64/ -llmfit
     INCLUDEPATH += $$PWD/lmfit/include/
 #}
 
