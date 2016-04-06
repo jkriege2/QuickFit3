@@ -7,6 +7,7 @@
 #include "qfimporterimageseries.h"
 #include <tiffio.h>
 #include <QMutex>
+#include <QInputDialog>
 #include <stdint.h>
 #include "qftools.h"
 #include "qfimagemetadatatool.h"
@@ -59,6 +60,27 @@ class QFImageReaderRAW: public QFImporterImageSeries
                 int bps=set.value("bitspersample", int(sizeof(T)*8)).toInt();
                 ok=((bps==sizeof(T)*8)&&(width>0)&&(height>0)&&(channels>0));
             } else if (QFile::exists(filename)) {
+                bool dok;
+                int i;
+                if(width==0){
+                    i = QInputDialog::getInt(NULL, "RAW import","Image width:",32,1,16*1024,1,&dok);
+                    if(dok) width = i;
+                }
+                if(height==0){
+                    i = QInputDialog::getInt(NULL, "RAW import","Image height:",32,1,16*1024,1,&dok);
+                    if(dok) height = i;
+                }
+                if(channels==0){
+                    i = QInputDialog::getInt(NULL, "RAW import","No. of channels:",1,1,16,1,&dok);
+                    if(dok) channels=i;
+                }
+                /** writing settings*/
+                QSettings set(filename+".description.txt", QSettings::IniFormat);
+                set.setValue("width",width);
+                set.setValue("height",height);
+                set.setValue("channels",channels);
+                set.setValue("bitspersample",int(sizeof(T)*8));
+                set.sync();
                 ok=true;
             }
             if (ok) {
@@ -109,7 +131,7 @@ class QFImageReaderRAW: public QFImporterImageSeries
          *  This does not change the state of the class. This method may have a long runtime, if it has to really count the frames!
          */
         inline virtual uint32_t countFrames() {
-            if (rawFile) {
+            if (rawFile && (width!=0) && (height!=0) && (channels!=0)) {
                 return rawFile->size()/(width*height*channels*sizeof(T));
             }
             return 0;
