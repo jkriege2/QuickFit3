@@ -5,7 +5,7 @@
 [submodule "extlibsb040/JKQtPlotter"]
 	path = extlibsb040/JKQtPlotter
 	url = https://github.com/jkriege2/JKQtPlotter.git
-	branch = master
+	branch = v2015.10
 [submodule "extlibsb040/TinyTIFF"]
 	path = extlibsb040/TinyTIFF
 	url = https://github.com/jkriege2/TinyTIFF.git
